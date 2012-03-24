@@ -16,7 +16,7 @@
 			$output = "";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mod."&act=1");
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Configuration globale</th></tr>";
-			$file = file("/etc/netdisco/netdisco.conf");
+			$file = file("/usr/local/etc/netdisco/netdisco.conf");
 			$dnssuffix = ".local";
 			$netdiscodir = "/usr/lib/netdisco/";
 			$nodetimeout = 60;
@@ -33,7 +33,7 @@
 			$snmpver = 2;
 
 			if(!$file) {
-				$output .= FS::$iMgr->printError("Impossible de libre le fichier /etc/netdisco/netdisco.conf");
+				$output .= FS::$iMgr->printError("Impossible de libre le fichier /usr/local/etc/netdisco/netdisco.conf");
 			} else {
 				foreach ($file as $lineNumber => $buf) {
 					$buf = trim($buf);
