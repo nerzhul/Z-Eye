@@ -37,7 +37,7 @@
 			$output .= "</div><div class=\"left\">";
 
 			if(!FS::$sessMgr->isConnected()) {
-				$output .= "<form class=\"clearfixlogform\" action=\"".FS::$iMgr->getModuleIdByPath("connect")."\" method=\"post\">";
+				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
 					$output .= "<h1>Identification</h1>";
 					$output .= $this->addLabel("uname","Utilisateur");
 					$output .= $this->addInput("uname","");
@@ -48,7 +48,7 @@
 					$output .= $this->addSubmit("conn","Connexion");
 					$output .= "</form>";
 			} else {
-				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"".FS::$iMgr->getModuleIdByPath("disconnect")."\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
+				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
 				$output .= FS::$iMgr->addSubmit("disconnect","Confirmer");
 				$output .= "</form>";
 			}
