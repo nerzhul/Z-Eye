@@ -125,7 +125,7 @@
 			$file = fopen("/usr/local/etc/netdisco/netdisco.conf","w+");
 			fwrite($file,"# ---- General Settings ----\n");
 			fwrite($file,"domain = ".$dns."\nhome = ".$dir."\n");
-			fwrite($file,"topofile        = /etc/netdisco/netdisco-topology.txt\ntimeout = 90\nmacsuck_timeout = 90\nmacsuck_all_vlans = true\n");
+			fwrite($file,"topofile        = /usr/local/etc/netdisco/netdisco-topology.txt\ntimeout = 90\nmacsuck_timeout = 90\nmacsuck_all_vlans = true\n");
 			fwrite($file,"arpnip          = true\n");
 			fwrite($file,"\n# -- Database Maintenance and Data Removal --\nexpire_devices = ".$devicetimeout."expire_nodes = ".$nodetimeout."\n");
 			fwrite($file,"expire_nodes_archive = 60\n");
