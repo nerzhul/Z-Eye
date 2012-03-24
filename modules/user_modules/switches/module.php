@@ -91,7 +91,7 @@
 				$output .= "<tr><td>Vitesse</td><td>Non disponible</td></tr>";
 				$output .= "<tr><td>Duplex</td><td>Non disponible</td></tr>";
 				$output .= "<tr><td>Switchport Mode</td><td>";
-				$trmode = snmpget($device,"Iota","1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
+				$trmode = FS::$snmpMgr->get($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
 				$trmode = preg_split("# #",$trmode);
 				$trmode = $trmode[1];
 				$output .= FS::$iMgr->addList("trmode","arangeform();");
@@ -942,7 +942,7 @@
                         if($resultwalk == "")
                                 return NULL;
 
-                        $result = snmpget($device,"Iota","ifAlias.".$resultwalk);
+                        $result = FS::$snmpMgr->get($device,"ifAlias.".$resultwalk);
 			if(count($result) < 1)
 				return NULL;
                         $result = explode(" ",$result,2);
@@ -1299,7 +1299,7 @@
 		private function setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
 			if($device == "" || $field == "" || $pid == "" || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
-			snmpset($device,"IotaRW",$field.".".$pid,$vtype,$value);
+			FS::$snmpMgr->set($device,$field.".".$pid,$vtype,$value);
 			return 0;
 		}
 
@@ -1317,12 +1317,12 @@
 
 		public function writeMemory($device) {
 			$rand = rand(1,100);
-			snmpset($device,"IotaRW","1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($device,"IotaRW","1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
-			snmpset($device,"IotaRW","1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($device,"IotaRW","1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"1");
+			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"4");
+			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"3");
+			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"1");
 
-			snmpget($device,"Iota","1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
+			FS::$snmpMgr->get($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 
 			return 0;
 		}
@@ -1454,7 +1454,7 @@
 					}
 					$portid = $out[1];
 
-					$value = snmpget($device,"Iota","1.3.6.1.4.1.9.9.68.1.2.2.1.2.".$portid);
+					$value = FS::$snmpMgr->get($device,"1.3.6.1.4.1.9.9.68.1.2.2.1.2.".$portid);
 					if($value == false)
 							echo "-1";
 					else
