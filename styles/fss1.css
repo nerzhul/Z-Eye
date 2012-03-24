@@ -40,6 +40,7 @@ url("fonts/TitilliumMaps29L002.woff") format("woff")
 	background-color: #BBB;
 	font-family: Arial, Helvetica, sans-serif;
 	background-attachment: fixed;
+	/* Background image taken from deviantart and created by all hope is lost */
 	background-image: url("images/background-fss.jpg");
 }
 
