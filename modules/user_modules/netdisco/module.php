@@ -1,7 +1,7 @@
 <?php
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	class iNetdisco extends genModule{
-		function iNetdisco($iMgr) { parent::genModule($iMgr); }
+		function iNetdisco() { parent::genModule(); }
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h4>Management du service de découverte Netdisco</h4>";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
