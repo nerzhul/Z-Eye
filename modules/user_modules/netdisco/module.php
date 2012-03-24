@@ -14,7 +14,7 @@
 
 		private function showMainConf() {
 			$output = "";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this.mod."&act=1");
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mod."&act=1");
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Configuration globale</th></tr>";
 			$file = file("/etc/netdisco/netdisco.conf");
 			$dnssuffix = ".local";
