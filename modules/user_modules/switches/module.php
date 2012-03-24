@@ -1,5 +1,5 @@
 <?php
-	require_once(dirname(__FILE__)."/generic_module.php");
+	require_once(dirname(__FILE__)."/../generic_module.php");
 	class iSwitchMgmt extends genModule{
 		function iConnect($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
