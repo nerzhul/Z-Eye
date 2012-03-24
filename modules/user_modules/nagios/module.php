@@ -5,14 +5,21 @@
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h3>Management de Nagios (icinga)</h3>";
 			$node = FS::$secMgr->checkAndSecuriseGetData("n");
-			
+			$cont = FS::$secMgr->checkAndSecuriseGetData("ctct");
 			if($node != NULL)
 				$this->showNode($node);
+			else if($node != NULL)
+				$this->showContact($cont);
 			else
 				$this->showMain();
 			
 			$output .= "</div>";
 			return $output;
+		}
+		
+		private function showContact($cont) {
+			$output = "<h4>Gestion du contact ".$cont."</h4>";
+			return $output;	
 		}
 
 		private function showNode($node) {
@@ -21,10 +28,40 @@
 		}
 		
 		private function showMain() {
-			$output = "<h4>Configuration générale</h4>";
+			$output = "<h4>Gestion des objets</h4>";
 			
-			
+			$output .= "<hr><h4>Configuration globale</h4>";
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Délais</th></tr>";
+			$output .= FS::$iMgr->addIndexedLine("Intervalle de mise à jour des status","stupdateint",30);
+			$output .= FS::$iMgr->addIndexedLine("Intervalle de vérification des commandes externes","cmdcheckint",15);
+			$output .= FS::$iMgr->addIndexedLine("Intervalle de mise à jour des résultats des hôtes et services","resfreq",10);
+			$output .= FS::$iMgr->addIndexedLine("Age maximal des résultats","maxresultage",3600);
+			$output .= FS::$iMgr->addIndexedLine("Age maximal de l'état d'un hôte","cachehostlifetime",15);
+			$output .= FS::$iMgr->addIndexedLine("Age maximal de l'état d'un service","cachesrvlifetime",15);
+			$output .= FS::$iMgr->addIndexedLine("Temps maximal de recherche d'état d'un service","srvchecktimeout",60);
+			$output .= FS::$iMgr->addIndexedLine("Temps maximal de recherche d'état d'un hôte","hostchecktimeout",30);
+			$output .= FS::$iMgr->addIndexedLine("Temps maximal d'envoi d'une notification","notiftimeout",30);
+			$output .= FS::$iMgr->addIndexedLine("Intervalle par défaut d'utilisation d'une sonde","interval",60);
+			$output .= "<tr><th colspan=\"2\">Logs</th></tr>";
+			// Log rotation method
+			$output .= FS::$iMgr->addIndexedCheckLine("Log des notifications","lognotif",true);
+			$output .= FS::$iMgr->addIndexedCheckLine("Log des tentatives sur les services","logsrvretries",true);
+			$output .= FS::$iMgr->addIndexedCheckLine("Log des tentatives sur les hôtes","loghostretries",true);
+			$output .= "<tr><th colspan=\"2\">Notifications</th></tr>";
+			$output .= FS::$iMgr->addIndexedCheckLine("Activer","notifenable",true);
+			// service_check_timeout_state
+			$output .= "<tr><th colspan=\"2\">Autres</th></tr>";
+			$output .= FS::$iMgr->addIndexedCheckLine("Détection des services instables","flapenable",true);
+			// date_format
+			$output .= FS::$iMgr->addIndexedCheckLine("Mail de l'administrateur","adminemail","admin@localhost");
+			$output .= "</form>";
 			return $output;	
+		}
+		
+		private function checkIcingaMainConfig() {
+			
+			return true;	
 		}
 		
 		private function writeIcingaMainConfig() {
@@ -68,6 +105,93 @@
 			fwrite($file,"log_current_states=1\n");
 			fwrite($file,"log_external_commands=1\n");
 			fwrite($file,"log_passive_checks=1\n");
+			fwrite($file,"service_inter_check_delay_method=s\n");
+			fwrite($file,"max_service_check_spread=30\n");
+			fwrite($file,"service_interleave_factor=s\n");
+			fwrite($file,"host_inter_check_delay_method=s\n");
+			fwrite($file,"max_host_check_spread=30\n");
+			fwrite($file,"max_concurrent_checks=0\n");
+			//fwrite($file,"check_result_reaper_frequency=".$resfreq."\n");
+			fwrite($file,"max_check_result_reaper_time=30\n");
+			fwrite($file,"check_result_path=/var/spool/icinga/checkresults\n");
+			//fwrite($file,"max_check_result_file_age=".$maxresultage."\n");
+			//fwrite($file,"cached_host_check_horizon=".$cachehostlifetime."\n");
+			//fwrite($file,"cached_service_check_horizon=".$cachesrvlifetime."\n");
+			fwrite($file,"enable_predictive_host_dependency_checks=1\n");
+			fwrite($file,"enable_predictive_service_dependency_checks=1\n");
+			fwrite($file,"soft_state_dependencies=0\n");
+			fwrite($file,"time_change_threshold=900\n");
+			fwrite($file,"auto_reschedule_checks=0\n");
+			fwrite($file,"auto_rescheduling_interval=30\n");
+			fwrite($file,"auto_rescheduling_window=180\n");
+			fwrite($file,"sleep_time=0.25\n");
+			fwrite($file,"# ---- Timeouts ----\n");
+			//fwrite($file,"service_check_timeout=".$srvchecktimeout."\n");
+			//fwrite($file,"host_check_timeout=".$hostchecktimeout."\n");
+			//fwrite($file,"notification_timeout=".$notiftimeout."\n");
+			fwrite($file,"event_handler_timeout=30\n");
+			fwrite($file,"ocsp_timeout=5\n");
+			fwrite($file,"perfdata_timeout=5\n");
+			fwrite($file,"retain_state_information=1\n");
+			fwrite($file,"state_retention_file=/var/spool/icinga/rentention.dat\n");
+			fwrite($file,"sync_retention_file=/var/spool/icinga/sync.dat\n");
+			fwrite($file,"retention_update_interval=60\n");
+			fwrite($file,"use_retain_program_state=1\n");
+			fwrite($file,"dump_retained_host_service_states_to_neb=1\n");
+			fwrite($file,"use_retained_scheduling_info=1\n");
+			fwrite($file,"retained_host_attribute_mask=0\n");
+			fwrite($file,"retained_service_attribute_mask=0\n");
+			fwrite($file,"retained_process_host_attribute_mask=0\n");
+			fwrite($file,"retained_process_service_attribute_mask=0\n");
+			fwrite($file,"retained_contact_host_attribute_mask=0\n");
+			fwrite($file,"retained_contact_service_attribute_mask=0\n");
+			//fwrite($file,"interval_length=".$interval."\n");
+			fwrite($file,"use_aggressive_host_checking=0\n");
+			fwrite($file,"execute_service_checks=1\n");
+			fwrite($file,"accept_passive_service_checks=1\n");
+			fwrite($file,"execute_host_checks=1\n");
+			fwrite($file,"accept_passive_host_checks=1\n");
+			//fwrite($file,"enable_notifications=".$notifenable."\n");
+			fwrite($file,"enable_event_handlers=1\n");
+			fwrite($file,"process_performance_data=0\n");
+			fwrite($file,"obsess_over_services=0\n");
+			fwrite($file,"obsess_over_hosts=0\n");
+			fwrite($file,"translate_passive_host_checks=0\n");
+			fwrite($file,"passive_host_checks_are_soft=0\n");
+			fwrite($file,"check_for_orphaned_services=1\n");
+			fwrite($file,"check_for_orphaned_hosts=1\n");
+			//fwrite($file,"service_check_timeout_state=".$timeoutstate."\n");
+			fwrite($file,"check_service_freshness=1\n");
+			fwrite($file,"service_freshness_check_interval=60\n");
+			fwrite($file,"check_host_freshness=1\n");
+			fwrite($file,"host_freshness_check_interval=60\n");
+			fwrite($file,"additional_freshness_latency=15\n");
+			//fwrite($file,"enable_flap_detection=".$flapenable."\n");
+			fwrite($file,"low_service_flap_threshold=5.0\n");
+			fwrite($file,"high_service_flag_threshold=20.0\n");
+			fwrite($file,"low_host_flap_threshold=5.0\n");
+			fwrite($file,"high_host_flap_threshold=20.0\n");
+			//fwrite($file,"date_format.".$dateformat."\n");
+			fwrite($file,"pl_file=/usr/local/lib/pl.pl\n");
+			fwrite($file,"enable_embedded_perl=0\n");
+			fwrite($file,"use_embedded_perl_implicitly=1\n");
+			fwrite($file,"stalking_event_handlers_for_hosts=0\n");
+			fwrite($file,"stalking_event_handlers_for_services=0\n");
+			fwrite($file,"stalking_notifications_for_hosts=0\n");
+			fwrite($file,"stalking_notifications_for_services=0\n");
+			fwrite($file,"illegal_object_name_chars=`~!$%^&*|'\"<>?;()=\n");
+			fwrite($file,"illegal_macro_output_chars=`~$&|'\"<>\n");
+			fwrite($file,"use_regexp_matching=0\n");
+			fwrite($file,"use_true_regexp_matching=0\n");
+			//fwrite($file,"admin_email=".$adminemail."\n");
+			//fwrite($file,"admin_pager=".$adminemail."\n");
+			fwrite($file,"daemon_dumps_core=0\n");
+			fwrite($file,"use_large_installation_tweaks=0\n");
+			fwrite($file,"enable_environment_macros=0\n");
+			fwrite($file,"debug_level=0\n");
+			fwrite($file,"debug_verbosity=1\n");
+			fwrite($file,"debug_file=/var/spool/icinga/icinga.debug\n");
+			fwrite($file,"event_profiling_enabled=0\n");
 			
 			fclose($file);
 			return 0;			

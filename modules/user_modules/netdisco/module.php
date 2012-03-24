@@ -83,7 +83,7 @@
 			fclose($file);
 			// @TODO: load configuration file
 			$output .= "<tr><td>Suffixe DNS</td><td>".FS::$iMgr->addInput("suffix",$dnssuffix)."</td></tr>";
-			$output .= "<tr><td>Répertoire de Netdisco</td><td>".FS::$iMgr->addInput("dir",$netdiscodir)."</td></tr>";
+			$output .= FS::$iMgr->addIndexedLine("Répertoire de Netdisco","dir",$netdiscodir);
 			$output .= "<tr><td>Noeud principal</td><td>".FS::$iMgr->addInput("fnode",$firstnode)."</td></tr>";
 			$output .= "<tr><th colspan=\"2\">Configuration des timers</th></tr>";
 			$output .= "<tr><td>Expiration des noeuds</td><td>".FS::$iMgr->addInput("nodetimeout",$nodetimeout,4,4)."</td></tr>";
