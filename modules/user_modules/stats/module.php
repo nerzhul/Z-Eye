@@ -489,7 +489,7 @@
 				$output .= "Erreur de connexion au serveur";
 				return $output;
 			}
-			if(!ssh2_auth_password($conn, 'miniroot', 'SiCeP&CER')) {
+			if(!ssh2_auth_password($conn, 'root', 'root')) {
 				$output .= "Authentication error for server cerbere";
 				return $output;
 			}
@@ -516,7 +516,7 @@
         	        	$output .= "Erreur de connexion au serveur";
         		        return $output;
 		        }
-        		if(!ssh2_auth_password($conn, 'miniroot', 'SiCeP&MOR')) {
+        		if(!ssh2_auth_password($conn, 'root', 'root')) {
 	        	        $output .= "Authentication error for server morgoth";
                 		return $output;
 	        	}
