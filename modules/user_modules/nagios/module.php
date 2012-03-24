@@ -1,7 +1,7 @@
 <?php
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	class iNagios extends genModule{
-		function iNagios($iMgr) { parent::genModule($iMgr); }
+		function iNagios() { parent::genModule(); }
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h3>Management de Nagios (icinga)</h3>";
 			$node = FS::$secMgr->checkAndSecuriseGetData("n");
@@ -55,7 +55,8 @@
 			$output .= FS::$iMgr->addIndexedCheckLine("Détection des services instables","flapenable",true);
 			// date_format
 			$output .= FS::$iMgr->addIndexedCheckLine("Mail de l'administrateur","adminemail","admin@localhost");
-			$output .= "</form>";
+			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+			$output .= "</table></form>";
 			return $output;	
 		}
 		
