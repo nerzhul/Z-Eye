@@ -155,8 +155,6 @@
 						
 						$module->getModuleClass()->setModuleId($id);
 						$output .= $module->getModuleClass()->Load();
-						$this->registerAccess();
-						
 					}
 					else
 						$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");
