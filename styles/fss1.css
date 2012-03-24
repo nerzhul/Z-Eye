@@ -424,7 +424,7 @@ pre {
 	height: 42px;
 	position: relative;
     top: 0;
-    z-index: 3;
+    z-index: 999;
 	margin-left: -10px;
 }
 
@@ -505,11 +505,10 @@ pre {
 
 /* sliding panel */
 #logform {
-    position: absolute;   /*Panel will overlap  content */
-    /*position: relative;*/   /*Panel will "push" the content down */
+    position: fixed;
     top: 0;
     width: 100%;
-    z-index: 2;
+    z-index: 999;
     text-align: center;
     margin-left: -10px;
     margin-right: auto;
