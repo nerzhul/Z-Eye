@@ -12,6 +12,7 @@
 		private static $favicon = false;
 		private static $svnrev = true;
 		private static $pgsqlen = true;
+		private static $snmpen = true;
 
 		public static function getSysLang() { return Config::$lang; }
 		public static function getSysStylesheet() { return Config::$stylesheet; }
@@ -20,6 +21,7 @@
 		public static function hasFavicon() { return Config::$favicon; }
 		public static function showSVNrev() { return Config::$svnrev; }
 		public static function enablePostgreSQL() { return Config::$pgsqlen; }
+		public static function enableSNMP() { return Config::$snmpen; }
 
 	};
 ?>
