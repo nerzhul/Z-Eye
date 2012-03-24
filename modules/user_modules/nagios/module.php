@@ -7,11 +7,11 @@
 			$node = FS::$secMgr->checkAndSecuriseGetData("n");
 			$cont = FS::$secMgr->checkAndSecuriseGetData("ctct");
 			if($node != NULL)
-				$this->showNode($node);
+				$output .= $this->showNode($node);
 			else if($node != NULL)
-				$this->showContact($cont);
+				$output .= $this->showContact($cont);
 			else
-				$this->showMain();
+				$output .= $this->showMain();
 			
 			$output .= "</div>";
 			return $output;
