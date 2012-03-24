@@ -484,7 +484,7 @@
 		private function loadDHCPStats() {
 			$output = "<h2>Statistiques DHCP</h2>";
 
-			$conn = ssh2_connect("cerbere.iota.u-psud.fr",22);
+			$conn = ssh2_connect("host2",22);
 			if(!$conn) {
 				$output .= "Erreur de connexion au serveur";
 				return $output;
@@ -511,7 +511,7 @@
 
 			$data = preg_replace("/\n/","<br />",$data);
 
-			$conn = ssh2_connect("morgoth.iota.u-psud.fr",22);
+			$conn = ssh2_connect("host1",22);
 		        if(!$conn) {
         	        	$output .= "Erreur de connexion au serveur";
         		        return $output;
