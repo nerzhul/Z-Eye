@@ -8,7 +8,7 @@
 			$cont = FS::$secMgr->checkAndSecuriseGetData("ctct");
 			if($node != NULL)
 				$output .= $this->showNode($node);
-			else if($node != NULL)
+			else if($ctct != NULL)
 				$output .= $this->showContact($cont);
 			else
 				$output .= $this->showMain();
