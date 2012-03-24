@@ -1,6 +1,6 @@
 <?php
-	require_once(dirname(__FILE__)."/generic_module.php");
-	require_once(dirname(__FILE__)."/../../central/rrd.php");
+	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/../../../central/rrd.php");
 	class iStats extends genModule{
 		function iStats($iMgr) { parent::genModule($iMgr); }
 
@@ -9,7 +9,7 @@
 			if($stype == NULL) $stype = 1;
 
 			$output = "<div id=\"monoComponent\">";
-			$output .= FS::$iMgr->addForm("index.php?mod=32&act=2");
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
 			$output .= FS::$iMgr->addList("stype");
 			$output .= FS::$iMgr->addElementToList("Statistiques d'attaque",1,$stype == 1 ? true : false);
 			$output .= FS::$iMgr->addElementToList("Statistiques DHCP",2, $stype == 2 ? true : false);
@@ -414,7 +414,7 @@
 		}
 
 		private function loadAttackStats() {
-			$output = "<h4>Statistiques d'attaque</h4><form action=\"index.php?mod=32&act=1\" method=\"post\">";
+			$output = "<h4>Statistiques d'attaque</h4><form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">";
 			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
                         if($ech == NULL) $ech = 7;
 			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
@@ -662,7 +662,7 @@
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 
-			$output .= FS::$iMgr->addForm("index.php?mod=32&act=3");
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
 			$output .= FS::$iMgr->addList("f");
 			foreach ($sort_result as $class_a => $ca_keys) {
                                 foreach ($ca_keys as $class_b => $cb_keys) {
@@ -754,6 +754,30 @@
 				}
 			}
 			return $output;
+		}
+		
+		public function handlePostDatas($act) {
+			switch($act) {
+				case 1:
+					$ech = FS::$secMgr->checkAndSecurisePostData("ech");
+					if($ech == NULL) $ech = 7;
+					$ec = FS::$secMgr->checkAndSecurisePostData("ec");
+								if($ec == NULL) $ec = 365;
+								if(!FS::$secMgr->isNumeric($ec)) $ec = 365;
+					header("Location: index.php?mod=".$this->mid."&s=1&ech=".$ech."&ec=".$ec);
+					return;
+				case 2:
+					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
+														if($stype == NULL) $stype = 1;
+					header("Location: index.php?mod=".$this->mid."&s=".$stype);
+														return;
+				case 3: 
+					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
+					if($filtr == NULL) header("Location: index.php?mod".$this->mid."&s=2");
+					else header("Location: index.php?mod=".$this->mid."&s=2&f=".$filtr);
+					return;
+				default: break;
+			}
 		}
 	};
 ?>

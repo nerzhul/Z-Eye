@@ -1,6 +1,6 @@
 <?php
-	require_once(dirname(__FILE__)."/generic_module.php");
-	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
+	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/../../../lib/FSS/modules/Network.FS.class.php");
 	
 	/**
 	* TODO : objectize those scripts
@@ -372,7 +372,7 @@
 			$output .= "</form>";
 			
 			if($edit) {
-				$output .= "<h4>Range d'adresses distribuées automatiquement</h4>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "31", "do": "5", "net": "'.$netid.'"}',"Ajouter un range d'adresses");
+				$output .= "<h4>Range d'adresses distribuées automatiquement</h4>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "'.$this->mid.'", "do": "5", "net": "'.$netid.'"}',"Ajouter un range d'adresses");
 				$exist = false;
 				$output2 = "<table class=\"standardTable\" width=\"40%\"><th>Première IP</th><th>Dernière IP</th><th width=\"16px\"></th><th width=\"16px\"></th></tr>";
 				$query = FS::$dbMgr->Select("fss_dhcp_ranges","id,start,end","subnet = '".$netid."'");
@@ -383,9 +383,9 @@
 						$output .= $output2;
 					}
 					$distRange[count($distRange)] = array($data["start"],$data["end"]);
-					$output .= "<tr><td>".$data["start"]."</td><td>".$data["end"]."</td><td><a href =\"index.php?mod=31&do=6&rid=".$data["id"]."&net=".$netid."\">";
+					$output .= "<tr><td>".$data["start"]."</td><td>".$data["end"]."</td><td><a href =\"index.php?mod=".$this->mid."&do=6&rid=".$data["id"]."&net=".$netid."\">";
 					$output .= $this->iMgr->addImage("styles/images/pencil.gif",15,15);
-					$output .= "</a></td><td><a href=\"index.php?mod=31&act=7&rid=".$data["id"]."&net=".$netid."\">";
+					$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=7&rid=".$data["id"]."&net=".$netid."\">";
 					$output .= $this->iMgr->addImage("styles/images/cross.png",15,15);
 					$output .= "</a></tr>";
 				}
@@ -407,7 +407,7 @@
 				for($i=$netMgr->getFirstUsableIPLong();$i<=$netMgr->getLastUsableIPLong();$i++) {
 					$query = FS::$dbMgr->Select("fss_dhcp_host","hostname,`hw-ethernet`,description","addr = '".long2ip($i)."'");
 					if($data = mysql_fetch_array($query)) {
-						$output .= "<tr style=\"background-color:#DDDDDD;\"><td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid":"31", "do":"7", "ip":"'.long2ip($i).'" }',long2ip($i))."</center></td><td>".$data["hostname"]."</td><td>".$data["hw-ethernet"]."</td><td>".$data["description"]."</td><td><a href=\"index.php?mod=31&act=10&ip=".long2ip($i)."\">";
+						$output .= "<tr style=\"background-color:#DDDDDD;\"><td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid":"'.$this->mid.'", "do":"7", "ip":"'.long2ip($i).'" }',long2ip($i))."</center></td><td>".$data["hostname"]."</td><td>".$data["hw-ethernet"]."</td><td>".$data["description"]."</td><td><a href=\"index.php?mod=".$this->mid."&act=10&ip=".long2ip($i)."\">";
 					$output .= $this->iMgr->addImage("styles/images/cross.png",15,15);
 					$output .= "</a></td></tr>";
 					}
@@ -420,7 +420,7 @@
 							$output .= "<tr style=\"background-color:#66FF99;\">";
 						else
 							$output .= "<tr style=\"background-color:#66CCFF;\">";
-						$output .= "<td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid":"31", "do":"7", "ip":"'.long2ip($i).'" }',long2ip($i))."</center></td><td></td><td></td><td></td><td></td></tr>";
+						$output .= "<td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid":"'.$this->mid.'", "do":"7", "ip":"'.long2ip($i).'" }',long2ip($i))."</center></td><td></td><td></td><td></td><td></td></tr>";
 					}
 				}
 				$output .= "</table>";
@@ -1086,7 +1086,7 @@
 			$output .= "</table></form>
 
 			<h4>Configuration des sous-réseaux</h4>";
-			$output .= FS::$iMgr->addJSONLink('{ "at": "2", "mid": "31", "do": "1" }',"Ajouter un réseau à distribuer");
+			$output .= FS::$iMgr->addJSONLink('{ "at": "2", "mid": "'.$this->mid.'", "do": "1" }',"Ajouter un réseau à distribuer");
 
 			$subnets = "<table class=\"standardTable\" width=\"55%\">
 			<tr><th>Réseau</th><th>Masque</th><th></th></tr>";
@@ -1097,7 +1097,7 @@
 					$output .= $subnets;
 					$exist = true;
 				}
-				$output .= "<tr><td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "31", "do": "2", "net": "'.$data["id"].'" }',$data["net_addr"])."</center></td><td><center>".$data["netmask"]."</center></td><td width=\"15px\"><a href =\"index.php?mod=31&act=4&net=".$data["id"]."\">";
+				$output .= "<tr><td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "'.$this->mid.'", "do": "2", "net": "'.$data["id"].'" }',$data["net_addr"])."</center></td><td><center>".$data["netmask"]."</center></td><td width=\"15px\"><a href =\"index.php?mod=".$this->mid."&act=4&net=".$data["id"]."\">";
 				$output .= $this->iMgr->addImage("styles/images/cross.png",15,15);
 				$output .= "</a></td></tr>";
 			}
@@ -1106,7 +1106,7 @@
 				
 			$output .= "<h4>Configuration des failover</h4>";
 			$exist = false;
-			$output .= FS::$iMgr->addJSONLink('{ "at": "2", "mid": "31", "do": "3" }',"Créer un failover");
+			$output .= FS::$iMgr->addJSONLink('{ "at": "2", "mid": "'.$this->mid.'", "do": "3" }',"Créer un failover");
 			$subnets = "<table class=\"standardTable\" width=\"60%\">
 			<tr><th>Nom</th><th>Source</th><th>Destination</th><th>Type</th><th></th></tr>";
 			$query = FS::$dbMgr->Select("fss_dhcp_failover","id,name,s_addr,s_port,d_addr,d_port,`primary`");
@@ -1115,9 +1115,9 @@
 					$output .= $subnets;
 					$exist = true;
 				}
-				$output .= "<tr><td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "31", "do": "4", "fid": "'.$data["id"].'" }',$data["name"])."</center></td><td><center><b>".$data["s_addr"].":".$data["s_port"]."</b></center></td>
+				$output .= "<tr><td><center>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "'.$this->mid.'", "do": "4", "fid": "'.$data["id"].'" }',$data["name"])."</center></td><td><center><b>".$data["s_addr"].":".$data["s_port"]."</b></center></td>
 				<td><center><b>".$data["d_addr"].":".$data["d_port"]."</b></center></td><td><center>".($data["primary"] == 1 ? "Primaire" : "Secondaire")."
-				</center></td><td width=\"16px\"><a href =\"index.php?mod=31&act=13&fid=".$data["id"]."\">";
+				</center></td><td width=\"16px\"><a href =\"index.php?mod=".$this->mid."&act=13&fid=".$data["id"]."\">";
 				$output .= $this->iMgr->addImage("styles/images/cross.png",15,15);
 				$output .= "</a></td></tr>";
 			}
@@ -1205,6 +1205,94 @@
 			}
 
 			return $config;
+		}
+		
+		public function handlePostDatas($act) {
+			switch($act) {
+				case 1: 
+					switch($this->UpdateGeneralSection()) {
+						case 0: header("Location: index.php?mod=".$this->mid); break;
+						case 1: header("Location: index.php?mod=".$this->mid."&err=1"); break;
+						case 2: header("Location: index.php?mod=".$this->mid."&err=2"); break;
+						case 3: header("Location: index.php?mod=".$this->mid."&err=3"); return;
+						case 4: header("Location: index.php?mod=".$this->mid."&err=4"); return;
+						case 5: header("Location: index.php?mod=".$this->mid."&err=5"); return;
+						default: $this->HoneyPot();
+					}
+					return;
+				case 2:
+					$err = $this->CreateSubnet();
+					if($err < 0)
+						header("Location: index.php?mod=".$this->mid."&do=1&err=".$err);
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&net=".$err);							
+					return;
+				case 3:
+					$err = $this->UpdateSubnet();
+					if(is_array($err))
+						header("Location: index.php?mod=".$this->mid."&do=2&err=".$err[1]."&net=".$err[0]);
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&net=".$err);
+					return;
+				case 4: $this->DeleteSubnet(); break;
+				case 5: 
+					$net = $this->CreateDistributedRange();
+					if(is_array($net))
+						header("Location: index.php?mod=".$this->mid."&do=5&err=".$net[1]."&net=".$net[0]);
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&net=".$net);
+					return;
+				case 6: 
+					$net = $this->UpdateDistributedRange(); 
+					if(is_array($net))
+						header("Location: index.php?mod=".$this->mid."&do=6&err=".$net[1]."&net=".$net[0]."&rid=".$net[2]);
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&net=".$net);
+					return;
+				case 7:
+					$netid = $this->DeleteDistributedRange();
+					header("Location: index.php?mod=".$this->mid."&do=2&net=".$netid);
+					return;
+				case 8: // add reserv
+					if(FS::isAJAXCall()) {
+						$err = $this->addOrUpdateReserv(true);
+						echo $err;
+					}
+					else {
+						$netid = $this->addOrUpdateReserv();
+						if(is_array($netid))
+							header("Location: index.php?mod=".$this->mid."&do=7&err=".$netid[1]."&ip=".$netid[0]);
+						else
+							header("Location: index.php?mod=".$this->mid."&do=2&net=".$netid);
+					}
+					return;
+				case 10: // delete reserv
+					$netid = $this->deleteReserv();
+					header("Location: index.php?mod=".$this->mid."&do=2&net=".$netid);
+					return;
+				case 11:
+					$fid = $this->CreateFailover();
+					if(is_array($fid))
+						header("Location: index.php?mod=".$this->mid."&do=3&err=".$fid[1]);
+					else
+						header("Location: index.php?mod=".$this->mid."");
+					return;
+				case 12: // update failover
+					$fid = $this->UpdateFailover();
+					if(is_array($fid))
+						header("Location: index.php?mod=".$this->mid."&do=4&err=".$fid[1]."&fid=".$fid[0]);
+					else
+						header("Location: index.php?mod=".$this->mid."");
+					return;
+				case 13: // delete failover
+					$this->DeleteFailover();
+					break;
+				case 14: // apply configuration
+					$this->writeConfig();
+					break;
+				default: $this->HoneyPot(); break;
+			}
+			header("Location: index.php?mod=".$this->mid);
 		}
 	};
 ?>

@@ -1,5 +1,5 @@
 <?php
-	require_once(dirname(__FILE__)."/generic_module.php");
+	require_once(dirname(__FILE__)."/../generic_module.php");
 	class iNetdisco extends genModule{
 		function iNetdisco($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
@@ -14,7 +14,7 @@
 
 		private function showMainConf() {
 			$output = "";
-			$output .= FS::$iMgr->addForm("index.php?mod=36&act=1");
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this.mod."&act=1");
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Configuration globale</th></tr>";
 			$file = file("/etc/netdisco/netdisco.conf");
 			$dnssuffix = ".local";
@@ -122,7 +122,7 @@
 			return true;
 		}
 		public function writeNetdiscoConf($dns,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$firstnode) {
-			$file = fopen("/etc/netdisco/netdisco.conf","w+");
+			$file = fopen("/usr/local/etc/netdisco/netdisco.conf","w+");
 			fwrite($file,"# ---- General Settings ----\n");
 			fwrite($file,"domain = ".$dns."\nhome = ".$dir."\n");
 			fwrite($file,"topofile        = /etc/netdisco/netdisco-topology.txt\ntimeout = 90\nmacsuck_timeout = 90\nmacsuck_all_vlans = true\n");
@@ -141,10 +141,40 @@
 			fwrite($file,'$mibhome/foundry, $mibhome/hp,     $mibhome/nortel, $mibhome/extreme, $mibhome/rfc,     $mibhome/net-snmp'."\n".'bulkwalk_off = true'."\n");
 			fclose($file);
 
-			$file = fopen("/etc/netdisco/netdisco-topology.txt","w+");
+			$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","w+");
 			fwrite($file,$firstnode."\n");
 			fclose($file);
 			return 0;
+		}
+		
+		public function handlePostDatas($act) {
+			switch($act) {
+				case 1:
+					$suffix = FS::$secMgr->checkAndSecurisePostData("suffix");
+					$dir = FS::$secMgr->checkAndSecurisePostData("dir");
+					$nodetimeout = FS::$secMgr->checkAndSecurisePostData("nodetimeout");
+					$devicetimeout = FS::$secMgr->checkAndSecurisePostData("devicetimeout");
+					$pghost = FS::$secMgr->checkAndSecurisePostData("pghost");
+					$dbname = FS::$secMgr->checkAndSecurisePostData("dbname");
+					$dbuser = FS::$secMgr->checkAndSecurisePostData("dbuser");
+					$dbpwd = FS::$secMgr->checkAndSecurisePostData("dbpwd");
+					$snmpro = FS::$secMgr->checkAndSecurisePostData("snmpro");
+					$snmprw = FS::$secMgr->checkAndSecurisePostData("snmprw");
+					$snmptimeout = FS::$secMgr->checkAndSecurisePostData("snmptimeout");
+					$snmptry = FS::$secMgr->checkAndSecurisePostData("snmptry");
+					$snmpver = FS::$secMgr->checkAndSecurisePostData("snmpver");
+					$snmpmibs = FS::$secMgr->checkAndSecurisePostData("snmpmibs");
+					$fnode = FS::$secMgr->checkAndSecurisePostData("fnode");
+					if($this->checkNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$fnode) == true) {
+						$this->writeNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$fnode);
+						header("Location: m-".$this->mid.".html");
+						
+						return;
+					}
+					header("Location: index.php?m=".$this->mid."&err=1");	
+					return;
+				default: break;
+			}
 		}
 	};
 ?>

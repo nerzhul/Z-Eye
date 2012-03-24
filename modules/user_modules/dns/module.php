@@ -1,7 +1,7 @@
 <?php
-	require_once(dirname(__FILE__)."/generic_module.php");
-	require_once(dirname(__FILE__)."/user_objects/DNSZone.class.php");
-	require_once(dirname(__FILE__)."/user_objects/DNSRecord.class.php");
+	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/../user_objects/DNSZone.class.php");
+	require_once(dirname(__FILE__)."/../user_objects/DNSRecord.class.php");
 	class iDNS extends genModule{
 		function iDNS($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
@@ -21,7 +21,7 @@
 		
 		private function showMain() {
 			$output = "<div id=\"monoComponent\"><h3>Configuration DNS</h3>
-			<h4>Gestion des Zones DNS</h4>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "36", "do": "1" }',"Ajouter une nouvelle zone DNS")."<br /><br />";
+			<h4>Gestion des Zones DNS</h4>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": '.$this->mid.'", "do": "1" }',"Ajouter une nouvelle zone DNS")."<br /><br />";
 			$query = FS::$dbMgr->Select("fss_dns_zones","id,zonename,type");
 			$exists = false;
 			while($data = mysql_fetch_array($query)) {
@@ -29,7 +29,7 @@
 						$output .= "<table class=\"standardTable\" width=\"80%\"><tr><th>Zone</th><th width=\"20%\">Type</th><th width=\"15px\"></th></tr>";
 						$exists = true;
 					}
-					$output .= "<tr><td>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "36", "do": "2", "zid": "'.$data["id"].'"}',$data["zonename"])."</td><td><center>".($data["type"] == 1 ? "Maître" : "Esclave")."</center></td><td><a href=\"index.php?mod=36&act=3&zid=".$data["id"]."\">";
+					$output .= "<tr><td>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": '.$this->mid.'", "do": "2", "zid": "'.$data["id"].'"}',$data["zonename"])."</td><td><center>".($data["type"] == 1 ? "Maître" : "Esclave")."</center></td><td><a href=\"index.php?mod=".$this->mid."&act=3&zid=".$data["id"]."\">";
 					$output .= $this->iMgr->addImage("styles/images/cross.png",15,15);
 					$output .= "</a></tr>";
 			}
@@ -63,7 +63,7 @@
 						$output .= $subzone;
 						$exists = true;
 					}
-					$output .= "<tr><td>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "36", "do": "2", "zid": "'.$data["id"].'"}',$data["zonename"])."</td><td><center>".($data["type"] == 1 ? "Maître" : "Esclave")."</center></td></tr>";
+					$output .= "<tr><td>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": '.$this->mid.'", "do": "2", "zid": "'.$data["id"].'"}',$data["zonename"])."</td><td><center>".($data["type"] == 1 ? "Maître" : "Esclave")."</center></td></tr>";
 				}
 				
 				if($exists)
@@ -97,7 +97,7 @@
 			$output .= "</table></form>";
 			
 			if($edit && $zone->getType() == 1) {
-				$output .= "<h4>Enregistrements de la zone</h4>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": "36", "do": "3", "zid": "'.$zid.'" }',"Ajouter un enregistrement")."<br /><br />";
+				$output .= "<h4>Enregistrements de la zone</h4>".FS::$iMgr->addJSONLink('{ "at": "2", "mid": '.$this->mid.'", "do": "3", "zid": "'.$zid.'" }',"Ajouter un enregistrement")."<br /><br />";
 				$exists = false;
 				$output2 = "<table class=\"standardTable\" width=\"70%\"><tr><th>Nom</th><th width=\"12%\">Type</th><th>Valeur</th><th width=\"15px\"></th></tr>";
 				$query = FS::$dbMgr->Select("fss_dns_records","id,name,type,value,zoneid","zoneid = '".$zid."'","name");
@@ -371,6 +371,45 @@
 			$rec->Delete();
 			
 			return $zid;
+		}
+		
+		public function handlePostDatas($act) {
+			switch($act) {
+				case 1:
+					$zid = $this->addDNSZone();
+					if(is_array($zid))
+						header("Location: index.php?mod=".$this->mid."&do=1&err=".$zid[1]);
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&zid=".$zid);
+					return;
+				case 2: 
+					$zid = $this->updateDNSZone();
+					if(is_array($zid))
+						header("Location: index.php?mod=".$this->mid."&do=2&zid=".$zid[0]."&err=".$zid[1]);
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&zid=".$zid);
+					return;
+				case 3:
+					$this->deleteDNZZone();
+					header("Location: index.php?mod=".$this->mid."");
+					return;
+				case 4:
+					$zid = $this->addRecord();
+					if(is_array($zid))
+						header("Location: index.php?mod=".$this->mid."&do=3&zid=".$zid[0]."&err=".$zid[1]);
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&zid=".$zid);
+					return;
+				case 5:
+					$zid = $this->deleteRecord();
+					if(FS::isAJAXCall())
+						echo $zid;
+					else
+						header("Location: index.php?mod=".$this->mid."&do=2&zid=".$zid);
+					return;
+				default: break;
+			}
+			header("Location: index.php?mod=".$this->mid."");
 		}
 	};
 ?>

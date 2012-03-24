@@ -37,8 +37,7 @@
 			$output .= "</div><div class=\"left\">";
 
 			if(!FS::$sessMgr->isConnected()) {
-				$link = new HTTPLink(14);
-				$output .= "<form class=\"clearfixlogform\" action=\"".$link->getIt()."\" method=\"post\">";
+				$output .= "<form class=\"clearfixlogform\" action=\"".FS::$iMgr->getModuleIdByPath("connect")."\" method=\"post\">";
 					$output .= "<h1>Identification</h1>";
 					$output .= $this->addLabel("uname","Utilisateur");
 					$output .= $this->addInput("uname","");
@@ -49,8 +48,7 @@
 					$output .= $this->addSubmit("conn","Connexion");
 					$output .= "</form>";
 			} else {
-				$link = new HTTPLink(16);
-				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"".$link->getIt()."\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
+				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"".FS::$iMgr->getModuleIdByPath("disconnect")."\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
 				$output .= FS::$iMgr->addSubmit("disconnect","Confirmer");
 				$output .= "</form>";
 			}
@@ -127,26 +125,68 @@
 			return $output;
 		}
 
-		private function loadModule($id) {
+		public function loadModule($id) {
 			$output = "";
-			$query = $this->dbMgr->Select("fss_modules","name,path,ulevel,isconnected","id = '".$id."'");
-			if($data = mysql_fetch_array($query)) {
-				if($data["isconnected"] > 0 && FS::$sessMgr->isConnected() || 
-				$data["isconnected"] == -1 && !FS::$sessMgr->isConnected() || $data["isconnected"] == 0) {
-					if($data["ulevel"] <= FS::$sessMgr->getUserLevel()) {
-						require_once(dirname(__FILE__)."/user_modules/mod_".$data["path"].".php");
-						$module = $this->getObjectByName($data["name"]);
-						$output .= $module->Load();
+					
+			$dir = opendir(dirname(__FILE__)."/user_modules");
+			$found = false;
+			$moduleid = 0;
+			while(($elem = readdir($dir)) && $found == false) {
+				$dirpath = dirname(__FILE__)."/user_modules/".$elem;
+				if(is_dir($dirpath)) $moduleid++;
+				if(is_dir($dirpath) && $moduleid == $id) {
+					$dir2 = opendir($dirpath);
+					while(($elem2 = readdir($dir2)) && $found == false) {
+						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+							$found = true;
+							$path = $elem;
+					}
+				}
+			}
+			if($found == true) {
+				
+				require_once(dirname(__FILE__)."/user_modules/".$path."/main.php");
+				$module = new iModule();
+				
+				if($module->getConfig()->connected == 1 && FS::$sessMgr->isConnected() || 
+					$module->getConfig()->connected == 0 && !FS::$sessMgr->isConnected() || $module->getConfig()->connected == 2) {
+					
+					if($module->getConfig()->seclevel <= FS::$sessMgr->getUserLevel()) {
+						
+						$module->getModuleClass()->setModuleId($id);
+						$output .= $module->getModuleClass()->Load();
+						$this->registerAccess();
+						
 					}
 					else
 						$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");
 				}
 				else
-					$output .= $this->printError("Vous devez être authentifié pour accéder à ce contenu.");
+						$output .= $this->printError("Vous devez être authentifié pour accéder à ce contenu.");
 			}
 			else
 				$output .= $this->printError("Module inconnu !");
+
 			return $output;
+		}
+		
+		public function getModuleIdByPath($path) {
+			$dir = opendir(dirname(__FILE__)."/user_modules");
+			$moduleid = 0;
+			$found = false;
+			while(($elem = readdir($dir)) && $found == false) {
+				$dirpath = dirname(__FILE__)."/user_modules/".$elem;
+				if(is_dir($dirpath)) $moduleid++;
+				if(is_dir($dirpath) && $elem == $path) {
+					$dir2 = opendir($dirpath);
+					while(($elem2 = readdir($dir2)) && $found == false) {
+						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+							return $moduleid;
+					}
+				}
+			}
+			
+			return 0;
 		}
 		
 		private function showHome() {
@@ -154,45 +194,6 @@
 			$output .= "<div id=\"pagination\"><br /><br /><br /><br />";
 			$output .= "</div>";
 			return $output;
-		}
-		
-		private function showArticle($article) {
-			$cat = new Category();
-			$cat->setId($article->getCategory());
-			$cat->Load();
-			$output = "<div id=\"article\">
-			<h4><span>".$cat->getName()." &gt; </span>".$article->getTitle()." <span>(Publi&eacute; le ".$article->getPostDate().")</span></h4>
-			".$article->getContent()."<br />";
-			if(strlen($article->getSource()) > 0)
-				$output .= "<span>Source : <a href=\"".$article->getSource()."\">".$article->getSource()."</a></span><br />";	
-			$output .= "<span>&Eacute;crit par ".$this->getRealNameById($article->getAuthor())."</span><br />";
-			if($article->getUpdateDate() != $article->getPostDate())
-				$output .= "<span>Mis à jour le ".$article->getUpdateDate()."</span><br />";
-					
-			$output .= "<hr></div>";
-			return $output;
-		}
-		
-		public function getObjectByName($name) {
-			switch($name) {
-				case "iConnect": return new iConnect($this);
-				case "iDisconnect": return new iDisconnect($this);
-				case "iLinkMgmt": return new iLinkMgmt($this);
-				case "iModuleMgmt": return new iModuleMgmt($this);
-				case "iMenuMgmt": return new iMenuMgmt($this);
-				case "iInscription": return new iInscription($this);
-				case "iSandbox": return new iSandBox($this);
-				case "iDHCP": return new iDHCPConfig($this);
-				case "iStats": return new iStats($this);
-				case "iNagios": return new iNagios($this);
-				case "iSwitchMgmt": return new iSwitchMgmt($this);
-				case "iPriseMgmt": return new iPriseMgmt($this);
-				case "iNetdisco": return new iNetdisco($this);
-				case "":
-				default: 
-					require_once("user_modules/generic_module.php");
-					return new genModule($this);
-			}
 		}
 	};
 ?>

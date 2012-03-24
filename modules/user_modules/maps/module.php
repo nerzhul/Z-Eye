@@ -1,5 +1,5 @@
 <?php
-	require_once(dirname(__FILE__)."/generic_module.php");
+	require_once(dirname(__FILE__)."/../generic_module.php");
 	class iMap extends genModule{
 		function iMap($iMgr) { parent::genModule($iMgr); $this->img = NULL; }
 		public function Load() {

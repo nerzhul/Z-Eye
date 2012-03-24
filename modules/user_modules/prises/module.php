@@ -1,5 +1,5 @@
 <?php
-	require_once(dirname(__FILE__)."/generic_module.php");
+	require_once(dirname(__FILE__)."/../generic_module.php");
 	class iPriseMgmt extends genModule{
 		function iPriseMgmt($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
@@ -78,6 +78,27 @@
 					$output .= $value."</table>";
 			}
 			return $output;
+		}
+		
+		private function updatePiecePrise($piece,$nbpr) {
+			if($nbpr == NULL || $piece == NULL || !FS::$secMgr->isNumeric($nbpr) || strlen($piece) > 10) {
+				return "ERROR";
+			}
+			FS::$dbMgr->Delete("fss_piece_prises","piece = '".$piece."'");
+			for($i=1;$i<=$nbpr;$i++)
+				FS::$dbMgr->Insert("fss_piece_prises","piece,prise,comment","'".$piece."','".$i."',''");
+			return $nbpr;
+		}
+		
+		public function handlePostDatas($act) {
+			switch($act) {
+				case 1:
+					$nbpr = FS::$secMgr->checkAndSecurisePostData("nbpr");
+					$piece = FS::$secMgr->checkAndSecurisePostData("piece");
+					echo $this->updatePiecePrise($piece,$nbpr);
+					return;
+				default: break;
+			}
 		}
 	};
 ?>
