@@ -1,10 +1,10 @@
 <?php
 	class genModule {
-		function genModule($interfaceMgr) {
-			$this->iMgr = $interfaceMgr;
+		function genModule() {
 		}
 		
 		public function Load() { $this->iMgr->printError("Module inconnu !"); }
-		protected $iMgr;
+		public function setModuleId($id) { $this->mid = $id; }
+		protected $mid;
 	}
 ?>
