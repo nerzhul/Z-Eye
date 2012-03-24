@@ -19,6 +19,12 @@
 		
 		private function showContact($cont) {
 			$output = "<h4>Gestion du contact ".$cont."</h4>";
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+			$output .= "<table class=\"standardTable\">";
+			$output .= FS::$iMgr->addIndexedLine("Nom du contact","ctctname","contactname"); // compress spaces to make contct_name and use it as alias
+			$output .= FS::$iMgr->addIndexedLine("Adresse E-Mail","ctctmail","admin@domain.tld");
+			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+			$output .= "</table></form>";
 			return $output;	
 		}
 
