@@ -1,6 +1,6 @@
 <?php
 	require_once(dirname(__FILE__)."/../generic_module.php");
-	require_once(dirname(__FILE__)."/../../../central/rrd.php");
+	require_once(dirname(__FILE__)."/../user_objects/rrd.php");
 	class iStats extends genModule{
 		function iStats($iMgr) { parent::genModule($iMgr); }
 
