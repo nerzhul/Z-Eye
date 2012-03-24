@@ -14,7 +14,7 @@
 
 		private function showMainConf() {
 			$output = "";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mod."&act=1");
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Configuration globale</th></tr>";
 			$file = file("/usr/local/etc/netdisco/netdisco.conf");
 			$dnssuffix = ".local";
@@ -76,8 +76,8 @@
 				}
 				fclose($file);
 			}
-			$file = fopen("/etc/netdisco/netdisco-topology.txt","r");
-			$firstnode = fread($file,filesize("/etc/netdisco/netdisco-topology.txt"));
+			$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","r");
+			$firstnode = fread($file,filesize("/usr/local/etc/netdisco/netdisco-topology.txt"));
 			fclose($file);
 			// @TODO: load configuration file
 			$output .= "<tr><td>Suffixe DNS</td><td>".FS::$iMgr->addInput("suffix",$dnssuffix)."</td></tr>";
@@ -168,10 +168,9 @@
 					if($this->checkNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$fnode) == true) {
 						$this->writeNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$fnode);
 						header("Location: m-".$this->mid.".html");
-						
 						return;
 					}
-					header("Location: index.php?m=".$this->mid."&err=1");	
+					header("Location: index.php?mod=".$this->mid."&err=1");	
 					return;
 				default: break;
 			}
