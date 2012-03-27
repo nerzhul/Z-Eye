@@ -31,7 +31,7 @@
 			$snmprw = "private";
 			$snmptimeout = 1;
 			$snmptry = 3;
-			$snmpmibs = "/usr/share/netdisco/mibs/";
+			$snmpmibs = "/usr/local/share/netdisco-mibs/";
 			$snmpver = 2;
 
 			if(!$file) {
@@ -103,7 +103,6 @@
 			$output .= FS::$iMgr->addElementToList("1","1",$snmpver == 1 ? true : false);
 			$output .= FS::$iMgr->addElementToList("2c","2",$snmpver == 2 ? true : false);
 			$output .= "</select></td></tr>";
-			$output .= "<tr><td>Répertoire des MIBS</td><td>".FS::$iMgr->addInput("snmpmibs",$snmpmibs)."</td></tr>";
 			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
 			$output .= "</table></form>";
 			return $output;
@@ -139,7 +138,7 @@
 			fwrite($file,"\n# ---- Database Settings ----\ndb_Pg = dbi:Pg:dbname=".$dbname.";host=".$pghost."\ndb_Pg_user = ".$dbuser."\ndb_Pg_pw = ".$dbpwd."\n");
 			fwrite($file,"db_Pg_opts      = PrintError => 1, AutoCommit => 1\n");
 			fwrite($file,"\n# ---- SNMP Settings ----\ncommunity = ".$snmpro."\ncommunity_rw = ".$snmprw."\nsnmptimeout = ".($snmptimeout*1000000)."\n");
-			fwrite($file,"snmpretries = ".$snmptry."\nsnmpver = ".$snmpver."\nmibhome = ".$snmpmibs.'\nmibdirs = $mibhome/allied,  $mibhome/asante, $mibhome/cisco, \\'."\n");
+			fwrite($file,"snmpretries = ".$snmptry."\nsnmpver = ".$snmpver."\nmibhome = ".$snmpmibs."\nmibdirs = ".'$mibhome/allied,  $mibhome/asante, $mibhome/cisco, \\'."\n");
 			fwrite($file,'$mibhome/foundry, $mibhome/hp,     $mibhome/nortel, $mibhome/extreme, $mibhome/rfc,     $mibhome/net-snmp'."\n".'bulkwalk_off = true'."\n");
 			fclose($file);
 
@@ -165,10 +164,9 @@
 					$snmptimeout = FS::$secMgr->checkAndSecurisePostData("snmptimeout");
 					$snmptry = FS::$secMgr->checkAndSecurisePostData("snmptry");
 					$snmpver = FS::$secMgr->checkAndSecurisePostData("snmpver");
-					$snmpmibs = FS::$secMgr->checkAndSecurisePostData("snmpmibs");
 					$fnode = FS::$secMgr->checkAndSecurisePostData("fnode");
-					if($this->checkNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$fnode) == true) {
-						$this->writeNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$fnode);
+					if($this->checkNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
+						$this->writeNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode);
 						header("Location: index.php?mod=".$this->mid."&err=0");
 						return;
 					}
