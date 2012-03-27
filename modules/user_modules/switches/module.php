@@ -438,47 +438,85 @@
 						var img = new Image();
 						img.onload = function() {
 							context.drawImage(img, 0,0,892,119);
-							var normportX = null;
-							var normportY = null;
-							var trunkport = null;
-							switch(type) {
-								case 1: normportX = c3750p48x; normportY = c3750p48y; trunkport = c3750g48; break;
-								case 2: normportX = c3750p24x; normportY = c3750p24y; trunkport = c3750g24; break;
-								case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; break;
-								case 4:
-							}
-							
-							for(i=0;i<normportX.length;i++) {
-								if(ptab[i] == 0)
-									context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
-								else if(ptab[i] == 1)
-									context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-								else if(ptab[i] == 2)
-									context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
-								else
-									context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-								context.fillRect(normportX[i], normportY, 7, 7);
-							}
-							
-							for(i=0;i<trunkport.length;i++) {
-								if(gptab[i] == 0)
+							if(type == 1) {
+								for(i=0;i<c3750p48x.length;i++) {
+									if(ptab[i] == 0)
 										context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
-								else if(gptab[i] == 1)
+									else if(ptab[i] == 1)
 										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-								else if(gptab[i] == 2)
+									else if(ptab[i] == 2)
 										context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
-								else
+									else
 										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-								context.fillRect(trunkport[i][0], trunkport[i][1], 7, 7);
+									context.fillRect(c3750p48x[i], c3750p48y, 7, 7);
+								}
+								for(i=0;i<c3750g48.length;i++) {
+									if(gptab[i] == 0)
+											context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+									else if(gptab[i] == 1)
+											context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+									else if(gptab[i] == 2)
+											context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+									else
+											context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+									context.fillRect(c3750g48[i][0], c3750g48[i][1], 7, 7);
+								}
+							} else if(type == 2) {
+								for(i=0;i<c3750p24x.length;i++) {
+									if(ptab[i] == 0)
+										context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
+									else if(ptab[i] == 1)
+										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+									else if(ptab[i] == 2)
+										context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+									else
+										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+									context.fillRect(c3750p24x[i], c3750p24y, 7, 7);
+								}
+								for(i=0;i<c3750g24.length;i++) {
+										if(gptab[i] == 0)
+												context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+										else if(gptab[i] == 1)
+												context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+										else if(gptab[i] == 2)
+												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+										else
+												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+										context.fillRect(c3750g24[i][0], c3750g24[i][1], 7, 7);
+								}
+							} else if(type == 3) {
+								for(i=0;i<c2960p24x.length;i++) {
+									if(ptab[i] == 0)
+										context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
+									else if(ptab[i] == 1)
+										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+									else if(ptab[i] == 2)
+										context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+									else
+										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+									context.fillRect(c2960p24x[i], c2960p24y, 6, 6);
+								}
+								for(i=0;i<c2960g24.length;i++) {
+										if(gptab[i] == 0)
+												context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+										else if(gptab[i] == 1)
+												context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+										else if(gptab[i] == 2)
+												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+										else
+												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+										context.fillRect(c2960g24[i][0], c2960g24[i][1], 6, 6);
+								}
 							}
 						}
-						
-						switch(type) {
-							case 1:	img.src = '/uploads/WS-C3750-48PS-S_front.jpg'; break;
-							case 2: img.src = '/uploads/WS-C3750-24PS-S_front.jpg'; break;
-							case 3: img.src = '/uploads/2960-24.jpg'; break;
-							case 4: img.src = '/uploads/2960-48.jpg'; break;
-						}
+						if(type == 1)
+							img.src = '/uploads/WS-C3750-48PS-S_front.jpg';
+						else if(type == 2)
+							img.src = '/uploads/WS-C3750-24PS-S_front.jpg';
+						else if(type == 3)
+							img.src = '/uploads/2960-24.jpg';
+						else if(type == 4)
+							img.src = '/uploads/2960-48.jpg';
 					}</script>";
 					$swlist = $this->getDeviceSwitches($devmod,1);
 					$swlist = preg_split("#\/#",$swlist);
@@ -487,7 +525,7 @@
 							case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
 								$poearr = array();
 								// POE States
-								$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%");
+								$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
 								while($data = pg_fetch_array($query)) {
 									$pid = preg_split("#\/#",$data["port"]);
 									$pid = $pid[2];
@@ -552,7 +590,7 @@
 							case "WS-C3750-24PS": case "WS-C3750-24P": // 100 Mbits switches
 								$poearr = array();
 								// POE States
-								$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%");
+								$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
 								while($data = pg_fetch_array($query)) {
 									$pid = preg_split("#\/#",$data["port"]);
 									$pid = $pid[2];
