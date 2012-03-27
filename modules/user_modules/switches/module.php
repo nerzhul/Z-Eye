@@ -650,7 +650,7 @@
 								}
 								$output .= "]; drawContext('canvas_".($i+1)."',2,ptab,gptab,powport);</script>";
 								break;
-							case "WS-2960S-24TS-L": // Gbit switches
+							case "WS-C2960S-24TS-L": // Gbit switches
 								$poearr = array();
 								$portlist = "";
 								for($i=1;$i<25;$i++) {
