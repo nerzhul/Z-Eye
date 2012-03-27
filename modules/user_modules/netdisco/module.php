@@ -20,7 +20,7 @@
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Configuration globale</th></tr>";
 			$file = file("/usr/local/etc/netdisco/netdisco.conf");
 			$dnssuffix = ".local";
-			$netdiscodir = "/usr/lib/netdisco/";
+			$netdiscodir = "/usr/local/share/netdisco/";
 			$nodetimeout = 60;
 			$devicetimeout = 90;
 			$pghost = "127.0.0.1";
@@ -83,7 +83,6 @@
 			fclose($file);
 			// @TODO: load configuration file
 			$output .= "<tr><td>Suffixe DNS</td><td>".FS::$iMgr->addInput("suffix",$dnssuffix)."</td></tr>";
-			$output .= FS::$iMgr->addIndexedLine("Répertoire de Netdisco","dir",$netdiscodir);
 			$output .= "<tr><td>Noeud principal</td><td>".FS::$iMgr->addInput("fnode",$firstnode)."</td></tr>";
 			$output .= "<tr><th colspan=\"2\">Configuration des timers</th></tr>";
 			$output .= "<tr><td>Expiration des noeuds</td><td>".FS::$iMgr->addInput("nodetimeout",$nodetimeout,4,4)."</td></tr>";
@@ -108,7 +107,7 @@
 			return $output;
 		}
 
-		public function checkNetdiscoConf($dns,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$firstnode) {
+		public function checkNetdiscoConf($dns,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$firstnode) {
 			if(!FS::$secMgr->isNumeric($nodetimeout) || !FS::$secMgr->isNumeric($devicetimeout) || !FS::$secMgr->isNumeric($snmptimeout) ||
 				!FS::$secMgr->isNumeric($snmptry) || !FS::$secMgr->isNumeric($snmpver))
 				return false;
@@ -122,10 +121,10 @@
 
 			return true;
 		}
-		public function writeNetdiscoConf($dns,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$snmpmibs,$firstnode) {
+		public function writeNetdiscoConf($dns,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$firstnode) {
 			$file = fopen("/usr/local/etc/netdisco/netdisco.conf","w+");
 			fwrite($file,"# ---- General Settings ----\n");
-			fwrite($file,"domain = ".$dns."\nhome = ".$dir."\n");
+			fwrite($file,"domain = ".$dns."\nhome = /usr/local/share/netdisco\n");
 			fwrite($file,"topofile        = /usr/local/etc/netdisco/netdisco-topology.txt\ntimeout = 90\nmacsuck_timeout = 90\nmacsuck_all_vlans = true\n");
 			fwrite($file,"arpnip          = true\n");
 			fwrite($file,"\n# -- Database Maintenance and Data Removal --\nexpire_devices = ".$devicetimeout."expire_nodes = ".$nodetimeout."\n");
@@ -138,7 +137,7 @@
 			fwrite($file,"\n# ---- Database Settings ----\ndb_Pg = dbi:Pg:dbname=".$dbname.";host=".$pghost."\ndb_Pg_user = ".$dbuser."\ndb_Pg_pw = ".$dbpwd."\n");
 			fwrite($file,"db_Pg_opts      = PrintError => 1, AutoCommit => 1\n");
 			fwrite($file,"\n# ---- SNMP Settings ----\ncommunity = ".$snmpro."\ncommunity_rw = ".$snmprw."\nsnmptimeout = ".($snmptimeout*1000000)."\n");
-			fwrite($file,"snmpretries = ".$snmptry."\nsnmpver = ".$snmpver."\nmibhome = ".$snmpmibs."\nmibdirs = ".'$mibhome/allied,  $mibhome/asante, $mibhome/cisco, \\'."\n");
+			fwrite($file,"snmpretries = ".$snmptry."\nsnmpver = ".$snmpver."\nmibhome = /usr/local/share/netdisco-mibs/\nmibdirs = ".'$mibhome/allied,  $mibhome/asante, $mibhome/cisco, \\'."\n");
 			fwrite($file,'$mibhome/foundry, $mibhome/hp,     $mibhome/nortel, $mibhome/extreme, $mibhome/rfc,     $mibhome/net-snmp'."\n".'bulkwalk_off = true'."\n");
 			fclose($file);
 
@@ -152,7 +151,6 @@
 			switch($act) {
 				case 1:
 					$suffix = FS::$secMgr->checkAndSecurisePostData("suffix");
-					$dir = FS::$secMgr->checkAndSecurisePostData("dir");
 					$nodetimeout = FS::$secMgr->checkAndSecurisePostData("nodetimeout");
 					$devicetimeout = FS::$secMgr->checkAndSecurisePostData("devicetimeout");
 					$pghost = FS::$secMgr->checkAndSecurisePostData("pghost");
@@ -165,8 +163,8 @@
 					$snmptry = FS::$secMgr->checkAndSecurisePostData("snmptry");
 					$snmpver = FS::$secMgr->checkAndSecurisePostData("snmpver");
 					$fnode = FS::$secMgr->checkAndSecurisePostData("fnode");
-					if($this->checkNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
-						$this->writeNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode);
+					if($this->checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
+						$this->writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode);
 						header("Location: index.php?mod=".$this->mid."&err=-1");
 						return;
 					}
