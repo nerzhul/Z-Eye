@@ -403,18 +403,26 @@
 				}
 				if($found == 1) {
 					$output .= "<h4>Vue de façade</h4>";
-					$output .= "<script>var c3750p48x = [59,71,87,98,115,126,143,154,171,182,199,210,227,238,254,266,299,310,326,338,355,366,382,394,
+					$output .= "<script>
+						// 3750 48 ports	
+						var c3750p48x = [59,71,87,98,115,126,143,154,171,182,199,210,227,238,254,266,299,310,326,338,355,366,382,394,
 						411,422,438,450,466,478,494,506,539,550,567,578,595,606,623,635,651,663,679,690,707,718,735,746];
-						var c3750p24x = [355,366,383,394,411,422,439,450,467,478,495,506,596,607,624,635,652,663,680,691,708,719,736,747];
 						var c3750p48y = 38;
-						var c3750impp48y = 50;
-						var c3750pp48y = 64;
-						var c3750p24y = 36;
-						var c3750impp24y = 50;
-						var c3750pp24y = 64;
 						var c3750g48 = [[815,58],[866,58],[815,90],[866,90]];
+						// poe
+						var c3750poe48x = [61,61,89,89,117,117,144,144,172,172,200,200,229,229,254,254,300,300,327,327,356,356,383,383,
+                                                412,412,439,439,467,467,495,495,540,540,568,568,596,596,624,624,652,652,680,680,708,708,736,736];
+                                                var c3750impp48y = 66;
+                                                var c3750pp48y = 94;
+						// 3750 24 ports
+						var c3750p24x = [355,366,383,394,411,422,439,450,467,478,495,506,596,607,624,635,652,663,680,691,708,719,736,747];
+						var c3750p24y = 36;
 						var c3750g24 = [[816,89],[867,89]];
-						
+						// poe
+						var c3750poe24x = [357,357,385,385,413,413,441,441,470,470,498,498,597,597,625,625,652,652,681,681,710,710,738,738];
+                                                var c3750impp24y = 65;
+                                                var c3750pp24y = 94;
+						// 2960 - 24 ports
 						var c2960p24x = [411,424,440,451,467,478,495,507,523,536,552,564,593,605,621,633,649,660,676,687,704,717,732,744];
 						var c2960p24y = 14;
 						var c2960g24 = [[778,85],[808,85],[834,85],[865,85]];
@@ -440,10 +448,12 @@
 								context.drawImage(img, 0,0,892,119);
 								var normportX = null; var normportY = null;
 								var trunkport = null; var icsize = null;
+								var poeX = null; var poePY = null; var poeIMPY = null;
 								switch(type) {
-									case 1: normportX = c3750p48x; normportY = c3750p48y; trunkport = c3750g48; icsize = 7; break;
+									case 1: normportX = c3750p48x; normportY = c3750p48y; trunkport = c3750g48; icsize = 7; 
+										poeX = c3750poe48x; poePY = c3750pp48y; poeIMPY = c3750impp48y; break;
 									case 2: normportX = c3750p24x; normportY = c3750p24y; trunkport = c3750g24; icsize = 7; break;
-									case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; icsize = 7; break;
+									case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; icsize = 6; break;
 									case 4: break;
 								}
 								for(i=0;i<normportX.length;i++) {
@@ -456,6 +466,11 @@
 									else
 										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
 									context.fillRect(normportX[i], normportY, icsize, icsize);
+									context.fillStyle = \"rgba(200, 200, 0, 0.6)\";
+                                                                        if(poetab[i] == 1)
+                                                                                context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
+                                                                        else if(poetab[i] == 2)
+                                                                                context.fillText(\"15.0\",poeX[i]-4, (i%2 == 0 ? poeIMPY : poePY));
 								}
 								for(i=0;i<trunkport.length;i++) {
 										if(gptab[i] == 0)
@@ -490,8 +505,8 @@
 									$pid = $pid[2];
 									switch($data["class"]) {
 										case "class0": $poearr[$pid] = 0; break;
-										case "class1": $poearr[$pid] = 1; break;
-										case "class2": $poearr[$pid] = 2; break;
+										case "class2": $poearr[$pid] = 1; break;
+										case "class3": $poearr[$pid] = 2; break;
 									}
 								}
 
