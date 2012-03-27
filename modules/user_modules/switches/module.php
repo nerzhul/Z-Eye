@@ -417,7 +417,7 @@
 						
 						var c2960p24x = [411,424,440,451,467,478,495,507,523,536,552,564,593,605,621,633,649,660,676,687,704,717,732,744];
 						var c2960p24y = 14;
-						var c2960g24 = [[816,89],[830,89],[850,89][867,89]];
+						var c2960g24 = [[778,85],[808,85],[834,85],[865,85]];
 						
 						function drawContext(obj,type,ptab,gptab,poetab) {
 						var canvas = document.getElementById(obj);
@@ -489,7 +489,7 @@
 									if(ptab[i] == 0)
 										context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
 									else if(ptab[i] == 1)
-										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
 									else if(ptab[i] == 2)
 										context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
 									else
@@ -709,9 +709,9 @@
 								}
 
 								uksort($arr_res,"strnatcasecmp");
-								for($j=1;$j<=count($arr_res);$j++) {
+								for($j=25;$j<=(25+count($arr_res));$j++) {
 									$output .= $arr_res[$j];
-									if($j < count($arr_res)) $output .= ",";
+									if($j < (24+count($arr_res))) $output .= ",";
 								}
                                                                $output .= "]; var powport = [";
 								for($j=1;$j<=count($poearr);$j++) {
