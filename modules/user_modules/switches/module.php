@@ -520,7 +520,7 @@
 					}</script>";
 					$swlist = $this->getDeviceSwitches($devmod,1);
 					$swlist = preg_split("#\/#",$swlist);
-					for($i=count($swlist)-1;$i>0;$i--) {
+					for($i=count($swlist)-1;$i>=0;$i--) {
 						switch($swlist[$i]) {
 							case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
 								$poearr = array();
@@ -653,9 +653,9 @@
 							case "WS-C2960S-24TS-L": // Gbit switches
 								$poearr = array();
 								$portlist = "";
-								for($i=1;$i<25;$i++) {
-									$portlist .= "'GigabitEthernet".($i+1)."/0/".$i."'";
-									if($i < 24)
+								for($j=1;$j<25;$j++) {
+									$portlist .= "'GigabitEthernet".($i+1)."/0/".$j."'";
+									if($j < 24)
 										$portlist .= ",";
 								}
 								// POE States
