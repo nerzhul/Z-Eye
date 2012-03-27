@@ -415,8 +415,8 @@
 						var c3750g48 = [[815,58],[866,58],[815,90],[866,90]];
 						var c3750g24 = [[816,89],[867,89]];
 						
-						var c2960p24x = [355,366,383,394,411,422,439,450,467,478,495,506,596,607,624,635,652,663,680,691,708,719,736,747];
-						var c2960p24y = 36;
+						var c2960p24x = [411,424,440,451,467,478,495,507,523,536,552,564,593,605,621,633,649,660,676,687,704,717,732,744];
+						var c2960p24y = 14;
 						var c2960g24 = [[816,89],[830,89],[850,89][867,89]];
 						
 						function drawContext(obj,type,ptab,gptab,poetab) {
@@ -489,12 +489,12 @@
 									if(ptab[i] == 0)
 										context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
 									else if(ptab[i] == 1)
-										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
 									else if(ptab[i] == 2)
 										context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
 									else
 										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-									context.fillRect(c2960p24x[i], c2960p24y, 7, 7);
+									context.fillRect(c2960p24x[i], c2960p24y, 6, 6);
 								}
 								for(i=0;i<c2960g24.length;i++) {
 										if(gptab[i] == 0)
@@ -505,7 +505,7 @@
 												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
 										else
 												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-										context.fillRect(c2960g24[i][0], c2960g24[i][1], 7, 7);
+										context.fillRect(c2960g24[i][0], c2960g24[i][1], 6, 6);
 								}
 							}
 						}
