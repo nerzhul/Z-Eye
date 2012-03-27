@@ -482,9 +482,9 @@
 							}
 						}
 						if(type == 1)
-							img.src = 'http://demeter.srv.iogs/uploads/WS-C3750-48PS-S_front.jpg';
+							img.src = '/uploads/WS-C3750-48PS-S_front.jpg';
 						else if(type == 2)
-							img.src = 'http://demeter.srv.iogs/uploads/WS-C3750-24PS-S_front.jpg';
+							img.src = '/uploads/WS-C3750-24PS-S_front.jpg';
 					}</script>";
 					$swlist = $this->getDeviceSwitches($devmod,1);
 					$swlist = preg_split("#\/#",$swlist);
@@ -703,7 +703,7 @@
 				if($found == 0) $found = 1;
 				$convport = preg_replace("#\/#","-",$data["port"]);
 				$swpdata = (isset($prisearr[$data["port"]]) ? $prisearr[$data["port"]] : "");
-				$tmpoutput2 = "<tr id=\"".$convport."\"><td><a class=\"monoComponentt_a\" href=\"http://demeter.srv.iogs/index.php?mod=".$this->mid."&d=".$device."&p=".$data["port"]."\">".$data["port"]."</a></td><td>";
+				$tmpoutput2 = "<tr id=\"".$convport."\"><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&p=".$data["port"]."\">".$data["port"]."</a></td><td>";
 
 				// Editable Desc
 				$tmpoutput2 .= "<div id=\"swds_".$convport."\">";
