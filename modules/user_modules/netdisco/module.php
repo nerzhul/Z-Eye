@@ -7,7 +7,7 @@
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err == 1)
 				$output .= FS::$iMgr->printError("Les données que vous avez entré ne sont pas valides !");
-			else if ($err == 0)
+			else if ($err == -1)
 				$output .= FS::$iMgr->printDebug("Modification prise en compte.");
 			$output .= $this->showMainConf();
 			$output .= "</div>";
@@ -167,7 +167,7 @@
 					$fnode = FS::$secMgr->checkAndSecurisePostData("fnode");
 					if($this->checkNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
 						$this->writeNetdiscoConf($suffix,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode);
-						header("Location: index.php?mod=".$this->mid."&err=0");
+						header("Location: index.php?mod=".$this->mid."&err=-1");
 						return;
 					}
 					header("Location: index.php?mod=".$this->mid."&err=1");	
