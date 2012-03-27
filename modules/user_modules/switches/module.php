@@ -420,62 +420,63 @@
 						var c2960g24 = [[778,85],[808,85],[834,85],[865,85]];
 						
 						function drawContext(obj,type,ptab,gptab,poetab) {
-						var canvas = document.getElementById(obj);
-						var context = canvas.getContext(\"2d\");
-						context.fillStyle = \"rgba(0,118,176,0)\";
-						context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-						context.translate(context.canvas.width/2, context.canvas.height/2);
-						context.translate(-context.canvas.width/2, -context.canvas.height/2);
-						context.beginPath();
-						context.moveTo(-2,-2);
-						context.lineTo(892,-2);
-						context.lineTo(892,119);
-						context.lineTo(-2,119);
-						context.lineTo(-2,-2);	
-						context.closePath(); // complete custom shape
-
-						context.moveTo(0,0);
-						var img = new Image();
-						img.onload = function() {
-							context.drawImage(img, 0,0,892,119);
-							var normportX = null; var normportY = null;
-							var trunkport = null; var icsize = null;
-							switch(type) {
-								case 1: normportX = c3750p48x; normportY = c3750p48y; trunkport = c3750g48; icsize = 7; break;
-								case 2: normportX = c3750p24x; normportY = c3750p24y; trunkport = c3750g24; icsize = 7; break;
-								case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; icsize = 7; break;
-								case 4: break;
-							}
-							for(i=0;i<normportX.length;i++) {
-								if(ptab[i] == 0)
-									context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
-								else if(ptab[i] == 1)
-									context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-								else if(ptab[i] == 2)
-									context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
-								else
-									context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-								context.fillRect(normportX[i], normportY, icsize, icsize);
-							}
-							for(i=0;i<trunkport.length;i++) {
-									if(gptab[i] == 0)
-											context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
-									else if(gptab[i] == 1)
-											context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-									else if(gptab[i] == 2)
-											context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+							var canvas = document.getElementById(obj);
+							var context = canvas.getContext(\"2d\");
+							context.fillStyle = \"rgba(0,118,176,0)\";
+							context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+							context.translate(context.canvas.width/2, context.canvas.height/2);
+							context.translate(-context.canvas.width/2, -context.canvas.height/2);
+							context.beginPath();
+							context.moveTo(-2,-2);
+							context.lineTo(892,-2);
+							context.lineTo(892,119);
+							context.lineTo(-2,119);
+							context.lineTo(-2,-2);	
+							context.closePath(); // complete custom shape
+	
+							context.moveTo(0,0);
+							var img = new Image();
+							img.onload = function() {
+								context.drawImage(img, 0,0,892,119);
+								var normportX = null; var normportY = null;
+								var trunkport = null; var icsize = null;
+								switch(type) {
+									case 1: normportX = c3750p48x; normportY = c3750p48y; trunkport = c3750g48; icsize = 7; break;
+									case 2: normportX = c3750p24x; normportY = c3750p24y; trunkport = c3750g24; icsize = 7; break;
+									case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; icsize = 7; break;
+									case 4: break;
+								}
+								for(i=0;i<normportX.length;i++) {
+									if(ptab[i] == 0)
+										context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
+									else if(ptab[i] == 1)
+										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+									else if(ptab[i] == 2)
+										context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
 									else
-											context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-									context.fillRect(trunkport[i][0], trunkport[i][1], icsize, icsize);
+										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+									context.fillRect(normportX[i], normportY, icsize, icsize);
+								}
+								for(i=0;i<trunkport.length;i++) {
+										if(gptab[i] == 0)
+												context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+										else if(gptab[i] == 1)
+												context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+										else if(gptab[i] == 2)
+												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+										else
+												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+										context.fillRect(trunkport[i][0], trunkport[i][1], icsize, icsize);
+								}
+							}
+							switch(type) {
+								case 1:	img.src = '/uploads/WS-C3750-48PS-S_front.jpg'; break;
+								case 2:	img.src = '/uploads/WS-C3750-24PS-S_front.jpg'; break;
+								case 3: img.src = '/uploads/2960-24.jpg'; break;
+								case 4: img.src = '/uploads/2960-48.jpg'; break;
 							}
 						}
-						switch(type) {
-							case 1:	img.src = '/uploads/WS-C3750-48PS-S_front.jpg'; break;
-							case 2:	img.src = '/uploads/WS-C3750-24PS-S_front.jpg'; break;
-							case 3: img.src = '/uploads/2960-24.jpg'; break;
-							case 4: img.src = '/uploads/2960-48.jpg'; break;
-						}
-					}</script>";
+					</script>";
 					$swlist = $this->getDeviceSwitches($devmod,1);
 					$swlist = preg_split("#\/#",$swlist);
 					for($i=count($swlist)-1;$i>=0;$i--) {
@@ -487,7 +488,11 @@
 								while($data = pg_fetch_array($query)) {
 									$pid = preg_split("#\/#",$data["port"]);
 									$pid = $pid[2];
-									$poearr[$pid] = $data["class"];
+									switch($data["class"]) {
+										case "class0": $poearr[$pid] = 0; break;
+										case "class1": $poearr[$pid] = 1; break;
+										case "class2": $poearr[$pid] = 2; break;
+									}
 								}
 
 								$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
@@ -552,7 +557,11 @@
 								while($data = pg_fetch_array($query)) {
 									$pid = preg_split("#\/#",$data["port"]);
 									$pid = $pid[2];
-									$poearr[$pid] = $data["class"];
+									switch($data["class"]) {
+										case "class0": $poearr[$pid] = 0; break;
+										case "class1": $poearr[$pid] = 1; break;
+										case "class2": $poearr[$pid] = 2; break;
+									}
 								}
 
 								$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
@@ -621,7 +630,11 @@
 								while($data = pg_fetch_array($query)) {
 									$pid = preg_split("#\/#",$data["port"]);
 									$pid = $pid[2];
-									$poearr[$pid] = $data["class"];
+									switch($data["class"]) {
+										case "class0": $poearr[$pid] = 0; break;
+										case "class1": $poearr[$pid] = 1; break;
+										case "class2": $poearr[$pid] = 2; break;
+									}
 								}
 
 								$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
