@@ -520,7 +520,7 @@
 					}</script>";
 					$swlist = $this->getDeviceSwitches($devmod,1);
 					$swlist = preg_split("#\/#",$swlist);
-					for($i=count($swlist)-1;$i>=0;$i--) {
+					for($i=count($swlist)-1;$i>0;$i--) {
 						switch($swlist[$i]) {
 							case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
 								$poearr = array();
