@@ -414,6 +414,11 @@
 						var c3750pp24y = 64;
 						var c3750g48 = [[815,58],[866,58],[815,90],[866,90]];
 						var c3750g24 = [[816,89],[867,89]];
+						
+						var c2960p24x = [355,366,383,394,411,422,439,450,467,478,495,506,596,607,624,635,652,663,680,691,708,719,736,747];
+						var c2960p24y = 36;
+						var c2960g24 = [[816,89],[830,89],[850,89][867,89]];
+						
 						function drawContext(obj,type,ptab,gptab,poetab) {
 						var canvas = document.getElementById(obj);
 						var context = canvas.getContext(\"2d\");
@@ -447,14 +452,14 @@
 								}
 								for(i=0;i<c3750g48.length;i++) {
 									if(gptab[i] == 0)
-                                                                                context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
-                                                                        else if(gptab[i] == 1)
-                                                                                context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-                                                                        else if(gptab[i] == 2)
-                                                                                context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
-                                                                        else
-                                                                                context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-                                                                        context.fillRect(c3750g48[i][0], c3750g48[i][1], 7, 7);
+											context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+									else if(gptab[i] == 1)
+											context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+									else if(gptab[i] == 2)
+											context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+									else
+											context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+									context.fillRect(c3750g48[i][0], c3750g48[i][1], 7, 7);
 								}
 							} else if(type == 2) {
 								for(i=0;i<c3750p24x.length;i++) {
@@ -469,28 +474,55 @@
 									context.fillRect(c3750p24x[i], c3750p24y, 7, 7);
 								}
 								for(i=0;i<c3750g24.length;i++) {
-                                                                        if(gptab[i] == 0)
-                                                                                context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
-                                                                        else if(gptab[i] == 1)
-                                                                                context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-                                                                        else if(gptab[i] == 2)
-                                                                                context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
-                                                                        else
-                                                                                context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-                                                                        context.fillRect(c3750g24[i][0], c3750g24[i][1], 7, 7);
-                                                                }
+										if(gptab[i] == 0)
+												context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+										else if(gptab[i] == 1)
+												context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+										else if(gptab[i] == 2)
+												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+										else
+												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+										context.fillRect(c3750g24[i][0], c3750g24[i][1], 7, 7);
+								}
+							} else if(type == 3) {
+								for(i=0;i<c2960p24x.length;i++) {
+									if(ptab[i] == 0)
+										context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
+									else if(ptab[i] == 1)
+										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+									else if(ptab[i] == 2)
+										context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+									else
+										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+									context.fillRect(c2960p24x[i], c2960p24y, 7, 7);
+								}
+								for(i=0;i<c2960g24.length;i++) {
+										if(gptab[i] == 0)
+												context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+										else if(gptab[i] == 1)
+												context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+										else if(gptab[i] == 2)
+												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+										else
+												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+										context.fillRect(c2960g24[i][0], c2960g24[i][1], 7, 7);
+								}
 							}
 						}
 						if(type == 1)
 							img.src = '/uploads/WS-C3750-48PS-S_front.jpg';
 						else if(type == 2)
 							img.src = '/uploads/WS-C3750-24PS-S_front.jpg';
+						else if(type == 3)
+							img.src = '/uploads/2960-24.jpg';
+						else if(type == 4)
+							img.src = '/uploads/2960-48.jpg';
 					}</script>";
 					$swlist = $this->getDeviceSwitches($devmod,1);
 					$swlist = preg_split("#\/#",$swlist);
 					for($i=count($swlist)-1;$i>=0;$i--) {
 						switch($swlist[$i]) {
-							case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": {
+							case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
 								$poearr = array();
 								// POE States
 								$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%");
@@ -555,7 +587,7 @@
 								break;
 							}
 							case "WS-C3750-24TS": case "WS-C3750G-24TS": case "WS-C3750G-24WS": case "WS-C3750G-24T": case "WS-C3750-FS":
-							case "WS-C3750-24PS": case "WS-C3750-24P":
+							case "WS-C3750-24PS": case "WS-C3750-24P": // 100 Mbits switches
 								$poearr = array();
 								// POE States
 								$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%");
@@ -617,6 +649,76 @@
 									if($j < count($poearr)) $output .= ",";
 								}
 								$output .= "]; drawContext('canvas_".($i+1)."',2,ptab,gptab,powport);</script>";
+								break;
+							case "WS-2960S-24TS-L": // Gbit switches
+								$poearr = array();
+								$portlist = "";
+								for($i=1;$i<25;$i++) {
+									$portlist .= "'GigabitEthernet".($i+1)."/0/".$i."'";
+									if($i < 24)
+										$portlist .= ",";
+								}
+								// POE States
+								$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port IN (".$portlist.")");
+								while($data = pg_fetch_array($query)) {
+									$pid = preg_split("#\/#",$data["port"]);
+									$pid = $pid[2];
+									$poearr[$pid] = $data["class"];
+								}
+
+								$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
+								$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN (".$portlist.")","port");
+								$arr_res = array();
+								while($data = pg_fetch_array($query)) {
+									if(preg_match("#unrouted#",$data["port"]))
+										continue;
+									$pid = preg_split("#\/#",$data["port"]);
+									$pid = $pid[2];
+									if($data["up_admin"] == "down")
+										$arr_res[$pid] = 0;
+									else if($data["up_admin"] == "up" && $data["up"] == "down")
+										$arr_res[$pid] = 1;
+									else if($data["up"] == "up")
+										$arr_res[$pid] = 2;
+									else
+										$arr_res[$pid] = 3;
+								}
+
+								uksort($arr_res,"strnatcasecmp");
+								for($j=1;$j<=count($arr_res);$j++) {
+									$output .= $arr_res[$j];
+									if($j < count($arr_res)) $output .= ",";
+								}
+								$output .= "]; var gptab = [";
+								$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN ('GigabitEthernet".($i+1)."/0/25', 'GigabitEthernet".($i+1)."/0/26',
+										'GigabitEthernet".($i+1)."/0/27','GigabitEthernet".($i+1)."/0/28')","port");
+								$arr_res = array();
+								while($data = pg_fetch_array($query)) {
+									if(preg_match("#unrouted#",$data["port"]))
+										continue;
+									$pid = preg_split("#\/#",$data["port"]);
+									$pid = $pid[2];
+									if($data["up_admin"] == "down")
+										$arr_res[$pid] = 0;
+									else if($data["up_admin"] == "up" && $data["up"] == "down")
+										$arr_res[$pid] = 1;
+									else if($data["up"] == "up")
+										$arr_res[$pid] = 2;
+									else
+										$arr_res[$pid] = 3;
+								}
+
+								uksort($arr_res,"strnatcasecmp");
+								for($j=1;$j<=count($arr_res);$j++) {
+									$output .= $arr_res[$j];
+									if($j < count($arr_res)) $output .= ",";
+								}
+                                                               $output .= "]; var powport = [";
+								for($j=1;$j<=count($poearr);$j++) {
+									$output .= $poearr[$j];
+									if($j < count($poearr)) $output .= ",";
+								}
+								$output .= "]; drawContext('canvas_".($i+1)."',3,ptab,gptab,powport);</script>";
 								break;
 							default: break;
 						}
