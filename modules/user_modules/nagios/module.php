@@ -30,6 +30,17 @@
 
 		private function showNode($node) {
 			$output = "<h4>Gestion du noeud ".$node."</h4>";
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+			$output .= "<table class=\"standardTable\">";
+			$output .= FS::$iMgr->addIndexedLine("Nom du serveur","srvname","servername"); // compress spaces to make contct_name and use it as alias
+			$output .= FS::$iMgr->addIndexedLine("Adresse du serveur","srvaddr","servername");
+			$output .= FS::$iMgr->addIndexedNumericLine("Intervalle de mise à jour (minutes)","updateint","5");
+			$output .= FS::$iMgr->addIndexedNumericLine("Intervalle des tentatives en cas d'échec (minutes)","rtryint","1");
+			$output .= FS::$iMgr->addIndexedNumericLine("Nombres d'essais avant de définir en échec","maxtry","10");
+			$output .= FS::$iMgr->addIndexedNumericLine("Intervalle de notifications (minutes) (0 = 1 seule notification)","notifint","30");
+			// ensemble de cases à cocher pour les contacts @ TODO
+			$output .= FS::$iMgr->addIndexedNumericLine("","updateint","5");
+			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
 			return $output;	
 		}
 		

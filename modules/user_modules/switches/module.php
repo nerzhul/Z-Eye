@@ -149,9 +149,12 @@
 
 			if(preg_match("#^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$#",$search)) {
 				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&node=".$search."\"</script>";
-                        }
+            }
 			else if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$#",$search)) {
 				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&node=".$search."\"</script>";
+			}
+			else if(is_numeric($search) && $search < 4096) {
+				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&vlan=".$search."\"</script>";
 			}
 			else {
 				if($device = FS::$pgdbMgr->GetOneData("device","ip","name = '".$search."'"))
