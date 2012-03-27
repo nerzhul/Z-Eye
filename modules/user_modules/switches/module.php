@@ -426,7 +426,11 @@
 						var c2960p24x = [411,424,440,451,467,478,495,507,523,536,552,564,593,605,621,633,649,660,676,687,704,717,732,744];
 						var c2960p24y = 14;
 						var c2960g24 = [[778,85],[808,85],[834,85],[865,85]];
-						
+						// poe
+                                                var c2960poe24x = [357,357,385,385,413,413,441,441,470,470,498,498,597,597,625,625,652,652,681,681,710,710,738,738];
+                                                var c2960impp24y = 65;
+                                                var c2960pp24y = 94;
+	
 						function drawContext(obj,type,ptab,gptab,poetab) {
 							var canvas = document.getElementById(obj);
 							var context = canvas.getContext(\"2d\");
@@ -452,8 +456,10 @@
 								switch(type) {
 									case 1: normportX = c3750p48x; normportY = c3750p48y; trunkport = c3750g48; icsize = 7; 
 										poeX = c3750poe48x; poePY = c3750pp48y; poeIMPY = c3750impp48y; break;
-									case 2: normportX = c3750p24x; normportY = c3750p24y; trunkport = c3750g24; icsize = 7; break;
-									case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; icsize = 6; break;
+									case 2: normportX = c3750p24x; normportY = c3750p24y; trunkport = c3750g24; icsize = 7; 
+										poeX = c3750poe24x; poePY = c3750pp24y; poeIMPY = c3750impp24y; break;
+									case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; icsize = 6; 
+										poeX = c2960poe24x; poePY = c2960pp24y; poeIMPY = c2960impp24y; break;
 									case 4: break;
 								}
 								for(i=0;i<normportX.length;i++) {
@@ -574,8 +580,8 @@
 									$pid = $pid[2];
 									switch($data["class"]) {
 										case "class0": $poearr[$pid] = 0; break;
-										case "class1": $poearr[$pid] = 1; break;
-										case "class2": $poearr[$pid] = 2; break;
+										case "class2": $poearr[$pid] = 1; break;
+										case "class3": $poearr[$pid] = 2; break;
 									}
 								}
 
@@ -647,8 +653,8 @@
 									$pid = $pid[2];
 									switch($data["class"]) {
 										case "class0": $poearr[$pid] = 0; break;
-										case "class1": $poearr[$pid] = 1; break;
-										case "class2": $poearr[$pid] = 2; break;
+										case "class2": $poearr[$pid] = 1; break;
+										case "class3": $poearr[$pid] = 2; break;
 									}
 								}
 
