@@ -1587,14 +1587,15 @@
 					pg_query($sql);
 					$sql = "UPDATE device_port_vlan SET vlan ='".$nvlan."' WHERE ip='".$dip."' and port='".$port."' and native='t'";
 					pg_query($sql);
+					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."' AND port='".$port."'");
 					if(FS::$secMgr->checkAndSecurisePostData("vllist") != NULL) {
 						$vlantab = preg_split("/,/",FS::$secMgr->checkAndSecurisePostData("vllist"));
-						FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."' AND port='".$port."'");
 						for($i=0;$i<count($vlantab);$i++)
 							FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vlantab[$i]."','f',NOW(),NOW()");
 					}
-					$sql = "UPDATE device_port_vlan SET vlan ='".$nvlan."' WHERE ip='".$dip."' and port='".$port."' and native='t'";
-					pg_query($sql);
+					else {
+						FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$nvlan."','t',NOW(),NOW()");
+					}
 					header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				default: break;
