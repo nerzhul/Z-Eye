@@ -437,7 +437,7 @@
 						context.moveTo(0,0);
 						var img = new Image();
 						img.onload = function() {
-							context.drawImage(img, 0,0,892,119);*
+							context.drawImage(img, 0,0,892,119);
 							var normportX = null; var normportY = null;
 							var trunkport = null; var icsize = null;
 							switch(type) {
