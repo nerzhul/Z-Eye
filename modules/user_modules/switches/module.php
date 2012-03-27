@@ -59,13 +59,13 @@
 			$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 			if($data = pg_fetch_array($query)) {
 				$out = "";
-	                        exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$device." ifDescr | grep ".$port,$out);
-        	                if(strlen($out[0]) < 5)
-                	                return -1;
-                        	$out = explode(" ",$out[0]);
-	                        $out = explode(".",$out[0]);
-        	                if(!FS::$secMgr->isNumeric($out[1]))
-                	                return -1;
+				exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$device." ifDescr | grep ".$port,$out);
+				if(strlen($out[0]) < 5)
+						return -1;
+				$out = explode(" ",$out[0]);
+				$out = explode(".",$out[0]);
+				if(!FS::$secMgr->isNumeric($out[1]))
+						return -1;
 				$portid = $out[1];
 
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=9");
