@@ -3,6 +3,7 @@
 		private static $lang = "FR-fr";
 		private static $stylesheet = "fss1.css";
 		private static $websiteName = "Z-Monitor";
+		private static $OS = "FreeBSD";
 		/* 0 (no crypt, not recommended
 		1: sha1
 		2: md5(sha1)
@@ -17,6 +18,7 @@
 		public static function getSysLang() { return Config::$lang; }
 		public static function getSysStylesheet() { return Config::$stylesheet; }
 		public static function getWebsiteName() { return Config::$websiteName; }
+		public static function getOS() { return Config::$OS; }
 		public static function getCryptLevel() { return Config::$cryptlevel; }
 		public static function hasFavicon() { return Config::$favicon; }
 		public static function showSVNrev() { return Config::$svnrev; }
