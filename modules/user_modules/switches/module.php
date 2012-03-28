@@ -248,7 +248,7 @@
 					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
                                         $mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> [<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a> <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$convport."\">";
-										$mactoip[$idx]["dat"] .= FS::$iMgr->addImage("/styles/images/pencil.gif",8,8)."</a> ]".($piece == NULL ? "" : " Prise ".$piece);
+										$mactoip[$idx]["dat"] .= FS::$iMgr->addImage("/styles/images/pencil.gif",12,12)."</a> ]".($piece == NULL ? "" : " Prise ".$piece);
                                         $mactoip[$idx]["fst"] = $data["time_first"];
                                         $mactoip[$idx]["lst"] = $data["time_last"];
                                 }
