@@ -2,7 +2,7 @@
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/../user_objects/rrd.php");
 	class iStats extends genModule{
-		function iStats($iMgr) { parent::genModule($iMgr); }
+		function iStats() { parent::genModule(); }
 
 		public function Load() {
 			$stype = FS::$secMgr->checkAndSecuriseGetData("s");
