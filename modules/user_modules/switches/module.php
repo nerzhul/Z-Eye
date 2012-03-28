@@ -638,7 +638,8 @@
 								}
 								$output .= "]; drawContext('canvas_".($i+1)."',2,ptab,gptab,powport);</script>";
 								break;
-							case "WS-C2960S-24TS-L": // Gbit switches
+							case "WS-C2960S-24TD-L": case "WS-C2960S-24PD-L": case "WS-C2960S-24TS-S": // Gbit switches with 2 SFP need another image for this
+							case "WS-C2960S-24PS-L": case "WS-C2960S-24TS-L": // Gbit switches with 4 SFP
 								$poearr = array();
 								$portlist = "";
 								for($j=1;$j<25;$j++) {
