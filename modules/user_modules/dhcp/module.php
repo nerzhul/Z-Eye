@@ -1,7 +1,7 @@
 <?php
 	require_once(dirname(__FILE__)."/../generic_module.php");
-	class iConnect extends genModule{
-		function iConnect() { parent::genModule(); }
+	class iDHCP extends genModule{
+		function iDHCP() { parent::genModule(); }
 		public function Load() {
 			$output = "";
 			$output .= "<div id=\"module_connect\"><h4>Supervision du DHCP</h4>";
