@@ -17,16 +17,19 @@
 			$dhcpdatas2 = "";
 			$DHCPservers = "";
 			$DHCPfound = false;
+			$DHCPconnerr = false;
 			$query = FS::$dbMgr->Select("fss_server_list","addr","dhcp = 1");
 			while($data = mysql_fetch_array($query)) {
 				
 				$conn = ssh2_connect($data["addr"],22);
 				if(!$conn) {
-					$output .= "Erreur de connexion au serveur";
+					$output .= FS::$iMgr->printError("Erreur de connexion au serveur ".$data["addr"]);
+					$DHCPconnerr = true;
 				}
 				else {
 					if(!ssh2_auth_password($conn, $data["login"], $data["pwd"])) {
-						$output .= "Authentication error for server '".$data["addr"]."'";
+						$output .= FS::$iMgr->printError("Authentication error for server '".$data["addr"]."'");
+						$DHCPconnerr = true;
 					}
 					else {
 						
@@ -56,7 +59,8 @@
 			if($DHCPfound)
 				$output .= "Données collectées sur les serveurs: ".$DHCPservers;
 			else {
-				$output .= FS::$iMgr->printError("Aucun serveur DHCP enregistré !");
+				if($DHCPconnerr == false)
+					$output .= FS::$iMgr->printError("Aucun serveur DHCP enregistré !");
 				return $output;
 			}
 
