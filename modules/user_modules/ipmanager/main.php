@@ -8,7 +8,7 @@
 			$this->conf->modulename = "iIPManager";
 			$this->conf->seclevel = 6;
 			$this->conf->connected = 1;
-			$this->moduleclass = new iDHCP();
+			$this->moduleclass = new iIPManager();
 		}
 	};
 ?>
