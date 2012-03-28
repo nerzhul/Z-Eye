@@ -18,7 +18,7 @@
 			$DHCPservers = "";
 			$DHCPfound = false;
 			$DHCPconnerr = false;
-			$query = FS::$dbMgr->Select("fss_server_list","addr","dhcp = 1");
+			$query = FS::$dbMgr->Select("fss_server_list","addr,login,pwd","dhcp = 1");
 			while($data = mysql_fetch_array($query)) {
 				
 				$conn = ssh2_connect($data["addr"],22);
