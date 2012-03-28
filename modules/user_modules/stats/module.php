@@ -491,13 +491,8 @@
 					return;
 				case 2:
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
-														if($stype == NULL) $stype = 1;
-					header("Location: index.php?mod=".$this->mid."&s=".$stype);
-														return;
-				case 3: 
-					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
-					if($filtr == NULL) header("Location: index.php?mod".$this->mid."&s=2");
-					else header("Location: index.php?mod=".$this->mid."&s=2&f=".$filtr);
+					if($stype == NULL) $stype = 1;
+						header("Location: index.php?mod=".$this->mid."&s=".$stype);
 					return;
 				default: break;
 			}

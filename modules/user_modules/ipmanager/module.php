@@ -199,7 +199,7 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 
 			if(count($sort_result) > 0) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 				$output .= FS::$iMgr->addList("f");
 				foreach ($sort_result as $class_a => $ca_keys) {
 					foreach ($ca_keys as $class_b => $cb_keys) {
@@ -300,6 +300,13 @@
 		}
 		
 		public function handlePostDatas($act) {
+			switch($act) {
+				case 1:
+					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
+					if($filtr == NULL) header("Location: index.php?mod".$this->mid."");
+					else header("Location: index.php?mod=".$this->mid."&f=".$filtr);
+					return;
+			}
 		}
 	};
 ?>
