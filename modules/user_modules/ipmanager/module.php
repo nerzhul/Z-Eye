@@ -28,7 +28,7 @@
 				}
 				else {
 					if(!ssh2_auth_password($conn, $data["login"], $data["pwd"])) {
-						$output .= FS::$iMgr->printError("Authentication error for server '".$data["addr"]."'");
+						$output .= FS::$iMgr->printError("Authentication error for server '".$data["addr"]."' with login '".$data["login"]."'");
 						$DHCPconnerr = true;
 					}
 					else {
