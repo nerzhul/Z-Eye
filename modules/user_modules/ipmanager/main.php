@@ -6,7 +6,7 @@
 		function iModule() {
 			parent::InterfaceModule();
 			$this->conf->modulename = "iIPManager";
-			$this->conf->seclevel = 6;
+			$this->conf->seclevel = 4;
 			$this->conf->connected = 1;
 			$this->moduleclass = new iIPManager();
 		}
