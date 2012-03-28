@@ -214,6 +214,8 @@
 				$output .= "</select>";
 				$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
 				$output .= "</form>";
+				
+				$last_ip = "";
 				foreach ($sort_result as $class_a => $ca_keys) {
 					foreach ($ca_keys as $class_b => $cb_keys) {
 						if($filter == NULL) $output .= "<h3>Classe B: $class_a.$class_b.0.0/16</h3>";
@@ -232,6 +234,7 @@
 										continue;
 									if(isset($ipData["state"])) $rstate = $ipData["state"];
 									else $rstate = "";
+									
 									switch($rstate) {
 									case "free":
 										$rstate = "Libre";
