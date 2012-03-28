@@ -101,13 +101,13 @@
 				$output .= "<tr><td id=\"vllabel\">Vlan natif</td><td id=\"vln\">";
 
 				$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native","ip = '".$dip."' AND port = '".$port."'","vlan");
-                                $nvlan = $data["vlan"];
-                                $vlanlist = "";
-                                $vlancount = 0;
-                                while($data2 = pg_fetch_array($query2)) {
-                                        if($data2["native"] == "t" && $data2["vlan"] != 1) $nvlan = $data2["vlan"];
-                                        $vlanlist .= $data2["vlan"].",";
-                                }
+				$nvlan = $data["vlan"];
+				$vlanlist = "";
+				$vlancount = 0;
+				while($data2 = pg_fetch_array($query2)) {
+						if($data2["native"] == "t" && $data2["vlan"] != 1) $nvlan = $data2["vlan"];
+						$vlanlist .= $data2["vlan"].",";
+				}
 				$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
 				$output .= FS::$iMgr->addInput("nvlan",$nvlan,4,4);
 				$output .= "</td></tr>";
@@ -247,7 +247,8 @@
 					$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
 					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
-                                        $mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> [<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>]".($piece == NULL ? "" : " Prise ".$piece);
+                                        $mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> [<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a> <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$convport."\">";
+										$mactoip[$idx]["dat"] .= FS::$iMgr->addImage("/styles/images/pencil.gif",8,8)."</a> ]".($piece == NULL ? "" : " Prise ".$piece);
                                         $mactoip[$idx]["fst"] = $data["time_first"];
                                         $mactoip[$idx]["lst"] = $data["time_last"];
                                 }
