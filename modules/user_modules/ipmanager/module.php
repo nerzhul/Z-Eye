@@ -57,7 +57,7 @@
 			}
 			
 			if($DHCPfound)
-				$output .= "Données collectées sur les serveurs: ".$DHCPservers;
+				$output .= "Données collectées sur le(s) serveur(s): ".$DHCPservers."<br /><br />";
 			else {
 				if($DHCPconnerr == false)
 					$output .= FS::$iMgr->printError("Aucun serveur DHCP enregistré !");
