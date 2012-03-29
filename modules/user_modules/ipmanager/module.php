@@ -73,7 +73,7 @@
 							break;
 						default: {
 								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".$key."'");
-								$query3 = FS::$pgdbMgr->GetOneData("node","switch,port,time_last","mac = '".$mac."'");
+								$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."'");
 								if($data3 = pg_fetch_array($query3)) {
 									$rstate = "IP fixe";
 									$style = "background-color: orange;";
