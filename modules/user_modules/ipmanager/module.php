@@ -84,7 +84,7 @@
 				$netoutput .= "<script>
 				{
 					var pie3 = new RGraph.Pie('".$cc_keys["net"]."', [".$used.",".$reserv.",".$free."]);
-					pie3.Set('chart.key', ['Used (".substr(($used/$usableaddr*100),0,5)."%)', 'Reserved (".substr(($reserv/$usableaddr*100),0,5)."%)', 'Free (".substr(($free/$usableaddr*100),0,5)."%)']);
+					pie3.Set('chart.key', ['Used (".substr(($used/$netobj->getMaxHosts()*100),0,5)."%)', 'Reserved (".substr(($reserv/$$netobj->getMaxHosts()*100),0,5)."%)', 'Free (".substr(($free/$netobj->getMaxHosts()*100),0,5)."%)']);
 					pie3.Set('chart.key.interactive', true);
 					pie3.Set('chart.colors', ['red', 'yellow', 'green']);
 					pie3.Set('chart.shadow', true);
