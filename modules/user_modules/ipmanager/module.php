@@ -17,7 +17,7 @@
 			$netoutput = "";
 			
 			$resarray = array();
-			// @TODO filter
+			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask");
 			
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
@@ -77,13 +77,13 @@
 					$netoutput .= "</td><td>".$rstate."</td><td>";
 					$netoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
 					$netoutput .= $value["host"]."</td><td>";
-					$netoutput .= $value["end"]."</td></tr>";
+					$netoutput .= $value["ltime"]."</td></tr>";
 				}
 				
 				$netoutput .= "</table></center><br /><hr>";
 				$netoutput .= "<script>
 				{
-					var pie3 = new RGraph.Pie('".$cc_keys["net"]."', [".$used.",".$reserv.",".$free."]);
+					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".($netobj->getMaxHosts()-$used-$reserv)."]);
 					pie3.Set('chart.key', ['Used (".substr(($used/($netobj->getMaxHosts())*100),0,5)."%)', 'Reserved (".substr(($reserv/($netobj->getMaxHosts())*100),0,5)."%)', 'Free (".substr(($free/($netobj->getMaxHosts())*100),0,5)."%)']);
 					pie3.Set('chart.key.interactive', true);
 					pie3.Set('chart.colors', ['red', 'yellow', 'green']);
