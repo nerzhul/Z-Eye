@@ -72,7 +72,8 @@
 							$reserv++;
 							break;
 						default: {
-								$query3 = FS::$pgdbMgr->GetOneData("node","switch,port,time_last","mac = '".$value["mac"]."'");
+								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".$key."'");
+								$query3 = FS::$pgdbMgr->GetOneData("node","switch,port,time_last","mac = '".$mac."'");
 								if($data3 = pg_fetch_array($query3)) {
 									$rstate = "IP fixe";
 									$style = "background-color: orange;";
@@ -95,8 +96,8 @@
 				$netoutput .= "</table></center><br /><hr>";
 				$netoutput .= "<script>
 				{
-					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$dhcpfree.",".$fixedip.",".$unkst."]);
-					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Baux libres (".substr(($dhcpfree/count($iparray)*100),0,5)."%)', 'Inconnu (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
+					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$fixedip.",".$dhcpfree.",".$unkst."]);
+					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', 'IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Baux libres (".substr(($dhcpfree/count($iparray)*100),0,5)."%)', 'Inconnu (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
 					pie3.Set('chart.key.interactive', true);
 					pie3.Set('chart.colors', ['red', 'yellow', 'orange', 'green', 'gray']);
 					pie3.Set('chart.shadow', true);
