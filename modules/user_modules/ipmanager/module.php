@@ -16,6 +16,7 @@
 			$formoutput = "";
 			$netoutput = "";
 
+			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 			$output .= FS::$iMgr->addList("f");
 			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask");
@@ -23,7 +24,6 @@
 				$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 			}
 			
-			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask",($filter != NULL ? "netid = '".$filter."'" : ""));
 			while($data = mysql_fetch_array($query)) {
 				$iparray = array();
@@ -74,15 +74,16 @@
 						default: {
 								$rstate = "Libre";
 								$style = "background-color: #BFFFBF;";
-								$time = mktime(date("H")-1, date("i"), date("s"), date("m"), date("d"), date("Y"));
-								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > '".date("Y-m-d H:i:s",$time)."' AND active = 't'");
+								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > current_timestamp - interval '1 hour' AND active = 't'");
 								if($mac) {
-									$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND time_last > '".date("Y-m-d H:i:s",$time)."' AND active = 't'");
+									$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND time_last > current_timestamp - interval '1 hour' AND active = 't'");
 									if($data3 = pg_fetch_array($query3)) {
 										$rstate = "IP fixe";
 										$style = "background-color: orange;";
 										$fixedip++;
 									}
+									else
+										$free++;
 								}
 								else
 									$free++;
@@ -100,7 +101,7 @@
 				$netoutput .= "<script>
 				{
 					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$fixedip.",".$free."]);
-					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', 'IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Baux libres (".substr(($free/count($iparray)*100),0,5)."%)', ]);
+					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', 'IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Libres (".substr(($free/count($iparray)*100),0,5)."%)', ]);
 					pie3.Set('chart.key.interactive', true);
 					pie3.Set('chart.colors', ['red', 'yellow', 'orange', 'green']);
 					pie3.Set('chart.shadow', true);
