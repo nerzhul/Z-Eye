@@ -27,7 +27,6 @@
 			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask",($filter != NULL ? "netid = '".$filter."'" : ""));
 			while($data = mysql_fetch_array($query)) {
 				$iparray = array();
-				$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
 				$netoutput .= "<center><canvas id=\"".$data["netid"]."\" height=\"300\" width=\"450\">HTML5 non support&eacute;</canvas></center>";
 				$netoutput .= "<center><table><tr><th>Adresse IP</th><th>Statut</th><th>MAC address</th><th>Nom d'hote</th><th>Fin du bail</th></tr>";
@@ -52,6 +51,7 @@
 				$used = 0;
 				$reserv = 0;
 				$dhcpfree = 0;
+				$fixedip = 0;
 				foreach($iparray as $key => $value) {
 					$rstate = "";
 					$style = "";
@@ -71,9 +71,16 @@
 							$style = "background-color: #FFFF80;";
 							$reserv++;
 							break;
-						default:
-							$rstate = "";
-							$style = "";
+						default: {
+							$query3 = FS::$pgdbMgr->GetOneData("node","switch,port,time_last","mac = '".$value["mac"]."'");
+							if($data3 = pg_fetch_array($query3)) {
+								$rstate = "IP fixe";
+								$style = "background-color: orange;";
+								$fixedip++;
+							} else {
+								$rstate = "";
+								$style = "";
+							}
 							break;
 					}
 					$netoutput .= "<tr style=\"$style\"><td><a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".long2ip($key)."\">";
@@ -83,16 +90,16 @@
 					$netoutput .= $value["host"]."</td><td>";
 					$netoutput .= $value["ltime"]."</td></tr>";
 				}
-				$unkst = count($iparray)-$used-$reserv-$dhcpfree;
+				$unkst = count($iparray)-$used-$reserv-$dhcpfree-$fixedip;
 				$netoutput .= "</table></center><br /><hr>";
 				$netoutput .= "<script>
 				{
-					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$dhcpfree.",".$unkst."]);
-					pie3.Set('chart.key', ['Lease used (".substr(($used/count($iparray)*100),0,5)."%)', 'Reserved (".substr(($reserv/count($iparray)*100),0,5)."%)', 'Free lease (".substr(($dhcpfree/count($iparray)*100),0,5)."%)', 'Unknown status (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
+					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$dhcpfree.",".$fixedip.",".$unkst."]);
+					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Baux libres (".substr(($dhcpfree/count($iparray)*100),0,5)."%)', 'Inconnu (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
 					pie3.Set('chart.key.interactive', true);
-					pie3.Set('chart.colors', ['red', 'yellow', 'green', 'gray']);
+					pie3.Set('chart.colors', ['red', 'yellow', 'orange', 'green', 'gray']);
 					pie3.Set('chart.shadow', true);
-					pie3.Set('chart.exploded', [10,10,10,10]);
+					pie3.Set('chart.exploded', [10,10,10,10,10]);
 					pie3.Set('chart.shadow.offsetx', 0);
 					pie3.Set('chart.shadow.offsety', 0);
 					pie3.Set('chart.shadow.blur', 25);
