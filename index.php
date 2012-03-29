@@ -23,12 +23,12 @@
 		FS::$iMgr->addJSFile("modules/js/dns.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.core.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.tooltips.js");
-                FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.effects.js");
-                FS::$iMgr->addJSFile("lib/RGraph/RGraph.pie.js");
-                FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.context.js");
-                FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.annotate.js");
-                FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.zoom.js");
-                FS::$iMgr->addJSFile("lib/RGraph/RGraph.line.js");
+			FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.effects.js");
+			FS::$iMgr->addJSFile("lib/RGraph/RGraph.pie.js");
+			FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.context.js");
+			FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.annotate.js");
+			FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.zoom.js");
+			FS::$iMgr->addJSFile("lib/RGraph/RGraph.line.js");
 
 		echo FS::$iMgr->showHeader();
 		echo FS::$iMgr->showContent();
