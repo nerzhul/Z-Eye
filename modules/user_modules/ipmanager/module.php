@@ -72,14 +72,15 @@
 							$reserv++;
 							break;
 						default: {
-							$query3 = FS::$pgdbMgr->GetOneData("node","switch,port,time_last","mac = '".$value["mac"]."'");
-							if($data3 = pg_fetch_array($query3)) {
-								$rstate = "IP fixe";
-								$style = "background-color: orange;";
-								$fixedip++;
-							} else {
-								$rstate = "";
-								$style = "";
+								$query3 = FS::$pgdbMgr->GetOneData("node","switch,port,time_last","mac = '".$value["mac"]."'");
+								if($data3 = pg_fetch_array($query3)) {
+									$rstate = "IP fixe";
+									$style = "background-color: orange;";
+									$fixedip++;
+								} else {
+									$rstate = "";
+									$style = "";
+								}
 							}
 							break;
 					}
