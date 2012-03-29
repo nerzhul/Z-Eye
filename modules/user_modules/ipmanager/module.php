@@ -50,7 +50,7 @@
 				
 				$used = 0;
 				$reserv = 0;
-				$dhcpfree = 0;
+				$free = 0;
 				$fixedip = 0;
 				foreach($iparray as $key => $value) {
 					$rstate = "";
@@ -59,7 +59,7 @@
 						case 1:
 							$rstate = "Libre";
 							$style = "background-color: #BFFFBF;";
-							$dhcpfree++;
+							$free++;
 							break;
 						case 2:
 							$rstate = "Utilis&eacute;";
@@ -72,8 +72,8 @@
 							$reserv++;
 							break;
 						default: {
-								$rstate = "";
-								$style = "";
+								$rstate = "Libre";
+								$style = "background-color: #BFFFBF;";
 								$time = mktime(date("H")-1, date("i"), date("s"), date("m"), date("d"), date("Y"));
 								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > '".date("Y-m-d H:i:s",$time)."' AND active = 't'");
 								if($mac) {
@@ -84,6 +84,8 @@
 										$fixedip++;
 									}
 								}
+								else
+									$free++;
 							}
 							break;
 					}
@@ -94,16 +96,15 @@
 					$netoutput .= $value["host"]."</td><td>";
 					$netoutput .= $value["ltime"]."</td></tr>";
 				}
-				$unkst = count($iparray)-$used-$reserv-$dhcpfree-$fixedip;
 				$netoutput .= "</table></center><br /><hr>";
 				$netoutput .= "<script>
 				{
-					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$fixedip.",".$dhcpfree.",".$unkst."]);
-					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', 'IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Baux libres (".substr(($dhcpfree/count($iparray)*100),0,5)."%)', 'Inconnu (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
+					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$fixedip.",".$free."]);
+					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', 'IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Baux libres (".substr(($free/count($iparray)*100),0,5)."%)', ]);
 					pie3.Set('chart.key.interactive', true);
-					pie3.Set('chart.colors', ['red', 'yellow', 'orange', 'green', 'gray']);
+					pie3.Set('chart.colors', ['red', 'yellow', 'orange', 'green']);
 					pie3.Set('chart.shadow', true);
-					pie3.Set('chart.exploded', [10,10,10,10,10]);
+					pie3.Set('chart.exploded', [10,10,10,10]);
 					pie3.Set('chart.shadow.offsetx', 0);
 					pie3.Set('chart.shadow.offsety', 0);
 					pie3.Set('chart.shadow.blur', 25);
