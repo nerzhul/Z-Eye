@@ -18,14 +18,14 @@
 			
 			$resarray = array();
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
-			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask");
+			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask",($filter != NULL ? "netid = '".$filter."'" : ""));
 			
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 			$output .= FS::$iMgr->addList("f");
 				
 			while($data = mysql_fetch_array($query)) {
 				$iparray = array();
-				$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"]."/".$data["netmask"],($filter == $data["netid"]."/".$data["netmask"] ? true : false));
+				$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
 				$netoutput .= "<center><canvas id=\"".$data["netid"]."\" height=\"300\" width=\"450\">HTML5 non support&eacute;</canvas></center>";
 				$netoutput .= "<center><table><tr><th>Adresse IP</th><th>Statut</th><th>MAC address</th><th>Nom d'hote</th><th>Fin du bail</th></tr>";
@@ -88,7 +88,7 @@
 					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$dhcpfree.",".$unkst."]);
 					pie3.Set('chart.key', ['Used (".substr(($used/count($iparray)*100),0,5)."%)', 'Reserved (".substr(($reserv/count($iparray)*100),0,5)."%)', 'DHCPFree (".substr(($dhcpfree/count($iparray)*100),0,5)."%)', 'Unknown status (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
 					pie3.Set('chart.key.interactive', true);
-					pie3.Set('chart.colors', ['red', 'yellow', 'gray', 'green']);
+					pie3.Set('chart.colors', ['red', 'yellow', 'green', 'gray']);
 					pie3.Set('chart.shadow', true);
 					pie3.Set('chart.exploded', [10,10,10,10]);
 					pie3.Set('chart.shadow.offsetx', 0);
