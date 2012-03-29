@@ -24,6 +24,7 @@
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.core.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.tooltips.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.effects.js");
+		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.key.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.pie.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.context.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.annotate.js");

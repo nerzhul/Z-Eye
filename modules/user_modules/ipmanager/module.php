@@ -90,6 +90,7 @@
 					pie3.Set('chart.key.interactive', true);
 					pie3.Set('chart.colors', ['red', 'yellow', 'gray', 'green']);
 					pie3.Set('chart.shadow', true);
+					pie3.Set('chart.exploded', [10,10,10,10]);
 					pie3.Set('chart.shadow.offsetx', 0);
 					pie3.Set('chart.shadow.offsety', 0);
 					pie3.Set('chart.shadow.blur', 25);
