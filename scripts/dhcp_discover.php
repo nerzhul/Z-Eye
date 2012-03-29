@@ -244,7 +244,7 @@
 								if(isset($ipData["end"])) $iend = $ipData["end"];
 								else $iend = "";
 
-								FS::$dbMgr->Insert("fss_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","'".$class_a.".".$class_b.".".$class_c.".".$ipKey."','".$iwh."','".$ihost."','".$iend."','".$rstate."'");
+								FS::$dbMgr->Insert("fss_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid","'".$class_a.".".$class_b.".".$class_c.".".$ipKey."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$cc_keys["net"]."'");
 							}
 						}
 					}
