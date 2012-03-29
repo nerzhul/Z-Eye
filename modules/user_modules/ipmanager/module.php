@@ -77,7 +77,7 @@
 								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."'");
 								if($mac) {
 									$time = mktime(date("H")-1, date("i"), date("s"), date("m"), date("d"), date("Y"));
-									$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND time_last > '".date("Y-m-d H:i:s",$time)."'");
+									$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND time_last > '".date("Y-m-d H:i:s",$time)."' AND active = 't'");
 									if($data3 = pg_fetch_array($query3)) {
 										$rstate = "IP fixe";
 										$style = "background-color: orange;";
