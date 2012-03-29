@@ -32,7 +32,7 @@
 				$netobj = new FSNetwork();
 				$netobj->setNetAddr($data["netid"]);
 				$netobj->setNetMask($data["netmask"]);
-				for($i=ip2long($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
+				for($i=($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
 					$iparray[$i] = array();
 					$iparray[$i]["mac"] = "";
 					$iparray[$i]["host"] = "";
@@ -49,6 +49,7 @@
 				
 				$used = 0;
 				$reserv = 0;
+				$dhcpfree = 0;
 				foreach($iparray as $key => $value) {
 					$rstate = "";
 					$style = "";
@@ -56,6 +57,7 @@
 						case 1:
 							$rstate = "Libre";
 							$style = "background-color: #BFFFBF;";
+							$dhcpfree++;
 							break;
 						case 2:
 							$rstate = "Utilis&eacute;";
@@ -79,12 +81,12 @@
 					$netoutput .= $value["host"]."</td><td>";
 					$netoutput .= $value["ltime"]."</td></tr>";
 				}
-				
+				$unkst = count($iparray)-$used-$reserv-$dhcpfree;
 				$netoutput .= "</table></center><br /><hr>";
 				$netoutput .= "<script>
 				{
-					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".($netobj->getMaxHosts()-$used-$reserv+4)."]);
-					pie3.Set('chart.key', ['Used (".substr(($used/($netobj->getMaxHosts())*100),0,5)."%)', 'Reserved (".substr(($reserv/($netobj->getMaxHosts())*100),0,5)."%)', 'Free (".substr(($free/($netobj->getMaxHosts())*100),0,5)."%)']);
+					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$unkst.",".$dhcpfree."]);
+					pie3.Set('chart.key', ['Used (".substr(($used/count($iparray)*100),0,5)."%)', 'Reserved (".substr(($reserv/count($iparray)*100),0,5)."%)', 'DHCPFree (".substr(($free/count($iparray)*100),0,5)."%)', 'Unknown status (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
 					pie3.Set('chart.key.interactive', true);
 					pie3.Set('chart.colors', ['red', 'yellow', 'green']);
 					pie3.Set('chart.shadow', true);
