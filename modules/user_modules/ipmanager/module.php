@@ -32,7 +32,7 @@
 				$netobj = new FSNetwork();
 				$netobj->setNetAddr($data["netid"]);
 				$netobj->setNetMask($data["netmask"]);
-				for($i=ip2long($netobj->getFirstUsableIP());$i<=($netobj->getLastUsableIP());$i++) {
+				for($i=ip2long($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
 					$iparray[$i] = array();
 					$iparray[$i]["mac"] = "";
 					$iparray[$i]["host"] = "";
