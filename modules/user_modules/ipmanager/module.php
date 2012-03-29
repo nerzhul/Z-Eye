@@ -83,9 +83,9 @@
 				$netoutput .= "</table></center><br /><hr>";
 				$netoutput .= "<script>
 				{
-					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".($netobj->getMaxHosts()-$used-$reserv)."]);
-					";//pie3.Set('chart.key', ['Used (".substr(($used/($netobj->getMaxHosts())*100),0,5)."%)', 'Reserved (".substr(($reserv/($netobj->getMaxHosts())*100),0,5)."%)', 'Free (".substr(($free/($netobj->getMaxHosts())*100),0,5)."%)']);
-					$netoutput .= "pie3.Set('chart.key.interactive', true);
+					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".($netobj->getMaxHosts()-$used-$reserv+4)."]);
+					pie3.Set('chart.key', ['Used (".substr(($used/($netobj->getMaxHosts())*100),0,5)."%)', 'Reserved (".substr(($reserv/($netobj->getMaxHosts())*100),0,5)."%)', 'Free (".substr(($free/($netobj->getMaxHosts())*100),0,5)."%)']);
+					pie3.Set('chart.key.interactive', true);
 					pie3.Set('chart.colors', ['red', 'yellow', 'green']);
 					pie3.Set('chart.shadow', true);
 					pie3.Set('chart.shadow.offsetx', 0);
