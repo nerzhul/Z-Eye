@@ -136,51 +136,51 @@
 			// static leases
 			$dhcpdatas2 = preg_replace("/\n/","<br />",$dhcpdatas2);
 			$reserv = preg_split("/host /",$dhcpdatas2);
-	        for($i=0;$i<count($reserv);$i++) {
-				$resline = preg_split("#<br />#",$reserv[$i]);
-				for($j=0;$j<count($resline);$j++) {
-					if(preg_match("#(.*){#",$resline[$j],$host)) {
+	        	for($i=0;$i<count($reserv);$i++) {
+                		$resline = preg_split("#<br />#",$reserv[$i]);
+	        	        for($j=0;$j<count($resline);$j++) {
+		                        if(preg_match("#(.*){#",$resline[$j],$host)) {
 						if(preg_match("#subnet(.*)#",$resline[$j],$subnet)) {
-							$subnet = preg_split("# #",$subnet[0]);
+                		                	$subnet = preg_split("# #",$subnet[0]);
 							$net = $subnet[1];
 							$mask = $subnet[3];
 							$ip_split = preg_split("#\.#",$net);
 							$sort_result[$ip_split[0]][$ip_split[1]][$ip_split[2]]["net"] = $net;
 							$sort_result[$ip_split[0]][$ip_split[1]][$ip_split[2]]["mask"] = $mask;
-						}
+                		        	}
 						else {
-											$reserv_host = $host[0];
+		                	                $reserv_host = $host[0];
 							$reserv_host = preg_split("# #",$reserv_host);
-										$reserv_host = preg_replace("#\{#","",$reserv_host);
-										$reserv_host = $reserv_host[0];
+        		        	        	$reserv_host = preg_replace("#\{#","",$reserv_host);
+		                		        $reserv_host = $reserv_host[0];
 						}
 					}
-					else if(preg_match("#hardware ethernet (.*);#",$resline[$j],$hweth)) {
-						$reserv_hw = $hweth[0];
+	                	        else if(preg_match("#hardware ethernet (.*);#",$resline[$j],$hweth)) {
+                        		        $reserv_hw = $hweth[0];
 						$hw = preg_split("# #",$reserv_hw);
-						$hw = preg_replace("#;#","",$hw[2]);
+			                        $hw = preg_replace("#;#","",$hw[2]);
 					}
-					else if(preg_match("#fixed-address (.*);#",$resline[$j],$ipaddr)) {
-						$reserv_ip = $ipaddr[0];
+                	        	else if(preg_match("#fixed-address (.*);#",$resline[$j],$ipaddr)) {
+                		                $reserv_ip = $ipaddr[0];
 						$reserv_ip = preg_split("# #",$reserv_ip);
-						$reserv_ip = preg_replace("#;#","",$reserv_ip[1]);
+	                        		$reserv_ip = preg_replace("#;#","",$reserv_ip[1]);
 					}
 					$st = "reserved";
 
 					if(isset($reserv_host) && $reserv_host != "subnet") {
 						if(!isset($result_temp[$reserv_host]))
 							$result_temp[$reserv_host] = array();
-		
+
 						$result_temp[$reserv_host]["state"] = $st;
-						$result_temp[$reserv_host]["hw"] = $hw;
-						$result_temp[$reserv_host]["end"] = " ";
-						$result_temp[$reserv_host]["start"] = " ";
+	                		        $result_temp[$reserv_host]["hw"] = $hw;
+        	        	        	$result_temp[$reserv_host]["end"] = " ";
+			                        $result_temp[$reserv_host]["start"] = " ";
 						if(isset($reserv_ip))
-							$result_temp[$reserv_host]["ip"] = $reserv_ip;
+	        	        	        	$result_temp[$reserv_host]["ip"] = $reserv_ip;
 						$result_temp[$reserv_host]["hostname"] = $reserv_host;
 					}
-				}
-			}
+	                	}
+        		}
 
 			foreach($result_temp as $key => $value) {
 				$result[$value["ip"]] = $value;
@@ -191,8 +191,8 @@
 					$ip_split = preg_split("#\.#",$key);
 					$sort_result[$ip_split[0]][$ip_split[1]][$ip_split[2]][$ip_split[3]] = $ipData;
 					ksort($sort_result[$ip_split[0]]);
-					ksort($sort_result[$ip_split[0]][$ip_split[1]]);
-					ksort($sort_result[$ip_split[0]][$ip_split[1]][$ip_split[2]]);
+			        	ksort($sort_result[$ip_split[0]][$ip_split[1]]);
+	        			ksort($sort_result[$ip_split[0]][$ip_split[1]][$ip_split[2]]);
 				}
 			}
 
@@ -214,8 +214,6 @@
 				$output .= "</select>";
 				$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
 				$output .= "</form>";
-				
-				$last_ip = "";
 				foreach ($sort_result as $class_a => $ca_keys) {
 					foreach ($ca_keys as $class_b => $cb_keys) {
 						if($filter == NULL) $output .= "<h3>Classe B: $class_a.$class_b.0.0/16</h3>";
@@ -234,7 +232,6 @@
 										continue;
 									if(isset($ipData["state"])) $rstate = $ipData["state"];
 									else $rstate = "";
-									
 									switch($rstate) {
 									case "free":
 										$rstate = "Libre";

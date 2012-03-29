@@ -101,13 +101,13 @@
 				$output .= "<tr><td id=\"vllabel\">Vlan natif</td><td id=\"vln\">";
 
 				$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native","ip = '".$dip."' AND port = '".$port."'","vlan");
-				$nvlan = $data["vlan"];
-				$vlanlist = "";
-				$vlancount = 0;
-				while($data2 = pg_fetch_array($query2)) {
-						if($data2["native"] == "t" && $data2["vlan"] != 1) $nvlan = $data2["vlan"];
-						$vlanlist .= $data2["vlan"].",";
-				}
+                                $nvlan = $data["vlan"];
+                                $vlanlist = "";
+                                $vlancount = 0;
+                                while($data2 = pg_fetch_array($query2)) {
+                                        if($data2["native"] == "t" && $data2["vlan"] != 1) $nvlan = $data2["vlan"];
+                                        $vlanlist .= $data2["vlan"].",";
+                                }
 				$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
 				$output .= FS::$iMgr->addInput("nvlan",$nvlan,4,4);
 				$output .= "</td></tr>";
@@ -171,7 +171,10 @@
 						$output .= "<table class=\"standardTable\"><tr><th>Prise</th><th>Switch</th><th>Port</th></tr>";
 						$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 						$convport = preg_replace("#\/#","-",$data["port"]);
-						$output .= "<tr><td>".$search."</td><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."\">".$swname."</a></td><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."#".$convport."\">".$data["port"]."</a></td></tr>";
+						$output .= "<tr><td>".$search."</td><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."\">".$swname."</a></td><td>";
+						$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."#".$convport."\">".$data["port"]."</a></td><td>";
+						$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>";
+						$output .= "</td></tr>";
 						$output .= "</table>";
 					}
 
@@ -243,12 +246,15 @@
 				while($data = pg_fetch_array($query)) {
                                         $idx = count($mactoip);
                                         $mactoip[$idx] = array();
-                                        $mactoip[$idx]["type"] = "Switch port";
+                                        $mactoip[$idx]["type"] = "Switch, port";
 					$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
 					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
-                                        $mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> [<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$convport."\">";
-										$mactoip[$idx]["dat"] .= FS::$iMgr->addImage("/styles/images/pencil.gif",12,12)."</a>".($piece == NULL ? "" : " Prise ".$piece);
+                                        $mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> ";
+					$mactoip[$idx]["dat"] .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
+					$mactoip[$idx]["dat"] .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>";
+					$mactoip[$idx]["dat"] .= ($piece == NULL ? "" : "<br />Prise ".$piece);
+					$mactoip[$idx]["type"] .= ($piece == NULL ? "" : ", prise");
                                         $mactoip[$idx]["fst"] = $data["time_first"];
                                         $mactoip[$idx]["lst"] = $data["time_last"];
                                 }
@@ -639,8 +645,7 @@
 								}
 								$output .= "]; drawContext('canvas_".($i+1)."',2,ptab,gptab,powport);</script>";
 								break;
-							case "WS-C2960S-24TD-L": case "WS-C2960S-24PD-L": case "WS-C2960S-24TS-S": // Gbit switches with 2 SFP need another image for this
-							case "WS-C2960S-24PS-L": case "WS-C2960S-24TS-L": // Gbit switches with 4 SFP
+							case "WS-C2960S-24TS-L": // Gbit switches
 								$poearr = array();
 								$portlist = "";
 								for($j=1;$j<25;$j++) {
@@ -1684,12 +1689,15 @@
 					$sql = "UPDATE device_port_vlan SET vlan ='".$nvlan."' WHERE ip='".$dip."' and port='".$port."' and native='t'";
 					pg_query($sql);
 					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."' AND port='".$port."'");
-					if(FS::$secMgr->checkAndSecurisePostData("vllist") != NULL) {
-						$vlantab = preg_split("/,/",FS::$secMgr->checkAndSecurisePostData("vllist"));
-						for($i=0;$i<count($vlantab);$i++)
-							FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vlantab[$i]."','f',NOW(),NOW()");
+					$vllist = FS::$secMgr->checkAndSecurisePostData("vllist");
+					if($trunk == 1) {
+						if($vllist != NULL) {
+							$vlantab = preg_split("/,/",$vllist);
+							for($i=0;$i<count($vlantab);$i++)
+								FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vlantab[$i]."','f',NOW(),NOW()");
+						}
 					}
-					else {
+					else if ($trunk == 2) {
 						FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$nvlan."','t',NOW(),NOW()");
 					}
 					header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);

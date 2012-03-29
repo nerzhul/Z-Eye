@@ -17,7 +17,7 @@
 			$output = "<h4>Informations sur la pièce ";
 			$piece = FS::$secMgr->checkAndSecuriseGetData("piece");
 			$output .= $piece."</h4>";
-			$output .= "<a class=\"monoComponentt_a\" href=\"m-34.html\">Retour</a>";
+			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\">Retour</a>";
 
 			$found = 0;
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>#Prise</th><th>Switch</th><th>Port</th><th>Commentaire</th></tr>";
@@ -28,9 +28,9 @@
 				$query2 = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$piece.".".$data["prise"]."'");
 				if($data2 = mysql_fetch_array($query2)) {
 					$dev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data2["ip"]."'");
-					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=33&d=".$dev."\">".$dev."</a></td>";
+					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=14&d=".$dev."\">".$dev."</a></td>";
 					$convport = preg_replace("#\/#","-",$data2["port"]);
-					$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=33&d=".$dev."#".$convport."\">".$data2["port"]."</a></td><td>";
+					$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=14&d=".$dev."#".$convport."\">".$data2["port"]."</a></td><td>";
 				}
 				else
 					$tmpoutput .= " - </td><td>Non câblé</td><td>";
@@ -48,7 +48,7 @@
 			$output .= "<script type=\"text/javascript\">";
                         $output .= "function modifyPiece(src,sbmit,piece_,nbprise_) { ";
                         $output .= "if(sbmit == true) { ";
-                        $output .= "$.post('index.php?at=3&mod=34&act=1', { piece: piece_, nbpr: document.getElementsByName(nbprise_)[0].value }, function(data) { ";
+                        $output .= "$.post('index.php?at=3&mod=".$this->mid."&act=1', { piece: piece_, nbpr: document.getElementsByName(nbprise_)[0].value }, function(data) { ";
                         $output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
                         $output .= "}); } ";
                         $output .= "else $(src).toggle(); }";
@@ -63,7 +63,7 @@
                                         $batarr[$data["piece"][0]][$data["piece"][1]] = "<h4>Bâtiment ".$data["piece"][0]." (".$data["piece"][1].($data["piece"][1] == 1 ? "er" : "ème")." étage) </h4><table class=\"standardTable\"><tr><th>Pièce</th><th>Nombre de prises</th></tr>";
 
 				$npiece = preg_replace("#\.#","-",$data["piece"]);
-				$batarr[$data["piece"][0]][$data["piece"][1]] .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=34&piece=".$data["piece"]."\">".$data["piece"]."</a></td><td><center>";
+				$batarr[$data["piece"][0]][$data["piece"][1]] .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&piece=".$data["piece"]."\">".$data["piece"]."</a></td><td><center>";
 				$batarr[$data["piece"][0]][$data["piece"][1]] .= "<div id=\"nbpr_".$npiece."\">";
                                 $batarr[$data["piece"][0]][$data["piece"][1]] .= "<a onclick=\"javascript:modifyPiece('#nbpr_".$npiece." a',false);\"><div id=\"nbpr_".$npiece."l\" class=\"modport\">";
                                 $batarr[$data["piece"][0]][$data["piece"][1]] .= $data["m"];

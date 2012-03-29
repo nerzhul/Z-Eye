@@ -478,7 +478,7 @@
 			mysql_select_db("fssmanager");
 			return $output;
 		}
-		
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
@@ -491,9 +491,9 @@
 					return;
 				case 2:
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
-					if($stype == NULL) $stype = 1;
-						header("Location: index.php?mod=".$this->mid."&s=".$stype);
-					return;
+														if($stype == NULL) $stype = 1;
+					header("Location: index.php?mod=".$this->mid."&s=".$stype);
+														return;
 				default: break;
 			}
 		}
