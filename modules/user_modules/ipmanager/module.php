@@ -15,14 +15,16 @@
 			$output = "";
 			$formoutput = "";
 			$netoutput = "";
-			
-			$resarray = array();
-			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
-			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask",($filter != NULL ? "netid = '".$filter."'" : ""));
-			
+
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 			$output .= FS::$iMgr->addList("f");
-				
+			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask");
+			while($data = mysql_fetch_array($query)) {
+				$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
+			}
+			
+			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
+			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask",($filter != NULL ? "netid = '".$filter."'" : ""));
 			while($data = mysql_fetch_array($query)) {
 				$iparray = array();
 				$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
