@@ -209,7 +209,6 @@
 						$usableaddr = ~(ip2long($cc_keys["mask"]));
 						$usableaddr += 4294967295 - 4;
 						$usedaddr = (count($cc_keys)-2);
-						$output .= "<center><table><tr><th>Adresse IP</th><th>Statut</th><th>MAC address</th><th>Nom d'hote</th><th>Fin du bail</th></tr>";
 						$used = 0;
 						$reserv = 0;
 						foreach($cc_keys as $ipKey => $ipData) {
@@ -255,5 +254,7 @@
 	}
 	else
 		echo "Aucun réseau IP n'a été trouvé dans le(s) serveur(s) DHCP !\n";
+		
+	echo "[Z-Monitor] DHCP Discover done at ".date('d-m-Y G:i:s');
 
 ?>
