@@ -88,7 +88,7 @@
 					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$unkst.",".$dhcpfree."]);
 					pie3.Set('chart.key', ['Used (".substr(($used/count($iparray)*100),0,5)."%)', 'Reserved (".substr(($reserv/count($iparray)*100),0,5)."%)', 'DHCPFree (".substr(($free/count($iparray)*100),0,5)."%)', 'Unknown status (".substr(($unkst/count($iparray)*100),0,5)."%)' ]);
 					pie3.Set('chart.key.interactive', true);
-					pie3.Set('chart.colors', ['red', 'yellow', 'green']);
+					pie3.Set('chart.colors', ['red', 'yellow', 'gray', 'green']);
 					pie3.Set('chart.shadow', true);
 					pie3.Set('chart.shadow.offsetx', 0);
 					pie3.Set('chart.shadow.offsety', 0);
