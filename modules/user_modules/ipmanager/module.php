@@ -74,9 +74,9 @@
 						default: {
 								$rstate = "Libre";
 								$style = "background-color: #BFFFBF;";
-								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > current_timestamp - interval '1 hour' AND active = 't'");
+								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
 								if($mac) {
-									$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND time_last > current_timestamp - interval '1 hour' AND active = 't'");
+									$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
 									if($data3 = pg_fetch_array($query3)) {
 										$rstate = "IP fixe";
 										$style = "background-color: orange;";
