@@ -125,8 +125,7 @@
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$dhcp = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
-					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
-						$spwd != $spwd2) {
+					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=1");
 						return;
 					}
