@@ -42,7 +42,7 @@
 				}
 			}
 			
-			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\"Retour</a><br />";
+			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\">Retour</a><br />";
 			
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
