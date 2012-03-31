@@ -42,6 +42,8 @@
 				}
 			}
 			
+			$output .= "<a class=\"monoComponentt_a\" href=\"m-=".$this->mid.".html\"Retour</a><br />";
+			
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
