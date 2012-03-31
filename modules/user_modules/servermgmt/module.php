@@ -44,9 +44,9 @@
 			
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !");
-				case 2: $output .= FS::$iMgr->printError("Impossible de se connecter au serveur spécifié !");
-				case 3: $output .= FS::$iMgr->printError("Login au serveur incorrect !");
+				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
+				case 2: $output .= FS::$iMgr->printError("Impossible de se connecter au serveur spécifié !"); break;
+				case 3: $output .= FS::$iMgr->printError("Login au serveur incorrect !"); break;
 			}
 			
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
