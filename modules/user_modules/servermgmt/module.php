@@ -67,7 +67,7 @@
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
 				$tmpoutput .= "<center>".($data["dhcp"] > 0 ? "X" : "")."</center></td><td><center>".($data["dns"] > 0 ? "X" : "")."</center></td><td>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]."\">";
-				$tmpoutput .= $output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
 				$tmpoutput .= "</td></tr>";
 			}
 			if($found)
