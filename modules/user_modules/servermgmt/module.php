@@ -102,9 +102,8 @@
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
-					$dhcp = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$dhcp = FS::$secMgr->checkAndSecurisePostData("dhcp");
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
-					echo $dhcp."/".$dns;
 					return;
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
@@ -124,7 +123,7 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=4");
 						return;
 					}
-					FS::$dbMgr->Insert("fss_server_list","addr,login,pwd,dhcp,dns","'".$saddr."','".$slogin."','".$spwd."','".$dhcp."','".$dns."'");
+					FS::$dbMgr->Insert("fss_server_list","addr,login,pwd,dhcp,dns","'".$saddr."','".$slogin."','".$spwd."','".($dhcp == "on" ? 1 : 0)."','".($dns == "on" ? 1 : 0)."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 2:
@@ -132,7 +131,7 @@
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
-					$dhcp = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$dhcp = FS::$secMgr->checkAndSecurisePostData("dhcp");
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=1");
@@ -147,6 +146,7 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=3");
 						return;
 					}
+					FS::$dbMgr->Update("fss_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0).", dns = '".($dns == "on")."'","addr = '".$saddr."'");
 					break;
 				case 3: {
 					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
