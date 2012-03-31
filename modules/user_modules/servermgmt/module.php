@@ -42,8 +42,14 @@
 				}
 			}
 			
+			if($create == false)
+				$output .= FS::$iMgr->addHidden("saddr",$saddr);
+	
 			$output .= "<table class=\"standardTable\">";
-			$output .= FS::$iMgr->addIndexedLine("Adresse IP/DNS","saddr",$saddr);
+			if($create)
+				$output .= FS::$iMgr->addIndexedLine("Adresse IP/DNS","saddr",$saddr);
+			else
+				$output .= "<tr><td>Adresse IP/DNS</td><td>".$saddr."</td></tr>";		
 			$output .= FS::$iMgr->addIndexedLine("Utilisateur SSH","slogin",$slogin);
 			$output .= FS::$iMgr->addIndexedLine("Mot de passe","spwd","",true);
 			$output .= FS::$iMgr->addIndexedLine("Répétition du mot de passe","spwd2","",true);
