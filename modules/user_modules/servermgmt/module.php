@@ -127,7 +127,7 @@
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."err=1");
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=1");
 						return;
 					}
 					$conn = ssh2_connect($saddr,22);
