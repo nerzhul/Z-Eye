@@ -49,6 +49,7 @@
 				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
 				case 2: $output .= FS::$iMgr->printError("Impossible de se connecter au serveur spécifié !"); break;
 				case 3: $output .= FS::$iMgr->printError("Login au serveur incorrect !"); break;
+				case 4: if($create) $output .= FS::$iMgr->printError("Ce serveur est déjà référencé !"); break;
 			}
 			
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
@@ -103,6 +104,8 @@
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$dhcp = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
+					echo $dhcp."/".$dns;
+					return;
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
@@ -117,6 +120,12 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
+					if(FS::$dbMgr->GetOneData("fss_server_list","login","addr ='".$saddr."'")) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=4");
+						return;
+					}
+					FS::$dbMgr->Insert("fss_server_list","addr,login,pwd,dhcp,dns","'".$saddr."','".$slogin."','".$spwd."','".$dhcp."','".$dns."'");
+					header("Location: m-".$this->mid.".html");
 					break;
 				case 2:
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
