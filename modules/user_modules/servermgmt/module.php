@@ -4,7 +4,7 @@
 	class iServerMgmt extends genModule{
 		function iServerMgmt() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"module_connect\"><h3>Gestion du moteur d'analyse des serveurs</h3>";
+			$output = "<div id=\"monoComponent\"><h3>Gestion du moteur d'analyse des serveurs</h3>";
 			$output .= $this->showServerList();
 			$output .= "</div>";
 			return $output;
