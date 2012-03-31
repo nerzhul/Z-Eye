@@ -42,6 +42,15 @@
 				}
 			}
 			
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !");
+				case 2: $output .= FS::$iMgr->printError("Impossible de se connecter au serveur spécifié !");
+				case 3: $output .= FS::$iMgr->printError("Login au serveur incorrect !");
+			}
+			
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
+			
 			if($create == false)
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);
 	
@@ -64,7 +73,7 @@
 		private function showServerList() {
 			$output = "<h4>Liste des serveurs</h4>";
 			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=1\">Nouveau Serveur</a><br />";
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Login</th><th>DHCP ?</th><th>DNS</th><th>Supprimer</th></tr>";
+			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Login</th><th>DHCP</th><th>DNS</th><th>Supprimer</th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select("fss_server_list","addr,login,dhcp,dns");
 			while($data = mysql_fetch_array($query)) {
@@ -85,7 +94,50 @@
 		
 		public function handlePostDatas($act) {
 			switch($act) {
-				
+				case 1:
+					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+					$dhcp = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
+					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
+						$spwd != $spwd2 || $do == NULL || $do == "") {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
+						return;
+					}
+					$conn = ssh2_connect($saddr,22);
+					if(!$conn) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=2");
+						return;
+					}
+					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
+						return;
+					}
+					break;
+				case 2:
+					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+					$dhcp = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
+					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
+						$spwd != $spwd2 || $do == NULL || $do == "") {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."err=1");
+						return;
+					}
+					$conn = ssh2_connect($saddr,22);
+					if(!$conn) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=2");
+						return;
+					}
+					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=3");
+						return;
+					}
+					break;
 				case 3: {
 					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
 							FS::$dbMgr->Delete("fss_server_list","addr = '".$srv."'");
