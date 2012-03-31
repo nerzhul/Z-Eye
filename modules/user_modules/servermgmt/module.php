@@ -25,7 +25,7 @@
 			else {
 				$output = "<h4>Edition du serveur</h4>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-				if(!$addr) {
+				if(!$addr || $addr == "") {
 					$output .= FS::$iMgr->printError("Aucun serveur à éditer spécifié !");
 					return $output;
 				}
@@ -63,12 +63,12 @@
 			$query = FS::$dbMgr->Select("fss_server_list","addr,login,dhcp,dns");
 			while($data = mysql_fetch_array($query)) {
 				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=1&addr=".$data["addr"]."\">".$data["addr"];
+				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
-				$tmpoutput .= "<center>".($data["dhcp"] > 0 ? "X" : "")."</center></td><td><center>".($data["dns"] > 0 ? "X" : "")."</center></td><td>";
+				$tmpoutput .= "<center>".($data["dhcp"] > 0 ? "X" : "")."</center></td><td><center>".($data["dns"] > 0 ? "X" : "")."</center></td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]."\">";
 				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
-				$tmpoutput .= "</td></tr>";
+				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
 				$output .= $tmpoutput."</table>";
