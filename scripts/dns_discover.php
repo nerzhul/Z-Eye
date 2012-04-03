@@ -107,8 +107,8 @@
 					FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."'");
 				}
 				else if(count($record) == 2) {
-					if(preg_match('#\$ORIGIN#',$record[0]))
-						$recsuffix = substr($record[1],0,strlen($record[1])-2);
+					if(preg_match('#\$ORIGIN#',$record[0]) && $record[1] != $zonename)
+						$recsuffix = substr($record[1],0,strlen($record[1])-1);
 				}
 			}
 		}
