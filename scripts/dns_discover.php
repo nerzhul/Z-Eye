@@ -57,6 +57,36 @@
 		return;
 	}
 	
+	FS::$dbMgr->Delete("fss_dns_zone_cache");
+	
+	$zones = preg_split("/zone /",$dns_stream_datas);
+	$filelist = array();
+	for($i=0;$i<count($zones);$i++) {
+		$zone = preg_split("#\n#",$zones[$i]);
+		$zonename = "";
+		$zonetype = 0;
+		$zonefile = "";
+		for($j=0;$j<count($lease);$j++) {
+			if(preg_match("#\"(.*)\" (IN)*[ ]*{#",$zone[$j],$zname)) {
+				$zonename = $zname[0];
+				$zonename = preg_replace("#{#","",$zonename);
+			}
+			else if(preg_match("#type (.*);#",$zone[$j],$ztype)) {
+				$zonetype = $ztype[0];
+				$zonetype = preg_replace("#;#","",$zonetype);
+				switch($zonetype) {
+					case "master": $zonetype = 1; break;
+					case "slave": $zonetype = 2; break;
+					case "hint": default: $zonetype = 0; break;
+				}
+			}
+			else if(preg_match("#file \"(.*)\";#",$zone[$j],$zfile)) {
+				$zonefile = $zfile[0];
+				$zonefile = preg_replace("#;#","",$zonefile);
+			}
+		}
+		echo $zonename." ".$zonetype." ".$zonefile;
+	}
 		
 	echo "[".Config::getWebsiteName()."] DNS Discover done at ".date('d-m-Y G:i:s');
 
