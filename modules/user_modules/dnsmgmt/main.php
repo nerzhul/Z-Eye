@@ -5,10 +5,10 @@
 	class iModule extends InterfaceModule {
 		function iModule() {
 			parent::InterfaceModule();
-			$this->conf->modulename = "iDHCPConfig";
-			$this->conf->seclevel = 6;
+			$this->conf->modulename = "iDNSManager";
+			$this->conf->seclevel = 4;
 			$this->conf->connected = 1;
-			$this->moduleclass = new iDHCPConfig();
+			$this->moduleclass = new iDNSManager();
 		}
 	};
 ?>

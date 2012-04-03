@@ -85,12 +85,13 @@
 			}
 		}
 		if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
+			if($zonename[strlen($zonename)-1] == ".")
+				$zonename[strlen($zonename)-1] = "";
+				
 			FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
 			$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
 			$zonebuffer = preg_replace("#[\t]#"," ",trim($zonebuffer));
 			$zonebuffer = preg_replace("#[ ]{2,}#"," ",trim($zonebuffer));
-			if($zonename[strlen($zonename)-1] == ".")
-				$zonename[strlen($zonename)-1] = "";
 				
 			$buflines = preg_split("#\n#",$zonebuffer);
 			
