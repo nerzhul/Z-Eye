@@ -92,11 +92,20 @@
 			$buflines = preg_split("#\n#",$zonebuffer);
 			
 			$currecord = "";
+			$recsuffix = "";
 			for($j=0;$j<count($buflines);$j++) {
 				$record = preg_split("#[ ]#",$buflines[$j]);
-				var_dump($record);
 				if(count($record) == 3) {
+					$currecord = $record[0];
 				}
+				else if(count($record) == 2) {
+					if(preg_match('#$ORIGIN#',$record[0]))
+						$recsuffix = $record[1];
+					else
+						var_dump($record);
+				}
+				else
+					var_dump($record);
 			}
 		}
 	}
