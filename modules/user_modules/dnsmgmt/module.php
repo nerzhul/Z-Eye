@@ -38,7 +38,7 @@
 				}
 				$dnsoutput .= "<tr><td style=\"padding: 2px\">".$data["record"]."</td><td>".$data["rectype"]."</td><td>";
 				if($data["rectype"] == "A")
-					$dnsoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
+					$dnsoutput .= "<a class=\"monoComponent_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
 				else
 					$dnsoutput .= $data["recval"];
 				$dnsoutput .= "</td></tr>";

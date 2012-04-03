@@ -98,6 +98,9 @@
 			$currecord = "";
 			$recsuffix = "";
 			for($j=0;$j<count($buflines);$j++) {
+				if($buflines[$j][0] == ";" || $buflines[$j][0] == "#")
+					continue;
+					
 				$record = preg_split("#[ ]#",$buflines[$j]);
 				if(count($record) == 3) {
 					if(strlen($record[0]) > 0)
