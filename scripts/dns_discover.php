@@ -98,14 +98,13 @@
 			$currecord = "";
 			$recsuffix = "";
 			for($j=0;$j<count($buflines);$j++) {
-				if($buflines[$j][0] == ";" || $buflines[$j][0] == "#")
-					continue;
-					
 				$record = preg_split("#[ ]#",$buflines[$j]);
+				if($record[0] == ";" || $record[0] == "#")
+					continue;
 				if(count($record) == 3) {
 					if(strlen($record[0]) > 0)
 						$currecord = $record[0];
-					FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".$currecord."','".$record[1]."','".$record[2]."'");
+					FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."'");
 				}
 				else if(count($record) == 2) {
 					if(preg_match('#\$ORIGIN#',$record[0]))

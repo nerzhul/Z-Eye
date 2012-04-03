@@ -34,11 +34,12 @@
 			while($data = mysql_fetch_array($query)) {
 				if($curzone != $data["zonename"]) {
 					$curzone = $data["zonename"];
+					if($curzone != "") $dnsoutput .= "</table>";
 					$dnsoutput .= "<h4>Zone: ".$data["zonename"]."</h4><table><th>Enregistrement</th><th>Type</th><th>Valeur</th></tr>";
 				}
 				$dnsoutput .= "<tr><td style=\"padding: 2px\">".$data["record"]."</td><td>".$data["rectype"]."</td><td>";
 				if($data["rectype"] == "A")
-					$dnsoutput .= "<a class=\"monoComponent_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
+					$dnsoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
 				else
 					$dnsoutput .= $data["recval"];
 				$dnsoutput .= "</td></tr>";
