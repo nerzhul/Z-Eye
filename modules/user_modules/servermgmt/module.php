@@ -148,7 +148,8 @@
 							return;
 						}
 					}
-					FS::$dbMgr->Update("fss_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0).", dns = '".($dns == "on")."'","addr = '".$saddr."'");
+					FS::$dbMgr->Update("fss_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0).", dns = '".($dns == "on" ? 1 : 0)."'","addr = '".$saddr."'");
+					if($spwd == $spwd2) FS::$dbMgr->Update("fss_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 3: {
