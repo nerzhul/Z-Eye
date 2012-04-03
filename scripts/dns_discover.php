@@ -96,16 +96,15 @@
 			for($j=0;$j<count($buflines);$j++) {
 				$record = preg_split("#[ ]#",$buflines[$j]);
 				if(count($record) == 3) {
-					$currecord = $record[0];
+					if(strlen($record[0]) > 0)
+						$currecord = $record[0];
+					echo $recsuffix;
+					FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".$currecord."','".$record[1]."','".$record[2]."'");
 				}
 				else if(count($record) == 2) {
-					if(preg_match('#$ORIGIN#',$record[0]))
-						$recsuffix = $record[1];
-					else
-						var_dump($record);
+					if(preg_match('#\$ORIGIN#',$record[0]))
+						$recsuffix = substr($record[1],0,strlen($record[1])-2);
 				}
-				else
-					var_dump($record);
 			}
 		}
 	}
