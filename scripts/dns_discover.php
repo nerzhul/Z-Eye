@@ -22,7 +22,7 @@
 			}
 			else {
 				
-				$stream = ssh2_exec($conn,"cat /var/lib/dhcp/dhcpd.leases");
+				$stream = ssh2_exec($conn,"grep -Rsh '' /etc/bind/");
 				stream_set_blocking($stream, true);
 					
 				while ($buf = fread($stream, 4096)) {
@@ -30,14 +30,7 @@
 				}
 				fclose($stream);
 	
-				$stream = ssh2_exec($conn,"cat /etc/dhcp/conf.d/*.conf");
-				stream_set_blocking($stream, true);
-				while ($buf = fread($stream, 4096)) {
-					$dhcpdatas2 .= $buf;
-				}
-				fclose($stream);
-	
-				$dhcpdatas = preg_replace("/\n/","<br />",$dhcpdatas);
+				//$dhcpdatas = preg_replace("/\n/","<br />",$dhcpdatas);
 				if($DNSfound == false) $DNSfound = true;
 				else $DNSServers .= ", ";
 				$DNSServers .= $data["addr"];
