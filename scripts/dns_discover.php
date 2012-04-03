@@ -60,13 +60,13 @@
 	FS::$dbMgr->Delete("fss_dns_zone_cache");
 	
 	$zones = preg_split("/zone /",$dns_stream_datas);
-	$filelist = array();
+	$zonereg = array();
 	for($i=0;$i<count($zones);$i++) {
 		$zone = preg_split("#\n#",$zones[$i]);
 		$zonename = "";
 		$zonetype = 0;
 		$zonefile = "";
-		for($j=0;$j<count($lease);$j++) {
+		for($j=0;$j<count($zone);$j++) {
 			if(preg_match("#\"(.*)\" (IN)*[ ]*{#",$zone[$j],$zname)) {
 				$zonename = $zname[0];
 				$zonename = preg_replace("#{#","",$zonename);
@@ -85,7 +85,9 @@
 				$zonefile = preg_replace("#;#","",$zonefile);
 			}
 		}
-		echo $zonename." ".$zonetype." ".$zonefile;
+		if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
+			FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
+		}
 	}
 		
 	echo "[".Config::getWebsiteName()."] DNS Discover done at ".date('d-m-Y G:i:s');
