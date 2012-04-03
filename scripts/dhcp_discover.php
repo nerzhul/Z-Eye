@@ -255,6 +255,6 @@
 	else
 		echo "Aucun réseau IP n'a été trouvé dans le(s) serveur(s) DHCP !\n";
 		
-	echo "[Z-Monitor] DHCP Discover done at ".date('d-m-Y G:i:s');
+	echo "[".Config::getWebsiteName()."] DHCP Discover done at ".date('d-m-Y G:i:s');
 
 ?>

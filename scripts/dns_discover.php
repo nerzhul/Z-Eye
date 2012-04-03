@@ -1,14 +1,32 @@
 <?php
 	require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
-	
-	FS::LoadFSModules();
-	
-	$dhcpdatas = "";
+
+	$dns_stream_datas = "";
 	$dhcpdatas2 = "";
 	$DNSServers = "";
 	$DNSfound = false;
 	$DNSconnerr = false;
-	$query = FS::$dbMgr->Select("fss_server_list","addr,login,pwd","dhcp = 1");
+	
+	function bufferizeDNSFiles($file) {
+		$tmpbuf = "";
+		$stream = ssh2_exec($conn,$file);
+		stream_set_blocking($stream, true);
+			
+		while ($buf = fread($stream, 4096)) {
+			$inc_path = array();
+			preg_match("#include \"(.*)\"#",$buf,$inc_path);
+			if(count($inc_path) > 0) {
+				$tmpbuf .= bufferizeDNSFiles($inc_path[0]);
+			}
+			else
+				$tmpbuf .= $buf;
+		}
+		return $tmpbuf;
+	}
+	
+	FS::LoadFSModules();
+	
+	$query = FS::$dbMgr->Select("fss_server_list","addr,login,pwd","dns = 1");
 	while($data = mysql_fetch_array($query)) {
 		$conn = ssh2_connect($data["addr"],22);
 		if(!$conn) {
@@ -21,18 +39,8 @@
 				$DNSconnerr = true;
 			}
 			else {
-				/* @TODO: First read named.conf, cat all includes
-				Second: while(includes) reread includes & zone files (file directive)
-				Third: read name registered files */
-				$stream = ssh2_exec($conn,"grep -Rsh '' /etc/bind/");
-				stream_set_blocking($stream, true);
-					
-				while ($buf = fread($stream, 4096)) {
-					$dhcpdatas .= $buf;
-				}
-				fclose($stream);
-	
-				//$dhcpdatas = preg_replace("/\n/","<br />",$dhcpdatas);
+				$dns_stream_datas = bufferizeDNSFiles("/etc/bind/named.conf");
+				echo $dns_stream_datas;
 				if($DNSfound == false) $DNSfound = true;
 				else $DNSServers .= ", ";
 				$DNSServers .= $data["addr"];
@@ -44,11 +52,11 @@
 		echo "Données collectées sur le(s) serveur(s): ".$DNSServers."\n";
 	else {
 		if($DNSconnerr == false)
-			echo "Aucun serveur DHCP enregistré !\n";
+			echo "Aucun serveur DNS enregistré !\n";
 		return;
 	}
 	
 		
-	echo "[Z-Mon] DNS Discover done at ".date('d-m-Y G:i:s');
+	echo "[".Config::getWebsiteName()."] DNS Discover done at ".date('d-m-Y G:i:s');
 
 ?>
