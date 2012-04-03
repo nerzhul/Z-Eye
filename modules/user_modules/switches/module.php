@@ -277,13 +277,15 @@
                                         $tmpoutput .= $mactoip[$i]["dat"]."<br />";
 				$tmpoutput .= "</td><td>";
 				for($i=0;$i<count($mactoip);$i++) {
-					$res = preg_split("#\.#",$mactoip[$i]["fst"]);
-                                        $tmpoutput .= $res[0]."<br />";
+					$res = preg_replace("#\.(.*)<#","<",$mactoip[$i]["fst"]);
+					$res = preg_replace("#\.(.*)$#","",$res);
+                                        $tmpoutput .= $res."<br />";
 				}
 				$tmpoutput .= "</td><td>";
 				for($i=0;$i<count($mactoip);$i++) {
-					$res = preg_split("#\.#",$mactoip[$i]["lst"]);
-                                        $tmpoutput .= $res[0]."<br />";
+					$res = preg_replace("#\.(.*)<#","<",$mactoip[$i]["lst"]);
+					$res = preg_replace("#\.(.*)$#","",$res);
+                                        $tmpoutput .= $res."<br />";
 				}
 				$tmpoutput .= "</td></tr></table>";
 				if(count($mactoip) > 0)
