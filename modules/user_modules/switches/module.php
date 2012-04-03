@@ -189,7 +189,7 @@
 									$dnszone .= ".";
 							}
 							$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","rectype,recval","record = '".$hostname."' AND zonename = '".$dnszone."'");
-							$tmpoutput .= "<table class=\"standardTable\"><tr><th>Type d'enregistrement</th><th>Valeur</th></tr>";
+							$tmpoutput .= "Données trouvées dans le cache DNS.!<br /><table class=\"standardTable\"><tr><th>Type d'enregistrement</th><th>Valeur</th></tr>";
 							while($data = mysql_fetch_array($query)) {
 								if($found == 0) {
 									$found = 1;
@@ -204,7 +204,7 @@
 								}
 								$output .= "</td><td>";
 								if(FS::$secMgr->isIP($data["recval"]))
-									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["recval"].">".$data["recval"]."</a>";
+									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["recval"]."\">".$data["recval"]."</a>";
 								else
 									$output .= $data["recval"];
 								$output .= "</td></tr>";
