@@ -6,17 +6,18 @@
 	$DNSServers = "";
 	$DNSfound = false;
 	$DNSconnerr = false;
-	
-	function bufferizeDNSFiles($file) {
+	$conn = NULL;
+
+	function bufferizeDNSFiles($conn,$file) {
 		$tmpbuf = "";
-		$stream = ssh2_exec($conn,$file);
+		$stream = ssh2_exec($conn,"cat ".$file);
 		stream_set_blocking($stream, true);
-			
 		while ($buf = fread($stream, 4096)) {
 			$inc_path = array();
-			preg_match("#include \"(.*)\"#",$buf,$inc_path);
-			if(count($inc_path) > 0) {
-				$tmpbuf .= bufferizeDNSFiles($inc_path[0]);
+			preg_match_all("#include \"(.*)\"#",$buf,$inc_path);
+			if(count($inc_path[1]) > 0) {
+				for($i=0;$i<count($inc_path[1]);$i++)
+					$tmpbuf .= bufferizeDNSFiles($conn,$inc_path[1][$i]);
 			}
 			else
 				$tmpbuf .= $buf;
@@ -39,7 +40,7 @@
 				$DNSconnerr = true;
 			}
 			else {
-				$dns_stream_datas = bufferizeDNSFiles("/etc/bind/named.conf");
+				$dns_stream_datas = bufferizeDNSFiles($conn,"/etc/bind/named.conf");
 				echo $dns_stream_datas;
 				if($DNSfound == false) $DNSfound = true;
 				else $DNSServers .= ", ";
