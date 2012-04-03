@@ -137,7 +137,7 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=1");
 						return;
 					}
-					if($spwd == NULL || $spwd == "") {
+					if($spwd != NULL || $spwd != "") {
 						$conn = ssh2_connect($saddr,22);
 						if(!$conn) {
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=2");
@@ -147,9 +147,9 @@
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=3");
 							return;
 						}
+						if($spwd == $spwd2) FS::$dbMgr->Update("fss_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
 					}
-					FS::$dbMgr->Update("fss_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0).", dns = '".($dns == "on" ? 1 : 0)."'","addr = '".$saddr."'");
-					if($spwd == $spwd2) FS::$dbMgr->Update("fss_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
+					FS::$dbMgr->Update("fss_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0)."', dns = '".($dns == "on" ? 1 : 0)."'","addr = '".$saddr."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 3: {
