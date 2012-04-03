@@ -60,7 +60,6 @@
 	FS::$dbMgr->Delete("fss_dns_zone_cache");
 	
 	$zones = preg_split("/zone /",$dns_stream_datas);
-	$zonereg = array();
 	for($i=0;$i<count($zones);$i++) {
 		$zone = preg_split("#\n#",$zones[$i]);
 		$zonename = "";
@@ -68,11 +67,11 @@
 		$zonefile = "";
 		for($j=0;$j<count($zone);$j++) {
 			if(preg_match("#\"(.*)\" (IN)*[ ]*{#",$zone[$j],$zname)) {
-				$zonename = $zname[0];
+				$zonename = $zname[1];
 				$zonename = preg_replace("#{#","",$zonename);
 			}
 			else if(preg_match("#type (.*);#",$zone[$j],$ztype)) {
-				$zonetype = $ztype[0];
+				$zonetype = $ztype[1];
 				$zonetype = preg_replace("#;#","",$zonetype);
 				switch($zonetype) {
 					case "master": $zonetype = 1; break;
@@ -81,12 +80,14 @@
 				}
 			}
 			else if(preg_match("#file \"(.*)\";#",$zone[$j],$zfile)) {
-				$zonefile = $zfile[0];
+				$zonefile = $zfile[1];
 				$zonefile = preg_replace("#;#","",$zonefile);
 			}
 		}
 		if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
 			FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
+			$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
+			FS::$dbMgr->Delete("fss_dns_zone_record_cache","zonename = '".$zonename."'");
 		}
 	}
 		
