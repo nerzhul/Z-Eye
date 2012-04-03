@@ -218,7 +218,7 @@
 			}
 			else if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$#",$node)) {
 				$ipaddr = $node;
-				$query = FS::$pgdbMgr->Select("node_ip","mac","ip = '".$node."'");
+				$query = FS::$pgdbMgr->Select("node_ip","mac","ip = '".$node."'","time_last",1,1);
 				if($data = pg_fetch_array($query))
                                 	$mac = $data["mac"];
 			}
@@ -244,29 +244,29 @@
 
 				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$mac."'");
 				while($data = pg_fetch_array($query)) {
-                                        $idx = count($mactoip);
-                                        $mactoip[$idx] = array();
-                                        $mactoip[$idx]["type"] = "Switch, port";
+					$idx = count($mactoip);
+					$mactoip[$idx] = array();
+					$mactoip[$idx]["type"] = "Switch, port";
 					$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
 					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
-                                        $mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> ";
+					$mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> ";
 					$mactoip[$idx]["dat"] .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
 					$mactoip[$idx]["dat"] .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>";
 					$mactoip[$idx]["dat"] .= ($piece == NULL ? "" : "<br />Prise ".$piece);
 					$mactoip[$idx]["type"] .= ($piece == NULL ? "" : ", prise");
-                                        $mactoip[$idx]["fst"] = $data["time_first"];
-                                        $mactoip[$idx]["lst"] = $data["time_last"];
-                                }
+					$mactoip[$idx]["fst"] = $data["time_first"].($piece == NULL ? "" : "<br />");
+					$mactoip[$idx]["lst"] = $data["time_last"].($piece == NULL ? "" : "<br />");
+                }
 
 				$query = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser,time_first,time_last","mac = '".$mac."'");
-                                while($data = pg_fetch_array($query)) {
+                    while($data = pg_fetch_array($query)) {
 					$idx = count($mactoip);
-                                        $mactoip[$idx] = array();
-                                        $mactoip[$idx]["type"] = "Netbios";
-                                        $mactoip[$idx]["dat"] = ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a>";
-                                        $mactoip[$idx]["fst"] = $data["time_first"];
-                                        $mactoip[$idx]["lst"] = $data["time_last"];
+					$mactoip[$idx] = array();
+					$mactoip[$idx]["type"] = "Netbios";
+					$mactoip[$idx]["dat"] = ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a>";
+					$mactoip[$idx]["fst"] = $data["time_first"];
+					$mactoip[$idx]["lst"] = $data["time_last"];
 				}
 
 				for($i=0;$i<count($mactoip);$i++)
