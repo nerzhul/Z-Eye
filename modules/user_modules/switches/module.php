@@ -147,10 +147,10 @@
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			$output .= $search."\"</h4>";
 
-			if(preg_match("#^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$#",$search)) {
+			if(FS::$secMgr->isMacAddr($search)) {
 				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&node=".$search."\"</script>";
             }
-			else if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$#",$search)) {
+			else if(FS::$secMgr->isIP($search)) {
 				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&node=".$search."\"</script>";
 			}
 			else if(is_numeric($search) && $search < 4096) {
@@ -178,6 +178,42 @@
 						$output .= "</table>";
 					}
 
+					if($found == 0) {
+						$searchsplit = preg_split("#\.#",$search);
+						if(count($searchsplit) > 1) {
+							$hostname = $searchsplit[0];
+							$dnszone = "";
+							for($i=1;$i<count($searchsplit);$i++) {
+								$dnszone .= $searchsplit[$i];
+								if($i != count($searchsplit)-1)
+									$dnszone .= ".";
+							}
+							$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","rectype,recval","record = '".$hostname."' AND zonename = '".$dnszone."'");
+							$tmpoutput .= "<table class=\"standardTable\"><tr><th>Type d'enregistrement</th><th>Valeur</th></tr>";
+							while($data = mysql_fetch_array($query)) {
+								if($found == 0) {
+									$found = 1;
+									$output .= $tmpoutput;
+								}
+								$output .= "<tr><td>";
+								switch($data["rectype"]) {
+									case "A": $output .= "IPv4"; break;
+									case "AAAA": $output .= "IPv6"; break;
+									case "CNAME": $output .= "Alias"; break;
+									default: $output .= $data["rectype"]; break;
+								}
+								$output .= "</td><td>";
+								if(FS::$secMgr->isIP($data["recval"]))
+									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["recval"].">".$data["recval"]."</a>";
+								else
+									$output .= $data["recval"];
+								$output .= "</td></tr>";
+								$found = 1;
+							}
+							if($found == 1)
+								$output .= "</table>";
+						}
+					}
 					if($found == 0)	$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 				}
 			}
