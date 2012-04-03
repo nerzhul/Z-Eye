@@ -57,6 +57,7 @@
 	}
 	
 	FS::$dbMgr->Delete("fss_dns_zone_cache");
+	FS::$dbMgr->Delete("fss_dns_zone_record_cache");
 	
 	$zones = preg_split("/zone /",$dns_stream_datas);
 	for($i=0;$i<count($zones);$i++) {
@@ -88,7 +89,7 @@
 			$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
 			$zonebuffer = preg_replace("#[\t]#"," ",trim($zonebuffer));
 			$zonebuffer = preg_replace("#[ ]{2,}#"," ",trim($zonebuffer));
-			FS::$dbMgr->Delete("fss_dns_zone_record_cache","zonename = '".$zonename."'");
+			
 			$buflines = preg_split("#\n#",$zonebuffer);
 			
 			$currecord = "";
@@ -98,7 +99,6 @@
 				if(count($record) == 3) {
 					if(strlen($record[0]) > 0)
 						$currecord = $record[0];
-					echo $recsuffix;
 					FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".$currecord."','".$record[1]."','".$record[2]."'");
 				}
 				else if(count($record) == 2) {
