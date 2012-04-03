@@ -41,7 +41,6 @@
 			}
 			else {
 				$dns_stream_datas = bufferizeDNSFiles($conn,"/etc/bind/named.conf");
-				echo $dns_stream_datas;
 				if($DNSfound == false) $DNSfound = true;
 				else $DNSServers .= ", ";
 				$DNSServers .= $data["addr"];
@@ -87,7 +86,18 @@
 		if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
 			FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
 			$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
+			$zonebuffer = preg_replace("#[\t]#"," ",trim($zonebuffer));
+			$zonebuffer = preg_replace("#[ ]{2,}#"," ",trim($zonebuffer));
 			FS::$dbMgr->Delete("fss_dns_zone_record_cache","zonename = '".$zonename."'");
+			$buflines = preg_split("#\n#",$zonebuffer);
+			
+			$currecord = "";
+			for($j=0;$j<count($buflines);$j++) {
+				$record = preg_split("#[ ]#",$buflines[$j]);
+				var_dump($record);
+				if(count($record) == 3) {
+				}
+			}
 		}
 	}
 		
