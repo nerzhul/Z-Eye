@@ -5,7 +5,7 @@
 		function iDNSManager() { parent::genModule(); }
 		public function Load() {
 			$output = "";
-			$output .= "<div id=\"module_connect\"><h3>Supervision DNS</h3>";
+			$output .= "<div id=\"monoComponent\"><h3>Supervision DNS</h3>";
 			$output .= $this->showStats();
 			$output .= "</div>";
 			return $output;
@@ -34,16 +34,21 @@
 			while($data = mysql_fetch_array($query)) {
 				if($curzone != $data["zonename"]) {
 					$curzone = $data["zonename"];
-					$dnsoutput .= "<h4>Zone: ".$data["zonename"]."</h4><table class=\"standardTable\"><th>Enregistrement</th><th>Type</th><th>Valeur</th></tr>";
+					$dnsoutput .= "<h4>Zone: ".$data["zonename"]."</h4><table><th>Enregistrement</th><th>Type</th><th>Valeur</th></tr>";
 				}
-				$dnsoutput .= "<tr><td>".$data["record"]."</td><td>".$data["rectype"]."</td><td>".$data["recval"]."</td></tr>";
+				$dnsoutput .= "<tr><td style=\"padding: 2px\">".$data["record"]."</td><td>".$data["rectype"]."</td><td>";
+				if($data["rectype"] == "A")
+					$dnsoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
+				else
+					$dnsoutput .= $data["recval"];
+				$dnsoutput .= "</td></tr>";
 			}
 			$output .= $formoutput;
 			$output .= "</select>";
 			$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
 			$output .= "</form>";
-			if(strlen($dnsoutput > 0))
-				$output .= $dnsoutput."</table>";
+			if(strlen($dnsoutput) > 0)
+				$output .= $dnsoutput."</table><hr>";
 
 			return $output;
 		}
