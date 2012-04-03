@@ -773,16 +773,6 @@
                                 $output .= "else $(src).toggle(); }";
                                 $output .= "</script>";
 
-				// Script pour modifier le duplex du port
-                                /*$output .= "<script type=\"text/javascript\">";
-                                $output .= "function modifyPortDuplex(src,sbmit,sw_,swport_,swdp_,swdpc_) { ";
-                                $output .= "if(sbmit == true) { ";
-                                $output .= "$.post('index.php?at=3&mod=".$this->mid."&act=5', { sw: sw_, swport: swport_, swdp: document.getElementsByName(swdp_)[0].value, wr: document.getElementsByName(swdpc_)[0].checked }, function(data) { ";
-                                $output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
-                                $output .= "}); } ";
-                                $output .= "else $(src).toggle(); }";
-                                $output .= "</script>";*/
-
 			}
 			$tmpoutput = "<table class=\"standardTable\"><tr><th><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
 			$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">Description</a></th><th>Prise</th><th>MAC Interface</th><th>Up (Link/Admin)</th>";
@@ -847,23 +837,13 @@
 				$tmpoutput2 .= "</td><td>";
 				if($iswif == false) {
 
-					// Editable duplex
-	                                $tmpoutput2 .= "<div id=\"swdp_".$convport."\">";
-					$tmpoutput2 .= "<a onclick=\"javascript:modifyPortDuplex('#swdp_".$convport." a',false);\"><div id=\"swdp_".$convport."l\" class=\"modport\"><span style=\"color: black;\">";
+	                $tmpoutput2 .= "<div id=\"swdp_".$convport."\">";
+					$tmpoutput2 .= "<div id=\"swdp_".$convport."l\" class=\"modport\"><span style=\"color: black;\">";
 					$dup = (strlen($data["duplex"]) > 0 ? $data["duplex"] : "[NA]");
 					$dupadm = (strlen($data["duplex_admin"]) > 0 ? $data["duplex_admin"] : "[NA]");
 					if($dup == "half" && $dupadm != "half") $dup = "<span style=\"color: red;\">half</span>";
 					$tmpoutput2 .= $dup." / ".$dupadm;
-					$tmpoutput2 .= "</span></div></a><a style=\"display: none;\">Duplex :";
-					$tmpoutput2 .= "<select name=\"swdp-".$convport."\" id=\"swdp-".$convport."\">";
-					$tmpoutput2 .= FS::$iMgr->addElementToList("auto",4,$dupadm == "auto" ? true : false);
-					$tmpoutput2 .= FS::$iMgr->addElementToList("half",1,$dupadm == "half" ? true : false);
-					$tmpoutput2 .= FS::$iMgr->addElementToList("full",2,$dupadm == "full" ? true : false);
-					$tmpoutput2 .= "</select>";
-					$tmpoutput2 .= "<br />Sauver ? ".FS::$iMgr->addCheck("swdpchk-".$convport);
-					$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPortDuplex('#swdp_".$convport."',true,'".$dip."','".$data["port"]."',";
-	                                $tmpoutput2 .= "'swdp-".$convport."','swdpchk-".$convport."');\" />";
-        	                        $tmpoutput2 .= "</a></div>";
+					$tmpoutput2 .= "</span></div></div>";
 
 					$tmpoutput2 .= "</td><td>";
 				}
@@ -914,7 +894,7 @@
 					$query2 = FS::$pgdbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'","mac");
 					while($data2 = pg_fetch_array($query2)) {
 						$tmpoutput2 .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
-						$query3 = FS::$pgdbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'");
+						$query3 = FS::$pgdbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'","time_last",1,1);
 						while($data3 = pg_fetch_array($query3)) {
 							$tmpoutput2 .= "&nbsp;&nbsp;<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
 							$query4 = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser","mac = '".$data2["mac"]."' AND ip = '".$data3["ip"]."'");
