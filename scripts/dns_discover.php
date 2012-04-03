@@ -86,7 +86,7 @@
 		}
 		if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
 			if($zonename[strlen($zonename)-1] == ".")
-				$zonename[strlen($zonename)-1] = "";
+				$zonename = substr($zonename,0,strlen($zonename)-1);
 				
 			FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
 			$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
