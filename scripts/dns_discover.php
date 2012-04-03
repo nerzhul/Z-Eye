@@ -21,7 +21,9 @@
 				$DNSconnerr = true;
 			}
 			else {
-				
+				/* @TODO: First read named.conf, cat all includes
+				Second: while(includes) reread includes & zone files (file directive)
+				Third: read name registered files */
 				$stream = ssh2_exec($conn,"grep -Rsh '' /etc/bind/");
 				stream_set_blocking($stream, true);
 					
