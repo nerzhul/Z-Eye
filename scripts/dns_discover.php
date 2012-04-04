@@ -88,7 +88,7 @@
 						$recsuffix = "";
 						for($j=0;$j<count($buflines);$j++) {
 							$record = preg_split("#[ ]#",$buflines[$j]);
-							if($record[0] == ";" || $record[0] == "#")
+							if(count($record) < 2 || $record[0] == ";" || $record[0] == "#")
 								continue;
 							if(count($record) == 3) {
 								if(strlen($record[0]) > 0)
@@ -98,13 +98,21 @@
 							else if(count($record) == 2) {
 								/*if(preg_match('#\$ORIGIN#',$record[0]) && $record[1] != $zonename)
 									$recsuffix = substr($record[1],0,strlen($record[1])-1);*/
+							} 
+							else if($record[1] == "SRV") {
+								$tmprec = "";
+								for($k=2;$k<count($record);$k++) {
+									$tmprec .= $record[$k];
+									if($k != count($record) -1)
+										$tmprec .= " ";
+								}
+								FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".$currecord."','".$record[1]."','".$tmprec."'");
 							}
 						}
 					}
 				}
 			}
 		}
-		fclose($conn);
 	}
 	
 	if($DNSfound)
