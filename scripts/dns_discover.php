@@ -104,6 +104,7 @@
 				}
 			}
 		}
+		fclose($conn);
 	}
 	
 	if($DNSfound)
