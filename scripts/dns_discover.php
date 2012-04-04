@@ -27,6 +27,9 @@
 	
 	FS::LoadFSModules();
 	
+	FS::$dbMgr->Delete("fss_dns_zone_cache");
+	FS::$dbMgr->Delete("fss_dns_zone_record_cache");
+	
 	$query = FS::$dbMgr->Select("fss_server_list","addr,login,pwd","dns = 1");
 	while($data = mysql_fetch_array($query)) {
 		$conn = ssh2_connect($data["addr"],22);
@@ -44,6 +47,61 @@
 				if($DNSfound == false) $DNSfound = true;
 				else $DNSServers .= ", ";
 				$DNSServers .= $data["addr"];
+				
+				$zones = preg_split("/zone /",$dns_stream_datas);
+				for($i=0;$i<count($zones);$i++) {
+					$zone = preg_split("#\n#",$zones[$i]);
+					$zonename = "";
+					$zonetype = 0;
+					$zonefile = "";
+					for($j=0;$j<count($zone);$j++) {
+						if(preg_match("#\"(.*)\" (IN)*[ ]*{#",$zone[$j],$zname)) {
+							$zonename = $zname[1];
+							$zonename = preg_replace("#{#","",$zonename);
+						}
+						else if(preg_match("#type (.*);#",$zone[$j],$ztype)) {
+							$zonetype = $ztype[1];
+							$zonetype = preg_replace("#;#","",$zonetype);
+							switch($zonetype) {
+								case "master": $zonetype = 1; break;
+								case "slave": $zonetype = 2; break;
+								case "hint": default: $zonetype = 0; break;
+							}
+						}
+						else if(preg_match("#file \"(.*)\";#",$zone[$j],$zfile)) {
+							$zonefile = $zfile[1];
+							$zonefile = preg_replace("#;#","",$zonefile);
+						}
+					}
+					if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
+						if($zonename[strlen($zonename)-1] == ".")
+							$zonename = substr($zonename,0,strlen($zonename)-1);
+							
+						FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
+						$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
+						$zonebuffer = preg_replace("#[\t]#"," ",trim($zonebuffer));
+						$zonebuffer = preg_replace("#[ ]{2,}#"," ",trim($zonebuffer));
+							
+						$buflines = preg_split("#\n#",$zonebuffer);
+						
+						$currecord = "";
+						$recsuffix = "";
+						for($j=0;$j<count($buflines);$j++) {
+							$record = preg_split("#[ ]#",$buflines[$j]);
+							if($record[0] == ";" || $record[0] == "#")
+								continue;
+							if(count($record) == 3) {
+								if(strlen($record[0]) > 0)
+									$currecord = $record[0];
+								FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."'");
+							}
+							else if(count($record) == 2) {
+								/*if(preg_match('#\$ORIGIN#',$record[0]) && $record[1] != $zonename)
+									$recsuffix = substr($record[1],0,strlen($record[1])-1);*/
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -56,63 +114,9 @@
 		return;
 	}
 	
-	FS::$dbMgr->Delete("fss_dns_zone_cache");
-	FS::$dbMgr->Delete("fss_dns_zone_record_cache");
 	
-	$zones = preg_split("/zone /",$dns_stream_datas);
-	for($i=0;$i<count($zones);$i++) {
-		$zone = preg_split("#\n#",$zones[$i]);
-		$zonename = "";
-		$zonetype = 0;
-		$zonefile = "";
-		for($j=0;$j<count($zone);$j++) {
-			if(preg_match("#\"(.*)\" (IN)*[ ]*{#",$zone[$j],$zname)) {
-				$zonename = $zname[1];
-				$zonename = preg_replace("#{#","",$zonename);
-			}
-			else if(preg_match("#type (.*);#",$zone[$j],$ztype)) {
-				$zonetype = $ztype[1];
-				$zonetype = preg_replace("#;#","",$zonetype);
-				switch($zonetype) {
-					case "master": $zonetype = 1; break;
-					case "slave": $zonetype = 2; break;
-					case "hint": default: $zonetype = 0; break;
-				}
-			}
-			else if(preg_match("#file \"(.*)\";#",$zone[$j],$zfile)) {
-				$zonefile = $zfile[1];
-				$zonefile = preg_replace("#;#","",$zonefile);
-			}
-		}
-		if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
-			if($zonename[strlen($zonename)-1] == ".")
-				$zonename = substr($zonename,0,strlen($zonename)-1);
-				
-			FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
-			$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
-			$zonebuffer = preg_replace("#[\t]#"," ",trim($zonebuffer));
-			$zonebuffer = preg_replace("#[ ]{2,}#"," ",trim($zonebuffer));
-				
-			$buflines = preg_split("#\n#",$zonebuffer);
-			
-			$currecord = "";
-			$recsuffix = "";
-			for($j=0;$j<count($buflines);$j++) {
-				$record = preg_split("#[ ]#",$buflines[$j]);
-				if($record[0] == ";" || $record[0] == "#")
-					continue;
-				if(count($record) == 3) {
-					if(strlen($record[0]) > 0)
-						$currecord = $record[0];
-					FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."'");
-				}
-				else if(count($record) == 2) {
-					if(preg_match('#\$ORIGIN#',$record[0]) && $record[1] != $zonename)
-						$recsuffix = substr($record[1],0,strlen($record[1])-1);
-				}
-			}
-		}
-	}
+	
+	
 		
 	echo "[".Config::getWebsiteName()."] DNS Discover done at ".date('d-m-Y G:i:s');
 
