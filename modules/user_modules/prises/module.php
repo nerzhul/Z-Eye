@@ -28,9 +28,9 @@
 				$query2 = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$piece.".".$data["prise"]."'");
 				if($data2 = mysql_fetch_array($query2)) {
 					$dev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data2["ip"]."'");
-					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=14&d=".$dev."\">".$dev."</a></td>";
+					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dev."\">".$dev."</a></td>";
 					$convport = preg_replace("#\/#","-",$data2["port"]);
-					$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=14&d=".$dev."#".$convport."\">".$data2["port"]."</a></td><td>";
+					$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dev."#".$convport."\">".$data2["port"]."</a></td><td>";
 				}
 				else
 					$tmpoutput .= " - </td><td>Non câblé</td><td>";

@@ -6,7 +6,7 @@
 		function iModule() {
 			parent::InterfaceModule();
 			$this->conf->modulename = "iPriseMgmt";
-			$this->conf->seclevel = 5;
+			$this->conf->seclevel = 4;
 			$this->conf->connected = 1;
 			$this->moduleclass = new iPriseMgmt();
 		}
