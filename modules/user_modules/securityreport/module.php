@@ -48,17 +48,11 @@
         	$sql_date = $year."-".$month."-".$day." 00:00:00";
 			$fields = "";
 			
-			if($shscan) $fields .= "scans";
-			if($shtse) {
-				if(strlen($fields) > 0) $fields .= ",";
-				$fields .= "tse";
-			}
-			if($shssh) {
-				if(strlen($fields) > 0) $fields .= ",";
-				$fields .= "ssh";
-			}
+			if($shscan) $fields .= ",scans";
+			if($shtse) $fields .= ",tse";
+			if($shssh) $fields .= ",ssh";
 			
-			$sql = "select ".$fields." from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".$ec." DAY))";
+			$sql = "select atkdate,".$fields." from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".$ec." DAY))";
 			mysql_select_db("snort");
 			$query = mysql_query($sql);
 			$labels = $scans = $tse = $ssh = "[";
