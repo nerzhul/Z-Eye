@@ -33,9 +33,10 @@
 			$output .= FS::$iMgr->addHidden("mod",$this->mid);
             $output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours <br />";
 			$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours <br />";
-			$output .= FS::$iMgr->addCheck("sc",$shscan)."Scans ? ";
-			$output .= FS::$iMgr->addCheck("tse",$shtse)."TSE ? ";
-			$output .= FS::$iMgr->addCheck("ssh",$shssh)."SSH ? ";
+			$output .= "Filtres: ";
+			$output .= FS::$iMgr->addCheck("sc",$shscan)."Scans ";
+			$output .= FS::$iMgr->addCheck("tse",$shtse)."TSE ";
+			$output .= FS::$iMgr->addCheck("ssh",$shssh)."SSH ";
 
 			$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
 			$output .= "</form><canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
