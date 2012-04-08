@@ -4,7 +4,7 @@
 		function iSecReport() { parent::genModule(); }
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h3>Rapports de Sécurité</h3>";
-			$this->loadAttackGraph();
+			$output .= $this->loadAttackGraph();
 			$output .= "</div>";
 			return $output;
 		}
