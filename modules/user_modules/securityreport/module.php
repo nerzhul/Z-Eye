@@ -29,12 +29,14 @@
 			if($shssh == NULL) $shssh = true;
 			else if($shssh == "on") $shssh = true;
 			else $shssh = false;
-            $output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours ";
-			$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours ";
-			$output .= "Scans ? ".FS::$iMgr->addCheck("sc",$shscan);
-			$output .= "TSE ? ".FS::$iMgr->addCheck("tse",$shtse);
-			$output .= "SSH ? ".FS::$iMgr->addCheck("ssh",$shssh);
+			
 			$output .= FS::$iMgr->addHidden("mod",$this->mid);
+            $output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours ";
+			$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours <br />";
+			$output .= FS::$iMgr->addCheck("sc",$shscan)."Scans ? ";
+			$output .= FS::$iMgr->addCheck("tse",$shtse)."TSE ? ";
+			$output .= FS::$iMgr->addCheck("ssh",$shssh)."SSH ? ";
+
 			$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
 			$output .= "</form><canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
 
