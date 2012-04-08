@@ -29,7 +29,7 @@
 				return $output;
 			}
 			
-			$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","zonename,record,rectype,recval",($filter != NULL ? "zonename = '".$filter."'" : ""),"zonename",1);
+			$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","zonename,record,rectype,recval",($filter != NULL ? "zonename = '".$filter."'" : ""),"zonename,record",2);
 			$curzone = "";
 			while($data = mysql_fetch_array($query)) {
 				if($curzone != $data["zonename"]) {
