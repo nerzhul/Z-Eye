@@ -10,7 +10,7 @@
 		}
 		
 		private function loadAttackGraph() {
-			$output = "<h4>Courbes d'attaques</h4><form action=\"index.php?mod=".$this->mid."&act=1\" method=\"get\">";
+			$output = "<h4>Courbes d'attaques</h4><form action=\"index.php?mod=".$this->mid."\" method=\"get\">";
 			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
                         if($ech == NULL) $ech = 7;
 			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
@@ -34,6 +34,7 @@
 			$output .= "Scans ? ".FS::$iMgr->addCheck("sc",$shscan);
 			$output .= "TSE ? ".FS::$iMgr->addCheck("tse",$shtse);
 			$output .= "SSH ? ".FS::$iMgr->addCheck("ssh",$shssh);
+			$output .= FS::$iMgr->addHidden("mod",$this->mid);
 			$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
 			$output .= "</form><canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
 
