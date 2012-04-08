@@ -18,11 +18,10 @@
 			$output .= "</select>";
 			$output .= FS::$iMgr->addSubmit("Aller","Aller")."</form><br />";
 			switch($stype) {
-				case 1: $output .= $this->loadAttackStats(); break;
 				case 3: $output .= $this->loadNagiosMap(); break;
 				case 4: $output .= $this->loadWeathermaps(); break;
 				case 5: $output .= $this->loadDebitStats(); break;
-				default:$output .= $this->loadAttackStats(); break;
+				default: $output .= $this->loadWeathermaps(); break;
 			}
 			$output .= "</div>";
 			return $output;
@@ -411,84 +410,8 @@
 			return $output;
 		}
 
-		private function loadAttackStats() {
-			$output = "<h4>Statistiques d'attaque</h4><form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">";
-			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
-                        if($ech == NULL) $ech = 7;
-			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
-			if($ec == NULL) $ec = 365;
-			if(!FS::$secMgr->isNumeric($ec)) $ec = 365;
-                        $output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours<br />";
-			$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours<br />";
-                        $output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
-                        $output .= "</form><canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
-
-			$year = date("Y");
-	        	$month = date("m");
-	        	$day = date("d");
-
-        		$sql_date = $year."-".$month."-".$day." 00:00:00";
-			$sql = "select * from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".$ec." DAY))";
-			mysql_select_db("snort");
-			$query = mysql_query($sql);
-		        $labels = $scans = $tse = $ssh = "[";
-		        $cursor = 0;
-		        $subline = false;
-		        $temp1 = $temp2 = $temp3 = $temp4 = "";
-		        while($data = mysql_fetch_array($query)) {
-                		if($cursor == $ech) {
-		                        if($subline)
-                		                $labels .= "'\\r\\n".$temp1."',";
-		                        else
-                                		$labels .= "'".$temp1."',";
-                		        $scans .= $temp2.",";
-		                        $tse .= $temp3.",";
-                		        $ssh .= $temp4.",";
-		                        $cursor = $temp1 = $temp2 = $temp3 = $temp4 = 0;
-		                        $subline = ($subline ? false : true);
-		                } else {
-		                        $cursor++;
-		                        $temp1 = substr($data["atkdate"],8,2)."/".substr($data["atkdate"],5,2);
-		                        $temp2 += $data["scans"];
-		                        $temp3 += $data["tse"];
-		                        $temp4 += $data["ssh"];
-		                }
-		        }
-
-		        $labels .= "]";
-		        $scans .= "]";
-		        $tse .= "]";
-			$ssh .= "]";
-		        $output .= "<script>window.onload = function (){var data = ";
-
-		        $output .= "[".$scans.",".$tse.",".$ssh."];";
-
-		        $output .= "var line = new RGraph.Line(\"atkst\", data);";
-		        $output .= "line.Set('chart.yaxispos', 'right');
-		        line.Set('chart.hmargin', 15);
-		        line.Set('chart.tickmarks', 'endcircle');
-		        line.Set('chart.linewidth', 2);
-		        line.Set('chart.shadow', true);
-		        line.Set('chart.gutter.top', 5);
-		        line.Set('chart.gutter.right', 100);
-		        line.Set('chart.key', ['Scans', 'Attaques TSE', 'Attaques SSH']);
-		        line.Set('chart.gutter.bottom', 45); ";
-		        $output .= "line.Set('chart.labels', ".$labels.");";
-		        $output .= "line.Draw();}</script>";
-			mysql_select_db("fssmanager");
-			return $output;
-		}
-
 		public function handlePostDatas($act) {
 			switch($act) {
-				case 1:
-					$ech = FS::$secMgr->checkAndSecurisePostData("ech");
-					if($ech == NULL) $ech = 7;
-					$ec = FS::$secMgr->checkAndSecurisePostData("ec");
-								if($ec == NULL) $ec = 365;
-								if(!FS::$secMgr->isNumeric($ec)) $ec = 365;
-					header("Location: index.php?mod=".$this->mid."&s=1&ech=".$ech."&ec=".$ec);
-					return;
 				case 2:
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
 														if($stype == NULL) $stype = 1;
