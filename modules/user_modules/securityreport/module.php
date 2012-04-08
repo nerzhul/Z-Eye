@@ -10,7 +10,7 @@
 		}
 		
 		private function loadAttackGraph() {
-			$output = "<h4>Courbes d'attaques</h4><form action=\"index.php?mod=".$this->mid."\" method=\"get\">";
+			$output = "<h4>Courbes d'attaques</h4><form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">";
 			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
                         if($ech == NULL) $ech = 7;
 			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
@@ -19,15 +19,15 @@
 			if($ec == NULL) $ec = 365;
 			$shscan = FS::$secMgr->checkAndSecuriseGetData("sc");
 			if($shscan == NULL) $shscan = true;
-			else if($shscan == "on") $shscan = true;
+			else if($shscan > 0) $shscan = true;
 			else $shscan = false;
 			$shtse = FS::$secMgr->checkAndSecuriseGetData("tse");
 			if($shtse == NULL) $shtse = true;
-			else if($shtse == "on") $shtse = true;
+			else if($shtse > 0) $shtse = true;
 			else $shtse = false;
 			$shssh = FS::$secMgr->checkAndSecuriseGetData("ssh");
 			if($shssh == NULL) $shssh = true;
-			else if($shssh == "on") $shssh = true;
+			else if($shssh > 0) $shssh = true;
 			else $shssh = false;
 			
 			$output .= FS::$iMgr->addHidden("mod",$this->mid);
@@ -110,6 +110,16 @@
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
+					$ech = FS::$secMgr->checkAndSecurisePostData("ech");
+					$ec = FS::$secMgr->checkAndSecurisePostData("ec");
+					$sc = FS::$secMgr->checkAndSecurisePostData("sc");
+					($sc != NULL && $sc == "on") ? $sc = 1 : $sc = 0;
+					$tse = FS::$secMgr->checkAndSecurisePostData("tse");
+					($tse != NULL && $tse == "on") ? $tse = 1 : $tse = 0;
+					$ssh = FS::$secMgr->checkAndSecurisePostData("ssh");
+					($ssh != NULL && $ssh == "on") ? $ssh = 1 : $ssh = 0;
+					header("Location: index.php?mod=".$this->mid."&ech=".$ech."&ec=".$ec."&ssh=".$ssh."&tse=".$tse."&sc=".$sc."");
+					break;
 				default: break;
 			}
 		}

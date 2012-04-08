@@ -413,9 +413,9 @@
 			switch($act) {
 				case 2:
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
-														if($stype == NULL) $stype = 1;
+					if($stype == NULL) $stype = 1;
 					header("Location: index.php?mod=".$this->mid."&s=".$stype);
-														return;
+					return;
 				default: break;
 			}
 		}
