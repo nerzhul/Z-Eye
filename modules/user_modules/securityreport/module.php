@@ -52,7 +52,7 @@
 			if($shtse) $fields .= ",tse";
 			if($shssh) $fields .= ",ssh";
 			
-			$sql = "select atkdate,".$fields." from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".$ec." DAY))";
+			$sql = "select atkdate".$fields." from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".$ec." DAY))";
 			mysql_select_db("snort");
 			$query = mysql_query($sql);
 			$labels = $scans = $tse = $ssh = "[";
