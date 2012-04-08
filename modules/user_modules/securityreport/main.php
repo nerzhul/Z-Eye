@@ -5,10 +5,10 @@
 	class iModule extends InterfaceModule {
 		function iModule() {
 			parent::InterfaceModule();
-			$this->conf->modulename = "iDNS";
-			$this->conf->seclevel = 6;
+			$this->conf->modulename = "iSecReport";
+			$this->conf->seclevel = 4;
 			$this->conf->connected = 1;
-			$this->moduleclass = new iDNS();
+			$this->moduleclass = new iSecReport();
 		}
 	};
 ?>
