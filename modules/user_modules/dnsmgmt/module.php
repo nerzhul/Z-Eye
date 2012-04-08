@@ -44,6 +44,8 @@
 						$style = "background-color: #BFFFBF;"; break;
 					case "SRV":
 						$style = "background-color: #B3FFFF;"; break;
+					case "NS":
+						$style = "background-color: #FF8888;"; break;
 					default: $style = ""; break;
 				}
 				$dnsoutput .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$data["record"]."</td><td>".$data["rectype"]."</td><td>";
