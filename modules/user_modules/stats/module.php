@@ -11,7 +11,6 @@
 			$output = "<div id=\"monoComponent\">";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
 			$output .= FS::$iMgr->addList("stype");
-			$output .= FS::$iMgr->addElementToList("Statistiques d'attaque",1,$stype == 1 ? true : false);
 			$output .= FS::$iMgr->addElementToList("Cartographie Icinga (Nagios)",3, $stype == 3 ? true : false);
 			$output .= FS::$iMgr->addElementToList("Débits up/down Switches en cours",4, $stype == 4 ? true : false);
 			$output .= FS::$iMgr->addElementToList("Statistiques de débit",5, $stype == 5 ? true : false);
