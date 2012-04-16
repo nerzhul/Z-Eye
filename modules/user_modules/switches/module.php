@@ -61,11 +61,11 @@
 				$out = "";
 				exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$device." ifDescr | grep ".$port,$out);
 				if(strlen($out[0]) < 5)
-						return -1;
+						return FS::$iMgr->printError("Unable to walk and find port Description");
 				$out = explode(" ",$out[0]);
 				$out = explode(".",$out[0]);
 				if(!FS::$secMgr->isNumeric($out[1]))
-						return -1;
+						return FS::$iMgr->printError("Port Description isn't numeric");
 				$portid = $out[1];
 
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=9");
