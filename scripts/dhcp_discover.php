@@ -1,6 +1,23 @@
 <?php
 	require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 	
+	function bufferizeDHCPFiles($conn,$file) {
+		$tmpbuf = "";
+		$stream = ssh2_exec($conn,"cat ".$file);
+		stream_set_blocking($stream, true);
+		while ($buf = fread($stream, 4096)) {
+			$inc_path = array();
+			preg_match_all("#include \"(.*)\"#",$buf,$inc_path);
+			if(count($inc_path[1]) > 0) {
+				for($i=0;$i<count($inc_path[1]);$i++)
+					$tmpbuf .= bufferizeDHCPFiles($conn,$inc_path[1][$i]);
+			}
+			else
+				$tmpbuf .= $buf;
+		}
+		return $tmpbuf;
+	}
+	
 	FS::LoadFSModules();
 	
 	$dhcpdatas = "";
@@ -30,12 +47,7 @@
 				}
 				fclose($stream);
 	
-				$stream = ssh2_exec($conn,"cat /etc/dhcp/conf.d/*.conf");
-				stream_set_blocking($stream, true);
-				while ($buf = fread($stream, 4096)) {
-					$dhcpdatas2 .= $buf;
-				}
-				fclose($stream);
+				$dhcpdatas2 = bufferizeDHCPFiles($conn,"/etc/dhcp/dhcpd.conf");
 	
 				$dhcpdatas = preg_replace("/\n/","<br />",$dhcpdatas);
 				if($DHCPfound == false) $DHCPfound = true;
