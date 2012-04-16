@@ -1425,7 +1425,8 @@
 		private function setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
 			if($device == "" || $field == "" || $pid == "" || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
-			FS::$snmpMgr->set($device,$field.".".$pid,$vtype,$value);
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			FS::$snmpMgr->set($ip,$field.".".$pid,$vtype,$value);
 			return 0;
 		}
 
