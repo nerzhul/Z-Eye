@@ -1426,7 +1426,7 @@
 			if($device == "" || $field == "" || $pid == "" || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			FS::$snmpMgr->set($ip,$field.".".$pid,$vtype,$value);
+			FS::$snmpMgr->set($dip,$field.".".$pid,$vtype,$value);
 			return 0;
 		}
 
@@ -1448,11 +1448,12 @@
 
 		public function writeMemory($device) {
 			$rand = rand(1,100);
-			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"1");
-			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"4");
-			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"3");
-			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"1");
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			FS::$snmpMgr->setInt($dip,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"1");
+			FS::$snmpMgr->setInt($dip,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"4");
+			FS::$snmpMgr->setInt($dip,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"3");
+			FS::$snmpMgr->setInt($dip,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"1");
+			
 			FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 
 			return 0;
