@@ -91,7 +91,7 @@
 				$output .= "<tr><td>Vitesse</td><td>Non disponible</td></tr>";
 				$output .= "<tr><td>Duplex</td><td>Non disponible</td></tr>";
 				$output .= "<tr><td>Switchport Mode</td><td>";
-				$trmode = FS::$snmpMgr->get($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
+				$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
 				$trmode = preg_split("# #",$trmode);
 				$trmode = $trmode[1];
 				$output .= FS::$iMgr->addList("trmode","arangeform();");
@@ -1050,7 +1050,11 @@
 			if($device == "" || $portname == "" || $field == "")
 				return NULL;
 
-			$resw = FS::$snmpMgr->walk($device,"ifDescr");
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			if($dip == NULL)
+				return NULL;
+				
+			$resw = FS::$snmpMgr->walk($dip,"ifDescr");
 			if(count($resw) < 1)
 				return NULL;
 
@@ -1064,7 +1068,7 @@
                         if($resultwalk == "")
                                 return NULL;
 
-                        $result = FS::$snmpMgr->get($device,"ifAlias.".$resultwalk);
+                        $result = FS::$snmpMgr->get($dip,"ifAlias.".$resultwalk);
 			if(count($result) < 1)
 				return NULL;
                         $result = explode(" ",$result,2);
@@ -1447,8 +1451,8 @@
 			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"4");
 			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"3");
 			FS::$snmpMgr->setInt($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"1");
-
-			FS::$snmpMgr->get($device,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 
 			return 0;
 		}
@@ -1585,7 +1589,7 @@
 					}
 					$portid = $out[1];
 
-					$value = FS::$snmpMgr->get($device,"1.3.6.1.4.1.9.9.68.1.2.2.1.2.".$portid);
+					$value = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.68.1.2.2.1.2.".$portid);
 					if($value == false)
 							echo "-1";
 					else
