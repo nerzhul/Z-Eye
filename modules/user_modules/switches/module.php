@@ -59,7 +59,7 @@
 			$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 			if($data = pg_fetch_array($query)) {
 				$out = "";
-				exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$device." ifDescr | grep ".$port,$out);
+				exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$port,$out);
 				if(strlen($out[0]) < 5)
 						return FS::$iMgr->printError("Unable to walk and find port Description");
 				$out = explode(" ",$out[0]);
@@ -1427,7 +1427,11 @@
 
 		public function getPortId($device,$portname) {
 			$out = "";
-			exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$device." ifDescr | grep ".$portname,$out);
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			if($dip == NULL)
+				return -1;
+				
+			exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$portname,$out);
 			if(strlen($out[0]) < 5)
 				return -1;
 			$out = explode(" ",$out[0]);
@@ -1563,7 +1567,12 @@
 					$device = FS::$secMgr->checkAndSecuriseGetData("dev");
 					$portname = FS::$secMgr->checkAndSecuriseGetData("port");
 					$out = "";
-					exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$device." ifDescr | grep ".$portname,$out);
+					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+					if($dip == NULL) {
+						echo "-1";
+						return;
+					}
+					exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$portname,$out);
 					if(strlen($out[0]) < 5) {
 							echo "-1";
 						return;
