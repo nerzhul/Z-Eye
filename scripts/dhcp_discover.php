@@ -182,7 +182,8 @@
 	}
 
 	foreach($result_temp as $key => $value) {
-		$result[$value["ip"]] = $value;
+		if(isset($value["ip"]))
+			$result[$value["ip"]] = $value;
 	}
 
 	foreach ($result as $key => $ipData) {
