@@ -11,7 +11,7 @@
 					$output .= $this->CreateOrEditServer($do == 1 ? true : false);
 					break;
 				case 4: case 5:
-					$output .= $this->CreateOrEditRadiusDB($do == 1 ? true : false);
+					$output .= $this->CreateOrEditRadiusDB($do == 4 ? true : false);
 					break;
 				default:
 					$output .= $this->showServerList();
@@ -168,12 +168,9 @@
 				$output .= $tmpoutput."</table>";
 			else
 				$output .= FS::$iMgr->printError("Aucun serveur trouvé !");
-			return $output;	
-		}
-		
-		private function showServerList() {
-			$output = "<h4>Liste des bases Radius</h4>";
-			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=4\">Nouveau Serveur</a><br />";
+
+			$output .= "<h4>Liste des bases Radius</h4>";
+			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=4\">Nouvelle base</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><tr><th>Port</th><tr><th>Hôte</th><th>Login</th><th>Supprimer</th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select("fss_radius_db_list","addr,port,dbname,login");
@@ -269,7 +266,7 @@
 						return;
 					}
 					$testDBMgr = new FSMySQLMgr();
-					$testDBMgr->setConfig($saddr,$sport,$sdbname,$slogin,$spwd);
+					$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
 					
 					$conn = $testDBMgr->Connect();
 					if(!$conn) {
