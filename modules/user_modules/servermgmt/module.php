@@ -198,7 +198,6 @@
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$dhcp = FS::$secMgr->checkAndSecurisePostData("dhcp");
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
-					return;
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
@@ -265,6 +264,8 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
+					
+					FS::$dbMgr->Close();
 					$testDBMgr = new FSMySQLMgr();
 					$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
 					
@@ -273,6 +274,7 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=2");
 						return;
 					}
+					FS::$dbMgr->Connect();
 					if(FS::$dbMgr->GetOneData("fss_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
@@ -292,6 +294,7 @@
 						return;
 					}
 					if($spwd != NULL || $spwd != "") {
+						FS::$dbMgr->Close();
 						$testDBMgr = new FSMySQLMgr();
 						$testDBMgr->setConfig($saddr,$sport,$sdbname,$slogin,$spwd);
 						
@@ -300,6 +303,7 @@
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=2");
 							return;
 						}
+						FS::$dbMgr->Connect();
 						if($spwd == $spwd2) FS::$dbMgr->Update("fss_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
 					FS::$dbMgr->Update("fss_radius_db_list","login = '".$slogin."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
