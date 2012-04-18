@@ -306,44 +306,47 @@
 					$mactoip[$idx]["lst"] = $data["time_last"];
 				}
 				
-				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig(RadiusDbConfig::getDbName(),RadiusDbConfig::getDbPort(),RadiusDbConfig::getDbHost(),RadiusDbConfig::getDbUser(),RadiusDbConfig::getDbPwd());
-				$radSQLMgr->Connect();
-				
-				$ciscomac = $mac[0].$mac[1].$mac[3].$mac[4].".".$mac[6].$mac[7].$mac[9].$mac[10].".".$mac[12].$mac[13].$mac[15].$mac[16];
-				$query = $radSQLMgr->Select("radacct","username,calledstationid,callingstationid,acctstoptime","radacctid = (SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."')");
-				if($data = mysql_fetch_array($query)) {
-					$idx = count($mactoip);
-					$mactoip[$idx]["type"] = "802.1X: Utilisateur";
-					$mactoip[$idx]["dat"] = $data["username"];
-					$mactoip[$idx]["fst"] = $radSQLMgr->GetOneData("radacct","acctstarttime","radacctid = (SELECT MIN(radacctid) from radacct where callingstationid = '".$ciscomac."' AND calledstationid = '".$data["calledstationid"]."' AND username = '".$data["username"]."')");
-					$mactoip[$idx]["lst"] = $data["acctstoptime"];
-				}
-				
-				$query = $radSQLMgr->Select("radacct","SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$ciscomac."'");
-				if($data = mysql_fetch_array($query)) {
-					$idx = count($mactoip);
-					$mactoip[$idx]["type"] = "802.1X Acct: Bande passante";
-					if($data["input"] > 1024*1024*1024)
-						$inputbw = round($data["input"]/1024/1024/1024,2)."Go";
-					else if($data["input"] > 1024*1024)
-						$inputbw = round($data["input"]/1024/1024,2)."Mo";
-					else if($data["input"] > 1024)
-						$inputbw = round($data["input"]/1024,2)."Ko";
-					else
-						$inputbw = $data["input"]."o";
-						
-					if($data["output"] > 1024*1024*1024)
-						$outputbw = round($data["output"]/1024/1024/1024,2)."Go";
-					else if($data["output"] > 1024*1024)
-						$outputbw = round($data["output"]/1024/1024,2)."Mo";
-					else if($data["output"] > 1024)
-						$outputbw = round($data["output"]/1024,2)."Ko";
-					else
-						$outputbw = $data["output"]."o";
-					$mactoip[$idx]["dat"] = "Download: ".$inputbw." / ".$outputbw;
-					$mactoip[$idx]["fst"] = $data["fst"];
-					$mactoip[$idx]["lst"] = $data["lst"];
+				$query = FS::$dbMgr->Select("fss_radius_db_list","addr,port,dbname,login,pwd");
+				while($data = mysql_fetch_array($query)) {
+					$radSQLMgr = new FSMySQLMgr();
+					$radSQLMgr->setConfig(RadiusDbConfig::getDbName(),RadiusDbConfig::getDbPort(),RadiusDbConfig::getDbHost(),RadiusDbConfig::getDbUser(),RadiusDbConfig::getDbPwd());
+					$radSQLMgr->Connect();
+					
+					$ciscomac = $mac[0].$mac[1].$mac[3].$mac[4].".".$mac[6].$mac[7].$mac[9].$mac[10].".".$mac[12].$mac[13].$mac[15].$mac[16];
+					$query2 = $radSQLMgr->Select("radacct","username,calledstationid,callingstationid,acctstoptime","radacctid = (SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."')");
+					if($data2 = mysql_fetch_array($query2)) {
+						$idx = count($mactoip);
+						$mactoip[$idx]["type"] = "802.1X: Utilisateur";
+						$mactoip[$idx]["dat"] = $data2["username"];
+						$mactoip[$idx]["fst"] = $radSQLMgr->GetOneData("radacct","acctstarttime","radacctid = (SELECT MIN(radacctid) from radacct where callingstationid = '".$ciscomac."' AND calledstationid = '".$data2["calledstationid"]."' AND username = '".$data2["username"]."')");
+						$mactoip[$idx]["lst"] = $data2["acctstoptime"];
+					}
+					
+					$query2 = $radSQLMgr->Select("radacct","SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$ciscomac."'");
+					if($data2 = mysql_fetch_array($query2)) {
+						$idx = count($mactoip);
+						$mactoip[$idx]["type"] = "802.1X Acct: Bande passante";
+						if($data2["input"] > 1024*1024*1024)
+							$inputbw = round($data2["input"]/1024/1024/1024,2)."Go";
+						else if($data2["input"] > 1024*1024)
+							$inputbw = round($data2["input"]/1024/1024,2)."Mo";
+						else if($data2["input"] > 1024)
+							$inputbw = round($data2["input"]/1024,2)."Ko";
+						else
+							$inputbw = $data2["input"]."o";
+							
+						if($data2["output"] > 1024*1024*1024)
+							$outputbw = round($data2["output"]/1024/1024/1024,2)."Go";
+						else if($data2["output"] > 1024*1024)
+							$outputbw = round($data2["output"]/1024/1024,2)."Mo";
+						else if($data2["output"] > 1024)
+							$outputbw = round($data2["output"]/1024,2)."Ko";
+						else
+							$outputbw = $data2["output"]."o";
+						$mactoip[$idx]["dat"] = "Download: ".$inputbw." / ".$outputbw;
+						$mactoip[$idx]["fst"] = $data2["fst"];
+						$mactoip[$idx]["lst"] = $data2["lst"];
+					}
 				}
 
 				for($i=0;$i<count($mactoip);$i++)
