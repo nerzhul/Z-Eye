@@ -1,5 +1,6 @@
 <?php
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/../../../config/radiusdb.conf.php");
 	class iSwitchMgmt extends genModule{
 		function iConnect($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
@@ -296,12 +297,26 @@
                 }
 
 				$query = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser,time_first,time_last","mac = '".$mac."'");
-                    while($data = pg_fetch_array($query)) {
+                while($data = pg_fetch_array($query)) {
 					$idx = count($mactoip);
 					$mactoip[$idx] = array();
 					$mactoip[$idx]["type"] = "Netbios";
 					$mactoip[$idx]["dat"] = ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a>";
 					$mactoip[$idx]["fst"] = $data["time_first"];
+					$mactoip[$idx]["lst"] = $data["time_last"];
+				}
+				
+				$radSQLMgr = new FSMySQLMgr();
+				$radSQLMgr->setConfig(RadiusDbConfig::$getDbName(),RadiusDbConfig::getDbPort(),RadiusDbConfig::getDbHost(),RadiusDbConfig::getDbUser(),RadiusDbConfig::getDbPwd());
+				$radSQLMgr->Connect();
+				
+				$ciscomac = preg_replace("#^([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}$#","$1$2.$3$4.$5$6",$mac);
+				$query = $radSQLMgr->GetOneData("radacct","username,calledstationid,callingstationid","radacctid = SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."'");
+				if($data = mysql_fetch_array($query)) {
+					$idx = count($mactoip);
+					$mactoip[$idx]["type"] = "Utilisateur 802.1X";
+					$mactoip[$idx]["dat"] = $data["username"];
+					$mactoip[$idx]["fst"] = $radSQLMgr->GetOneData("radacct","acctstarttime","radacctid = SELECT MIN(radacctid) from radacct where callingstationid = '".$ciscomac."' AND calledstationid = '".$data["calledstationid"]."' AND username = '".$data["username"]."'");
 					$mactoip[$idx]["lst"] = $data["time_last"];
 				}
 
@@ -1401,7 +1416,7 @@
 			if($pid == -1)
 				return -1;
 
-                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
 		}
 
 		public function setSwitchportModeWithPID($device, $pid, $value) {
@@ -1410,6 +1425,45 @@
 
                         return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
 		}
+		
+		/*
+		
+		ATTENTION le port ID n'est pas celui de getPortId
+		public function setPortSpeed($device, $portname, $value) {
+			if(!FS::$secMgr->isNumeric($value))
+                                return -1;
+
+			$pid = $this->getPortId($device,$portname);
+			if($pid == -1)
+				return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9.SWITCHID","i",$value);
+		}
+
+		public function setPortSpeedWithPID($device, $pid, $value) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
+                                return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10.SWITCHID","i",$value);
+		}
+		
+		public function setPortDuplex($device, $portname, $value) {
+			if(!FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
+                                return -1;
+
+			$pid = $this->getPortId($device,$portname);
+			if($pid == -1)
+				return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
+		}
+
+		public function setPortDuplexWithPID($device, $pid, $value) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
+                                return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
+		}*/
 
 		private function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
