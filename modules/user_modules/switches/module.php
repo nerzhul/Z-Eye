@@ -289,7 +289,7 @@
 					$convport = preg_replace("#\/#","-",$data["port"]);
 					$mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> ";
 					$mactoip[$idx]["dat"] .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
-					$mactoip[$idx]["dat"] .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>";
+					$mactoip[$idx]["dat"] .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
 					$mactoip[$idx]["dat"] .= ($piece == NULL ? "" : "<br />Prise ".$piece);
 					$mactoip[$idx]["type"] .= ($piece == NULL ? "" : ", prise");
 					$mactoip[$idx]["fst"] = $data["time_first"].($piece == NULL ? "" : "<br />");
@@ -307,17 +307,26 @@
 				}
 				
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig(RadiusDbConfig::$getDbName(),RadiusDbConfig::getDbPort(),RadiusDbConfig::getDbHost(),RadiusDbConfig::getDbUser(),RadiusDbConfig::getDbPwd());
+				$radSQLMgr->setConfig(RadiusDbConfig::getDbName(),RadiusDbConfig::getDbPort(),RadiusDbConfig::getDbHost(),RadiusDbConfig::getDbUser(),RadiusDbConfig::getDbPwd());
 				$radSQLMgr->Connect();
 				
-				$ciscomac = preg_replace("#^([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}:([0-9a-fA-F]{2}$#","$1$2.$3$4.$5$6",$mac);
-				$query = $radSQLMgr->GetOneData("radacct","username,calledstationid,callingstationid","radacctid = SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."'");
+				$ciscomac = $mac[0].$mac[1].$mac[3].$mac[4].".".$mac[6].$mac[7].$mac[9].$mac[10].".".$mac[12].$mac[13].$mac[15].$mac[16];
+				$query = $radSQLMgr->Select("radacct","username,calledstationid,callingstationid","radacctid = (SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."')");
 				if($data = mysql_fetch_array($query)) {
 					$idx = count($mactoip);
 					$mactoip[$idx]["type"] = "Utilisateur 802.1X";
 					$mactoip[$idx]["dat"] = $data["username"];
-					$mactoip[$idx]["fst"] = $radSQLMgr->GetOneData("radacct","acctstarttime","radacctid = SELECT MIN(radacctid) from radacct where callingstationid = '".$ciscomac."' AND calledstationid = '".$data["calledstationid"]."' AND username = '".$data["username"]."'");
-					$mactoip[$idx]["lst"] = $data["time_last"];
+					$mactoip[$idx]["fst"] = $radSQLMgr->GetOneData("radacct","acctstarttime","radacctid = (SELECT MIN(radacctid) from radacct where callingstationid = '".$ciscomac."' AND calledstationid = '".$data["calledstationid"]."' AND username = '".$data["username"]."')");
+					$mactoip[$idx]["lst"] = $data["acctstoptime"];
+				}
+				
+				$query = $radSQLMgr->Select("radacct","SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$ciscomac."'");
+				if($data = mysql_fetch_array($query)) {
+					$idx = count($mactoip);
+					$mactoip[$idx]["type"] = "Bande passante consommée";
+					$mactoip[$idx]["dat"] = "Download: ".$data["input"]."o / ".$data["output"]."o";
+					$mactoip[$idx]["fst"] = $data["fst"];
+					$mactoip[$idx]["lst"] = $data["lst"];
 				}
 
 				for($i=0;$i<count($mactoip);$i++)
