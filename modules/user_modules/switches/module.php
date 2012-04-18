@@ -324,7 +324,24 @@
 				if($data = mysql_fetch_array($query)) {
 					$idx = count($mactoip);
 					$mactoip[$idx]["type"] = "Bande passante consommée";
-					$mactoip[$idx]["dat"] = "Download: ".$data["input"]."o / ".$data["output"]."o";
+					if($data["input"] > 1024*1024*1024)
+						$inputbw = ($data["input"]/1024/1024/1024)."Go";
+					if($data["input"] > 1024*1024)
+						$inputbw = ($data["input"]/1024/1024)."Mo";
+					if($data["input"] > 1024)
+						$inputbw = ($data["input"]/1024)."Ko";
+					else
+						$inputbw = $data["input"]."o";
+						
+					if($data["output"] > 1024*1024*1024)
+						$outputbw = ($data["output"]/1024/1024/1024)."Go";
+					if($data["output"] > 1024*1024)
+						$outputbw = ($data["output"]/1024/1024)."Mo";
+					if($data["output"] > 1024)
+						$outputbw = ($data["output"]/1024)."Ko";
+					else
+						$inputbw = $data["output"]."o";
+					$mactoip[$idx]["dat"] = "Download: ".$inputbw." / ".$outputbw;
 					$mactoip[$idx]["fst"] = $data["fst"];
 					$mactoip[$idx]["lst"] = $data["lst"];
 				}
