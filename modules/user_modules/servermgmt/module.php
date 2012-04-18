@@ -171,14 +171,14 @@
 
 			$output .= "<h4>Liste des bases Radius</h4>";
 			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=4\">Nouvelle base</a><br />";
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><tr><th>Port</th><tr><th>Hôte</th><th>Login</th><th>Supprimer</th></tr>";
+			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Port</th><th>Hôte</th><th>Login</th><th>Supprimer</th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select("fss_radius_db_list","addr,port,dbname,login");
 			while($data = mysql_fetch_array($query)) {
 				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=.".$data["dbname"]."\">".$data["addr"];
-				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname."]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=.".$data["dbname"]."\">";
+				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
+				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
+				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">";
 				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
 				$tmpoutput .= "</center></td></tr>";
 			}
@@ -269,11 +269,11 @@
 					$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
 					
 					$conn = $testDBMgr->Connect();
-					if(!$conn) {
+					if($conn != 0) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=2");
 						return;
 					}
-					if(FS::$dbMgr->GetOneData("fss_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$dbname."'")) {
+					if(FS::$dbMgr->GetOneData("fss_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
@@ -288,7 +288,7 @@
 					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2) {
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=1");
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=.".$sport."&db=.".$sdbname."&err=1");
 						return;
 					}
 					if($spwd != NULL || $spwd != "") {
@@ -297,7 +297,7 @@
 						
 						$conn = $testDBMgr->Connect();
 						if(!$conn) {
-							header("Location: index.php?mod=".$this->mid."&do=".$act."&err=2");
+							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=.".$sport."&db=.".$sdbname."&err=2");
 							return;
 						}
 						if($spwd == $spwd2) FS::$dbMgr->Update("fss_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$dbname."'");
@@ -310,7 +310,7 @@
 					$sport = FS::$secMgr->checkAndSecurisePostData("pr");
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("db");
 					if($saddr && $sport && $sdbname) {
-							FS::$dbMgr->Delete("fss_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$dbname."'");
+							FS::$dbMgr->Delete("fss_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}	
 					header('Location: m-'.$this->mid.'.html');				
 				}
