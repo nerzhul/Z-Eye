@@ -311,7 +311,7 @@
 				$radSQLMgr->Connect();
 				
 				$ciscomac = $mac[0].$mac[1].$mac[3].$mac[4].".".$mac[6].$mac[7].$mac[9].$mac[10].".".$mac[12].$mac[13].$mac[15].$mac[16];
-				$query = $radSQLMgr->Select("radacct","username,calledstationid,callingstationid","radacctid = (SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."')");
+				$query = $radSQLMgr->Select("radacct","username,calledstationid,callingstationid,acctstoptime","radacctid = (SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."')");
 				if($data = mysql_fetch_array($query)) {
 					$idx = count($mactoip);
 					$mactoip[$idx]["type"] = "Utilisateur 802.1X";
@@ -340,7 +340,7 @@
 					if($data["output"] > 1024)
 						$outputbw = ($data["output"]/1024)."Ko";
 					else
-						$inputbw = $data["output"]."o";
+						$outputbw = $data["output"]."o";
 					$mactoip[$idx]["dat"] = "Download: ".$inputbw." / ".$outputbw;
 					$mactoip[$idx]["fst"] = $data["fst"];
 					$mactoip[$idx]["lst"] = $data["lst"];
