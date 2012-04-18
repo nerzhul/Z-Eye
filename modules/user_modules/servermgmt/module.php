@@ -258,7 +258,6 @@
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
-					return;
 					if($saddr == NULL || $saddr == "" || $sport == NULL || !FS::$secMgr->isNumeric($sport) || $sdbname == NULL || $sdbname == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
