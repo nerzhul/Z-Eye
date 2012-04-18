@@ -325,20 +325,20 @@
 					$idx = count($mactoip);
 					$mactoip[$idx]["type"] = "Bande passante consommée";
 					if($data["input"] > 1024*1024*1024)
-						$inputbw = ($data["input"]/1024/1024/1024)."Go";
-					if($data["input"] > 1024*1024)
-						$inputbw = ($data["input"]/1024/1024)."Mo";
-					if($data["input"] > 1024)
-						$inputbw = ($data["input"]/1024)."Ko";
+						$inputbw = round($data["input"]/1024/1024/1024,2)."Go";
+					else if($data["input"] > 1024*1024)
+						$inputbw = round($data["input"]/1024/1024,2)."Mo";
+					else if($data["input"] > 1024)
+						$inputbw = round($data["input"]/1024,2)."Ko";
 					else
 						$inputbw = $data["input"]."o";
 						
 					if($data["output"] > 1024*1024*1024)
-						$outputbw = ($data["output"]/1024/1024/1024)."Go";
-					if($data["output"] > 1024*1024)
-						$outputbw = ($data["output"]/1024/1024)."Mo";
-					if($data["output"] > 1024)
-						$outputbw = ($data["output"]/1024)."Ko";
+						$outputbw = round($data["output"]/1024/1024/1024,2)."Go";
+					else if($data["output"] > 1024*1024)
+						$outputbw = round($data["output"]/1024/1024,2)."Mo";
+					else if($data["output"] > 1024)
+						$outputbw = round($data["output"]/1024,2)."Ko";
 					else
 						$outputbw = $data["output"]."o";
 					$mactoip[$idx]["dat"] = "Download: ".$inputbw." / ".$outputbw;
