@@ -300,15 +300,15 @@
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=2");
 							return;
 						}
-						if($spwd == $spwd2) FS::$dbMgr->Update("fss_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$dbname."'");
+						if($spwd == $spwd2) FS::$dbMgr->Update("fss_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
-					FS::$dbMgr->Update("fss_radius_db_list","login = '".$slogin."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$dbname."'");
+					FS::$dbMgr->Update("fss_radius_db_list","login = '".$slogin."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 6: {
-					$saddr = FS::$secMgr->checkAndSecurisePostData("addr");
-					$sport = FS::$secMgr->checkAndSecurisePostData("pr");
-					$sdbname = FS::$secMgr->checkAndSecurisePostData("db");
+					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
+					$sport = FS::$secMgr->checkAndSecuriseGetData("pr");
+					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
 					if($saddr && $sport && $sdbname) {
 							FS::$dbMgr->Delete("fss_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}	
