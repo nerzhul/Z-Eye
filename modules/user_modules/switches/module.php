@@ -314,7 +314,7 @@
 				$query = $radSQLMgr->Select("radacct","username,calledstationid,callingstationid,acctstoptime","radacctid = (SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."')");
 				if($data = mysql_fetch_array($query)) {
 					$idx = count($mactoip);
-					$mactoip[$idx]["type"] = "Utilisateur 802.1X";
+					$mactoip[$idx]["type"] = "802.1X: Utilisateur";
 					$mactoip[$idx]["dat"] = $data["username"];
 					$mactoip[$idx]["fst"] = $radSQLMgr->GetOneData("radacct","acctstarttime","radacctid = (SELECT MIN(radacctid) from radacct where callingstationid = '".$ciscomac."' AND calledstationid = '".$data["calledstationid"]."' AND username = '".$data["username"]."')");
 					$mactoip[$idx]["lst"] = $data["acctstoptime"];
@@ -323,7 +323,7 @@
 				$query = $radSQLMgr->Select("radacct","SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$ciscomac."'");
 				if($data = mysql_fetch_array($query)) {
 					$idx = count($mactoip);
-					$mactoip[$idx]["type"] = "Bande passante consommée";
+					$mactoip[$idx]["type"] = "802.1X Acct: Bande passante";
 					if($data["input"] > 1024*1024*1024)
 						$inputbw = round($data["input"]/1024/1024/1024,2)."Go";
 					else if($data["input"] > 1024*1024)
