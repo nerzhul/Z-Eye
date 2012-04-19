@@ -13,12 +13,12 @@
 			$output .= $this->showConnForm();
 			$output .= "<div id=\"fakemain\">";
 			$output .= "<div id=\"menus\">";
-                        $output .= $this->showRightMenu();
+            $output .= $this->showRightMenu();
 			$output .= "<div id=\"rightmenu\">";
 			$output .= $this->loadMenu(6);
 			$output .= "</div>";
-                        $output .= $this->showAdminMenu();
-                        $output .= "</div>";
+			$output .= $this->showAdminMenu();
+			$output .= "</div>";
 
 			$output .= "<div id=\"main\">";
 			// header for enterprise
@@ -114,11 +114,12 @@
 			
 			if(FS::$sessMgr->isConnected())
 				$output .= $this->showSearch();
-			if(!FS::$secMgr->isNumeric($module))
+			if($module && !FS::$secMgr->isNumeric($module))
 				$output .= $this->printError("Module inconnu !");
 			else {
 				FS::$secMgr->SecuriseStringForDB($module);
-				$output .= "<hr>".$this->loadModule($module);
+				if($module)
+					$output .= "<hr>".$this->loadModule($module);
 			}
 			$output .= "</div>";
 			return $output;
