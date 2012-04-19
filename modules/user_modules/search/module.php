@@ -115,7 +115,7 @@
 			
 			if($lastmac) {
 				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$lastmac."'","time_last",2,1);
-				if($data = mysql_fetch_array($query)) {
+				if($data = pg_fetch_array($query)) {
 					$tmpoutput .= "<div><h4>Dernier équipement</h4>";
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
@@ -130,6 +130,11 @@
 					$tmpoutput .= "</div>";
 				}
 			}
+			if(strlen($tmpoutput) > 0)
+				$output .= $tmpoutput;
+			else
+				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
+			return $output;
 		}
 		
 		private function showMacAddrResults($search) {
