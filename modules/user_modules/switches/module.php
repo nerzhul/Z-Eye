@@ -146,9 +146,6 @@
 				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&vlan=".$search."\"</script>";
 			}
 			else {
-				if($device = FS::$pgdbMgr->GetOneData("device","ip","name = '".$search."'"))
-					$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&d=".$search."\"</script>";
-				else {
 					$found = 0;
 					$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
 					while($data = mysql_fetch_array($query)) {
@@ -200,7 +197,6 @@
 						}
 					}
 					if($found == 0)	$output .= FS::$iMgr->printError("Aucune donnée trouvée");
-				}
 			}
 			return $output;
 		}

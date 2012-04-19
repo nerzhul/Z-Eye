@@ -100,7 +100,7 @@
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
-			/// @TODO DNS infos
+
 			// Devices
 			$query = FS::$pgdbMgr->Select("device","ip,description,model","name ILIKE '".$search."'");
 			
@@ -109,7 +109,38 @@
 				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
 				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
 				$tmpoutput .= "<b><i>Modèle:</i></b> ".$data["model"]."<br />";
-				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
+				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
+			}
+			
+			// DNS infos
+			$searchsplit = preg_split("#\.#",$search);
+			if(count($searchsplit) > 1) {
+				$hostname = $searchsplit[0];
+				$dnszone = "";
+				for($i=1;$i<count($searchsplit);$i++) {
+					$dnszone .= $searchsplit[$i];
+					if($i != count($searchsplit)-1)
+						$dnszone .= ".";
+				}
+				$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","rectype,recval","record = '".$hostname."' AND zonename = '".$dnszone."'");
+				while($data = mysql_fetch_array($query)) {
+					if($found == 0) {
+						$found = 1;
+						$tmpoutput .= "<div><h4>Enregistrements DNS</h4>";
+					}
+					switch($data["rectype"]) {
+						case "A": $tmpoutput .= "Adresse IPv4: "; break;
+						case "AAAA": $tmpoutput .= "Adresse IPv6: "; break;
+						case "CNAME": $tmpoutput .= "Alias: "; break;
+						default: $tmpoutput .= "Autre (".$data["rectype"]."): "; break;
+					}
+					if(FS::$secMgr->isIP($data["recval"]))
+						$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a><br />";
+					else
+						$tmpoutput .= $data["recval"]."<br />";
+				}
+				if($found) $tmpoutput .= "</div>";
+				$found = 0;
 			}
 			
 			// Netbios INFOS
