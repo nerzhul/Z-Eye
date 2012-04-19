@@ -58,14 +58,14 @@
 			$tmpoutput = "";
 			$found = 0;
 			
-			$query = FS::$pgdbMgr->Select("device_vlan","ip,description","vlan = '".$vlan."'","ip");
+			$query = FS::$pgdbMgr->Select("device_vlan","ip,description","vlan = '".$search."'","ip");
 			while($data = pg_fetch_array($query)) {
 				if($dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
 					if($found == 0) {
 						$found = 1;
 						$tmpoutput .= "<div><h4>VLAN présent dans ces équipements</h4>";
 					}
-					$tmpoutput .= "<b><i>Equipement</b></i>: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$dname."&fltr=".$vlan."\">".$dname."</a> (".$data["description"].")<br />";
+					$tmpoutput .= "<li>: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dname."&fltr=".$vlan."\">".$dname."</a> (".$data["description"].")<br />";
 				}
 			}
 			
@@ -118,7 +118,7 @@
 						default: $tmpoutput .= "Autre (".$data["rectype"]."): "; break;
 					}
 					if(FS::$secMgr->isIP($data["recval"]))
-						$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&s=".$data["recval"]."\">".$data["recval"]."</a><br />";
+						$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a><br />";
 					else
 						$tmpoutput .= $data["recval"]."<br />";
 				}
