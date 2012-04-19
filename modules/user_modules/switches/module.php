@@ -205,7 +205,7 @@
 								}
 								$output .= "</td><td>";
 								if(FS::$secMgr->isIP($data["recval"]))
-									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["recval"]."\">".$data["recval"]."</a>";
+									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["recval"]."\">".$data["recval"]."</a>";
 								else
 									$output .= $data["recval"];
 								$output .= "</td></tr>";
@@ -231,7 +231,7 @@
 			$query = FS::$pgdbMgr->Select("node_nbt","mac,ip,nbname,nbuser,time_first,time_last","domain = '".$nb."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0)	$found = 1;
-				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["mac"]."\">".$data["mac"]."</a></td><td>\\\\".$nb."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$data["time_first"]."</td><td>".$data["time_last"]."</td></tr>";
+				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>\\\\".$nb."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$data["time_first"]."</td><td>".$data["time_last"]."</td></tr>";
 			}
 
 			if($found == 0)
@@ -257,7 +257,7 @@
 				$ipaddr = $node;
 				$query = FS::$pgdbMgr->Select("node_ip","mac","ip = '".$node."'","time_last",1,1);
 				if($data = pg_fetch_array($query))
-                                	$mac = $data["mac"];
+                     $mac = $data["mac"];
 			}
 			else {
 				$mac = FS::$pgdbMgr->GetOneData("node_nbt","mac","nbname = '".$node."'");
@@ -267,14 +267,14 @@
 				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
 			else {
 				$tmpoutput = "<table class=\"standardTable\"><tr><th>MAC</th><th>Type</th><th>Equipement ou noeud</th><th>Première info</th><th>Dernière info</th></tr><tr>";
-				$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$mac."\">".$mac."</td><td>";
+				$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&node=".$mac."\">".$mac."</td><td>";
 				$mactoip = array();
 				$query = FS::$pgdbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$mac."'");
 				while($data = pg_fetch_array($query)) {
 					$idx = count($mactoip);
 					$mactoip[$idx] = array();
 					$mactoip[$idx]["type"] = "Mac -> IP";
-					$mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a>";
+					$mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["ip"]."\">".$data["ip"]."</a>";
 					$mactoip[$idx]["fst"] = $data["time_first"];
 					$mactoip[$idx]["lst"] = $data["time_last"];
 				}
@@ -301,7 +301,7 @@
 					$idx = count($mactoip);
 					$mactoip[$idx] = array();
 					$mactoip[$idx]["type"] = "Netbios";
-					$mactoip[$idx]["dat"] = ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a>";
+					$mactoip[$idx]["dat"] = ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["nbname"]."\">".$data["nbname"]."</a>";
 					$mactoip[$idx]["fst"] = $data["time_first"];
 					$mactoip[$idx]["lst"] = $data["time_last"];
 				}
@@ -975,17 +975,17 @@
 					$tmpoutput2 .= "</td><td>";
 					$query2 = FS::$pgdbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'","mac");
 					while($data2 = pg_fetch_array($query2)) {
-						$tmpoutput2 .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
+						$tmpoutput2 .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
 						$query3 = FS::$pgdbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'","time_last",1,1);
 						while($data3 = pg_fetch_array($query3)) {
-							$tmpoutput2 .= "&nbsp;&nbsp;<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
+							$tmpoutput2 .= "&nbsp;&nbsp;<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
 							$query4 = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser","mac = '".$data2["mac"]."' AND ip = '".$data3["ip"]."'");
 							if($data4 = pg_fetch_array($query4)) {
 								if($data4["domain"] != "")
-									$tmpoutput2 .= "&nbsp;&nbsp;\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data4["domain"]."\">".$data4["domain"]."</a>\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
+									$tmpoutput2 .= "&nbsp;&nbsp;\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["domain"]."\">".$data4["domain"]."</a>\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
 								else
-									$tmpoutput2 .= "&nbsp;&nbsp;<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
-								$tmpoutput2 .= "&nbsp;&nbsp;".($data4["nbuser"] == "" ? "[UNK]" : $data4["nbuser"])."@<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
+									$tmpoutput2 .= "&nbsp;&nbsp;<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
+								$tmpoutput2 .= "&nbsp;&nbsp;".($data4["nbuser"] == "" ? "[UNK]" : $data4["nbuser"])."@<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
 							}
 						}
 					}

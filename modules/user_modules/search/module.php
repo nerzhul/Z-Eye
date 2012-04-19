@@ -119,9 +119,9 @@
 				$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
 				$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 				$convport = preg_replace("#\/#","-",$data["port"]);
-				$tmpoutput .=  "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> ";
-				$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
-				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
+				$tmpoutput .=  "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
+				$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
 				$tmpoutput .= ($piece == NULL ? "" : " / Prise ".$piece);
 				$fst = preg_split("#\.#",$data["time_first"]);
 				$lst = preg_split("#\.#",$data["time_last"]);
