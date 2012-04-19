@@ -116,13 +116,13 @@
 					$found = 1;
 					$tmpoutput .= "<div><h4>Distribution DHCP</h4>";
 				}
-				$tmpoutput .= "Nom d'hôte DHCP: ".$data["hostname"]."<br />";
-				$tmpoutput .= "Adresse MAC liée: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
-				if($data["distributed"] == 2 || $data["distributed"] == 3) {
-					$tmpoutput .= "Type d'attribution :".($data["distributed"] == 2 ? "Dynamique" : "Statique")."<br />";
-					if($data["distributed"] == 2)
-						$tmpoutput .= "Validité :".$data["leasetime"]."<br />";
-				}
+				if(strlen($data["hostname"]) > 0)
+					$tmpoutput .= "Nom d'hôte DHCP: ".$data["hostname"]."<br />";
+				if(strlen($data["macaddr"]) > 0)
+					$tmpoutput .= "Adresse MAC liée: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+				$tmpoutput .= "Type d'attribution :".($data["distributed"] != 3 ? "Dynamique" : "Statique")."<br />";
+				if($data["distributed"] == 2)
+					$tmpoutput .= "Validité :".$data["leasetime"]."<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
