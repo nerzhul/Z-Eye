@@ -334,20 +334,6 @@ pre {
 	background-color: #0CF;
 }
 
-#pagination {
-	text-align: center;	
-}
-
-#pagination a {
-	color: #888;
-	font-size: 11px;
-	text-decoration: none;
-	font-family: Arial;
-}
-#pagination a:hover {
-	font-weight: bold;	
-}
-
 .required_text {
 	color: red;
 	font-style: italic;

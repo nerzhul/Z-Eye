@@ -117,7 +117,7 @@
 			else {
 				FS::$secMgr->SecuriseStringForDB($module);
 				switch($module) {
-					case 0:	$output .= $this->showHome(); break;
+					case 0:	$output .= $this->showSearch(); break;
 					default: $output .= $this->loadModule($module); break;
 				}
 			}
@@ -187,9 +187,10 @@
 			return 0;
 		}
 		
-		private function showHome() {
-			$output = "";
-			$output .= "<div id=\"pagination\"><br /><br /><br /><br />";
+		private function showSearch() {
+			$output = "<div id=\"monoComponent\"><center><h2>Recherche</h2>";
+			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath($path));
+			$output .= $this->addInput("s","",60,60)."<br />".$this->addSubmit("Rechercher","Rechercher")."</form>";
 			$output .= "</div>";
 			return $output;
 		}
