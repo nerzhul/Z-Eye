@@ -120,11 +120,6 @@
 			$output = "<h4>Résultats de la recherche : \"";
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			$output .= $search."\"</h4>";
-
-			if(is_numeric($search) && $search < 4096) {
-				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&vlan=".$search."\"</script>";
-			}
-			else {
 					$found = 0;
 					$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
 					while($data = mysql_fetch_array($query)) {
@@ -139,7 +134,6 @@
 						$output .= "</table>";
 					}
 					if($found == 0)	$output .= FS::$iMgr->printError("Aucune donnée trouvée");
-			}
 			return $output;
 		}
 

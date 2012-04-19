@@ -24,26 +24,11 @@
 			else if(FS::$secMgr->isIP($search)) {
 				$output .= $this->showIPAddrResults($search);
 			}
-			else if(is_numeric($search) && $search < 4096) { // Can be a piece
-				$output .= $this->showVLANResults($search);
+			else if(is_numeric($search)) {
+				$output .= $this->showNumericResults($search);
 			}
 			else {
 				$tmpoutput = $this->showNamedInfos($search);
-					// Other types
-					/*$found = 0;
-					$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
-					while($data = mysql_fetch_array($query)) {
-						if($found == 0) $found = 1;
-						$output .= "<table class=\"standardTable\"><tr><th>Prise</th><th>Switch</th><th>Port</th></tr>";
-						$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-						$convport = preg_replace("#\/#","-",$data["port"]);
-						$output .= "<tr><td>".$search."</td><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."\">".$swname."</a></td><td>";
-						$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."#".$convport."\">".$data["port"]."</a></td><td>";
-						$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>";
-						$output .= "</td></tr>";
-						$output .= "</table>";
-					}
-*/
 				if(strlen($tmpoutput) > 0)
 					$output .= $tmpoutput;
 				else
@@ -53,11 +38,28 @@
 			return $output;
 		}
 		
-		private function showVLANResults($search) {
+		private function showNumericResults($search) {
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
 			
+			// Prise number
+			$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
+			while($data = mysql_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Prise référencée</h4>";
+				}
+				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				$convport = preg_replace("#\/#","-",$data["port"]);
+				$output .= "Equipement et port reliés: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."\">".$swname."</a> (";
+				$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."#".$convport."\">".$data["port"]."</a>";
+				$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>) <br />";
+			}
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
+			
+			// VLAN on a device
 			$query = FS::$pgdbMgr->Select("device_vlan","ip,description","vlan = '".$search."'","ip");
 			while($data = pg_fetch_array($query)) {
 				if($dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
