@@ -97,6 +97,22 @@
 				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
 			}
 			
+			// Prise number
+			$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
+			while($data = mysql_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Prise référencée</h4>";
+				}
+				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				$convport = preg_replace("#\/#","-",$data["port"]);
+				$tmpoutput .= "Equipement: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."\">".$swname."</a> (";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."#".$convport."\">".$data["port"]."</a>";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>) <br />";
+			}
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
+			
 			// DNS infos
 			$searchsplit = preg_split("#\.#",$search);
 			if(count($searchsplit) > 1) {
