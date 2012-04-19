@@ -102,7 +102,9 @@
 					$found = 1;
 					$tmpoutput .= "<div><h4>Adresses IP</h4>";
 				}
-				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data["time_first"]." et le ".$data["time_last"].")<br />";
+				$fst = preg_split("#.#",$data["time_first"]);
+				$lst = preg_split("#.#",$data["time_last"]);
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst." et le ".$lst.")<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
@@ -121,7 +123,9 @@
 				$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
 				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
 				$tmpoutput .= ($piece == NULL ? "" : " / Prise ".$piece);
-				$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data["time_first"]." et le ".$data["time_last"].")<br />";
+				$fst = preg_split("#.#",$data["time_first"]);
+				$lst = preg_split("#.#",$data["time_last"]);
+				$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
