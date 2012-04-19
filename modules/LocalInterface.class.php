@@ -189,8 +189,8 @@
 		
 		private function showSearch() {
 			$output = "<div id=\"monoComponent\"><center><h2>Z-Eye</h2>";
-			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath($path));
-			$output .= $this->addInput("s","",60,60)."<br /><input class=\"bigButtonStyle\" type=\"submit\" name=\"Rechercher\" value=\"Rechercher\" />."</form>";
+			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath("search"));
+			$output .= $this->addInput("s","",60,60)."<br /><input class=\"bigButtonStyle\" type=\"submit\" name=\"Rechercher\" value=\"Rechercher\" /></form>";
 			$output .= "</div>";
 			return $output;
 		}

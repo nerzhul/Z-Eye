@@ -141,7 +141,7 @@
 			$query = FS::$dbMgr->Select("fss_radius_db_list","addr,port,dbname,login,pwd");
 			while($data = mysql_fetch_array($query)) {
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig(RadiusDbConfig::getDbName(),RadiusDbConfig::getDbPort(),RadiusDbConfig::getDbHost(),RadiusDbConfig::getDbUser(),RadiusDbConfig::getDbPwd());
+				$radSQLMgr->setConfig($data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
 				$radSQLMgr->Connect();
 				
 				$ciscomac = $search[0].$search[1].$search[3].$search[4].".".$search[6].$search[7].$search[9].$search[10].".".$search[12].$search[13].$search[15].$search[16];
@@ -153,7 +153,6 @@
 					}
 					$tmpoutput .= "Utilisateur: ".$data2["username"]." / Station: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data2["calledstationid"].">".$data2["calledstationid"]."</a>";
 					$tmpoutput .= "Première Identification: ".$data2["acctstarttime"]." / Dernière identification: ".$data2["acctstoptime"]."<br /><hr>";
-					
 				}
 				
 				if($found) $tmpoutput .= "</div>";
