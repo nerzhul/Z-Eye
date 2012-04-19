@@ -88,7 +88,7 @@
 					
 				//}
 				if(strlen($tmpoutput) > 0)
-					$outut .= $tmpoutput;
+					$output .= $tmpoutput;
 				else
 					$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 			}
@@ -101,6 +101,11 @@
 			$tmpoutput = "";
 			$found = 0;
 			/// @TODO DNS infos
+			// Devices
+			if($device = FS::$pgdbMgr->GetOneData("device","ip","name ILIKE '".$search."'")) {
+				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$device."\">".$device."</a>";
+			}
 			
 			// Netbios INFOS
 			$query = FS::$pgdbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '".$search."' OR nbname ILIKE '".$search."'");
@@ -114,7 +119,7 @@
 				$lst = preg_split("#\.#",$data["time_last"]);
 				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>";
 				$tmpoutput .= "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>";
-				$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$list[0]."</td></tr>";
+				$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
 			}
 			
 			if($found) $tmpoutput .= "</table></div>";
