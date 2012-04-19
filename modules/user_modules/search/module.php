@@ -102,13 +102,14 @@
 			$found = 0;
 			/// @TODO DNS infos
 			// Devices
-			$query = FS::$pgdbMgr->Select("device","ip,description,model,","name ILIKE '".$search."'");
+			$query = FS::$pgdbMgr->Select("device","ip,description,model","name ILIKE '".$search."'");
 			
 			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
-				$tmpoutput .= "Adresse IP: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$device."\">".$device."</a><br />";
-				$tmpoutput .= "Modèle: ".$data["model"]."<br />";
-				$tmpoutput .= "Description: ".$data["description"]."<br />";
+				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
+				$tmpoutput .= "<b><i>Modèle:</i></b> ".$data["model"]."<br />";
+				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
 			}
 			
 			// Netbios INFOS
