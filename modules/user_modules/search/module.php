@@ -102,9 +102,13 @@
 			$found = 0;
 			/// @TODO DNS infos
 			// Devices
-			if($device = FS::$pgdbMgr->GetOneData("device","ip","name ILIKE '".$search."'")) {
+			$query = FS::$pgdbMgr->Select("device","ip,description,model,","name ILIKE '".$search."'");
+			
+			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
-				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$device."\">".$device."</a>";
+				$tmpoutput .= "Adresse IP: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$device."\">".$device."</a><br />";
+				$tmpoutput .= "Modèle: ".$data["model"]."<br />";
+				$tmpoutput .= "Description: ".$data["description"]."<br />";
 			}
 			
 			// Netbios INFOS
