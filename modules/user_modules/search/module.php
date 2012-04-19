@@ -102,9 +102,9 @@
 					$found = 1;
 					$tmpoutput .= "<div><h4>Adresses IP</h4>";
 				}
-				$fst = preg_split("#.#",$data["time_first"]);
-				$lst = preg_split("#.#",$data["time_last"]);
-				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst." et le ".$lst.")<br />";
+				$fst = preg_split("#\.#",$data["time_first"]);
+				$lst = preg_split("#\.#",$data["time_last"]);
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
@@ -123,8 +123,8 @@
 				$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
 				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
 				$tmpoutput .= ($piece == NULL ? "" : " / Prise ".$piece);
-				$fst = preg_split("#.#",$data["time_first"]);
-				$lst = preg_split("#.#",$data["time_last"]);
+				$fst = preg_split("#\.#",$data["time_first"]);
+				$lst = preg_split("#\.#",$data["time_last"]);
 				$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 			}
 			
@@ -137,7 +137,9 @@
 					$found = 1;
 					$tmpoutput .= "<div><h4>Noms Netbios</h4>";
 				}
-				$tmpoutput .= ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data["time_first"]." et le ".$data["time_last"].")<br />";
+				$fst = preg_split("#\.#",$data["time_first"]);
+				$lst = preg_split("#\.#",$data["time_last"]);
+				$tmpoutput .= ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 			}
 		
 			if($found) $tmpoutput .= "</div>";
@@ -156,8 +158,10 @@
 						$found = 1;
 						$tmpoutput .= "<div><h4>Utilisateurs 802.1X</h4>";
 					}
+					$fst = preg_split("#\.#",$data2["acctstarttime"]);
+					$lst = preg_split("#\.#",$data2["acctstoptime"]);
 					$tmpoutput .= "Utilisateur: ".$data2["username"]." / Station: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data2["calledstationid"].">".$data2["calledstationid"]."</a>";
-					$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data2["acctstarttime"]." et le ".$data2["acctstoptime"].")<br />";
+					$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 				}
 				
 				if($found) $tmpoutput .= "</div>";
@@ -187,7 +191,9 @@
 						$outputbw = round($data2["output"]/1024,2)."Ko";
 					else
 						$outputbw = $data2["output"]."o";
-					$tmpoutput .= "Station: ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data2["fst"]." et le ".$data2["lst"].")<br /><hr>";
+					$fst = preg_split("#\.#",$data2["fst"]);
+					$lst = preg_split("#\.#",$data2["lst"]);
+					$tmpoutput .= "Station: ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br /><hr>";
 					$totinbw += $data2["input"];
 					$totoutbw += $data2["output"];
 				}
