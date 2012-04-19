@@ -28,10 +28,9 @@
 				$output .= $this->showVlanResults($search);
 			}*/
 			else {
+				$output .= $this->showNamedInfos($search);
 				/*if($device = FS::$pgdbMgr->GetOneData("device","ip","name = '".$search."'"))
 					$output .= $this->showDeviceResults($search);
-				else if($domain = FS::$pgdbMgr->GetOneData("node_nbt","domain","domain ILIKE '".$search."'"))
-					$output .= $this->showNBDomainResults($search);
 				else if($nb = FS::$pgdbMgr->GetOneData("node_nbt","nbname","nbname ILIKE '".$search."'"))
 					$output .= $this->showNBNodeResults
 				else {
@@ -93,6 +92,35 @@
 			return $output;
 		}
 		
+		private function showNamedInfos($search) {
+			$output = "";
+			$tmpoutput = "";
+			$found = 0;
+			/// @TODO DNS infos
+			// Netbios INFOS
+			$query = FS::$pgdbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '".$search."' OR nbname ILIKE '".$search."'");
+			while($data = pg_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Domaine/Groupe de Travail Netbios</h4>";
+					$tmpoutput = "<table class=\"standardTable\"><tr><th>Noeud</th><th>Nom</th><th>Utilisateur</th><th>Première vue</th><th>Dernière vue</th></tr>";
+				}
+				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>";
+				$tmpoutput .= "\\\\".$nb."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>";
+				$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$data["time_first"]."</td><td>".$data["time_last"]."</td></tr>";
+			}
+			
+			if($found) $tmpoutput .= "</table></div>";
+			$found = 0;
+
+			if(strlen($tmpoutput) > 0)
+				$output .= $tmpoutput;
+			else
+				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
+
+			return $output;
+		}
+		
 		private function showIPAddrResults($search) {
 			$output = "";
 			$tmpoutput = "";
@@ -120,9 +148,9 @@
 					$tmpoutput .= "Nom d'hôte DHCP: ".$data["hostname"]."<br />";
 				if(strlen($data["macaddr"]) > 0)
 					$tmpoutput .= "Adresse MAC liée: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
-				$tmpoutput .= "Type d'attribution :".($data["distributed"] != 3 ? "Dynamique" : "Statique")."<br />";
-				if($data["distributed"] == 2)
-					$tmpoutput .= "Validité :".$data["leasetime"]."<br />";
+				$tmpoutput .= "Type d'attribution: ".($data["distributed"] != 3 ? "Dynamique" : "Statique")."<br />";
+				if($data["distributed"] != 3)
+					$tmpoutput .= "Validité : ".$data["leasetime"]."<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
@@ -160,6 +188,26 @@
 					$tmpoutput .= "</div>";
 				}
 			}
+			
+			$query = FS::$pgdbMgr->Select("node_nbt","domain,nbname,nbuser,time_first,time_last","ip = '".$search."'");
+			while($data = pg_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Domaine Netbios</h4>";
+				}
+				
+				$fst = preg_split("#\.#",$data["time_first"]);
+				$lst = preg_split("#\.#",$data["time_last"]);
+				
+				$tmpoutput .= "Machine Netbios: \\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>";
+				$tmpoutput .= "\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a><br />";
+				$tmpoutput .= "Utilisateur Netbios: ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
+				$tmpoutput .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+			}
+			
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
+			
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else

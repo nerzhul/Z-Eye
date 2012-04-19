@@ -11,8 +11,6 @@
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
-			$mac = FS::$secMgr->checkAndSecuriseGetData("node");
-			$nb = FS::$secMgr->checkAndSecuriseGetData("nb");
 			$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
 			if($port != NULL && $device != NULL)
@@ -21,10 +19,6 @@
 				$output .= $this->showSearchResults();
 			else if($device != NULL)
 				$output .= $this->showDeviceInfos();
-			else if($mac != NULL)
-				$output .= $this->showNodeInfos();
-			else if($nb != NULL)
-				$output .= $this->showNetbiosInfos();
 			else if($vlan != NULL)
 				$output .= $this->showVlanInfos();
 			else
@@ -148,22 +142,12 @@
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			$output .= $search."\"</h4>";
 
-			if(FS::$secMgr->isMacAddr($search)) {
-				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&node=".$search."\"</script>";
-            }
-			else if(FS::$secMgr->isIP($search)) {
-				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&node=".$search."\"</script>";
-			}
-			else if(is_numeric($search) && $search < 4096) {
+			if(is_numeric($search) && $search < 4096) {
 				$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&vlan=".$search."\"</script>";
 			}
 			else {
 				if($device = FS::$pgdbMgr->GetOneData("device","ip","name = '".$search."'"))
 					$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&d=".$search."\"</script>";
-				else if($domain = FS::$pgdbMgr->GetOneData("node_nbt","domain","domain ILIKE '".$search."'"))
-					$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&nb=".$domain."\"</script>";
-				else if($nb = FS::$pgdbMgr->GetOneData("node_nbt","nbname","nbname ILIKE '".$search."'"))
-					$output .= "<script type=\"text/javascript\">document.location.href=\"index.php?mod=".$this->mid."&node=".$nb."\"</script>";
 				else {
 					$found = 0;
 					$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
@@ -217,161 +201,6 @@
 					}
 					if($found == 0)	$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 				}
-			}
-			return $output;
-		}
-
-		private function showNetbiosInfos() {
-			$output = "<h4>Inventaire Netbios du domaine/groupe de travail : <i>";
-                        $nb = FS::$secMgr->checkAndSecuriseGetData("nb");
-                        $output .= $nb."</i></h4>";
-
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>Noeud</th><th>Nom</th><th>Utilisateur</th><th>Première vue</th><th>Dernière vue</th></tr>";
-			$found = 0;
-			$query = FS::$pgdbMgr->Select("node_nbt","mac,ip,nbname,nbuser,time_first,time_last","domain = '".$nb."'");
-			while($data = pg_fetch_array($query)) {
-				if($found == 0)	$found = 1;
-				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>\\\\".$nb."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$data["time_first"]."</td><td>".$data["time_last"]."</td></tr>";
-			}
-
-			if($found == 0)
-				$output .= FS::$iMgr->printError("Aucune donnée trouvée");
-			else
-				$output .= $tmpoutput."</table>";
-
-			return $output;
-		}
-
-		protected function showNodeInfos() {
-			$output = "<h4>Noeud ";
-			$node = FS::$secMgr->checkAndSecuriseGetData("node");
-			$output .= $node."</h4>";
-
-			$mac = "";
-			$ipaddr = "";
-
-			if(preg_match("#^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$#",$node)) {
-				$mac = $node;
-			}
-			else if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$#",$node)) {
-				$ipaddr = $node;
-				$query = FS::$pgdbMgr->Select("node_ip","mac","ip = '".$node."'","time_last",1,1);
-				if($data = pg_fetch_array($query))
-                     $mac = $data["mac"];
-			}
-			else {
-				$mac = FS::$pgdbMgr->GetOneData("node_nbt","mac","nbname = '".$node."'");
-			}
-
-			if($node == $ipaddr && $mac == "")
-				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
-			else {
-				$tmpoutput = "<table class=\"standardTable\"><tr><th>MAC</th><th>Type</th><th>Equipement ou noeud</th><th>Première info</th><th>Dernière info</th></tr><tr>";
-				$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&node=".$mac."\">".$mac."</td><td>";
-				$mactoip = array();
-				$query = FS::$pgdbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$mac."'");
-				while($data = pg_fetch_array($query)) {
-					$idx = count($mactoip);
-					$mactoip[$idx] = array();
-					$mactoip[$idx]["type"] = "Mac -> IP";
-					$mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["ip"]."\">".$data["ip"]."</a>";
-					$mactoip[$idx]["fst"] = $data["time_first"];
-					$mactoip[$idx]["lst"] = $data["time_last"];
-				}
-
-				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$mac."'");
-				while($data = pg_fetch_array($query)) {
-					$idx = count($mactoip);
-					$mactoip[$idx] = array();
-					$mactoip[$idx]["type"] = "Switch, port";
-					$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
-					$convport = preg_replace("#\/#","-",$data["port"]);
-					$mactoip[$idx]["dat"] = "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."\">".$switch."</a> ";
-					$mactoip[$idx]["dat"] .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
-					$mactoip[$idx]["dat"] .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
-					$mactoip[$idx]["dat"] .= ($piece == NULL ? "" : "<br />Prise ".$piece);
-					$mactoip[$idx]["type"] .= ($piece == NULL ? "" : ", prise");
-					$mactoip[$idx]["fst"] = $data["time_first"].($piece == NULL ? "" : "<br />");
-					$mactoip[$idx]["lst"] = $data["time_last"].($piece == NULL ? "" : "<br />");
-                }
-
-				$query = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser,time_first,time_last","mac = '".$mac."'");
-                while($data = pg_fetch_array($query)) {
-					$idx = count($mactoip);
-					$mactoip[$idx] = array();
-					$mactoip[$idx]["type"] = "Netbios";
-					$mactoip[$idx]["dat"] = ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["nbname"]."\">".$data["nbname"]."</a>";
-					$mactoip[$idx]["fst"] = $data["time_first"];
-					$mactoip[$idx]["lst"] = $data["time_last"];
-				}
-				
-				$query = FS::$dbMgr->Select("fss_radius_db_list","addr,port,dbname,login,pwd");
-				while($data = mysql_fetch_array($query)) {
-					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig(RadiusDbConfig::getDbName(),RadiusDbConfig::getDbPort(),RadiusDbConfig::getDbHost(),RadiusDbConfig::getDbUser(),RadiusDbConfig::getDbPwd());
-					$radSQLMgr->Connect();
-					
-					$ciscomac = $mac[0].$mac[1].$mac[3].$mac[4].".".$mac[6].$mac[7].$mac[9].$mac[10].".".$mac[12].$mac[13].$mac[15].$mac[16];
-					$query2 = $radSQLMgr->Select("radacct","username,calledstationid,callingstationid,acctstoptime","radacctid = (SELECT MAX(radacctid) from radacct WHERE callingstationid = '".$ciscomac."')");
-					if($data2 = mysql_fetch_array($query2)) {
-						$idx = count($mactoip);
-						$mactoip[$idx]["type"] = "802.1X: Utilisateur";
-						$mactoip[$idx]["dat"] = $data2["username"];
-						$mactoip[$idx]["fst"] = $radSQLMgr->GetOneData("radacct","acctstarttime","radacctid = (SELECT MIN(radacctid) from radacct where callingstationid = '".$ciscomac."' AND calledstationid = '".$data2["calledstationid"]."' AND username = '".$data2["username"]."')");
-						$mactoip[$idx]["lst"] = $data2["acctstoptime"];
-					}
-					
-					$query2 = $radSQLMgr->Select("radacct","SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$ciscomac."'");
-					if($data2 = mysql_fetch_array($query2)) {
-						$idx = count($mactoip);
-						$mactoip[$idx]["type"] = "802.1X Acct: Bande passante";
-						if($data2["input"] > 1024*1024*1024)
-							$inputbw = round($data2["input"]/1024/1024/1024,2)."Go";
-						else if($data2["input"] > 1024*1024)
-							$inputbw = round($data2["input"]/1024/1024,2)."Mo";
-						else if($data2["input"] > 1024)
-							$inputbw = round($data2["input"]/1024,2)."Ko";
-						else
-							$inputbw = $data2["input"]."o";
-							
-						if($data2["output"] > 1024*1024*1024)
-							$outputbw = round($data2["output"]/1024/1024/1024,2)."Go";
-						else if($data2["output"] > 1024*1024)
-							$outputbw = round($data2["output"]/1024/1024,2)."Mo";
-						else if($data2["output"] > 1024)
-							$outputbw = round($data2["output"]/1024,2)."Ko";
-						else
-							$outputbw = $data2["output"]."o";
-						$mactoip[$idx]["dat"] = "Download: ".$inputbw." / ".$outputbw;
-						$mactoip[$idx]["fst"] = $data2["fst"];
-						$mactoip[$idx]["lst"] = $data2["lst"];
-					}
-				}
-
-				for($i=0;$i<count($mactoip);$i++)
-					$tmpoutput .= $mactoip[$i]["type"]."<br />";
-
-				$tmpoutput .= "</td><td>";
-				for($i=0;$i<count($mactoip);$i++)
-                                        $tmpoutput .= $mactoip[$i]["dat"]."<br />";
-				$tmpoutput .= "</td><td>";
-				for($i=0;$i<count($mactoip);$i++) {
-					$res = preg_replace("#\.(.*)<#","<",$mactoip[$i]["fst"]);
-					$res = preg_replace("#\.(.*)$#","",$res);
-                                        $tmpoutput .= $res."<br />";
-				}
-				$tmpoutput .= "</td><td>";
-				for($i=0;$i<count($mactoip);$i++) {
-					$res = preg_replace("#\.(.*)<#","<",$mactoip[$i]["lst"]);
-					$res = preg_replace("#\.(.*)$#","",$res);
-                                        $tmpoutput .= $res."<br />";
-				}
-				$tmpoutput .= "</td></tr></table>";
-				if(count($mactoip) > 0)
-					$output .= $tmpoutput;
-				else
-					$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
 			}
 			return $output;
 		}
