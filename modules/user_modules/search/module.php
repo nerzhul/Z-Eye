@@ -17,7 +17,7 @@
 		}
 		
 		private function findRefsAndShow($search) {
-			$output = "<h3>Recherche ".$search."</h3>";
+			$output = "<h3>Recherche: ".$search."</h3>";
 			if(FS::$secMgr->isMacAddr($search)) {
 				$output .= $this->showMacAddrResults($search);
             }
@@ -25,7 +25,7 @@
 				$output .= $this->showIPAddrResults($search);
 			}
 			else if(is_numeric($search) && $search < 4096) { // Can be a piece
-				$output .= $this->showVlanResults($search);
+				$output .= $this->showVLANResults($search);
 			}
 			else {
 				$tmpoutput = $this->showNamedInfos($search);
@@ -53,7 +53,7 @@
 			return $output;
 		}
 		
-		private function showVLANInfos($search) {
+		private function showVLANResults($search) {
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
@@ -65,7 +65,7 @@
 						$found = 1;
 						$tmpoutput .= "<div><h4>VLAN présent dans ces équipements</h4>";
 					}
-					$tmpoutput .= "<li>: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dname."&fltr=".$vlan."\">".$dname."</a> (".$data["description"].")<br />";
+					$tmpoutput .= "<li>: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
 				}
 			}
 			
