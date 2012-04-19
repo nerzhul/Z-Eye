@@ -93,6 +93,45 @@
 			return $output;
 		}
 		
+		private function showIPAddrResults($search) {
+			$output = "";
+			$tmpoutput = "";
+			$found = 0;
+			$lastmac = "";
+			$query = FS::$pgdbMgr->Select("node_ip","mac,time_first,time_last","ip = '".$search."'","time_last",1);
+			while($data = pg_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Adresses MAC</h4>";
+				}
+				$fst = preg_split("#\.#",$data["time_first"]);
+				$lst = preg_split("#\.#",$data["time_last"]);
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+				$lastmac = $data["mac"];
+			}
+			
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
+			
+			if($lastmac) {
+				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$lastmac."'","time_last",2,1);
+				if($data = mysql_fetch_array($query)) {
+					$tmpoutput .= "<div><h4>Dernier équipement</h4>";
+					$fst = preg_split("#\.#",$data["time_first"]);
+					$lst = preg_split("#\.#",$data["time_last"]);
+					$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
+					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+					$convport = preg_replace("#\/#","-",$data["port"]);
+					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
+					$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
+					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
+					$tmpoutput .= "/ Prise ".$piece;
+					$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+					$tmpoutput .= "</div>";
+				}
+			}
+		}
+		
 		private function showMacAddrResults($search) {
 			$output = "";
 			$tmpoutput = "";
@@ -106,7 +145,7 @@
 				}
 				$fst = preg_split("#\.#",$data["time_first"]);
 				$lst = preg_split("#\.#",$data["time_last"]);
-				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
@@ -225,9 +264,6 @@
 			else
 				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
 			return $output;
-		}
-			
-		private function showIPAddrResults($search) {
 		}
 	};
 ?>
