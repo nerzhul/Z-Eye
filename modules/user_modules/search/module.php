@@ -98,6 +98,36 @@
 			$tmpoutput = "";
 			$found = 0;
 			$lastmac = "";
+			$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","zonename,record","recval = '".$search."'");
+			while($data = mysql_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Noms DNS associés</h4>";
+				}
+				$tmpoutput .= $data["record"].".".$data["zonename"]."<br />";
+			}
+			
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
+			
+			$query = FS::$dbMgr->Select("fss_dhcp_ip_cache","macaddr,hostname,leasetime,distributed","ip = '".$search."'");
+			while($data = mysql_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Distribution DHCP</h4>";
+				}
+				$tmpoutput .= "Nom d'hôte DHCP: ".$data["hostname"]."<br />";
+				$tmpoutput .= "Adresse MAC liée: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+				if($data["distributed"] == 2 || $data["distributed"] == 3) {
+					$tmpoutput .= "Type d'attribution :".($data["distributed"] == 2 ? "Dynamique" : "Statique")."<br />";
+					if($data["distributed"] == 2)
+						$tmpoutput .= "Validité :".$data["leasetime"]."<br />";
+				}
+			}
+			
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
+			
 			$query = FS::$pgdbMgr->Select("node_ip","mac,time_first,time_last","ip = '".$search."'","time_last",1);
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
