@@ -103,11 +103,11 @@
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h4>Adresses MAC</h4>";
+					$lastmac = $data["mac"];
 				}
 				$fst = preg_split("#\.#",$data["time_first"]);
 				$lst = preg_split("#\.#",$data["time_last"]);
 				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
-				$lastmac = $data["mac"];
 			}
 			
 			if($found) $tmpoutput .= "</div>";
