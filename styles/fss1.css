@@ -352,6 +352,17 @@ pre {
 	height: 22px;
 }
 
+.bigButtonStyle {
+	background: #EEEEEE;
+    border: 1px solid #DDDDDD;
+	vertical-align: center;
+	height: 36px;
+	margin-top: 10px;
+	padding-left: 30px;
+	padding-right: 30px;
+	border-radius: 4px 4px 4px 4px;
+}
+
 .debugMsg {
 	color: blue;
 	font-weight: 100;
