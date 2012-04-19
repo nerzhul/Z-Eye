@@ -24,16 +24,11 @@
 			else if(FS::$secMgr->isIP($search)) {
 				$output .= $this->showIPAddrResults($search);
 			}
-			/*else if(is_numeric($search) && $search < 4096) { // Can be a piece
+			else if(is_numeric($search) && $search < 4096) { // Can be a piece
 				$output .= $this->showVlanResults($search);
-			}*/
+			}
 			else {
 				$tmpoutput = $this->showNamedInfos($search);
-				/*if($device = FS::$pgdbMgr->GetOneData("device","ip","name = '".$search."'"))
-					$output .= $this->showDeviceResults($search);
-				else if($nb = FS::$pgdbMgr->GetOneData("node_nbt","nbname","nbname ILIKE '".$search."'"))
-					$output .= $this->showNBNodeResults
-				else {
 					// Other types
 					/*$found = 0;
 					$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
@@ -48,51 +43,40 @@
 						$output .= "</td></tr>";
 						$output .= "</table>";
 					}
-
-					if($found == 0) {
-						$searchsplit = preg_split("#\.#",$search);
-						if(count($searchsplit) > 1) {
-							$hostname = $searchsplit[0];
-							$dnszone = "";
-							for($i=1;$i<count($searchsplit);$i++) {
-								$dnszone .= $searchsplit[$i];
-								if($i != count($searchsplit)-1)
-									$dnszone .= ".";
-							}
-							$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","rectype,recval","record = '".$hostname."' AND zonename = '".$dnszone."'");
-							$tmpoutput .= "Données trouvées dans le cache DNS.!<br /><table class=\"standardTable\"><tr><th>Type d'enregistrement</th><th>Valeur</th></tr>";
-							while($data = mysql_fetch_array($query)) {
-								if($found == 0) {
-									$found = 1;
-									$output .= $tmpoutput;
-								}
-								$output .= "<tr><td>";
-								switch($data["rectype"]) {
-									case "A": $output .= "IPv4"; break;
-									case "AAAA": $output .= "IPv6"; break;
-									case "CNAME": $output .= "Alias"; break;
-									default: $output .= $data["rectype"]; break;
-								}
-								$output .= "</td><td>";
-								if(FS::$secMgr->isIP($data["recval"]))
-									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["recval"]."\">".$data["recval"]."</a>";
-								else
-									$output .= $data["recval"];
-								$output .= "</td></tr>";
-								$found = 1;
-							}
-							if($found == 1)
-								$output .= "</table>";
-						}
-					}*/
-					
-				//}
+*/
 				if(strlen($tmpoutput) > 0)
 					$output .= $tmpoutput;
 				else
 					$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 			}
 			
+			return $output;
+		}
+		
+		private function showVLANInfos($search) {
+			$output = "";
+			$tmpoutput = "";
+			$found = 0;
+			
+			$query = FS::$pgdbMgr->Select("device_vlan","ip,description","vlan = '".$vlan."'","ip");
+			while($data = pg_fetch_array($query)) {
+				if($dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
+					if($found == 0) {
+						$found = 1;
+						$tmpoutput .= "<div><h4>VLAN présent dans ces équipements</h4>";
+					}
+					$tmpoutput .= "<b><i>Equipement</b></i>: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$dname."&fltr=".$vlan."\">".$dname."</a> (".$data["description"].")<br />";
+				}
+			}
+			
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
+			
+			if(strlen($tmpoutput) > 0)
+				$output .= $tmpoutput;
+			else
+				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
+
 			return $output;
 		}
 		
@@ -103,7 +87,6 @@
 
 			// Devices
 			$query = FS::$pgdbMgr->Select("device","ip,description,model","name ILIKE '".$search."'");
-			
 			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
 				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
@@ -135,7 +118,7 @@
 						default: $tmpoutput .= "Autre (".$data["rectype"]."): "; break;
 					}
 					if(FS::$secMgr->isIP($data["recval"]))
-						$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a><br />";
+						$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&s=".$data["recval"]."\">".$data["recval"]."</a><br />";
 					else
 						$tmpoutput .= $data["recval"]."<br />";
 				}
@@ -164,7 +147,7 @@
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
-				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
+				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
 
 			return $output;
 		}
@@ -259,7 +242,7 @@
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
-				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
+				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
 			return $output;
 		}
 		
@@ -410,7 +393,7 @@
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
-				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
+				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
 			return $output;
 		}
 	};

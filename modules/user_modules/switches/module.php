@@ -8,10 +8,8 @@
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 			$output .= "<center>".FS::$iMgr->addInput("search","Recherche");
 			$output .= FS::$iMgr->addSubmit("Rechercher","Rechercher")."</center></form>";
-			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
-			$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
 			if($port != NULL && $device != NULL)
 				$output .= $this->showPortInfos();
@@ -19,8 +17,6 @@
 				$output .= $this->showSearchResults();
 			else if($device != NULL)
 				$output .= $this->showDeviceInfos();
-			else if($vlan != NULL)
-				$output .= $this->showVlanInfos();
 			else
 				$output .= $this->showDeviceList();
 
@@ -120,23 +116,6 @@
 			return $output;
 		}
 
-		private function showVlanInfos() {
-			$output = "<h4>VLAN ";
-			$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
-			$output .= $vlan."</h4>";
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>Equipement</th><th>Description</th><th>Date de création</th></tr>";
-			$found = 0;
-			$query = FS::$pgdbMgr->Select("device_vlan","ip,description,creation","vlan = '".$vlan."'","ip");
-			while($data = pg_fetch_array($query)) {
-				if($dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
-					if($found == 0) $found = 1;
-					$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$dname."&fltr=".$vlan."\">".$dname."</a></td><td>".$data["description"]."</td><td>".$data["creation"]."</td></tr>";
-				}
-			}
-			if($found == 1) $output .= $tmpoutput;
-			return $output;
-		}
-
 		private function showSearchResults() {
 			$output = "<h4>Résultats de la recherche : \"";
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
@@ -158,43 +137,6 @@
 						$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>";
 						$output .= "</td></tr>";
 						$output .= "</table>";
-					}
-
-					if($found == 0) {
-						$searchsplit = preg_split("#\.#",$search);
-						if(count($searchsplit) > 1) {
-							$hostname = $searchsplit[0];
-							$dnszone = "";
-							for($i=1;$i<count($searchsplit);$i++) {
-								$dnszone .= $searchsplit[$i];
-								if($i != count($searchsplit)-1)
-									$dnszone .= ".";
-							}
-							$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","rectype,recval","record = '".$hostname."' AND zonename = '".$dnszone."'");
-							$tmpoutput .= "Données trouvées dans le cache DNS.!<br /><table class=\"standardTable\"><tr><th>Type d'enregistrement</th><th>Valeur</th></tr>";
-							while($data = mysql_fetch_array($query)) {
-								if($found == 0) {
-									$found = 1;
-									$output .= $tmpoutput;
-								}
-								$output .= "<tr><td>";
-								switch($data["rectype"]) {
-									case "A": $output .= "IPv4"; break;
-									case "AAAA": $output .= "IPv6"; break;
-									case "CNAME": $output .= "Alias"; break;
-									default: $output .= $data["rectype"]; break;
-								}
-								$output .= "</td><td>";
-								if(FS::$secMgr->isIP($data["recval"]))
-									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["recval"]."\">".$data["recval"]."</a>";
-								else
-									$output .= $data["recval"];
-								$output .= "</td></tr>";
-								$found = 1;
-							}
-							if($found == 1)
-								$output .= "</table>";
-						}
 					}
 					if($found == 0)	$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 			}
