@@ -28,7 +28,7 @@
 				$output .= $this->showVlanResults($search);
 			}*/
 			else {
-				$output .= $this->showNamedInfos($search);
+				$tmpoutput = $this->showNamedInfos($search);
 				/*if($device = FS::$pgdbMgr->GetOneData("device","ip","name = '".$search."'"))
 					$output .= $this->showDeviceResults($search);
 				else if($nb = FS::$pgdbMgr->GetOneData("node_nbt","nbname","nbname ILIKE '".$search."'"))
@@ -84,9 +84,13 @@
 							if($found == 1)
 								$output .= "</table>";
 						}
-					}
-					if($found == 0)	*/$output .= FS::$iMgr->printError("Aucune donnée trouvée");
+					}*/
+					
 				//}
+				if(strlen($tmpoutput) > 0)
+					$outut .= $tmpoutput;
+				else
+					$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 			}
 			
 			return $output;
@@ -106,7 +110,7 @@
 					$tmpoutput = "<table class=\"standardTable\"><tr><th>Noeud</th><th>Nom</th><th>Utilisateur</th><th>Première vue</th><th>Dernière vue</th></tr>";
 				}
 				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>";
-				$tmpoutput .= "\\\\".$nb."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>";
+				$tmpoutput .= "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>";
 				$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$data["time_first"]."</td><td>".$data["time_last"]."</td></tr>";
 			}
 			
