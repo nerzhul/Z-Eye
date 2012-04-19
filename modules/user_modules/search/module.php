@@ -232,7 +232,7 @@
 					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 					$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
 					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
-					$tmpoutput .= "/ Prise ".$piece;
+					if($piece) $tmpoutput .= "/ Prise ".$piece;
 					$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 					$tmpoutput .= "</div>";
 				}
