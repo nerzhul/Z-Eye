@@ -5,16 +5,11 @@
 		function iConnect($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h3>Management des Switches</h3>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$output .= "<center>".FS::$iMgr->addInput("search","Recherche");
-			$output .= FS::$iMgr->addSubmit("Rechercher","Rechercher")."</center></form>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
 			if($port != NULL && $device != NULL)
 				$output .= $this->showPortInfos();
-			else if($search != NULL)
-				$output .= $this->showSearchResults();
 			else if($device != NULL)
 				$output .= $this->showDeviceInfos();
 			else
@@ -113,27 +108,6 @@
 			}
 			else
 				$output .= FS::$iMgr->printError("Les données demandées n'existent pas !");
-			return $output;
-		}
-
-		private function showSearchResults() {
-			$output = "<h4>Résultats de la recherche : \"";
-			$search = FS::$secMgr->checkAndSecuriseGetData("s");
-			$output .= $search."\"</h4>";
-					$found = 0;
-					$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
-					while($data = mysql_fetch_array($query)) {
-						if($found == 0) $found = 1;
-						$output .= "<table class=\"standardTable\"><tr><th>Prise</th><th>Switch</th><th>Port</th></tr>";
-						$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-						$convport = preg_replace("#\/#","-",$data["port"]);
-						$output .= "<tr><td>".$search."</td><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."\">".$swname."</a></td><td>";
-						$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."#".$convport."\">".$data["port"]."</a></td><td>";
-						$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>";
-						$output .= "</td></tr>";
-						$output .= "</table>";
-					}
-					if($found == 0)	$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 			return $output;
 		}
 
@@ -1305,10 +1279,6 @@
 		
 		public function handlePostDatas($act) {
 			switch($act) {
-				case 1:
-					$search = FS::$secMgr->checkAndSecurisePostData("search");
-					header("Location: index.php?mod=".$this->mid."&s=".$search);
-					return;
 				case 2:
 					$port = FS::$secMgr->checkAndSecurisePostData("swport");
 					$sw = FS::$secMgr->checkAndSecurisePostData("sw");
