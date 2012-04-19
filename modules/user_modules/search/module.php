@@ -101,6 +101,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			/// @TODO DNS infos
+			
 			// Netbios INFOS
 			$query = FS::$pgdbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '".$search."' OR nbname ILIKE '".$search."'");
 			while($data = pg_fetch_array($query)) {
@@ -109,9 +110,11 @@
 					$tmpoutput .= "<div><h4>Domaine/Groupe de Travail Netbios</h4>";
 					$tmpoutput = "<table class=\"standardTable\"><tr><th>Noeud</th><th>Nom</th><th>Utilisateur</th><th>Première vue</th><th>Dernière vue</th></tr>";
 				}
+				$fst = preg_split("#\.#",$data["time_first"]);
+				$lst = preg_split("#\.#",$data["time_last"]);
 				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>";
 				$tmpoutput .= "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>";
-				$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$data["time_first"]."</td><td>".$data["time_last"]."</td></tr>";
+				$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$list[0]."</td></tr>";
 			}
 			
 			if($found) $tmpoutput .= "</table></div>";
@@ -223,7 +226,24 @@
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
-			// @ TODO réservation DHCP
+			
+			$query = FS::$dbMgr->Select("fss_dhcp_ip_cache","ip,hostname,leasetime,distributed","macaddr = '".$search."'");
+			while($data = mysql_fetch_array($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>Distribution DHCP</h4>";
+				}
+				if(strlen($data["hostname"]) > 0)
+					$tmpoutput .= "Nom d'hôte DHCP: ".$data["hostname"]."<br />";
+				if(strlen($data["macaddr"]) > 0)
+					$tmpoutput .= "Adresse IP liée: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a><br />";
+				$tmpoutput .= "Type d'attribution: ".($data["distributed"] != 3 ? "Dynamique" : "Statique")."<br />";
+				if($data["distributed"] != 3)
+					$tmpoutput .= "Validité : ".$data["leasetime"]."<br />";
+			}
+			
+			if($found) $tmpoutput .= "</div>";
+			$found = 0;
 			$query = FS::$pgdbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$search."'","time_last",2);
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
