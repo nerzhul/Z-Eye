@@ -112,12 +112,13 @@
 			$module = FS::$secMgr->checkGetData("mod");
 			if(!$module) $module = 0;
 			
-			$output .= $this->showSearch();
+			if(FS::$sessMgr->isConnected())
+				$output .= $this->showSearch();
 			if(!FS::$secMgr->isNumeric($module))
 				$output .= $this->printError("Module inconnu !");
 			else {
 				FS::$secMgr->SecuriseStringForDB($module);
-				$output .= $this->loadModule($module);
+				$output .= "<hr>".$this->loadModule($module);
 			}
 			$output .= "</div>";
 			return $output;
