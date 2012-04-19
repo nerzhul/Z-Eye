@@ -6,6 +6,8 @@
 		public function Load() {
 			$output = "<div id=\"monoComponent\">";
 			$search = FS::$secMgr->checkAndSecurisePostData("s");
+			if(!$search)
+				$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			if($search && strlen($search) > 0)
 				$output .= $this->findRefsAndShow($search);
 			else
