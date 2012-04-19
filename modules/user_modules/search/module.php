@@ -52,9 +52,9 @@
 				}
 				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 				$convport = preg_replace("#\/#","-",$data["port"]);
-				$output .= "Equipement et port reliés: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."\">".$swname."</a> (";
-				$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."#".$convport."\">".$data["port"]."</a>";
-				$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>) <br />";
+				$tmpoutput .= "Equipement: <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."\">".$swname."</a> (";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."#".$convport."\">".$data["port"]."</a>";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>) <br />";
 			}
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
