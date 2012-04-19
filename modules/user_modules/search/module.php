@@ -92,16 +92,17 @@
 		}
 		
 		private function showMacAddrResults($search) {
+			$output = "";
 			$tmpoutput = "";
 			$found = 0;
 			// @ TODO réservation DHCP
-			$query = FS::$pgdbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$search."'","lst",2);
+			$query = FS::$pgdbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$search."'","time_last",2);
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h4>Adresses IP</h4>";
 				}
-				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a> (Premier enregistrement: ".$data["time_first"]." / Dernier enregistrement : ".$data["time_last"]."<br /><hr>";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["ip"]."\">".$data["ip"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data["time_first"]." et le ".$data["time_last"].")<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
@@ -120,7 +121,7 @@
 				$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
 				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
 				$tmpoutput .= ($piece == NULL ? "" : " / Prise ".$piece);
-				$tmpoutput .= "(Premier enregistrement: ".$data["time_first"]." / Dernier enregistrement: ".$data["time_last"]."<br /><hr>";
+				$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data["time_first"]." et le ".$data["time_last"].")<br />";
 			}
 			
 			if($found) $tmpoutput .= "</div>";
@@ -132,7 +133,7 @@
 					$found = 1;
 					$tmpoutput .= "<div><h4>Noms Netbios</h4>";
 				}
-				$tmpoutput .= ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a> (Premier enregistrement: ".$data["time_first"]." / Dernier enregistrement: ".$data["time_last"].")";
+				$tmpoutput .= ($data["domain"] != "" ? "\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "")."\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data["time_first"]." et le ".$data["time_last"].")<br />";
 			}
 		
 			if($found) $tmpoutput .= "</div>";
@@ -152,7 +153,7 @@
 						$tmpoutput .= "<div><h4>Utilisateurs 802.1X</h4>";
 					}
 					$tmpoutput .= "Utilisateur: ".$data2["username"]." / Station: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data2["calledstationid"].">".$data2["calledstationid"]."</a>";
-					$tmpoutput .= "Première Identification: ".$data2["acctstarttime"]." / Dernière identification: ".$data2["acctstoptime"]."<br /><hr>";
+					$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data2["acctstarttime"]." et le ".$data2["acctstoptime"].")<br />";
 				}
 				
 				if($found) $tmpoutput .= "</div>";
@@ -182,7 +183,7 @@
 						$outputbw = round($data2["output"]/1024,2)."Ko";
 					else
 						$outputbw = $data2["output"]."o";
-					$tmpoutput .= "Station: ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "(Première donnée: ".$data2["fst"]." / Dernière donnée: ".$data2["lst"].")<br /><hr>";
+					$tmpoutput .= "Station: ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$data2["fst"]." et le ".$data2["lst"].")<br /><hr>";
 					$totinbw += $data2["input"];
 					$totoutbw += $data2["output"];
 				}
@@ -211,6 +212,7 @@
 				$output .= $tmpoutput;
 			else
 				$output .= FS::$iMgr->printError("Aucune donnée sur ce noeud");
+			return $output;
 		}
 			
 		private function showIPAddrResults($search) {
