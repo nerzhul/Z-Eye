@@ -110,7 +110,7 @@
 					$rectypef .= "'TXT'";
 				}
 				
-				$rectype .= ")";
+				$rectypef .= ")";
 				if($shother) $rectypef .= " AND rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 			}
 			
@@ -141,7 +141,7 @@
 				$dnsoutput .= "</td></tr>";
 			}
 			$output .= $formoutput;
-			$output .= "</select>";
+			$output .= "</select><br />";
 			$output .= FS::$iMgr->addCheck("sa",$shA)."A ";
 			$output .= FS::$iMgr->addCheck("saaaa",$shAAAA)."AAAA ";
 			$output .= FS::$iMgr->addCheck("scname",$shCNAME)."CNAME ";
@@ -150,6 +150,7 @@
 			$output .= FS::$iMgr->addCheck("stxt",$shTXT)."TXT ";
 			$output .= FS::$iMgr->addCheck("sptr",$shPTR)."PTR ";
 			$output .= FS::$iMgr->addCheck("sother",$shother)."Autres ";
+			$output .= "<br />";
 			$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
 			$output .= "</form>";
 			if(strlen($dnsoutput) > 0)
@@ -162,54 +163,46 @@
 			switch($act) {
 				case 1:
 					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
-					$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
-					$shAAAA = FS::$secMgr->checkAndSecuriseGetData("saaaa");
-					$shNS = FS::$secMgr->checkAndSecuriseGetData("sns");
-					$shCNAME = FS::$secMgr->checkAndSecuriseGetData("scname");
-					$shSRV = FS::$secMgr->checkAndSecuriseGetData("ssrv");
-					$shPTR = FS::$secMgr->checkAndSecuriseGetData("sptr");
-					$shTXT = FS::$secMgr->checkAndSecuriseGetData("stxt");
-					$shother = FS::$secMgr->checkAndSecuriseGetData("sother");
+					$shA = FS::$secMgr->checkAndSecurisePostData("sa");
+					$shAAAA = FS::$secMgr->checkAndSecurisePostData("saaaa");
+					$shNS = FS::$secMgr->checkAndSecurisePostData("sns");
+					$shCNAME = FS::$secMgr->checkAndSecurisePostData("scname");
+					$shSRV = FS::$secMgr->checkAndSecurisePostData("ssrv");
+					$shPTR = FS::$secMgr->checkAndSecurisePostData("sptr");
+					$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
+					$shother = FS::$secMgr->checkAndSecurisePostData("sother");
 					
 					if($filtr == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) 
 						header("Location: index.php?mod".$this->mid."");
 					else {
-						if($shA == NULL) $shA = 1;
-						else if($shA > 0) $shA = 1;
+						if($shA == "on") $shA = 1;
 						else $shA = 0;
 			
-						if($shAAAA == NULL) $shAAAA = 1;
-						else if($shAAAA > 0) $shAAAA = 1;
+						if($shAAAA == "on") $shAAAA = 1;
 						else $shAAAA = 0;
 						
 			
-						if($shNS == NULL) $shNS = 1;
-						else if($shNS > 0) $shNS = 1;
+						if($shNS == "on") $shNS = 1;
 						else $shNS = 0;
 						
 			
-						if($shCNAME == NULL) $shCNAME = 1;
-						else if($shCNAME > 0) $shCNAME = 1;
+						if($shCNAME == "on") $shCNAME = 1;
 						else $shCNAME = 0;
 						
 			
-						if($shSRV == NULL) $shSRV = 1;
-						else if($shSRV > 0) $shSRV = 1;
+						if($shSRV == "on") $shSRV = 1;
 						else $shSRV = 0;
 						
 			
-						if($shPTR == NULL) $shPTR = 1;
-						else if($shPTR > 0) $shPTR = 1;
+						if($shPTR == "on") $shPTR = 1;
 						else $shPTR = 0;
 						
 			
-						if($shTXT == NULL) $shTXT = 1;
-						else if($shTXT > 0) $shTXT = 1;
+						if($shTXT == "on") $shTXT = 1;
 						else $shTXT = 0;
 						
 			
-						if($shother == NULL) $shother = 1;
-						else if($shother > 0) $shother = 1;
+						if($shother == "on") $shother = 1;
 						else $shother = 0;
 						header("Location: index.php?mod=".$this->mid.($filtr != NULL ? "&f=".$filtr : "")."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother);
 					}
