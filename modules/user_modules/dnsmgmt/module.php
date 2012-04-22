@@ -111,7 +111,7 @@
 				}
 				
 				$rectypef .= ")";
-				if($shother) $rectypef .= " AND rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
+				if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 			}
 			
 			$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","zonename,record,rectype,recval",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
