@@ -88,10 +88,12 @@
 			$found = 0;
 
 			// Devices
-			$query = FS::$pgdbMgr->Select("device","ip,description,model","name ILIKE '".$search."'");
+			$query = FS::$pgdbMgr->Select("device","mac,ip,description,model","name ILIKE '".$search."'");
 			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
 				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
+				if(strlen($data["mac"]) > 0)
+					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a> - ";
 				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
 				$tmpoutput .= "<b><i>Modèle:</i></b> ".$data["model"]."<br />";
 				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
@@ -257,6 +259,17 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			
+			// Devices
+			$query = FS::$pgdbMgr->Select("device","mac,name,description,model","ip = '".$search."'");
+			if($data = pg_fetch_array($query)) {
+				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
+				$tmpoutput .= "<b><i>Nom: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
+				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a>)<br />";
+				$tmpoutput .= "<b><i>Modèle:</i></b> ".$data["model"]."<br />";
+				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
+			}
+			
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
@@ -407,6 +420,17 @@
 						$outputbw = $totoutbw."o";
 					$tmpoutput .= "Bande passante totale consommée: Téléchargement => ".$inputbw." / Upload: ".$outputbw."</div>";
 				}
+			}
+			
+			// Devices
+			$query = FS::$pgdbMgr->Select("device","ip,name,description,model","mac = '".$search."'");
+			if($data = pg_fetch_array($query)) {
+				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
+				$tmpoutput .= "<b><i>Nom: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
+				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
+				$tmpoutput .= "<b><i>Modèle:</i></b> ".$data["model"]."<br />";
+				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
 			}
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
