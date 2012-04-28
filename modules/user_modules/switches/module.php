@@ -21,93 +21,110 @@
 
 		private function showPortInfos() {
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
-                        $port = FS::$secMgr->checkAndSecuriseGetData("p");
+            $port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			$output = "";
 			if($err != NULL)
 				$output .= FS::$iMgr->printError("Erreur lors de la modification des données sur le switch !");
 			$output .= "<h4>".$port." sur ".$device."</h4>";
-			$output .= "<script type=\"text/javascript\">function arangeform() {";
-			$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
-			$output .= "$('#vltr').show();";
-			$output .= "$('#vllabel').html('Vlan Natif');";
-			$output .= "} else if(document.getElementsByName('trmode')[0].value == 2) {";
-			$output .= "$('#vltr').hide();";
-			$output .= "$('#vllabel').html('Vlan');";
-			$output .= "}";
-			$output .= "};";
-			$output .= "function showwait() {";
-			$output .= "$('#subpop').html('Modification en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
-			$output .= "$('#pop').show();";
-			$output .= "};";
-			$output .= "</script>";
+			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&p=".$port."\">Configuration</a> | ";
+			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&p=".$port."&sh=2\">Statistiques de débit</a><br />";
+			
+			// Get Port ID
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
-			if($data = pg_fetch_array($query)) {
-				$out = "";
-				exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$port,$out);
-				if(strlen($out[0]) < 5)
-						return FS::$iMgr->printError("Unable to walk and find port Description");
-				$out = explode(" ",$out[0]);
-				$out = explode(".",$out[0]);
-				if(!FS::$secMgr->isNumeric($out[1]))
-						return FS::$iMgr->printError("Port Description isn't numeric");
-				$portid = $out[1];
-
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=9");
-				$output .= FS::$iMgr->addHidden("portid",$portid);
-				$output .= FS::$iMgr->addHidden("sw",$device);
-				$output .= FS::$iMgr->addHidden("port",$port);
-				$output .= "<table><tr><th>Champ</th><th>Valeur</th></tr>";
-				$output .= "<tr><td>Description</td><td>".FS::$iMgr->addInput("desc",$data["name"])."</td></tr>";
-				$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-				$output .= "<tr><td>Prise</td><td>".FS::$iMgr->addInput("prise",$piece)."</td></tr>";
-				$output .= "<tr><td>Adresse MAC</td><td>".$data["mac"]."</td></tr>";
-				$output .= "<tr><td>Etat / Duplex / Vitesse</td><td>";
-				if($data["up_admin"] == "down")
-                                        $output .= "<span style=\"color: red;\">Eteint</span>";
-                                else if($data["up_admin"] == "up" && $data["up"] == "down")
-                                        $output .= "<span style=\"color: orange;\">Inactif</span>";
-                                else if($data["up"] == "up")
-                                        $output .= "<span style=\"color: black;\">Actif</span>";
-                                else
-                                        $output .= "unk";
-				$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
-				$output .= "<tr><td>Eteindre</td><td>".FS::$iMgr->addCheck("shut",($data["up_admin"] == "down" ? true : false))."</td></tr>";
-				$output .= "<tr><td>Vitesse</td><td>Non disponible</td></tr>";
-				$output .= "<tr><td>Duplex</td><td>Non disponible</td></tr>";
-				$output .= "<tr><td>Switchport Mode</td><td>";
-				$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
-				$trmode = preg_split("# #",$trmode);
-				$trmode = $trmode[1];
-				$output .= FS::$iMgr->addList("trmode","arangeform();");
-				$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
-				$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
-				$output .= "</select>";
-				$output .= "<tr><td id=\"vllabel\">Vlan natif</td><td id=\"vln\">";
-
-				$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native","ip = '".$dip."' AND port = '".$port."'","vlan");
-                                $nvlan = $data["vlan"];
-                                $vlanlist = "";
-                                $vlancount = 0;
-                                while($data2 = pg_fetch_array($query2)) {
-                                        if($data2["native"] == "t" && $data2["vlan"] != 1) $nvlan = $data2["vlan"];
-                                        $vlanlist .= $data2["vlan"].",";
-                                }
-				$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
-				$output .= FS::$iMgr->addInput("nvlan",$nvlan,4,4);
-				$output .= "</td></tr>";
-				$output .= "<tr id=\"vltr\" ".($trmode == 2 ? "style=\"display:none;\"" : "")."><td>Vlans Encapsulés</td><td>";
-				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-				$output .= $vlanlist;
-				$output .= "</textarea></td></tr>";
-				$output .= "<tr><td>Sauver ?</td><td>".FS::$iMgr->addCheck("wr")."</td></tr>";
-				$output .= "</table>";
-				$output .= "<center><br /><input class=\"buttonStyle\" type=\"submit\" name=\"Enregistrer\" value=\"Enregistrer\" onclick=\"showwait();\"/></center>";
-				$output .= "</form>";
+			$out = "";
+			exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$port,$out);
+			if(strlen($out[0]) < 5)
+					return FS::$iMgr->printError("Unable to walk and find port Description");
+			$out = explode(" ",$out[0]);
+			$out = explode(".",$out[0]);
+			if(!FS::$secMgr->isNumeric($out[1]))
+					return FS::$iMgr->printError("Port Description isn't numeric");
+			$portid = $out[1];
+			
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+			// Port modification
+			if(!$sh || $sh == 1) {
+				$output .= "<script type=\"text/javascript\">function arangeform() {";
+				$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
+				$output .= "$('#vltr').show();";
+				$output .= "$('#vllabel').html('Vlan Natif');";
+				$output .= "} else if(document.getElementsByName('trmode')[0].value == 2) {";
+				$output .= "$('#vltr').hide();";
+				$output .= "$('#vllabel').html('Vlan');";
+				$output .= "}";
+				$output .= "};";
+				$output .= "function showwait() {";
+				$output .= "$('#subpop').html('Modification en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+				$output .= "$('#pop').show();";
+				$output .= "};";
+				$output .= "</script>";
+				$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
+				if($data = pg_fetch_array($query)) {
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=9");
+					$output .= FS::$iMgr->addHidden("portid",$portid);
+					$output .= FS::$iMgr->addHidden("sw",$device);
+					$output .= FS::$iMgr->addHidden("port",$port);
+					$output .= "<table><tr><th>Champ</th><th>Valeur</th></tr>";
+					$output .= "<tr><td>Description</td><td>".FS::$iMgr->addInput("desc",$data["name"])."</td></tr>";
+					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
+					$output .= "<tr><td>Prise</td><td>".FS::$iMgr->addInput("prise",$piece)."</td></tr>";
+					$output .= "<tr><td>Adresse MAC</td><td>".$data["mac"]."</td></tr>";
+					$output .= "<tr><td>Etat / Duplex / Vitesse</td><td>";
+					if($data["up_admin"] == "down")
+											$output .= "<span style=\"color: red;\">Eteint</span>";
+									else if($data["up_admin"] == "up" && $data["up"] == "down")
+											$output .= "<span style=\"color: orange;\">Inactif</span>";
+									else if($data["up"] == "up")
+											$output .= "<span style=\"color: black;\">Actif</span>";
+									else
+											$output .= "unk";
+					$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
+					$output .= "<tr><td>Eteindre</td><td>".FS::$iMgr->addCheck("shut",($data["up_admin"] == "down" ? true : false))."</td></tr>";
+					$output .= "<tr><td>Vitesse</td><td>Non disponible</td></tr>";
+					$output .= "<tr><td>Duplex</td><td>Non disponible</td></tr>";
+					$output .= "<tr><td>Switchport Mode</td><td>";
+					$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
+					$trmode = preg_split("# #",$trmode);
+					$trmode = $trmode[1];
+					$output .= FS::$iMgr->addList("trmode","arangeform();");
+					$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
+					$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
+					$output .= "</select>";
+					$output .= "<tr><td id=\"vllabel\">Vlan natif</td><td id=\"vln\">";
+	
+					$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native","ip = '".$dip."' AND port = '".$port."'","vlan");
+					$nvlan = $data["vlan"];
+					$vlanlist = "";
+					$vlancount = 0;
+					while($data2 = pg_fetch_array($query2)) {
+							if($data2["native"] == "t" && $data2["vlan"] != 1) $nvlan = $data2["vlan"];
+							$vlanlist .= $data2["vlan"].",";
+					}
+					$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
+					$output .= FS::$iMgr->addInput("nvlan",$nvlan,4,4);
+					$output .= "</td></tr>";
+					$output .= "<tr id=\"vltr\" ".($trmode == 2 ? "style=\"display:none;\"" : "")."><td>Vlans Encapsulés</td><td>";
+					$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+					$output .= $vlanlist;
+					$output .= "</textarea></td></tr>";
+					$output .= "<tr><td>Sauver ?</td><td>".FS::$iMgr->addCheck("wr")."</td></tr>";
+					$output .= "</table>";
+					$output .= "<center><br /><input class=\"buttonStyle\" type=\"submit\" name=\"Enregistrer\" value=\"Enregistrer\" onclick=\"showwait();\"/></center>";
+					$output .= "</form>";
+				}
+				else
+					$output .= FS::$iMgr->printError("Les données demandées n'existent pas !");
 			}
-			else
-				$output .= FS::$iMgr->printError("Les données demandées n'existent pas !");
+			// Port Stats
+			else if($sh == 2) {
+				$file = file(dirname(__FILE__)."/../../../datas/rrd/".$dip."_".$portid.".html");
+				if($file) {
+					$output .= $file;
+				}
+				else
+					$output .= FS::$iMgr->printError("Aucun débit réseau collecté pour ce port !");
+			}
 			return $output;
 		}
 
