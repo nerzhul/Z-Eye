@@ -120,7 +120,21 @@
 			else if($sh == 2) {
 				$file = file(dirname(__FILE__)."/../../../datas/rrd/".$dip."_".$portid.".html");
 				if($file) {
-					$output .= $file;
+					$filebuffer = "";
+					$stopbuffer = 0;
+					for($i=0;$i<count($file);$i++) {
+						$file[$i] = preg_replace("#src=\"(.*)\"#","src=\"datas/rrd/$1\"",$file[$i]);
+						if(preg_match("#<head>#",$file[$i]) || preg_match("#<div id=\"footer#",$file[$i]) || 
+							 preg_match("#<div id=\"legend#",$file[$i]))
+                                                        $stopbuffer = 1;
+						else if($stopbuffer == 1 && (preg_match("#</head>#",$file[$i]) || preg_match("#</div>#",$file[$i])))
+							$stopbuffer = 0;
+						else if($stopbuffer == 0 && !preg_match("#<title>#",$file[$i]) && !preg_match("#<meta#",$file[$i]) 
+							&& !preg_match("#<h1>(.*)</h1>#",$file[$i]) && !preg_match("#<body#",$file[$i]) &&
+							!preg_match("#<html#",$file[$i]) && !preg_match("#<!--#",$file[$i]))
+							$filebuffer .= $file[$i];
+					}
+					$output .= "<br />".$filebuffer."<br /><center><span style=\"font-size: 9px;\">Generated with MRTG</span></center>";
 				}
 				else
 					$output .= FS::$iMgr->printError("Aucun débit réseau collecté pour ce port !");
