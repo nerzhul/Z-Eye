@@ -30,5 +30,5 @@
 	}
 	$end_time = microtime(true);
 	$script_time = $end_time - $start_time;
-	echo "[".Config::getWebsiteName()."][MRTG-Discover] done at ".date('d-m-Y G:i:s')." (Execution time: ".$script_time.")\n";
+	echo "[".Config::getWebsiteName()."][MRTG-Discover] done at ".date('d-m-Y G:i:s')." (Execution time: ".$script_time."s)\n";
 ?>
