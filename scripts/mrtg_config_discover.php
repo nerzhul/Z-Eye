@@ -15,16 +15,19 @@
 			echo "[".Config::getWebsiteName()."][MRTG-Discover][FATAL] Cannot write file to ".dirname(__FILE__)."/../datas/mrtg-config/ !";
 			exit(1);
 		}
+		$wkdirwr = 0;
 		echo "[".Config::getWebsiteName()."][MRTG-Discover] Do: write ".dirname(__FILE__)."/../datas/mrtg-config/mrtg-".$data["name"].".cfg\n";
 		for($i=0;$i<count($out);$i++) {
-			if(preg_match("#WorkDir:#",$out[$i]) && $wkdirwr == 0) {
-				$towr = "WorkDir: ".dirname(__FILE__)."/../datas/rrd\n";
-				$wkdirwr = 1;
+			if(preg_match("#WorkDir:#",$out[$i])) {
+				if($wkdirwr == 0) {
+					$towr = "WorkDir: ".dirname(__FILE__)."/../datas/rrd\n";
+					$wkdirwr = 1;
+				}
 			}
 			else
 				$towr = $out[$i];
 				
-			fwrite($file,$out[$i]."\n");
+			fwrite($file,$towr."\n");
 		}
 		fclose($file);
 	}
