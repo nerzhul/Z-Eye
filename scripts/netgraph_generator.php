@@ -81,6 +81,8 @@
 	$peer_arr = array();
 	$query = FS::$pgdbMgr->Select("device_port","ip,remote_id","remote_id != ''");
 	while($data = pg_fetch_array($query)) {
+		$dmodel = FS::$pgdbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
+		if(preg_match("#AIRAP#",$dmodel)) continue;
 		$dmodel = FS::$pgdbMgr->GetOneData("device","model","ip = '".$data["ip"]."'");
 		if(preg_match("#AIRAP#",$dmodel)) continue;
 		if(!in_array($data["remote_id"],$nodelist))
