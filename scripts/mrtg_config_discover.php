@@ -17,7 +17,5 @@
 		fclose($file);
 	}
 	
-	
 	echo "[".Config::getWebsiteName()."] MRTG Discover done at ".date('d-m-Y G:i:s')."\n";
-
 ?>
