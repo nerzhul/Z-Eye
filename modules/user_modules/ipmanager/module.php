@@ -90,10 +90,10 @@
 							}
 							break;
 					}
-					$netoutput .= "<tr style=\"$style\"><td><a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".long2ip($key)."\">";
+					$netoutput .= "<tr style=\"$style\"><td><a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
 					$netoutput .= long2ip($key)."</a>";
 					$netoutput .= "</td><td>".$rstate."</td><td>";
-					$netoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
+					$netoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
 					$netoutput .= $value["host"]."</td><td>";
 					$netoutput .= $value["ltime"]."</td></tr>";
 				}
