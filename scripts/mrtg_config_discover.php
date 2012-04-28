@@ -12,7 +12,7 @@
 		exec("cfgmaker ".SNMPConfig::$SNMPReadCommunity."@".$data["ip"],$out);
 		$file = fopen(dirname(__FILE__)."/../datas/mrtg-config/mrtg-".$data["name"].".cfg","w+");
 		if(!$file) {
-			echo "[FATAL] Cannot write file to ".dirname(__FILE__)."/../datas/mrtg-config/ !";
+			echo "[".Config::getWebsiteName()."][MRTG-Discover][FATAL] Cannot write file to ".dirname(__FILE__)."/../datas/mrtg-config/ !";
 			exit(1);
 		}
 		echo "[".Config::getWebsiteName()."][MRTG-Discover] Do: write ".dirname(__FILE__)."/../datas/mrtg-config/mrtg-".$data["name"].".cfg\n";
