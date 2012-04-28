@@ -5,10 +5,11 @@
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h3>Analyse des Débits</h3>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if($device != NULL)
 				$output .= $this->showDeviceWeatherMap($device);
-			else
-				$output .= $this->showGeneralWeatherMap();
+			else if($sh == 1)
+				$output .= $this->showGeneralLightWeatherMap();
 			$output .= "</div>";
 			return $output;
 		}
@@ -18,20 +19,14 @@
 			$output .= FS::$iMgr->addImage("datas/weathermap/".$device.".png");
 			return $output;	
 		}
-		private function showGeneralWeatherMap() {
-			$output = "<h2>Etat des liens inter équipements</h2>";
-			$query = FS::$pgdbMgr->Select("device_port","ip,port,remote_id","remote_id != ''","ip");
-			$neighbor_arr = array();
-			while($data = pg_fetch_array($query)) {
-				if(!isset($neighbor[$data["ip"]]))
-					$neighbor[$data["ip"]] = array();
-				$tmparr = $neighbor_arr[$data["ip"]];
-				if(!in_array($data["remote_id"],$tmparr))
-					$tmparr[count($tmparr)] = array($data["port"],$data["remote_ip"]);
-			}
-			
-			
-			
+		private function showGeneralLightWeatherMap() {
+			$output = "<h2>Carte du réseau</h2>";
+			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.png");
+			return $output;	
+		}
+		
+		private function showGeneralFullWeatherMap() {
+			$output = "<h2>Carte complète du réseau</h2>";
 			$output .= FS::$iMgr->addImage("datas/weathermap/main.png");
 			return $output;	
 		}
