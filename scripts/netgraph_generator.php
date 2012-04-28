@@ -67,9 +67,9 @@
 			$nodelist[count($nodelist)] = $data["name"];
 	}
 	
-	$query = FS::$pgdbMgr->Select("device_port","remote_id","remote_id != ''");
+	$query = FS::$pgdbMgr->Select("device_port","ip,remote_id","remote_id != ''");
 	while($data = pg_fetch_array($query)) {
-		$dmodel = FS::$pgdbMgr->GetOneData("device","model","ip = '".$data["ip"]."'");
+		$dmodel = FS::$pgdbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
 		if(!in_array($data["remote_id"],$nodelist) && !preg_match("#AIRAP#",$dmodel))
 			$nodelist[count($nodelist)] = $data["remote_id"];
 	}
@@ -81,6 +81,8 @@
 	$peer_arr = array();
 	$query = FS::$pgdbMgr->Select("device_port","ip,remote_id","remote_id != ''");
 	while($data = pg_fetch_array($query)) {
+		$dmodel = FS::$pgdbMgr->GetOneData("device","model","ip = '".$data["ip"]."'");
+		if(preg_match("#AIRAP#",$dmodel)) continue;
 		if(!in_array($data["remote_id"],$nodelist))
 			$nodelist[count($nodelist)] = $data["remote_id"];
 		$dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
