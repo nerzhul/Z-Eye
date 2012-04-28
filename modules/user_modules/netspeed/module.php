@@ -14,16 +14,24 @@
 		}
 		
 		private function showDeviceWeatherMap($device) {
-			$dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$device."'");
-			if(!$dname)
-				return FS::$iMgr->printError("Cet équipement n'existe pas !");
-				
-			$output = "<h2>Etat des liens de ".$dname."</h2>";
-			$output .= FS::$iMgr->addImage("datas/weathermap/".$dname.".png");
+			$output = "<h2>Etat des liens de ".$device."</h2>";
+			$output .= FS::$iMgr->addImage("datas/weathermap/".$device.".png");
 			return $output;	
 		}
 		private function showGeneralWeatherMap() {
 			$output = "<h2>Etat des liens inter équipements</h2>";
+			$query = FS::$pgdbMgr->Select("device_port","ip,port,remote_id","remote_id != ''","ip");
+			$neighbor_arr = array();
+			while($data = pg_fetch_array($query)) {
+				if(!isset($neighbor[$data["ip"]]))
+					$neighbor[$data["ip"]] = array();
+				$tmparr = $neighbor_arr[$data["ip"]];
+				if(!in_array($data["remote_id"],$tmparr))
+					$tmparr[count($tmparr)] = array($data["port"],$data["remote_ip"]);
+			}
+			
+			
+			
 			$output .= FS::$iMgr->addImage("datas/weathermap/main.png");
 			return $output;	
 		}

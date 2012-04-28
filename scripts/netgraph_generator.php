@@ -16,7 +16,7 @@
 	$nodelist = array();
 	$query = FS::$pgdbMgr->Select("device","name");
 	while($data = pg_fetch_array($query)) {
-		if(!in_array($data["name"]))
+		if(!in_array($data["name"],$nodelist))
 			$nodelist[count($nodelist)] = $data["name"];
 	}
 	
