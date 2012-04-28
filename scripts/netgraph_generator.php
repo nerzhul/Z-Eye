@@ -11,7 +11,7 @@
 		exit(1);
 	}
 	
-	$graphbuffer = "digraph maingraph {\ngraph [size=\"100,100\", bgcolor=white, nodesep=1];\n	node [label=\"\N\", fillcolor=dimgrey, fixedsize=false, fontcolor=white, fontname=lucon, fontsize=16, shape=plaintext, style=filled];\n edge [color=black];\ngraph [ratio=compress];\n";
+	$graphbuffer = "digraph maingraph {\ngraph [size=\"40,40\", bgcolor=white, nodesep=1];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, fontsize=16, shape=plaintext];\n edge [color=black,fontsize=10];\n";
 	
 	$nodelist = array();
 	$query = FS::$pgdbMgr->Select("device","name");
@@ -30,12 +30,17 @@
 		 $graphbuffer .= preg_replace("#[.-]#","_",$nodelist[$i])." [label=\"".$nodelist[$i]."\", URL=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$nodelist[$i]."\", fontsize=72];\n";
 	}
 	
+	$peer_arr = array();
 	$query = FS::$pgdbMgr->Select("device_port","ip,remote_id","remote_id != ''");
 	while($data = pg_fetch_array($query)) {
 		if(!in_array($data["remote_id"],$nodelist))
 			$nodelist[count($nodelist)] = $data["remote_id"];
 		$dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-		$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])."\n";
+		if(!isset($peer_arr[$data["ip"]])) $peer_arr[$data["ip"]] = array();
+		if(!in_array($data["remote_id"],$peer_arr[$data["ip"]])) {
+			$peer_arr[$data["ip"]][count($peer_arr[$data["ip"]])] = $data["remote_id"];
+			$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])."\n";
+		}
 	}
 	
 	$graphbuffer .= "}\n";
