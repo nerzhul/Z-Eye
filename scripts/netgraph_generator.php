@@ -11,7 +11,7 @@
 		exit(1);
 	}
 	
-	$graphbuffer = "digraph maingraph {\ngraph [size=\"40,40\", bgcolor=white, nodesep=1];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, fontsize=16, shape=plaintext];\n edge [color=black,fontsize=10];\n";
+	$graphbuffer = "digraph maingraph {\ngraph [bgcolor=white, nodesep=0.5];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, fontsize=16, shape=plaintext];\n edge [color=black,fontsize=12];\n";
 	
 	$nodelist = array();
 	$query = FS::$pgdbMgr->Select("device","name");
