@@ -10,7 +10,10 @@
 		$fpath = dirname(__FILE__)."/../datas/mrtg-config/".$elem;
 		if(is_file($fpath)) {
 			echo "[".Config::getWebsiteName()."][MRTG-RRD-Refresh] Do: env LANG=C /usr/bin/mrtg ".$fpath."\n";
-			exec("env LANG=C /usr/bin/mrtg ".$fpath);
+			if(Config::getOS() == "FreeBSD")
+				exec("env LANG=C /usr/local/bin/mrtg ".$fpath);
+			else if(Config::getOS() == "Debian")
+				exec("env LANG=C /usr/bin/mrtg ".$fpath);
 		}
 	}
 	
