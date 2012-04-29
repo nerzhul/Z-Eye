@@ -21,7 +21,12 @@
 		}
 		private function showGeneralLightWeatherMap() {
 			$output = "<h2>Carte du réseau</h2>";
-			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.png");
+			$output .= "<span id=\"netmap\" class=\"zoom\" style=\"position: relative; overflow: hidden;\">";
+			$output .= "<p>Carte des équipement réseau filaires</p>";
+			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.png",1000,700);
+			$output .= "</span><script type=\"text/javascript\">";
+			$output .= "$('#netmap').zoom();";
+			$output .= "</script>";
 			return $output;	
 		}
 		

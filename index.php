@@ -15,12 +15,11 @@
 		FS::$sessMgr->InitSessionIfNot();
 		FS::$iMgr->addStylesheet("styles/fss1.css");
 		FS::$iMgr->addJSFile("lib/jQuery/jQuery.js");
+		FS::$iMgr->addJSFile("lib/jQuery/jQuery-zoom.js");
 		FS::$iMgr->addJSFile("modules/js/canvas.js");
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-math.js");
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-Regex.js");
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-interface.js");
-		FS::$iMgr->addJSFile("modules/js/dhcp.js");
-		FS::$iMgr->addJSFile("modules/js/dns.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.core.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.tooltips.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.effects.js");
