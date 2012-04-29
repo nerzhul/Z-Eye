@@ -12,17 +12,17 @@
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
-			}
-			$device = FS::$secMgr->checkAndSecuriseGetData("d");
-			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
-			if($device != NULL)
-				$output .= $this->showDeviceWeatherMap($device);
-			else if($sh == 1)
-				$output .= $this->showGeneralFullWeatherMap();
-			else
-				$output .= $this->showGeneralLightWeatherMap();
-				if(!FS::isAJAXCall())
 				$output .= "</div>";
+			} else {
+				$device = FS::$secMgr->checkAndSecuriseGetData("d");
+				$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+				if($device != NULL)
+					$output .= $this->showDeviceWeatherMap($device);
+				else if($sh == 1)
+					$output .= $this->showGeneralFullWeatherMap();
+				else
+					$output .= $this->showGeneralLightWeatherMap();
+			}
 			return $output;
 		}
 		
@@ -33,13 +33,13 @@
 		}
 		private function showGeneralLightWeatherMap() {
 			$output = "<h2>Carte du réseau</h2>";
-			$output .= FS::$iMgr->addImageWithLens("datas/weathermap/main-nowifi.svg",1000,700,"netmap",400);
+			$output .= FS::$iMgr->addImageWithLens("datas/weathermap/main-nowifi.svg",1000,700,"netmapL",400);
 			return $output;	
 		}
 		
 		private function showGeneralFullWeatherMap() {
 			$output = "<h2>Carte complète du réseau</h2>";
-			$output .= FS::$iMgr->addImageWithLens("datas/weathermap/main.svg",1000,700,"netmap",400);
+			$output .= FS::$iMgr->addImageWithLens("datas/weathermap/main.svg",1000,700,"netmapF",400);
 			return $output;	
 		}
 		
