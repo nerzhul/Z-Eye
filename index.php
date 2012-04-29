@@ -15,6 +15,7 @@
 		FS::$sessMgr->InitSessionIfNot();
 		FS::$iMgr->addStylesheet("styles/fss1.css");
 		FS::$iMgr->addJSFile("lib/jQuery/jQuery.js");
+		FS::$iMgr->addJSFile("lib/jQuery/jQueryUI.js");
 		FS::$iMgr->addJSFile("lib/jQuery/jQuery-zoom.js");
 		FS::$iMgr->addJSFile("lib/jQuery/jQuery.imageLens.js");
 		FS::$iMgr->addJSFile("modules/js/canvas.js");
