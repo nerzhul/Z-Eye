@@ -38,6 +38,7 @@
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
 				$output .= "</div>";
+			} else {
 				// Get Port ID
 				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 				$out = "";
@@ -49,8 +50,6 @@
 				if(!FS::$secMgr->isNumeric($out[1]))
 						return FS::$iMgr->printError("Port Description isn't numeric");
 				$portid = $out[1];
-				} else {
-				
 				$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 				// Port modification
 				if(!$sh || $sh == 1) {
