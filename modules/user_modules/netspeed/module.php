@@ -9,7 +9,6 @@
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">Carte principale</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1\">Carte détaillée</a>";
-				$output .= "<li>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
