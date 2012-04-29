@@ -14,8 +14,8 @@
 					echo FS::$iMgr->LoadMenu($mid);
 					break;
 				case 2: // module
-					$mid = FS::$secMgr->checkAndSecuriseGetData("mid");
-					echo FS::$iMgr->showModule($mid);
+					$mid = FS::$secMgr->checkAndSecuriseGetData("mod");
+					echo FS::$iMgr->loadModule($mid);
 					break;
 				case 3: // Action Handler
 					$aMgr = new ActionMgr();
