@@ -9,6 +9,8 @@
 			if($device != NULL)
 				$output .= $this->showDeviceWeatherMap($device);
 			else if($sh == 1)
+				$output .= $this->showGeneralFullWeatherMap();
+			else
 				$output .= $this->showGeneralLightWeatherMap();
 			$output .= "</div>";
 			return $output;
@@ -21,9 +23,9 @@
 		}
 		private function showGeneralLightWeatherMap() {
 			$output = "<h2>Carte du réseau</h2>";
-			$output .= "<span id=\"netmap\" class=\"zoom\" style=\"position: relative; overflow: hidden;\">";
+			$output .= "<span id=\"netmap\" class=\"zoom\" style=\"display: inline-block; position: relative; overflow: hidden;\">";
 			$output .= "<p>Carte des équipement réseau filaires</p>";
-			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.png",1000,700);
+			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700);
 			$output .= "</span><script type=\"text/javascript\">";
 			$output .= "$('#netmap').zoom();";
 			$output .= "</script>";
@@ -32,7 +34,11 @@
 		
 		private function showGeneralFullWeatherMap() {
 			$output = "<h2>Carte complète du réseau</h2>";
-			$output .= FS::$iMgr->addImage("datas/weathermap/main.png");
+			$output .= "<span id=\"netmap\" class=\"zoom\" style=\"display: inline-block; position: relative; overflow: hidden;\">";
+			$output .= "<p>Carte des équipement réseau filaires</p>";
+			$output .= FS::$iMgr->addImage("datas/weathermap/main.svg",1000,700);
+			$output .= "</span><script type=\"text/javascript\">";
+			$output .= "$('#netmap').zoom();";
 			return $output;	
 		}
 		
