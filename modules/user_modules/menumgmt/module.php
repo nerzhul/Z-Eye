@@ -141,7 +141,7 @@
 				<h4>Modifier les éléments</h4>
 				<table class=\"standardTable\">
 				<tr><th>Elément</th><th>Ordre</th><th></th></tr>";
-				$query = FS::$dbMgr->Select("fss_menu_link","id_menu_item,`order`","id_menu = '".$mid."'","order");
+				$query = FS::$dbMgr->Select("fss_menu_link","id_menu_item,`order`","id_menu = '".$mid."'","`order`");
 				while($data = mysql_fetch_array($query)) {
 					$query2 = FS::$dbMgr->Select("fss_menu_items","id,title","id = '".$data["id_menu_item"]."'");
 					if($data2 = mysql_fetch_array($query2)) {
