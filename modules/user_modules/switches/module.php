@@ -151,25 +151,25 @@
 		}
 
 		protected function showDeviceInfos() {
+			$device = FS::$secMgr->checkAndSecuriseGetData("d");
+			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
+			$od = FS::$secMgr->checkAndSecuriseGetData("od");
+			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				$output = "<h4>Equipement ";
-				$device = FS::$secMgr->checkAndSecuriseGetData("d");
-				$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
-				$od = FS::$secMgr->checkAndSecuriseGetData("od");
-				$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 	
 				if($od == NULL) $od = "port";
 				else if($od == "desc") $od = "name";
 				else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
 	
 				$output .= $device." (";
-				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 				$output .= $dip;
 	
-							$dloc = FS::$pgdbMgr->GetOneData("device","location","name = '".$device."'");
+				$dloc = FS::$pgdbMgr->GetOneData("device","location","name = '".$device."'");
 				if($dloc != NULL)
-								$output .= " - ".$dloc;
+				$output .= " - ".$dloc;
 				$output .= ")</h4>";
 				
 				$output .= "<div id=\"contenttabs\"><ul>";
