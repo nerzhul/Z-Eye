@@ -4,6 +4,13 @@
 		function iNetSpeed() { parent::genModule(); }
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h3>Analyse des Débits</h3>";
+			$output .= "<div id=\"contenttabs\"><ul>";
+			$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">Carte principale</a>";
+			$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1\">Carte détaillée</a>";
+			$output .= "<li>";
+			$output .= "</ul></div>";
+			$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+			$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if($device != NULL)
