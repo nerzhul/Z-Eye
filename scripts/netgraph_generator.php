@@ -63,11 +63,12 @@
 			if(!in_array($data["remote_id"],$peer_arr[$data["ip"]])) {
 				$peer_arr[$data["ip"]][count($peer_arr[$data["ip"]])] = $data["remote_id"];
 				
+				$outcharge = 0;
+				
 				$pid = getPortId($data["ip"],$data["port"]);
 				if($pid != -1) {
 					$mrtgfilename = $data["ip"]."_".$pid.".log";
 					$mrtgfile = file(dirname(__FILE__)."/../datas/rrd/".$mrtgfilename);
-					$outcharge = 0;
 					for($i=1;$i<2;$i++) {
 						$outputbw = 0;
 						$res = preg_split("# #",$mrtgfile[$i]);
