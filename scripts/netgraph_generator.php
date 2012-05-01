@@ -3,13 +3,25 @@
 	
 	FS::LoadFSModules();
 	
+	function getPortId($ip,$portname) {
+			$out = "";
+			exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$ip." ifDescr | grep ".$portname,$out);
+			if(strlen($out[0]) < 5)
+				return -1;
+			$out = explode(" ",$out[0]);
+			$out = explode(".",$out[0]);
+			if(!FS::$secMgr->isNumeric($out[1]))
+				return -1;
+			return $out[1];
+	}
+		
 	function generateGraph($filename, $options=array()) {
 		$file = fopen(dirname(__FILE__)."/../datas/weathermap/".$filename.".dot","w+");
 		if(!$file) {
 			echo  "[".Config::getWebsiteName()."][NetGraph-Generator][FATAL] Can't write ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot !";
 			exit(1);
 		}
-		
+		// penwidth for epaisseur
 		$graphbuffer = "digraph maingraph {\ngraph [bgcolor=white, nodesep=1];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
 		
 		$nodelist = array();
@@ -36,7 +48,7 @@
 		}
 		
 		$peer_arr = array();
-		$query = FS::$pgdbMgr->Select("device_port","ip,remote_id","remote_id != ''");
+		$query = FS::$pgdbMgr->Select("device_port","ip,port,speed,remote_id","remote_id != ''");
 		while($data = pg_fetch_array($query)) {
 			if(in_array("NO-WIFI",$options)) {
 				$dmodel = FS::$pgdbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
@@ -50,6 +62,39 @@
 			if(!isset($peer_arr[$data["ip"]])) $peer_arr[$data["ip"]] = array();
 			if(!in_array($data["remote_id"],$peer_arr[$data["ip"]])) {
 				$peer_arr[$data["ip"]][count($peer_arr[$data["ip"]])] = $data["remote_id"];
+				
+				$pid = getPortId($data["ip"],$data["port"]);
+				$mrtgfilename = $data["ip"]."_".$pid.".log";
+				$mrtgfile = file($mrtgfilename);
+				$incharge = 0;
+				$outcharge = 0;
+				for($i=1;$i<2;$i++) {
+					$inputbw = 0;
+					$outputbw = 0;
+					$res = preg_split("# #",$mrtgfile[$i]);
+					if(count($res) == 5) {
+						$inputbw = $res[1];
+						$outputbw = $res[2];
+						if($data["speed"] == 0) {
+							$inputbw = $outputbw = 0;
+						} else {
+							$maxbw = preg_split("# #",$data["speed"]);
+							if(count($maxbw) == 2) {
+								if($maxbw[1] == "Gbit" || $maxbw[1] == "Gbps")
+									$maxbw = $maxbw[0] * 1000000000;
+								else if($maxbw[1] == "Mbit" || $maxbw[1] == "Mbps")
+									$maxbw = $maxbw[0] * 1000000;
+							}
+							else
+								$maxbw = $maxbw[0];
+							$incharge = $inputbw / $maxbw;
+							$outcharge = $outputbw / $maxbw;
+						}						
+					}
+				}
+				
+				
+				
 				$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])."\n";
 			}
 		}
