@@ -6,7 +6,7 @@
 	function getPortId($ip,$portname) {
 			$out = "";
 			exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$ip." ifDescr | grep ".$portname,$out);
-			if(strlen($out[0]) < 5)
+			if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
 				return -1;
 			$out = explode(" ",$out[0]);
 			$out = explode(".",$out[0]);
@@ -64,38 +64,66 @@
 				$peer_arr[$data["ip"]][count($peer_arr[$data["ip"]])] = $data["remote_id"];
 				
 				$pid = getPortId($data["ip"],$data["port"]);
-				$mrtgfilename = $data["ip"]."_".$pid.".log";
-				$mrtgfile = file($mrtgfilename);
-				$incharge = 0;
-				$outcharge = 0;
-				for($i=1;$i<2;$i++) {
-					$inputbw = 0;
-					$outputbw = 0;
-					$res = preg_split("# #",$mrtgfile[$i]);
-					if(count($res) == 5) {
-						$inputbw = $res[1];
-						$outputbw = $res[2];
-						if($data["speed"] == 0) {
-							$inputbw = $outputbw = 0;
-						} else {
-							$maxbw = preg_split("# #",$data["speed"]);
-							if(count($maxbw) == 2) {
-								if($maxbw[1] == "Gbit" || $maxbw[1] == "Gbps")
-									$maxbw = $maxbw[0] * 1000000000;
-								else if($maxbw[1] == "Mbit" || $maxbw[1] == "Mbps")
-									$maxbw = $maxbw[0] * 1000000;
-							}
-							else
-								$maxbw = $maxbw[0];
-							$incharge = $inputbw / $maxbw;
-							$outcharge = $outputbw / $maxbw;
-						}						
+				if($pid != -1) {
+					$mrtgfilename = $data["ip"]."_".$pid.".log";
+					$mrtgfile = file($mrtgfilename);
+					$outcharge = 0;
+					for($i=1;$i<2;$i++) {
+						$outputbw = 0;
+						$res = preg_split("# #",$mrtgfile[$i]);
+						if(count($res) == 5) {
+							$outputbw = $res[2];
+							if($data["speed"] == 0) {
+								$outputbw = 0;
+							} else {
+								$maxbw = preg_split("# #",$data["speed"]);
+								if(count($maxbw) == 2) {
+									if($maxbw[1] == "Gbit" || $maxbw[1] == "Gbps")
+										$maxbw = $maxbw[0] * 1000000000;
+									else if($maxbw[1] == "Mbit" || $maxbw[1] == "Mbps")
+										$maxbw = $maxbw[0] * 1000000;
+								}
+								else
+									$maxbw = $maxbw[0];
+								$outcharge = $outputbw / $maxbw;
+							}						
+						}
 					}
 				}
 				
+				$penwidth = "1.0";
+				$pencolor = "black";
 				
-				
-				$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])."\n";
+				if($outcharge < 10) {
+					$penwidth = "1.0";
+					$pencolor = "#8C00FF";
+				}
+				else if($outcharge < 25) {
+					$penwidth = "1.5";
+					$pencolor = "#2020FF";
+				}
+				else if($outcharge < 40) {
+					$penwidth = "2.0";
+					$pencolor = "#00C0FF";	
+				}
+				else if($outcharge < 55) {
+					$penwidth = "3.0";
+					$pencolor = "#00F000";
+				}
+				else if($outcharge < 70) {
+					$penwidth = "4.0";
+					$pencolor = "#F0F000";
+				}
+				else if($outcharge < 85) {
+					$penwidth = "4.5";
+					$pencolor = "#FFC000";
+				}
+				else {
+					$pendwith = "5.0";
+					$pencolor = "red";
+				}
+
+				$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])." [color=".$pencolor.", penwidth=".$penwidth."];\n";
 			}
 		}
 		
