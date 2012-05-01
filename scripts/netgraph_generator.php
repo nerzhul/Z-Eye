@@ -47,7 +47,6 @@
 			 $graphbuffer .= preg_replace("#[.-]#","_",$nodelist[$i])." [label=\"".$nodelist[$i]."\", URL=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$nodelist[$i]."\"];\n";
 		}
 		
-		$peer_arr = array();
 		$outlink = array();
 		$query = FS::$pgdbMgr->Select("device_port","ip,port,speed,remote_id","remote_id != ''");
 		while($data = pg_fetch_array($query)) {
@@ -60,44 +59,41 @@
 			if(!in_array($data["remote_id"],$nodelist))
 				$nodelist[count($nodelist)] = $data["remote_id"];
 			$dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-			if(!isset($peer_arr[$data["ip"]])) $peer_arr[$data["ip"]] = array();
-			if(!in_array($data["remote_id"],$peer_arr[$data["ip"]])) {
-				$peer_arr[$data["ip"]][count($peer_arr[$data["ip"]])] = $data["remote_id"];
-				
-				$outcharge = 0;
-				
-				$pid = getPortId($data["ip"],$data["port"]);
-				if($pid != -1) {
-					$mrtgfilename = $data["ip"]."_".$pid.".log";
-					$mrtgfile = file(dirname(__FILE__)."/../datas/rrd/".$mrtgfilename);
-					for($i=1;$i<2;$i++) {
-						$outputbw = 0;
-						$res = preg_split("# #",$mrtgfile[$i]);
-						if(count($res) == 5) {
-							if($data["speed"] == 0) {
-								$inputbw = 0;
-								$outputbw = 0;
-							} else {
-								$inputbw = $res[1];
-								$outputbw = $res[2];
-								$maxbw = preg_split("# #",$data["speed"]);
-								if(count($maxbw) == 2) {
-									if($maxbw[1] == "Gbit" || $maxbw[1] == "Gbps")
-										$maxbw = $maxbw[0] * 1000000000;
-									else if($maxbw[1] == "Mbit" || $maxbw[1] == "Mbps")
-										$maxbw = $maxbw[0] * 1000000;
-								}
-								else
-									$maxbw = $maxbw[0];
-								$outcharge = $outputbw / $maxbw;
-								$incharge = $inputbw / $maxbw;
+			$outcharge = 0;
+			$incharge = 0;
+			$pid = getPortId($data["ip"],$data["port"]);
+			if($pid != -1) {
+				$mrtgfilename = $data["ip"]."_".$pid.".log";
+				$mrtgfile = file(dirname(__FILE__)."/../datas/rrd/".$mrtgfilename);
+				for($i=1;$i<2;$i++) {
+					$outputbw = 0;
+					$res = preg_split("# #",$mrtgfile[$i]);
+					if(count($res) == 5) {
+						if($data["speed"] == 0) {
+							$inputbw = 0;
+							$outputbw = 0;
+						} else {
+							$inputbw = $res[1];
+							$outputbw = $res[2];
+							$maxbw = preg_split("# #",$data["speed"]);
+							if(count($maxbw) == 2) {
+								if($maxbw[1] == "Gbit" || $maxbw[1] == "Gbps")
+									$maxbw = $maxbw[0] * 1000000000;
+								else if($maxbw[1] == "Mbit" || $maxbw[1] == "Mbps")
+									$maxbw = $maxbw[0] * 1000000;
 							}
-							if(!isset($outlink[$dname])) $outlink[$dname] = array();
-							$outlink[$dname][$data["remote_id"]] = array("lock" => 1, "chrg" => $outcharge);
-							if(!isset($outlink[$data["remote_id"]])) $outlink[$data["remote_id"]] = array();
-							if(!isset($outlink[$data["remote_id"]][$dname]) || $outlink[$data["remote_id"]][$dname]["lock"] == 0)
-								$outlink[$data["remote_id"]][$dname] = array("lock" => 0, "chrg" => $incharge);
+							else
+								$maxbw = $maxbw[0];
+							$outcharge = $outputbw / $maxbw;
+							$incharge = $inputbw / $maxbw;
 						}
+						
+						if(!isset($outlink[$dname])) $outlink[$dname] = array();
+						$outlink[$dname][$data["remote_id"]] = array("lock" => 1, "chrg" => $outcharge);
+						
+						if(!isset($outlink[$data["remote_id"]])) $outlink[$data["remote_id"]] = array();
+						if(!isset($outlink[$data["remote_id"]][$dname]) || $outlink[$data["remote_id"]][$dname]["lock"] == 0)
+							$outlink[$data["remote_id"]][$dname] = array("lock" => 0, "chrg" => $incharge);
 					}
 				}
 			}
@@ -105,7 +101,7 @@
 		
 		foreach($outlink as $dname => $outlinkkey) {
 			foreach($outlinkkey as $remotename => $outlinkval) {
-				$outcharge = $outlink[$dname][$remotename];
+				$outcharge = $outlink[$dname][$remotename]["chrg"];
 				$penwidth = "1.0";
 				$pencolor = "black";
 				
