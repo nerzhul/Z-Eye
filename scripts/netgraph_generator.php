@@ -66,7 +66,7 @@
 				$pid = getPortId($data["ip"],$data["port"]);
 				if($pid != -1) {
 					$mrtgfilename = $data["ip"]."_".$pid.".log";
-					$mrtgfile = file($mrtgfilename);
+					$mrtgfile = file(dirname(__FILE__)."/../datas/rrd/".$mrtgfilename);
 					$outcharge = 0;
 					for($i=1;$i<2;$i++) {
 						$outputbw = 0;
