@@ -96,7 +96,7 @@
 							if(!isset($inlink[$dname])) $inlink[$dname] = array();
 							$inlink[$dname][$data["remote_id"]] = $incharge;
 							if(!isset($outlink[$dname])) $outlink[$dname] = array();
-							$outlink[$dname][$data["remote_id"]] = $incharge;
+							$outlink[$dname][$data["remote_id"]] = $outcharge;
 						}
 					}
 				}
@@ -133,14 +133,14 @@
 					$pencolor = "red";
 				}
 
-				$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])." [color=".$pencolor.", penwidth=".$penwidth."];\n";
+				$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
 			}
 		}
 		
-		foreach($outlink as $dname) {
-			foreach($outlink[$dname] as $remotename) {
-				if(!isset($outlink[$remotename]) || !isset($outlist[$remotename][$dname])) {
-					$outcharge = $outlink[$dname][$remotename];
+		foreach($outlink as $dname => $outlinkkey) {
+			foreach($outlinkkey as $remotename => $outlinkval) {
+				if(!isset($outlink[$remotename]) || !isset($outlink[$remotename][$dname])) {
+					$outcharge = $inlink[$dname][$remotename];
 					$penwidth = "1.0";
 					$pencolor = "black";
 					
@@ -172,7 +172,7 @@
 						$pendwith = "5.0";
 						$pencolor = "red";
 					}
-					$graphbuffer .= preg_replace("#[.-]#","_",$remotename)." -> ".preg_replace("#[.-]#","_",$dname)." [color=".$pencolor.", penwidth=".$penwidth."];\n";
+					$graphbuffer .= preg_replace("#[.-]#","_",$remotename)." -> ".preg_replace("#[.-]#","_",$dname)." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
 				}
 			}
 		}
