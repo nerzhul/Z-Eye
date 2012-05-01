@@ -48,7 +48,6 @@
 		}
 		
 		$peer_arr = array();
-		$inlink = array();
 		$outlink = array();
 		$query = FS::$pgdbMgr->Select("device_port","ip,port,speed,remote_id","remote_id != ''");
 		while($data = pg_fetch_array($query)) {
@@ -93,14 +92,20 @@
 								$outcharge = $outputbw / $maxbw;
 								$incharge = $inputbw / $maxbw;
 							}
-							if(!isset($inlink[$dname])) $inlink[$dname] = array();
-							$inlink[$dname][$data["remote_id"]] = $incharge;
 							if(!isset($outlink[$dname])) $outlink[$dname] = array();
-							$outlink[$dname][$data["remote_id"]] = $outcharge;
+							$outlink[$dname][$data["remote_id"]] = array("lock" => 1, "chrg" => $outcharge);
+							if(!isset($outlink[$data["remote_id"]])) $outlink[$data["remote_id"]] = array();
+							if(!isset($outlink[$data["remote_id"]][$dname]) || $outlink[$data["remote_id"]][$dname]["lock"] == 0)
+								$outlink[$data["remote_id"]][$dname] = array("lock" => 0, "chrg" => $incharge);
 						}
 					}
 				}
-				
+			}
+		}
+		
+		foreach($outlink as $dname => $outlinkkey) {
+			foreach($outlinkkey as $remotename => $outlinkval) {
+				$outcharge = $outlink[$dname][$remotename];
 				$penwidth = "1.0";
 				$pencolor = "black";
 				
@@ -132,48 +137,7 @@
 					$pendwith = "5.0";
 					$pencolor = "red";
 				}
-
-				$graphbuffer .= preg_replace("#[.-]#","_",$dname)." -> ".preg_replace("#[.-]#","_",$data["remote_id"])." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
-			}
-		}
-		
-		foreach($outlink as $dname => $outlinkkey) {
-			foreach($outlinkkey as $remotename => $outlinkval) {
-				if(!isset($outlink[$remotename]) || !isset($outlink[$remotename][$dname])) {
-					$outcharge = $inlink[$dname][$remotename];
-					$penwidth = "1.0";
-					$pencolor = "black";
-					
-					if($outcharge > 0 && $outcharge < 10) {
-						$penwidth = "1.0";
-						$pencolor = "#8C00FF";
-					}
-					else if($outcharge < 25) {
-						$penwidth = "1.5";
-						$pencolor = "#2020FF";
-					}
-					else if($outcharge < 40) {
-						$penwidth = "2.0";
-						$pencolor = "#00C0FF";	
-					}
-					else if($outcharge < 55) {
-						$penwidth = "3.0";
-						$pencolor = "#00F000";
-					}
-					else if($outcharge < 70) {
-						$penwidth = "4.0";
-						$pencolor = "#F0F000";
-					}
-					else if($outcharge < 85) {
-						$penwidth = "4.5";
-						$pencolor = "#FFC000";
-					}
-					else {
-						$pendwith = "5.0";
-						$pencolor = "red";
-					}
-					$graphbuffer .= preg_replace("#[.-]#","_",$remotename)." -> ".preg_replace("#[.-]#","_",$dname)." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
-				}
+				$graphbuffer .= preg_replace("#[.-]#","_",$remotename)." -> ".preg_replace("#[.-]#","_",$dname)." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
 			}
 		}
 		
