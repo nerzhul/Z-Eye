@@ -95,7 +95,7 @@
 				$penwidth = "1.0";
 				$pencolor = "black";
 				
-				if($outcharge < 10) {
+				if($outcharge > 0 && $outcharge < 10) {
 					$penwidth = "1.0";
 					$pencolor = "#8C00FF";
 				}
