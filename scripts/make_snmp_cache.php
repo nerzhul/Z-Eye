@@ -55,7 +55,6 @@
 	}
 	
 	function makeSNMPCache($snmpro,$snmprw) {
-		FS::$dbMgr->Delete("fss_snmp_cache");
 		$query = FS::$pgdbMgr->Select("device","ip,name");
 		while($data = pg_fetch_array($query)) {
 			$devro = "";
