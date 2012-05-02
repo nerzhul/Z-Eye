@@ -17,8 +17,9 @@
 		FS::$iMgr->addStylesheet("styles/jQueryUI.css");
 		FS::$iMgr->addJSFile("lib/jQuery/jQuery.js");
 		FS::$iMgr->addJSFile("lib/jQuery/jQueryUI.js");
-		FS::$iMgr->addJSFile("lib/jQuery/jQuery-zoom.js");
 		FS::$iMgr->addJSFile("lib/jQuery/jQuery.imageLens.js");
+		FS::$iMgr->addJSFile("lib/jQuery/jQuery.mousewheel.js");
+		FS::$iMgr->addJSFile("lib/jQuery/jQuery.mapbox.js");
 		FS::$iMgr->addJSFile("modules/js/canvas.js");
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-math.js");
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-Regex.js");
