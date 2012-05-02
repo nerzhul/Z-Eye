@@ -27,19 +27,19 @@
 		}
 		
 		private function showDeviceWeatherMap($device) {
-			$output = "<h2>Etat des liens de ".$device."</h2><div id=\"netmapdL>";
+			$output = "<h2>Etat des liens de ".$device."</h2>";
 			$output .= FS::$iMgr->addImage("datas/weathermap/".$device.".png");
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
-			$output = "<h2>Carte du réseau</h2>";
+			$output = "<h2>Carte du réseau</h2><div id=\"netmapdL\">";
 			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL");
 			$output .= "</div><script type=\"text/javascript\">$('#netmapdL').mapbox({mousewheel: true});</script>";
 			return $output;	
 		}
 		
 		private function showGeneralFullWeatherMap() {
-			$output = "<h2>Carte complète du réseau</h2><div id=\"netmapdF>";
+			$output = "<h2>Carte complète du réseau</h2><div id=\"netmapdF\">";
 			//$output .= FS::$iMgr->addImageWithLens("datas/weathermap/main.svg",1000,700,"netmapF",400);
 			$output .= FS::$iMgr->addImage("datas/weathermap/main.svg",1000,700,"netmapF");
 			$output .= "</div><script type=\"text/javascript\">$('#netmapdF').mapbox({mousewheel: true});</script>";
