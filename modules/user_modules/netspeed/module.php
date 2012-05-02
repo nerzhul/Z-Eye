@@ -32,9 +32,13 @@
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
-			$output = "<h2>Carte du réseau</h2><div id=\"netmapdL\">";
-			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL");
-			$output .= "</div><script type=\"text/javascript\">$('#netmapdL').mapbox({mousewheel: true});</script>";
+			$output = "<h2>Carte du réseau</h2><div id=\"netmapdL\"><div>";
+			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL")."</div>";
+			$output .= "<div style=\"height: 1000px; width: 700px;\">";
+        	$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL");
+        	$output .= "<div class=\"mapcontent\">";
+           	$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL");
+			$output .= "</div></div></div><script type=\"text/javascript\">$('#netmapdL').mapbox({mousewheel: true});</script>";
 			return $output;	
 		}
 		
