@@ -32,22 +32,18 @@
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
-			$output = "<h2>Carte du réseau</h2><div id=\"netmapdL\" style=\"width: 1000px; height: 700px; overflow: hidden;\"><div style=\"background: url(datas/weathermap/main-nowifi.svg); no-repeat; width: 1000px; height: 700px;\">";
-			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL")."</div>";
-			$imgsize = getimagesize("datas/weathermap/main-nowifi.svg");
+			$output = "<h2>Carte du réseau</h2>";
+			$imgsize = getimagesize("datas/weathermap/main-nowifi.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output .= "<div style=\"width:".$sizes[1]."px; height:".$sizes[3]."px;\">";
-        	$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL");
-        	$output .= "<div class=\"mapcontent\">";
-			$output .= "</div></div></div><script type=\"text/javascript\">$('#netmapdL').mapbox({mousewheel: true});</script>";
+			$output .= FS::$iMgr->addImageWithZoom("datas/weathermap/main-nowifi.svg","1000","700",$sizes[1],$sizes[3],"netmapL");
 			return $output;	
 		}
 		
 		private function showGeneralFullWeatherMap() {
 			$output = "<h2>Carte complète du réseau</h2><div id=\"netmapdF\">";
-			//$output .= FS::$iMgr->addImageWithLens("datas/weathermap/main.svg",1000,700,"netmapF",400);
-			$output .= FS::$iMgr->addImage("datas/weathermap/main.svg",1000,700,"netmapF");
-			$output .= "</div><script type=\"text/javascript\">$('#netmapdF').mapbox({mousewheel: true});</script>";
+			$imgsize = getimagesize("datas/weathermap/main.png");
+			$sizes = preg_split("#\"#",$imgsize[3]);
+			$output .= FS::$iMgr->addImageWithZoom("datas/weathermap/main.svg","1000","700",$sizes[1],$sizes[3],"netmapF");
 			return $output;	
 		}
 		
