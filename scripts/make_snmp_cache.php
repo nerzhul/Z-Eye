@@ -18,7 +18,7 @@
 			return $out[1];
 	}
 	
-	function loadNetdiscoCommunities() {
+	function loadNetdiscoCommunities(&$snmpro,&$snmprw) {
 		
 		if(Config::getOS() == "FreeBSD")
 			$file = file("/usr/local/etc/netdisco/netdisco.conf");
@@ -42,7 +42,7 @@
 				}
 				else if(preg_match("#^community_rw$#",$res[0])) {
 					$tmprw = preg_replace("# #","",$res[1]);
-					$snmprw = preg_split("#[,]#",$tmpro);
+					$snmprw = preg_split("#[,]#",$tmprw);
 				}
 			}
 		}
@@ -54,7 +54,7 @@
 		return 0;
 	}
 	
-	function makeSNMPCache() {
+	function makeSNMPCache($snmpro,$snmprw) {
 		FS::$dbMgr->Delete("fss_snmp_cache");
 		$query = FS::$pgdbMgr->Select("device","ip,name");
 		while($data = pg_fetch_array($query)) {
@@ -90,8 +90,8 @@
 	echo "[".Config::getWebsiteName()."][SNMP-Caching] started at ".date('d-m-Y G:i:s')."\n";
 	$start_time = microtime(true);
 	
-	loadNetdiscoCommunities();
-	makeSNMPCache();
+	loadNetdiscoCommunities($snmpro,$snmprw);
+	makeSNMPCache($snmpro,$snmprw);
 
 	$end_time = microtime(true);
 	$script_time = $end_time - $start_time;
