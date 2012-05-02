@@ -60,12 +60,20 @@
 		while($data = pg_fetch_array($query)) {
 			$devro = "";
 			$devrw = "";
-			for($i=0;$i<count($snmpro) || $devro == "";$i++) {
+			
+			$foundro = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$data["name"]."'");
+			$foundrw = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$data["name"]."'");
+			if($foundro && checkSnmp($data["ip"],$foundro) == 0)
+				$devro = $foundro;
+			if($foundrw && checkSnmp($data["ip"],$foundrw) == 0)
+				$devrw = $foundrw;
+				
+			for($i=0;$i<count($snmpro) && $devro == "";$i++) {
 				if(checkSnmp($data["ip"],$snmpro[$i]) == 0)
 					$devro = $snmpro[$i];
 			}
 			
-			for($i=0;$i<count($snmprw) || $devrw == "";$i++) {
+			for($i=0;$i<count($snmprw) && $devrw == "";$i++) {
 				if(checkSnmp($data["ip"],$snmprw[$i]) == 0)
 					$devrw = $snmprw[$i];
 			}
