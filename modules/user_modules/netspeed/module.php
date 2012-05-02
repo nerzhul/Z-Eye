@@ -34,7 +34,8 @@
 		private function showGeneralLightWeatherMap() {
 			$output = "<h2>Carte du réseau</h2><div id=\"netmapdL\" style=\"width: 1000px; height: 700px; overflow: hidden;\"><div style=\"background: url(datas/weathermap/main-nowifi.svg) no-repeat; width: 1000px; height: 700px;\">";
 			$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL")."</div>";
-			$output .= "<div style=\"height: 1000px; width: 700px;\">";
+			$imgsize = getimagesize("datas/weathermap/main-nowifi.svg");
+			$output .= "<div style=\"".$imgsize."\">";
         	$output .= FS::$iMgr->addImage("datas/weathermap/main-nowifi.svg",1000,700,"netmapL");
         	$output .= "<div class=\"mapcontent\">";
 			$output .= "</div></div></div><script type=\"text/javascript\">$('#netmapdL').mapbox({mousewheel: true});</script>";
