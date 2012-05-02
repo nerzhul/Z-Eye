@@ -10,7 +10,7 @@
 				return -1;
 			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
 			if($community == NULL) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$ip." ifDescr | grep ".$portname,$out);
+			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 			if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
 				return -1;
 			$out = explode(" ",$out[0]);
