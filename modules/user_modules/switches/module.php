@@ -156,13 +156,13 @@
 			$od = FS::$secMgr->checkAndSecuriseGetData("od");
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			if($od == NULL) $od = "port";
+			else if($od == "desc") $od = "name";
+			else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
+				
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				$output = "<h4>Equipement ";
-	
-				if($od == NULL) $od = "port";
-				else if($od == "desc") $od = "name";
-				else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
 	
 				$output .= $device." (";
 				$output .= $dip;
