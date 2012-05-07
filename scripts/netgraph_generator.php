@@ -3,32 +3,43 @@
 	
 	FS::LoadFSModules();
 	
-	function getPortId($device,$portname) {
+	$portbuffer = array();
+
+	function getPortId($device,$portname,&$portbuffer) {
 			$out = "";
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($dip == NULL)
 				return -1;
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
-			if($community == NULL) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
-			if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
-				return -1;
-			$out = explode(" ",$out[0]);
-			$out = explode(".",$out[0]);
-			if(!FS::$secMgr->isNumeric($out[1]))
-				return -1;
-			return $out[1];
+
+			if(!isset($portbuffer[$dip])) $portbuffer[$dip] = array();
+			if(!isset($portbuffer[$dip][$portname])) {
+				$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+				if($community == NULL) $community = SNMPConfig::$SNMPReadCommunity;
+				exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
+				if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
+					return -1;
+				$out = explode(" ",$out[0]);
+				$out = explode(".",$out[0]);
+				if(!FS::$secMgr->isNumeric($out[1]))
+					return -1;
+				$portbuffer[$dip][$portname] = $out[1];
+				return $out[1];
+			}
+			else
+				return $portbuffer[$dip][$portname];
 	}
 		
-	function generateGraph($filename, $options=array()) {
+	function generateGraph($filename, &$portbuffer, $options=array()) {
 		$file = fopen(dirname(__FILE__)."/../datas/weathermap/".$filename.".dot","w+");
 		if(!$file) {
 			echo  "[".Config::getWebsiteName()."][NetGraph-Generator][FATAL] Can't write ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot !";
 			exit(1);
 		}
 		// penwidth for epaisseur
-		$graphbuffer = "digraph maingraph {\ngraph [bgcolor=white, nodesep=1];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
-		
+		if(!in_array("NO-DIRECTION",$options))
+			$graphbuffer = "digraph maingraph {\ngraph [bgcolor=white, nodesep=1];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
+		else
+			$graphbuffer = "graph maingraph {\ngraph [bgcolor=white, nodesep=1];\n        node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
 		$nodelist = array();
 		$query = FS::$pgdbMgr->Select("device","model, name");
 		while($data = pg_fetch_array($query)) {
@@ -37,6 +48,20 @@
 			if(!in_array($data["name"],$nodelist))
 				$nodelist[count($nodelist)] = $data["name"];
 		}
+		
+		/*$query = FS::$pgdbMgr->Select("device_port","remote_id","remote_id != ''","ip,remote_id");
+		while($data = pg_fetch_array($query)) {
+			if(in_array("NO-WIFI",$options)) {
+				$dmodel = FS::$pgdbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
+				if(preg_match("#AIRAP#",$dmodel)) continue;
+			}
+			if(!in_array($data["remote_id"],$nodelist))
+				$nodelist[count($nodelist)] = $data["remote_id"];
+		}*/
+		
+		/*for($i=0;$i<count($nodelist);$i++) {
+			 $graphbuffer .= preg_replace("#[.-]#","_",$nodelist[$i])." [label=\"".$nodelist[$i]."\", URL=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$nodelist[$i]."\", size=20];\n";
+		}*/
 		
 		$outlink = array();
 		$query = FS::$pgdbMgr->Select("device_port","ip,port,speed,remote_id","remote_id != ''","ip,remote_id");
@@ -54,7 +79,7 @@
 			$dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 			$outcharge = 0;
 			$incharge = 0;
-			$pid = getPortId($dname,$data["port"]);
+			$pid = getPortId($dname,$data["port"],$portbuffer);
 			if($pid != -1) {
 				$mrtgfilename = $data["ip"]."_".$pid.".log";
 				$mrtgfile = file(dirname(__FILE__)."/../datas/rrd/".$mrtgfilename);
@@ -82,11 +107,13 @@
 						}
 						
 						if(!isset($outlink[$dname])) $outlink[$dname] = array();
-						$outlink[$dname][$data["remote_id"]] = array("lock" => 1, "chrg" => $outcharge);
-						
-						if(!isset($outlink[$data["remote_id"]])) $outlink[$data["remote_id"]] = array();
-						if(!isset($outlink[$data["remote_id"]][$dname]) || $outlink[$data["remote_id"]][$dname]["lock"] == 0)
-							$outlink[$data["remote_id"]][$dname] = array("lock" => 0, "chrg" => $incharge);
+						if(!in_array("NO-DIRECTION",$options) || in_array("NO-DIRECTION",$options) && !isset($outlink[$data["remote_id"]][$dname]))
+							$outlink[$dname][$data["remote_id"]] = array("lock" => 1, "chrg" => $outcharge);
+						if(!in_array("NO-DIRECTION",$options)) {
+							if(!isset($outlink[$data["remote_id"]])) $outlink[$data["remote_id"]] = array();
+							if(!isset($outlink[$data["remote_id"]][$dname]) || $outlink[$data["remote_id"]][$dname]["lock"] == 0)
+								$outlink[$data["remote_id"]][$dname] = array("lock" => 0, "chrg" => $incharge);
+						}
 					}
 				}
 			}
@@ -126,7 +153,10 @@
 					$pendwith = "5.0";
 					$pencolor = "red";
 				}
-				$graphbuffer .= preg_replace("#[.-]#","_",$remotename)." -> ".preg_replace("#[.-]#","_",$dname)." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
+				if(in_array("NO-DIRECTION",$options))
+					$graphbuffer .= preg_replace("#[.-]#","_",$remotename)." -- ".preg_replace("#[.-]#","_",$dname)." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
+				else
+					$graphbuffer .= preg_replace("#[.-]#","_",$remotename)." -> ".preg_replace("#[.-]#","_",$dname)." [color=\"".$pencolor."\", penwidth=".$penwidth."];\n";
 			}
 		}
 		
@@ -142,10 +172,11 @@
 	echo "[".Config::getWebsiteName()."][NetGraph-Generator] started at ".date('d-m-Y G:i:s')."\n";
 	$start_time = microtime(true);
 	
-	generateGraph("main");
-	
+	generateGraph("main", $portbuffer);
+	generateGraph("main-nodir", $portbuffer, array("NO-DIRECTION"));
 	// Without WiFi APs
-	generateGraph("main-nowifi",array("NO-WIFI"));
+	generateGraph("main-nowifi", $portbuffer, array("NO-WIFI"));
+	generateGraph("main-nodir-nowifi", $portbuffer, array("NO-DIRECTION","NO-WIFI"));
 
 	$end_time = microtime(true);
 	$script_time = $end_time - $start_time;
