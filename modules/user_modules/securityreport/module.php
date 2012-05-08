@@ -43,7 +43,9 @@
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1".(!$shscan ? "&sc=0" : "").(!$shtse ? "&tse=0" : "").(!$shssh ? "&ssh=0" : "")."&ech=".$ech."&ec=".$ec."\">Graphique</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=2&max=".$topmax."\">Scans</a>";
+				$output .= "<li".($showmodule == 2 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&sh=2&max=".$topmax."\">Scans</a>";
+				$output .= "<li".($showmodule == 3 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&sh=3&max=".$topmax."\">Terminal Server</a>";
+				$output .= "<li".($showmodule == 4 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&sh=4&max=".$topmax."\">SSH</a>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -145,7 +147,6 @@
 				}
 				else if($showmodule == 2) {
 					mysql_select_db("snort");
-					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,scans","","scans",1,10);
 					$found = 0;
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
@@ -154,9 +155,49 @@
 					$output .= "</form>";
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Scans</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
+					
+					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,scans","","scans",1,$topmax);
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["scans"]."</td></tr>";
+					}
+					if($found)
+						$output .= $tmpoutput."</table>";
+				}
+				else if($showmodule == 3) {
+					mysql_select_db("snort");
+					$found = 0;
+					
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
+					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
+					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
+					$output .= "</form>";
+					
+					$tmpoutput = "<h4>Top ".$topmax." des Attaques TSE</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
+					
+					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,tse","","tse",1,$topmax);
+					while($data = mysql_fetch_array($query)) {
+						if($found == 0) $found = 1;
+						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["tse"]."</td></tr>";
+					}
+					if($found)
+						$output .= $tmpoutput."</table>";
+				}
+				else if($showmodule == 4) {
+					mysql_select_db("snort");
+					$found = 0;
+					
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
+					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
+					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
+					$output .= "</form>";
+					
+					$tmpoutput = "<h4>Top ".$topmax." des Attaques SSH</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
+					
+					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,ssh","","ssh",1,$topmax);
+					while($data = mysql_fetch_array($query)) {
+						if($found == 0) $found = 1;
+						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["ssh"]."</td></tr>";
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
@@ -178,9 +219,9 @@
 					($ssh != NULL && $ssh == "on") ? $ssh = 1 : $ssh = 0;
 					header("Location: index.php?mod=".$this->mid."&sh=1&ech=".$ech."&ec=".$ec."&ssh=".$ssh."&tse=".$tse."&sc=".$sc."");
 					break;
-				case 2:
+				case 2: case 3: case 4:
 					$topmax = FS::$secMgr->checkAndSecurisePostData("max");
-					header("Location: index.php?mod=".$this->mid."&sh=2&max=".$topmax."");
+					header("Location: index.php?mod=".$this->mid."&sh=".$act."&max=".$topmax."");
 					break;
 				default: break;
 			}
