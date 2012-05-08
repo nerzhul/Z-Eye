@@ -54,7 +54,7 @@
 			else {
 				if(!$showmodule || $showmodule == 1) {
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
-					
+					mysql_select_db("snort");
 					$totalips = FS::$dbMgr->Count("collected_ips","ip");
 					$totalscan = FS::$dbMgr->Select("collected_ips","sum(scans)");
 					$totaltse = FS::$dbMgr->Select("collected_ips","sum(tse)");
@@ -91,7 +91,6 @@
 					if($shssh) $fields .= ",ssh";
 					
 					$sql = "select atkdate".$fields." from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".$ec." DAY))";
-					mysql_select_db("snort");
 					$query = mysql_query($sql);
 					$labels = $scans = $tse = $ssh = "[";
 					$cursor = 0;
