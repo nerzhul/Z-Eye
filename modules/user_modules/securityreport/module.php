@@ -196,7 +196,7 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = FS::$dbMgr->Select("attack_stats","atkdate,tse","","scans",1,$topmax);
+					$query = FS::$dbMgr->Select("attack_stats","atkdate,tse","","tse",1,$topmax);
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
@@ -226,7 +226,7 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = FS::$dbMgr->Select("attack_stats","atkdate,ssh","","scans",1,$topmax);
+					$query = FS::$dbMgr->Select("attack_stats","atkdate,ssh","","ssh",1,$topmax);
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
