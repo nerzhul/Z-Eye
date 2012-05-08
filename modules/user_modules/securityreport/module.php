@@ -12,10 +12,27 @@
 		private function loadAttackGraph() {
 			$output = "";
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
+			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
+			if($ech == NULL) $ech = 7;
+			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
+			if(!FS::$secMgr->isNumeric($ec)) $ec = 365;
+			
+			if($ec == NULL) $ec = 365;
+			$shscan = FS::$secMgr->checkAndSecuriseGetData("sc");
+			if($shscan == NULL) $shscan = true;
+			else if($shscan > 0) $shscan = true;
+			else $shscan = false;
+			$shtse = FS::$secMgr->checkAndSecuriseGetData("tse");
+			if($shtse == NULL) $shtse = true;
+			else if($shtse > 0) $shtse = true;
+			else $shtse = false;
+			$shssh = FS::$secMgr->checkAndSecuriseGetData("ssh");
+			if($shssh == NULL) $shssh = true;
+			else if($shssh > 0) $shssh = true;
+			else $shssh = false;
 			if(!FS::isAjaxCall()) {
-				$output .= "<h3>Statistiques d'attaque</h3>";
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1\">Graphique d'attaques</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1".(!$shscan ? "&sc=0" : "").(!$shtse ? "&tse=0" : "").(!$shssh ? "&ssh=0" : "")."&ech=".$ech."&ec=".$ec."\">Graphique d'attaques</a>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -24,24 +41,7 @@
 			else {
 				if(!$showmodule || $showmodule == 1) {
 					$output .= "<form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">";
-					$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
-								if($ech == NULL) $ech = 7;
-					$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
-					if(!FS::$secMgr->isNumeric($ec)) $ec = 365;
 					
-					if($ec == NULL) $ec = 365;
-					$shscan = FS::$secMgr->checkAndSecuriseGetData("sc");
-					if($shscan == NULL) $shscan = true;
-					else if($shscan > 0) $shscan = true;
-					else $shscan = false;
-					$shtse = FS::$secMgr->checkAndSecuriseGetData("tse");
-					if($shtse == NULL) $shtse = true;
-					else if($shtse > 0) $shtse = true;
-					else $shtse = false;
-					$shssh = FS::$secMgr->checkAndSecuriseGetData("ssh");
-					if($shssh == NULL) $shssh = true;
-					else if($shssh > 0) $shssh = true;
-					else $shssh = false;
 					
 					$output .= FS::$iMgr->addHidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours <br />";
