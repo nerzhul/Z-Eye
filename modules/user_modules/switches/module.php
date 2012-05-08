@@ -182,7 +182,6 @@
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
 				$output .= "</div>";
 			} else {
-
 				if($dip == NULL) {
 					$output .= FS::$iMgr->printError("Equipement inexistant !");
 					return $output;
