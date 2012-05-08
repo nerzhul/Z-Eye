@@ -169,7 +169,8 @@
 					$query = FS::$dbMgr->Select("attack_stats","atkdate,scans","","scans",1,$topmax);
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
-						$tmpoutput .= "<tr><td>".$data["atkdate"]."</td><td>".$data["scans"]."</td></tr>";
+						$date = preg_split("# #",$data["atkdate"]);
+						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["scans"]."</td></tr>";
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
@@ -198,7 +199,8 @@
 					$query = FS::$dbMgr->Select("attack_stats","atkdate,tse","","scans",1,$topmax);
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
-						$tmpoutput .= "<tr><td>".$data["atkdate"]."</td><td>".$data["tse"]."</td></tr>";
+						$date = preg_split("# #",$data["atkdate"]);
+						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["tse"]."</td></tr>";
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
@@ -227,7 +229,8 @@
 					$query = FS::$dbMgr->Select("attack_stats","atkdate,ssh","","scans",1,$topmax);
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
-						$tmpoutput .= "<tr><td>".$data["atkdate"]."</td><td>".$data["ssh"]."</td></tr>";
+						$date = preg_split("# #",$data["atkdate"]);
+						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["ssh"]."</td></tr>";
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
