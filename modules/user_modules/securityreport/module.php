@@ -96,7 +96,7 @@
 					if($shscan) $scans .= "]";
 					if($shtse) $tse .= "]";
 					if($shssh) $ssh .= "]";
-					$output .= "<script>window.onload = function (){var data = ";
+					$output .= "<script type=\"text/javascript\">var data = ";
 		
 					$output .= "[";
 					if($shscan) $output .= $scans;
@@ -131,7 +131,7 @@
 					$output .= "]);
 					line.Set('chart.gutter.bottom', 45); ";
 					$output .= "line.Set('chart.labels', ".$labels.");";
-					$output .= "line.Draw();}</script>";
+					$output .= "line.Draw();</script>";
 					mysql_select_db("fssmanager");
 				}
 			}
