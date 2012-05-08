@@ -3,9 +3,12 @@
 	class iSecReport extends genModule{
 		function iSecReport() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\"><h3>Rapports de Sécurité</h3>";
+			$output = "";
+			if(!FS::isAjaxCall())
+				$output = "<div id=\"monoComponent\"><h3>Rapports de Sécurité</h3>";
 			$output .= $this->loadAttackGraph();
-			$output .= "</div>";
+			if(!FS::isAjaxCall())
+				$output .= "</div>";
 			return $output;
 		}
 		
