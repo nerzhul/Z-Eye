@@ -163,6 +163,16 @@
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
+						
+					$found = 0;
+					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
+					$query = FS::$dbMgr->Select("attack_stats","atkdate,scans","","scans",1,$topmax);
+					while($data = mysql_fetch_array($query)) {
+						if($found == 0) $found = 1;
+						$tmpoutput .= "<tr><td>".$data["atkdate"]."</td><td>".$data["scans"]."</td></tr>";
+					}
+					if($found)
+						$output .= $tmpoutput."</table>";
 				}
 				else if($showmodule == 3) {
 					mysql_select_db("snort");
@@ -182,6 +192,16 @@
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
+						
+					$found = 0;
+					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
+					$query = FS::$dbMgr->Select("attack_stats","atkdate,tse","","scans",1,$topmax);
+					while($data = mysql_fetch_array($query)) {
+						if($found == 0) $found = 1;
+						$tmpoutput .= "<tr><td>".$data["atkdate"]."</td><td>".$data["tse"]."</td></tr>";
+					}
+					if($found)
+						$output .= $tmpoutput."</table>";
 				}
 				else if($showmodule == 4) {
 					mysql_select_db("snort");
@@ -198,6 +218,16 @@
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["ssh"]."</td></tr>";
+					}
+					if($found)
+						$output .= $tmpoutput."</table>";
+						
+					$found = 0;
+					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
+					$query = FS::$dbMgr->Select("attack_stats","atkdate,ssh","","scans",1,$topmax);
+					while($data = mysql_fetch_array($query)) {
+						if($found == 0) $found = 1;
+						$tmpoutput .= "<tr><td>".$data["atkdate"]."</td><td>".$data["ssh"]."</td></tr>";
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
