@@ -42,7 +42,7 @@
 			
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1".(!$shscan ? "&sc=0" : "").(!$shtse ? "&tse=0" : "").(!$shssh ? "&ssh=0" : "")."&ech=".$ech."&ec=".$ec."\">Graphique</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1".(!$shscan ? "&sc=0" : "").(!$shtse ? "&tse=0" : "").(!$shssh ? "&ssh=0" : "")."&ech=".$ech."&ec=".$ec."\">Général</a>";
 				$output .= "<li".($showmodule == 2 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&sh=2&max=".$topmax."\">Scans</a>";
 				$output .= "<li".($showmodule == 3 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&sh=3&max=".$topmax."\">Terminal Server</a>";
 				$output .= "<li".($showmodule == 4 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&sh=4&max=".$topmax."\">SSH</a>";
@@ -53,6 +53,20 @@
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {
+					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
+					
+					$totalips = FS::$dbMgr->Count("collected_ips","*");
+					$totalscan = FS::$dbMgr->Select("collected_ips","sum(scans)");
+					$totaltse = FS::$dbMgr->Select("collected_ips","sum(tse)");
+					$totalssh = FS::$dbMgr->Select("collected_ips","sum(ssh)");
+					$totalatk = $totalscan + $totaltse + $totalssh;
+					
+					$output .= "Total des attaques: ".$totalatk."<br />";
+					$output .= "Nombre d'IP attaquantes: ".$totalips."<br />";
+					$output .= "Nombre de scans de ports: ".$totalscan."<br />";
+					$output .= "Nombre d'attaques TSE: ".$totaltse."<br />";
+					$output .= "Nombre d'attaques SSH: ".$totalssh."<br />";
+					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 					$output .= FS::$iMgr->addHidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours <br />";
