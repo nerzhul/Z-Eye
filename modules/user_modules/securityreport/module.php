@@ -51,9 +51,7 @@
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {
-					$output .= "<form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">";
-					
-					
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 					$output .= FS::$iMgr->addHidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours <br />";
 					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours <br />";
@@ -150,10 +148,11 @@
 					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,scans","","scans",1,10);
 					$found = 0;
 					
-					$output .= "<form action=\"index.php?mod=".$this->mid."&act=2\" method=\"post\">";
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
 					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
 					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
+					
 					$tmpoutput = "<h4>Top ".$topmax." des Scans</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
