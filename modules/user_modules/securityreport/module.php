@@ -150,8 +150,8 @@
 					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,scans","","scans",1,10);
 					$found = 0;
 					
-					$output .= "<form action=\"index.php?mod=".$this->mid."&sh=2\" method=\"get\">";
-					$output .= "Maximum: ".FS::$iMgr->addNumericInput("topmax",$topmax,3,3)." <br />";
+					$output .= "<form action=\"index.php?mod=".$this->mid."&act=2\" method=\"post\">";
+					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
 					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
 					$tmpoutput = "<h4>Top ".$topmax." des Scans</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
@@ -178,6 +178,10 @@
 					$ssh = FS::$secMgr->checkAndSecurisePostData("ssh");
 					($ssh != NULL && $ssh == "on") ? $ssh = 1 : $ssh = 0;
 					header("Location: index.php?mod=".$this->mid."&sh=1&ech=".$ech."&ec=".$ec."&ssh=".$ssh."&tse=".$tse."&sc=".$sc."");
+					break;
+				case 2:
+					$topmax = FS::$secMgr->checkAndSecurisePostData("max");
+					header("Location: index.php?mod=".$this->mid."&sh=2&max=".$topmax."");
 					break;
 				default: break;
 			}
