@@ -55,7 +55,7 @@
 				if(!$showmodule || $showmodule == 1) {
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
 					
-					$totalips = FS::$dbMgr->Count("collected_ips","*");
+					$totalips = FS::$dbMgr->Count("collected_ips","ip");
 					$totalscan = FS::$dbMgr->Select("collected_ips","sum(scans)");
 					$totaltse = FS::$dbMgr->Select("collected_ips","sum(tse)");
 					$totalssh = FS::$dbMgr->Select("collected_ips","sum(ssh)");
