@@ -5,7 +5,7 @@
 		public function Load() {
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output = "<div id=\"monoComponent\"><h3>Rapports de Sécurité</h3>";
+				$output .= "<div id=\"monoComponent\"><h3>Rapports de Sécurité</h3>";
 			$output .= $this->loadAttackGraph();
 			if(!FS::isAjaxCall())
 				$output .= "</div>";
@@ -149,7 +149,12 @@
 					mysql_select_db("snort");
 					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,scans","","scans",1,10);
 					$found = 0;
-					$tmpoutput = "<table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
+					
+					$output .= "<form action=\"index.php?mod=".$this->mid."&sh=2\" method=\"get\">";
+					$output .= "Maximum: ".FS::$iMgr->addNumericInput("topmax",$topmax,3,3)." <br />";
+					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
+					$output .= "</form>";
+					$tmpoutput = "<h4>Top ".$topmax." des Scans</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					while($data = mysql_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["scans"]."</td></tr>";
