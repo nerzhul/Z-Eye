@@ -507,6 +507,7 @@ pre {
     text-align: center;
     margin-left: -10px;
     margin-right: auto;
+	opacity: 0.9;
 }
 
 #logpanel {
