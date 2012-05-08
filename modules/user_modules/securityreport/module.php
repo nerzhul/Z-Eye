@@ -56,16 +56,16 @@
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
 					mysql_select_db("snort");
 					$totalips = FS::$dbMgr->Count("collected_ips","ip");
-					$totalscan = FS::$dbMgr->Select("collected_ips","sum(scans)");
-					$totaltse = FS::$dbMgr->Select("collected_ips","sum(tse)");
-					$totalssh = FS::$dbMgr->Select("collected_ips","sum(ssh)");
+					$totalscan = FS::$dbMgr->Sum("collected_ips","scans");
+					$totaltse = FS::$dbMgr->Sum("collected_ips","tse");
+					$totalssh = FS::$dbMgr->Sum("collected_ips","ssh");
 					$totalatk = $totalscan + $totaltse + $totalssh;
 					
 					$output .= "Total des attaques: ".$totalatk."<br />";
 					$output .= "Nombre d'IP attaquantes: ".$totalips."<br />";
 					$output .= "Nombre de scans de ports: ".$totalscan."<br />";
 					$output .= "Nombre d'attaques TSE: ".$totaltse."<br />";
-					$output .= "Nombre d'attaques SSH: ".$totalssh."<br />";
+					$output .= "Nombre d'attaques SSH: ".$totalssh."<br /><hr>";
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 					$output .= FS::$iMgr->addHidden("mod",$this->mid);
