@@ -14,25 +14,33 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
 			if($ech == NULL) $ech = 7;
+			
 			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
 			if(!FS::$secMgr->isNumeric($ec)) $ec = 365;
-			
 			if($ec == NULL) $ec = 365;
+			
 			$shscan = FS::$secMgr->checkAndSecuriseGetData("sc");
 			if($shscan == NULL) $shscan = true;
 			else if($shscan > 0) $shscan = true;
 			else $shscan = false;
+			
 			$shtse = FS::$secMgr->checkAndSecuriseGetData("tse");
 			if($shtse == NULL) $shtse = true;
 			else if($shtse > 0) $shtse = true;
 			else $shtse = false;
+			
 			$shssh = FS::$secMgr->checkAndSecuriseGetData("ssh");
 			if($shssh == NULL) $shssh = true;
 			else if($shssh > 0) $shssh = true;
 			else $shssh = false;
+			
+			$topmax = FS::$secMgr->checkAndSecuriseGetData("max");
+			if($topmax == NULL || !FS::$secMgr->isNumeric($topmax) || $topmax < 1) $topmax = 10;
+			
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1".(!$shscan ? "&sc=0" : "").(!$shtse ? "&tse=0" : "").(!$shssh ? "&ssh=0" : "")."&ech=".$ech."&ec=".$ec."\">Graphique d'attaques</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1".(!$shscan ? "&sc=0" : "").(!$shtse ? "&tse=0" : "").(!$shssh ? "&ssh=0" : "")."&ech=".$ech."&ec=".$ec."\">Graphique</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=2&max=".$topmax."\">Scans</a>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -133,6 +141,18 @@
 					$output .= "line.Set('chart.labels', ".$labels.");";
 					$output .= "line.Draw();</script>";
 					mysql_select_db("fssmanager");
+				}
+				else if($showmodule == 2) {
+					mysql_select_db("snort");
+					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,scans","","scans",1,10);
+					$found = 0;
+					$tmpoutput = "<table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
+					while($data = mysql_fetch_array($query)) {
+						if($found == 0) $found = 1;
+						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["scans"]."</td></tr>";
+					}
+					if($found)
+						$output .= $tmpoutput."</table>";
 				}
 			}
 			return $output;
