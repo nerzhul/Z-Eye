@@ -11,46 +11,124 @@
 		
 		private function showMainConf() {
 			$output = "";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$output .= "<table>";
-			$output .= "<tr><td>Liste des LANs</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-		
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs DNS</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+			if(!FS::isAjaxCall()) {
+				$output .= "<div id=\"contenttabs\"><ul>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."\">Général</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=2\">DNS</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=3\">SMTP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=4\">HTTP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=5\">SQL</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=6\">Telnet</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=7\">FTP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=8\">SNMP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=9\">ORacle</a>";
+				$output .= "</ul></div>";
+				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+				$output .= "</div>";
+			}
+			else if(!$sh || $sh == 1) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Liste des LANs</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs SMTP</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				$output .= "</textarea></td></tr>";	
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 2) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs DNS</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 3) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs SMTP</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
 			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs HTTP</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			}
+			else if($sh == 4) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs HTTP</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 5) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs SQL</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 6) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs Telnet</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 7) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs FTP</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 8) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs SNMP</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 9) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><td>Serveurs Oracle</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
 			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs SQL</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs Telnet</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs FTP</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs SNMP</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><td>Serveurs Oracle</td><td>";
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-			
-			$output .= "</textarea></td></tr>";
-			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-			$output .= "</table></form>";
 			return $output;
 		}
 		private function writeConfiguration() {
