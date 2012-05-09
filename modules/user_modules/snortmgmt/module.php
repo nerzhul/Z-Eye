@@ -15,14 +15,16 @@
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."\">Général</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=6\">Telnet</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=10\">SSH</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=11\">TSE</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=2\">DNS</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=3\">SMTP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=4\">HTTP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=5\">SQL</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=6\">Telnet</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=7\">FTP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=8\">SNMP</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=9\">ORacle</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=9\">Oracle</a>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -42,6 +44,7 @@
 			else if($sh == 2) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","endns");
 				$output .= "<tr><td>Serveurs DNS</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
@@ -53,6 +56,7 @@
 			else if($sh == 3) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensmtp");
 				$output .= "<tr><td>Serveurs SMTP</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
@@ -65,6 +69,7 @@
 			else if($sh == 4) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enhttp");
 				$output .= "<tr><td>Serveurs HTTP</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
@@ -76,6 +81,7 @@
 			else if($sh == 5) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensql");
 				$output .= "<tr><td>Serveurs SQL</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
@@ -87,6 +93,7 @@
 			else if($sh == 6) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","entelnet");
 				$output .= "<tr><td>Serveurs Telnet</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
@@ -98,6 +105,7 @@
 			else if($sh == 7) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enftp");
 				$output .= "<tr><td>Serveurs FTP</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
@@ -109,6 +117,7 @@
 			else if($sh == 8) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensnmp");
 				$output .= "<tr><td>Serveurs SNMP</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
@@ -120,7 +129,32 @@
 			else if($sh == 9) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enoracle");
 				$output .= "<tr><td>Serveurs Oracle</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 10) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enssh");
+				$output .= "<tr><td>Serveurs SSH</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 11) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","entse");
+				$output .= "<tr><td>Serveurs TSE</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
 				$output .= "</textarea></td></tr>";
@@ -147,6 +181,8 @@
 			fwrite($file,"var TELNET_SERVERS ["."]\n");
 			fwrite($file,"var FTP_SERVERS ["."]\n");
 			fwrite($file,"var SNMP_SERVERS ["."]\n");
+			fwrite($file,"var SSH_SERVERS ["."]\n");
+			fwrite($file,"var TSE_SERVERS ["."]\n");
 			fwrite($file,"portvar HTTP_PORTS 80\n");
 			fwrite($file,"portvar SMTP_PORTS ["."]\n");
 			fwrite($file,"portvar SHELLCODE_PORTS !80\n");
