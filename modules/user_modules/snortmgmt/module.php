@@ -15,9 +15,7 @@
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."\">Général</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=6\">Telnet</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=10\">SSH</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=11\">TSE</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=6\">Accès distant</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=2\">DNS</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=3\">Mail</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=7\">FTP</a>";
@@ -104,9 +102,19 @@
 			else if($sh == 6) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","entelnet");
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes Telnet","entelnet");
 				$output .= "<tr><td>Serveurs Telnet</td><td>";
-				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				$output .= "<textarea name=\"telnetlist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes SSH","enssh");
+				$output .= "<tr><td>Serveurs SSH</td><td>";
+				$output .= "<textarea name=\"sshlist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes TSE","entse");
+				$output .= "<tr><td>Serveurs TSE</td><td>";
+				$output .= "<textarea name=\"tselist\" rows=10 cols=40>";
 				
 				$output .= "</textarea></td></tr>";
 				
@@ -142,30 +150,6 @@
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enoracle");
 				$output .= "<tr><td>Serveurs Oracle</td><td>";
-				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-				
-				$output .= "</textarea></td></tr>";
-				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-				$output .= "</table></form>";
-			}
-			else if($sh == 10) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
-				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enssh");
-				$output .= "<tr><td>Serveurs SSH</td><td>";
-				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-				
-				$output .= "</textarea></td></tr>";
-				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-				$output .= "</table></form>";
-			}
-			else if($sh == 11) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
-				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","entse");
-				$output .= "<tr><td>Serveurs TSE</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
 				$output .= "</textarea></td></tr>";
