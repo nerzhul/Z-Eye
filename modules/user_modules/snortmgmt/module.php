@@ -4,10 +4,37 @@
 		function iSnortMgmt() { parent::genModule(); }
 		public function Load() {
 			$output = "<div id=\"monoComponent\"><h3>Management de l'IDS SNORT</h3>";
+			$output .= $this->showMainConf();
 			$output .= "</div>";
 			return $output;
 		}
 		
+		private function showMainConf() {
+			$output = "";
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			$output .= "<tr><td>Liste des LANs</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs DNS</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs SMTP</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs HTTP</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs SQL</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs Telnet</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs FTP</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs SNMP</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><td>Serveurs Oracle</td><td>";
+			$output .= "</textarea></td></tr>";
+			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+			$output .= "</table></form>";
+			return $output;
+		}
 		private function writeConfiguration() {
 			if(Config::getOS() == "Debian")
 				$file = fopen("/etc/snort/snort.conf","w");	
