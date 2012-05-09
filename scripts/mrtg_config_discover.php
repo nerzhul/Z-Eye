@@ -7,7 +7,10 @@
 	$start_time = microtime(true);
 	$query = FS::$pgdbMgr->Select("device","ip,name");
 	while($data = pg_fetch_array($query)) {
-		echo "[".Config::getWebsiteName()."][MRTG-Discover] Do: cfgmaker ".SNMPConfig::$SNMPReadCommunity."@".$data["ip"]."\n";
+		$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$data["name"]."'");
+		if($community == NULL) $community = SNMPConfig::$SNMPReadCommunity;
+
+		echo "[".Config::getWebsiteName()."][MRTG-Discover] Do: cfgmaker ".$community."@".$data["ip"]."\n";
 		$out = "";
 		exec("cfgmaker ".SNMPConfig::$SNMPReadCommunity."@".$data["ip"],$out);
 		$file = fopen(dirname(__FILE__)."/../datas/mrtg-config/mrtg-".$data["name"].".cfg","w+");
