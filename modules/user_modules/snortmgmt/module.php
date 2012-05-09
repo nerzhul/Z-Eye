@@ -12,24 +12,42 @@
 		private function showMainConf() {
 			$output = "";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			$output .= "<table>";
 			$output .= "<tr><td>Liste des LANs</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+		
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs DNS</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs SMTP</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs HTTP</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs SQL</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs Telnet</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs FTP</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs SNMP</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><td>Serveurs Oracle</td><td>";
+			$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+			
 			$output .= "</textarea></td></tr>";
 			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
 			$output .= "</table></form>";
