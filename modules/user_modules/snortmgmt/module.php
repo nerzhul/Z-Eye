@@ -20,11 +20,14 @@
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=11\">TSE</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=2\">DNS</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=3\">SMTP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=13\">IMAP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=14\">POP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=7\">FTP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=4\">HTTP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=5\">SQL</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=7\">FTP</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=8\">SNMP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=9\">Oracle</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=8\">SNMP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=12\">SIP</a>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -162,6 +165,42 @@
 				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
+			else if($sh == 12) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensip");
+				$output .= "<tr><td>Serveurs SIP</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 13) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enimap");
+				$output .= "<tr><td>Serveurs IMAP</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 14) {
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enpop");
+				$output .= "<tr><td>Serveurs POP</td><td>";
+				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
 			
 			return $output;
 		}
@@ -183,11 +222,17 @@
 			fwrite($file,"var SNMP_SERVERS ["."]\n");
 			fwrite($file,"var SSH_SERVERS ["."]\n");
 			fwrite($file,"var TSE_SERVERS ["."]\n");
+			fwrite($file,"var IMAP_SERVERS ["."]\n");
+			fwrite($file,"var POP_SERVERS ["."]\n");
 			fwrite($file,"portvar HTTP_PORTS 80\n");
 			fwrite($file,"portvar SMTP_PORTS ["."]\n");
+			fwrite($file,"portvar SSH_PORTS 22\n");
+			fwrite($file,"portvar SIP_PORTS ["."]\n");
 			fwrite($file,"portvar SHELLCODE_PORTS !80\n");
 			fwrite($file,"portvar ORACLE_PORTS ["."]\n");
 			fwrite($file,"portvar FTP_PORTS ["."]\n");
+			fwrite($file,"portvar POP_PORTS ["."]\n");
+			fwrite($file,"portvar IMAP_PORTS ["."]\n");
 			if(Config::getOS() == "Debian") {
 				fwrite($file,"var RULE_PATH /etc/snort/rules\n");
 				fwrite($file,"var PREPROC_RULE_PATH /etc/snort/preproc_rules\n");
@@ -195,13 +240,14 @@
 				fwrite($file,"dynamicengine /usr/lib/snort_dynamicengine/libsf_engine.so\n");
 			} else {
 				fwrite($file,"var RULE_PATH /usr/local/etc/snort/rules\n");
+				fwrite($file,"var SO_RULE_PATH /usr/local/etc/snort/so_rules\n");
 				fwrite($file,"var PREPROC_RULE_PATH /usr/local/etc/snort/preproc_rules\n");
 				fwrite($file,"dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor/\n");
 				fwrite($file,"dynamicengine /usr/local/lib/snort/dynamicengine/libsf_engine.so\n");
 			}
 			fwrite($file,"preprocessor frag3_global: max_frags 65536\n");
 			fwrite($file,"preprocessor frag3_engine: policy first detect_anomalies overlap_limit 10\n");
-			fwrite($file,"preprocessor stream5_global: max_tcp 8192, track_tcp yes, track_udp no\n");
+			fwrite($file,"preprocessor stream5_global: max_tcp 8192, track_tcp yes, track_udp yes, track_icmp no\n");
 			fwrite($file,"preprocessor stream5_tcp: policy first\n");
 			fwrite($file,"preprocessor http_inspect: global iis_unicode_map unicode.map 1252\n");
 			fwrite($file,"preprocessor http_inspect_server: server default ports { $HTTP_SERVERS }\n");
@@ -214,8 +260,11 @@
 			fwrite($file,"preprocessor ftp_telnet_protocol: ftp client default max_resp_len 256 bounce yes telnet_cmds yes\n");
 			fwrite($file,"preprocessor smtp: ports { $SMTP_PORTS } inspection_type stateful normalize cmds normalize_cmds { EXPN VRFY RCPT } alt_max_command_line_len 260 { MAIL } alt_max_command_line_len 300 { RCPT } alt_max_command_line_len 500 { HELP HELO ETRN } alt_max_command_line_len 255 { EXPN VRFY }\n");
 			fwrite($file,"preprocessor sfportscan: proto { all } memcap { 10000000 } sense_level { low } ignore_scanners { $HOME_NET }\n");
-			fwrite($file,"preprocessor ssh: server_ports { 22 } max_client_bytes 19600 max_encrypted_packets 20 enable_respoverflow enable_ssh1crc32 enable_srvoverflow enable_protomismatch\n");
+			fwrite($file,"preprocessor ssh: server_ports { 22 } autodetect max_client_bytes 19600 max_encrypted_packets 20 enable_respoverflow enable_ssh1crc32 enable_srvoverflow enable_protomismatch\n");
 			fwrite($file,"preprocessor dcerpc2\n");
+			fwrite($file,"preprocessor sip: maxsession 10000, ports { $SIP_PORTS }, methods { invite cancel ack bye register options refer subscribe update join info message notify benotify do qauth sprack publish service unsubscribe prack }, max_uri_len 512, max_call_id_len 80, max_requestName_len 20, max_from_len 256, max_to_len 256, max_via_len 1024, max_contact_len 512, max_content_len 1024\n");
+			fwrite($file,"preprocessor imap: ports { $IMAP_PORTS } b64_decode_depth 0 qp_decode_depth 0 bitenc_decode_depth 0 uu_decode_depth 0\n");
+			fwrite($file,"preprocessor pop: ports { $POP_PORTS } b64_decode_depth 0 qp_decode_depth 0 bitenc_decode_depth 0 uu_decode_depth 0\n");
 			fwrite($file,"dcerpc2_server: default\n");
 			fwrite($file,"preprocessor dns: ports { 53 } enable_rdata_overflow\n");
 			fwrite($file,"preprocessor ssl: noinspect_encrypted, trustservers\n");
@@ -223,6 +272,83 @@
 			fwrite($file,"include classification.config\n");
 			fwrite($file,"include reference.config\n");
 			fwrite($file,"include $RULE_PATH/local.rules\n");
+			
+			fwrite($file,"include $RULE_PATH/local.rules\n");
+			fwrite($file,"include $RULE_PATH/backdoor.rules\n");
+			fwrite($file,"include $RULE_PATH/bad-traffic.rules\n");
+			fwrite($file,"include $RULE_PATH/blacklist.rules\n");
+			fwrite($file,"include $RULE_PATH/botnet-cnc.rules\n");
+			fwrite($file,"include $RULE_PATH/chat.rules\n");
+			fwrite($file,"include $RULE_PATH/content-replace.rules\n");
+			fwrite($file,"include $RULE_PATH/ddos.rules\n");
+			fwrite($file,"include $RULE_PATH/dns.rules\n");
+			fwrite($file,"include $RULE_PATH/dos.rules\n");
+			fwrite($file,"include $RULE_PATH/exploit.rules\n");
+			fwrite($file,"include $RULE_PATH/finger.rules\n");
+			fwrite($file,"include $RULE_PATH/ftp.rules\n");
+			fwrite($file,"include $RULE_PATH/icmp.rules\n");
+			fwrite($file,"include $RULE_PATH/icmp-info.rules\n");
+			fwrite($file,"include $RULE_PATH/imap.rules\n");
+			fwrite($file,"include $RULE_PATH/info.rules\n");
+			fwrite($file,"include $RULE_PATH/misc.rules\n");
+			fwrite($file,"include $RULE_PATH/multimedia.rules\n");
+			fwrite($file,"include $RULE_PATH/mysql.rules\n");
+			fwrite($file,"include $RULE_PATH/netbios.rules\n");
+			fwrite($file,"include $RULE_PATH/nntp.rules\n");
+			fwrite($file,"include $RULE_PATH/oracle.rules\n");
+			fwrite($file,"include $RULE_PATH/other-ids.rules\n");
+			fwrite($file,"include $RULE_PATH/p2p.rules\n");
+			fwrite($file,"include $RULE_PATH/phishing-spam.rules\n");
+			fwrite($file,"include $RULE_PATH/policy.rules\n");
+			fwrite($file,"include $RULE_PATH/pop2.rules\n");
+			fwrite($file,"include $RULE_PATH/pop3.rules\n");
+			fwrite($file,"include $RULE_PATH/rpc.rules\n");
+			fwrite($file,"include $RULE_PATH/rservices.rules\n");
+			fwrite($file,"include $RULE_PATH/scada.rules\n");
+			fwrite($file,"include $RULE_PATH/scan.rules\n");
+			fwrite($file,"include $RULE_PATH/shellcode.rules\n");
+			fwrite($file,"include $RULE_PATH/smtp.rules\n");
+			fwrite($file,"include $RULE_PATH/snmp.rules\n");
+			fwrite($file,"include $RULE_PATH/specific-threats.rules\n");
+			fwrite($file,"include $RULE_PATH/spyware-put.rules\n");
+			fwrite($file,"include $RULE_PATH/sql.rules\n");
+			fwrite($file,"include $RULE_PATH/telnet.rules\n");
+			fwrite($file,"include $RULE_PATH/tftp.rules\n");
+			fwrite($file,"include $RULE_PATH/virus.rules\n");
+			fwrite($file,"include $RULE_PATH/voip.rules\n");
+			fwrite($file,"include $RULE_PATH/web-activex.rules\n");
+			fwrite($file,"include $RULE_PATH/web-attacks.rules\n");
+			fwrite($file,"include $RULE_PATH/web-cgi.rules\n");
+			fwrite($file,"include $RULE_PATH/web-client.rules\n");
+			fwrite($file,"include $RULE_PATH/web-coldfusion.rules\n");
+			fwrite($file,"include $RULE_PATH/web-frontpage.rules\n");
+			fwrite($file,"include $RULE_PATH/web-iis.rules\n");
+			fwrite($file,"include $RULE_PATH/web-misc.rules\n");
+			fwrite($file,"include $RULE_PATH/web-php.rules\n");
+			fwrite($file,"include $RULE_PATH/x11.rules\n");
+			
+			fwrite($file,"include $PREPROC_RULE_PATH/preprocessor.rules\n");
+			fwrite($file,"include $PREPROC_RULE_PATH/decoder.rules\n");
+			fwrite($file,"include $PREPROC_RULE_PATH/sensitive-data.rules\n");
+			
+			fwrite($file,"include $SO_RULE_PATH/bad-traffic.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/chat.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/dos.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/exploit.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/icmp.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/imap.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/misc.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/multimedia.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/netbios.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/nntp.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/p2p.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/smtp.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/snmp.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/specific-threats.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/web-activex.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/web-client.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/web-iis.rules\n");
+			fwrite($file,"include $SO_RULE_PATH/web-misc.rules\n");
 			
 			fclose($file);
 		}
