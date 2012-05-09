@@ -19,9 +19,7 @@
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=10\">SSH</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=11\">TSE</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=2\">DNS</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=3\">SMTP</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=13\">IMAP</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=14\">POP</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=3\">Mail</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=7\">FTP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=4\">HTTP</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=5\">SQL</a>";
@@ -61,7 +59,17 @@
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensmtp");
 				$output .= "<tr><td>Serveurs SMTP</td><td>";
-				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
+				$output .= "<textarea name=\"smtplist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes IMAP","enimap");
+				$output .= "<tr><td>Serveurs IMAP</td><td>";
+				$output .= "<textarea name=\"imaplist\" rows=10 cols=40>";
+				
+				$output .= "</textarea></td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes POP","enpop");
+				$output .= "<tr><td>Serveurs POP</td><td>";
+				$output .= "<textarea name=\"poplist\" rows=10 cols=40>";
 				
 				$output .= "</textarea></td></tr>";
 				
@@ -170,30 +178,6 @@
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensip");
 				$output .= "<tr><td>Serveurs SIP</td><td>";
-				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-				
-				$output .= "</textarea></td></tr>";
-				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-				$output .= "</table></form>";
-			}
-			else if($sh == 13) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
-				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enimap");
-				$output .= "<tr><td>Serveurs IMAP</td><td>";
-				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-				
-				$output .= "</textarea></td></tr>";
-				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-				$output .= "</table></form>";
-			}
-			else if($sh == 14) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
-				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enpop");
-				$output .= "<tr><td>Serveurs POP</td><td>";
 				$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 				
 				$output .= "</textarea></td></tr>";
