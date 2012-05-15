@@ -596,11 +596,12 @@
 					$output .= "};";
 					$output .= "</script>";
 					$output .= "<h4>Retaguer un VLAN</h4>";
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=11");
 					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
-					$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchports();")."</form><div id=\"vlplist\"></div>";
+					$output .= FS::$iMgr->addSubmit("modify","Appliquer")."</form><br />";
+					$output .= FS::$iMgr->addJSSubmit("search","Vérifier les ports concernés","return searchports();")."<div id=\"vlplist\"></div>";
 					return $output;
 				}
 	
