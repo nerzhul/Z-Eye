@@ -374,4 +374,42 @@
 			return getFieldForPortWithPid($device,$pid,$field);
 		}
 
+/*
+		@ TODO
+		ATTENTION le port ID n'est pas celui de getPortId
+		public function setPortSpeed($device, $portname, $value) {
+			if(!FS::$secMgr->isNumeric($value))
+                                return -1;
+
+			$pid = $this->getPortId($device,$portname);
+			if($pid == -1)
+				return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9.SWITCHID","i",$value);
+		}
+
+		public function setPortSpeedWithPID($device, $pid, $value) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
+                                return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10.SWITCHID","i",$value);
+		}
+		
+		public function setPortDuplex($device, $portname, $value) {
+			if(!FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
+                                return -1;
+
+			$pid = $this->getPortId($device,$portname);
+			if($pid == -1)
+				return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
+		}
+
+		public function setPortDuplexWithPID($device, $pid, $value) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
+                                return -1;
+
+            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
+		}*/
 ?>

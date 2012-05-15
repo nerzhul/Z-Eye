@@ -598,6 +598,9 @@
 					$output .= "function searchports() {";
 					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
 					$output .= "$('#pop').show();";
+					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10', function(data) {
+						$('#pop').html(data);
+					);";
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
@@ -888,45 +891,6 @@
 			return $output;
 		}
 		
-		/*
-		
-		ATTENTION le port ID n'est pas celui de getPortId
-		public function setPortSpeed($device, $portname, $value) {
-			if(!FS::$secMgr->isNumeric($value))
-                                return -1;
-
-			$pid = $this->getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9.SWITCHID","i",$value);
-		}
-
-		public function setPortSpeedWithPID($device, $pid, $value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
-                                return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10.SWITCHID","i",$value);
-		}
-		
-		public function setPortDuplex($device, $portname, $value) {
-			if(!FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
-                                return -1;
-
-			$pid = $this->getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
-		}
-
-		public function setPortDuplexWithPID($device, $pid, $value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
-                                return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
-		}*/
-		
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 2:
@@ -1202,6 +1166,7 @@
 					header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				case 10:
+					echo "<h4>Liste des ports concernés par la modification</h4>";
 					break;
 				default: break;
 			}
