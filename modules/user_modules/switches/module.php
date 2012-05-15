@@ -595,11 +595,11 @@
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "function checkTagForm() {
-						if(strlen($('#vlplis').html()) < 1) {
-							alert('Vous devez d'abord vérifier si des ports sont concernés !');
+						if($('#vlplist') == null || $('#vlplist').html().length < 1) {
+							alert('Vous devez vérifier si des ports sont concernés !');
 							return false;
 						}
-						if(document.getElementsByName('accept')[0].checked != checked) {
+						if(document.getElementsByName('accept')[0].checked == false) {
 							alert('Vous devez confirmer la modification !');
 							return false;
 						}
