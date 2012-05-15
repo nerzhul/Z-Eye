@@ -39,8 +39,8 @@
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2","i",$value);
 		}
 		
-		function getSwitchAccessVLANWithPID($device,$pid,$value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
+		function getSwitchAccessVLANWithPID($device,$pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 				return -1;
 
 			return getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");

@@ -1173,6 +1173,8 @@
 							continue;
 						$pid = $pid[1];
 						$portmode = getSwitchportModeWithPID($device,$pid);
+						$portmode = explode(" ",$portmode);
+						$portmode = $portmode[1];
 						if($portmode == 1) {
 							$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
 							if(in_array($vlan,$vllist))
