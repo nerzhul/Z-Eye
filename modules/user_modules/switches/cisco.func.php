@@ -242,6 +242,14 @@
 			return $out[1];
 		}
 		
+		function getPortList($device) {
+			$out = "";
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr",$out);
+			return $out;
+		}
+		
 		// Saving running-config => startup-config
 		function writeMemory($device) {
 			$rand = rand(1,100);
