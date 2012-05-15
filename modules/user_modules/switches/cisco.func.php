@@ -151,7 +151,7 @@
 		function getSwitchportTrunkVlansWithPid($device,$pid) {
 			$vlanlist = array();
 			$vlid = 1;
-			$hstr = getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4.".$pid);
+			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4");
 			for($i=0;$i<strlen($hstr);$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				for($j=0;$j<strlen($vlanbytes);$j++) {
@@ -160,7 +160,7 @@
 						array_push($vlanlist,$vlid);
 				}
 			}
-			$hstr = getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17.".$pid);
+			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17");
 			for($i=0;$i<strlen($hstr);$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				for($j=0;$j<strlen($vlanbytes);$j++) {
@@ -169,7 +169,7 @@
 						array_push($vlanlist,$vlid);
 				}
 			}
-			$hstr = getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18.".$pid);
+			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18");
 			for($i=0;$i<strlen($hstr);$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				for($j=0;$j<strlen($vlanbytes);$j++) {
@@ -178,7 +178,7 @@
 						array_push($vlanlist,$vlid);
 				}
 			}
-			$hstr = getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19.".$pid);
+			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19");
 			for($i=0;$i<strlen($hstr);$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				for($j=0;$j<strlen($vlanbytes);$j++) {
@@ -221,7 +221,9 @@
 			if($device == "" || $field == "" || $pid == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			return FS::$snmpMgr->get($dip,$field.".".$pid);
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+			return snmpget($dip,$community,$field.".".$pid);
 		}
 		
 		function getPortId($device,$portname) {
@@ -249,6 +251,7 @@
 				return -1;
 			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+			var_dump($community);
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			return $out;
 		}

@@ -42,17 +42,7 @@
 			} else {
 				// Get Port ID
 				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-				$out = "";
-				$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
-				if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-				exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$port,$out);
-				if(strlen($out[0]) < 5)
-					return FS::$iMgr->printError("Unable to walk and find port Description");
-				$out = explode(" ",$out[0]);
-				$out = explode(".",$out[0]);
-				if(!FS::$secMgr->isNumeric($out[1]))
-					return FS::$iMgr->printError("Port Description isn't numeric");
-				$portid = $out[1];
+				$portid = getPortId($device,$port);
 				$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 				// Port modification
 				if(!$sh || $sh == 1) {
@@ -598,7 +588,7 @@
 					$output .= "function searchports() {";
 					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
 					$output .= "$('#pop').show();
-					var ovlid = getElementsByName('oldvl')[0].value;";
+					var ovlid = document.getElementsByName('oldvl')[0].value;";
 					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
 						$('#subpop').html(data); });";
 					$output .= "return false;";
@@ -618,7 +608,7 @@
 				if($iswif == false) {
 					$poearr = array();
 					// POE States
-					$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'");
+					$query = FS::$pgdbMgr->"device_port_power","port,class","ip = '".$dip."'");
 					while($data = pg_fetch_array($query))
 						$poearr[$data["port"]] = $data["class"];
 				}
@@ -1173,7 +1163,6 @@
 						echo FS::$iMgr->printError("Cet équipement n'existe pas !");	
 						return;
 					}
-					var_dump();
 					$plist = getPortList($device);
 					$portswithvlan = array();
 					for($i=0;$i<count($plist);$i++) {
