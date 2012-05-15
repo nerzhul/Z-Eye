@@ -591,6 +591,14 @@
 					}
 					return $output;			
 				}
+				else if($showmodule == 4) {
+					$output .= "<h4>Retaguer un VLAN</h4>";
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
+					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
+					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
+					$output .= "Confirmer ".FS::$iMgr->addCheck("accept");
+					$output .= FS::$iMgr->addSubmit("Lancer")."</form>";
+				}
 	
 				$iswif = (preg_match("#AIR#",FS::$pgdbMgr->GetOneData("device","model","name = '".$device."'")) ? true : false);
 	
@@ -792,14 +800,6 @@
 				}
 				else
 					$output .= FS::$iMgr->printError("Impossible de trouver des informations sur l'équipement");
-			}
-			else if($showmodule == 4) {
-				$output .= "<h4>Retaguer un VLAN</h4>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
-				$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
-				$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
-				$output .= "Confirmer ".FS::$iMgr->addCheck("accept");
-				$output .= FS::$iMgr->addSubmit("Lancer")."</form>";
 			}
 			return $output;
 		}
