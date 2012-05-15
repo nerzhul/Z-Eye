@@ -45,11 +45,11 @@
 				if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 				exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$port,$out);
 				if(strlen($out[0]) < 5)
-						return FS::$iMgr->printError("Unable to walk and find port Description");
+					return FS::$iMgr->printError("Unable to walk and find port Description");
 				$out = explode(" ",$out[0]);
 				$out = explode(".",$out[0]);
 				if(!FS::$secMgr->isNumeric($out[1]))
-						return FS::$iMgr->printError("Port Description isn't numeric");
+					return FS::$iMgr->printError("Port Description isn't numeric");
 				$portid = $out[1];
 				$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 				// Port modification
@@ -119,7 +119,7 @@
 						$output .= "</textarea></td></tr>";
 						$output .= "<tr><td>Sauver ?</td><td>".FS::$iMgr->addCheck("wr")."</td></tr>";
 						$output .= "</table>";
-						$output .= "<center><br /><input class=\"buttonStyle\" type=\"submit\" name=\"Enregistrer\" value=\"Enregistrer\" onclick=\"showwait();\"/></center>";
+						$output .= "<center><br />".FS::$iMgr->addJSSubmit("Enregistrer","Enregistrer","showwait();")."</center>";
 						$output .= "</form>";
 					}
 					else
@@ -592,13 +592,19 @@
 					return $output;			
 				}
 				else if($showmodule == 4) {
+					$output .= "<script type=\"text/javascript\">";
+					$output .= "function searchports() {";
+					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+					$output .= "$('#pop').show();";
+					$output .= "};";
+					$output .= "</script>";
 					$output .= "<h4>Retaguer un VLAN</h4>";
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
 					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
-					$output .= "Confirmer ".FS::$iMgr->addCheck("accept");
-					$output .= FS::$iMgr->addSubmit("Lancer")."</form>";
-					return = $output;
+					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
+					$output .= FS::$iMgr->addJSSubmit("launch","Lancer","searchports();")."</form>";
+					return $output;
 				}
 	
 				$iswif = (preg_match("#AIR#",FS::$pgdbMgr->GetOneData("device","model","name = '".$device."'")) ? true : false);
