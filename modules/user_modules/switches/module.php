@@ -598,6 +598,7 @@
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept");
 					$output .= FS::$iMgr->addSubmit("Lancer")."</form>";
+					return = $output;
 				}
 	
 				$iswif = (preg_match("#AIR#",FS::$pgdbMgr->GetOneData("device","model","name = '".$device."'")) ? true : false);
