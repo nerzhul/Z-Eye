@@ -41,7 +41,9 @@
 				// Get Port ID
 				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 				$out = "";
-				exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$port,$out);
+				$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+				if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+				exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$port,$out);
 				if(strlen($out[0]) < 5)
 						return FS::$iMgr->printError("Unable to walk and find port Description");
 				$out = explode(" ",$out[0]);
@@ -177,6 +179,7 @@
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=3\">Vue de façade</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=1\">Modules internes</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=2\">Détails</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=4\">Outils avancés</a>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -790,6 +793,14 @@
 				else
 					$output .= FS::$iMgr->printError("Impossible de trouver des informations sur l'équipement");
 			}
+			else if($showmodule == 4) {
+				$output .= "<h4>Retaguer un VLAN</h4>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
+				$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
+				$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
+				$output .= "Confirmer ".FS::$iMgr->addCheck("accept");
+				$output .= FS::$iMgr->addSubmit("Lancer")."</form>";
+			}
 			return $output;
 		}
 
@@ -1300,7 +1311,9 @@
 			if($dip == NULL)
 				return -1;
 				
-			exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$portname,$out);
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 			if(strlen($out[0]) < 5)
 				return -1;
 			$out = explode(" ",$out[0]);
@@ -1438,7 +1451,9 @@
 						echo "-1";
 						return;
 					}
-					exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$dip." ifDescr | grep ".$portname,$out);
+					$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+					if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+					exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 					if(strlen($out[0]) < 5) {
 							echo "-1";
 						return;
@@ -1595,6 +1610,8 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
+				case 10:
+					break;
 				default: break;
 			}
 		}
