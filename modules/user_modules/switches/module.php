@@ -1172,9 +1172,15 @@
 						if(!FS::$secMgr->isNumeric($pid[1]))
 							continue;
 						$pid = $pid[1];
-						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
-						if(in_array($vlan,$vllist))
-							array_push($portswithvlan,$pname);	
+						$portmode = getSwitchportModeWithPID($device,$pid);
+						if($portmode == 1) {
+							$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
+							if(in_array($vlan,$vllist))
+								array_push($portswithvlan,$pname);
+						}
+						else if($portmode == 2) {
+							$vlan = getSwitchAccessVLANWithPID($device,$pid);
+						}
 					}
 					
 					break;
