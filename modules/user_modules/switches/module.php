@@ -594,8 +594,9 @@
 				else if($showmodule == 4) {
 					$output .= "<script type=\"text/javascript\">";
 					$output .= "function searchports() {";
-					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
 					$output .= "$('#pop').show();";
+					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
 					$output .= "<h4>Retaguer un VLAN</h4>";
@@ -603,7 +604,7 @@
 					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
-					$output .= FS::$iMgr->addJSSubmit("launch","Lancer","searchports();")."</form>";
+					$output .= FS::$iMgr->addJSSubmit("launch","Lancer","return searchports();")."</form>";
 					return $output;
 				}
 	
@@ -917,6 +918,50 @@
                         $result = explode(" ",$result,2);
 
 			return $result;
+		}
+
+		public function getSwitchportTrunkVlan($device,$portname) {
+			$pid = $this->getPortId($device,$portname);
+			if($pid == -1)
+				return -1;
+			$vlanlist = array();
+			$vlid = 1;
+			$hstr = $this->getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4.".$pid);
+			for($i=0;$i<strlen($hstr);$i++) {
+				$vlanbytes = base_convert($hstr[$i],16,2);
+				for($j=0;$j<strlen($vlanbytes);$j++) {
+					$vlid++;
+					if($vlanbytes[$j] == "1")
+						array_push($vlanlist,$vlid);
+				}
+			}
+			$hstr = $this->getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17.".$pid);
+			for($i=0;$i<strlen($hstr);$i++) {
+				$vlanbytes = base_convert($hstr[$i],16,2);
+				for($j=0;$j<strlen($vlanbytes);$j++) {
+					$vlid++;
+					if($vlanbytes[$j] == "1")
+						array_push($vlanlist,$vlid);
+				}
+			}
+			$hstr = $this->getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18.".$pid);
+			for($i=0;$i<strlen($hstr);$i++) {
+				$vlanbytes = base_convert($hstr[$i],16,2);
+				for($j=0;$j<strlen($vlanbytes);$j++) {
+					$vlid++;
+					if($vlanbytes[$j] == "1")
+						array_push($vlanlist,$vlid);
+				}
+			}
+			$hstr = $this->getFieldForPort($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19.".$pid);
+			for($i=0;$i<strlen($hstr);$i++) {
+				$vlanbytes = base_convert($hstr[$i],16,2);
+				for($j=0;$j<strlen($vlanbytes);$j++) {
+					$vlid++;
+					if($vlanbytes[$j] == "1")
+						array_push($vlanlist,$vlid);
+				}
+			}
 		}
 
 		public function setPortState($device,$portname,$value) {
