@@ -597,9 +597,10 @@
 					$output .= "<script type=\"text/javascript\">";
 					$output .= "function searchports() {";
 					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
-					$output .= "$('#pop').show();";
-					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10', function(data) {
-						$('#pop').html(data); });";
+					$output .= "$('#pop').show();
+					var ovlid = $('[name=\'oldvl\']')";
+					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&vlan='+ovlid, function(data) {
+						$('#subpop').html(data); });";
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
