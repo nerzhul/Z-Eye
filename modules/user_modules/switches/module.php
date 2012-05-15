@@ -594,13 +594,18 @@
 						$('#vlplist').html(data); });";
 					$output .= "return false;";
 					$output .= "};";
+					$output .= "function checkTagForm() {
+						if(strlen($('#vlplis').html()) > 0 && document.getElementsByName('accept')[0].checked = checked)
+							return true;
+						return false;
+					};";
 					$output .= "</script>";
 					$output .= "<h4>Retaguer un VLAN</h4>";
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=11");
 					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
-					$output .= FS::$iMgr->addSubmit("modify","Appliquer")."</form><br />";
+					$output .= FS::$iMgr->addJSSubmit("modify","Appliquer","return checkTagForm();")."</form><br />";
 					$output .= FS::$iMgr->addJSSubmit("search","Vérifier les ports concernés","return searchports();")."<div id=\"vlplist\"></div>";
 					return $output;
 				}
