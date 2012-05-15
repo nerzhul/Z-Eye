@@ -595,9 +595,15 @@
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "function checkTagForm() {
-						if(strlen($('#vlplis').html()) > 0 && document.getElementsByName('accept')[0].checked = checked)
-							return true;
-						return false;
+						if(strlen($('#vlplis').html()) < 1) {
+							alert('Vous devez d'abord vérifier si des ports sont concernés !');
+							return false;
+						}
+						if(document.getElementsByName('accept')[0].checked != checked) {
+							alert('Vous devez confirmer la modification !');
+							return false;
+						}
+						return true;
 					};";
 					$output .= "</script>";
 					$output .= "<h4>Retaguer un VLAN</h4>";
