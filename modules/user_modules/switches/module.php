@@ -598,7 +598,7 @@
 					$output .= "function searchports() {";
 					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
 					$output .= "$('#pop').show();
-					var ovlid = $('[name=\'oldvl\']');";
+					var ovlid = $('[name=\'oldvl\']').value;";
 					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
 						$('#subpop').html(data); });";
 					$output .= "return false;";
@@ -1168,12 +1168,25 @@
 				case 10:
 					echo "<h4>Liste des ports concernés par la modification</h4>";
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
+					$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 					if(!$device) {
 						echo FS::$iMgr->printError("Cet équipement n'existe pas !");	
 						return;
 					}
+					var_dump();
 					$plist = getPortList($device);
-					var_dump($plist);
+					$portswithvlan = array();
+					for($i=0;$i<count($plist);$i++) {
+						$pdata = explode(" ",$plist[$i]);
+						$pname = $pdata[3];
+						$pid = explode(".",$pdata[0]);
+						if(!FS::$secMgr->isNumeric($pid[1]))
+							continue;
+						$pid = $pid[1];
+						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
+						if(in_array($vlan,$vllist))
+							array_push($portswithvlan,$pname);	
+					}
 					break;
 				default: break;
 			}
