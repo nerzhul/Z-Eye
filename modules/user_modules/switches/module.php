@@ -1167,7 +1167,7 @@
 					return;
 				case 10:
 					echo "<h4>Liste des ports concernés par la modification</h4>";
-					$device = FS::$secMgr->checkAndSecurisePostData("d");
+					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					if(!$device) {
 						echo FS::$iMgr->printError("Cet équipement n'existe pas !");	
 						return;
