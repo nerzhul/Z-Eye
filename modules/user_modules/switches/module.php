@@ -598,7 +598,7 @@
 					$output .= "function searchports() {";
 					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
 					$output .= "$('#pop').show();
-					var ovlid = javascript.getElementsByName(\'oldvl\')[0].value;";
+					var ovlid = getElementsByName('oldvl')[0].value;";
 					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
 						$('#subpop').html(data); });";
 					$output .= "return false;";
