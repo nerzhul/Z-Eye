@@ -608,7 +608,7 @@
 				if($iswif == false) {
 					$poearr = array();
 					// POE States
-					$query = FS::$pgdbMgr->"device_port_power","port,class","ip = '".$dip."'");
+					$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'");
 					while($data = pg_fetch_array($query))
 						$poearr[$data["port"]] = $data["class"];
 				}
@@ -1176,6 +1176,7 @@
 						if(in_array($vlan,$vllist))
 							array_push($portswithvlan,$pname);	
 					}
+					
 					break;
 				default: break;
 			}

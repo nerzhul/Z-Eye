@@ -205,6 +205,13 @@
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
 		}
 		
+		function getSwitchportModeWithPID($device, $pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+			return getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
+		}
+		
 		/*
 		* Generic functions
 		*/
@@ -251,7 +258,6 @@
 				return -1;
 			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			var_dump($community);
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			return $out;
 		}
@@ -300,6 +306,14 @@
 				return -1;
 
             return setSwitchportModeWithPID($device,$pid,$value);
+		}
+		
+		function getSwitchportMode($device, $portname, $value) {
+			$pid = getPortId($device,$portname);
+			if($pid == -1)
+				return -1;
+
+            return getSwitchportModeWithPID($device,$pid,$value);
 		}
 		
 		function setSwitchNoTrunkVlan($device,$portname) {
