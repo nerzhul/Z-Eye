@@ -590,7 +590,8 @@
 					$output .= "$('#pop').show();
 					var ovlid = document.getElementsByName('oldvl')[0].value;";
 					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
-						$('#subpop').html(data); });";
+						$('#pop').hide();
+						$('#vlplist').html(data); });";
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
@@ -599,7 +600,7 @@
 					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
-					$output .= FS::$iMgr->addJSSubmit("launch","Lancer","return searchports();")."</form>";
+					$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchports();")."</form><div id=\"vlplist\"></div>";
 					return $output;
 				}
 	
@@ -1186,7 +1187,14 @@
 								array_push($portswithvlan,$pname);
 						}
 					}
-					
+					if(count($portswithvlan) > 0) {
+						echo "<ul>";
+						for($i=0;$i<count($portswithvlan);$i++)
+							echo "<li>".$portswithvlan[$i]."</li>";
+						echo "</ul>";
+					}
+					else
+						FS::$iMgr->printError("Ce VLAN n'est pas présent sur l'équipement");
 					break;
 				default: break;
 			}
