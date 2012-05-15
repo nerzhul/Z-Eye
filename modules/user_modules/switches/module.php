@@ -5,8 +5,9 @@
 	class iSwitchMgmt extends genModule{
 		function iConnect($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
+			$output = "";
 			if(!FS::isAjaxCall())
-				$output = "<div id=\"monoComponent\"><h3>Management des Switches</h3>";
+				$output .= "<div id=\"monoComponent\"><h3>Management des Switches</h3>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
