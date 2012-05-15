@@ -1179,7 +1179,9 @@
 								array_push($portswithvlan,$pname);
 						}
 						else if($portmode == 2) {
-							$vlan = getSwitchAccessVLANWithPID($device,$pid);
+							$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+							if($vlan == $pvlan)
+								array_push($portswithvlan,$pname);
 						}
 					}
 					
