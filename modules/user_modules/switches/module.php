@@ -599,8 +599,7 @@
 					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
 					$output .= "$('#pop').show();";
 					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10', function(data) {
-						$('#pop').html(data);
-					);";
+						$('#pop').html(data); });";
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
