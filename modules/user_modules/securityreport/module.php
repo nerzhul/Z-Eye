@@ -131,7 +131,7 @@
 									{ name: 'Attaques TSE', data: ".$tse." },
 									{ name: 'Attaques SSH', data: ".$ssh." }]
 							});
-						});
+						
 						</script>";
 					/*$output .= "<script type=\"text/javascript\">var data = ";
 		
