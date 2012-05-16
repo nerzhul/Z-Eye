@@ -1176,33 +1176,18 @@
 						echo FS::$iMgr->printError("Cet équipement n'existe pas !");	
 						return;
 					}
-					$plist = getPortList($device);
-					$portswithvlan = array();
-					for($i=0;$i<count($plist);$i++) {
-						$pdata = explode(" ",$plist[$i]);
-						$pname = $pdata[3];
-						$pid = explode(".",$pdata[0]);
-						if(!FS::$secMgr->isNumeric($pid[1]))
-							continue;
-						$pid = $pid[1];
-						$portmode = getSwitchportModeWithPID($device,$pid);
-						$portmode = explode(" ",$portmode);
-						$portmode = $portmode[1];
-						if($portmode == 1) {
-							$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
-							if(in_array($vlan,$vllist))
-								array_push($portswithvlan,$pname);
-						}
-						else if($portmode == 2) {
-							$pvlan = getSwitchAccessVLANWithPID($device,$pid);
-							if($vlan == $pvlan)
-								array_push($portswithvlan,$pname);
-						}
+					
+					if(!$vlan || !FS::$secMgr->isNumeric($vlan)) {
+						echo FS::$iMgr->printError("Le Vlan recherché est inexistant ou invalide !");
+						return;
 					}
-					if(count($portswithvlan) > 0) {
+					
+					$plist = getPortList($device,$vlan);
+
+					if(count($plist) > 0) {
 						echo "<ul>";
-						for($i=0;$i<count($portswithvlan);$i++)
-							echo "<li>".$portswithvlan[$i]."</li>";
+						for($i=0;$i<count($plist);$i++)
+							echo "<li>".$plist[$i]."</li>";
 						echo "</ul>";
 					}
 					else

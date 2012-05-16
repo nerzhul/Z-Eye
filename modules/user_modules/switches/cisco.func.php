@@ -59,6 +59,10 @@
 
 			$res = preg_split("/,/",$values);
 
+			/* 
+			* For each VLAN from 1 to 4096, set bit value to 1 if vlan is allowed, else set to 0
+			* Each byte is converted to a hex string, and chained
+			*/
 			$str = "";
 			$tmpstr="";
 			$count=0;
@@ -95,6 +99,11 @@
 							$count = 0;
 					}
 			}
+			
+			/*
+			* There is 4 mibs, each contains 1024 vlan id
+			* For now, we don't use vlanid > 1024, only 1-1024
+			*/
 			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17","x",$str2);
 			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18","x",$str2);
 			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str2);
@@ -112,6 +121,9 @@
 			$str23 = "";
 			$str4 = "";
 			$count=1;
+			/*
+			* To unset allowed vlans, set all bits to 1 for vlan 2-4095. Vlan 1 and 4096 must be set to 0
+			*/
 			for($i=1;$i<1023;$i++) {
 				$tmpstr1 .= "1";
 				$tmpstr4 .= "1";
@@ -128,7 +140,7 @@
 					$str4 .= $tmpchar4;
                     $tmpstr1 = "";
 					$tmpstr4 = "";
-                     $count = 0;
+                    $count = 0;
                }
            }
 
@@ -265,6 +277,8 @@
 		}
 		
 		function getPortId($device,$portname) {
+			/*
+			* Old Source code, now we use port_id_cache to improve the perfs
 			$out = "";
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($dip == NULL)
@@ -279,10 +293,17 @@
 			$out = explode(".",$out[0]);
 			if(!FS::$secMgr->isNumeric($out[1]))
 				return -1;
-			return $out[1];
+			return $out[1];*/
+			$pid = FS::$dbMgr->GetOneData("fss_port_id_cache","pid","device = '".$device."' AND portname = '".$portname."'");
+			if($pid == NULL) $pid = -1;
+			return $pid;
 		}
 		
-		function getPortList($device) {
+		/*
+		* get Port list from a device. If there is a filter, only port with specified vlan are returned
+		*/
+		
+		function getPortList($device,$vlanFltr = NULL) {
 			$out = "";
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($dip == NULL)
@@ -290,7 +311,34 @@
 			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
-			return $out;
+			$plist = array();
+			for($i=0;$i<count($out);$i++) {
+				$pdata = explode(" ",$out[$i]);
+				$pname = $pdata[3];
+				$pid = explode(".",$pdata[0]);
+				if(!FS::$secMgr->isNumeric($pid[1]))
+					continue;
+				$pid = $pid[1];
+				if($vlanFltr == NULL || !FS::$secMgr->isNumeric($vlanFltr) || $vlanFltr < 1 || $vlanFltr > 4096) 
+					array_push($plist,$pname);
+				else {
+					$portmode = getSwitchportModeWithPID($device,$pid);
+					$portmode = explode(" ",$portmode);
+					$portmode = $portmode[1];
+					if($portmode == 1) {
+						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
+						if(in_array($vlanFltr,$vllist))
+							array_push($plist,$pname);
+					}
+					else if($portmode == 2) {
+						$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+						if($vlanFltr == $pvlan)
+							array_push($plist,$pname);
+					}
+				}
+			}
+			
+			return $plist;
 		}
 		
 		// Saving running-config => startup-config
