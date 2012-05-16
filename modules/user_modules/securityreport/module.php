@@ -124,7 +124,8 @@
 					/*if($shtse) */$tse .= "]";
 					/*if($shssh) */$ssh .= "]";
 					
-					$output .= "<script type=\"text/javascript\"> var hchart = new HighCharts.Chart({
+					$output .= "<script type=\"text/javascript\"> (function($){ var hchart;
+							hchart = new HighCharts.Chart({
 							chart: { renderTo: 'atkst', type: 'bar' },
 							title: { text: 'Graphique d\'attaques SNORT' },
 							xAxis: { categories: ".$labels." },
@@ -132,7 +133,7 @@
 									{ name: 'Attaques TSE', data: ".$tse." },
 									{ name: 'Attaques SSH', data: ".$ssh." }]
 							});
-						
+						})(jQuery);
 						</script>";
 					/*$output .= "<script type=\"text/javascript\">var data = ";
 		
