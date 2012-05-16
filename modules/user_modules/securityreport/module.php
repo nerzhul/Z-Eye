@@ -53,8 +53,6 @@
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {
-					$output .= "<html><head><script type=\"text/javascript\" src=\"lib/jQuery/jQuery.js\"></script>
-						<script type=\"text/javascript\" src=\"lib/HighCharts/highcharts.min.js\"></script></head><body>";
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
 					mysql_select_db("snort");
 					$totalips = FS::$dbMgr->Count("collected_ips","ip");
@@ -82,6 +80,8 @@
 					$output .= "</form>";
 					//$output .= "<canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
 					$output .= "<div id=\"atkst\"></div>";
+					$output .= "<script type=\"text/javascript\" src=\"lib/jQuery/jQuery.js\">";
+					$output .= "<script type=\"text/javascript\" src=\"lib/HighCharts/highcharts.min.js\"></script>";
 					$year = date("Y");
 					$month = date("m");
 					$day = date("d");
@@ -170,7 +170,6 @@
 					line.Set('chart.gutter.bottom', 45); ";
 					$output .= "line.Set('chart.labels', ".$labels.");";
 					$output .= "line.Draw();</script>";*/
-					$output .= "</body></html>";
 					mysql_select_db("fssmanager");
 				}
 				else if($showmodule == 2) {
