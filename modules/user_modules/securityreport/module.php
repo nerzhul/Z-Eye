@@ -53,7 +53,8 @@
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {
-					$output .= "<html><head><script type=\"text/javascript\" src=\"lib/HighCharts/highcharts.min.js\"></script></head><body>";
+					$output .= "<html><head><script type=\"text/javascript\" src=\"lib/jQuery/jQuery.js\"></script>
+						<script type=\"text/javascript\" src=\"lib/HighCharts/highcharts.min.js\"></script></head><body>";
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
 					mysql_select_db("snort");
 					$totalips = FS::$dbMgr->Count("collected_ips","ip");
