@@ -32,6 +32,7 @@
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.annotate.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.zoom.js");
 		FS::$iMgr->addJSFile("lib/RGraph/RGraph.line.js");
+		FS::$iMgr->addJSFile("lib/HighCharts/highcharts.min.js");
 
 		echo FS::$iMgr->showHeader();
 		echo FS::$iMgr->showContent();

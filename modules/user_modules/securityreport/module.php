@@ -71,17 +71,15 @@
 					$output .= FS::$iMgr->addHidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours <br />";
 					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours <br />";
-					$output .= "Filtres: ";
+					/*$output .= "Filtres: ";
 					$output .= FS::$iMgr->addCheck("sc",$shscan)."Scans ";
 					$output .= FS::$iMgr->addCheck("tse",$shtse)."TSE ";
-					$output .= FS::$iMgr->addCheck("ssh",$shssh)."SSH ";
+					$output .= FS::$iMgr->addCheck("ssh",$shssh)."SSH ";*/
 		
 					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
 					//$output .= "<canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
 					$output .= "<div id=\"atkst\"></div>";
-					$output .= "<script type=\"text/javascript\" src=\"lib/jQuery/jQuery.js\">";
-					$output .= "<script type=\"text/javascript\" src=\"lib/HighCharts/highcharts.min.js\"></script>";
 					$year = date("Y");
 					$month = date("m");
 					$day = date("d");
@@ -124,11 +122,14 @@
 					/*if($shtse) */$tse .= "]";
 					/*if($shssh) */$ssh .= "]";
 					
-					$output .= "<script type=\"text/javascript\"> (function($){ var hchart;
-							hchart = new HighCharts.Chart({
-							chart: { renderTo: 'atkst', type: 'bar' },
+					$output .= "<script type=\"text/javascript\">(function($){ var hchart;
+							hchart = new Highcharts.Chart({
+							chart: { renderTo: 'atkst', type: 'line' },
 							title: { text: 'Graphique d\'attaques SNORT' },
 							xAxis: { categories: ".$labels." },
+							yAxis: { title: { text: 'Nombre d\'attaques' } },
+							legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
+									x: -10, y: 100 },
 							series: [ { name: 'Scans', data: ".$scans." },
 									{ name: 'Attaques TSE', data: ".$tse." },
 									{ name: 'Attaques SSH', data: ".$ssh." }]
@@ -171,6 +172,7 @@
 					line.Set('chart.gutter.bottom', 45); ";
 					$output .= "line.Set('chart.labels', ".$labels.");";
 					$output .= "line.Draw();</script>";*/
+					$output .= "</body></html>";
 					mysql_select_db("fssmanager");
 				}
 				else if($showmodule == 2) {
@@ -272,13 +274,13 @@
 				case 1:
 					$ech = FS::$secMgr->checkAndSecurisePostData("ech");
 					$ec = FS::$secMgr->checkAndSecurisePostData("ec");
-					$sc = FS::$secMgr->checkAndSecurisePostData("sc");
+					/*$sc = FS::$secMgr->checkAndSecurisePostData("sc");
 					($sc != NULL && $sc == "on") ? $sc = 1 : $sc = 0;
 					$tse = FS::$secMgr->checkAndSecurisePostData("tse");
 					($tse != NULL && $tse == "on") ? $tse = 1 : $tse = 0;
 					$ssh = FS::$secMgr->checkAndSecurisePostData("ssh");
-					($ssh != NULL && $ssh == "on") ? $ssh = 1 : $ssh = 0;
-					header("Location: index.php?mod=".$this->mid."&sh=1&ech=".$ech."&ec=".$ec."&ssh=".$ssh."&tse=".$tse."&sc=".$sc."");
+					($ssh != NULL && $ssh == "on") ? $ssh = 1 : $ssh = 0;*/
+					header("Location: index.php?mod=".$this->mid."&sh=1&ech=".$ech."&ec=".$ec/*."&ssh=".$ssh."&tse=".$tse."&sc=".$sc.*/"");
 					break;
 				case 2: case 3: case 4:
 					$topmax = FS::$secMgr->checkAndSecurisePostData("max");
