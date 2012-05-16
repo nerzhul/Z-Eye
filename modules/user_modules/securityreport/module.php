@@ -53,7 +53,7 @@
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {
-					$output .= "<script type=\"text/javascript\" src=\"lib/HighCharts/highcharts.min.js\"></script>";
+					$output .= "<html><head><script type=\"text/javascript\" src=\"lib/HighCharts/highcharts.min.js\"></script></head><body>";
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
 					mysql_select_db("snort");
 					$totalips = FS::$dbMgr->Count("collected_ips","ip");
@@ -123,8 +123,7 @@
 					/*if($shtse) */$tse .= "]";
 					/*if($shssh) */$ssh .= "]";
 					
-					$output .= "<script type=\"text/javascript\"> var hchart;
-						$(document).ready(function() { hchart = new HighCharts.Chart({
+					$output .= "<script type=\"text/javascript\"> var hchart = new HighCharts.Chart({
 							chart: { renderTo: 'atkst', type: 'bar' },
 							title: { text: 'Graphique d\'attaques SNORT' },
 							xAxis: { categories: ".$labels." },
@@ -170,6 +169,7 @@
 					line.Set('chart.gutter.bottom', 45); ";
 					$output .= "line.Set('chart.labels', ".$labels.");";
 					$output .= "line.Draw();</script>";*/
+					$output .= "</body></html>";
 					mysql_select_db("fssmanager");
 				}
 				else if($showmodule == 2) {
