@@ -77,8 +77,9 @@
 					$output .= FS::$iMgr->addCheck("ssh",$shssh)."SSH ";
 		
 					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
-					$output .= "</form><canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
-		
+					$output .= "</form>";
+					//$output .= "<canvas id=\"atkst\" height=\"450\" width=\"1175\"></canvas>";
+					$output .= "<div id=\"atkst\"></div>";
 					$year = date("Y");
 					$month = date("m");
 					$day = date("d");
@@ -86,9 +87,9 @@
 					$sql_date = $year."-".$month."-".$day." 00:00:00";
 					$fields = "";
 					
-					if($shscan) $fields .= ",scans";
-					if($shtse) $fields .= ",tse";
-					if($shssh) $fields .= ",ssh";
+					/*if($shscan) */$fields .= ",scans";
+					/*if($shtse) */$fields .= ",tse";
+					/*if($shssh) */$fields .= ",ssh";
 					
 					$sql = "select atkdate".$fields." from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".$ec." DAY))";
 					$query = mysql_query($sql);
@@ -102,25 +103,37 @@
 											$labels .= "'\\r\\n".$temp1."',";
 									else
 											$labels .= "'".$temp1."',";
-									if($shscan) $scans .= $temp2.",";
-									if($shtse) $tse .= $temp3.",";
-									if($shssh) $ssh .= $temp4.",";
+									/*if($shscan) */$scans .= $temp2.",";
+									/*if($shtse) */$tse .= $temp3.",";
+									/*if($shssh) */$ssh .= $temp4.",";
 									$cursor = $temp1 = $temp2 = $temp3 = $temp4 = 0;
 									$subline = ($subline ? false : true);
 							} else {
 									$cursor++;
 									$temp1 = substr($data["atkdate"],8,2)."/".substr($data["atkdate"],5,2);
-									if($shscan) $temp2 += $data["scans"];
-									if($shtse) $temp3 += $data["tse"];
-									if($shssh) $temp4 += $data["ssh"];
+									/*if($shscan) */$temp2 += $data["scans"];
+									/*if($shtse) */$temp3 += $data["tse"];
+									/*if($shssh) */$temp4 += $data["ssh"];
 							}
 					}
 		
 					$labels .= "]";
-					if($shscan) $scans .= "]";
-					if($shtse) $tse .= "]";
-					if($shssh) $ssh .= "]";
-					$output .= "<script type=\"text/javascript\">var data = ";
+					/*if($shscan) */$scans .= "]";
+					/*if($shtse) */$tse .= "]";
+					/*if($shssh) */$ssh .= "]";
+					
+					$output .= "<script type=\"text/javascript\"> var hchart;
+						$(document).ready(function() { hchart = new HighCharts.Chart({
+							chart: { renderTo: 'atkst', type: 'bar' },
+							title: { text: 'Graphique d\'attaques SNORT' },
+							xAxis: { categories: ".$labels." },
+							series: [ { name: 'Scans', data: ".$scans." },
+									{ name: 'Attaques TSE', data: ".$tse." },
+									{ name: 'Attaques SSH', data: ".$ssh." }]
+							});
+						});
+						</script>";
+					/*$output .= "<script type=\"text/javascript\">var data = ";
 		
 					$output .= "[";
 					if($shscan) $output .= $scans;
@@ -155,7 +168,7 @@
 					$output .= "]);
 					line.Set('chart.gutter.bottom', 45); ";
 					$output .= "line.Set('chart.labels', ".$labels.");";
-					$output .= "line.Draw();</script>";
+					$output .= "line.Draw();</script>";*/
 					mysql_select_db("fssmanager");
 				}
 				else if($showmodule == 2) {
