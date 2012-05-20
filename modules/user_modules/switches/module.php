@@ -584,6 +584,7 @@
 					return $output;			
 				}
 				else if($showmodule == 4) {
+					$err = FS::$secMgr->checkAndSecuriseGetData("err");
 					$output .= "<script type=\"text/javascript\">";
 					$output .= "function searchports() {";
 					$output .= "$('#subpop').html('Recherche des ports concernés en cours...<br /><br /><br />');";
@@ -607,6 +608,7 @@
 					};";
 					$output .= "</script>";
 					$output .= "<h4>Retaguer un VLAN</h4>";
+					if($err && $err == 1) $output .= FS::$iMgr->printError("L'une des valeurs entrées est invalide !");
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=11");
 					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
@@ -1193,6 +1195,17 @@
 					else
 						FS::$iMgr->printError("Ce VLAN n'est pas présent sur l'équipement");
 					break;
+				case 11:
+					$old = FS::$secMgr->checkAndSecuriseGetData("oldvl");
+					$new = FS::$secMgr->checkAndSecuriseGetData("newvl");
+					if(!$old || !$new || !FS::$secMgr->isNumeric($old) || !FS::$secMgr->isNumeric($new) || $old > 4096 || $new > 4096 || $old < 0 || $new < 0) {
+						header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4&err=1");
+						return;
+					}
+					
+					replaceVlan($device,$old,$new);
+					header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4");
+					return;
 				default: break;
 			}
 		}

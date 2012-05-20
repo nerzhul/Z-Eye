@@ -61,10 +61,13 @@
 		}
 		
 		function setSwitchTrunkVlanWithPID($device,$pid,$values) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values))
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || (!is_array($values) && !preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values)))
 				return -1;
 
-			$res = preg_split("/,/",$values);
+			if(!is_array($res))
+				$res = preg_split("/,/",$values);
+			else
+				$res = $values;
 
 			/* 
 			* For each VLAN from 1 to 4096, set bit value to 1 if vlan is allowed, else set to 0
@@ -334,7 +337,7 @@
 					$portmode = $portmode[1];
 					if($portmode == 1) {
 						$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
-						if($vlan == $nvlan)
+						if($vlanFltr == $nvlan)
 							array_push($plist,$pname);
 							
 						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
@@ -350,6 +353,48 @@
 			}
 			
 			return $plist;
+		}
+		
+		function replaceVlan($device,$oldvlan,$newvlan) {
+			$out = "";
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			if($dip == NULL)
+				return -1;
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			for($i=0;$i<count($out);$i++) {
+				$pdata = explode(" ",$out[$i]);
+				$pname = $pdata[3];
+				$pid = explode(".",$pdata[0]);
+				if(!FS::$secMgr->isNumeric($pid[1]))
+					continue;
+				$pid = $pid[1];
+				$portmode = getSwitchportModeWithPID($device,$pid);
+				$portmode = explode(" ",$portmode);
+				$portmode = $portmode[1];
+				if($portmode == 1) {
+					$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
+					if($oldvlan == $nvlan)
+						setSwitchTrunkNativeVlanWithPID($device,$pid,$newvlan);
+						
+					$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
+					if(in_array($oldvlan,$vllist)) {
+						$vllist2 = array();
+						for($j=0;$j<count($vllist);$j++) {
+							if($vllist[$j] != $oldvlan)
+								array_push($vllist2,$vllist[$j]);
+						}
+						array_push($vllist,$newvlan);
+						setSwitchTrunkVlanWithPID($device,$pid,$vllist2);
+					}
+				}
+				else if($portmode == 2) {
+					$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+					if($oldvlan == $pvlan)
+						setSwitchAccessVLANWithPID($device,$pid,$newvlan);
+				}
+			}
 		}
 		
 		// Saving running-config => startup-config
