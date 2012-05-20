@@ -53,6 +53,13 @@
             return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
 		}
 		
+		function getSwitchTrunkNativeVlanWithPID($device,$pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+				return -1;
+
+            return getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
+		}
+		
 		function setSwitchTrunkVlanWithPID($device,$pid,$values) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values))
 				return -1;
@@ -326,6 +333,10 @@
 					$portmode = explode(" ",$portmode);
 					$portmode = $portmode[1];
 					if($portmode == 1) {
+						$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
+						if($vlan == $nvlan)
+							array_push($plist,$pname);
+							
 						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
 						if(in_array($vlanFltr,$vllist))
 							array_push($plist,$pname);
