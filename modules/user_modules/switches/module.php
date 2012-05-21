@@ -168,6 +168,7 @@
 				
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."\">Liste des ports</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=5\">Liste des VLANs</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=3\">Vue de façade</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=1\">Modules internes</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=2\">Détails</a>";
@@ -616,6 +617,23 @@
 					$output .= FS::$iMgr->addJSSubmit("modify","Appliquer","return checkTagForm();")."</form><br />";
 					$output .= FS::$iMgr->addJSSubmit("search","Vérifier les ports concernés","return searchports();")."<div id=\"vlplist\"></div>";
 					return $output;
+				}
+				else if($showmodule == 5) {
+					$output .= "<h4>Liste des VLANs</h4>";
+					$found = 0;
+					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+					$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,reation","ip = '".$dip."'","ip");
+					$tmpoutput = "<table><tr><th>ID</th><th>Description</th><th>Date de création</th></tr>";
+					while($data = pg_fetch_array($query)) {
+						if(!$found) $found = 1;
+						$crdate = preg_split("#\.#",$data["creation"]);
+						$tmpoutput .= "<tr><td>".$data["vlan"]."</td><td>".$data["description"]."</td><td>".$crdate[0]."</td></tr>";
+					}
+					if($found)
+						$output .= $tmpoutput."</table>";
+					else
+						$output .= FS::$iMgr->printError("Aucun VLAN trouvé sur cet équipement !");
+					return $output;	
 				}
 	
 				$iswif = (preg_match("#AIR#",FS::$pgdbMgr->GetOneData("device","model","name = '".$device."'")) ? true : false);
