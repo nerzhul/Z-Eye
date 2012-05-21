@@ -622,7 +622,7 @@
 					$output .= "<h4>Liste des VLANs</h4>";
 					$found = 0;
 					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-					$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,reation","ip = '".$dip."'","ip");
+					$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 					$tmpoutput = "<table><tr><th>ID</th><th>Description</th><th>Date de création</th></tr>";
 					while($data = pg_fetch_array($query)) {
 						if(!$found) $found = 1;
