@@ -339,16 +339,16 @@
 					$portmode = $portmode[1];
 					if($portmode == 1) {
 						$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
-						if($vlanFltr == $nvlan)
+						if(!in_array($pname,$plist) && $vlanFltr == $nvlan)
 							array_push($plist,$pname);
 
 						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
-						if(in_array($vlanFltr,$vllist))
+						if(!in_array($pname,$plist) && in_array($vlanFltr,$vllist))
 							array_push($plist,$pname);
 					}
 					else if($portmode == 2) {
 						$pvlan = getSwitchAccessVLANWithPID($device,$pid);
-						if($vlanFltr == $pvlan)
+						if(!in_array($pname,$plist) && $vlanFltr == $pvlan)
 							array_push($plist,$pname);
 					}
 				}
