@@ -167,7 +167,7 @@
 				$output .= ")</h4>";
 				
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."\">Liste des ports</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device.($filter ? "&fltr=".$filter : "")."\">Liste des ports</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=5\">Liste des VLANs</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=3\">Vue de façade</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&sh=1\">Modules internes</a>";
