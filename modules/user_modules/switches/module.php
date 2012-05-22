@@ -694,7 +694,7 @@
 				$tmpoutput .= "<th><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&od=vlan\">Vlan natif</a></th><th>";
 				if($iswif == true) $tmpoutput .= "Canal</th><th>Puissance</th><th>SSID";
 				else $tmpoutput .= "Vlan Trunk</th><th>Equipements connectés</th></tr>";
-				$query = FS::$pgdbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'","LENGTH(".$od."),".$od);
+				$query = FS::$pgdbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",($filter == "port" ? "LENGTH(".$od."),": "").$od);
 				while($data = pg_fetch_array($query)) {
 					if(preg_match("#unrouted#",$data["port"]))
 						continue;
