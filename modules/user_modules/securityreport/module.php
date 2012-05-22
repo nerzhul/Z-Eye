@@ -129,6 +129,7 @@
 						})(jQuery);
 						</script>";
 					$output .= "</body></html>";
+					$output .= "</body></html>";
 					mysql_select_db("fssmanager");
 				}
 				else if($showmodule == 2) {

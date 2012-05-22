@@ -610,7 +610,7 @@
 					$output .= "</script>";
 					$output .= "<h4>Retaguer un VLAN</h4>";
 					if($err && $err == 1) $output .= FS::$iMgr->printError("L'une des valeurs entrées est invalide !");
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=11");
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&d=".$device."&act=11");
 					$output .= "Ancien ID de VLAN ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= "Nouvel ID de VLAN ".FS::$iMgr->addNumericInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
@@ -1214,8 +1214,9 @@
 						FS::$iMgr->printError("Ce VLAN n'est pas présent sur l'équipement");
 					break;
 				case 11:
-					$old = FS::$secMgr->checkAndSecuriseGetData("oldvl");
-					$new = FS::$secMgr->checkAndSecuriseGetData("newvl");
+					$old = FS::$secMgr->checkAndSecurisePostData("oldvl");
+					$new = FS::$secMgr->checkAndSecurisePostData("newvl");
+					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					if(!$old || !$new || !FS::$secMgr->isNumeric($old) || !FS::$secMgr->isNumeric($new) || $old > 4096 || $new > 4096 || $old < 0 || $new < 0) {
 						header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4&err=1");
 						return;

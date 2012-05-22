@@ -346,6 +346,8 @@
 					}
 					else if($portmode == 2) {
 						$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+						$pvlan = explode(" ",$pvlan);
+						$pvlan = $pvlan[1];
 						if($vlanFltr == $pvlan)
 							array_push($plist,$pname);
 					}
@@ -391,6 +393,9 @@
 				}
 				else if($portmode == 2) {
 					$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+                                        $pvlan = explode(" ",$pvlan);
+                                        $pvlan = $pvlan[1];
+
 					if($oldvlan == $pvlan)
 						setSwitchAccessVLANWithPID($device,$pid,$newvlan);
 				}
