@@ -63,7 +63,12 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 				return -1;
 
-            return getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
+			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
+            if(count($vlan) != 2)
+				return -1;
+
+			$vlan = $vlan[1];
+			return $vlan; 
 		}
 		
 		function setSwitchTrunkVlanWithPID($device,$pid,$values) {
