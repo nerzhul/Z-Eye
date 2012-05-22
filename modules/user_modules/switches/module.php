@@ -151,7 +151,7 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($od == NULL) $od = "port";
-			else if($od == "desc") $od = "name";
+			else if($od == "desc" || $od == "name") $od = "name";
 			else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
 				
 			$output = "";
