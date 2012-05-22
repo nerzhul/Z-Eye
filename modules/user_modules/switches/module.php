@@ -665,23 +665,23 @@
 	
 					// Script pour modifier le nom du port
 					$output .= "<script type=\"text/javascript\">";
-									$output .= "function modifyPortDesc(src,sbmit,sw_,swport_,swds_,swdsc_) { ";
-									$output .= "if(sbmit == true) { ";
-									$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=3', { sw: sw_, swport: swport_, swdesc: document.getElementsByName(swds_)[0].value, wr: document.getElementsByName(swdsc_)[0].checked }, function(data) { ";
-									$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
-									$output .= "}); } ";
-									$output .= "else $(src).toggle(); }";
-									$output .= "</script>";
-	
-					// Script pour modifier le statut du port
-									$output .= "<script type=\"text/javascript\">";
-									$output .= "function modifyPortState(src,sbmit,sw_,swport_,swst_,swstc_) { ";
-									$output .= "if(sbmit == true) { ";
-									$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=4', { sw: sw_, swport: swport_, swst: document.getElementsByName(swst_)[0].checked, wr: document.getElementsByName(swstc_)[0].checked }, function(data) { ";
-									$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
-									$output .= "}); } ";
-									$output .= "else $(src).toggle(); }";
-									$output .= "</script>";
+					$output .= "function modifyPortDesc(src,sbmit,sw_,swport_,swds_,swdsc_) { ";
+					$output .= "if(sbmit == true) { ";
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=3', { sw: sw_, swport: swport_, swdesc: document.getElementsByName(swds_)[0].value, wr: document.getElementsByName(swdsc_)[0].checked }, function(data) { ";
+					$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
+					$output .= "}); } ";
+					$output .= "else $(src).toggle(); }";
+					$output .= "</script>";
+
+	// Script pour modifier le statut du port
+					$output .= "<script type=\"text/javascript\">";
+					$output .= "function modifyPortState(src,sbmit,sw_,swport_,swst_,swstc_) { ";
+					$output .= "if(sbmit == true) { ";
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=4', { sw: sw_, swport: swport_, swst: document.getElementsByName(swst_)[0].checked, wr: document.getElementsByName(swstc_)[0].checked }, function(data) { ";
+					$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
+					$output .= "}); } ";
+					$output .= "else $(src).toggle(); }";
+					$output .= "</script>";
 	
 				}
 				$tmpoutput = "<table class=\"standardTable\"><tr><th><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
