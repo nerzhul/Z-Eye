@@ -28,7 +28,7 @@
 			while($data = mysql_fetch_array($query)) {
 				$iparray = array();
 				$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
-				$netoutput .= "<center><canvas id=\"".$data["netid"]."\" height=\"300\" width=\"450\">HTML5 non support&eacute;</canvas></center>";
+				$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
 				$netoutput .= "<center><table><tr><th>Adresse IP</th><th>Statut</th><th>MAC address</th><th>Nom d'hote</th><th>Fin du bail</th></tr>";
 				$netobj = new FSNetwork();
 				$netobj->setNetAddr($data["netid"]);
@@ -98,21 +98,23 @@
 					$netoutput .= $value["ltime"]."</td></tr>";
 				}
 				$netoutput .= "</table></center><br /><hr>";
-				$netoutput .= "<script>
-				{
-					var pie3 = new RGraph.Pie('".$data["netid"]."', [".$used.",".$reserv.",".$fixedip.",".$free."]);
-					pie3.Set('chart.key', ['Baux (".substr(($used/count($iparray)*100),0,5)."%)', 'Reservations (".substr(($reserv/count($iparray)*100),0,5)."%)', 'IPs Fixes (".substr(($fixedip/count($iparray)*100),0,5)."%)', 'Libres (".substr(($free/count($iparray)*100),0,5)."%)', ]);
-					pie3.Set('chart.key.interactive', true);
-					pie3.Set('chart.colors', ['red', 'yellow', 'orange', 'green']);
-					pie3.Set('chart.shadow', true);
-					pie3.Set('chart.exploded', [10,10,10,10]);
-					pie3.Set('chart.shadow.offsetx', 0);
-					pie3.Set('chart.shadow.offsety', 0);
-					pie3.Set('chart.shadow.blur', 25);
-					pie3.Set('chart.strokestyle', 'white');
-					pie3.Set('chart.linewidth', 3);
-					pie3.Draw();
-				   }</script>";
+				$netoutput .= "<script type=\"text/javascript\">
+					var chart = new Highcharts.Chart({
+						chart: { renderTo: '".$data["netid"]."', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
+						title: { text: '' },
+						tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
+									Math.round(this.percentage*100)/100+' %)'; } },
+						plotOptions: {
+							pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: {
+									enabled: true,formatter: function() { return '<b>'+this.point.name+'</b>: '+
+									this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
+						}}},
+						series: [{ type: 'pie', data: 
+							[{ name: 'Baux', y: ".$used.", color: 'red' },
+							{ name: 'Reservations', y: ".$reserv.", color: 'yellow'},
+							{ name: 'Adresses fixes', y: ".$fixedip.", color: 'orange'},
+							{ name: 'Libres', y:".$free.", color: 'green'}]
+						}]});</script>";
 			}
 			$output .= $formoutput;
 			$output .= "</select>";

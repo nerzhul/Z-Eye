@@ -23,15 +23,6 @@
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-math.js");
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-Regex.js");
 		FS::$iMgr->addJSFile("lib/FSS/js/FS-interface.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.core.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.tooltips.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.effects.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.key.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.pie.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.context.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.annotate.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.common.zoom.js");
-		FS::$iMgr->addJSFile("lib/RGraph/RGraph.line.js");
 		FS::$iMgr->addJSFile("lib/HighCharts/highcharts.min.js");
 
 		echo FS::$iMgr->showHeader();
