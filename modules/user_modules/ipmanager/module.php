@@ -174,8 +174,12 @@
 						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["ip"]."' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 			                        while($data2 = pg_fetch_array($query2)) {
 							if($data2["mac"] == $data["macaddr"]) {
-								if(!$found) $found = true;
-								$output .= $data["ip"]." / <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
+								$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND active = 't' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
+								if(!$foundrecent) {
+									if(!$found) $found = true;
+									$output .= $data["ip"]." / <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
+								}
+
 							}
 						}
 					}

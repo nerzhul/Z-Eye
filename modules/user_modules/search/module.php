@@ -223,7 +223,7 @@
 			$found = 0;
 			
 			if($lastmac) {
-				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$lastmac."'","time_last",2,1);
+				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$lastmac."' AND active = 't'","time_last",1,1);
 				if($data = pg_fetch_array($query)) {
 					$tmpoutput .= "<div><h4>Dernier équipement</h4>";
 					$fst = preg_split("#\.#",$data["time_first"]);
@@ -264,9 +264,8 @@
 			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h4>Equipement Réseau</h4>";
 				$tmpoutput .= "<b><i>Nom: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
-				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a>";
-				if(strlen($data["mac"]) > 0)
-					$tmpoutput .= " (<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a>)<br />";
+				$tmpoutput .= "<b><i>Informations: </i></b><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
+				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a>)<br />";
 				$tmpoutput .= "<b><i>Modèle:</i></b> ".$data["model"]."<br />";
 				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
 			}
