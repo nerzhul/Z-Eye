@@ -288,10 +288,10 @@
 						$toquery = "";
 						if($data["recval"][strlen($data["recval"])-1] == ".") {
 							$toquery = $data["recval"];
-							$toquery[strlen($toquery)-1] = '\0';
+							$toquery[strlen($toquery)-1] = '';
 						}
 						else
-							$data["record"].".".$filter;
+							$toquery = $data["record"].".".$filter;
 						$out = array();
 						exec("dig -t A ".$toquery." +short|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
 						if(count($out) == 0) {
