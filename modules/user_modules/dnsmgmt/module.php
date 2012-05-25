@@ -275,10 +275,10 @@
 					// Search deprecated records
 					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","recval","zonename = '".$filter."' AND rectype = 'A'");
 					while($data = mysql_fetch_array($query)) {
-						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
+						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 						while($data2 = pg_fetch_array($query2)) {
 							if($data2["mac"] == $data["macaddr"]) {
-								$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND active = 't' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
+								$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 								if(!$foundrecent) {
 									if(!$found) $found = true;
 									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["recval"].".".$filter."\">".$data["recval"].".".$filter."</a><br /> / ".$data["ip"];
