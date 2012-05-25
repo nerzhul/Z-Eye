@@ -24,9 +24,7 @@
 				$output .= FS::$iMgr->addList("f");
 				
 				$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
-				if($shA == NULL) $shA = true;
-				else if($shA > 0) $shA = true;
-				else $shA = false;
+				if($shA == NULL) $shA = 1;
 				
 				$shAAAA = FS::$secMgr->checkAndSecuriseGetData("saaaa");
 				if($shAAAA == NULL) $shAAAA = 1;
@@ -277,14 +275,16 @@
 					while($data = mysql_fetch_array($query)) {
 						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 						while($data2 = pg_fetch_array($query2)) {
-							if($data2["mac"] == $data["macaddr"]) {
-								$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
-								if(!$foundrecent) {
-									if(!$found) $found = true;
-									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["recval"].".".$filter."\">".$data["recval"].".".$filter."</a><br /> / ".$data["ip"];
-								}
+							$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
+							if(!$foundrecent) {
+								if(!$found) $found = true;
+								$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["recval"].".".$filter."\">".$data["recval"].".".$filter."</a><br /> / ".$data["ip"];
 							}
 						}
+					}
+					
+					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","recval","zonename = '".$filter."' AND rectype = 'CNAME'");
+					while($data = mysql_fetch_array($query)) {
 					}
 					if($found) echo "<h4>Enregistrements obsolètes trouvés !</h4>".$output;
 					else echo FS::$iMgr->printDebug("Aucun enregistrement obsolète trouvé");
