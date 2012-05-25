@@ -199,11 +199,12 @@
 					$output .= "<h4>Recherche d'enregistrements obsolètes</h4>";
 					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
 					$output .= "$('#obsres').html('".FS::$iMgr->addImage('styles/images/loader.gif')."');";
-					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
 					$output .= "$('#obsres').html(data);";
 					$output .= "});return false;}</script>";
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->addHidden("obsdata",$filter);
+					$output .= "Intervalle (jours) ".FS::$iMgr->addNumericInput("ival")."<br />";
 					$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchobsolete();");
 					$output .= "</form><div id=\"obsres\"></div>";
 				}
@@ -260,7 +261,28 @@
 					}
 					return;
 				case 2:
-					
+					$filter = FS::$secMgr->checkAndSecurisePostData("obsdata");
+					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
+					if(!$filter || !FS::$secMgr->isIP($filter) || !$interval || !FS::$secMgr->isNumeric($interval) ||
+						$interval < 1) {
+						echo FS::$iMgr->printError("Requête invalide !");
+						return;
+					}
+
+					// Search deprecated records
+					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","recval","zonename = '".$filter."' AND rectype = 'A'");
+					while($data = mysql_fetch_array($query)) {
+						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
+						while($data2 = pg_fetch_array($query2)) {
+							if($data2["mac"] == $data["macaddr"]) {
+								$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND active = 't' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
+								if(!$foundrecent) {
+									if(!$found) $found = true;
+									$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["recval"].".".$filter."\">".$data["recval"].".".$filter."</a><br /> / ".$data["ip"];
+								}
+							}
+						}
+					}
 					return;
 			}
 		}
