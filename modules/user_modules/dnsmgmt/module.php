@@ -269,6 +269,9 @@
 						return;
 					}
 
+					$found = false;
+					$output = "";
+					
 					// Search deprecated records
 					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","recval","zonename = '".$filter."' AND rectype = 'A'");
 					while($data = mysql_fetch_array($query)) {
@@ -283,6 +286,8 @@
 							}
 						}
 					}
+					if($found) echo "<h4>Enregistrements obsolètes trouvés !</h4>".$output;
+					else echo FS::$iMgr->printDebug("Aucun enregistrement obsolète trouvé");
 					return;
 			}
 		}
