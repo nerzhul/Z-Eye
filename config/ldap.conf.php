@@ -13,6 +13,7 @@
 			public static $LDAPuid = "uid";
 			public static $LDAPsurname = "displayName";
 			public static $LDAPmail = "mail";
+			public static $LDAPfilter = "";
         };
 ?>
 
