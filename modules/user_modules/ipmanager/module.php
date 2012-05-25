@@ -34,119 +34,119 @@
 					return "Veuillez choisir le réseau IP à monitorer: <br /><br />".$output;
 
 				$output .= "<div id=\"contenttabs\"><ul>";
-        	                $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."\">Statistiques</a>";
-                	        $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sh=2\">Outils avancés</a>";
-                        	$output .= "</ul></div>";
-	                        $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-        	                $output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."\">Statistiques</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sh=2\">Outils avancés</a>";
+				$output .= "</ul></div>";
+				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
 			} else {
-			if(!$showmodule || $showmodule == 1) {
-			$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
-			while($data = mysql_fetch_array($query)) {
-				$iparray = array();
-				$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
-				$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
-				$netoutput .= "<center><table><tr><th>Adresse IP</th><th>Statut</th><th>MAC address</th><th>Nom d'hote</th><th>Fin du bail</th></tr>";
-				$netobj = new FSNetwork();
-				$netobj->setNetAddr($data["netid"]);
-				$netobj->setNetMask($data["netmask"]);
-				for($i=($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
-					$iparray[$i] = array();
-					$iparray[$i]["mac"] = "";
-					$iparray[$i]["host"] = "";
-					$iparray[$i]["ltime"] = "";
-					$iparray[$i]["distrib"] = 0;
-				}
-				$query2 = FS::$dbMgr->Select("fss_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","netid = '".$data["netid"]."'");
-				while($data2 = mysql_fetch_array($query2)) {
-					$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
-					$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
-					$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
-					$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
-				}
-				
-				$used = 0;
-				$reserv = 0;
-				$free = 0;
-				$fixedip = 0;
-				foreach($iparray as $key => $value) {
-					$rstate = "";
-					$style = "";
-					switch($value["distrib"]) {
-						case 1:
-							$rstate = "Libre";
-							$style = "background-color: #BFFFBF;";
-							$free++;
-							break;
-						case 2:
-							$rstate = "Utilis&eacute;";
-							$style = "background-color: #FF6A6A;";
-							$used++;
-							break;
-						case 3:
-							$rstate = "R&eacute;serv&eacute;";
-							$style = "background-color: #FFFF80;";
-							$reserv++;
-							break;
-						default: {
+				if(!$showmodule || $showmodule == 1) {
+				$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
+				while($data = mysql_fetch_array($query)) {
+					$iparray = array();
+					$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
+					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
+					$netoutput .= "<center><table><tr><th>Adresse IP</th><th>Statut</th><th>MAC address</th><th>Nom d'hote</th><th>Fin du bail</th></tr>";
+					$netobj = new FSNetwork();
+					$netobj->setNetAddr($data["netid"]);
+					$netobj->setNetMask($data["netmask"]);
+					for($i=($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
+						$iparray[$i] = array();
+						$iparray[$i]["mac"] = "";
+						$iparray[$i]["host"] = "";
+						$iparray[$i]["ltime"] = "";
+						$iparray[$i]["distrib"] = 0;
+					}
+					$query2 = FS::$dbMgr->Select("fss_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","netid = '".$data["netid"]."'");
+					while($data2 = mysql_fetch_array($query2)) {
+						$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
+						$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
+						$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
+						$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
+					}
+					
+					$used = 0;
+					$reserv = 0;
+					$free = 0;
+					$fixedip = 0;
+					foreach($iparray as $key => $value) {
+						$rstate = "";
+						$style = "";
+						switch($value["distrib"]) {
+							case 1:
 								$rstate = "Libre";
 								$style = "background-color: #BFFFBF;";
-								$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
-								if($mac) {
-									$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
-									if($data3 = pg_fetch_array($query3)) {
-										$rstate = "IP fixe";
-										$style = "background-color: orange;";
-										$fixedip++;
+								$free++;
+								break;
+							case 2:
+								$rstate = "Utilis&eacute;";
+								$style = "background-color: #FF6A6A;";
+								$used++;
+								break;
+							case 3:
+								$rstate = "R&eacute;serv&eacute;";
+								$style = "background-color: #FFFF80;";
+								$reserv++;
+								break;
+							default: {
+									$rstate = "Libre";
+									$style = "background-color: #BFFFBF;";
+									$mac = FS::$pgdbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
+									if($mac) {
+										$query3 = FS::$pgdbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
+										if($data3 = pg_fetch_array($query3)) {
+											$rstate = "IP fixe";
+											$style = "background-color: orange;";
+											$fixedip++;
+										}
+										else
+											$free++;
 									}
 									else
 										$free++;
 								}
-								else
-									$free++;
-							}
-							break;
+								break;
+						}
+						$netoutput .= "<tr style=\"$style\"><td><a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
+						$netoutput .= long2ip($key)."</a>";
+						$netoutput .= "</td><td>".$rstate."</td><td>";
+						$netoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
+						$netoutput .= $value["host"]."</td><td>";
+						$netoutput .= $value["ltime"]."</td></tr>";
 					}
-					$netoutput .= "<tr style=\"$style\"><td><a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
-					$netoutput .= long2ip($key)."</a>";
-					$netoutput .= "</td><td>".$rstate."</td><td>";
-					$netoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
-					$netoutput .= $value["host"]."</td><td>";
-					$netoutput .= $value["ltime"]."</td></tr>";
+					$netoutput .= "</table></center><br /><hr>";
+					$netoutput .= "<script type=\"text/javascript\">
+						var chart = new Highcharts.Chart({
+							chart: { renderTo: '".$data["netid"]."', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
+							title: { text: '' },
+							tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
+										Math.round(this.percentage*100)/100+' %)'; } },
+							plotOptions: {
+								pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: {
+										enabled: true,formatter: function() { return '<b>'+this.point.name+'</b>: '+
+										this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
+							}}},
+							series: [{ type: 'pie', data: 
+								[{ name: 'Baux', y: ".$used.", color: 'red' },
+								{ name: 'Reservations', y: ".$reserv.", color: 'yellow'},
+								{ name: 'Adresses fixes', y: ".$fixedip.", color: 'orange'},
+								{ name: 'Libres', y:".$free.", color: 'green'}]
+							}]});</script>";
 				}
-				$netoutput .= "</table></center><br /><hr>";
-				$netoutput .= "<script type=\"text/javascript\">
-					var chart = new Highcharts.Chart({
-						chart: { renderTo: '".$data["netid"]."', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
-						title: { text: '' },
-						tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
-									Math.round(this.percentage*100)/100+' %)'; } },
-						plotOptions: {
-							pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: {
-									enabled: true,formatter: function() { return '<b>'+this.point.name+'</b>: '+
-									this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
-						}}},
-						series: [{ type: 'pie', data: 
-							[{ name: 'Baux', y: ".$used.", color: 'red' },
-							{ name: 'Reservations', y: ".$reserv.", color: 'yellow'},
-							{ name: 'Adresses fixes', y: ".$fixedip.", color: 'orange'},
-							{ name: 'Libres', y:".$free.", color: 'green'}]
-						}]});</script>";
-			}
-			$output .= $netoutput;
-			} else if($showmodule == 2) {
-				$output .= "<h4>Recherche de réservation obsolète</h4>";
-				$output .= "<script type=\"text/javascript\">function searchobsolete() {";
-				$output .= "$('#obsres').html('".FS::$iMgr->addImage('styles/images/loader.gif')."');";
-				$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
-                                $output .= "$('#obsres').html(data);";
-                                $output .= "});return false;}</script>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
-				$output .= FS::$iMgr->addHidden("obsdata",$filter);
-				$output .= "Intervalle (jours) ".FS::$iMgr->addNumericInput("ival")."<br />";
-				$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchobsolete();");
-				$output .= "</form><div id=\"obsres\"></div>";
-			}
+				$output .= $netoutput;
+				} else if($showmodule == 2) {
+					$output .= "<h4>Recherche de réservation obsolète</h4>";
+					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
+					$output .= "$('#obsres').html('".FS::$iMgr->addImage('styles/images/loader.gif')."');";
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
+									$output .= "$('#obsres').html(data);";
+									$output .= "});return false;}</script>";
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+					$output .= FS::$iMgr->addHidden("obsdata",$filter);
+					$output .= "Intervalle (jours) ".FS::$iMgr->addNumericInput("ival")."<br />";
+					$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchobsolete();");
+					$output .= "</form><div id=\"obsres\"></div>";
+				}
 			}
 			return $output;
 		}
