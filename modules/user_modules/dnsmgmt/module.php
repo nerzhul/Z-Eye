@@ -75,7 +75,6 @@
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
 			} else {
 				if(!$showmodule || $showmodule == 1) {
-					
 					$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
 					if($shA == NULL) $shA = true;
 					else if($shA > 0) $shA = true;
@@ -115,11 +114,6 @@
 					if($shother == NULL) $shother = true;
 					else if($shother > 0) $shother = true;
 					else $shother = false;
-				
-					if(strlen($formoutput) == 0) {
-						$output .= FS::$iMgr->printError("Aucune donnée récoltée sur les serveurs DNS !");
-						return $output;
-					}
 					
 					if(!$filter) {
 						$output .= FS::$iMgr->printError("Aucune zone DNS spécifiée !");

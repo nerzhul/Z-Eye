@@ -27,9 +27,9 @@
 					$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
 				$output .= $formoutput;
-	                        $output .= "</select>";
-                        	$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
-                	        $output .= "</form><br />";
+				$output .= "</select>";
+				$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
+				$output .= "</form><br />";
 				if(!$filter)
 					return "Veuillez choisir le réseau IP à monitorer: <br /><br />".$output;
 
