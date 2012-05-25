@@ -263,7 +263,7 @@
 				case 2:
 					$filter = FS::$secMgr->checkAndSecurisePostData("obsdata");
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
-					if(!$filter || !FS::$secMgr->isIP($filter) || !$interval || !FS::$secMgr->isNumeric($interval) ||
+					if(!$filter || !$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
 						echo FS::$iMgr->printError("Requête invalide !");
 						return;
