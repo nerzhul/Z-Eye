@@ -271,20 +271,44 @@
 					$output = "";
 					
 					// Search deprecated records
-					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","recval","zonename = '".$filter."' AND rectype = 'A'");
+					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
 					while($data = mysql_fetch_array($query)) {
 						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 						while($data2 = pg_fetch_array($query2)) {
 							$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 							if(!$foundrecent) {
 								if(!$found) $found = true;
-								$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["recval"].".".$filter."\">".$data["recval"].".".$filter."</a><br /> / ".$data["ip"];
+								$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$data["recval"]."<br />";
 							}
 						}
 					}
 					
-					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","recval","zonename = '".$filter."' AND rectype = 'CNAME'");
+					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'CNAME'");
 					while($data = mysql_fetch_array($query)) {
+						$toquery = "";
+						if($data["recval"][strlen($data["recval"])-1] == ".") {
+							$toquery = $data["recval"];
+							$toquery[strlen($toquery)-1] = '\0';
+						}
+						else
+							$data["record"].".".$filter;
+						$out = array();
+						exec("dig -t A ".$toquery." +short|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
+						if(count($out) == 0) {
+							$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / Orphelin<br />";
+						}
+						else {
+							for($i=0;$i<count($out);$i++) {
+								$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$out[$i]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
+								while($data2 = pg_fetch_array($query2)) {
+									$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
+									if(!$foundrecent) {
+										if(!$found) $found = true;
+										$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$out[$i]."<br />";
+									}
+								}
+							}
+						}
 					}
 					if($found) echo "<h4>Enregistrements obsolètes trouvés !</h4>".$output;
 					else echo FS::$iMgr->printDebug("Aucun enregistrement obsolète trouvé");
