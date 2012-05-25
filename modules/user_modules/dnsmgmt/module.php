@@ -193,10 +193,19 @@
 					}
 					
 					if(strlen($dnsoutput) > 0)
-						$output .= $dnsoutput."</table><hr>";
+						$output .= $dnsoutput."</table>";
 				}
 				else if($showmodule == 2) {
-					$output .= "text";
+					$output .= "<h4>Recherche d'enregistrements obsolètes</h4>";
+					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
+					$output .= "$('#obsres').html('".FS::$iMgr->addImage('styles/images/loader.gif')."');";
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
+					$output .= "$('#obsres').html(data);";
+					$output .= "});return false;}</script>";
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+					$output .= FS::$iMgr->addHidden("obsdata",$filter);
+					$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchobsolete();");
+					$output .= "</form><div id=\"obsres\"></div>";
 				}
 			}
 			return $output;
@@ -249,6 +258,9 @@
 						else $shother = 0;
 						header("Location: index.php?mod=".$this->mid.($filtr != NULL ? "&f=".$filtr : "")."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother);
 					}
+					return;
+				case 2:
+					
 					return;
 			}
 		}
