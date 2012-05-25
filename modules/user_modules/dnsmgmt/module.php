@@ -67,12 +67,14 @@
 				$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
 				$output .= "</form>";
 				
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">Statistiques</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">Outils avancés</a>";
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+				if($filter) {
+					$output .= "<div id=\"contenttabs\"><ul>";
+					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">Statistiques</a>";
+					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">Outils avancés</a>";
+					$output .= "</ul></div>";
+					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+					$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+				}
 			} else {
 				if(!$showmodule || $showmodule == 1) {
 					$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
