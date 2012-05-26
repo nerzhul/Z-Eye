@@ -636,15 +636,8 @@
 					$output .= FS::$iMgr->addJSSubmit("modify","Appliquer","return checkTagForm();")."</form><br />";
 					$output .= FS::$iMgr->addJSSubmit("search","Vérifier les ports concernés","return searchports();")."<div id=\"vlplist\"></div>";
 					
-					/// Part to copy startup-config -> server
-					$output .= "<script type=\"text/javascript\">function arangeform() {";
-					$output .= "if(document.getElementsByName('exportm')[0].value == 2 || document.getElementsByName('exportm')[0].value == 4 || document.getElementsByName('exportm')[0].value == 5) {";
-					$output .= "$('#slogin').show();";
-					$output .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
-					$output .= "$('#slogin').hide();";
-					$output .= "}";
-					$output .= "};";
-					$output .= "function checkCopyState(copyId) {
+					// Common JS
+					$output .= "<script type=\"text/javascript\">function checkCopyState(copyId) {
 							setTimeout(function() {
 								$.post('index.php?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
 									if(data == 2) {
@@ -664,7 +657,14 @@
 									else
 										$('#subpop').html('Unknown response: '+data);
 								}); }, 1000);
-						}";
+						}</script>";
+					
+					// Copy startup-config -> TFTP/FTP server
+					$output .= "<script type=\"text/javascript\">function arangeform() {";
+					$output .= "if(document.getElementsByName('exportm')[0].value == 2 || document.getElementsByName('exportm')[0].value == 4 || document.getElementsByName('exportm')[0].value == 5) {";
+					$output .= "$('#slogin').show();";
+					$output .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
+					$output .= "$('#slogin').hide(); }};";
 					$output .= "function sendbackupreq() {";
 					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
@@ -690,6 +690,21 @@
 					$output .= "<div id=\"slogin\" style=\"display:none;\">Utilisateur ".FS::$iMgr->addInput("srvuser");
 					$output .= " Mot de passe ".FS::$iMgr->addPasswdField("srvpwd")."</div>";
 					$output .= FS::$iMgr->addJSSubmit("send","Envoyer","return sendbackupreq();");
+					
+					// Copy startup-config -> running-config
+					$output .= "<script type=\"text/javascript\">function restorestartupconfig() {";
+					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+					$output .= "$('#pop').show();";
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
+						var copyId = data;
+						$('#subpop').html('Restauration en cours...');
+						checkCopyState(copyId);
+					});";
+					$output .= "return false;";
+					$output .= "};";
+					$output .= "</script>";
+					$output .= "<h4>Restaurer la startup-config</h4>";
+					$output .= FS::$iMgr->addJSSubmit("restore","Restaurer","return restorestartupconfig();");
 					return $output;
 				}
 				else if($showmodule == 5) {
@@ -1357,6 +1372,17 @@
 						case 9: echo "Requête abandonnée"; break;
 						default: echo "Erreur inconnue"; break;
 					}
+					return;
+				/*
+				* Restore startup-config
+				*/
+				case 15:
+					$device = FS::$secMgr->checkAndSecuriseGetData("d");
+					if(!$device) {
+						echo FS::$iMgr->printError("Les données entrées sont erronées ou invalides !");
+						return;
+					}
+					echo restoreStartupConfig($device);
 					return;
 				default: break;
 			}

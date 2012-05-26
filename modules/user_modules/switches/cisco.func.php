@@ -428,7 +428,20 @@
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
 			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
-			return 0;
+			return $rand;
+		}
+		
+		function restoreStartupConfig($device) {
+			$rand = rand(1,100);
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","4");
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
+			return $rand;
 		}
 		
 		// Save startup-config to TFTP Server
