@@ -644,13 +644,34 @@
 					$output .= "$('#slogin').hide();";
 					$output .= "}";
 					$output .= "};";
+					$output .= "function checkCopyState(copyId) {
+							setTimeout(function() {
+								$.post('index.php?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
+									if(data == '2') {
+										$('#subpop').html('Copie en cours 2 ...');
+										checkCopyState(copyId);
+									}
+									else if(data == '3') {
+										$('#subpop').html('Succès !');
+										setTimeout(function() { $('#pop').hide(); },1000);
+									}
+									else if(data == '4') {
+										$('#subpop').html('Echec !');
+										setTimeout(function() { $('#pop').hide(); },5000);
+									}
+									else
+										$('#subpop').html(data);
+								}); }, 1000);
+						}";
 					$output .= "function sendbackupreq() {";
 					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
-					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
 					srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value },
 					function(data) { 
-						$('#subpop').html(data);
+						var copyId = data;
+						$('#subpop').html('Copie en cours...');
+						checkCopyState(copyId);
 					});";
 					$output .= "return false;";
 					$output .= "};";
@@ -1276,6 +1297,9 @@
 					replaceVlan($device,$old,$new);
 					header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4");
 					return;
+				/*
+				* Backup startup-config
+				*/
 				case 12:
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					$exportmode = FS::$secMgr->checkAndSecurisePostData("exportm");
@@ -1300,6 +1324,18 @@
 						$res = exportConfigToTFTP($device,$sip,$filename);
 						echo $res;
 					}
+					return;
+				/*
+				* Verify backup state
+				*/
+				case 13:
+					$device = FS::$secMgr->checkAndSecuriseGetData("d");
+					$saveid = FS::$secMgr->checkAndSecuriseGetData("saveid");
+					if(!$device || !$actid || !FS::$secMgr->isNumeric($saveid)) {
+						echo FS::$iMgr->printError("Les données demandées sont invalides !");
+						return;
+					}
+					$res = getCopyState($device,$saveid);
 				default: break;
 			}
 		}

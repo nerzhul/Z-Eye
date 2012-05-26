@@ -440,11 +440,9 @@
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$dip);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$filename);
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			if(snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand) == 4)
-				return -1;
 			return $rand;
 		}
 		// Save startup-config to FTP/SCP/SFTP Server
@@ -456,16 +454,24 @@
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$dip);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$filename);
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			if(snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand) == 4)
-				return -1;
-				
 			return $rand;	
 		}
+		
+		// Get Copy state from switch, using previous randomized id
+		function getCopyState($device,$copyId) {
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
+			$res = snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
+			$res = preg_split("# #",$res);
+			return $res[1];
+		}
+		
 		/*
 		* helpers
 		*/
