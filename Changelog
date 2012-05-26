@@ -1,0 +1,11 @@
+Z-Eye Changelog
+
+Version Alpha-Devel
+- Many basic functions, changelog started before
+
+Version Alpha 0.13.2
+- DHCP Monitor: Added tab Advanced Tool and new function to get useless DHCP reservations (following user interval)
+- DNS Monitor: Added tab Advanced Tool and new function to get useless DNS entries (following user interval)
+
+Version Alpha 0.14
+- Switch Management: Added new Advanced Tool to save startup-config to TFTP/FTP/SCP/SFTP

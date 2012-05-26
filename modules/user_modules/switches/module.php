@@ -92,13 +92,13 @@
 						$output .= "<tr><td>Adresse MAC</td><td>".$data["mac"]."</td></tr>";
 						$output .= "<tr><td>Etat / Duplex / Vitesse</td><td>";
 						if($data["up_admin"] == "down")
-												$output .= "<span style=\"color: red;\">Eteint</span>";
-										else if($data["up_admin"] == "up" && $data["up"] == "down")
-												$output .= "<span style=\"color: orange;\">Inactif</span>";
-										else if($data["up"] == "up")
-												$output .= "<span style=\"color: black;\">Actif</span>";
-										else
-												$output .= "unk";
+								$output .= "<span style=\"color: red;\">Eteint</span>";
+						else if($data["up_admin"] == "up" && $data["up"] == "down")
+								$output .= "<span style=\"color: orange;\">Inactif</span>";
+						else if($data["up"] == "up")
+								$output .= "<span style=\"color: black;\">Actif</span>";
+						else
+								$output .= "unk";
 						$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
 						$output .= "<tr><td>Eteindre</td><td>".FS::$iMgr->addCheck("shut",($data["up_admin"] == "down" ? true : false))."</td></tr>";
 						$output .= "<tr><td>Vitesse</td><td>Non disponible</td></tr>";
@@ -635,6 +635,32 @@
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
 					$output .= FS::$iMgr->addJSSubmit("modify","Appliquer","return checkTagForm();")."</form><br />";
 					$output .= FS::$iMgr->addJSSubmit("search","Vérifier les ports concernés","return searchports();")."<div id=\"vlplist\"></div>";
+					
+					/// Part to copy startup-config -> server
+					$output .= "<script type=\"text/javascript\">function arangeform() {";
+					$output .= "if(document.getElementsByName('exportm')[0].value == 2 || document.getElementsByName('exportm')[0].value == 4 || document.getElementsByName('exportm')[0].value == 5) {";
+					$output .= "$('#slogin').show();";
+					$output .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
+					$output .= "$('#slogin').hide();";
+					$output .= "}";
+					$output .= "};";
+					$output .= "function showwait() {";
+					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+					$output .= "$('#pop').show();";
+					$output .= "};";
+					$output .= "</script>";
+					$output .= "<h4>Exporter la configuration</h4>";
+					$output .= FS::$iMgr->addList("exportm","arangeform();");
+					$output .= FS::$iMgr->addElementToList("TFTP",1);
+					$output .= FS::$iMgr->addElementToList("FTP",2);
+					$output .= FS::$iMgr->addElementToList("SCP",4);
+					$output .= FS::$iMgr->addElementToList("SFTP",5);
+					$output .= "</select>";
+					$output .= "Adresse du serveur ".FS::$iMgr->addIPInput("srvip")."<br />";
+					$output .= "Nom de fichier ".FS::$iMgr->addInput("srvfilename")."<br />";
+					$output .= "<div id=\"slogin\" style=\"display:none;\">Utilisateur ".FS::$iMgr->addInput("srvuser");
+					$output .= "Mot de passe ".FS::$iMgr->addInput("srvpwd")."</div>";
+					$output .= FS::$iMgr->addJSSubmit("send","Envoyer");
 					return $output;
 				}
 				else if($showmodule == 5) {
