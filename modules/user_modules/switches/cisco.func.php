@@ -446,12 +446,14 @@
 			return $rand;
 		}
 		// Save startup-config to FTP/SCP/SFTP Server
-		function exportConfigToAuthServer($device,$server,$path,$user,$pwd) {
+		function exportConfigToAuthServer($device,$server,$type,$path,$user,$pwd) {
+			if($type != 2 && $type != 4 && $type != 5)
+				return -1;
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);

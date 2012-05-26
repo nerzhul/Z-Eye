@@ -1319,13 +1319,12 @@
 							echo FS::$iMgr->printError("Les données entrées sont erronées ou invalides !");
 							return;
 						}
-						$res = exportConfigToAuthServer($device,$dip,$filename,$username,$password);
-						echo $res;
+						echo exportConfigToAuthServer($device,$sip,$exportmode,$filename,$username,$password);
 					}
-					else {
-						$res = exportConfigToTFTP($device,$sip,$filename);
-						echo $res;
-					}
+					else if($exportmode == 1) {
+						echo  exportConfigToTFTP($device,$sip,$filename);
+					} else
+						FS::$iMgr->printError("Type d'export invalide !");
 					return;
 				/*
 				* Verify backup state
@@ -1348,12 +1347,14 @@
 					}
 					$err = getCopyError($device,$saveid);
 					switch($err) {
-						case 2: echo "Nom de fichier incorrect"; break;
-						case 3: echo "Temps de connexion dépassé"; break;
+						case 2: echo "Nom de fichier, chemin ou droits incorrects"; break;
+						case 3: echo "Temps de connexion dépassé<br />Le serveur distant ne répond pas"; break;
 						case 4: echo "Pas de mémoire disponible"; break;
-						case 5: echo "Configuration de la copie incorrecte"; break;
+						case 5: echo "La source de la copie est incorrecte"; break;
 						case 6: echo "Protocole non supporté"; break;
 						case 7: echo "Erreur d'application de la configuration"; break;
+						case 8: echo "Système non prêt"; break;
+						case 9: echo "Requête abandonnée"; break;
 						default: echo "Erreur inconnue"; break;
 					}
 					return;
