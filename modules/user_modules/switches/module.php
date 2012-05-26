@@ -647,20 +647,20 @@
 					$output .= "function checkCopyState(copyId) {
 							setTimeout(function() {
 								$.post('index.php?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
-									if(data == '2') {
-										$('#subpop').html('Copie en cours 2 ...');
+									if(data == 2) {
+										$('#subpop').html('Copie en cours ...');
 										checkCopyState(copyId);
 									}
-									else if(data == '3') {
+									else if(data == 3) {
 										$('#subpop').html('Succès !');
 										setTimeout(function() { $('#pop').hide(); },1000);
 									}
-									else if(data == '4') {
+									else if(data == 4) {
 										$('#subpop').html('Echec !');
 										setTimeout(function() { $('#pop').hide(); },5000);
 									}
 									else
-										$('#subpop').html(data);
+										$('#subpop').html('Unknown response: '+data);
 								}); }, 1000);
 						}";
 					$output .= "function sendbackupreq() {";
@@ -1331,11 +1331,11 @@
 				case 13:
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					$saveid = FS::$secMgr->checkAndSecuriseGetData("saveid");
-					if(!$device || !$actid || !FS::$secMgr->isNumeric($saveid)) {
+					if(!$device || !$saveid || !FS::$secMgr->isNumeric($saveid)) {
 						echo FS::$iMgr->printError("Les données demandées sont invalides !");
 						return;
 					}
-					$res = getCopyState($device,$saveid);
+					echo getCopyState($device,$saveid);
 				default: break;
 			}
 		}
