@@ -656,7 +656,9 @@
 										setTimeout(function() { $('#pop').hide(); },1000);
 									}
 									else if(data == 4) {
-										$('#subpop').html('Echec !');
+										$.post('index.php?at=3&mod=".$this->mid."&act=14&d=".$device."&saveid='+copyId, function(data) {
+											$('#subpop').html('Echec !<br />Cause: '+data); 
+										});
 										setTimeout(function() { $('#pop').hide(); },5000);
 									}
 									else
@@ -1336,6 +1338,25 @@
 						return;
 					}
 					echo getCopyState($device,$saveid);
+					return;
+				case 14:
+					$device = FS::$secMgr->checkAndSecuriseGetData("d");
+					$saveid = FS::$secMgr->checkAndSecuriseGetData("saveid");
+					if(!$device || !$saveid || !FS::$secMgr->isNumeric($saveid)) {
+						echo FS::$iMgr->printError("Les données demandées sont invalides !");
+						return;
+					}
+					$err = getCopyError($device,$saveid);
+					switch($err) {
+						case 2: echo "Nom de fichier incorrect"; break;
+						case 3: echo "Temps de connexion dépassé"; break;
+						case 4: echo "Pas de mémoire disponible"; break;
+						case 5: echo "Configuration de la copie incorrecte"; break;
+						case 6: echo "Protocole non supporté"; break;
+						case 7: echo "Erreur d'application de la configuration"; break;
+						default: echo "Erreur inconnue"; break;
+					}
+					return;
 				default: break;
 			}
 		}

@@ -465,9 +465,18 @@
 		// Get Copy state from switch, using previous randomized id
 		function getCopyState($device,$copyId) {
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			$res = snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
+			$res = preg_split("# #",$res);
+			return $res[1];
+		}
+		
+		function getCopyError($device,$copyId) {
+			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
+			$res = snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.13.".$copyId);
 			$res = preg_split("# #",$res);
 			return $res[1];
 		}
