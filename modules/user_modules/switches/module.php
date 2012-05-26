@@ -644,23 +644,29 @@
 					$output .= "$('#slogin').hide();";
 					$output .= "}";
 					$output .= "};";
-					$output .= "function showwait() {";
+					$output .= "function sendbackupreq() {";
 					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
+					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
+					srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value },
+					function(data) { 
+						$('#subpop').html(data);
+					});";
+					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
 					$output .= "<h4>Exporter la configuration</h4>";
-					$output .= FS::$iMgr->addList("exportm","arangeform();");
+					$output .= "Type de serveur ".FS::$iMgr->addList("exportm","arangeform();");
 					$output .= FS::$iMgr->addElementToList("TFTP",1);
 					$output .= FS::$iMgr->addElementToList("FTP",2);
 					$output .= FS::$iMgr->addElementToList("SCP",4);
 					$output .= FS::$iMgr->addElementToList("SFTP",5);
-					$output .= "</select>";
+					$output .= "</select><br />";
 					$output .= "Adresse du serveur ".FS::$iMgr->addIPInput("srvip")."<br />";
 					$output .= "Nom de fichier ".FS::$iMgr->addInput("srvfilename")."<br />";
 					$output .= "<div id=\"slogin\" style=\"display:none;\">Utilisateur ".FS::$iMgr->addInput("srvuser");
-					$output .= "Mot de passe ".FS::$iMgr->addInput("srvpwd")."</div>";
-					$output .= FS::$iMgr->addJSSubmit("send","Envoyer");
+					$output .= " Mot de passe ".FS::$iMgr->addPasswdField("srvpwd")."</div>";
+					$output .= FS::$iMgr->addJSSubmit("send","Envoyer","return sendbackupreq();");
 					return $output;
 				}
 				else if($showmodule == 5) {
@@ -1257,7 +1263,7 @@
 					}
 					else
 						FS::$iMgr->printError("Ce VLAN n'est pas présent sur l'équipement");
-					break;
+					return;
 				case 11:
 					$old = FS::$secMgr->checkAndSecurisePostData("oldvl");
 					$new = FS::$secMgr->checkAndSecurisePostData("newvl");
@@ -1270,6 +1276,30 @@
 					replaceVlan($device,$old,$new);
 					header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4");
 					return;
+				case 12:
+					$device = FS::$secMgr->checkAndSecuriseGetData("d");
+					$exportmode = FS::$secMgr->checkAndSecurisePostData("exportm");
+					$sip =  FS::$secMgr->checkAndSecurisePostData("srvip");
+					$filename = FS::$secMgr->checkAndSecurisePostData("srvfilename");
+					if(!$device || !$exportmode || !FS::$secMgr->isNumeric($exportmode) || ($exportmode != 1 && $exportmode != 2 && $exportmode != 4 && $exportmode != 5) ||
+						!$sip || !FS::$secMgr->isIP($sip) || !$filename || strlen($filename) == 0) {
+						echo FS::$iMgr->printError("Les données entrées sont erronées ou invalides !");
+						return;
+					}
+					if($exportmode == 2 || $exportmode == 4 || $exportmode == 5) {
+						$username = FS::$secMgr->checkAndSecurisePostData("srvuser");
+						$password = FS::$secMgr->checkAndSecurisePostData("srvpwd");
+						if(!$username || $username == "" || !$password || $password == "") {
+							echo FS::$iMgr->printError("Les données entrées sont erronées ou invalides !");
+							return;
+						}
+						$res = exportConfigToAuthServer($device,$dip,$filename,$username,$password);
+						echo $res;
+					}
+					else {
+						$res = exportConfigToTFTP($device,$sip,$filename);
+						echo $res;
+					}
 				default: break;
 			}
 		}
