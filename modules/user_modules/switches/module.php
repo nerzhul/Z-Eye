@@ -669,7 +669,8 @@
 					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
-					srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value },
+					srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
+					io: document.getElementsByName('io')[0].value },
 					function(data) { 
 						var copyId = data;
 						$('#subpop').html('Copie en cours...');
@@ -678,12 +679,16 @@
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
-					$output .= "<h4>Exporter la configuration</h4>";
+					$output .= "<h4>Transférer la configuration</h4>";
 					$output .= "Type de serveur ".FS::$iMgr->addList("exportm","arangeform();");
 					$output .= FS::$iMgr->addElementToList("TFTP",1);
 					$output .= FS::$iMgr->addElementToList("FTP",2);
 					$output .= FS::$iMgr->addElementToList("SCP",4);
 					$output .= FS::$iMgr->addElementToList("SFTP",5);
+					$output .= "</select><br />";
+					$output .= "Sens de transfert ".FS::$iMgr->addList("io");
+					$output .= FS::$iMgr->addElementToList("Export",1);
+					$output .= FS::$iMgr->addElementToList("Import",2);
 					$output .= "</select><br />";
 					$output .= "Adresse du serveur ".FS::$iMgr->addIPInput("srvip")."<br />";
 					$output .= "Nom de fichier ".FS::$iMgr->addInput("srvfilename")."<br />";
@@ -1319,25 +1324,32 @@
 				*/
 				case 12:
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
-					$exportmode = FS::$secMgr->checkAndSecurisePostData("exportm");
+					$trmode = FS::$secMgr->checkAndSecurisePostData("exportm");
 					$sip =  FS::$secMgr->checkAndSecurisePostData("srvip");
 					$filename = FS::$secMgr->checkAndSecurisePostData("srvfilename");
-					if(!$device || !$exportmode || !FS::$secMgr->isNumeric($exportmode) || ($exportmode != 1 && $exportmode != 2 && $exportmode != 4 && $exportmode != 5) ||
-						!$sip || !FS::$secMgr->isIP($sip) || !$filename || strlen($filename) == 0) {
+					$io = FS::$secMgr->checkAndSecurisePostData("io");
+					if(!$device || !$trmode || ($trmode != 1 && $trmode != 2 && $trmode != 4 && $trmode != 5) ||
+						!$sip || !FS::$secMgr->isIP($sip) || !$filename || strlen($filename) == 0 || !$io || ($io != 1 && $io != 2)) {
 						echo FS::$iMgr->printError("Les données entrées sont erronées ou invalides !");
 						return;
 					}
-					if($exportmode == 2 || $exportmode == 4 || $exportmode == 5) {
+					if($trmode == 2 || $trmode == 4 || $trmode == 5) {
 						$username = FS::$secMgr->checkAndSecurisePostData("srvuser");
 						$password = FS::$secMgr->checkAndSecurisePostData("srvpwd");
 						if(!$username || $username == "" || !$password || $password == "") {
 							echo FS::$iMgr->printError("Les données entrées sont erronées ou invalides !");
 							return;
 						}
-						echo exportConfigToAuthServer($device,$sip,$exportmode,$filename,$username,$password);
+						if($io == 1)
+							echo exportConfigToAuthServer($device,$sip,$trmode,$filename,$username,$password);
+						else if($io == 2)
+							echo importConfigFromAuthServer($device,$sip,$trmode,$filename,$username,$password);
 					}
-					else if($exportmode == 1) {
-						echo  exportConfigToTFTP($device,$sip,$filename);
+					else if($trmode == 1) {
+						if($io == 1)
+							echo  exportConfigToTFTP($device,$sip,$filename);
+						else
+							echo  importConfigFromTFTP($device,$sip,$filename);
 					} else
 						FS::$iMgr->printError("Type d'export invalide !");
 					return;
