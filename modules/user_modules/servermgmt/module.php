@@ -32,8 +32,8 @@
 				case 4: case 5:
 					$output .= $this->CreateOrEditRadiusDB($do == 4 ? true : false);
 					break;
-				case 6: case 7:
-					$output .= $this->CreateOrEditDeviceSaveServer($do == 6 ? true : false);
+				case 7: case 8:
+					$output .= $this->CreateOrEditDeviceSaveServer($do == 7 ? true : false);
 					break;
 				default:
 					$output .= $this->showServerList();
@@ -445,7 +445,7 @@
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
-					if($saddr == NULL || $saddr == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2))) {
+					if($saddr == NULL || $saddr == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && $slogin != "" || $spwd != "" || $spwd2 != "")) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
