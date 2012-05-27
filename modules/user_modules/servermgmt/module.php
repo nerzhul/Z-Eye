@@ -98,7 +98,7 @@
 			
 			if($create == false) {
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);
-				$output .= FS::$iMgr->addHidden("stype",$sport);
+				$output .= FS::$iMgr->addHidden("stype",$stype);
 			}
 	
 			$output .= "<table class=\"standardTable\">";
