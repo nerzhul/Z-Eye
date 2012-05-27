@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/../modules/user_modules/switches/cisco.func.php");
 	
 	function doSwitchBackup() {
-		$query = FS::$dbMgr->Select("fss_save_device_servers","addr,type,login,pwd");
+		$query = FS::$dbMgr->Select("fss_save_device_servers","addr,type,path,login,pwd");
 		while($data = mysql_fetch_array($query)) {
 			if(!FS::$secMgr->isIP($data["addr"]))
 				continue;
@@ -30,9 +30,9 @@
 			$query2 = FS::$pgdbMgr->Select("device","name");
 			while($data2 = pg_fetch_array($quer2)) {
 				if($data["type"] == 1)
-					$copyId = exportConfigToTFTP($data2["name"],$data["addr"],"conf-".$data2["name"]);
+					$copyId = exportConfigToTFTP($data2["name"],$data["addr"],$data["path"]."conf-".$data2["name"]);
 				else if($data["type"] == 2 || $data["type"] == 4 || $data["type"] == 5)
-					$copyId = exportConfigToAuthServer($data2["name"],$data["addr"],$data["type"],"conf-".$data2["name"],$data["login"],$data["pwd"]);
+					$copyId = exportConfigToAuthServer($data2["name"],$data["addr"],$data["type"],$data["path"]."conf-".$data2["name"],$data["login"],$data["pwd"]);
 				
 				sleep(1);
 				$copyState = getCopyState($data2["name"],$copyId);
