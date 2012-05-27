@@ -450,7 +450,7 @@
 						return;
 					}
 
-					if(FS::$dbMgr->GetOneData("fss_save_device_servers","login","addr ='".$saddr."' AND type = '".$stype."'")) {
+					if(FS::$dbMgr->GetOneData("fss_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
