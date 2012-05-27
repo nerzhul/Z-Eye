@@ -27,8 +27,8 @@
 			if(!FS::$secMgr->isIP($data["addr"]))
 				continue;
 				
-			$query2 = FS::$pgdbMgr->Select("device","name");
-			while($data2 = pg_fetch_array($quer2)) {
+			$query2 = FS::$pgdbMgr->Select("device","ip,name");
+			while($data2 = pg_fetch_array($query2)) {
 				if($data["type"] == 1)
 					$copyId = exportConfigToTFTP($data2["name"],$data["addr"],$data["path"]."conf-".$data2["name"]);
 				else if($data["type"] == 2 || $data["type"] == 4 || $data["type"] == 5)
