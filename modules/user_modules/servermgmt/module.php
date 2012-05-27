@@ -114,12 +114,12 @@
 			else {
 				$output .= "<tr><td>Adresse IP/DNS</td><td>".$saddr."</td></tr>";
 				$output .= "<tr><td>Type de service</td><td>";
-				$output .= FS::$iMgr->addList("stype","arangeform();");
-				$output .= FS::$iMgr->addElementToList("TFTP",1,$stype == 1 ? true : false);
-				$output .= FS::$iMgr->addElementToList("FTP",2,$stype == 2 ? true : false);
-				$output .= FS::$iMgr->addElementToList("SCP",4,$stype == 4 ? true : false);
-				$output .= FS::$iMgr->addElementToList("SFTP",5,$stype == 5 ? true : false);
-				$output .= "</select>";
+				switch($stype) {
+					case 1: $output .= "TFTP"; break;
+					case 2: $output .= "FTP"; break;
+					case 4: $output .= "SCP"; break;
+					case 5: $output .= "SFTP"; break;
+				}
 			}
 			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Utilisateur</td><td>".FS::$iMgr->addInput("slogin",$slogin)."</td></tr>";
 			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe</td><td>".FS::$iMgr->addPasswdField("spwd","")."</td></tr>";
