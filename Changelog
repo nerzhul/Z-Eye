@@ -11,3 +11,4 @@ Version Alpha 0.14
 - Switch Management: Added new Advanced Tool to save startup-config to TFTP/FTP/SCP/SFTP
 - Switch Management: Save/Restore configuration from TFTP/FTP/SCP/SFTP server
 - Switch Management: Restore startup-config to running-config
+- Switch Management: Added script to backup all configs to some servers (managed from analysis servers)

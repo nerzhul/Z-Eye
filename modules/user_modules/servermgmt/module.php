@@ -457,7 +457,7 @@
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
-					if($saddr == NULL || $saddr == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
+					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
@@ -475,7 +475,7 @@
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
-					if($saddr == NULL || $saddr == "" || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd != $spwd2))) {
+					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd != $spwd2))) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&type=".$stype."&err=1");
 						return;
 					}
