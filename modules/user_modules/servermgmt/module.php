@@ -121,9 +121,9 @@
 				$output .= FS::$iMgr->addElementToList("SFTP",5,$stype == 5 ? true : false);
 				$output .= "</select>";
 			}
-			$output .= "<tr id=\"tohide1\"><td>Utilisateur</td><td>".FS::$iMgr->addInput("slogin",$slogin)."</td></tr>";
-			$output .= "<tr id=\"tohide2\"><td>Mot de passe</td><td>".FS::$iMgr->addPasswdField("spwd","")."</td></tr>";
-			$output .= "<tr id=\"tohide3\"><td>Mot de passe (répétition)</td><td>".FS::$iMgr->addPasswdField("spwd2","")."</td></tr>";
+			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Utilisateur</td><td>".FS::$iMgr->addInput("slogin",$slogin)."</td></tr>";
+			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe</td><td>".FS::$iMgr->addPasswdField("spwd","")."</td></tr>";
+			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe (répétition)</td><td>".FS::$iMgr->addPasswdField("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
 			$output .= "</table>";
 			
