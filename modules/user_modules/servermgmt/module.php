@@ -32,6 +32,9 @@
 				case 4: case 5:
 					$output .= $this->CreateOrEditRadiusDB($do == 4 ? true : false);
 					break;
+				case 6: case 7:
+					$output .= $this->CreateOrEditDeviceSaveServer($do == 6 ? true : false);
+					break;
 				default:
 					$output .= $this->showServerList();
 					break;
@@ -454,7 +457,7 @@
 					FS::$dbMgr->Insert("fss_save_device_servers","addr,type,login,pwd","'".$saddr."','".$stype."','".$slogin."','".$spwd."'");
 					header("Location: m-".$this->mid.".html");
 					break;
-				case 5:
+				case 8:
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -467,7 +470,7 @@
 					FS::$dbMgr->Update("fss_save_device_servers","pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
 					header("Location: m-".$this->mid.".html");
 					break;
-				case 6: {
+				case 9: {
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
 					if($saddr && $stype) {
