@@ -82,13 +82,13 @@
 			
 			$output .= "<script type=\"text/javascript\">function arangeform() {";
 			$output .= "if(document.getElementsByName('stype')[0].value == 1) {";
-			$output .= "$('#tohide1').show();";
-			$output .= "$('#tohide2').show();";
-			$output .= "$('#tohide3').show();";
-			$output .= "} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {";
 			$output .= "$('#tohide1').hide();";
 			$output .= "$('#tohide2').hide();";
 			$output .= "$('#tohide3').hide();";
+			$output .= "} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {";
+			$output .= "$('#tohide1').show();";
+			$output .= "$('#tohide2').show();";
+			$output .= "$('#tohide3').show();";
 			$output .= "}";
 			$output .= "};</script>";
 					
