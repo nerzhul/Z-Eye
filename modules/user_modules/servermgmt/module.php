@@ -314,8 +314,7 @@
 					case 4: $tmpoutput .= "SCP"; break;
 					case 5: $tmpoutput .= "SFTP"; break;
 				}
-				$tmpoutput .= "</td><td>".$data["path"]."</td><td>";
-				$tmpoutput .= "</td><td>".$data["login"]."</td><td><center>";
+				$tmpoutput .= "</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=9&addr=".$data["addr"]."&type=".$data["type"]."\">";
 				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
 				$tmpoutput .= "</center></td></tr>";
