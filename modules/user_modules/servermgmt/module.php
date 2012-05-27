@@ -46,7 +46,7 @@
 		private function CreateOrEditDeviceSaveServer($create) {
 			$saddr = "";
 			$slogin = "";
-			$stype = 0;
+			$stype = 1;
 			$spwd = "";
 			
 			if($create)
@@ -55,7 +55,7 @@
 				$output = "<h4>Edition des informations du serveur de sauvegarde (configuration des équipements réseau)</h4>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$type = FS::$secMgr->checkAndSecuriseGetData("type");
-				if(!$addr || $addr == "" || !$stype || !FS::$secMgr->isNumeric($stype)) {
+				if(!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
 					$output .= FS::$iMgr->printError("Aucun serveur à éditer spécifié!");
 					return $output;
 				}
