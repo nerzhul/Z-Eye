@@ -80,6 +80,18 @@
 				case 3: if($create) $output .= FS::$iMgr->printError("Ce serveur est déjà référencé !"); break;
 			}
 			
+			$output .= "<script type=\"text/javascript\">function arangeform() {";
+			$output .= "if(document.getElementsByName('stype')[0].value == 1) {";
+			$output .= "$('#tohide1').show();";
+			$output .= "$('#tohide2').show();";
+			$output .= "$('#tohide3').show();";
+			$output .= "} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {";
+			$output .= "$('#tohide1').hide();";
+			$output .= "$('#tohide2').hide();";
+			$output .= "$('#tohide3').hide();";
+			$output .= "}";
+			$output .= "};</script>";
+					
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 7 : 8));
 			
 			if($create == false) {
@@ -91,7 +103,7 @@
 			if($create) {
 				$output .= FS::$iMgr->addIndexedLine("Adresse IP/DNS","saddr",$saddr);
 				$output .= "<tr><td>Type de service</td><td>";
-				$output .= FS::$iMgr->addList("stype");
+				$output .= FS::$iMgr->addList("stype","arangeform();");
 				$output .= FS::$iMgr->addElementToList("TFTP",1);
 				$output .= FS::$iMgr->addElementToList("FTP",2);
 				$output .= FS::$iMgr->addElementToList("SCP",4);
@@ -102,16 +114,16 @@
 			else {
 				$output .= "<tr><td>Adresse IP/DNS</td><td>".$saddr."</td></tr>";
 				$output .= "<tr><td>Type de service</td><td>";
-				$output .= FS::$iMgr->addList("stype");
+				$output .= FS::$iMgr->addList("stype","arangeform();");
 				$output .= FS::$iMgr->addElementToList("TFTP",1,$stype == 1 ? true : false);
 				$output .= FS::$iMgr->addElementToList("FTP",2,$stype == 2 ? true : false);
 				$output .= FS::$iMgr->addElementToList("SCP",4,$stype == 4 ? true : false);
 				$output .= FS::$iMgr->addElementToList("SFTP",5,$stype == 5 ? true : false);
 				$output .= "</select>";
 			}
-			$output .= FS::$iMgr->addIndexedLine("Utilisateur","slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine("Mot de passe","spwd","",true);
-			$output .= FS::$iMgr->addIndexedLine("Répétition du mot de passe","spwd2","",true);
+			$output .= "<tr id=\"tohide1\"><td>Utilisateur</td><td>".FS::$iMgr->addInput("slogin",$slogin)."</td></tr>";
+			$output .= "<tr id=\"tohide2\"><td>Mot de passe</td><td>".FS::$iMgr->addPasswdField("spwd","")."</td></tr>";
+			$output .= "<tr id=\"tohide3\"><td>Mot de passe (répétition)</td><td>".FS::$iMgr->addPasswdField("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
 			$output .= "</table>";
 			
