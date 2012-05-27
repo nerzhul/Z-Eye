@@ -40,6 +40,81 @@
 			return $output;
 		}
 		
+		private function CreateOrEditDeviceSaveServer($create) {
+			$saddr = "";
+			$slogin = "";
+			$stype = 0;
+			$spwd = "";
+			
+			if($create)
+				$output = "<h4>Ajouter un serveur de sauvegarde (configuration des équipements réseau)</h4>";
+			else {
+				$output = "<h4>Edition des informations du serveur de sauvegarde (configuration des équipements réseau)</h4>";
+				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+				$type = FS::$secMgr->checkAndSecuriseGetData("type");
+				if(!$addr || $addr == "" || !$stype || !FS::$secMgr->isNumeric($stype)) {
+					$output .= FS::$iMgr->printError("Aucun serveur à éditer spécifié!");
+					return $output;
+				}
+				$query = FS::$dbMgr->Select("fss_save_device_servers","login,pwd","addr = '".$addr."' AND type = '".$type."'");
+				if($data = mysql_fetch_array($query)) {
+					$saddr = $addr;
+					$slogin = $data["login"];
+					$spwd = $data["pwd"];
+					$stype = $type;
+				}
+				else {
+					$output .= FS::$iMgr->printError("Aucun serveur enregistré avec ces coordonnées !");
+					return $output;
+				}
+			}
+			
+			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\">Retour</a><br />";
+			
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
+				case 3: if($create) $output .= FS::$iMgr->printError("Ce serveur est déjà référencé !"); break;
+			}
+			
+			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 7 : 8));
+			
+			if($create == false) {
+				$output .= FS::$iMgr->addHidden("saddr",$saddr);
+				$output .= FS::$iMgr->addHidden("stype",$sport);
+			}
+	
+			$output .= "<table class=\"standardTable\">";
+			if($create) {
+				$output .= FS::$iMgr->addIndexedLine("Adresse IP/DNS","saddr",$saddr);
+				$output .= "<tr><td>Type de service</td><td>";
+				$output .= FS::$iMgr->addList("stype");
+				$output .= FS::$iMgr->addElementToList("TFTP",1);
+				$output .= FS::$iMgr->addElementToList("FTP",2);
+				$output .= FS::$iMgr->addElementToList("SCP",4);
+				$output .= FS::$iMgr->addElementToList("SFTP",5);
+				$output .= "</select>";
+				$output .= "</td></tr>";
+			}
+			else {
+				$output .= "<tr><td>Adresse IP/DNS</td><td>".$saddr."</td></tr>";
+				$output .= "<tr><td>Type de service</td><td>";
+				$output .= FS::$iMgr->addList("stype");
+				$output .= FS::$iMgr->addElementToList("TFTP",1,$stype == 1 ? true : false);
+				$output .= FS::$iMgr->addElementToList("FTP",2,$stype == 2 ? true : false);
+				$output .= FS::$iMgr->addElementToList("SCP",4,$stype == 4 ? true : false);
+				$output .= FS::$iMgr->addElementToList("SFTP",5,$stype == 5 ? true : false);
+				$output .= "</select>";
+			}
+			$output .= FS::$iMgr->addIndexedLine("Utilisateur","slogin",$slogin);
+			$output .= FS::$iMgr->addIndexedLine("Mot de passe","spwd","",true);
+			$output .= FS::$iMgr->addIndexedLine("Répétition du mot de passe","spwd2","",true);
+			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
+			$output .= "</table>";
+			
+			return $output;
+		}
+		
 		private function CreateOrEditRadiusDB($create) {
 			$saddr = "";
 			$slogin = "";
@@ -205,6 +280,31 @@
 				$output .= $tmpoutput."</table>";
 			else
 				$output .= FS::$iMgr->printError("Aucune base renseignée !");
+				
+			$output .= "<h4>Liste des serveurs de sauvegarde (configurations des équipements réseau)</h4>";
+			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=7\">Nouveau serveur</a><br />";
+			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Type</th><th>Login</th><th>Supprimer</th></tr>";
+			$found = false;
+			$query = FS::$dbMgr->Select("fss_save_device_servers","addr,type,login");
+			while($data = mysql_fetch_array($query)) {
+				if($found == false) $found = true;
+				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=8&addr=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
+				$tmpoutput .= "</td><td>";
+				switch($data["type"]) {
+					case 1: $tmpoutput .= "TFTP"; break;
+					case 2: $tmpoutput .= "FTP"; break;
+					case 4: $tmpoutput .= "SCP"; break;
+					case 5: $tmpoutput .= "SFTP"; break;
+				}
+				$tmpoutput .= "</td><td>".$data["login"]."</td><td><center>";
+				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=9&addr=".$data["addr"]."&type=".$data["type"]."\">";
+				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+				$tmpoutput .= "</center></td></tr>";
+			}
+			if($found)
+				$output .= $tmpoutput."</table>";
+			else
+				$output .= FS::$iMgr->printError("Aucune base renseignée !");
 			return $output;	
 		}
 		
@@ -333,6 +433,45 @@
 					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
 					if($saddr && $sport && $sdbname) {
 							FS::$dbMgr->Delete("fss_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					}	
+					header('Location: m-'.$this->mid.'.html');				
+				}
+				case 7:
+					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
+					if($saddr == NULL || $saddr == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2))) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
+						return;
+					}
+
+					if(FS::$dbMgr->GetOneData("fss_save_device_servers","login","addr ='".$saddr."' AND type = '".$stype."'")) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
+						return;
+					}
+					FS::$dbMgr->Insert("fss_save_device_servers","addr,type,login,pwd","'".$saddr."','".$stype."','".$slogin."','".$spwd."'");
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 5:
+					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
+					if($saddr == NULL || $saddr == "" || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd != $spwd2))) {
+						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&type=".$stype."&err=1");
+						return;
+					}
+					FS::$dbMgr->Update("fss_save_device_servers","pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 6: {
+					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
+					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
+					if($saddr && $stype) {
+							FS::$dbMgr->Delete("fss_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}	
 					header('Location: m-'.$this->mid.'.html');				
 				}
