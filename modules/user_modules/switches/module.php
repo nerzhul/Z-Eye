@@ -101,8 +101,39 @@
 								$output .= "unk";
 						$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
 						$output .= "<tr><td>Eteindre</td><td>".FS::$iMgr->addCheck("shut",($data["up_admin"] == "down" ? true : false))."</td></tr>";
-						$output .= "<tr><td>Vitesse</td><td>Non disponible</td></tr>";
-						$output .= "<tr><td>Duplex</td><td>Non disponible</td></tr>";
+						$output .= "<tr><td>Vitesse Administrative</td><td>";
+                                                $sp = getPortSpeedWithPID($device,$portid);
+						if($sp > 0) {
+							$output .= FS::$iMgr->addList("speed");
+							$output .= FS::$iMgr->addElementToList("Auto",1,$sp == 1 ? true : false);
+							if(preg_match("#Ethernet#",$port)) {
+								$output .= FS::$iMgr->addElementToList("10 Mbits",10000000,$sp == 10000000 ? true : false);
+								if(preg_match("#FastEthernet#",$port))
+									$output .= FS::$iMgr->addElementToList("100 Mbits",100000000,$sp == 100000000 ? true : false);
+								if(preg_match("#GigabitEthernet#",$port)) {
+									$output .= FS::$iMgr->addElementToList("100 Mbits",10000000,$sp == 1000000000 ? true : false);
+									$output .= FS::$iMgr->addElementToList("1 Gbit",100000000,$sp == 10000000000 ? true : false);
+									if(preg_match("#TenGigabitEthernet#",$port))
+										$output .= FS::$iMgr->addElementToList("10 Gbits",10,$sp == 10 ? true : false);
+								}
+							}
+							$output .= "</select>";
+						}
+						else
+							$output .= "Non disponible";
+						$output .= "</td></tr>";
+						$output .= "<tr><td>Duplex Administratif</td><td>";
+						$dup = getPortDuplexWithPID($device,$portid);
+						/*if($dup > 0 && $dup < 5) {
+							$output .= FS::$iMgr->addList("duplex");
+							$output .= FS::$iMgr->addElementToList("Auto",4,$dup == 1 ? true : false);
+							$output .= FS::$iMgr->addElementToList("Half",1,$dup == 2 ? true : false);
+							$output .= FS::$iMgr->addElementToList("Full",2,$dup == 3 ? true : false);
+							$output .= "</select>";
+						}
+						else*/
+							$output .= "Non disponible";
+						$output .= "</td></tr>";
 						$output .= "<tr><td>Switchport Mode</td><td>";
 						$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
 						$trmode = preg_split("# #",$trmode);
@@ -112,15 +143,16 @@
 						$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
 						$output .= "</select>";
 						$output .= "<tr><td id=\"vllabel\">Vlan natif</td><td id=\"vln\">";
-		
-						$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native","ip = '".$dip."' AND port = '".$port."'","vlan");
-						$nvlan = $data["vlan"];
-						$vlanlist = "";
-						$vlancount = 0;
-						while($data2 = pg_fetch_array($query2)) {
-								if($data2["native"] == "t" && $data2["vlan"] != 1) $nvlan = $data2["vlan"];
-								$vlanlist .= $data2["vlan"].",";
+
+						if($trmode == 1) {
+							$nvlan = getSwitchTrunkNativeVlanWithPID($device,$portid);
+							$vllist = getSwitchportTrunkVlansWithPid($device,$portid);
 						}
+						else
+							$nvlan = getSwitchAccessVLANWithPID($device,$portid);
+						$vlanlist = "";
+						for($i=0;$i<count($vllist);$i++)
+							$vlanlist .= $vllist[$i].",";
 						$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
 						$output .= FS::$iMgr->addInput("nvlan",$nvlan,4,4);
 						$output .= "</td></tr>";
@@ -1190,6 +1222,8 @@
 					$shut = FS::$secMgr->checkAndSecurisePostData("shut");
 					$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 					$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
+					$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
+					$speed = FS::$secMgr->checkAndSecurisePostData("speed");
 					$wr = FS::$secMgr->checkAndSecurisePostData("wr");
 					if($port == NULL || $sw == NULL || $trunk == NULL || $nvlan == NULL) {
 						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
@@ -1202,6 +1236,23 @@
 						return;
 					}
 
+					if($duplex && FS::$secMgr->isNumeric($duplex)) {
+						if($duplex < 1 || $duplex > 4) {
+							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
+							return;
+						}
+						$idx = getPortIndexes($sw,$pid);
+						if($idx != NULL) {
+							setPortDuplexWithPid($sw,$idx[0].".".$idx[1],$duplex);
+						}
+					}
+
+					if($speed && FS::$secMgr->isNumeric($speed)) {
+						$idx = getPortIndexes($sw,$pid);
+                                                if($idx != NULL) {
+                                                        setPortSpeedWithPid($sw,$idx[0].".".$idx[1],$speed);
+                                                }
+					}
 					if($trunk == 1) {
 						$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
 
