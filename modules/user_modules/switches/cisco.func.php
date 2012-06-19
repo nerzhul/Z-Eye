@@ -39,14 +39,46 @@
 		/*
 		* Link Management
 		*/
-		
 		function setPortDuplexWithPID($device,$pid,$value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value < 1 || $value > 4)
+			if($value < 1 || $value > 4)
 				return NULL;
 
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
 		}
-		
+
+		function getPortDuplexWithPID($device,$pid) {
+/*			$idx = getPortIndexes($device,$pid);
+			if($idx == NULL)
+				return -2;*/
+			$dup = getFieldForPortWithPID($device,$pid/*$idx[0].".".$idx[1]*/,"1.3.6.1.2.1.10.7.2.1.19");
+			$dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+			return $dup;
+		}
+
+                function setPortSpeedWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value < 1)
+                                return NULL;
+                        
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
+                }
+                
+                function getPortSpeedWithPID($device,$pid) {
+			$idx = getPortIndexes($device,$pid);
+                        if($idx == NULL)
+                                return -2;
+
+                        $dup = getFieldForPortWithPID($device,$idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+                        
+                        $dup = $dup[1];
+                        return $dup;
+                }
 		/*
 		* VLAN management
 		*/
@@ -316,7 +348,7 @@
 		}
 		
 		function getFieldForPortWithPID($device, $pid, $field) {
-			if($device == "" || $field == "" || $pid == "" || !FS::$secMgr->isNumeric($pid))
+			if($device == "" || $field == "" || $pid == "" /*|| !FS::$secMgr->isNumeric($pid)*/)
 				return -1;
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
@@ -329,7 +361,14 @@
 			if($pid == NULL) $pid = -1;
 			return $pid;
 		}
-		
+
+		function getPortIndexes($device,$pid) {
+			$query = FS::$dbMgr->Select("fss_port_id_cache","switchid,switchportid","device = '".$device."' AND pid = '".$pid."'");
+			if($data = mysql_fetch_array($query))
+				return array($data["switchid"],$data["switchportid"]);
+			return NULL;
+		}
+
 		/*
 		* get Port list from a device. If there is a filter, only port with specified vlan are returned
 		*/
@@ -638,14 +677,6 @@
 			return setSwitchTrunkEncapWithPID($device,$pid,$value);
 		}
 		
-		function setPortDuplex($device,$portname,$value) {
-			$pid = getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-
-			return setPortDuplexWithPID($device,$pid,$value);
-		}
-		
 		function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
 				return -1;
@@ -667,43 +698,4 @@
 
 			return getFieldForPortWithPid($device,$pid,$field);
 		}
-
-/*
-		@ TODO
-		ATTENTION le port ID n'est pas celui de getPortId
-		public function setPortSpeed($device, $portname, $value) {
-			if(!FS::$secMgr->isNumeric($value))
-                                return -1;
-
-			$pid = $this->getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9.SWITCHID","i",$value);
-		}
-
-		public function setPortSpeedWithPID($device, $pid, $value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
-                                return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10.SWITCHID","i",$value);
-		}
-		
-		public function setPortDuplex($device, $portname, $value) {
-			if(!FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
-                                return -1;
-
-			$pid = $this->getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
-		}
-
-		public function setPortDuplexWithPID($device, $pid, $value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value == 3 || $value < 1 || $value > 4)
-                                return -1;
-
-            return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
-		}*/
 ?>

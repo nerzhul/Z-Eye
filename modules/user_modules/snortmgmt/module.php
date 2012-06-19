@@ -411,13 +411,247 @@
 			fwrite($file,"include $SO_RULE_PATH/p2p.rules\n");
 			fwrite($file,"include $SO_RULE_PATH/specific-threats.rules\n");
 			
+			fclose($file);
 			
+			$file = fopen(dirname(__FILE__)."/../../../datas/tmp/snort");
+			fwrite($file,"1");
 			fclose($file);
 		}
 		
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
+					$dbhost = FS::$secMgr->checkAndSecurisePostData("dbhost");
+					$dbname = rFS::$secMgr->checkAndSecurisePostData("dbname");
+					$dbuser = FS::$secMgr->checkAndSecurisePostData("dbuser");
+					$dbpwd = FS::$secMgr->checkAndSecurisePostData("dbpwd");
+					//$dbport = FS::$secMgr->checkAndSecurisePostData("dbport");
+					
+					if(!$dbhost || !$dbname || !$dbuser || $dbpwd) {
+						
+					}
+					break;
+				case 2: 
+					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
+					$enable = FS::$secMgr->checkAndSecurisePostData("endns");
+									
+					$srvlist = trim($srvlist);
+					$srvs = preg_split("#[,]#",$srvlist);
+					if(strlen($srvlist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'DNS','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 3:
+					$smtplist = FS::$secMgr->checkAndSecurisePostData("smtplist");
+					$enablesmtp = FS::$secMgr->checkAndSecurisePostData("ensmtp");
+					$imaplist = FS::$secMgr->checkAndSecurisePostData("imaplist");
+					$enableimap = FS::$secMgr->checkAndSecurisePostData("enimap");
+					$poplist = FS::$secMgr->checkAndSecurisePostData("poplist");
+					$enablepop = FS::$secMgr->checkAndSecurisePostData("enpop");
+									
+					$smtplist = trim($smtplist);
+					$srvs = preg_split("#[,]#",$smtplist);
+					if(strlen($smtplist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					$imaplist = trim($imaplist);
+					$srvs = preg_split("#[,]#",$imaplist);
+					if(strlen($imaplist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					$poplist = trim($poplist);
+					$srvs = preg_split("#[,]#",$poplist);
+					if(strlen($poplist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SMTP','".($enablesmtp == "on" ? 1 : 0)."','".$smtplist."','"."'");
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'IMAP','".($enableimap == "on" ? 1 : 0)."','".$imaplist."','"."'");
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'POP','".($enablepop == "on" ? 1 : 0)."','".$poplist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 4:
+					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
+					$enable = FS::$secMgr->checkAndSecurisePostData("enhttp");
+									
+					$srvlist = trim($srvlist);
+					$srvs = preg_split("#[,]#",$srvlist);
+					if(strlen($srvlist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'HTTP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 5:
+					$sqllist = FS::$secMgr->checkAndSecurisePostData("sqllist");
+					$sqlenable = FS::$secMgr->checkAndSecurisePostData("sqlenable");
+					$oraclelist = FS::$secMgr->checkAndSecurisePostData("oraclelist");
+					$oracleenable = FS::$secMgr->checkAndSecurisePostData("oracleenable");
+									
+					$sqllist = trim($sqllist);
+					$srvs = preg_split("#[,]#",$sqllist);
+					if(strlen($sqllist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					$oraclelist = trim($oraclelist);
+					$srvs = preg_split("#[,]#",$oraclelist);
+					if(strlen($oraclelist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SQL','".($sqlenable == "on" ? 1 : 0)."','".$sqllist."','"."'");
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'ORACLE','".($oracleenable == "on" ? 1 : 0)."','".$oraclelist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 6:
+					$telnetlist = FS::$secMgr->checkAndSecurisePostData("telnetlist");
+					$telnetenable = FS::$secMgr->checkAndSecurisePostData("entelnet");
+					$sshlist = FS::$secMgr->checkAndSecurisePostData("sshlist");
+					$sshenable = FS::$secMgr->checkAndSecurisePostData("enssh");
+					$tselist = FS::$secMgr->checkAndSecurisePostData("tselist");
+					$tseenable = FS::$secMgr->checkAndSecurisePostData("entse");
+									
+					$telnetlist = trim($telnetlist);
+					$srvs = preg_split("#[,]#",$telnetlist);
+					if(strlen($telnetlist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					$sshlist = trim($sshlist);
+					$srvs = preg_split("#[,]#",$sshlist);
+					if(strlen($sshlist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					$tselist = trim($tselist);
+					$srvs = preg_split("#[,]#",$tselist);
+					if(strlen($tselist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'TELNET','".($telnetenable == "on" ? 1 : 0)."','".$telnetlist."','"."'");
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SSH','".($sshenable == "on" ? 1 : 0)."','".$sshlist."','"."'");
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'TSE','".($tseenable == "on" ? 1 : 0)."','".$tselist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 7:
+					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
+					$enable = FS::$secMgr->checkAndSecurisePostData("enftp");
+									
+					$srvlist = trim($srvlist);
+					$srvs = preg_split("#[,]#",$srvlist);
+					if(strlen($srvlist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'FTP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 8:
+					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
+					$enable = FS::$secMgr->checkAndSecurisePostData("ensnmp");
+									
+					$srvlist = trim($srvlist);
+					$srvs = preg_split("#[,]#",$srvlist);
+					if(strlen($srvlist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SNMP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
+					break;
+				case 9:
+					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
+					$enable = FS::$secMgr->checkAndSecurisePostData("ensip");
+									
+					$srvlist = trim($srvlist);
+					$srvs = preg_split("#[,]#",$srvlist);
+					if(strlen($srvlist) > 0 && count($srvs) > 0) {
+						for($i=0;$i<count($srvs);$i++) {
+							if(!FS::$secMgr->isIP($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&err=1");
+								return;
+							}
+						}
+					}
+					
+					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SIP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					$this->writeConfiguration();
+					header("Location: m-".$this->mid.".html");
 					break;
 				case 2: 
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
