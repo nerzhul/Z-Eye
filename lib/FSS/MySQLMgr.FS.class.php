@@ -110,6 +110,11 @@
 			mysql_query($sql);
 		}
 		
+		public function Replace($table,$keys,$values) {
+			$sql = "REPLACE INTO ".$table."(".$keys.") VALUES (".$values.");";
+			mysql_query($sql);
+		}
+		
 		public function Delete($table,$cond = "") {
 			$sql = "DELETE FROM ".$table."";
 			if(strlen($cond) > 0)
