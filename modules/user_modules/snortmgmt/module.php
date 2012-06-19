@@ -411,7 +411,10 @@
 			fwrite($file,"include $SO_RULE_PATH/p2p.rules\n");
 			fwrite($file,"include $SO_RULE_PATH/specific-threats.rules\n");
 			
+			fclose($file);
 			
+			$file = fopen(dirname(__FILE__)."/../../../datas/tmp/snort");
+			fwrite($file,"1");
 			fclose($file);
 		}
 		
