@@ -37,11 +37,11 @@ int main(int argc, const char** argv)
 	}
 	
 	mysql_host = "localhost";
-	mysql_dbname = "root";
+	mysql_dbname = "fssmanager";
 	mysql_user = "root";
 	mysql_password = "root";
 	
-	if(mysql_real_connect(conn, mysql_host, mysql_dbname, mysql_user, mysql_password, 0, NULL, 0) == NULL)
+	if(mysql_real_connect(conn, mysql_host, mysql_user, mysql_password, mysql_dbname, 0, NULL, 0) == NULL)
 	{
 		printError("[Z-Eye][ERROR] Unable to connect to MySQL server (host %s, database %s, user %s, password %s)",
 			mysql_host,mysql_dbname,mysql_user,mysql_password);

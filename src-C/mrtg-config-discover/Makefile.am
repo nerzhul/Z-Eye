@@ -1,5 +1,5 @@
 bin_PROGRAMS = zeye-mrtg-config-discover
-AM_CPPFLAGS = -lpthread
+AM_CPPFLAGS = @MYSQL_CPPFLAGS@ 
 
 zeye_mrtg_config_discover_SOURCES = \
 	common.h \
@@ -8,6 +8,5 @@ zeye_mrtg_config_discover_SOURCES = \
 	stdmgmt.h
 
 
-zeye_mrtg_config_discover_LDADD = -lpthread
-
+zeye_mrtg_config_discover_LDADD = @MYSQL_LDADD@
 zeye_mrtg_config_discover_LDFLAGS = 

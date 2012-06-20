@@ -1,6 +1,6 @@
 bin_PROGRAMS = zeye-make-snmp-cache
 
-AM_CPPFLAGS = -I/usr/include/mysql -lpthread -lmysqlclient
+AM_CPPFLAGS = @MYSQL_CPPFLAGS@  
 
 zeye_make_snmp_cache_SOURCES = \
 	common.h \
@@ -11,6 +11,6 @@ zeye_make_snmp_cache_SOURCES = \
 	stdmgmt.h
 
 
-zeye_make_snmp_cache_LDADD = -lpthread -lmysqlclient
+zeye_make_snmp_cache_LDADD = @MYSQL_LDADD@ 
 
-zeye_make_snmp_cache_LDFLAGS = -I/usr/include/mysql
+zeye_make_snmp_cache_LDFLAGS = 
