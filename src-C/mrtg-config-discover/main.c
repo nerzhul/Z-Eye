@@ -20,6 +20,15 @@
 #include "stdmgmt.h"
 #include <time.h>
 
+void* execThreadCommand(void* data)
+{
+	char* community = (char*)data;
+	if(strlen(community) == 0)
+		return;
+	printSystem("[Z-Eye] mrtg_config_iscover: exec cfgmaker community@server");
+	system("cfgmaker community@server");
+}
+
 int main(int argc, const char** argv)
 {
 	printSystem("[Z-Eye] mrtg_config_discover with %s",mysql_get_client_info());
@@ -51,23 +60,19 @@ int main(int argc, const char** argv)
 	// pgsqlquery
 	// while 
 	{
-		mysql_query(conn, "SELECT snmpro FROM fss_snmp_cache where device = 'NAME'");
-		MYSQL_RES* result = mysql_store_result(conn);
-		int num_fields = mysql_num_fields(result);
-		char* community;
+		MYSQL_RES* result = MySQLSelect(conn, "SELECT snmpro FROM fss_snmp_cache where device = 'NAME'");
 		MYSQL_ROW row;
+		char* community = NULL;
+		
 		if((row = mysql_fetch_row(result)))
 		{
-			community = (char*)malloc(strlen(row[0])*sizeof(char)+1);
+			community = (char*)malloc((strlen(row[0])+1)*sizeof(char));
 			strcpy(community,row[0]);
+			pthread_t thread;
+			pthread_create(thread, NULL, execThreadCommand, (void*)community);
 		}
 		
 		mysql_free_result(result);
-		/*if(strlen(community) == 0)
-			continue;*/
-			
-		// create thread
-		
 	}
 	
 	mysql_close(conn);

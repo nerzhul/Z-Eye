@@ -22,20 +22,74 @@
 	
 	FS::LoadFSModules();
 	
-	echo "[".Config::getWebsiteName()."][MRTG-Discover] started at ".date('d-m-Y G:i:s')."\n";
+	echo "[".Config::getWebsiteName()."][Service-Checker] started at ".date('d-m-Y G:i:s')."\n";
 	$start_time = microtime(true);
 	
+	echo "Search if SNORT must be restarted: ";
+	// search snort
 	$file = fopen(dirname(__FILE__)."/../datas/tmp/snort");
 	if($file) {
 		$filedata = fread($file,filesize(dirname(__FILE__)."/../datas/tmp/snort"));
 		if($filedata == "1")
+		{
+			echo "yes\n";
 			exec("service snort restart");
+			echo "done.\n";
+		}
 		else
+		{
+			echo "no\n";
 			echo "[WARN] Invalid data into ".dirname(__FILE__)."/../datas/tmp/snort file !";
+		}
 		fclose($file);
-	}	
+	}
+	else
+		echo "no\n";
+		
+	echo "Search if Icinga must be restarted: ";
+	// search snort
+	$file = fopen(dirname(__FILE__)."/../datas/tmp/icinga");
+	if($file) {
+		$filedata = fread($file,filesize(dirname(__FILE__)."/../datas/tmp/icinga"));
+		if($filedata == "1")
+		{
+			echo "yes\n";
+			exec("service icinga restart");
+			echo "done.\n";
+		}
+		else
+		{
+			echo "no\n";
+			echo "[WARN] Invalid data into ".dirname(__FILE__)."/../datas/tmp/icinga file !";
+		}
+		fclose($file);
+	}
+	else
+		echo "no\n";
+		
+	echo "Search if Apache must be restarted: ";
+	// search snort
+	$file = fopen(dirname(__FILE__)."/../datas/tmp/apache");
+	if($file) {
+		$filedata = fread($file,filesize(dirname(__FILE__)."/../datas/tmp/apache"));
+		if($filedata == "1")
+		{
+			echo "yes\n";
+			exec("service apache22 restart");
+			echo "done.\n";
+		}
+		else
+		{
+			echo "no\n";
+			echo "[WARN] Invalid data into ".dirname(__FILE__)."/../datas/tmp/apache file !";
+		}
+		fclose($file);
+	}
+	else
+		echo "no\n";
+	
 	
 	$end_time = microtime(true);
 	$script_time = $end_time - $start_time;
-	echo "[".Config::getWebsiteName()."][MRTG-Discover] done at ".date('d-m-Y G:i:s')." (Execution time: ".$script_time."s)\n";
+	echo "[".Config::getWebsiteName()."][Service-Checker] done at ".date('d-m-Y G:i:s')." (Execution time: ".$script_time."s)\n";
 ?>

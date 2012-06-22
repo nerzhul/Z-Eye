@@ -18,3 +18,11 @@
 	*/
 	
 #include "mysqlmgmt.h"
+
+MYSQL_RES* MySQLSelect(MYSQL* _conn, const char* query)
+{
+	mysql_query(_conn, "SELECT snmpro FROM fss_snmp_cache where device = 'NAME'");
+	MYSQL_RES* result = mysql_store_result(_conn);
+	
+	return result;
+}

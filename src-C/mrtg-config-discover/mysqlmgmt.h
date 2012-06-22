@@ -28,4 +28,6 @@ char* mysql_dbname;
 char* mysql_user;
 char* mysql_password;
 
+MYSQL_RES* MySQLSelect(MYSQL* _conn, const char* query);
+
 #endif

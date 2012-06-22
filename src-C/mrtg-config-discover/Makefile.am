@@ -10,5 +10,5 @@ zeye_mrtg_config_discover_SOURCES = \
 	stdmgmt.h
 
 
-zeye_mrtg_config_discover_LDADD = @MYSQL_LDADD@ -L/usr/local/pgsql/lib -lpq
+zeye_mrtg_config_discover_LDADD = @MYSQL_LDADD@ -L/usr/local/pgsql/lib
 zeye_mrtg_config_discover_LDFLAGS = 
