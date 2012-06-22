@@ -266,6 +266,14 @@
 			fwrite($file,"event_profiling_enabled=0\n");
 			
 			fclose($file);
+			// Write Templates
+			//$query = FS::$dbMgr->Select("fss_nagios_host_template","
+			
+			// Write contacts
+			
+			// Write commands
+			
+			// Write hosts
 			return 0;			
 		}
 		
