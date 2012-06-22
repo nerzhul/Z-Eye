@@ -1,5 +1,5 @@
 bin_PROGRAMS = zeye-mrtg-config-discover
-AM_CPPFLAGS = @MYSQL_CPPFLAGS@ -I/usr/local/pgsql/include
+AM_CPPFLAGS = @MYSQL_CPPFLAGS@
 
 zeye_mrtg_config_discover_SOURCES = \
 	common.h \
