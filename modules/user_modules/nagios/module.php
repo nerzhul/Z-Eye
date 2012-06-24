@@ -22,95 +22,149 @@
 	class iNagios extends genModule{
 		function iNagios() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\"><h3>Management de Nagios (icinga)</h3>";
-			$node = FS::$secMgr->checkAndSecuriseGetData("n");
-			$cont = FS::$secMgr->checkAndSecuriseGetData("ctct");
-			if($node != NULL)
-				$output .= $this->showNode($node);
-			else if($cont != NULL)
-				$output .= $this->showContact($cont);
-			else
-				$output .= $this->showMain();
+			$output = "<div id=\"monoComponent\">";
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+			if(!FS::isAjaxCall()) $output .= "<h3>Management de Nagios (icinga)</h3>";
 			
+			$output .= $this->showMain();
 			$output .= "</div>";
 			return $output;
 		}
 		
-		private function showContact($cont) {
-			$output = "<h4>Gestion du contact ".$cont."</h4>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
-			$output .= "<table class=\"standardTable\">";
-			$output .= FS::$iMgr->addIndexedLine("Nom du contact","ctctname","contactname"); // compress spaces to make contct_name and use it as alias
-			$output .= FS::$iMgr->addIndexedLine("Adresse E-Mail","ctctmail","admin@domain.tld");
-			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-			$output .= "</table></form>";
-			return $output;	
-		}
-
-		private function showNode($node) {
-			$output = "<h4>Gestion du noeud ".$node."</h4>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
-			$output .= "<table class=\"standardTable\">";
-			$output .= FS::$iMgr->addIndexedLine("Nom du serveur","srvname","servername"); // compress spaces to make contct_name and use it as alias
-			$output .= FS::$iMgr->addIndexedLine("Adresse du serveur","srvaddr","servername");
-			$output .= FS::$iMgr->addIndexedNumericLine("Intervalle de mise à jour (minutes)","updateint","5");
-			$output .= FS::$iMgr->addIndexedNumericLine("Intervalle des tentatives en cas d'échec (minutes)","rtryint","1");
-			$output .= FS::$iMgr->addIndexedNumericLine("Nombres d'essais avant de définir en échec","maxtry","10");
-			$output .= FS::$iMgr->addIndexedNumericLine("Intervalle de notifications (minutes) (0 = 1 seule notification)","notifint","30");
-			// ensemble de cases à cocher pour les contacts @ TODO
-			$output .= FS::$iMgr->addIndexedNumericLine("","updateint","5");
-			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-			return $output;	
-		}
-		
-		private function showMain() {
-			$output = "<h4>Gestion des objets</h4>";
+		private function showMain() {			
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+			$output = "";
+			if(!FS::isAjaxCall()) {
+				$output .= "<div id=\"contenttabs\"><ul>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."\">Général</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=2\">Contacts (tpl)</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=3\">Hôtes (tpl)</a>";
+				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=4\">Services (tpl)</a>";
+				$output .= "</ul></div>";
+				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+				$output .= "</div>";
+			}
+			else if(!$sh || $sh == 1) {
+				$stupdateint = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'STATUS_UPDATE_INT'");
+				$cmdcheckint = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'CMD_CHECK_INT'");
+				$resfreq = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'RESULT_UPDATE_INT'");
+				$maxresultage = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'RESULT_MAX_AGE'");
+				$cachehostlifetime = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'HOST_CACHE_LIFETIME'");
+				$cachesrvlifetime = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'SERVICE_CACHE_LIFETIME'");
+				$srvchecktimeout = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'SRV_STATE_TIMEOUT'");
+				$hostchecktimeout = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'HOST_STATE_TIMEOUT'");
+				$notiftimeout = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'NOTIF_TIMEOUT'");
+				$sensorint = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'SENSOR_TIME'");
+				$lognotif = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'LOG_NOTIF'");
+				$logsrvretries = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'LOG_SRV_RETRIES'");
+				$loghostretries = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'LOG_HOST_RETRIES'");
+				$notifenable = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'ENABLE_NOTIF'");
+				$flapenable = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'ENABLE_FLAG'");
+				$adminmail = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'ADMIN_MAIL'");
 			
-			$stupdateint = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'STATUS_UPDATE_INT'");
-			$cmdcheckint = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'CMD_CHECK_INT'");
-			$resfreq = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'RESULT_UPDATE_INT'");
-			$maxresultage = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'RESULT_MAX_AGE'");
-			$cachehostlifetime = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'HOST_CACHE_LIFETIME'");
-			$cachesrvlifetime = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'SERVICE_CACHE_LIFETIME'");
-			$srvchecktimeout = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'SRV_STATE_TIMEOUT'");
-			$hostchecktimeout = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'HOST_STATE_TIMEOUT'");
-			$notiftimeout = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'NOTIF_TIMEOUT'");
-			$sensorint = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'SENSOR_TIME'");
-			$lognotif = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'LOG_NOTIF'");
-			$logsrvretries = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'LOG_SRV_RETRIES'");
-			$loghostretries = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'LOG_HOST_RETRIES'");
-			$notifenable = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'ENABLE_NOTIF'");
-			$flapenable = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'ENABLE_FLAG'");
-			$adminmail = FS::$dbMgr->GetOneData("fss_icinga_main","icingavalue","icingakey = 'ADMIN_MAIL'");
-			
-			
-			$output .= "<hr><h4>Configuration globale</h4>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Délais</th></tr>";
-			$output .= FS::$iMgr->addIndexedLine("Intervalle de mise à jour des status","stupdateint",$stupdateint);
-			$output .= FS::$iMgr->addIndexedLine("Intervalle de vérification des commandes externes","cmdcheckint",$cmdcheckint);
-			$output .= FS::$iMgr->addIndexedLine("Intervalle de mise à jour des résultats des hôtes et services","resfreq",$resfreq);
-			$output .= FS::$iMgr->addIndexedLine("Age maximal des résultats","maxresultage",$maxresultage);
-			$output .= FS::$iMgr->addIndexedLine("Age maximal de l'état d'un hôte","cachehostlifetime",$cachehostlifetime);
-			$output .= FS::$iMgr->addIndexedLine("Age maximal de l'état d'un service","cachesrvlifetime",$cachesrvlifetime);
-			$output .= FS::$iMgr->addIndexedLine("Temps maximal de recherche d'état d'un service","srvchecktimeout",$srvchecktimeout);
-			$output .= FS::$iMgr->addIndexedLine("Temps maximal de recherche d'état d'un hôte","hostchecktimeout",$hostchecktimeout);
-			$output .= FS::$iMgr->addIndexedLine("Temps maximal d'envoi d'une notification","notiftimeout",$notiftimeout);
-			$output .= FS::$iMgr->addIndexedLine("Intervalle par défaut d'utilisation d'une sonde","sensorint",$sensorint);
-			$output .= "<tr><th colspan=\"2\">Logs</th></tr>";
-			// Log rotation method
-			$output .= FS::$iMgr->addIndexedCheckLine("Log des notifications","lognotif",$lognotif);
-			$output .= FS::$iMgr->addIndexedCheckLine("Log des tentatives sur les services","logsrvretries",$logsrvretries);
-			$output .= FS::$iMgr->addIndexedCheckLine("Log des tentatives sur les hôtes","loghostretries",$loghostretries);
-			$output .= "<tr><th colspan=\"2\">Notifications</th></tr>";
-			$output .= FS::$iMgr->addIndexedCheckLine("Activer","notifenable",$notifenable);
-			// service_check_timeout_state
-			$output .= "<tr><th colspan=\"2\">Autres</th></tr>";
-			$output .= FS::$iMgr->addIndexedCheckLine("Détection des services instables","flapenable",$flapenable);
-			// date_format
-			$output .= FS::$iMgr->addIndexedCheckLine("Mail de l'administrateur","adminmail",$adminmail);
-			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
-			$output .= "</table></form>";
+				$output .= "<h3>Configuration globale</h3>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+				$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Délais</th></tr>";
+				$output .= FS::$iMgr->addIndexedLine("Intervalle de mise à jour des status","stupdateint",$stupdateint);
+				$output .= FS::$iMgr->addIndexedLine("Intervalle de vérification des commandes externes","cmdcheckint",$cmdcheckint);
+				$output .= FS::$iMgr->addIndexedLine("Intervalle de mise à jour des résultats des hôtes et services","resfreq",$resfreq);
+				$output .= FS::$iMgr->addIndexedLine("Age maximal des résultats","maxresultage",$maxresultage);
+				$output .= FS::$iMgr->addIndexedLine("Age maximal de l'état d'un hôte","cachehostlifetime",$cachehostlifetime);
+				$output .= FS::$iMgr->addIndexedLine("Age maximal de l'état d'un service","cachesrvlifetime",$cachesrvlifetime);
+				$output .= FS::$iMgr->addIndexedLine("Temps maximal de recherche d'état d'un service","srvchecktimeout",$srvchecktimeout);
+				$output .= FS::$iMgr->addIndexedLine("Temps maximal de recherche d'état d'un hôte","hostchecktimeout",$hostchecktimeout);
+				$output .= FS::$iMgr->addIndexedLine("Temps maximal d'envoi d'une notification","notiftimeout",$notiftimeout);
+				$output .= FS::$iMgr->addIndexedLine("Intervalle par défaut d'utilisation d'une sonde","sensorint",$sensorint);
+				$output .= "<tr><th colspan=\"2\">Logs</th></tr>";
+				// Log rotation method
+				$output .= FS::$iMgr->addIndexedCheckLine("Log des notifications","lognotif",$lognotif);
+				$output .= FS::$iMgr->addIndexedCheckLine("Log des tentatives sur les services","logsrvretries",$logsrvretries);
+				$output .= FS::$iMgr->addIndexedCheckLine("Log des tentatives sur les hôtes","loghostretries",$loghostretries);
+				$output .= "<tr><th colspan=\"2\">Notifications</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","notifenable",$notifenable);
+				// service_check_timeout_state
+				$output .= "<tr><th colspan=\"2\">Autres</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Détection des services instables","flapenable",$flapenable);
+				// date_format
+				$output .= FS::$iMgr->addIndexedCheckLine("Mail de l'administrateur","adminmail",$adminmail);
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "</table></form>";
+			}
+			else if($sh == 2) {
+				$output .= "<h3>Template de contacts</h3>";
+				$output .= "<h4>Nouveau template</h4>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+				$output .= "<table class=\"standardTable\">";
+				$output .= FS::$iMgr->addIndexedLine("Nom du template","");
+				$output .= "<tr><td>Période des notifications (Hôte)</td><td>";
+				$output .= FS::$iMgr->addList("notifhost");
+				$output .= FS::$iMgr->addElementToList("24x7",1,true);
+				$output .= FS::$iMgr->addElementToList("Heures travaillées",2);
+				$output .= "</select></td></tr><tr><td>Période des notifications (Services)</td><td>";
+				$output .= FS::$iMgr->addList("notifsrv");
+				$output .= FS::$iMgr->addElementToList("24x7",1,true);
+				$output .= FS::$iMgr->addElementToList("Heures travaillées",2);
+				$output .= "</select></td></tr>";
+				$output .= "<tr><td>Activer les notifications hôte: </td><td>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Down","hostdown",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Avertissements","hostwarn",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Statut Inconnu","hostunk",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Critique","hostcrit",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Instabilité","hostunstable",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Retour à la normale","hostrecovery",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Désactiver les notifications","hostnotifdisable",false);
+				$output .= "</td></tr><tr><td>Options des notifications (Services)</td><td>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Down","srvdown",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Avertissements","srvwarn",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Statut Inconnu","srvunk",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Critique","srvcrit",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Instabilité","srvunstable",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Retour à la normale","srvrecovery",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Désactiver les notifications","srvnotifdisable",false);
+				$output .= "</td></tr>";
+				$output .= FS::$iMgr->addTableSubmit("submit","Ajouter");
+				$output .= "</table></form>";
+				$output .= "<h4>Liste des templates</h4>";
+			} else if($sh == 3) {
+				$output .= "<h3>Template d'hôtes</h3>";
+				$output .= "<h4>Nouveau template</h4>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
+				$output .= "<table class=\"standardTable\">";
+				$output .= FS::$iMgr->addIndexedLine("Nom du template","");
+				$output .= FS::$iMgr->addIndexedCheckLine("Notifications","notifenable",true);
+				$output .= "<tr><td>Période des notifications</td><td>";
+				$output .= FS::$iMgr->addList("notifperiod");
+				$output .= FS::$iMgr->addElementToList("24x7",1,true);
+				$output .= FS::$iMgr->addElementToList("Heures travaillées",2);
+				$output .= "</select>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Gestionnaire d'évènements","eventhdlenable",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Alertes d'instabilité","flapenable",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Prédiction d'échecs","failpredictenable",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Effectuer les tests de performances","perfdata",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Retenir les informations (statut)","retainstatus",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Retenir les informations (!statut)","retainnonstatus",true);
+				$output .= FS::$iMgr->addIndexedLine("Intervalle de notification","notifinterval",true);
+				$output .= "<tr><td>Options des notifications</td><td>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Down","hostdown",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Avertissements","hostwarn",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Statut Inconnu","hostunk",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Critique","hostcrit",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Instabilité","hostunstable",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Retour à la normale","hostrecovery",true);
+				$output .= FS::$iMgr->addIndexedCheckLine("Désactiver les notifications","hostnotifdisable",false);
+				$output .= "</td></tr>";
+				$output .= FS::$iMgr->addTableSubmit("submit","Ajouter");
+				$output .= "</table></form>";
+				$output .= "<h4>Liste des templates</h4>";
+			} else if($sh == 4) {
+				$output .= "<h3>Template de services</h3>";
+				$output .= "<h4>Nouveau template</h4>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
+				$output .= FS::$iMgr->addIndexedLine("Nom du template","");
+				$output .= "</form>";
+				$output .= "<h4>Liste des templates</h4>";
+			}
 			return $output;	
 		}
 		
@@ -266,9 +320,80 @@
 			fwrite($file,"event_profiling_enabled=0\n");
 			
 			fclose($file);
-			// Write Templates
-			//$query = FS::$dbMgr->Select("fss_nagios_host_template","
 			
+			$file = fopen("/usr/local/etc/icinga/objects/templates.cfg","w+");
+			if($file == NULL || $file == false)
+				return 1;
+				
+			// Write Templates
+			$query = FS::$dbMgr->Select("fss_icinga_contact_template","name,hostnotifperiod,srvnotifperiod,srvnotifopt,hostnotifopt");
+			while($data = mysql_fetch_array($query)) {
+				fwrite($file,"define contact{\n");
+				fwrite($file,"\tname\t".$data["name"]."\n");
+				fwrite($file,"\thost_notification_period\t".$data["hostnotifperiod"]."\n");
+				fwrite($file,"\tservice_notification_options\t".$data["srvnotifperiod"]."\n");
+				fwrite($file,"\thost_notification_options\t".$data["hostnotifopt"]."\n");
+				fwrite($file,"\tservice_notification_period\t".$data["srvnotifopt"]."\n");
+				fwrite($file,"\thost_notification_commands\tnotify-host-by-email\n");
+				fwrite($file,"\tservice_notification_commands\tnotify-service-by-email\n");
+				fwrite($file,"\tregister\t0\n");
+				fwrite($file,"}\n");
+			}
+			
+			$query = FS::$dbMgr->Select("fss_icinga_host_template","name,notifenable,eventhdlenable,flapenable,failpredictenable,
+				perfenable,retainstatus,retainnonstatus,notifperiod,checkinterval,retryinterval,notifinterval,notifopts,
+				contactgroups");
+			while($data = mysql_fetch_array($query)) {
+				fwrite($file,"define host{\n");
+				fwrite($file,"\tname\t".$data["name"]."\n");
+				fwrite($file,"\tnotification_period\t".$data["notifperiod"]."\n");
+				fwrite($file,"\tevent_handler_enabled\t".$data["eventhdlenable"]."\n");
+				fwrite($file,"\tnotifications_enabled\t".$data["notifenable"]."\n");
+				fwrite($file,"\tflap_detection_enabled\t".$data["flapenable"]."\n");
+				fwrite($file,"\tfailure_prediction_enabled\t".$data["failpredictenable"]."\n");
+				fwrite($file,"\tprocess_perf_data\t".$data["perfenable"]."\n");
+				fwrite($file,"\tretain_status_information\t".$data["retainstatus"]."\n");
+				fwrite($file,"\tretain_nonstatus_information\t".$data["retainnonstatus"]."\n");
+				fwrite($file,"\tcheck_interval\t".$data["checkinterval"]."\n");
+				fwrite($file,"\tretry_interval\t".$data["retryinterval"]."\n");
+				fwrite($file,"\tnotification_interval\t".$data["notifinterval"]."\n");
+				fwrite($file,"\tnotification_options\t".$data["notifopts"]."\n");
+				//fwrite($file,"\tcontact_groups\t".$data["contactgroups"]."\n");
+				//fwrite($file,"\thostgroups\t"."\n"); @TODO
+				fwrite($file,"\tregister\t0\n");
+				fwrite($file,"}\n");
+			}
+			
+			$query = FS::$dbMgr->Select("fss_icinga_service_template","name,actcheckenable,passivecheckenable,parallelizeenable,obsess,
+				checkfreshness,notifenable,eventhdlenable,flapenable,failenable,processperf,retainstatus,retainnonstatus,volatile,
+				checkperiod,maxcheck,normalcheckinterval,retrycheckinterval,contactgroups,notifopts,notifinterval,notifperiod");
+			while($data = mysql_fetch_array($query)) {
+				fwrite($file,"define service{\n");
+				fwrite($file,"\tname\t".$data["name"]."\n");
+				fwrite($file,"\tactive_checks_enabled\t".$data["actcheckenable"]."\n");
+				fwrite($file,"\tpassive_checks_enabled\t".$data["passivecheckenable"]."\n");
+				fwrite($file,"\tparallelize_check\t".$data["parallelizeenable"]."\n");
+				fwrite($file,"\tobsess_over_service\t".$data["obsess"]."\n");
+				fwrite($file,"\tcheck_freshness\t".$data["checkfreshness"]."\n");
+				fwrite($file,"\tnotifications_enabled\t".$data["notifenable"]."\n");
+				fwrite($file,"\tevent_handler_enabled\t".$data["eventhdlenable"]."\n");
+				fwrite($file,"\tflap_detection_enabled\t".$data["flapenable"]."\n");
+				fwrite($file,"\tfailure_prediction_enabled\t".$data["failenable"]."\n");
+				fwrite($file,"\tprocess_perf_data\t".$data["processperf"]."\n");
+				fwrite($file,"\tretain_status_information\t".$data["retainstatus"]."\n");
+				fwrite($file,"\tretain_nonstatus_information\t".$data["retainnonstatus"]."\n");
+				fwrite($file,"\tis_volatile\t".$data["volatile"]."\n");
+				fwrite($file,"\tcheck_period\t".$data["checkperiod"]."\n");
+				fwrite($file,"\tmax_check_attempts\t".$data["maxcheck"]."\n");
+				fwrite($file,"\tnormal_check_interval\t".$data["normalcheckinterval"]."\n");
+				fwrite($file,"\tretry_check_interval\t".$data["retrycheckinterval"]."\n");
+				//fwrite($file,"\tcontact_groups\t"."\n"); @TODO
+				fwrite($file,"\tnotification_options\t".$data["notifopts"]."\n");
+				fwrite($file,"\tnotification_interval\t".$data["notifinterval"]."\n");
+				fwrite($file,"\tnotification_period\t".$data["notifperiod"]."\n");
+				fwrite($file,"\tregister\t0\n");
+				fwrite($file,"}\n");
+			}
 			// Write contacts
 			
 			// Write commands
@@ -279,7 +404,7 @@
 		
 		public function handlePostDatas($act) {
 			switch($act) {
-				case 1:
+				case 1: // main configuration
 					break;
 				default: break;
 			}
