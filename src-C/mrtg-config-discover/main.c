@@ -91,7 +91,7 @@ int main(int argc, const char** argv)
 	const char* mysql_host = "localhost";
 	const char* mysql_dbname = "fssmanager";
 	const char* mysql_user = "root";
-	const char* mysql_password = "SiCeP&MEDSQL";
+	const char* mysql_password = "root";
 	
 	if(mysql_real_connect(conn, mysql_host, mysql_user, mysql_password, mysql_dbname, 0, NULL, 0) == NULL)
 	{
