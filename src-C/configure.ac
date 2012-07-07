@@ -14,7 +14,6 @@ AC_SUBST(MYSQL_LDADD)
 AC_CONFIG_FILES([
 Makefile
 make-snmp-cache/Makefile
-mrtg-config-discover/Makefile
 mrtg-data-refresh/Makefile
 ])
 AC_OUTPUT

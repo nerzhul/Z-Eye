@@ -16,13 +16,12 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-#include "mysqlmgmt.h"
 #include "stdmgmt.h"
 #include <time.h>
 
 int main(int argc, const char** argv)
 {
-	printSystem("[Z-Eye] make_snmp_cache with %s",mysql_get_client_info());
+	printSystem("[Z-Eye] make_snmp_cache (MySQL ver. %s)",mysql_get_client_info());
 	
 	time_t starttime = time(0);
     struct tm now = *localtime(&starttime);
@@ -36,10 +35,10 @@ int main(int argc, const char** argv)
 		return 1;
 	}
 	
-	mysql_host = "localhost";
-	mysql_dbname = "fssmanager";
-	mysql_user = "root";
-	mysql_password = "root";
+	const char* mysql_host = "localhost";
+	const char* mysql_dbname = "fssmanager";
+	const char* mysql_user = "root";
+	const char* mysql_password = "root";
 	
 	if(mysql_real_connect(conn, mysql_host, mysql_user, mysql_password, mysql_dbname, 0, NULL, 0) == NULL)
 	{
