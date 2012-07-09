@@ -30,7 +30,6 @@
 		public function showContent() {
 			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
 			$output .= $this->showConnForm();
-			$output .= "<div id=\"fakemain\">";
 			$output .= "<div id=\"menus\">";
             $output .= $this->showRightMenu();
 			$output .= "<div id=\"rightmenu\">";
@@ -44,7 +43,7 @@
 			$output .= $this->showModule();
 			$output .= "</div>";
 			$output .= "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS";
-			$output .= " - Copyright 2010-".date('Y').", All rights Reserved</center></div></div>";
+			$output .= " - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
 			return $output;
 		}
 

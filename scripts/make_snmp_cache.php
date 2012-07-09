@@ -1,23 +1,4 @@
 <?php
-	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
-	*
-	* This program is free software; you can redistribute it and/or modify
-	* it under the terms of the GNU General Public License as published by
-	* the Free Software Foundation; either version 2 of the License, or
-	* (at your option) any later version.
-	*
-	* This program is distributed in the hope that it will be useful,
-	* but WITHOUT ANY WARRANTY; without even the implied warranty of
-	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	* GNU General Public License for more details.
-	*
-	* You should have received a copy of the GNU General Public License
-	* along with this program; if not, write to the Free Software
-	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-	*/
-	
 	require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 	
 	FS::LoadFSModules();
@@ -25,17 +6,6 @@
 	$snmpro = array();
 	$snmprw = array();
 	$snmpdbrecord = array();
-	function getPortId($ip,$portname) {
-			$out = "";
-			exec("snmpwalk -v 2c -c ".SNMPConfig::$SNMPReadCommunity." ".$ip." ifDescr | grep ".$portname,$out);
-			if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
-				return -1;
-			$out = explode(" ",$out[0]);
-			$out = explode(".",$out[0]);
-			if(!FS::$secMgr->isNumeric($out[1]))
-				return -1;
-			return $out[1];
-	}
 	
 	function loadNetdiscoCommunities(&$snmpro,&$snmprw) {
 		
@@ -79,8 +49,8 @@
 			$devro = "";
 			$devrw = "";
 			
-			$foundro = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$data["name"]."'");
-			$foundrw = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$data["name"]."'");
+			$foundro = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
+			$foundrw = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
 			if($foundro && checkSnmp($data["ip"],$foundro) == 0)
 				$devro = $foundro;
 			if($foundrw && checkSnmp($data["ip"],$foundrw) == 0)
@@ -99,10 +69,9 @@
 			if(strlen($devro) > 0 || strlen($devrw) > 0)
 				$snmpdbrecord[$data["name"]] = array("ro" => $devro, "rw" => $devrw);
 		}
-		
-		FS::$dbMgr->Delete("fss_snmp_cache");
+		FS::$pgdbMgr->Delete("z_eye_snmp_cache");
 		foreach($snmpdbrecord as $key => $value)
-			FS::$dbMgr->Insert("fss_snmp_cache","device,snmpro,snmprw","'".$key."','".$value["ro"]."','".$value["rw"]."'");
+			FS::$pgdbMgr->Insert("z_eye_snmp_cache","device,snmpro,snmprw","'".$key."','".$value["ro"]."','".$value["rw"]."'");
 	}
 	
 	echo "[".Config::getWebsiteName()."][SNMP-Caching] started at ".date('d-m-Y G:i:s')."\n";

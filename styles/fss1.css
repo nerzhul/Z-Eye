@@ -17,23 +17,11 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-
-@font-face {
-font-family: 'Titillium Maps';
-src: url("fonts/TitilliumMaps29L002.eot")
-}
-@font-face {
-font-family: 'Titillium Maps';
-src:
-url("fonts/TitilliumMaps29L002.otf") format("opentype"),
-url("fonts/TitilliumMaps29L002.woff") format("woff")
-}
-
 #pop {
-	position: absolute; 
+	position: fixed; 
 	width: 100%; 
 	height:100%;
-	z-index: 10; 
+	z-index: 100; 
 	margin-left: -10px;
 	margin-top: -18px;
 	background-color: rgba(0,0,0,0.6);
@@ -41,8 +29,8 @@ url("fonts/TitilliumMaps29L002.woff") format("woff")
 }
 
 #subpop {
-	-webkit-border-radius: 7px 7px 7px 7px;
-        border-radius: 7px 7px 7px 7px;
+	-webkit-border-radius: 4px 4px 4px 4px;
+    border-radius: 4px 4px 4px 4px;
 	background-color: rgba(255,255,255,0.90);
 	width:490px;
 	text-align:center;
@@ -60,9 +48,6 @@ url("fonts/TitilliumMaps29L002.woff") format("woff")
 	background-attachment: fixed;
 	/* Background image taken from deviantart and created by all hope is lost */
 	background-image: url("images/background-fss.jpg");
-}
-
-#fakemain {
 	text-align: center;
 	margin-left: auto; 
 	margin-right: auto; 
@@ -77,9 +62,8 @@ url("fonts/TitilliumMaps29L002.woff") format("woff")
 	padding: 15px;
 	margin: auto;
 	float: left;
-    -webkit-border-radius: 7px 7px 7px 7px;
-	border-radius: 7px 7px 7px 7px;
-	-moz-box-shadow: 0px 5px 7px ;
+    -webkit-border-radius: 2px 2px 2px 2px;
+	border-radius: 2px 2px 2px 2px;
 	-webkit-box-shadow: 0px 5px 7px ;
     box-shadow: 0px 5px 7px;
 }
@@ -216,7 +200,6 @@ pre {
 	text-align: left;
 	color: #AAAAAA;
 	text-decoration: none;
-	font-family: 'Titillium Maps',Arial;
 }
 
 #menu h3{

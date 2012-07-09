@@ -351,19 +351,19 @@
 			if($device == "" || $field == "" || $pid == "" /*|| !FS::$secMgr->isNumeric($pid)*/)
 				return -1;
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			return snmpget($dip,$community,$field.".".$pid);
 		}
 		
 		function getPortId($device,$portname) {
-			$pid = FS::$dbMgr->GetOneData("fss_port_id_cache","pid","device = '".$device."' AND portname = '".$portname."'");
+			$pid = FS::$pgdbMgr->GetOneData("z_eye_port_id_cache","pid","device = '".$device."' AND portname = '".$portname."'");
 			if($pid == NULL) $pid = -1;
 			return $pid;
 		}
 
 		function getPortIndexes($device,$pid) {
-			$query = FS::$dbMgr->Select("fss_port_id_cache","switchid,switchportid","device = '".$device."' AND pid = '".$pid."'");
+			$query = FS::$pgdbMgr->Select("z_eye_port_id_cache","switchid,switchportid","device = '".$device."' AND pid = '".$pid."'");
 			if($data = mysql_fetch_array($query))
 				return array($data["switchid"],$data["switchportid"]);
 			return NULL;
@@ -378,7 +378,7 @@
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($dip == NULL)
 				return -1;
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
@@ -419,7 +419,7 @@
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($dip == NULL)
 				return -1;
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			for($i=0;$i<count($out);$i++) {
@@ -460,7 +460,7 @@
 		function writeMemory($device) {
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
@@ -473,7 +473,7 @@
 		function restoreStartupConfig($device) {
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
@@ -487,7 +487,7 @@
 		function exportConfigToTFTP($device,$server,$path) {
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
@@ -502,7 +502,7 @@
 		function importConfigFromTFTP($device,$server,$path) {
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
@@ -519,7 +519,7 @@
 				return -1;
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
@@ -538,7 +538,7 @@
 				return -1;
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
 			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
@@ -554,7 +554,7 @@
 		// Get Copy state from switch, using previous randomized id
 		function getCopyState($device,$copyId) {
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			$res = snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
 			$res = preg_split("# #",$res);
@@ -563,7 +563,7 @@
 		
 		function getCopyError($device,$copyId) {
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			$res = snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.13.".$copyId);
 			$res = preg_split("# #",$res);

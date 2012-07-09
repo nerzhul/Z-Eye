@@ -30,61 +30,46 @@ def fetchMRTGInfos(ip,devname,devcom):
 		print "[FATAL] %s" % e
 		threadCounter = threadCounter - 1
 
-mysqlCon = None
 pgsqlCon = None
 
-defaultSNMPRO = 'public'
-
-mysqlHost = 'localhost'
-mysqlUser = 'root'
-mysqlPwd = 'root'
-mysqlDb = 'fssmanager'
+defaultSNMPRO = 'IOTA'
 
 pgsqlHost = '127.0.0.1'
 pgsqlUser = 'netdisco'
-pgsqlPwd = 'netdisco'
+pgsqlPwd = 'dbpassword'
 pgsqlDb = 'netdisco'
 
 now = datetime.datetime.now()
 print "[Z-Eye][mrtg-config-discover] Start at: %s" % now.strftime("%Y-%m-%d %H:%M")
 try:
-
-	mysqlCon = mdb.connect(mysqlHost,mysqlUser,mysqlPwd,mysqlDb);
+	pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
+	pgcursor = pgsqlCon.cursor()
+	pgcursor.execute("SELECT ip,name FROM device ORDER BY ip")
 	try:
-		pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
-		pgcursor = pgsqlCon.cursor()
-		pgcursor.execute("SELECT ip,name FROM device ORDER BY ip")
-		try:
-			pgres = pgcursor.fetchall()
-			for idx in pgres:
-				mycur = mysqlCon.cursor()
-				mycur.execute("SELECT snmpro FROM fss_snmp_cache where device = '%s'" % idx[1])
-				myres = mycur.fetchone()
-
-				devip = idx[0]
-				devname = idx[1]
-				if myres:
-					devcom = myres[0]
-				else:
-					devcom = defaultSNMPRO
-				thread.start_new_thread(fetchMRTGInfos,(devip,devname,devcom))
-		except StandardError, e:
-			print "[Z-Eye][mrtg-config-discover] Fatal Error: %s" % e
-		
-	except PgSQL.Error, e:
-		print "[Z-Eye][mrtg-config-discover] Pgsql Error %s" % e
-		sys.exit(1);	
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			pgcursor2 = pgsqlCon.cursor()
+			pgcursor2.execute("SELECT snmpro FROM z_eye_snmp_cache where device = '%s'" % idx[1])
+			pgres2 = pgcursor2.fetchone()
 	
+			devip = idx[0]
+			devname = idx[1]
+			if pgres2:
+				devcom = pgres2[0]
+			else:
+				devcom = defaultSNMPRO
+			thread.start_new_thread(fetchMRTGInfos,(devip,devname,devcom))
+	except StandardError, e:
+		print "[Z-Eye][mrtg-config-discover] Fatal Error: %s" % e
 		
-except _mysql.Error, e:
-
-	print "[Z-Eye][mrtg-config-discover] Mysql Error %d: %s" % (e.args[0], e.args[1])
-	sys.exit(1)
+except PgSQL.Error, e:
+	print "[Z-Eye][mrtg-config-discover] Pgsql Error %s" % e
+	sys.exit(1);	
 
 finally:
 
-	if mysqlCon:
-		mysqlCon.close()
+	if pgsqlCon:
+		pgsqlCon.close()
 
 	while threadCounter > 0:
 		print "Thread Number %d" % threadCounter
@@ -93,4 +78,3 @@ finally:
 	totaltime = datetime.datetime.now() - now
 	now = datetime.datetime.now()
 	print "[Z-Eye][mrtg-config-discover] End at: %s (Total time %s)" % (now.strftime("%Y-%m-%d %H:%M"), totaltime)
-

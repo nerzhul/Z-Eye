@@ -6,11 +6,11 @@
 	function makePortIdCache() {
 		$query = FS::$pgdbMgr->Select("device","ip,name");
 		while($data = pg_fetch_array($query)) {
-			$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$data["name"]."'");
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			$out = "";
 			exec("snmpwalk -v 2c -c ".$community." ".$data["ip"]." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
-			FS::$dbMgr->Delete("fss_port_id_cache","device = '".$data["name"]."'");
+			FS::$pgdbMgr->Delete("z_eye_port_id_cache","device = '".$data["name"]."'");
 			for($i=0;$i<count($out);$i++) {
 				$pdata = explode(" ",$out[$i]);
 				$pname = $pdata[3];
@@ -18,8 +18,8 @@
 				if(!FS::$secMgr->isNumeric($pid[1]))
 					continue;
 				$pid = $pid[1];
-				$swid = "";
-				$swpid = "";
+				$swid = 0;
+				$swpid = 0;
 				$out2 = "";
 				exec("snmpwalk -v 2c -c ".$community." ".$data["ip"]." 1.3.6.1.4.1.9.5.1.4.1.1.11 | grep ".$pid,$out2);
 				if(count($out2) > 0) {
@@ -32,7 +32,7 @@
 						}
 					}
 				}
-				FS::$dbMgr->Insert("fss_port_id_cache","device,portname,pid,switchid,switchportid","'".$data["name"]."','".$pname."','".$pid."','".$swid."','".$swpid."'");
+				FS::$pgdbMgr->Insert("z_eye_port_id_cache","device,portname,pid,switchid,switchportid","'".$data["name"]."','".$pname."','".$pid."','".$swid."','".$swpid."'");
 			}
 		}
 	}

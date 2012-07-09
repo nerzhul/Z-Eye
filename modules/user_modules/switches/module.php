@@ -111,8 +111,8 @@
 								if(preg_match("#FastEthernet#",$port))
 									$output .= FS::$iMgr->addElementToList("100 Mbits",100000000,$sp == 100000000 ? true : false);
 								if(preg_match("#GigabitEthernet#",$port)) {
-									$output .= FS::$iMgr->addElementToList("100 Mbits",10000000,$sp == 1000000000 ? true : false);
-									$output .= FS::$iMgr->addElementToList("1 Gbit",100000000,$sp == 10000000000 ? true : false);
+									$output .= FS::$iMgr->addElementToList("100 Mbits",100000000,$sp == 100000000 ? true : false);
+									$output .= FS::$iMgr->addElementToList("1 Gbit",1000000000,$sp == 1000000000 ? true : false);
 									if(preg_match("#TenGigabitEthernet#",$port))
 										$output .= FS::$iMgr->addElementToList("10 Gbits",10,$sp == 10 ? true : false);
 								}
@@ -1155,7 +1155,7 @@
 						echo "-1";
 						return;
 					}
-					$community = FS::$dbMgr->GetOneData("fss_snmp_cache","snmpro","device = '".$device."'");
+					$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 					if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 					exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 					if(strlen($out[0]) < 5) {
