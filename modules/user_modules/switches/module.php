@@ -87,7 +87,7 @@
 						$output .= FS::$iMgr->addHidden("port",$port);
 						$output .= "<table><tr><th>Champ</th><th>Valeur</th></tr>";
 						$output .= "<tr><td>Description</td><td>".FS::$iMgr->addInput("desc",$data["name"])."</td></tr>";
-						$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
+						$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
 						$output .= "<tr><td>Prise</td><td>".FS::$iMgr->addInput("prise",$piece)."</td></tr>";
 						$output .= "<tr><td>Adresse MAC</td><td>".$data["mac"]."</td></tr>";
 						$output .= "<tr><td>Etat / Duplex / Vitesse</td><td>";
@@ -773,9 +773,9 @@
 				}
 	
 				$prisearr = array();
-				$query = FS::$dbMgr->Select("fss_switch_port_prises","port,prise","ip = '".$dip."'");
-				while($data = mysql_fetch_array($query))
-									$prisearr[$data["port"]] = $data["prise"];
+				$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","port,prise","ip = '".$dip."'");
+				while($data = pg_fetch_array($query))
+					$prisearr[$data["port"]] = $data["prise"];
 	
 				$found = 0;
 				if($iswif == false) {
@@ -1053,8 +1053,8 @@
 
 					if($prise == NULL) $prise = "";
 					// Modify prise for switch port
-					$sql = "REPLACE INTO fss_switch_port_prises VALUES ('".$sw."','".$port."','".$prise."')";
-					mysql_query($sql);
+					$sql = "REPLACE INTO z_eye_switch_port_prises VALUES ('".$sw."','".$port."','".$prise."')";
+					pg_query($sql);
 
 					if($prise != "") {
 						$piecetab = preg_split("#\.#",$prise);
@@ -1300,7 +1300,7 @@
 					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$sw."'");
 
 					if($prise == NULL) $prise = "";
-					mysql_query("REPLACE INTO fss_switch_port_prises VALUES ('".$dip."','".$port."','".$prise."')");
+					pg_query("REPLACE INTO z_eye_switch_port_prises VALUES ('".$dip."','".$port."','".$prise."')");
 
 					if($prise != "") {
 							$piecetab = preg_split("#\.#",$prise);

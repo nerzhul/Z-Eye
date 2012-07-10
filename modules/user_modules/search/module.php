@@ -1,23 +1,4 @@
 <?php
-	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
-	*
-	* This program is free software; you can redistribute it and/or modify
-	* it under the terms of the GNU General Public License as published by
-	* the Free Software Foundation; either version 2 of the License, or
-	* (at your option) any later version.
-	*
-	* This program is distributed in the hope that it will be useful,
-	* but WITHOUT ANY WARRANTY; without even the implied warranty of
-	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	* GNU General Public License for more details.
-	*
-	* You should have received a copy of the GNU General Public License
-	* along with this program; if not, write to the Free Software
-	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-	*/
-	
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
 	class iSearch extends genModule{
@@ -63,8 +44,8 @@
 			$found = 0;
 			
 			// Prise number
-			$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port","prise = '".$search."'");
+			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h4>Prise référencée</h4>";
@@ -119,8 +100,8 @@
 			}
 			
 			// Prise number
-			$query = FS::$dbMgr->Select("fss_switch_port_prises","ip,port","prise = '".$search."'");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port","prise = '".$search."'");
+			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h4>Prise référencée</h4>";
@@ -248,7 +229,7 @@
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 					$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-					$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+					$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
 					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 					$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
@@ -339,7 +320,7 @@
 					$tmpoutput .= "<div><h4>Emplacements réseau</h4>";
 				}
 				$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-				$piece = FS::$dbMgr->GetOneData("fss_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+				$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 				$convport = preg_replace("#\/#","-",$data["port"]);
 				$tmpoutput .=  "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 				$tmpoutput .= "[<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
