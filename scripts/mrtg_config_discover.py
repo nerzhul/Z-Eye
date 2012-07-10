@@ -1,7 +1,6 @@
 #! python
 # -*- coding: utf-8 -*-
 
-import MySQLdb as mdb
 from pyPgSQL import PgSQL
 import datetime
 import sys
@@ -18,13 +17,13 @@ def fetchMRTGInfos(ip,devname,devcom):
 	try:
 		threadCounter = threadCounter + 1
 		cmd = "cfgmaker %s@%s" % (devcom,ip)
-                pipe = os.popen('{ ' + cmd + '; }', 'r')
-                text = pipe.read()
-                pipe.close()
-                text = re.sub("\/var\/www\/mrtg","/var/www/datas/rrd",text)
-                cfgfile = open("/var/www/datas/mrtg-config/mrtg-%s.cfg" % devname,"w")
-                cfgfile.writelines(text)
-                cfgfile.close()
+		pipe = os.popen('{ ' + cmd + '; }', 'r')
+		text = pipe.read()
+		pipe.close()
+		text = re.sub("\/var\/www\/mrtg","/var/www/datas/rrd",text)
+		cfgfile = open("/var/www/datas/mrtg-config/mrtg-%s.cfg" % devname,"w")
+		cfgfile.writelines(text)
+		cfgfile.close()
 		threadCounter = threadCounter - 1
 	except Exception, e:
 		print "[FATAL] %s" % e
