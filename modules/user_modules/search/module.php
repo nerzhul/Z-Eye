@@ -208,8 +208,8 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			
-			$query = FS::$dbMgr->Select("fss_dhcp_ip_cache","macaddr,hostname,leasetime,distributed","ip = '".$search."'");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","macaddr,hostname,leasetime,distributed","ip = '".$search."'");
+			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h4>Distribution DHCP</h4>";
@@ -301,8 +301,8 @@
 			$tmpoutput = "";
 			$found = 0;
 			
-			$query = FS::$dbMgr->Select("fss_dhcp_ip_cache","ip,hostname,leasetime,distributed","macaddr = '".$search."'");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed","macaddr = '".$search."'");
+			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h4>Distribution DHCP</h4>";

@@ -197,7 +197,7 @@
 	}
 
 	// Flush subnet table
-	FS::$dbMgr->Delete("fss_dhcp_subnet_cache");
+	FS::$pgdbMgr->Delete("z_eye_dhcp_subnet_cache");
 	
 	if(count($sort_result) > 0) {
 		foreach ($sort_result as $class_a => $ca_keys) {
@@ -206,14 +206,14 @@
 					if(isset($cc_keys["net"])) {
 						$netw = $cc_keys["net"]."/".$cc_keys["mask"];
 						// Ecrire en base
-						FS::$dbMgr->Insert("fss_dhcp_subnet_cache","netid,netmask","'".$cc_keys["net"]."','".$cc_keys["mask"]."'");
+						FS::$pgdbMgr->Insert("z_eye_dhcp_subnet_cache","netid,netmask","'".$cc_keys["net"]."','".$cc_keys["mask"]."'");
 					}
 				}
 			}
 		}
 		
 		// Flush ip table
-		FS::$dbMgr->Delete("fss_dhcp_ip_cache");
+		FS::$pgdbMgr->Delete("z_eye_dhcp_ip_cache");
 		
 		foreach ($sort_result as $class_a => $ca_keys) {
 			foreach ($ca_keys as $class_b => $cb_keys) {
@@ -257,7 +257,7 @@
 								if(isset($ipData["end"])) $iend = $ipData["end"];
 								else $iend = "";
 
-								FS::$dbMgr->Insert("fss_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid","'".$class_a.".".$class_b.".".$class_c.".".$ipKey."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$cc_keys["net"]."'");
+								FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid","'".$class_a.".".$class_b.".".$class_c.".".$ipKey."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$cc_keys["net"]."'");
 							}
 						}
 					}

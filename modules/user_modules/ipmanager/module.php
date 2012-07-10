@@ -41,8 +41,8 @@
 				$output .= "<h3>Supervision IP</h3>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 				$output .= FS::$iMgr->addList("f");
-				$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask");
-				while($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask");
+				while($data = pg_fetch_array($query)) {
 					$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
 				$output .= $formoutput;
@@ -60,8 +60,8 @@
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
 			} else {
 				if(!$showmodule || $showmodule == 1) {
-				$query = FS::$dbMgr->Select("fss_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
-				while($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
+				while($data = pg_fetch_array($query)) {
 					$iparray = array();
 					$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
@@ -76,7 +76,7 @@
 						$iparray[$i]["ltime"] = "";
 						$iparray[$i]["distrib"] = 0;
 					}
-					$query2 = FS::$dbMgr->Select("fss_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","netid = '".$data["netid"]."'");
+					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","netid = '".$data["netid"]."'");
 					while($data2 = mysql_fetch_array($query2)) {
 						$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
 						$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
@@ -188,7 +188,7 @@
 
 					$found = false;
 					$output = "";
-					$query = FS::$dbMgr->Select("fss_dhcp_ip_cache","ip,macaddr,hostname","netid = '".$filter."' AND distributed = 3");
+					$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname","netid = '".$filter."' AND distributed = 3");
 					while($data = mysql_fetch_array($query)) {
 						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["ip"]."' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 						while($data2 = pg_fetch_array($query2)) {
