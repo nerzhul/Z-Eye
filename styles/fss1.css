@@ -88,6 +88,14 @@ input {
 	float: left;
 }
 
+#searchform {
+	height: 50px;
+	margin-top: 50px;
+	position: fixed;
+	width: auto;
+	opacity: 0.95;
+}
+
 #connFormHorizontal {
 	float: right;
 	margin-left: 10px;
@@ -95,11 +103,10 @@ input {
 	margin-bottom: -5px;
 	padding: 5px;
 	background: -moz-radial-gradient(#222222, #000000);
-        background: -webkit-gradient(#222222, #000000);
+    background: -webkit-gradient(#222222, #000000);
     -webkit-border-radius: 7px 7px 1px 1px;
 	border-radius: 7px 7px 1px 1px;
 	background-color: #DDDDDD;
-	-moz-box-shadow: 0px 3px 3px ;
 	-webkit-box-shadow: 0px 3px 3px ;
     box-shadow: 0px 3px 3px;
 }
@@ -350,15 +357,48 @@ pre {
 	height: 22px;
 }
 
+.searchButton {
+        background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
+        border: 1px solid #CCC;
+        vertical-align: center;
+        height: 28px;
+        margin-top: 10px;
+        border-radius: 3px 3px 3px 3px;
+        cursor: pointer;
+}
+
+.searchButton:hover {
+        background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
+        border: 1px solid #CCC;
+        vertical-align: center;
+        height: 28px;
+        margin-top: 10px;
+        border-radius: 3px 3px 3px 3px;
+        cursor: pointer;
+}
+
 .bigButtonStyle {
-	background: #EEEEEE;
-    border: 1px solid #DDDDDD;
-	vertical-align: center;
-	height: 36px;
-	margin-top: 10px;
-	padding-left: 30px;
-	padding-right: 30px;
-	border-radius: 4px 4px 4px 4px;
+        background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
+        border: 1px solid #CCC;
+        vertical-align: center;
+        height: 36px;
+        margin-top: 10px;
+        padding-left: 30px;
+        padding-right: 30px;
+        border-radius: 3px 3px 3px 3px;
+        cursor: pointer;
+}
+
+.bigButtonStyle:hover {
+        background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
+        border: 1px solid #CCC;
+        vertical-align: center;
+        height: 36px;
+        margin-top: 10px;
+        padding-left: 30px;
+        padding-right: 30px;
+        border-radius: 3px 3px 3px 3px;
+        cursor: pointer;
 }
 
 .debugMsg {
@@ -414,7 +454,18 @@ pre {
 .clearfixlogform {height: 1%;}
 .clearfixlogform {display: block;}
 
-/* Panel Tab/button */
+.tabsearchform {
+	background-color: #FFF;
+	height: 100%;
+	top: 0;
+	z-index: 999;
+	border-radius: 0 4px 4px 0;
+	width: 50px;
+	margin-right: -50px;
+	float: left;
+	box-shadow: 0 1px 1px 1px;
+}
+
 .tablogform {
   	background: url(images/tab_b.png) repeat-x 0 0;
 	height: 42px;
@@ -509,6 +560,20 @@ pre {
     margin-left: -10px;
     margin-right: auto;
 	opacity: 0.9;
+}
+
+#searchpanel {
+        width: auto;
+        height: 100%;
+        background: #FFF;
+        overflow: hidden;
+        position: relative;
+        z-index: 9;
+        display: none;
+        float: left;
+        box-shadow: 0 1px 1px 1px;
+        padding-left: 10px;
+        padding-right: 10px;
 }
 
 #logpanel {

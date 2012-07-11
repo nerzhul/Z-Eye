@@ -25,8 +25,8 @@
 	$DHCPservers = "";
 	$DHCPfound = false;
 	$DHCPconnerr = false;
-	$query = FS::$dbMgr->Select("fss_server_list","addr,login,pwd","dhcp = 1");
-	while($data = mysql_fetch_array($query)) {
+	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd","dhcp = 1");
+	while($data = pg_fetch_array($query)) {
 		$conn = ssh2_connect($data["addr"],22);
 		if(!$conn) {
 			echo "Erreur de connexion au serveur ".$data["addr"]."\n";

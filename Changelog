@@ -1,19 +1,28 @@
 Z-Eye Changelog
 
-Version Alpha-Devel
+Alpha-Devel
 - Many basic functions, changelog started before
 
-Version Alpha 0.13.2
+Alpha 0.13.2
 - DHCP Monitor: Added tab Advanced Tool and new function to get useless DHCP reservations (following user interval)
 - DNS Monitor: Added tab Advanced Tool and new function to get useless DNS entries (following user interval)
 
-Version Alpha 0.14
+Alpha 0.14
 - Switch Management: Added new Advanced Tool to save startup-config to TFTP/FTP/SCP/SFTP
 - Switch Management: Save/Restore configuration from TFTP/FTP/SCP/SFTP server
 - Switch Management: Restore startup-config to running-config
 - Switch Management: Added script to backup all configs to some servers (managed from analysis servers)
 
-Version Alpha 0.15
+Alpha 0.15
 - Snort Management: Added interface to manage snort config easily
-- Switch Management: Added script to cache port ids
+- Switch Management: Added script to cache Switch Port IDs
+
+Alpha 0.16
+- Attack Stats: use Highcharts
+- DHCP & DNS: use Highcharts
+
+Alpha 0.17
+- Migrate many tables from MySQL to a unified PostGreSQL Database (performance increased !)
+- Convert some php cron scripts to python language (multithreading benefit)
+- Change Search Module to a better implementation in the interface
 

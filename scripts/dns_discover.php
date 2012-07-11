@@ -27,11 +27,11 @@
 	
 	FS::LoadFSModules();
 	
-	FS::$dbMgr->Delete("fss_dns_zone_cache");
-	FS::$dbMgr->Delete("fss_dns_zone_record_cache");
+	FS::$pgdbMgr->Delete("z_eye_dns_zone_cache");
+	FS::$pgdbMgr->Delete("z_eye_dns_zone_record_cache");
 	
-	$query = FS::$dbMgr->Select("fss_server_list","addr,login,pwd","dns = 1");
-	while($data = mysql_fetch_array($query)) {
+	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd","dns = 1");
+	while($data = pg_fetch_array($query)) {
 		$conn = ssh2_connect($data["addr"],22);
 		if(!$conn) {
 			echo "Erreur de connexion au serveur ".$data["addr"]."\n";
@@ -77,7 +77,7 @@
 						if($zonename[strlen($zonename)-1] == ".")
 							$zonename = substr($zonename,0,strlen($zonename)-1);
 							
-						FS::$dbMgr->Insert("fss_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
+						FS::$pgdbMgr->Insert("z_eye_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
 						$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
 						$zonebuffer = preg_replace("#[\t]#"," ",trim($zonebuffer));
 						$zonebuffer = preg_replace("#[ ]{2,}#"," ",trim($zonebuffer));
@@ -93,7 +93,7 @@
 							if(count($record) == 3) {
 								if(strlen($record[0]) > 0)
 									$currecord = $record[0];
-								FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."'");
+								FS::$pgdbMgr->Insert("z_eye_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."'");
 							}
 							else if(count($record) == 2) {
 								/*if(preg_match('#\$ORIGIN#',$record[0]) && $record[1] != $zonename)
@@ -106,7 +106,7 @@
 									if($k != count($record) -1)
 										$tmprec .= " ";
 								}
-								FS::$dbMgr->Insert("fss_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".$currecord."','".$record[1]."','".$tmprec."'");
+								FS::$pgdbMgr->Insert("z_eye_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".$currecord."','".$record[1]."','".$tmprec."'");
 							}
 						}
 					}

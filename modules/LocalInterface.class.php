@@ -30,6 +30,8 @@
 		public function showContent() {
 			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
 			$output .= $this->showConnForm();
+			if(FS::$sessMgr->isConnected())
+				$output .= $this->showSearchForm();
 			$output .= "<div id=\"menus\">";
             $output .= $this->showRightMenu();
 			$output .= "<div id=\"rightmenu\">";
@@ -49,9 +51,9 @@
 
 		protected function showConnForm() {
 			$output = "<div id=\"logform\"><div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
-			$output .= "<h1>Bienvenue sur Demeter</h1>";
+			$output .= "<h1>Bienvenue sur Z-Eye</h1>";
 
-			$output .= "<p class=\"grey\">Cette interface permet de monitorer et administrer les services</p>";
+			$output .= "<p class=\"grey\">Cette interface permet de monitorer et d'administrer les services</p>";
 			$output .= "</div><div class=\"left\">";
 
 			if(!FS::$sessMgr->isConnected()) {
@@ -97,6 +99,21 @@
 		
 			return $output;
 		}
+		
+		protected function showSearchForm() {
+			$output = "<div id=\"searchform\">
+				<div id=\"searchpanel\">
+					<div class=\"contentlog clearfixlogform\">";
+			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath("search"));
+			$output .= $this->addInput("s","",30,60)." <button class=\"searchButton\" type=\"submit\" name=\"Rechercher\" ><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
+			$output .= "</div></div>";
+
+			$output .= "<div class=\"tabsearchform\"><a id=\"searchopen\" class=\"open\" href=\"#\"><img src=\"styles/images/search.png\" width=\"30px\" height=\"30px\" style=\"margin-top: 10px\"/></a>
+				<a id=\"searchclose\" style=\"display: none;\" class=\"close\" href=\"#\"><img src=\"styles/images/search.png\" width=\"30px\" height=\"30px\" style=\"margin-top: 10px\"/></a></div>
+			</div>";
+		
+			return $output;
+		}
 
 		private function showRightMenu() {
 			$output = "<div id=\"rightmenu\">";
@@ -130,14 +147,12 @@
 			$module = FS::$secMgr->checkGetData("mod");
 			if(!$module) $module = 0;
 			
-			if(FS::$sessMgr->isConnected())
-				$output .= $this->showSearch();
 			if($module && !FS::$secMgr->isNumeric($module))
 				$output .= $this->printError("Module inconnu !");
 			else {
 				FS::$secMgr->SecuriseStringForDB($module);
 				if($module)
-					$output .= "<hr>".$this->loadModule($module);
+					$output .= $this->loadModule($module);
 			}
 			$output .= "</div>";
 			return $output;
@@ -203,14 +218,6 @@
 			}
 			
 			return 0;
-		}
-		
-		private function showSearch() {
-			$output = "<div id=\"monoComponent\"><center><h2>Z-Eye</h2>";
-			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath("search"));
-			$output .= $this->addInput("s","",60,60)."<br /><input class=\"bigButtonStyle\" type=\"submit\" name=\"Rechercher\" value=\"Rechercher\" /></form>";
-			$output .= "</div>";
-			return $output;
 		}
 	};
 ?>

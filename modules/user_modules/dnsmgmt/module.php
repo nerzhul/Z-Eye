@@ -66,8 +66,8 @@
 				$shother = FS::$secMgr->checkAndSecuriseGetData("sother");
 				if($shother == NULL) $shother = 1;
 				
-				$query = FS::$dbMgr->Select("fss_dns_zone_cache","zonename","","zonename");
-				while($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_dns_zone_cache","zonename","","zonename");
+				while($data = pg_fetch_array($query)) {
 					$formoutput .= FS::$iMgr->addElementTolist($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
 				}
 				$output .= $formoutput;
@@ -182,9 +182,9 @@
 						if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 					}
 					
-					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","zonename,record,rectype,recval",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
+					$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","zonename,record,rectype,recval",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
 					$curzone = "";
-					while($data = mysql_fetch_array($query)) {
+					while($data = pg_fetch_array($query)) {
 						if($curzone != $data["zonename"]) {
 							$curzone = $data["zonename"];
 							if($curzone != "") $dnsoutput .= "</table>";
@@ -290,8 +290,8 @@
 					$output = "";
 					
 					// Search deprecated records
-					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
-					while($data = mysql_fetch_array($query)) {
+					$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
+					while($data = pg_fetch_array($query)) {
 						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 						while($data2 = pg_fetch_array($query2)) {
 							$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
@@ -302,8 +302,8 @@
 						}
 					}
 					
-					$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'CNAME'");
-					while($data = mysql_fetch_array($query)) {
+					$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'CNAME'");
+					while($data = pg_fetch_array($query)) {
 						$toquery = "";
 						if($data["recval"][strlen($data["recval"])-1] == ".") {
 							$toquery = $data["recval"];

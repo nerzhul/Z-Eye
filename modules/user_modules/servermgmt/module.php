@@ -217,8 +217,8 @@
 					$output .= FS::$iMgr->printError("Aucun serveur à éditer spécifié !");
 					return $output;
 				}
-				$query = FS::$dbMgr->Select("fss_server_list","login,dhcp,dns","addr = '".$addr."'");
-				if($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_server_list","login,dhcp,dns","addr = '".$addr."'");
+				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$dhcp = $data["dhcp"];
@@ -266,8 +266,8 @@
 			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=1\">Nouveau Serveur</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Login</th><th>DHCP</th><th>DNS</th><th>Supprimer</th></tr>";
 			$found = false;
-			$query = FS::$dbMgr->Select("fss_server_list","addr,login,dhcp,dns");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,dhcp,dns");
+			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
@@ -349,11 +349,11 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
-					if(FS::$dbMgr->GetOneData("fss_server_list","login","addr ='".$saddr."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=4");
 						return;
 					}
-					FS::$dbMgr->Insert("fss_server_list","addr,login,pwd,dhcp,dns","'".$saddr."','".$slogin."','".$spwd."','".($dhcp == "on" ? 1 : 0)."','".($dns == "on" ? 1 : 0)."'");
+					FS::$pgdbMgr->Insert("z_eye_server_list","addr,login,pwd,dhcp,dns","'".$saddr."','".$slogin."','".$spwd."','".($dhcp == "on" ? 1 : 0)."','".($dns == "on" ? 1 : 0)."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 2:
@@ -377,14 +377,14 @@
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=3");
 							return;
 						}
-						if($spwd == $spwd2) FS::$dbMgr->Update("fss_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
+						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
 					}
-					FS::$dbMgr->Update("fss_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0)."', dns = '".($dns == "on" ? 1 : 0)."'","addr = '".$saddr."'");
+					FS::$pgdbMgr->Update("z_eye_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0)."', dns = '".($dns == "on" ? 1 : 0)."'","addr = '".$saddr."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 3: {
 					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
-							FS::$dbMgr->Delete("fss_server_list","addr = '".$srv."'");
+							FS::$pgdbMgr->Delete("z_eye_server_list","addr = '".$srv."'");
 					}	
 					header('Location: m-'.$this->mid.'.html');				
 				}
