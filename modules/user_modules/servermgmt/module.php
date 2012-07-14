@@ -60,8 +60,8 @@
 					$output .= FS::$iMgr->printError("Aucun serveur à éditer spécifié!");
 					return $output;
 				}
-				$query = FS::$dbMgr->Select("fss_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
-				if($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
+				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$spwd = $data["pwd"];
@@ -151,8 +151,8 @@
 					$output .= FS::$iMgr->printError("Aucune base de données à éditer spécifiée !");
 					return $output;
 				}
-				$query = FS::$dbMgr->Select("fss_radius_db_list","login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
-				if($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
+				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$spwd = $data["pwd"];
@@ -285,8 +285,8 @@
 			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=4\">Nouvelle base</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Port</th><th>Hôte</th><th>Login</th><th>Supprimer</th></tr>";
 			$found = false;
-			$query = FS::$dbMgr->Select("fss_radius_db_list","addr,port,dbname,login");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
+			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
@@ -303,8 +303,8 @@
 			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=7\">Nouveau serveur</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Type</th><th>Chemin sur le serveur</th><th>Login</th><th>Supprimer</th></tr>";
 			$found = false;
-			$query = FS::$dbMgr->Select("fss_save_device_servers","addr,type,path,login");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
+			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=8&addr=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>";
@@ -411,11 +411,11 @@
 						return;
 					}
 					FS::$dbMgr->Connect();
-					if(FS::$dbMgr->GetOneData("fss_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
-					FS::$dbMgr->Insert("fss_radius_db_list","addr,port,dbname,login,pwd","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."'");
+					FS::$pgdbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 5:
@@ -440,9 +440,9 @@
 							return;
 						}
 						FS::$dbMgr->Connect();
-						if($spwd == $spwd2) FS::$dbMgr->Update("fss_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
-					FS::$dbMgr->Update("fss_radius_db_list","login = '".$slogin."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					FS::$pgdbMgr->Update("z_eye_radius_db_list","login = '".$slogin."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 6: {
@@ -450,7 +450,7 @@
 					$sport = FS::$secMgr->checkAndSecuriseGetData("pr");
 					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
 					if($saddr && $sport && $sdbname) {
-							FS::$dbMgr->Delete("fss_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+							FS::$pgdbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}	
 					header('Location: m-'.$this->mid.'.html');				
 				}
@@ -466,11 +466,11 @@
 						return;
 					}
 
-					if(FS::$dbMgr->GetOneData("fss_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
-					FS::$dbMgr->Insert("fss_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
+					FS::$pgdbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 8:
@@ -484,14 +484,14 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&type=".$stype."&err=1");
 						return;
 					}
-					FS::$dbMgr->Update("fss_save_device_servers","path = '".$spath."', pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
+					FS::$pgdbMgr->Update("z_eye_save_device_servers","path = '".$spath."', pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 9: {
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
 					if($saddr && $stype) {
-							FS::$dbMgr->Delete("fss_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
+							FS::$pgdbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}	
 					header('Location: m-'.$this->mid.'.html');				
 				}

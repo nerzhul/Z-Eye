@@ -22,8 +22,8 @@
 	require_once(dirname(__FILE__)."/../modules/user_modules/switches/cisco.func.php");
 	
 	function doSwitchBackup() {
-		$query = FS::$dbMgr->Select("fss_save_device_servers","addr,type,path,login,pwd");
-		while($data = mysql_fetch_array($query)) {
+		$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","addr,type,path,login,pwd");
+		while($data = pg_fetch_array($query)) {
 			if(!FS::$secMgr->isIP($data["addr"]))
 				continue;
 				

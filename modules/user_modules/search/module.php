@@ -367,8 +367,8 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			
-			$query = FS::$dbMgr->Select("fss_radius_db_list","addr,port,dbname,login,pwd");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
+			while($data = pg_fetch_array($query)) {
 				$radSQLMgr = new FSMySQLMgr();
 				$radSQLMgr->setConfig($data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
 				$radSQLMgr->Connect();
