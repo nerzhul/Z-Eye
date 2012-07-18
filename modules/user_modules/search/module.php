@@ -1,23 +1,4 @@
 <?php
-	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
-	*
-	* This program is free software; you can redistribute it and/or modify
-	* it under the terms of the GNU General Public License as published by
-	* the Free Software Foundation; either version 2 of the License, or
-	* (at your option) any later version.
-	*
-	* This program is distributed in the hope that it will be useful,
-	* but WITHOUT ANY WARRANTY; without even the implied warranty of
-	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	* GNU General Public License for more details.
-	*
-	* You should have received a copy of the GNU General Public License
-	* along with this program; if not, write to the Free Software
-	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-	*/
-	
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
 	class iSearch extends genModule{
@@ -119,7 +100,7 @@
 			}
 			
 			// Prise number
-			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port","prise = '".$search."'");
+			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port","prise ILIKE '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -144,8 +125,8 @@
 					if($i != count($searchsplit)-1)
 						$dnszone .= ".";
 				}
-				$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","rectype,recval","record = '".$hostname."' AND zonename = '".$dnszone."'");
-				while($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");
+				while($data = pg_fetch_array($query)) {
 					if($found == 0) {
 						$found = 1;
 						$tmpoutput .= "<div><h4>Enregistrements DNS</h4>";
@@ -196,8 +177,8 @@
 			$tmpoutput = "";
 			$found = 0;
 			$lastmac = "";
-			$query = FS::$dbMgr->Select("fss_dns_zone_record_cache","zonename,record","recval = '".$search."'");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","zonename,record","recval ILIKE '".$search."'");
+			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h4>Noms DNS associés</h4>";
@@ -242,7 +223,7 @@
 			$found = 0;
 			
 			if($lastmac) {
-				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$lastmac."' AND active = 't'","time_last",1,1);
+				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac ILIKE '".$lastmac."' AND active = 't'","time_last",1,1);
 				if($data = pg_fetch_array($query)) {
 					$tmpoutput .= "<div><h4>Dernier équipement</h4>";
 					$fst = preg_split("#\.#",$data["time_first"]);
