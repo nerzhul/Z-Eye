@@ -154,8 +154,12 @@
 						for($i=0;$i<count($vllist);$i++)
 							$vlanlist .= $vllist[$i].",";
 						$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
-						$output .= FS::$iMgr->addInput("nvlan",$nvlan,4,4);
-						$output .= "</td></tr>";
+						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
+                                        	$output .= FS::$iMgr->addList("nvlan","");
+	                                        while($data = pg_fetch_array($query)) {
+							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
+                                	        }
+						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode == 2 ? "style=\"display:none;\"" : "")."><td>Vlans Encapsulés</td><td>";
 						$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
 						$output .= $vlanlist;

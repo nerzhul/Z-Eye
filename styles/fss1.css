@@ -30,12 +30,12 @@
 
 #subpop {
 	-webkit-border-radius: 4px 4px 4px 4px;
-    border-radius: 4px 4px 4px 4px;
+ 	border-radius: 4px 4px 4px 4px;
 	background-color: rgba(255,255,255,0.90);
 	width:490px;
-	text-align:center;
-	vertical-align:middle;
-	height:190px;
+	text-align: center;
+	vertical-align: middle;
+	height: 190px;
 	margin-left: auto;
 	margin-right: auto;
 	padding: 10px;
@@ -369,12 +369,6 @@ pre {
 
 .searchButton:hover {
         background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
-        border: 1px solid #CCC;
-        vertical-align: center;
-        height: 28px;
-        margin-top: 10px;
-        border-radius: 3px 3px 3px 3px;
-        cursor: pointer;
 }
 
 .bigButtonStyle {
