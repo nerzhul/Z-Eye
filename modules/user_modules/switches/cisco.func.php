@@ -89,20 +89,121 @@
 
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2","i",$value);
 		}
-		
+
 		function getSwitchAccessVLANWithPID($device,$pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-				return -1;
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
 
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");
-			$vlan = explode(" ",$ret);
-			if(count($vlan) != 2)
-				return -1;
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");
+                        $vlan = explode(" ",$ret);
+                        if(count($vlan) != 2)
+                                return -1;
 
-			$vlan = $vlan[1];
-			return $vlan;
+                        $vlan = $vlan[1];
+                        return $vlan;
+                }
+
+		function setSwitchportMABEnableWithPID($device,$pid,$value) {
+			// 1: enable / 2: disable
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2)
+				return 1;
+			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1","i",$value);
 		}
-		
+
+		function getSwitchportMABState($device,$pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
+                        $state = explode(" ",$ret);
+                        if(count($state) != 2)
+                                return -1;
+
+                        $state = $state[1];
+                        return $state;
+		}
+
+		function setSwitchMABTypeWithPID($device,$pid,$value) {
+			// 1: normal / 2: EAP
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2)
+                                return 1;
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
+		}
+
+		function getSwitchportMABType($device,$pid) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
+                        $type = explode(" ",$ret);
+                        if(count($type) != 2)
+                                return -1;
+
+                        $type = $type[1];
+                        return $type;
+                }
+
+		function setSwitchportAuthFailVLAN($device,$pid,$value) {
+			// #todo disable feature
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
+                                return 1;
+                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.1.1.2" : "1.3.6.1.4.1.9.9.656.1.3.1.1.3"),"i",($value == 0 ? 1 : $value));
+                }
+
+                function getSwitchportAuthFailVLAN($device,$pid) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.1.1.3");
+                        $vlan = explode(" ",$ret);
+                        if(count($vlan) != 2)
+                                return -1;
+
+                        $vlan = $vlan[1];
+                        return $vlan;
+                }
+
+		function setSwitchportAuthNoRespVLAN($device,$pid,$value) {
+			// @todo disable feature
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
+                                return 1;
+                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.2.1.1" : "1.3.6.1.4.1.9.9.656.1.3.2.1.2"),"i",($value == 0 ? 1 : $value));
+                }
+
+                function getSwitchportAuthNoRespVLAN($device,$pid) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.2.1.2");
+                        $vlan = explode(" ",$ret);
+                        if(count($vlan) != 2)
+                                return -1;
+
+                        $vlan = $vlan[1];
+                        return $vlan;
+                }
+
+		// authentication port-control 1,2,3
+		function setSwitchportControlMode($device,$pid,$value) {
+			// 1: unauthorized / 2: auto / 3: authorized / 3: disable feature
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2 && $value != 3)
+                                return 1;
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
+                }
+                        
+                function getSwitchportControlMode($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5");
+                        $val = explode(" ",$ret);
+                        if(count($val) != 2)
+                                return -1;
+
+                        $val = $val[1];
+                        return $val;
+                }
+
 		function setSwitchTrunkNativeVlanWithPID($device,$pid,$value) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 1005)
 				return -1;

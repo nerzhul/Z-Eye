@@ -69,10 +69,12 @@
 					$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
 					$output .= "$('#vltr').show();";
 					$output .= "$('#vllabel').html('Vlan Natif');";
-					$output .= "} else if(document.getElementsByName('trmode')[0].value == 2) {";
-					$output .= "$('#vltr').hide();";
-					$output .= "$('#vllabel').html('Vlan');";
-					$output .= "}";
+					$output .= "} else if(document.getElementsByName('trmode')[0].value == 2) {
+							$('#vltr').hide();
+							$('#vllabel').html('Vlan');";
+					$output .= "} else if(document.getElementsByName('trmode')[0].value == 3) {
+						$('#vltr').hide();
+						$('#vllabel').html('Vlan Fail');}";
 					$output .= "};";
 					$output .= "function showwait() {";
 					$output .= "$('#subpop').html('Modification en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
@@ -138,18 +140,31 @@
 						$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
 						$trmode = preg_split("# #",$trmode);
 						$trmode = $trmode[1];
-						$output .= FS::$iMgr->addList("trmode","arangeform();");
+						if(getSwitchportMABState($device,$portid) == 1)
+                                                        $trmode = 3;
+						$output .= FS::$iMgr->addList("trmode","arangeform()");
 						$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
 						$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
+						$output .= FS::$iMgr->addElementToList("802.1X - MAB",3,$trmode == 3 ? true : false);
 						$output .= "</select>";
-						$output .= "<tr><td id=\"vllabel\">Vlan natif</td><td id=\"vln\">";
-
-						if($trmode == 1) {
-							$nvlan = getSwitchTrunkNativeVlanWithPID($device,$portid);
-							$vllist = getSwitchportTrunkVlansWithPid($device,$portid);
+						$output .= "<tr><td id=\"vllabel\">";
+						switch($trmode) {
+							case 1:
+								$output .= "VLAN Natif";
+								$nvlan = getSwitchTrunkNativeVlanWithPID($device,$portid);
+								$vllist = getSwitchportTrunkVlansWithPid($device,$portid);
+								break;
+							case 2:
+								$output .= "VLAN";
+								$nvlan = getSwitchAccessVLANWithPID($device,$portid);
+								break;
+							case 3:
+								$output .= "VLAN Fail";
+								$nvlan = getSwitchportAuthNoRespVLAN($device,$portid);
+								break;
 						}
-						else
-							$nvlan = getSwitchAccessVLANWithPID($device,$portid);
+						$output .= "</td><td id=\"vln\">";
+
 						$vlanlist = "";
 						for($i=0;$i<count($vllist);$i++)
 							$vlanlist .= $vllist[$i].",";
@@ -1261,6 +1276,12 @@
 						$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
 
 						setSwitchAccessVLANWithPID($sw,$pid,1);
+						// mab disable
+                                                setSwitchportMABEnableWithPID($sw,$pid,2);
+                                                setSwitchportAuthFailVLAN($sw,$pid,0);
+                                                setSwitchportAuthNoRespVLAN($sw,$pid,0);
+                                                setSwitchportControlMode($sw,$pid,3);
+                                                // set settings
 						if(setSwitchTrunkEncapWithPID($sw,$pid,4) != 0) {
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
@@ -1280,6 +1301,12 @@
 					} else if($trunk == 2) {
 						setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
 						setSwitchNoTrunkVlanWithPID($sw,$pid);
+						// mab disable
+						setSwitchportMABEnableWithPID($sw,$pid,2);
+						setSwitchportAuthFailVLAN($sw,$pid,0);
+						setSwitchportAuthNoRespVLAN($sw,$pid,0);
+						setSwitchportControlMode($sw,$pid,3);
+						// set settings
 						if(setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
 								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
@@ -1292,6 +1319,23 @@
 								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 						}
+					} else if($trunk == 3) {
+						// switchport mode access & no vlan assigned
+						setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
+                                                setSwitchNoTrunkVlanWithPID($sw,$pid);
+						setSwitchportModeWithPID($sw,$pid,2);
+						setSwitchTrunkEncapWithPID($sw,$pid,5);
+						setSwitchAccessVLANWithPID($sw,$pid,1);
+
+						// enable mab
+						setSwitchportMABEnableWithPID($sw,$pid,1);
+						// NO EAP support for now
+						setSwitchMABTypeWithPID($sw,$pid,1);
+						// enable authfail & noresp vlans
+						setSwitchportAuthFailVLAN($sw,$pid,$nvlan);
+						setSwitchportAuthNoRespVLAN($sw,$pid,$nvlan);
+						// authentication port-control auto
+						setSwitchportControlMode($sw,$pid,2);
 					}
 					if(setPortStateWithPID($sw,$pid,($shut == "on" ? 2 : 1)) != 0) {
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
