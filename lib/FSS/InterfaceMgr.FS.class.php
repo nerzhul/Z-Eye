@@ -187,11 +187,11 @@
 			return $output;
 		}
 		
-		public function addForm($link,$id="") {
+		public function addForm($link,$id="",$post=true) {
 			$output = "<form action=\"".$link."\" ";
 			if(strlen($id) > 0)
 				$output .= "id=\"".$id."\" ";
-			$output .= "method=\"POST\" >";
+			$output .= "method=\"".($post ? "POST" : "GET")."\" >";
 			return $output;
 		}
 		

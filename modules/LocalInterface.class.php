@@ -103,8 +103,9 @@
 			$output = "<div id=\"searchform\">
 				<div id=\"searchpanel\">
 					<div class=\"contentlog clearfixlogform\">";
-			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath("search"));
-			$output .= $this->addInput("s","",30,60)." <button class=\"searchButton\" type=\"submit\" name=\"Rechercher\" ><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
+			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath("search"),"",false);
+                        $output .= $this->addHidden("mod",$this->getModuleIdByPath("search"));
+			$output .= $this->addInput("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
 			$output .= "</div></div>";
 
 			$output .= "<div class=\"tabsearchform\"><a id=\"searchopen\" class=\"open\" href=\"#\"><img src=\"styles/images/search.png\" width=\"30px\" height=\"30px\" style=\"margin-top: 10px\"/></a>
