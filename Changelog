@@ -29,3 +29,5 @@ Alpha 0.17
 Alpha 0.18
 - Costemic issues
 - Added support for MAB authentication on switch ports
+- Added support for single host/multi host/multi domain/multi auth for 802.1X
+- Mrtg_rrd_refresh renamed to mrtg_data_refresh & ported to python (MT)

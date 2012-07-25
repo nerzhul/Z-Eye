@@ -190,12 +190,33 @@
                                 return 1;
                         return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
                 }
-                        
-                function getSwitchportControlMode($device,$pid,$value) {
+
+                function getSwitchportControlMode($device,$pid) {
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
                         $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5");
+                        $val = explode(" ",$ret);
+                        if(count($val) != 2)
+                                return -1;
+
+                        $val = $val[1];
+                        return $val;
+                }
+
+		// authentication host-mode
+                function setSwitchportAuthHostMode($device,$pid,$value) {
+                        // 1: single-host (default) / 2: multi-host / 3: multi-auth / 4: multi-domain
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4)
+                                return 1;
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
+                }
+                        
+                function getSwitchportAuthHostMode($device,$pid) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;   
+                                
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3");
                         $val = explode(" ",$ret);
                         if(count($val) != 2)
                                 return -1;

@@ -65,16 +65,21 @@
 				$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 				// Port modification
 				if(!$sh || $sh == 1) {
+					// # todo, place JS before output
 					$output .= "<script type=\"text/javascript\">function arangeform() {";
 					$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
-					$output .= "$('#vltr').show();";
-					$output .= "$('#vllabel').html('Vlan Natif');";
-					$output .= "} else if(document.getElementsByName('trmode')[0].value == 2) {
-							$('#vltr').hide();
-							$('#vllabel').html('Vlan');";
-					$output .= "} else if(document.getElementsByName('trmode')[0].value == 3) {
+					$output .= "$('#vltr').show();
+						$('#mabtr').hide();
+						$('#vllabel').html('Vlan Natif');
+					} else if(document.getElementsByName('trmode')[0].value == 2) {
 						$('#vltr').hide();
-						$('#vllabel').html('Vlan Fail');}";
+						$('#mabtr').hide();
+						$('#vllabel').html('Vlan');
+					} else if(document.getElementsByName('trmode')[0].value == 3) {
+						$('#vltr').hide();
+						$('#vllabel').html('Vlan Fail');
+						$('#mabtr').show();
+					}";
 					$output .= "};";
 					$output .= "function showwait() {";
 					$output .= "$('#subpop').html('Modification en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
@@ -148,9 +153,11 @@
 						$output .= FS::$iMgr->addElementToList("802.1X - MAB",3,$trmode == 3 ? true : false);
 						$output .= "</select>";
 						$output .= "<tr><td id=\"vllabel\">";
+						$portoptlabel = "";
 						switch($trmode) {
 							case 1:
 								$output .= "VLAN Natif";
+								$portoptlabel = "Vlans Encapsulés";
 								$nvlan = getSwitchTrunkNativeVlanWithPID($device,$portid);
 								$vllist = getSwitchportTrunkVlansWithPid($device,$portid);
 								break;
@@ -160,6 +167,7 @@
 								break;
 							case 3:
 								$output .= "VLAN Fail";
+								$portoptlabel = "Options MAB";
 								$nvlan = getSwitchportAuthNoRespVLAN($device,$portid);
 								break;
 						}
@@ -175,10 +183,22 @@
 							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
                                 	        }
 						$output .= "</select></td></tr>";
-						$output .= "<tr id=\"vltr\" ".($trmode == 2 ? "style=\"display:none;\"" : "")."><td>Vlans Encapsulés</td><td>";
-						$output .= "<textarea name=\"vllist\" rows=10 cols=40>";
-						$output .= $vlanlist;
-						$output .= "</textarea></td></tr>";
+						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
+						$output .= "<textarea name=\"vllist\" rows=10 cols=40>".$vlanlist."</textarea>";
+						$output .= "</td></tr>";
+
+						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
+						$mabeap = getSwitchportMABType($device,$portid);
+						$dot1xhostmode = getSwitchportAuthHostMode($device,$portid);
+						$output .= FS::$iMgr->addCheck("mabeap",$mabeap == 2 ? true : false)." EAP<br />";
+						$output .= "Dot1x HostMode ".FS::$iMgr->addList("dot1xhostmode","");
+						$output .= FS::$iMgr->addElementToList("Single Host",1,$dot1xhostmode == 1 ? true : false);
+						$output .= FS::$iMgr->addElementToList("Multi Host",2,$dot1xhostmode == 2 ? true : false);
+						$output .= FS::$iMgr->addElementToList("Multi Auth",3,$dot1xhostmode == 3 ? true : false);
+						$output .= FS::$iMgr->addElementToList("Multi Domain",4,$dot1xhostmode == 4 ? true : false);
+						$output .= "</select>";
+
+						$output .= "</td></tr>";
 						$output .= "<tr><td>Sauver ?</td><td>".FS::$iMgr->addCheck("wr")."</td></tr>";
 						$output .= "</table>";
 						$output .= "<center><br />".FS::$iMgr->addJSSubmit("Enregistrer","Enregistrer","showwait();")."</center>";
@@ -1281,6 +1301,8 @@
                                                 setSwitchportAuthFailVLAN($sw,$pid,0);
                                                 setSwitchportAuthNoRespVLAN($sw,$pid,0);
                                                 setSwitchportControlMode($sw,$pid,3);
+						// dot1x disable
+						setSwitchportAuthHostMode($sw,$pid,1);
                                                 // set settings
 						if(setSwitchTrunkEncapWithPID($sw,$pid,4) != 0) {
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
@@ -1306,6 +1328,8 @@
 						setSwitchportAuthFailVLAN($sw,$pid,0);
 						setSwitchportAuthNoRespVLAN($sw,$pid,0);
 						setSwitchportControlMode($sw,$pid,3);
+						// dot1x disable
+						setSwitchportAuthHostMode($sw,$pid,1);
 						// set settings
 						if(setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
 								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
@@ -1320,6 +1344,12 @@
 								return;
 						}
 					} else if($trunk == 3) {
+						$dot1xhostmode = FS::$secMgr->checkAndSecurisePostData("dot1xhostmode");
+						$mabeap = FS::$secMgr->checkAndSecurisePostData("mabeap");
+						if($dot1xhostmode < 1 || $dot1xhostmode > 4) {
+                                                	header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+                                                        return;
+                                                }
 						// switchport mode access & no vlan assigned
 						setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
                                                 setSwitchNoTrunkVlanWithPID($sw,$pid);
@@ -1329,13 +1359,18 @@
 
 						// enable mab
 						setSwitchportMABEnableWithPID($sw,$pid,1);
-						// NO EAP support for now
-						setSwitchMABTypeWithPID($sw,$pid,1);
+						// set MAB to EAP or not
+						if($mabeap == "on")
+							setSwitchMABTypeWithPID($sw,$pid,2);
+						else
+							setSwitchMABTypeWithPID($sw,$pid,1);
 						// enable authfail & noresp vlans
 						setSwitchportAuthFailVLAN($sw,$pid,$nvlan);
 						setSwitchportAuthNoRespVLAN($sw,$pid,$nvlan);
 						// authentication port-control auto
 						setSwitchportControlMode($sw,$pid,2);
+						// Host Mode for Authentication
+						setSwitchportAuthHostMode($sw,$pid,$dot1xhostmode);
 					}
 					if(setPortStateWithPID($sw,$pid,($shut == "on" ? 2 : 1)) != 0) {
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
