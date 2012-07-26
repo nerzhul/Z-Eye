@@ -432,7 +432,7 @@
 					if($spwd != NULL || $spwd != "") {
 						FS::$dbMgr->Close();
 						$testDBMgr = new FSMySQLMgr();
-						$testDBMgr->setConfig($saddr,$sport,$sdbname,$slogin,$spwd);
+						$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
 						
 						$conn = $testDBMgr->Connect();
 						if(!$conn) {
