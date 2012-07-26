@@ -5,9 +5,7 @@
 		function iSearch() { parent::genModule(); }
 		public function Load() {
 			$output = "<div id=\"monoComponent\">";
-			$search = FS::$secMgr->checkAndSecurisePostData("s");
-			if(!$search)
-				$search = FS::$secMgr->checkAndSecuriseGetData("s");
+			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			if($search && strlen($search) > 0)
 				$output .= $this->findRefsAndShow($search);
 			else
@@ -290,7 +288,7 @@
 				}
 				if(strlen($data["hostname"]) > 0)
 					$tmpoutput .= "Nom d'hôte DHCP: ".$data["hostname"]."<br />";
-				if(strlen($data["macaddr"]) > 0)
+				if(strlen($data["ip"]) > 0)
 					$tmpoutput .= "Adresse IP liée: <a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a><br />";
 				$tmpoutput .= "Type d'attribution: ".($data["distributed"] != 3 ? "Dynamique" : "Statique")."<br />";
 				if($data["distributed"] != 3)
@@ -347,7 +345,6 @@
 		
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
-			
 			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
 			while($data = pg_fetch_array($query)) {
 				$radSQLMgr = new FSMySQLMgr();
@@ -420,6 +417,44 @@
 						$outputbw = $totoutbw."o";
 					$tmpoutput .= "Bande passante totale consommée: Téléchargement => ".$inputbw." / Upload: ".$outputbw."</div>";
 				}
+				$found = 0;
+				$shortmac = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
+                                $query2 = $radSQLMgr->Select("radacct","calledstationid,acctterminatecause,acctstarttime,acctterminatecause,acctstoptime,acctinputoctets,acctoutputoctets","username = '".$shortmac."'",2,10);
+				while($data2 = mysql_fetch_array($query2)) {
+					if($found == 0) {
+						$found = 1;
+						$tmpoutput .= "<div><h4>Accouting</h4>
+						<table><tr><th>Equipement</th><th>Début de session</th><th>Fin de session</th><th>Upload</th>
+						<th>Download</th><th>Cause de fin de session</th></tr>";
+					}
+					if($data2["acctinputoctets"] > 1024*1024*1024)
+                                                $inputbw = round($data2["acctinputoctets"]/1024/1024/1024,2)." Go";
+                                        else if($data2["acctinputoctets"] > 1024*1024)
+                                                $inputbw = round($data2["acctinputoctets"]/1024/1024,2)." Mo";
+                                        else if($data2["acctinputoctets"] > 1024)
+                                                $inputbw = round($data2["acctinputoctets"]/1024,2)." Ko";
+                                        else
+                                                $inputbw = $data2["acctinputoctets"]." octets";
+
+					if($data2["acctoutputoctets"] > 1024*1024*1024)
+                                                $outputbw = round($data2["acctoutputoctets"]/1024/1024/1024,2)." Go";
+                                        else if($data2["acctoutputoctets"] > 1024*1024)
+                                                $outputbw = round($data2["acctoutputoctets"]/1024/1024,2)." Mo";
+                                        else if($data2["acctoutputoctets"] > 1024)
+                                                $outputbw = round($data2["acctoutputoctets"]/1024,2)." Ko";
+                                        else
+                                                $outputbw = $data2["acctoutputoctets"]." octets";
+					$devportmac = preg_replace("[-]",":",$data2["calledstationid"]);
+					$macdevip = FS::$pgdbMgr->GetOneData("device_port","ip","mac = '".strtolower($devportmac)."'");
+					$macdev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$macdevip."'");
+					$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev."\">".$macdev."</a></td>";
+                                        $tmpoutput .= "<td>".date("d-m-y H:i:s",strtotime($data2["acctstarttime"]))."</td><td>";
+                                        $tmpoutput .= ($data2["acctstoptime"] != NULL ? date("d-m-y H:i:s",strtotime($data2["acctstoptime"])) : "");
+					$tmpoutput .= "</td><td>".$inputbw."</td><td>".$outputbw."</td>";
+					$tmpoutput .= "<td>".$data2["acctterminatecause"]."</td></tr>";
+					
+				}
+				if($found) $tmpoutput .= "</table></div>";
 			}
 			
 			// Devices
