@@ -423,7 +423,7 @@
 				while($data2 = mysql_fetch_array($query2)) {
 					if($found == 0) {
 						$found = 1;
-						$tmpoutput .= "<div><h4>Accouting</h4>
+						$tmpoutput .= "<div><h4>Accounting</h4>
 						<table><tr><th>Equipement</th><th>Début de session</th><th>Fin de session</th><th>Upload</th>
 						<th>Download</th><th>Cause de fin de session</th></tr>";
 					}
