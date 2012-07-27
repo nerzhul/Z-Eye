@@ -26,7 +26,7 @@
 		public function Load() {
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<div id=\"monoComponent\"><h3>Management des Switches</h3>";
+				$output .= "<h3>Management des Switches</h3>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
@@ -37,8 +37,6 @@
 			else
 				$output .= $this->showDeviceList();
 
-			if(!FS::isAjaxCall()) 
-				$output .= "</div>";
 			return $output;
 		}
 
@@ -177,10 +175,13 @@
 						for($i=0;$i<count($vllist);$i++)
 							$vlanlist .= $vllist[$i].",";
 						$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
+						$voicevlanoutput = FS::$iMgr->addElementToList("Aucun",4096);
+						$voicevlan = getSwitchportVoiceVlanWithPID($device,$portid);
+						$output .= FS::$iMgr->addList("nvlan","");
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
-                                        	$output .= FS::$iMgr->addList("nvlan","");
 	                                        while($data = pg_fetch_array($query)) {
 							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
+							$voicevlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
                                 	        }
 						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
@@ -198,7 +199,10 @@
 						$output .= FS::$iMgr->addElementToList("Multi Domain",4,$dot1xhostmode == 4 ? true : false);
 						$output .= "</select>";
 
-						$output .= "</td></tr>";
+						$output .= "</td></tr><tr><td>Vlan Voix</td><td>";
+						$output .= FS::$iMgr->addList("voicevlan","");
+						$output .= $voicevlanoutput;
+						$output .= "</select></td></tr>";
 						$output .= "<tr><td>Sauver ?</td><td>".FS::$iMgr->addCheck("wr")."</td></tr>";
 						$output .= "</table>";
 						$output .= "<center><br />".FS::$iMgr->addJSSubmit("Enregistrer","Enregistrer","showwait();")."</center>";
@@ -827,36 +831,15 @@
 					$output .= "}); } ";
 					$output .= "else $(src).toggle(); }";
 					$output .= "</script>";
-	
-					// Script pour modifier le nom du port
-					$output .= "<script type=\"text/javascript\">";
-					$output .= "function modifyPortDesc(src,sbmit,sw_,swport_,swds_,swdsc_) { ";
-					$output .= "if(sbmit == true) { ";
-					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=3', { sw: sw_, swport: swport_, swdesc: document.getElementsByName(swds_)[0].value, wr: document.getElementsByName(swdsc_)[0].checked }, function(data) { ";
-					$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
-					$output .= "}); } ";
-					$output .= "else $(src).toggle(); }";
-					$output .= "</script>";
-
-	// Script pour modifier le statut du port
-					$output .= "<script type=\"text/javascript\">";
-					$output .= "function modifyPortState(src,sbmit,sw_,swport_,swst_,swstc_) { ";
-					$output .= "if(sbmit == true) { ";
-					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=4', { sw: sw_, swport: swport_, swst: document.getElementsByName(swst_)[0].checked, wr: document.getElementsByName(swstc_)[0].checked }, function(data) { ";
-					$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
-					$output .= "}); } ";
-					$output .= "else $(src).toggle(); }";
-					$output .= "</script>";
-	
 				}
-				$tmpoutput = "<table class=\"standardTable\"><tr><th><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
-				$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">Description</a></th><th>Prise</th><th>MAC Interface</th><th>Up (Link/Admin)</th>";
+				$tmpoutput = "<table class=\"standardTable\"><tr><th><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
+				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">Description</a></th><th>Prise</th><th>MAC Interface</th><th>Up (Link/Admin)</th>";
 				if($iswif == false)
 					$tmpoutput .= "<th>Duplex (Link/Admin)</th>";
 				$tmpoutput .= "<th>Vitesse</th>";
 				if($iswif == false)
 					$tmpoutput .= "<th>POE</th>";
-				$tmpoutput .= "<th><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&od=vlan\">Vlan natif</a></th><th>";
+				$tmpoutput .= "<th><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=vlan\">Vlan natif</a></th><th>";
 				if($iswif == true) $tmpoutput .= "Canal</th><th>Puissance</th><th>SSID";
 				else $tmpoutput .= "Vlan Trunk</th><th>Equipements connectés</th></tr>";
 				$query = FS::$pgdbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",$od);
@@ -869,19 +852,10 @@
 					if($found == 0) $found = 1;
 					$convport = preg_replace("#\/#","-",$data["port"]);
 					$swpdata = (isset($prisearr[$data["port"]]) ? $prisearr[$data["port"]] : "");
-					$tmpoutput2 = "<tr id=\"".$convport."\"><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$device."&p=".$data["port"]."\">".$data["port"]."</a></td><td>";
+					$tmpoutput2 = "<tr id=\"".$convport."\"><td><a href=\"index.php?mod=".$this->mid."&d=".$device."&p=".$data["port"]."\">".$data["port"]."</a></td><td>";
 	
 					// Editable Desc
-					$tmpoutput2 .= "<div id=\"swds_".$convport."\">";
-									$tmpoutput2 .= "<a onclick=\"javascript:modifyPortDesc('#swds_".$convport." a',false);\"><div id=\"swds_".$convport."l\" class=\"modport\">";
-									$tmpoutput2 .= ($data["name"] == "" ? "Modifier" : $data["name"]);
-									$tmpoutput2 .= "</div></a><a style=\"display: none;\">";
-									$tmpoutput2 .= FS::$iMgr->addInput("swdesc-".$convport,$data["name"],30,40);
-					$tmpoutput2 .= "<br />Sauver ? ".FS::$iMgr->addCheck("swdescchk-".$convport);
-									$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPortDesc('#swds_".$convport."',true,'".$dip;
-					$tmpoutput2 .= "','".$data["port"]."','swdesc-".$convport."','swdescchk-".$convport."');\" />";
-									$tmpoutput2 .= "</a></div>";
-	
+					$tmpoutput2 .= $data["name"];
 					$tmpoutput2 .= "</td><td>";
 					// Editable piece
 					$tmpoutput2 .= "<div id=\"swpr_".$convport."\">";
@@ -894,7 +868,6 @@
 					$tmpoutput2 .= "</td><td>".$data["mac"]."</td><td>";
 					// Editable state
 					$tmpoutput2 .= "<div id=\"swst_".$convport."\">";
-					$tmpoutput2 .= "<a onclick=\"javascript:modifyPortState('#swst_".$convport." a',false);\"><div id=\"swst_".$convport."l\" class=\"modport\">";
 					if($data["up_admin"] == "down")
 						$tmpoutput2 .= "<span style=\"color: red;\">Eteint</span>";
 					else if($data["up_admin"] == "up" && $data["up"] == "down")
@@ -903,12 +876,6 @@
 						$tmpoutput2 .= "<span style=\"color: black;\">Actif</span>";
 					else
 						$tmpoutput2 .= "unk";
-					$tmpoutput2 .= "</div></a><a style=\"display: none;\">";
-					$tmpoutput2 .= "Eteindre: ".FS::$iMgr->addCheck("swst-".$convport,$data["up_admin"] == "down" ? true : false);
-					$tmpoutput2 .= "<br />Sauver ? ".FS::$iMgr->addCheck("swstchk-".$convport);
-					$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPortState('#swst_".$convport."',true,'".$dip."','".$data["port"]."',";
-					$tmpoutput2 .= "'swst-".$convport."','swstchk-".$convport."');\" />";
-					$tmpoutput2 .= "</a></div>";
 					$tmpoutput2 .= "</td><td>";
 					if($iswif == false) {
 	
@@ -949,7 +916,7 @@
 							$vlancount = 0;
 							$vlanlist .= "<br />";
 						}
-						$vlanlist .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&vlan=".$data2["vlan"]."\">".$data2["vlan"]."</a>,";
+						$vlanlist .= "<a href=\"index.php?mod=".$this->mid."&vlan=".$data2["vlan"]."\">".$data2["vlan"]."</a>,";
 						$vlancount++;
 					}
 					if($iswif == false) {
@@ -968,17 +935,17 @@
 						$tmpoutput2 .= "</td><td>";
 						$query2 = FS::$pgdbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'","mac");
 						while($data2 = pg_fetch_array($query2)) {
-							$tmpoutput2 .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
+							$tmpoutput2 .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
 							$query3 = FS::$pgdbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'","time_last",1,1);
 							while($data3 = pg_fetch_array($query3)) {
-								$tmpoutput2 .= "&nbsp;&nbsp;<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
+								$tmpoutput2 .= "&nbsp;&nbsp;<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
 								$query4 = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser","mac = '".$data2["mac"]."' AND ip = '".$data3["ip"]."'");
 								if($data4 = pg_fetch_array($query4)) {
 									if($data4["domain"] != "")
-										$tmpoutput2 .= "&nbsp;&nbsp;\\\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["domain"]."\">".$data4["domain"]."</a>\\<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
+										$tmpoutput2 .= "&nbsp;&nbsp;\\\\<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["domain"]."\">".$data4["domain"]."</a>\\<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
 									else
-										$tmpoutput2 .= "&nbsp;&nbsp;<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
-									$tmpoutput2 .= "&nbsp;&nbsp;".($data4["nbuser"] == "" ? "[UNK]" : $data4["nbuser"])."@<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
+										$tmpoutput2 .= "&nbsp;&nbsp;<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
+									$tmpoutput2 .= "&nbsp;&nbsp;".($data4["nbuser"] == "" ? "[UNK]" : $data4["nbuser"])."@<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
 								}
 							}
 						}
@@ -1056,12 +1023,12 @@
 			while($data = pg_fetch_array($query)) {
 				if(preg_match("#AIR#",$data["model"])) {
 					if($foundwif == 0) $foundwif = 1;
-					$outputwifi .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>";
+					$outputwifi .= "<tr><td><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>";
 	                                $outputwifi .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
 				}
 				else {
 					if($foundsw == 0) $foundsw = 1;
-					$outputswitch .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
+					$outputswitch .= "<tr><td><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
 					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
 				}
 			}
@@ -1128,32 +1095,6 @@
 						}
 						else
 							echo "ERROR";
-					}
-					return;
-				case 4:
-					$port = FS::$secMgr->checkAndSecurisePostData("swport");
-					$sw = FS::$secMgr->checkAndSecurisePostData("sw");
-					$st = FS::$secMgr->checkAndSecurisePostData("swst");
-					$save = FS::$secMgr->checkAndSecurisePostData("wr");
-					if($port == NULL || $sw == NULL || $st == NULL) {
-							echo "ERROR";
-							return;
-					}
-
-					if($lup = FS::$pgdbMgr->GetOneData("device_port","up","ip = '".$sw."' AND port = '".$port."'")) {
-						$state = $st == "true" ? 2 : 1;
-						if(setPortState($sw,$port,$state) == 0) {
-							if($save == "true")
-									writeMemory($sw);
-							FS::$pgdbMgr->Update("device_port","up_admin = '".($st == "true" ? "down" : "up")."'","ip = '".$sw."' AND port = '".$port."'");
-							if($state == 1) {
-								if($lup == "up") $lupstr = "<span style=\"color: black;\">Actif</span>";
-								else $lupstr = "<span style=\"color: orange;\">Inactif</span>";
-							}
-							echo ($state == 1 ? $lupstr : "<span style=\"color:red;\">Eteint</span>");
-							}
-							else
-									echo "ERROR";
 					}
 					return;
 				case 5:
@@ -1263,6 +1204,7 @@
 					$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
 					$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
 					$speed = FS::$secMgr->checkAndSecurisePostData("speed");
+					$voicevlan = FS::$secMgr->checkAndSecurisePostData("voicevlan");
 					$wr = FS::$secMgr->checkAndSecurisePostData("wr");
 					if($port == NULL || $sw == NULL || $trunk == NULL || $nvlan == NULL) {
 						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
@@ -1376,6 +1318,10 @@
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 					}
+					if(setSwitchportVoiceVlanWithPID($sw,$pid,$voicevlan) != 0) {
+                                                header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+                                                return;
+                                        }
 					setPortDescWithPID($sw,$pid,$desc);
 					if($wr == "on")
 						writeMemory($sw);

@@ -33,3 +33,5 @@ Alpha 0.18
 - Mrtg_rrd_refresh renamed to mrtg_data_refresh & ported to python (MT)
 - Fix a bug in radius DB (servermgmt)
 - Added Accounting implementation into search for mac adresses
+- Added support for voice VLAN on cisco switches
+- Remove useless JS to modify description and shut the port

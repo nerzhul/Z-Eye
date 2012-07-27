@@ -452,10 +452,30 @@
 		
 		function getSwitchportModeWithPID($device, $pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                  return -1;
+		                  return -1;
 
 			return getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
 		}
+
+		function setSwitchportVoiceVlanWithPID($device, $pid, $value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4096)
+                		   return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
+                }
+                
+                function getSwitchportVoiceVlanWithPID($device, $pid) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+		                  return -1;
+
+			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1");
+			$value = explode(" ",$ret);
+                        if(count($value) != 2)
+                                return -1;
+
+                        $value = $value[1];
+                        return $value;
+                }
 		
 		/*
 		* Generic functions
