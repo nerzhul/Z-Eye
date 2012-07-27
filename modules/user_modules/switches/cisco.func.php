@@ -506,7 +506,7 @@
 
 		function getPortIndexes($device,$pid) {
 			$query = FS::$pgdbMgr->Select("z_eye_port_id_cache","switchid,switchportid","device = '".$device."' AND pid = '".$pid."'");
-			if($data = mysql_fetch_array($query))
+			if($data = pg_fetch_array($query))
 				return array($data["switchid"],$data["switchportid"]);
 			return NULL;
 		}
