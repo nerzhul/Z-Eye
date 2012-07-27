@@ -24,9 +24,7 @@
 		function iDNSManager() { parent::genModule(); }
 		public function Load() {
 			$output = "";
-			$output .= "<div id=\"monoComponent\">";
 			$output .= $this->showStats();
-			$output .= "</div>";
 			return $output;
 		}
 
@@ -203,7 +201,7 @@
 						}
 						$dnsoutput .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$data["record"]."</td><td>".$data["rectype"]."</td><td>";
 						if($data["rectype"] == "A")
-							$dnsoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
+							$dnsoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
 						else
 							$dnsoutput .= $data["recval"];
 						$dnsoutput .= "</td></tr>";
@@ -297,7 +295,7 @@
 							$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 							if(!$foundrecent) {
 								if(!$found) $found = true;
-								$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$data["recval"]."<br />";
+								$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$data["recval"]."<br />";
 							}
 						}
 					}
@@ -314,7 +312,7 @@
 						$out = array();
 						exec("dig -t A ".$toquery." +short|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
 						if(count($out) == 0) {
-							$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / Orphelin<br />";
+							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / Orphelin<br />";
 						}
 						else {
 							for($i=0;$i<count($out);$i++) {
@@ -323,7 +321,7 @@
 									$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 									if(!$foundrecent) {
 										if(!$found) $found = true;
-										$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$out[$i]."<br />";
+										$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$out[$i]."<br />";
 									}
 								}
 							}

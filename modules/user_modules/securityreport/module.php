@@ -24,10 +24,8 @@
 		public function Load() {
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<div id=\"monoComponent\"><h3>Rapports de Sécurité</h3>";
+				$output .= "<h3>Rapports de Sécurité</h3>";
 			$output .= $this->loadAttackGraph();
-			if(!FS::isAjaxCall())
-				$output .= "</div>";
 			return $output;
 		}
 		

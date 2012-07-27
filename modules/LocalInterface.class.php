@@ -31,13 +31,6 @@
 			$output .= $this->showConnForm();
 			if(FS::$sessMgr->isConnected())
 				$output .= $this->showSearchForm();
-			$output .= "<div id=\"menus\">";
-            $output .= $this->showRightMenu();
-			$output .= "<div id=\"rightmenu\">";
-			$output .= $this->loadMenu(6);
-			$output .= "</div>";
-			$output .= $this->showAdminMenu();
-			$output .= "</div>";
 
 			$output .= "<div id=\"main\">";
 			// header for enterprise
@@ -49,12 +42,25 @@
 		}
 
 		protected function showConnForm() {
-			$output = "<div id=\"logform\"><div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
+			$output = "<div id=\"logform\"><div id=\"menupanel\">";
+			$menulist = array(1,7,6,3,2);
+                        $output .= $this->newShowMenu($menulist);
+			$output .= "<div id=\"menuStack\"><div id=\"menuElmt\"><ul class=\"login\">";
+
+                        $output .= "<li id=\"logintoggle\">";
+                        if(!FS::$sessMgr->isConnected())
+                                $output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>";
+                        else
+                                $output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
+                        $output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
+                        </li></ul></div></div>";
+			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
 			$output .= "<h1>Bienvenue sur Z-Eye</h1>";
 
-			$output .= "<p class=\"grey\">Cette interface permet de monitorer et d'administrer les services</p>";
-			$output .= "</div><div class=\"left\">";
+                        $output .= "<p class=\"grey\">Cette interface permet de monitorer et d'administrer les services</p>";
 
+			$output .= "</div><div class=\"left\">";
+			
 			if(!FS::$sessMgr->isConnected()) {
 				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
 					$output .= "<h1>Identification</h1>";
@@ -62,7 +68,6 @@
 					$output .= $this->addInput("uname","");
 					$output .= $this->addLabel("upwd","Mot de passe");
 					$output .= $this->addPasswdField("upwd","");
-					$output .= $this->addHidden("rdr","http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]);
 					$output .= "<div class=\"clearlogform\"></div>";
 					$output .= $this->addSubmit("conn","Connexion");
 					$output .= "</form>";
@@ -72,33 +77,11 @@
 				$output .= "</form>";
 			}
 			
-			
-			$output .= "</div></div></div>";
-
-			$output .= "<div class=\"tablogform\"><ul class=\"login\">
-			<li class=\"left\">&nbsp;</li><li>Bonjour ";
-			
-			if(!FS::$sessMgr->isConnected())
-				$output .= "invit&eacute;";
-			else {
-				$user = new User();
-				$user->LoadFromDB($_SESSION["uid"]);
-				$output .= $user->getSubName();
-			}
-			
-			$output .= "</li><li class=\"sep\">|</li>
-			<li id=\"logintoggle\">";
-			if(!FS::$sessMgr->isConnected())
-				$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>";
-			else
-				$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
-			$output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
-			</li>
-			<li class=\"right\">&nbsp;</li></ul></div></div>";
+			$output .= "</div></div></div></div></div>";
 		
-			return $output;
+			return $output;	
 		}
-		
+
 		protected function showSearchForm() {
 			$output = "<div id=\"searchform\">
 				<div id=\"searchpanel\">
@@ -115,13 +98,6 @@
 			return $output;
 		}
 
-		private function showRightMenu() {
-			$output = "<div id=\"rightmenu\">";
-			$output .= $this->loadMenu(1);
-			$output .= "</div>";
-			return $output;
-		}
-		
 		private function showUserMenu() {
 			$output = "<div id=\"rightmenu\">";
 			$output .= $this->loadMenu(2);
@@ -129,10 +105,29 @@
 			return $output;
 		}
 
-		private function showAdminMenu() {
-			$output = "<div id=\"rightmenu\">";
-			$output .= $this->loadMenu(3);
-			$output .= "</div>";
+		private function newShowMenu($mlist) {
+			$output = "";
+			for($i=0;$i<count($mlist);$i++) {
+				$query = $this->dbMgr->Select("fss_menus","name,ulevel,isconnected","id = '".$mlist[$i]."'");
+				if($data = mysql_fetch_array($query)) {
+					$conn = FS::$sessMgr->isConnected();
+					if((!$conn && $data["isconnected"] == -1 || $conn && $data["isconnected"] == 1 || $data["isconnected"] == 0) &&
+					(FS::$sessMgr->getUserLevel() >= $data["ulevel"])) {
+						$output .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$data["name"]."</div><div class=\"menupopup\">";
+						$query2 = $this->dbMgr->Select("fss_menu_link","id_menu_item","id_menu = '".$mlist[$i]."'","`order`");
+						while($data2 = mysql_fetch_array($query2)) {
+							$query3 = $this->dbMgr->Select("fss_menu_items","title,link,isconnected,ulevel","id = '".$data2["id_menu_item"]."'");
+							while($data3 = mysql_fetch_array($query3))
+								if((!$conn && $data3["isconnected"] == -1 || $conn && $data3["isconnected"] == 1 || $data3["isconnected"] == 0) &&
+									(FS::$sessMgr->getUserLevel() >= $data3["ulevel"])) {
+									$link = new HTTPLink($data3["link"]);
+									$output .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$data3["title"]."</a></div>";
+								}
+						}
+						$output .= "</div></div>";
+					}
+				}
+			}
 			return $output;
 		}
 
@@ -143,7 +138,7 @@
 		}
 
 		public function showModule() {
-			$output = "<div id=\"mainContent\">";
+			$output = "";
 			$module = FS::$secMgr->checkGetData("mod");
 			if(!$module) $module = 0;
 			
@@ -154,7 +149,6 @@
 				if($module)
 					$output .= $this->loadModule($module);
 			}
-			$output .= "</div>";
 			return $output;
 		}
 

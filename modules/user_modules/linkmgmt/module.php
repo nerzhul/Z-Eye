@@ -30,39 +30,37 @@
 					$output .= $this->showLinkForm(true);
 			}
 			else {
-				$output .= "<div id=\"monoComponent\">
-					<h3>Gestion des liens</h3>";
-					$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=1\">Nouveau lien</a>
-					<table class=\"standardTable\" width=\"55%\">
-					<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
-					$query = FS::$dbMgr->Select("fss_http_links","id,type,args","","id",1);
-					while($data = mysql_fetch_array($query)) {
-						$output .= "<tr><td><center><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=2&link=".$data["id"]."\">".$data["id"]."</a></center></td><td><center>";
-						if($data["type"] == 0)
-							$output .= "Normal";
-						else if($data["type"] == 1)
-							$output .= "Action";
-						else if($data["type"] == 2)
-							$output .= "Module";
-						else if($data["type"] == 3)
-							$output .= "JavaScript";
-						else if($data["type"] == 4)
-							$output .= "Rewrite Module";
-						else
-							$output .= "Rewrite Autres";
-						$output .= "</center></td><td><center>".$data["args"]."</center></td>";
-						$output .= "<td><a href=\"index.php?mod=".$this->mid."&act=3&link=".$data["id"]."\">";
-						$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
-						$output .= "</a></td></tr>";
-					}
-					$output .= "</table></div>";				
+				$output .= "<h3>Gestion des liens</h3>";
+				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau lien</a>
+				<table class=\"standardTable\" width=\"55%\">
+				<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
+				$query = FS::$dbMgr->Select("fss_http_links","id,type,args","","id",1);
+				while($data = mysql_fetch_array($query)) {
+					$output .= "<tr><td><center><a href=\"index.php?mod=".$this->mid."&do=2&link=".$data["id"]."\">".$data["id"]."</a></center></td><td><center>";
+					if($data["type"] == 0)
+						$output .= "Normal";
+					else if($data["type"] == 1)
+						$output .= "Action";
+					else if($data["type"] == 2)
+						$output .= "Module";
+					else if($data["type"] == 3)
+						$output .= "JavaScript";
+					else if($data["type"] == 4)
+						$output .= "Rewrite Module";
+					else
+						$output .= "Rewrite Autres";
+					$output .= "</center></td><td><center>".$data["args"]."</center></td>";
+					$output .= "<td><a href=\"index.php?mod=".$this->mid."&act=3&link=".$data["id"]."\">";
+					$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+					$output .= "</a></td></tr>";
+				}
+				$output .= "</table></div>";				
 			}
 			return $output;
 		}
 		
 		public function showLinkForm($edit = false) {
-			$output = "<div id=\"monoComponent\">
-				<h3>";
+			$output = "<h3>";
 			$output .= $edit ? "Edition d'un lien" : "Création d'un lien";
 			$output .= "</h3>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
@@ -88,7 +86,7 @@
 			$output .= FS::$iMgr->addInput("args",$lnk ? $lnk->getArgs() : "",25,130);
 			$output .= "<hr>";
 			$output .= FS::$iMgr->addSubmit("reg","Enregistrer");
-			$output .= "</form></div>";
+			$output .= "</form>";
 			return $output;
 		}
 		

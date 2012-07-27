@@ -23,7 +23,7 @@
 	class iServerMgmt extends genModule{
 		function iServerMgmt() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\"><h3>Gestion du moteur d'analyse des serveurs</h3>";
+			$output = "<h3>Gestion du moteur d'analyse des serveurs</h3>";
 			$do = FS::$secMgr->checkAndSecuriseGetData("do");
 			switch($do) {
 				case 1: case 2:
@@ -74,7 +74,7 @@
 				}
 			}
 			
-			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\">Retour</a><br />";
+			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
 			
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -165,7 +165,7 @@
 				}
 			}
 			
-			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\">Retour</a><br />";
+			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
 			
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -230,7 +230,7 @@
 				}
 			}
 			
-			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\">Retour</a><br />";
+			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
 			
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -263,13 +263,13 @@
 		
 		private function showServerList() {
 			$output = "<h4>Liste des serveurs</h4>";
-			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=1\">Nouveau Serveur</a><br />";
+			$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau Serveur</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Login</th><th>DHCP</th><th>DNS</th><th>Supprimer</th></tr>";
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,dhcp,dns");
 			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
+				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
 				$tmpoutput .= "<center>".($data["dhcp"] > 0 ? "X" : "")."</center></td><td><center>".($data["dns"] > 0 ? "X" : "")."</center></td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]."\">";
@@ -282,13 +282,13 @@
 				$output .= FS::$iMgr->printError("Aucun serveur trouvé !");
 
 			$output .= "<h4>Liste des bases Radius</h4>";
-			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=4\">Nouvelle base</a><br />";
+			$output .= "<a href=\"index.php?mod=".$this->mid."&do=4\">Nouvelle base</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Port</th><th>Hôte</th><th>Login</th><th>Supprimer</th></tr>";
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
 			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
+				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">";
 				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
@@ -300,13 +300,13 @@
 				$output .= FS::$iMgr->printError("Aucune base renseignée !");
 				
 			$output .= "<h4>Liste des serveurs de sauvegarde (configurations des équipements réseau)</h4>";
-			$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=7\">Nouveau serveur</a><br />";
+			$output .= "<a href=\"index.php?mod=".$this->mid."&do=7\">Nouveau serveur</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Type</th><th>Chemin sur le serveur</th><th>Login</th><th>Supprimer</th></tr>";
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
 			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=8&addr=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
+				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=8&addr=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>";
 				switch($data["type"]) {
 					case 1: $tmpoutput .= "TFTP"; break;

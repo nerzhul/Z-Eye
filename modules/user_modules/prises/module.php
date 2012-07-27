@@ -22,13 +22,12 @@
 	class iPriseMgmt extends genModule{
 		function iPriseMgmt($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\"><h3>Gestion des prises</h4>";
+			$output = "<h3>Gestion des prises</h4>";
 			$piece = FS::$secMgr->checkAndSecuriseGetData("piece");
 			if($piece != NULL)
 				$output .= $this->showPieceInfos();
 			else
 				$output .= $this->showMain();
-			$output .= "</div>";
 			return $output;
 		}
 
@@ -36,7 +35,7 @@
 			$output = "<h4>Informations sur la pièce ";
 			$piece = FS::$secMgr->checkAndSecuriseGetData("piece");
 			$output .= $piece."</h4>";
-			$output .= "<a class=\"monoComponentt_a\" href=\"m-".$this->mid.".html\">Retour</a>";
+			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a>";
 
 			$found = 0;
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>#Prise</th><th>Switch</th><th>Port</th><th>Commentaire</th></tr>";
@@ -47,9 +46,9 @@
 				$query2 = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port","prise = '".$piece.".".$data["prise"]."'");
 				if($data2 = pg_fetch_array($query2)) {
 					$dev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data2["ip"]."'");
-					$tmpoutput .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dev."\">".$dev."</a></td>";
+					$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dev."\">".$dev."</a></td>";
 					$convport = preg_replace("#\/#","-",$data2["port"]);
-					$tmpoutput .= "<td><a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dev."#".$convport."\">".$data2["port"]."</a></td><td>";
+					$tmpoutput .= "<td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dev."#".$convport."\">".$data2["port"]."</a></td><td>";
 				}
 				else
 					$tmpoutput .= " - </td><td>Non câblé</td><td>";
@@ -82,7 +81,7 @@
                                         $batarr[$data["piece"][0]][$data["piece"][1]] = "<h4>Bâtiment ".$data["piece"][0]." (".$data["piece"][1].($data["piece"][1] == 1 ? "er" : "ème")." étage) </h4><table class=\"standardTable\"><tr><th>Pièce</th><th>Nombre de prises</th></tr>";
 
 				$npiece = preg_replace("#\.#","-",$data["piece"]);
-				$batarr[$data["piece"][0]][$data["piece"][1]] .= "<tr><td><a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&piece=".$data["piece"]."\">".$data["piece"]."</a></td><td><center>";
+				$batarr[$data["piece"][0]][$data["piece"][1]] .= "<tr><td><a href=\"index.php?mod=".$this->mid."&piece=".$data["piece"]."\">".$data["piece"]."</a></td><td><center>";
 				$batarr[$data["piece"][0]][$data["piece"][1]] .= "<div id=\"nbpr_".$npiece."\">";
                                 $batarr[$data["piece"][0]][$data["piece"][1]] .= "<a onclick=\"javascript:modifyPiece('#nbpr_".$npiece." a',false);\"><div id=\"nbpr_".$npiece."l\" class=\"modport\">";
                                 $batarr[$data["piece"][0]][$data["piece"][1]] .= $data["m"];

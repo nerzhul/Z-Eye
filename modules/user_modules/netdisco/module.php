@@ -22,14 +22,13 @@
 	class iNetdisco extends genModule{
 		function iNetdisco() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\"><h4>Management du service de découverte Netdisco</h4>";
+			$output = "<h4>Management du service de découverte Netdisco</h4>";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err == 1)
 				$output .= FS::$iMgr->printError("Les données que vous avez entré ne sont pas valides !");
 			else if ($err == -1)
 				$output .= FS::$iMgr->printDebug("Modification prise en compte.");
 			$output .= $this->showMainConf();
-			$output .= "</div>";
 			return $output;
 		}
 

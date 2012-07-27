@@ -22,8 +22,7 @@
 	class iNetSpeedMgmt extends genModule{
 		function iNetSpeedMgmt() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\"><h3>Management du moteur d'Analyse des Débits</h3>";
-			$output .= "</div>";
+			$output = "<h3>Management du moteur d'Analyse des Débits</h3>";
 			return $output;
 		}
 		

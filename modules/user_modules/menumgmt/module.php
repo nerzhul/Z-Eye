@@ -35,9 +35,8 @@
 					$output .= $this->showMenuForm(true);
 			}
 			else {
-				$output .= "<div id=\"monoComponent\">
-					<h3>Gestion des menus</h3>";
-					$output .= "<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=1\">Nouveau menu</a>
+			$output .= "<h3>Gestion des menus</h3>";
+					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau menu</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Accréditation</th><th>Connecté</th><th></th><th></th></tr>";
 					$query = FS::$dbMgr->Select("fss_menus","id,name,ulevel,isconnected","","id",2);
@@ -58,7 +57,7 @@
 					
 					$output .= "</table>
 					<h3>Gestion des éléments de menu</h3>
-					<a class=\"monoComponentt_a\" href=\"index.php?mod=".$this->mid."&do=4\">Nouvel élément de menu</a>
+					<a href=\"index.php?mod=".$this->mid."&do=4\">Nouvel élément de menu</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Lien</th><th>Accréditation</th><th>Connecté</th><th></th><th></th></tr>";
 					$query = FS::$dbMgr->Select("fss_menu_items","id,title,link,ulevel,isconnected","","id",2);
@@ -78,13 +77,13 @@
 						$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
 						$output .= "</a></td></tr>";
 					}
-					$output .= "</table></div>";				
+					$output .= "</table>";				
 			}
 			return $output;
 		}
 		
 		public function showMenuElmForm($edit = false) {
-			$output = "<div id=\"monoComponent\"><h4>";
+			$output = "<h4>";
 			$output .= $edit ? "Edition de l'élément" : "Création d'un élément";
 			$output .= "</h4>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4));
@@ -111,13 +110,12 @@
 			$output .= FS::$iMgr->addElementToList("Les deux",0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
 			$output .= "</select><hr>";
 			$output .= FS::$iMgr->addSubmit("reg","Enregistrer");
-			$output .= "</form></div>";
+			$output .= "</form>";
 			return $output;
 		}
 		
 		public function showMenuForm($edit = false) {
-			$output = "<div id=\"monoComponent\">
-				<h3>";
+			$output = "<h3>";
 			$output .= $edit ? "Edition du menu" : "Création d'un menu";
 			$output .= "</h3>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
@@ -170,7 +168,7 @@
 					}
 				}
 			}
-			$output .= "</table></div>";
+			$output .= "</table>";
 			return $output;
 		}
 		

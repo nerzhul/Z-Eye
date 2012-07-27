@@ -22,12 +22,11 @@
 	class iNagios extends genModule{
 		function iNagios() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\">";
+			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) $output .= "<h3>Management de Nagios (icinga)</h3>";
 			
 			$output .= $this->showMain();
-			$output .= "</div>";
 			return $output;
 		}
 		

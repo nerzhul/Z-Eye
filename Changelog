@@ -35,3 +35,6 @@ Alpha 0.18
 - Added Accounting implementation into search for mac adresses
 - Added support for voice VLAN on cisco switches
 - Remove useless JS to modify description and shut the port
+
+Alpha 0.19
+- Cleanup CSS and divs

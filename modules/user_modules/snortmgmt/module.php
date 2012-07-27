@@ -22,9 +22,8 @@
 	class iSnortMgmt extends genModule{
 		function iSnortMgmt() { parent::genModule(); }
 		public function Load() {
-			$output = "<div id=\"monoComponent\"><h3>Management de l'IDS SNORT</h3>";
+			$output = "<h3>Management de l'IDS SNORT</h3>";
 			$output .= $this->showMainConf();
-			$output .= "</div>";
 			return $output;
 		}
 		

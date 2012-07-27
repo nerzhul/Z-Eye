@@ -24,9 +24,7 @@
 		function iIPManager() { parent::genModule(); }
 		public function Load() {
 			$output = "";
-			$output .= "<div id=\"module_connect\">";
 			$output .= $this->showStats();
-			$output .= "</div>";
 			return $output;
 		}
 
@@ -47,7 +45,7 @@
 				}
 				$output .= $formoutput;
 				$output .= "</select>";
-				$output .= FS::$iMgr->addSubmit("Filtrer","Filtrer");
+				$output .= FS::$iMgr->addSubmit("","Consulter");
 				$output .= "</form><br />";
 				if(!$filter)
 					return "Veuillez choisir le réseau IP à monitorer: <br /><br />".$output;
@@ -126,10 +124,10 @@
 								}
 								break;
 						}
-						$netoutput .= "<tr style=\"$style\"><td><a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
+						$netoutput .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
 						$netoutput .= long2ip($key)."</a>";
 						$netoutput .= "</td><td>".$rstate."</td><td>";
-						$netoutput .= "<a class=\"monoComponent_li_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
+						$netoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
 						$netoutput .= $value["host"]."</td><td>";
 						$netoutput .= $value["ltime"]."</td></tr>";
 					}
@@ -196,7 +194,7 @@
 								$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND active = 't' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 								if(!$foundrecent) {
 									if(!$found) $found = true;
-									$output .= $data["ip"]." / <a class=\"monoComponentt_a\" href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
+									$output .= $data["ip"]." / <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
 								}
 							}
 						}
