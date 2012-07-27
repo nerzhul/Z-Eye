@@ -75,7 +75,7 @@
 						$iparray[$i]["distrib"] = 0;
 					}
 					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","netid = '".$data["netid"]."'");
-					while($data2 = mysql_fetch_array($query2)) {
+					while($data2 = pg_fetch_array($query2)) {
 						$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
 						$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
 						$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
