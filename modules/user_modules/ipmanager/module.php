@@ -38,14 +38,13 @@
 			if(!FS::isAjaxCall()) {
 				$output .= "<h3>Supervision IP</h3>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-				$output .= FS::$iMgr->addList("f");
+				$output .= FS::$iMgr->addList("f","submit()");
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask");
 				while($data = pg_fetch_array($query)) {
 					$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
 				$output .= $formoutput;
 				$output .= "</select>";
-				$output .= FS::$iMgr->addSubmit("","Consulter");
 				$output .= "</form><br />";
 				if(!$filter)
 					return "Veuillez choisir le réseau IP à monitorer: <br /><br />".$output;

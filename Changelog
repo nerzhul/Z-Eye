@@ -38,3 +38,5 @@ Alpha 0.18
 
 Alpha 0.19
 - Cleanup CSS and divs
+- Fix a bug when change switchport prise (due to migrating from MySQL to PgSQL)
+- Implement Radius management (user + group creation/deletion)

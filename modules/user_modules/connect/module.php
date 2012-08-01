@@ -51,7 +51,7 @@
                         }
 
 			$url = FS::$secMgr->checkAndSecurisePostData("rdr");
-                        if($url == NULL || $url == "index.php") $url = "m-14.html";
+                        if($url == NULL || $url == "index.php") $url = "m-0.html";
 
 			echo $url;
 			if($errorldap == 0) {
