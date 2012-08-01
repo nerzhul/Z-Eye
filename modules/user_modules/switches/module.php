@@ -146,8 +146,8 @@
 						if(getSwitchportMABState($device,$portid) == 1)
                                                         $trmode = 3;
 						$output .= FS::$iMgr->addList("trmode","arangeform()");
-						$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
 						$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
+						$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
 						$output .= FS::$iMgr->addElementToList("802.1X - MAB",3,$trmode == 3 ? true : false);
 						$output .= "</select>";
 						$output .= "<tr><td id=\"vllabel\">";
@@ -1059,7 +1059,8 @@
 
 					if($prise == NULL) $prise = "";
 					// Modify prise for switch port
-					$sql = "REPLACE INTO z_eye_switch_port_prises VALUES ('".$sw."','".$port."','".$prise."')";
+					pg_query("DELETE FROM z_eye_switch_port_prises where ip = '".$dip."' AND port = '".$port."'");
+					$sql = "INSERT INTO z_eye_switch_port_prises VALUES ('".$sw."','".$port."','".$prise."')";
 					pg_query($sql);
 
 					if($prise != "") {
@@ -1329,7 +1330,8 @@
 					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$sw."'");
 
 					if($prise == NULL) $prise = "";
-					pg_query("REPLACE INTO z_eye_switch_port_prises VALUES ('".$dip."','".$port."','".$prise."')");
+					pg_query("DELETE FROM z_eye_switch_port_prises where ip = '".$dip."' AND port = '".$port."'");
+					pg_query("INSERT INTO z_eye_switch_port_prises (ip,port,prise) VALUES ('".$dip."','".$port."','".$prise."')");
 
 					if($prise != "") {
 							$piecetab = preg_split("#\.#",$prise);
