@@ -21,20 +21,25 @@
 """
 
 import datetime
-import os
 import time
+import os
 import thread
 from threading import Lock
 
 tc_mutex = Lock()
 threadCounter = 0
-max_threads = 30
+max_threads = 20
 
-def refreshMRTG(filename):
+def zeye_log(text):
+        logfile = open("/var/www/datas/logs/z_eye_collector.log","a")
+        logfile.writelines("%s\n"  % text)
+        logfile.close()
+
+def refreshMRTG(filename,useless):
 	global threadCounter
 	try:
 		tc_mutex.acquire()
-		threadCounter = threadCounter + 1
+		threadCounter += 1
 		tc_mutex.release()
 		cmd = "env LANG=C mrtg %s" % filename
 		pipe = os.popen('{ ' + cmd + '; }', 'r')
@@ -45,12 +50,14 @@ def refreshMRTG(filename):
 		tc_mutex.release()
 	except Exception, e:
 		print "[FATAL] %s" % e
+		zeye_log("[FATAL] %s" % e)
 		tc_mutex.acquire()
 		threadCounter = threadCounter - 1
 		tc_mutex.release()
 
 now = datetime.datetime.now()
 print "[Z-Eye][mrtg-data-refresh] Start at: %s" % now.strftime("%Y-%m-%d %H:%M")
+zeye_log("[Z-Eye][mrtg-data-refresh] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 
 _dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
 for file in _dir:
@@ -59,7 +66,7 @@ for file in _dir:
 		while threadCounter >= max_threads:
 			print "Waiting for %d threads..." % threadCounter
 			time.sleep(1)
-        thread.start_new_thread(refreshMRTG,(filename))
+        	thread.start_new_thread(refreshMRTG,(filename,0))
 
 while threadCounter > 0:
 	print "Waiting for %d threads..." % threadCounter
@@ -67,3 +74,4 @@ while threadCounter > 0:
 totaltime = datetime.datetime.now() - now
 now = datetime.datetime.now()
 print "[Z-Eye][mrtg-data-refresh] End at: %s (Total time %s)" % (now.strftime("%Y-%m-%d %H:%M"), totaltime)
+zeye_log("[Z-Eye][mrtg-data-refresh] End at: %s (Total time %s)" % (now.strftime("%Y-%m-%d %H:%M"), totaltime))

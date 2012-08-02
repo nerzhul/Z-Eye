@@ -1,25 +1,6 @@
 #! python
 # -*- coding: utf-8 -*-
 
-"""
-* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-"""
-	
 from pyPgSQL import PgSQL
 import datetime
 import sys
@@ -37,10 +18,15 @@ defaultSNMPRO = "public"
 
 pgsqlHost = '127.0.0.1'
 pgsqlUser = 'netdisco'
-pgsqlPwd = 'netdisco'
+pgsqlPwd = 'dbpassword'
 pgsqlDb = 'netdisco'
 
 max_threads = 30
+
+def zeye_log(text):
+        logfile = open("/var/www/datas/logs/z_eye_collector.log","a")
+        logfile.writelines("%s\n"  % text)
+        logfile.close()
 
 def fetchSNMPInfos(ip,devname,devcom):
 	global threadCounter
@@ -82,12 +68,14 @@ def fetchSNMPInfos(ip,devname,devcom):
 		pgsqlCon.close()
 	except Exception, e:
 		print "[FATAL] %s" % e
+		zeye_log("[FATAL] %s" % e)
 		tc_mutex.acquire()
 		threadCounter = threadCounter - 1
 		tc_mutex.release()
 
 now = datetime.datetime.now()
 print "[Z-Eye][PortId-Caching] Start at: %s" % now.strftime("%Y-%m-%d %H:%M")
+zeye_log("[Z-Eye][PortId-Caching] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 try:
 	global threadCounter
 	pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
@@ -97,7 +85,7 @@ try:
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
 			while threadCounter >= max_threads:
-				print "Waiting for %d threads..." % threadCounter
+                                print "Waiting for %d threads..." % threadCounter
 				time.sleep(1)
 
 			pgcursor.execute("SELECT snmpro FROM z_eye_snmp_cache where device = '%s'" % idx[1])
@@ -112,9 +100,11 @@ try:
 			thread.start_new_thread(fetchSNMPInfos,(devip,devname,devcom))
 	except StandardError, e:
 		print "[Z-Eye][PortId-Caching] Fatal Error: %s" % e
+		zeye_log("[Z-Eye][PortId-Caching] Fatal Error: %s" % e)
 		
 except PgSQL.Error, e:
 	print "[Z-Eye][PortId-Caching] Pgsql Error %s" % e
+	zeye_log("[Z-Eye][PortId-Caching] Pgsql Error %s" % e)
 	sys.exit(1);	
 
 finally:
@@ -129,3 +119,5 @@ finally:
 	totaltime = datetime.datetime.now() - now
 	now = datetime.datetime.now()
 	print "[Z-Eye][PortId-Caching] End at: %s (Total time %s)" % (now.strftime("%Y-%m-%d %H:%M"), totaltime)
+	zeye_log("[Z-Eye][PortId-Caching] End at: %s (Total time %s)" % (now.strftime("%Y-%m-%d %H:%M"), totaltime))
+
