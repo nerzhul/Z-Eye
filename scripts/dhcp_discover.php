@@ -1,4 +1,22 @@
 <?php
+	/*
+        * Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
+        * Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+        *
+        * This program is free software; you can redistribute it and/or modify
+        * it under the terms of the GNU General Public License as published by
+        * the Free Software Foundation; either version 2 of the License, or
+        * (at your option) any later version.
+        *
+        * This program is distributed in the hope that it will be useful,
+        * but WITHOUT ANY WARRANTY; without even the implied warranty of
+        * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        * GNU General Public License for more details.
+        *
+        * You should have received a copy of the GNU General Public License
+        * along with this program; if not, write to the Free Software
+        * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+        */
 	require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 	
 	function bufferizeDHCPFiles($conn,$file) {
@@ -25,8 +43,19 @@
 	$DHCPservers = "";
 	$DHCPfound = false;
 	$DHCPconnerr = false;
-	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd","dhcp = 1");
+	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd,dhcpdpath,dhcpleasepath","dhcp = 1");
 	while($data = pg_fetch_array($query)) {
+		if($data["dhcpdpath"] == NULL || $data["dhcpdpath"] == "" || !FS::$secMgr->isPath($data["dhcpdpath"])) {
+			echo "Chemin dhcpd.conf invalide pour le serveur ".$data["addr"].": ".$data["dhcpdpath"]."\n";
+			$DHCPconnerr = true;
+			continue;
+		}
+
+		if($data["dhcpleasepath"] == NULL || $data["dhcpleasepath"] == "" || !FS::$secMgr->isPath($data["dhcpleasepath"])) {
+                        echo "Chemin dhcpd.conf invalide pour le serveur ".$data["addr"].": ".$data["dhcpleasepath"]."\n";
+                        $DHCPconnerr = true;
+                        continue;
+                }
 		$conn = ssh2_connect($data["addr"],22);
 		if(!$conn) {
 			echo "Erreur de connexion au serveur ".$data["addr"]."\n";
@@ -39,7 +68,7 @@
 			}
 			else {
 				
-				$stream = ssh2_exec($conn,"cat /var/lib/dhcp/dhcpd.leases");
+				$stream = ssh2_exec($conn,"cat ".$data["dhcpleasepath"]);
 				stream_set_blocking($stream, true);
 					
 				while ($buf = fread($stream, 4096)) {
@@ -47,7 +76,7 @@
 				}
 				fclose($stream);
 	
-				$dhcpdatas2 = bufferizeDHCPFiles($conn,"/etc/dhcp/dhcpd.conf");
+				$dhcpdatas2 = bufferizeDHCPFiles($conn,$data["dhcpdpath"]);
 	
 				$dhcpdatas = preg_replace("/\n/","<br />",$dhcpdatas);
 				if($DHCPfound == false) $DHCPfound = true;
