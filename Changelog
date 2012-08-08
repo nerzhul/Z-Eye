@@ -41,3 +41,5 @@ Alpha 0.19
 - Fix a bug when change switchport prise (due to migrating from MySQL to PgSQL)
 - Implement Radius management (user + group creation/deletion)
 - Prepare a log system for z_eye fetch/collect
+- Added fields for dhcp/dns paths analyzing
+- Some bugfixes on search module

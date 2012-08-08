@@ -4,6 +4,7 @@
 	class iSearch extends genModule{
 		function iSearch() { parent::genModule(); }
 		public function Load() {
+			$output = "";
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			if($search && strlen($search) > 0)
 				$output .= $this->findRefsAndShow($search);
@@ -358,7 +359,7 @@
 					}
 					$fst = preg_split("#\.#",$data2["acctstarttime"]);
 					$lst = preg_split("#\.#",$data2["acctstoptime"]);
-					$tmpoutput .= "Utilisateur: ".$data2["username"]." / Station: <a href=\"index.php?mod=".$this->mid."&s=".$data2["calledstationid"].">".$data2["calledstationid"]."</a>";
+					$tmpoutput .= "Utilisateur: ".$data2["username"]." / Equipement: <a href=\"index.php?mod=".$this->mid."&s=".$data2["calledstationid"]."\">".$data2["calledstationid"]."</a>";
 					$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 				}
 				
@@ -379,7 +380,7 @@
 					else if($data2["input"] > 1024)
 						$inputbw = round($data2["input"]/1024,2)."Ko";
 					else
-						$inputbw = $data2["input"]."o";
+						$inputbw = $data2["input"]." octets";
 						
 					if($data2["output"] > 1024*1024*1024)
 						$outputbw = round($data2["output"]/1024/1024/1024,2)."Go";
@@ -388,10 +389,11 @@
 					else if($data2["output"] > 1024)
 						$outputbw = round($data2["output"]/1024,2)."Ko";
 					else
-						$outputbw = $data2["output"]."o";
+						$outputbw = $data2["output"]." octets";
 					$fst = preg_split("#\.#",$data2["fst"]);
 					$lst = preg_split("#\.#",$data2["lst"]);
-					$tmpoutput .= "Station: ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br /><hr>";
+					$tmpoutput .= "Equipement: ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".
+					(strlen($lst[0]) > 0 ? "Entre le" : "A partir du")." ".$fst[0].(strlen($lst[0]) > 0 ? " et le ".$lst[0] : "").")<br /><hr>";
 					$totinbw += $data2["input"];
 					$totoutbw += $data2["output"];
 				}
@@ -403,7 +405,7 @@
 					else if(totinbw > 1024)
 						$inputbw = round($totinbw/1024,2)."Ko";
 					else
-						$inputbw = $totinbw."o";
+						$inputbw = $totinbw." octets";
 						
 					if($totoutbw > 1024*1024*1024)
 						$outputbw = round($totoutbw/1024/1024/1024,2)."Go";
@@ -412,8 +414,8 @@
 					else if($totoutbw > 1024)
 						$outputbw = round($totoutbw/1024,2)."Ko";
 					else
-						$outputbw = $totoutbw."o";
-					$tmpoutput .= "Bande passante totale consommée: Téléchargement => ".$inputbw." / Upload: ".$outputbw."</div>";
+						$outputbw = $totoutbw." octets";
+					$tmpoutput .= "<b>Total</b> Download: ".$inputbw." / Upload: ".$outputbw."</div>";
 				}
 				$found = 0;
 				$shortmac = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
