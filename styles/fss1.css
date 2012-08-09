@@ -608,3 +608,23 @@ a:hover {
 	bottom: 130px;
 	display: none;
 }
+
+.ulform {
+	list-style-type: none;
+	display: inline-block;
+}
+
+.ulform li {
+	margin-bottom: 4px;
+}
+
+label {
+	float: left;
+	font-weight: bold;
+	text-align: left;
+}
+
+.ulform label {
+	margin: 4px 0 0;
+	width: 180px;
+}

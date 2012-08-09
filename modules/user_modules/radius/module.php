@@ -15,6 +15,7 @@
 					case 2: $output = FS::$iMgr->printError("Les valeurs entrées ne sont pas valides !"); break;
 					case 3: $output = FS::$iMgr->printError("Le groupe/utilisateur inscrit est déjà référencé !"); break;
 					case 4: $output = FS::$iMgr->printError("Echec de la suppression, données invalides !"); break;
+					case 5: $output = FS::$iMgr->printError("Certains utilisateurs n'ont pas été ajoutés car déjà existants !"); break;
 				}
 			}
 			else
@@ -66,13 +67,13 @@
                                 $radSQLMgr->Connect();
 				$formoutput = "<script type=\"text/javascript\"> function changeUForm() {
 					if(document.getElementsByName('utype')[0].value == 1) {
-						$('#macdf').hide(); $('#pindf').hide(); $('#userdf').show();
+						$('#userdf').show();
 					}
 					else if(document.getElementsByName('utype')[0].value == 2) {
-						$('#macdf').show(); $('#pindf').hide(); $('#userdf').hide();
+						$('#userdf').hide();
 					}
 					else if(document.getElementsByName('utype')[0].value == 3) {
-						$('#macdf').hide(); $('#pindf').show(); $('#userdf').hide();
+						$('#userdf').hide();
 					}
 				}; grpidx = 0; function addGrpForm() {
 					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->addList("ugroup'+grpidx+'","","Profil").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select>";
@@ -97,7 +98,7 @@
                                 FS::$iMgr->addElementToList("!~","!~").
                                 FS::$iMgr->addElementToList("=*","=*").
 				FS::$iMgr->addElementToList("!*","!*").
-				"</select> ".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"Valeur")." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
+				"</select> Valeur".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
 				FS::$iMgr->addElementToList("check",1).
 				FS::$iMgr->addElementToList("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertBefore('#formactions');
 				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
@@ -107,15 +108,15 @@
 				}</script>";
 
 				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
-				$formoutput .= "<ul style=\"list-style-type:none;\"><li>".
+				$formoutput .= "<ul class=\"ulform\"><li>".
 				FS::$iMgr->addList("utype","changeUForm()","Type d'authentification");
 				$formoutput .= FS::$iMgr->addElementToList("Utilisateur",1);
 				$formoutput .= FS::$iMgr->addElementToList("Adresse MAC",2);
 				//$formoutput .= FS::$iMgr->addElementToList("Code PIN",3);
 				$formoutput .= "</select></li><li>".
 				FS::$iMgr->addInput("username","",20,40,"Utilisateur")."</li><li>";
-				$formoutput .= "<fieldset id=\"userdf\" style=\"border:0;\">".
-				FS::$iMgr->addPasswdField("pwd","","Mot de passe")."<br />".
+				$formoutput .= "<fieldset id=\"userdf\" style=\"border:0; padding:0; margin-left: -1px;\"><li>".
+				FS::$iMgr->addPasswdField("pwd","","Mot de passe")."</li><li>".
 				FS::$iMgr->addList("upwdtype","","Type de mot de passe").
 				FS::$iMgr->addElementToList("Cleartext-Password",1).
 				FS::$iMgr->addElementToList("User-Password",2).
@@ -123,9 +124,9 @@
 				FS::$iMgr->addElementToList("MD5-Password",4).
 				FS::$iMgr->addElementToList("SHA1-Password",5).
 				FS::$iMgr->addElementToList("CHAP-Password",6).
-				"</select></fieldset></li><li id=\"formactions\">".FS::$iMgr->addButton("newgrp","Nouveau Groupe","addGrpForm()").
+				"</select></li></li><li id=\"formactions\">".FS::$iMgr->addButton("newgrp","Nouveau Groupe","addGrpForm()").
 				FS::$iMgr->addButton("newattr","Nouvel attribut","addAttrElmt('','','','')").
-				FS::$iMgr->addSubmit("","Enregistrer")."</form></li></ul>";
+				FS::$iMgr->addSubmit("","Enregistrer")."</li></ul></form>";
 				$output .= FS::$iMgr->addOpenableDiv($formoutput,"Nouvel Utilisateur");
 				$found = 0;
 				$tmpoutput = "<h4>Liste des Utilisateurs</h4>";
@@ -192,7 +193,7 @@
                                 FS::$iMgr->addElementToList("!~","!~").
                                 FS::$iMgr->addElementToList("=*","=*").
 				FS::$iMgr->addElementToList("!*","!*").
-				"</select> ".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"Valeur")." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
+				"</select> Valeur".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40)." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
 				FS::$iMgr->addElementToList("check",1).
 				FS::$iMgr->addElementToList("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
 				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
@@ -234,12 +235,11 @@
                                         drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=2&radentry='+e.dataTransfer.getData('text/html')); }
                                 });
 				</script>";
-				$formoutput .= FS::$iMgr->addList("radgrptpl","addTemplAttributes()","Template");
+				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addList("radgrptpl","addTemplAttributes()","Template");
 				$formoutput .= FS::$iMgr->addElementToList("Aucun",0);
 				$formoutput .= FS::$iMgr->addElementToList("VLAN",1);
-				$formoutput .= "</select>";
-				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3").
-				"<ul style=\"list-style-type:none;\"><li>".
+				$formoutput .= "</select></li><li>".
 				FS::$iMgr->addInput("groupname","",20,40,"Nom du profil")."</li><li>".
 				FS::$iMgr->addButton("newattr","Nouvel attribut","addAttrElmt('','','','')").
 				FS::$iMgr->addSubmit("","Enregistrer").
@@ -297,12 +297,33 @@
                                 }
 
 				$output .= "<h4>Import d'utilisateurs en masse</h4>";
+				$output .= "<script type=\"text/javascript\"> function changeUForm() {
+                                        if(document.getElementsByName('usertype')[0].value == 1) {
+                                                $('#uptype').show(); $('#csvtooltip').html(\"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b>\");
+                                        }
+                                        else if(document.getElementsByName('usertype')[0].value == 2) {
+                                                $('#uptype').hide(); $('#csvtooltip').html('<b>Note: </b> Les adresses MAC peuvent être de la forme <b>aa:bb:cc:dd:ee:ff</b>, <b>aa-bb-cc-dd-ee-ff</b> ou <b>aabbccddeeff</b> et ne sont pas sensibles à la casse.');
+                                        }
+                                        else if(document.getElementsByName('usertype')[0].value == 3) {
+                                                $('#uptype').hide(); $('#csvtooltip').html('');
+                                        }
+                                }; </script>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=6"); // #todo change this
-                                $output .= "<ul style=\"list-style-type:none;\"><li>".FS::$iMgr->addList("utype","changeUForm()","Type d'authentification");
-                                $formoutput .= FS::$iMgr->addElementToList("Utilisateur",1);
-                                $formoutput .= FS::$iMgr->addElementToList("Adresse MAC",2);
+                                $output .= "<ul class=\"ulform\"><li width=\"100%\">".FS::$iMgr->addList("usertype","changeUForm()","Type d'authentification");
+                                $output .= FS::$iMgr->addElementToList("Utilisateur",1);
+                                $output .= FS::$iMgr->addElementToList("Adresse MAC",2);
                                 //$formoutput .= FS::$iMgr->addElementToList("Code PIN",3);
-                                $formoutput .= "</select></li><li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->addList("ugroup'+grpidx+'","","Profil").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select>
+                                $output .= "</select></li><li id=\"uptype\">".FS::$iMgr->addList("upwdtype","","Type de mot de passe").
+                                FS::$iMgr->addElementToList("Cleartext-Password",1).
+                                FS::$iMgr->addElementToList("User-Password",2).
+                                FS::$iMgr->addElementToList("Crypt-Password",3).
+                                FS::$iMgr->addElementToList("MD5-Password",4).
+                                FS::$iMgr->addElementToList("SHA1-Password",5).
+                                FS::$iMgr->addElementToList("CHAP-Password",6).
+                                "</select></li><li>".FS::$iMgr->addList("ugroup","","Profil").FS::$iMgr->addElementToList("","none").
+				$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->addTextArea("csvlist","",580,330,"Liste des utilisateurs (format CSV)")."</li><li id=\"csvtooltip\">".
+				"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b></li><li>".
+				FS::$iMgr->addSubmit("","Importer")."</li></ul></form>";
 			}
 			else {
 				$output .= FS::$iMgr->printError("Cet onglet n'existe pas !");
@@ -339,8 +360,8 @@
                                         $('.ugroupli'+grpidx).remove();
                                 }
 				attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-				FS::$iMgr->addInput("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." ".
-				FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"Valeur")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
+				FS::$iMgr->addInput("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Valeur".
+				FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
 				FS::$iMgr->addElementToList("=","=").
 				FS::$iMgr->addElementToList("==","==").
 				FS::$iMgr->addElementToList(":=",":=").
@@ -370,7 +391,7 @@
 				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= FS::$iMgr->addHidden("uedit",1);
 				$formoutput .= "<h4>Modification de l'utilisateur '".$radentry."'</h4>";
-				$formoutput .= "<ul style=\"list-style-type:none;\"><li>".FS::$iMgr->addHidden("utype",$utype)."<b>Type d'utilisateur: </b>".
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addHidden("utype",$utype)."<b>Type d'utilisateur: </b>".
 				($utype == 1 ? "Normal" : "Adresse MAC");
 				$formoutput .= "</li><li>".
 				FS::$iMgr->addHidden("username",$radentry)."</li>";
@@ -411,7 +432,7 @@
 	                        	        FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
         	        	                FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
         		                        FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-	                	                "</select>".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40,"Valeur")." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+	                	                "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
         	                	        FS::$iMgr->addElementToList("check",1,true).
 	                                	FS::$iMgr->addElementToList("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
 						$attridx++;
@@ -434,7 +455,7 @@
                                         FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
                                         FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
                                         FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-                                        "</select>".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40,"Valeur")." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+                                        "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
                                         FS::$iMgr->addElementToList("check",1).
                                         FS::$iMgr->addElementToList("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
                                         $attridx++;
@@ -469,7 +490,7 @@
                                 FS::$iMgr->addElementToList("!~","!~").
                                 FS::$iMgr->addElementToList("=*","=*").
                                 FS::$iMgr->addElementToList("!*","!*").
-                                "</select> ".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"Valeur")." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
+                                "</select> Valeur".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40)." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
                                 FS::$iMgr->addElementToList("check",1).
                                 FS::$iMgr->addElementToList("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
                                 $('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
@@ -478,7 +499,7 @@
                                         $('.attrli'+attridx).remove();
                                 }</script>";
 				$formoutput .= "<h4>Modification du groupe '".$radentry."'</h4>";
-				$formoutput .= "<ul style=\"list-style-type:none;\">";
+				$formoutput .= "<ul class=\"ulform\">";
 				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
                                 $formoutput .= FS::$iMgr->addHidden("uedit",1).FS::$iMgr->addHidden("groupname",$radentry);
 				$attridx = 0;
@@ -499,7 +520,7 @@
                                          FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
                                          FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
                                          FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-                                         "</select>".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40,"Valeur")." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+                                         "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
                                          FS::$iMgr->addElementToList("check",1,true).
                                          FS::$iMgr->addElementToList("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
                                          $attridx++;
@@ -522,7 +543,7 @@
                                         FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
                                         FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
                                         FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-                                        "</select>".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40,"Valeur")." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+                                        "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
                                         FS::$iMgr->addElementToList("check",1).
                                         FS::$iMgr->addElementToList("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
                                         $attridx++;
@@ -612,7 +633,7 @@
 					if(!$userexist || $edit == 1) {
 						if($utype == 1) {
 							switch($upwdtype) {
-								case 1: $attr = "Cleartext-Password"; $value = $upwd; break;
+								case 1: $attr = "CleartextCleartext-Password"; $value = $upwd; break;
 								case 2: $attr = "User-Password"; $value = $upwd; break;
 								case 3: $attr = "Crypt-Password"; $value = crypt($upwd); break;
 								case 4: $attr = "MD5-Password"; $value = md5($upwd); break;
@@ -634,9 +655,9 @@
 						$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','".$attr."',':=','".$value."'");
 	                                        foreach($_POST as $key => $value) {
                         			        if(preg_match("#^ugroup#",$key)) {
-			                                        $groupfound = $radSQLMgr->Select("radgroupreply","distinct groupname","groupname = '".$value."'");
+			                                        $groupfound = $radSQLMgr->GetOneData("radgroupreply","groupname","groupname = '".$value."'");
 								if(!$groupfound)
-	                        			                $groupfound = $radSQLMgr->Select("radgroupcheck","distinct groupname","groupname = '".$value."'");
+	                        			                $groupfound = $radSQLMgr->GetOneData("radgroupcheck","groupname","groupname = '".$value."'");
 								if($groupfound) {
 									$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$username."' AND groupname = '".$value."'");
 									if(!$usergroup)
@@ -798,6 +819,117 @@
 					$radSQLMgr->Delete("radusergroup","groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radhuntgroup","groupname = '".$groupname."'");
 					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."");
+					return;
+
+				case 6:
+					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+					$utype = FS::$secMgr->checkAndSecurisePostData("usertype");
+					$pwdtype = FS::$secMgr->checkAndSecurisePostData("upwdtype");
+					$group = FS::$secMgr->checkAndSecurisePostData("ugroup");
+					$userlist = FS::$secMgr->checkAndSecurisePostData("csvlist");
+
+					if(!$raddb || !$radhost || !$radport) {
+                                                header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
+                                                return;
+                                        }
+                                        $radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radSQLMgr = new FSMySQLMgr();
+                                        $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                        $radSQLMgr->Connect();
+
+					if(!$utype || $utype != 1 && $utype != 2 || !$userlist) {
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+						return;
+					}
+
+					$groupfound = NULL;
+					if($group != "none") {
+						$groupfound = $radSQLMgr->GetOneData("radgroupreply","groupname","groupname = '".$group."'");
+                                                if(!$groupfound)
+                                         	       $groupfound = $radSQLMgr->GetOneData("radgroupcheck","groupname","groupname = '".$group."'");
+					}
+					if($utype == 1) {
+						$userlist = str_replace('\r','\n',$userlist);
+	                                        $userlist = str_replace('\n\n',"\n",$userlist);
+                	                        $userlist = preg_split("#\\n#",$userlist);
+						// Delete empty entries
+                                                $userlist = array_filter($userlist);
+						$fmtuserlist = array();
+						for($i=0;$i<count($userlist);$i++) {
+							$tmp = preg_split("#[,]#",$userlist[$i]);
+							if(count($tmp) != 2 || preg_match("#[ ]#",$tmp[0])) {
+								header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+								return;
+							}
+							$fmtuserlist[$tmp[0]] = $tmp[1];
+						}
+						$userfound = 0;
+						foreach($fmtuserlist as $user => $upwd) {
+							switch($pwdtype) {
+        	                                                case 1: $attr = "Cleartext-Password"; $value = $upwd; break;
+	                                                        case 2: $attr = "User-Password"; $value = $upwd; break;
+                                                        	case 3: $attr = "Crypt-Password"; $value = crypt($upwd); break;
+                                                	        case 4: $attr = "MD5-Password"; $value = md5($upwd); break;
+                                        	                case 5: $attr = "SHA1-Password"; $value = sha1($upwd); break;
+                                	                        case 6: $attr = "CHAP-Password"; $value = $upwd; break;
+                        	                                default:
+                	                                                header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+        	                                                        return;
+	                                                }
+                                                        if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$user."'"))
+                                                                $radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$user."','".$attr."',':=','".$value."'");
+                                                        if($groupfound) {
+                                                                $usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$user."' AND groupname = '".$group."'");
+                                                                if(!$usergroup)
+                                                                        $radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$user."','".$group."','1'");
+                                                        }
+                                                }
+						if($userfound) {
+                                                        header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
+							return;
+						}
+					}
+                                        else if($utype == 2) {
+						if(preg_match("#[,]#",$userlist)) {
+							header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+							return;
+						}
+						$userlist = str_replace('\r','\n',$userlist);
+                         	                $userlist = str_replace('\n\n',"\n",$userlist);
+                                	        $userlist = preg_split("#\\n#",$userlist);
+						// Delete empty entries
+						$userlist = array_filter($userlist);
+						// Match & format mac addr
+						for($i=0;$i<count($userlist);$i++) {
+							if(!FS::$secMgr->isMacAddr($userlist[$i]) && !preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) && !preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
+								header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+	                                                        return;
+							}
+							$userlist[$i] = preg_replace("#[:-]#","",$userlist[$i]);
+							$userlist[$i] = strtolower($userlist[$i]);
+						}
+						// Delete duplicate entries
+						$userlist = array_unique($userlist);
+						$userfound = 0;
+						for($i=0;$i<count($userlist);$i++) {
+							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$userlist[$i]."'"))
+								$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$userlist[$i]."','Auth-Type',':=','Accept'");
+							else $userfound = 1;
+                       	                                if($groupfound) {
+                                                 		$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$userlist[$i]."' AND groupname = '".$group."'");
+								if(!$usergroup)
+		                                                      	$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$userlist[$i]."','".$group."','1'");
+							}
+						}
+						if($userfound) {
+							header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
+							return;
+						}
+					}
+					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb);
 					return;
 			}
 		}

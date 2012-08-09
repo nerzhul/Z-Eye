@@ -1,24 +1,9 @@
 <?php
-	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	*
-	* This program is free software; you can redistribute it and/or modify
-	* it under the terms of the GNU General Public License as published by
-	* the Free Software Foundation; either version 2 of the License, or
-	* (at your option) any later version.
-	*
-	* This program is distributed in the hope that it will be useful,
-	* but WITHOUT ANY WARRANTY; without even the implied warranty of
-	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	* GNU General Public License for more details.
-	*
-	* You should have received a copy of the GNU General Public License
-	* along with this program; if not, write to the Free Software
-	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-	*/
+	/** This code is Property of Frost Sapphire Studios, all rights reserved.
+	*	All modification is stricty forbidden without Frost Sapphire Studios Agreement
+	**/
 
 	require_once(dirname(__FILE__)."/FS.main.php");
-	require_once(dirname(__FILE__)."/../ckeditor/ckeditor.php");
 	require_once(dirname(__FILE__)."/MySQLMgr".CLASS_EXT);
 	require_once(dirname(__FILE__)."/HTTPLink".CLASS_EXT);
 	require_once(dirname(__FILE__)."/modules/SVNRevision".CLASS_EXT);
@@ -76,11 +61,6 @@
 				for($i=0;$i<count($this->arr_js);$i++)
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
 				
-				$output .= "<script type=\"text/javascript\" src=\"lib/ckeditor/ckeditor.js\"></script>
-				<script type=\"text/javascript\" src=\"lib/ckeditor/config.js?t=ABLC4TW\"></script>
-				<script type=\"text/javascript\" src=\"lib/ckeditor/lang/fr.js?t=ABLC4TW\"></script>
-				<script type=\"text/javascript\" src=\"lib/ckeditor/plugins/styles/styles/default.js?t=ABLC4TW\"></script>";
-				
 				$output .= "</head>
 				<body class=\"body\">";
 			return $output;
@@ -130,18 +110,23 @@
 			return "<a class=\"monoComponentt_a\" href=\"".FS::$iMgr->getJSONLink($jsonstr)."\">".$text."</a>";
 		}
 		
-		public function addTextEditor($fieldname, $value = "") {
-			$CKEditor = new CKEditor();
-			$CKEditor->returnOutput = true;
- 			return $CKEditor->editor($fieldname, $value);
-		}
-
 		public function addLabel($for,$value,$class = "") {
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
+
+		public function addTextArea($name, $def_value = "", $width=400, $height=300, $label=NULL) {
+			$output = "";
+                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<textarea name=\"".$name."\" style=\"width:".$width."px;height:".$height."px\">".$def_value."</textarea>";
+
+			return $output;
+		}
 		
-		public function addInput($name, $def_value = "", $size = 20, $length = 40) {
-			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" />";
+		public function addInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+			$output = "";
+			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" />";
+			return $output;
 		}
 		
 		public function addNumericInput($name, $def_value = "", $size = 20, $length = 40) {
@@ -152,6 +137,13 @@
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
 		}
 		
+		public function addMacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+			$output = "";
+                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMAC('".$name."');\" />";
+			return $output;
+		}
+
 		public function addIPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask('".$name."');\" />";
 		}
@@ -160,8 +152,11 @@
 			return "<input type=\"hidden\" id=\"".$name."\" name=\"".$name."\" value=\"".$value."\" />";	
 		}
 		
-		public function addPasswdField($name, $def_value = "") {
-			return "<input type=\"password\" name=\"".$name."\" value=\"".$def_value."\" />";
+		public function addPasswdField($name, $def_value = "", $label=NULL) {
+			$output = "";
+                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<input type=\"password\" name=\"".$name."\" value=\"".$def_value."\" />";
+			return $output;
 		}
 		
 		public function addSubmit($name, $value) {
@@ -171,7 +166,11 @@
 		public function addJSSubmit($name, $value, $function) {
 			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$function."\" />";	
 		}
-		
+
+		public function addButton($name, $value, $js) {
+                        return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
+                }
+
 		public function addRadio($name, $value, $checked = false) {
 			$output = "<input id=\"".$name."\" type=\"radio\" value=\"".$value."\" name=\"".$name."\"";
 			if($checked) $output .= " checked=\"checked\"";
@@ -247,9 +246,23 @@
 			$output .= "</center></td></tr>";
 			return $output;
 		}
+
+		public function addProgress($name,$value,$max=100,$label=NULL) {
+			$output = "";
+			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<progress id=\"".$name."\" value=\"".$value."\" max=\"".$max."\"></progress><span id=\"".$name."val\"></span>";
+                        $output .= "<script type=\"text/javascript\">
+                        eltBar = document.getElementById(\"".$name."\");
+                        eltPct = document.getElementById(\"".$name."val\");
+                        eltPct.innerHTML = ' ' + Math.round(eltBar.position * 100) + \"%\";
+                        </script>";
+			return $output;
+		}
 		
-		public function addList($name,$js = "") {
-			$output = "<select name=\"".$name."\" id=\"".$name."\"";
+		public function addList($name,$js = "",$label=NULL) {
+			$output = "";
+			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<select name=\"".$name."\" id=\"".$name."\"";
 			if(strlen($js) > 0)
 				$output .= " onchange=\"javascript:".$js.";\" ";
 			
@@ -265,8 +278,10 @@
 			return $output;
 		}
 		
-		public function addCheck($name,$checked = false) {
-			$output = "<input type=\"checkbox\" name=\"".$name."\" ";
+		public function addCheck($name,$checked = false,$label="") {
+			$output = "";
+			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<input type=\"checkbox\" name=\"".$name."\" ";
 			if($checked)
 				$output .= "checked ";
 			$output .= " />";
@@ -313,6 +328,20 @@
 			return "<canvas id=\"".$name."\" height=\"".$height."\" width=\"".$width."\">[Votre Navigateur ne supporte pas le HTML5]</canvas>";
 		}
 		
+		public function addOpenableDiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
+			if($divname == NULL) $divname = uniqid();
+			if($liname == NULL) $liname = uniqid();
+			if($aname == NULL) $aname = uniqid();
+			$output = "<script type=\"text/javascript\">
+                                $(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
+                                $(\"#".$aname."2\").click(function(){ $(\"div#".$divname."\").slideUp(\"slow\");});
+                                $(\"#".$liname."\").click(function(){ $(\"#".$liname." a\").toggle();});
+                                </script>";
+                        $output .= "<ul style=\"list-style-type:none;padding:0;\"><li id=\"".$liname."\"><a id=\"".$aname."\" href=\"#\">".$text1."</a>
+                       		<a id=\"".$aname."2\" style=\"display:none;\" href=\"#\">".$text2."</a></li></ul>";
+                        $output .= "<div id=\"".$divname."\" style=\"display:none;\">".$content."</div>";
+			return $output;
+		}
 		// Simple methods
 		public function addStylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;
