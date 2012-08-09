@@ -48,3 +48,4 @@ Alpha 0.20
 - Some new functions on FSS lib
 - Radius module is now ready (only for MySQL for now)
 - Purge ckeditor from Z-Eye core
+- Purge twitter from Z-Eye core
