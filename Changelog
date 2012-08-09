@@ -49,3 +49,8 @@ Alpha 0.20
 - Radius module is now ready (only for MySQL for now)
 - Purge ckeditor from Z-Eye core
 - Purge twitter from Z-Eye core
+
+Alpha 0.21
+- Implement default module, which provides a speed reporting screen
+- Bug fix on mod switch
+- Implement basic log module, for Z-Eye logs

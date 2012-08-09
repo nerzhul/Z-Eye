@@ -76,10 +76,10 @@
 				$output .= FS::$iMgr->addSubmit("disconnect","Confirmer");
 				$output .= "</form>";
 			}
-			
+
 			$output .= "</div></div></div></div></div>";
-		
-			return $output;	
+
+			return $output;
 		}
 
 		protected function showSearchForm() {
@@ -141,13 +141,15 @@
 			$output = "";
 			$module = FS::$secMgr->checkGetData("mod");
 			if(!$module) $module = 0;
-			
+
 			if($module && !FS::$secMgr->isNumeric($module))
 				$output .= $this->printError("Module inconnu !");
 			else {
 				FS::$secMgr->SecuriseStringForDB($module);
 				if($module)
 					$output .= $this->loadModule($module);
+				else
+					$output .= $this->loadModule($this->getModuleIdByPath("default"));
 			}
 			return $output;
 		}

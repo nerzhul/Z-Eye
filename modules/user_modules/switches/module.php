@@ -334,6 +334,7 @@
 						$tmpoutput .= "</td></tr>";
 						if($found == 1) $output .= $tmpoutput;
 						$output .= "<tr><td>Adresse IP</td><td>".$data["ip"]."</td></tr>";
+						$iswif = (preg_match("#AIR#",$data["model"]) ? true : false);
 						if($iswif == false) {
 							$output .= "<tr><td>Adresse MAC</td><td>".$data["mac"]."</td></tr>";
 							$output .= "<tr><td>Domaine VTP</td><td>".$data["vtp_domain"]."</td></tr>";
@@ -920,10 +921,10 @@
 						$vlancount++;
 					}
 					if($iswif == false) {
-											$tmpoutput2 .= "<a>";
-											$tmpoutput2 .= $nvlan;
-											$tmpoutput2 .= "</a></td><td>";
-									}
+						$tmpoutput2 .= "<a>";
+						$tmpoutput2 .= $nvlan;
+						$tmpoutput2 .= "</a></td><td>";
+					}
 					else
 						$tmpoutput2 .= $nvlan."</td><td>";
 	
