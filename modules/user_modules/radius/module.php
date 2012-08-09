@@ -712,7 +712,7 @@
 					$groupname = FS::$secMgr->checkAndSecurisePostData("groupname");
 
 					if(!$groupname) {
-						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
                                                 return;
                                         }
 
@@ -731,12 +731,12 @@
 
 					$groupexist = $radSQLMgr->GetOneData("radgroupcheck","id","groupname='".$groupname."'");
 					if($groupexist && $edit != 1) {
-						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
+						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
 						return;
 					}
 					$groupexist = $radSQLMgr->GetOneData("radgroupreply","id","groupname='".$groupname."'");
 					if($groupexist && $edit != 1) {
-						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
+						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
 						return;
 					}
 					$attrTab = array();
@@ -773,7 +773,7 @@
 						}
 					}
 
-					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."");
+					header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."");
 					break;
 				case 4:
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
@@ -806,7 +806,7 @@
 					$groupname = FS::$secMgr->checkAndSecurisePostData("group");
 
 					if(!$raddb || !$radhost || !$radport || !$groupname) {
-						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=4");
+						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=4");
 						return;
 					}
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
@@ -818,7 +818,7 @@
 					$radSQLMgr->Delete("radgroupreply","groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radusergroup","groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radhuntgroup","groupname = '".$groupname."'");
-					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."");
+					header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."");
 					return;
 
 				case 6:
@@ -831,7 +831,7 @@
 					$userlist = FS::$secMgr->checkAndSecurisePostData("csvlist");
 
 					if(!$raddb || !$radhost || !$radport) {
-                                                header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
+                                                header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
                                                 return;
                                         }
                                         $radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
@@ -841,7 +841,7 @@
                                         $radSQLMgr->Connect();
 
 					if(!$utype || $utype != 1 && $utype != 2 || !$userlist) {
-						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 						return;
 					}
 
@@ -861,7 +861,7 @@
 						for($i=0;$i<count($userlist);$i++) {
 							$tmp = preg_split("#[,]#",$userlist[$i]);
 							if(count($tmp) != 2 || preg_match("#[ ]#",$tmp[0])) {
-								header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+								header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 								return;
 							}
 							$fmtuserlist[$tmp[0]] = $tmp[1];
@@ -876,7 +876,7 @@
                                         	                case 5: $attr = "SHA1-Password"; $value = sha1($upwd); break;
                                 	                        case 6: $attr = "CHAP-Password"; $value = $upwd; break;
                         	                                default:
-                	                                                header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+                	                                                header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
         	                                                        return;
 	                                                }
                                                         if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$user."'"))
@@ -888,13 +888,13 @@
                                                         }
                                                 }
 						if($userfound) {
-                                                        header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
+                                                        header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
 							return;
 						}
 					}
                                         else if($utype == 2) {
 						if(preg_match("#[,]#",$userlist)) {
-							header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 							return;
 						}
 						$userlist = str_replace('\r','\n',$userlist);
@@ -905,7 +905,7 @@
 						// Match & format mac addr
 						for($i=0;$i<count($userlist);$i++) {
 							if(!FS::$secMgr->isMacAddr($userlist[$i]) && !preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) && !preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
-								header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+								header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 	                                                        return;
 							}
 							$userlist[$i] = preg_replace("#[:-]#","",$userlist[$i]);
@@ -925,11 +925,11 @@
 							}
 						}
 						if($userfound) {
-							header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
+							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
 							return;
 						}
 					}
-					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb);
+					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb);
 					return;
 			}
 		}
