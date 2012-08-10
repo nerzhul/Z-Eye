@@ -840,9 +840,9 @@
 				$tmpoutput .= "<th>Vitesse</th>";
 				if($iswif == false)
 					$tmpoutput .= "<th>POE</th>";
-				$tmpoutput .= "<th><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=vlan\">Vlan natif</a></th><th>";
+				$tmpoutput .= "<th>";
 				if($iswif == true) $tmpoutput .= "Canal</th><th>Puissance</th><th>SSID";
-				else $tmpoutput .= "Vlan Trunk</th><th>Equipements connectés</th></tr>";
+				else $tmpoutput .= "Vlans</th><th>Equipements connectés</th></tr>";
 				$query = FS::$pgdbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",$od);
 				while($data = pg_fetch_array($query)) {
 					if(preg_match("#unrouted#",$data["port"]))
@@ -905,7 +905,7 @@
 						$tmpoutput2 .= "</td><td>";
 					}
 	
-					$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native","ip = '".$dip."' AND port = '".$data["port"]."'","vlan");
+					$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native,voice","ip = '".$dip."' AND port = '".$data["port"]."'","vlan");
 	
 					$nvlan = $data["vlan"];
 					$vlanlist = "";
@@ -917,16 +917,12 @@
 							$vlancount = 0;
 							$vlanlist .= "<br />";
 						}
-						$vlanlist .= "<a href=\"index.php?mod=".$this->mid."&vlan=".$data2["vlan"]."\">".$data2["vlan"]."</a>,";
+						$vlanlist .= "<a href=\"index.php?mod=".$this->mid."&vlan=".$data2["vlan"]."\">".$data2["vlan"]."</a>";
+						if($data2["native"] == "t") $vlanlist .= "<span style=\"font-size:10px\">(n)</span>";
+						if($data2["voice"] == "t") $vlanlist .= "<span style=\"font-size:10px\">(v)</span>";
+						$vlanlist .= ",";
 						$vlancount++;
 					}
-					if($iswif == false) {
-						$tmpoutput2 .= "<a>";
-						$tmpoutput2 .= $nvlan;
-						$tmpoutput2 .= "</a></td><td>";
-					}
-					else
-						$tmpoutput2 .= $nvlan."</td><td>";
 	
 					if($iswif == false) {
 						$tmpoutput2 .= substr($vlanlist,0,strlen($vlanlist)-1);

@@ -37,7 +37,7 @@ defaultSNMPRO = "public"
 
 pgsqlHost = '127.0.0.1'
 pgsqlUser = 'netdisco'
-pgsqlPwd = 'netdisco'
+pgsqlPwd = 'dbpassword'
 pgsqlDb = 'netdisco'
 
 max_threads = 30
@@ -54,12 +54,13 @@ def fetchSNMPInfos(ip,devname,devcom):
 		tc_mutex.acquire()
 		threadCounter += 1
 		tc_mutex.release()
-		cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null" % (devcom,ip)
+		cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
 		pipe = os.popen('{ ' + cmd + '; }', 'r')
 		text = pipe.read()
 		pipe.close()
 		pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
 		pgcursor = pgsqlCon.cursor()
+		stopSwIDSearch = 0
 		pgcursor.execute("DELETE FROM z_eye_port_id_cache WHERE device = '%s'" % devname)
 		for line in string.split(text, "\n"):
 			pdata = string.split(line, " ")
@@ -70,17 +71,23 @@ def fetchSNMPInfos(ip,devname,devcom):
 					pid = pdata2[1]
 					swid = 0
 					swpid = 0
-					cmd = "snmpwalk -v 2c -c %s %s 1.3.6.1.4.1.9.5.1.4.1.1.11 | grep %s" % (devcom,ip,pid)
-					pipe2 = os.popen('{ ' + cmd + '; }', 'r')
-					text2 = pipe2.read()
-					pipe2.close()
-					piddata = string.split(text2, " ")
-					if len(piddata) == 4:
-						piddata = string.split(piddata[0], ".")
-						if len(piddata) > 1:
-							swid = piddata[len(piddata)-2]
-							swpid = piddata[len(piddata)-1]
-						pgcursor.execute("INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid))
+					if stopSwIDSearch == 0:
+						cmd = "snmpwalk -v 2c -c %s %s 1.3.6.1.4.1.9.5.1.4.1.1.11 | grep %s" % (devcom,ip,pid)
+						pipe2 = os.popen('{ ' + cmd + '; }', 'r')
+						text2 = pipe2.read()
+						pipe2.close()
+						piddata = string.split(text2, " ")
+						if len(piddata) == 4:
+							piddata = string.split(piddata[0], ".")
+							if len(piddata) > 1:
+								swid = piddata[len(piddata)-2]
+								swpid = piddata[len(piddata)-1]
+						elif len(piddata) >= 3 and piddata[2] == "No":
+							stopSwIDSearch = 1
+					""" must be there for no switch/switchport id """
+					if devname == "sr2pile1.res.iogs":
+						print "INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid)
+					pgcursor.execute("INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid))
 		tc_mutex.acquire()
 		threadCounter = threadCounter - 1
 		tc_mutex.release()

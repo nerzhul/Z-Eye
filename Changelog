@@ -54,3 +54,9 @@ Alpha 0.21
 - Implement default module, which provides a speed reporting screen
 - Bug fix on mod switch
 - Implement basic log module, for Z-Eye logs
+- Bugfix on switch module
+- Voice VLAN is now get by netdisco cache
+- Remove native vlan column for switches
+- Added Voice vlan to Vlan column for switches
+- Bugfix on radius module
+- Bugfix on default module
