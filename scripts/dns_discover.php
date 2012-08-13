@@ -26,16 +26,17 @@
 	$DNSconnerr = false;
 	$conn = NULL;
 
-	function bufferizeDNSFiles($conn,$file) {
+	function bufferizeDNSFiles($conn,$file,$chrootpath,$chroot=1) {
 		$tmpbuf = "";
-		$stream = ssh2_exec($conn,"cat ".$file);
+		$stream = ssh2_exec($conn,"cat ".($chroot ? $chrootpath."/" : "").$file);
 		stream_set_blocking($stream, true);
 		while ($buf = fread($stream, 4096)) {
 			$inc_path = array();
 			preg_match_all("#include \"(.*)\"#",$buf,$inc_path);
 			if(count($inc_path[1]) > 0) {
-				for($i=0;$i<count($inc_path[1]);$i++)
-					$tmpbuf .= bufferizeDNSFiles($conn,$inc_path[1][$i]);
+				for($i=0;$i<count($inc_path[1]);$i++) {
+					$tmpbuf .= bufferizeDNSFiles($conn,$inc_path[1][$i],$chrootpath);
+				}
 			}
 			else
 				$tmpbuf .= $buf;
@@ -48,7 +49,7 @@
 	FS::$pgdbMgr->Delete("z_eye_dns_zone_cache");
 	FS::$pgdbMgr->Delete("z_eye_dns_zone_record_cache");
 	
-	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd","dns = 1");
+	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd,namedpath,chrootnamed","dns = 1");
 	while($data = pg_fetch_array($query)) {
 		$conn = ssh2_connect($data["addr"],22);
 		if(!$conn) {
@@ -61,11 +62,11 @@
 				$DNSconnerr = true;
 			}
 			else {
-				$dns_stream_datas = bufferizeDNSFiles($conn,"/etc/bind/named.conf");
+				$dns_stream_datas = bufferizeDNSFiles($conn,$data["namedpath"],$data["chrootnamed"],0);
 				if($DNSfound == false) $DNSfound = true;
 				else $DNSServers .= ", ";
 				$DNSServers .= $data["addr"];
-				
+
 				$zones = preg_split("/zone /",$dns_stream_datas);
 				for($i=0;$i<count($zones);$i++) {
 					$zone = preg_split("#\n#",$zones[$i]);
@@ -94,9 +95,9 @@
 					if(strlen($zonename) > 0 && $zonetype > 0 && strlen($zonefile) > 0) {
 						if($zonename[strlen($zonename)-1] == ".")
 							$zonename = substr($zonename,0,strlen($zonename)-1);
-							
-						FS::$pgdbMgr->Insert("z_eye_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
-						$zonebuffer = bufferizeDNSFiles($conn,$zonefile);
+						if(!FS::$pgdbMgr->GetOneData("z_eye_dns_zone_cache","zonename","zonename = '".$zonename."'"))
+							FS::$pgdbMgr->Insert("z_eye_dns_zone_cache","zonename, zonetype","'".$zonename."','".$zonetype."'");
+						$zonebuffer = bufferizeDNSFiles($conn,$zonefile,$data["chrootnamed"]);
 						$zonebuffer = preg_replace("#[\t]#"," ",trim($zonebuffer));
 						$zonebuffer = preg_replace("#[ ]{2,}#"," ",trim($zonebuffer));
 							

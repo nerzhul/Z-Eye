@@ -60,3 +60,9 @@ Alpha 0.21
 - Added Voice vlan to Vlan column for switches
 - Bugfix on radius module
 - Bugfix on default module
+- Optimisations on port id caching
+
+Alpha 0.22
+- Added radius import from DHCP cache
+- Migrate snort from Mysql to Pgsql
+- Added cleanup script

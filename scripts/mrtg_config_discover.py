@@ -60,7 +60,7 @@ defaultSNMPRO = 'IOTA'
 
 pgsqlHost = '127.0.0.1'
 pgsqlUser = 'netdisco'
-pgsqlPwd = 'netdisco'
+pgsqlPwd = 'dbpassword'
 pgsqlDb = 'netdisco'
 
 now = datetime.datetime.now()

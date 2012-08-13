@@ -52,8 +52,9 @@
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."\">Utilisateurs</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=2\">Profils</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=3\">Import de masse</a>";
+				$output .= "<li".($sh == 2 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=2\">Profils</a>";
+				$output .= "<li".($sh == 3 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=3\">Import de masse</a>";
+				$output .= "<li".($sh == 4 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=4\">Import Auto DHCP</a>";
 	
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
@@ -324,6 +325,87 @@
 				$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->addTextArea("csvlist","",580,330,"Liste des utilisateurs (format CSV)")."</li><li id=\"csvtooltip\">".
 				"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b></li><li>".
 				FS::$iMgr->addSubmit("","Importer")."</li></ul></form>";
+			}
+			else if($sh == 4) {
+				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radSQLMgr = new FSMySQLMgr();
+                                $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                $radSQLMgr->Connect();
+
+				$output = "";
+
+				$found = 0;
+				$formoutput .= "<h4>Nouvel Import Automatique</h4>";
+				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addList("subnet","","Subnet DHCP");
+                                $query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask");
+                                while($data = pg_fetch_array($query)) {
+					if(!$found) $found = 1;
+                                        $formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"]);
+                                }
+                                if($found) {
+					$found = 0;
+					$formoutput .= "</select></li><li>".FS::$iMgr->addList("radgroup","","Profil Radius");
+
+					$groups=array();
+        	                        $query = $radSQLMgr->Select("radgroupreply","distinct groupname");
+                	                while($data = mysql_fetch_array($query)) {
+                                	        if(!isset($groups[$data["groupname"]]))
+                                        	        $groups[$data["groupname"]] = 1;
+	                                }
+
+        	                        $query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
+                	                while($data = mysql_fetch_array($query)) {
+                                	        if(!isset($groups[$data["groupname"]]))
+                                        	        $groups[$data["groupname"]] = 1;
+                	                }
+                        	        if(count($groups) > 0) {
+						$found = 1;
+                                        	foreach($groups as $key => $value)
+							$formoutput .= FS::$iMgr->addElementToList($key,$key);
+                	                }
+					$formoutput .= "</select></li><li>".FS::$iMgr->addSubmit("reg","Ajouter")."</li></ul></form>";
+				}
+				if($found) {
+					$output .= $formoutput;
+					$found = 0;
+					$tmpoutput = "";
+					$tmpoutput .= "<script type=\"text/javascript\">
+		                                $.event.props.push('dataTransfer');
+                		                $('#radsubnet #dragtd').on({
+                                		        mouseover: function(e) { $('#trash').show(); },
+		                                        mouseleave: function(e) { $('#trash').hide(); },
+                		                        dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+                                		        dragenter: function(e) { e.preventDefault();},
+	        	                                dragover: function(e) { e.preventDefault(); },
+        	        	                        dragleave: function(e) { },
+                                	        drop: function(e) {},
+                                        	dragend: function() { $('#trash').hide(); $('#editf').hide();}
+		                                });
+                		                $('#trash').on({
+                                		        dragover: function(e) { e.preventDefault(); },
+		                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l'importation du subnet \''+e.dataTransfer.getData('text/html')+'\' ?".
+                		                                FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8").
+                                		                FS::$iMgr->addHidden("subnet","'+e.dataTransfer.getData('text/html')+'").
+                		                                FS::$iMgr->addSubmit("","Supprimer").
+                                		                FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                                		$('#pop').show();
+		                                        }
+                		                });
+					</script>";
+					$query = FS::$pgdbMgr->Select("z_eye_radius_dhcp_import","dhcpsubnet,groupname","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+					while($data = pg_fetch_array($query)) {
+						if($found == 0) {
+							$found = 1;
+							$tmpoutput .= "<h4>Imports automatiques existants</h4><table id=\"radsubnet\"><tr><th>Zone DHCP</th><th>Profil Radius</th></tr>";
+						}
+						$tmpoutput .= "<tr><td draggable=\"true\" id=\"dragtd\">".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td></tr>";
+					}
+					if($found) $output .= $tmpoutput."</table>";
+				}
+				else
+					$output .= FS::$iMgr->printError("Aucun subnet DHCP ou Profil Radius disponible pour la synchronisation");
 			}
 			else {
 				$output .= FS::$iMgr->printError("Cet onglet n'existe pas !");
@@ -818,6 +900,7 @@
 					$radSQLMgr->Delete("radgroupreply","groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radusergroup","groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radhuntgroup","groupname = '".$groupname."'");
+					FS::$pgdbMgr->Delete("z_eye_radius_dhcp_import","groupname = '".$groupname."'");
 					header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."");
 					return;
 
@@ -929,7 +1012,67 @@
 							return;
 						}
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb);
+					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=3");
+					return;
+				case 7:
+					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+					$radgroup = FS::$secMgr->checkAndSecurisePostData("radgroup");
+					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+
+                                        if(!$raddb || !$radhost || !$radport) {
+                                                header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
+                                                return;
+                                        }
+
+					if(!$radgroup || !$subnet || !FS::$secMgr->isIP($subnet)) {
+                                                header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=2");
+                                                return;
+                                        }
+
+                                        $radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radSQLMgr = new FSMySQLMgr();
+                                        $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                        $radSQLMgr->Connect();
+
+					$groupexist = $radSQLMgr->GetOneData("radgroupcheck","id","groupname='".$radgroup."'");
+                                        if(!$groupexist)
+	                                        $groupexist = $radSQLMgr->GetOneData("radgroupreply","id","groupname='".$radgroup."'");
+
+                                        if(!$groupexist) {
+                                                header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
+                                                return;
+                                        }
+
+					$subnetexist = FS::$pgdbMgr->GetOneData("z_eye_dhcp_subnet_cache","netmask","netid = '".$subnet."'");
+					if(!$subnetexist) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
+                                                return;
+					}
+					if(!FS::$pgdbMgr->GetOneData("z_eye_radius_dhcp_import","dhcpsubnet","addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."' AND dhcpsubnet = '".$subnet."'"))
+						FS::$pgdbMgr->Insert("z_eye_radius_dhcp_import","addr,port,dbname,dhcpsubnet,groupname","'".$radhost."','".$radport."','".$raddb."','".$subnet."','".$radgroup."'");
+					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4");
+					return;
+				case 8:
+					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+                                        $subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+
+					if(!$raddb || !$radhost || !$radport) {
+                                                header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
+                                                return;
+                                        }
+
+					if(!$subnet) {
+                                                header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=2");
+                                                return;
+                                        }
+
+					FS::$pgdbMgr->Delete("z_eye_radius_dhcp_import","addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."' AND dhcpsubnet = '".$subnet."'");
+					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4");
 					return;
 			}
 		}

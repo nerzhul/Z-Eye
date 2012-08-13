@@ -109,9 +109,9 @@
 			mysql_query($sql);
 		}
 		
-		public function setConfig($dbn,$dbp,$dbh,$dbu,$dbp) {
+		public function setConfig($dbn,$dbport,$dbh,$dbu,$dbp) {
 			$this->dbName = $dbn;
-			$this->dbPort = $dbp;
+			$this->dbPort = $dbport;
 			$this->dbHost = $dbh;
 			$this->dbUser = $dbu;
 			$this->dbPass = $dbp;

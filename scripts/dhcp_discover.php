@@ -37,7 +37,10 @@
 	}
 	
 	FS::LoadFSModules();
-	
+
+	echo "[".Config::getWebsiteName()."][DHCP-Sync] started at ".date('d-m-Y G:i:s')."\n";
+        $start_time = microtime(true);
+
 	$dhcpdatas = "";
 	$dhcpdatas2 = "";
 	$DHCPservers = "";
@@ -287,6 +290,24 @@
 								else $iend = "";
 
 								FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid","'".$class_a.".".$class_b.".".$class_c.".".$ipKey."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$cc_keys["net"]."'");
+								if($rstate == 3) {
+									$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
+									$query = FS::$pgdbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$cc_keys["net"]."'");
+									if($data = pg_fetch_array($query)) {
+										$radhost = $data["addr"];
+										$radport = $data["port"];
+										$raddb = $data["dbname"];
+										$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+					                                        $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        					$radSQLMgr = new FSMySQLMgr();
+					                                        $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+					                                        $radSQLMgr->Connect();
+										if(!$radSQLMgr->GetOneData("radusergroup","username","username = '".$macaddr."' AND groupname = '".$data["groupname"]."'"))
+											$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$macaddr."','".$data["groupname"]."','0'");
+										if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$macaddr."' AND attribute = 'Auth-Type' AND op = ':=' AND value = 'Accept'"))
+											$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$macaddr."','Auth-Type',':=','Accept'");
+									}
+								}
 							}
 						}
 					}
@@ -296,7 +317,9 @@
 	}
 	else
 		echo "Aucun réseau IP n'a été trouvé dans le(s) serveur(s) DHCP !\n";
-		
-	echo "[".Config::getWebsiteName()."] DHCP Discover done at ".date('d-m-Y G:i:s')."\n";
+
+	$end_time = microtime(true);
+        $script_time = $end_time - $start_time;
+        echo "[".Config::getWebsiteName()."][DHCP-Sync] done at ".date('d-m-Y G:i:s')." (Execution time: ".$script_time."s)\n";
 
 ?>

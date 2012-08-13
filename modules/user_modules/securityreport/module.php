@@ -22,13 +22,16 @@
 	class iSecReport extends genModule{
 		function iSecReport() { parent::genModule(); }
 		public function Load() {
+			$this->snortDB = new FSPostgreSQLMgr();
+			$this->snortDB->setConfig("snort",5432,"localhost","snortuser","snort159");
+			$this->snortDB->Connect();
 			$output = "";
 			if(!FS::isAjaxCall())
 				$output .= "<h3>Rapports de Sécurité</h3>";
 			$output .= $this->loadAttackGraph();
 			return $output;
 		}
-		
+
 		private function loadAttackGraph() {
 			$output = "";
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
@@ -71,11 +74,10 @@
 			else {
 				if(!$showmodule || $showmodule == 1) {
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
-					mysql_select_db("snort");
-					$totalips = FS::$dbMgr->Count("collected_ips","ip");
-					$totalscan = FS::$dbMgr->Sum("collected_ips","scans");
-					$totaltse = FS::$dbMgr->Sum("collected_ips","tse");
-					$totalssh = FS::$dbMgr->Sum("collected_ips","ssh");
+					$totalips = $this->snortDB->Count("collected_ips","ip");
+					$totalscan = $this->snortDB->Sum("collected_ips","scans");
+					$totaltse = $this->snortDB->Sum("collected_ips","tse");
+					$totalssh = $this->snortDB->Sum("collected_ips","ssh");
 					$totalatk = $totalscan + $totaltse + $totalssh;
 					
 					$output .= "Total des attaques: ".$totalatk."<br />";
@@ -103,12 +105,13 @@
 					$fields .= ",tse";
 					$fields .= ",ssh";
 					
-					$sql = "select atkdate".$fields." from attack_stats where atkdate > (SELECT DATE_SUB('".$sql_date."', INTERVAL ".($ec+15)." DAY))";
-					$query = mysql_query($sql);
+					$sqlcalc = "(SELECT '".$sql_date."'::timestamp - '".($ec+15)." day'::interval)";
+					$sql = "select atkdate".$fields." from attack_stats where atkdate > ".$sqlcalc." ORDER BY atkdate";
+					$query = pg_query($sql);
 					$labels = $scans = $tse = $ssh = "[";
 					$cursor = 0;
 					$temp1 = $temp2 = $temp3 = $temp4 = 0;
-					while($data = mysql_fetch_array($query)) {
+					while($data = pg_fetch_array($query)) {
 							if($cursor != $ech || $ech == 1) {
 									$cursor++;
 									$temp1 = substr($data["atkdate"],8,2)."/".substr($data["atkdate"],5,2);
@@ -147,10 +150,8 @@
 						</script>";
 					$output .= "</body></html>";
 					$output .= "</body></html>";
-					mysql_select_db("fssmanager");
 				}
 				else if($showmodule == 2) {
-					mysql_select_db("snort");
 					$found = 0;
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
@@ -160,8 +161,8 @@
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Scans</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					
-					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,scans","","scans",1,$topmax);
-					while($data = mysql_fetch_array($query)) {
+					$query = $this->snortDB->Select("collected_ips","ip,last_date,scans","","scans",1,$topmax);
+					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["scans"]."</td></tr>";
 					}
@@ -170,8 +171,8 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = FS::$dbMgr->Select("attack_stats","atkdate,scans","","scans",1,$topmax);
-					while($data = mysql_fetch_array($query)) {
+					$query = $this->snortDB->Select("attack_stats","atkdate,scans","","scans",1,$topmax);
+					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["scans"]."</td></tr>";
@@ -180,7 +181,6 @@
 						$output .= $tmpoutput."</table>";
 				}
 				else if($showmodule == 3) {
-					mysql_select_db("snort");
 					$found = 0;
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
@@ -190,8 +190,8 @@
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Attaques TSE</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					
-					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,tse","","tse",1,$topmax);
-					while($data = mysql_fetch_array($query)) {
+					$query = $this->snortDB->Select("collected_ips","ip,last_date,tse","","tse",1,$topmax);
+					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["tse"]."</td></tr>";
 					}
@@ -200,8 +200,8 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = FS::$dbMgr->Select("attack_stats","atkdate,tse","","tse",1,$topmax);
-					while($data = mysql_fetch_array($query)) {
+					$query = $this->snortDB->Select("attack_stats","atkdate,tse","","tse",1,$topmax);
+					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["tse"]."</td></tr>";
@@ -210,7 +210,6 @@
 						$output .= $tmpoutput."</table>";
 				}
 				else if($showmodule == 4) {
-					mysql_select_db("snort");
 					$found = 0;
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
@@ -220,8 +219,8 @@
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Attaques SSH</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					
-					$query = FS::$dbMgr->Select("collected_ips","ip,last_date,ssh","","ssh",1,$topmax);
-					while($data = mysql_fetch_array($query)) {
+					$query = $this->snortDB->Select("collected_ips","ip,last_date,ssh","","ssh",1,$topmax);
+					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["ssh"]."</td></tr>";
 					}
@@ -230,8 +229,8 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = FS::$dbMgr->Select("attack_stats","atkdate,ssh","","ssh",1,$topmax);
-					while($data = mysql_fetch_array($query)) {
+					$query = $this->snortDB->Select("attack_stats","atkdate,ssh","","ssh",1,$topmax);
+					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["ssh"]."</td></tr>";
@@ -257,5 +256,7 @@
 				default: break;
 			}
 		}
+
+		private $snortDB;
 	};
 ?>

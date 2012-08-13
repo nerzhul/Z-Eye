@@ -57,29 +57,40 @@
 		}
 		
 		public function GetMax($table,$field,$cond = "") {
-			$max = $this->GetOneData($table,"MAX(".$field.")",$cond);
-			if($max == NULL)
-				return 1;
-			return $max;
+			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
+                        if($data = pg_fetch_array($query)) {
+                                $splstr = preg_split("#[\.]#",$field);
+                                $splstr = preg_replace("#`#","",$splstr);
+                                return $data["mx"];
+                        }
+			return -1;
 		}
+
+		public function Sum($table,$field,$cond = "") {
+                        $query = $this->Select($table,"SUM(".$field.") as mx",$cond);
+                        if($data = pg_fetch_array($query)) {
+                                $splstr = preg_split("#[\.]#",$field);
+                                $splstr = preg_replace("#`#","",$splstr);
+                                return $data["mx"];
+                        }
+                        return -1;
+                }
 		
 		public function Count($table,$field,$cond = "") {
-			$count = $this->GetOneData($table,"COUNT(".$field.")",$cond);
-			if($count == NULL)
-				return 0;
-			return $count;
+			$query = $this->Select($table,"COUNT(".$field.") as ct",$cond);
+			if($data = pg_fetch_array($query)) {
+                                $splstr = preg_split("#[\.]#",$field);
+                                $splstr = preg_replace("#`#","",$splstr);
+                                return $data["ct"];
+                        }
+			return 0;
 		}
 		
 		public function Insert($table,$keys,$values) {
 			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";
 			pg_query($sql);
 		}
-		
-		public function InsertIgnore($table,$keys,$values) {
-			$sql = "INSERT IGNORE INTO ".$table."(".$keys.") VALUES (".$values.");";
-			pg_query($this->dbLink,$sql);
-		}
-		
+
 		public function Delete($table,$cond = "") {
 			$sql = "DELETE FROM ".$table."";
 			if(strlen($cond) > 0)
@@ -93,8 +104,15 @@
 				$sql .= " WHERE ".$cond;
 			pg_query($this->dbLink,$sql);
 		}
-		
-		
+
+		public function setConfig($dbn,$dbport,$dbh,$dbu,$dbp) {
+                        $this->dbName = $dbn;
+                        $this->dbPort = $dbport;
+                        $this->dbHost = $dbh;
+                        $this->dbUser = $dbu;
+                        $this->dbPass = $dbp;
+                }
+
 		private $dbName;
 		private $dbPort;
 		private $dbHost;
