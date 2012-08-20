@@ -22,18 +22,18 @@
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
-	if(!class_exists("MDNSMgmt")) {
-		class MDNSMgmt extends InterfaceModule {
-			function MDNSMgmt() {
+	if(!class_exists("MGroupMgmt")) {
+		class MGroupMgmt extends InterfaceModule {
+			function Mgroupmgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iDNSManager";
-				$this->conf->seclevel = 4;
-				$this->moduleclass = new iDNSManager();
-				$this->rulesclass = new rDNSMgmt();
-                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->modulename = "iGroupMgmt";
+				$this->conf->seclevel = 5;
+				$this->moduleclass = new iGroupMgmt();
+				$this->rulesclass = new rGroupMgmt();
+	                        $this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}
 
-	$module = new MDNSMgmt();
+	$module = new MGroupMgmt();
 ?>

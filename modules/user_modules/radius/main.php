@@ -20,14 +20,20 @@
 
 	require_once(dirname(__FILE__)."/../../../lib/FSS/objects/InterfaceModule.FS.class.php");
 	require_once(dirname(__FILE__)."/module.php");
+	require_once(dirname(__FILE__)."/rules.php");
 
-	class iModule extends InterfaceModule {
-		function iModule() {
-			parent::InterfaceModule();
-			$this->conf->modulename = "iRadius";
-			$this->conf->seclevel = 4;
-			$this->conf->connected = 1;
-			$this->moduleclass = new iRadius();
-		}
-	};
+	if(!class_exists("MRadius")) {
+		class MRadius extends InterfaceModule {
+			function MRadius() {
+				parent::InterfaceModule();
+				$this->conf->modulename = "iRadius";
+				$this->conf->seclevel = 4;
+				$this->moduleclass = new iRadius();
+				$this->rulesclass = new rRadius();
+                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+			}
+		};
+	}
+
+	$module = new MRadius();
 ?>

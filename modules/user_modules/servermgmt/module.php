@@ -49,7 +49,7 @@
 			$stype = 1;
 			$spwd = "";
 			$spath = "";
-			
+			FS::$iMgr->showReturnMenu(true);
 			if($create)
 				$output = "<h4>Ajouter un serveur de sauvegarde (configuration des équipements réseau)</h4>";
 			else {
@@ -114,7 +114,7 @@
 				$output .= "</td></tr>";
 			}
 			else {
-				$output .= "<tr><td>Adresse IP</td><td>".$saddr."</td></tr>";
+				$output .= "<tr><th>Adresse IP</th><th>".$saddr."</th></tr>";
 				$output .= "<tr><td>Type de service</td><td>";
 				switch($stype) {
 					case 1: $output .= "TFTP"; break;
@@ -139,7 +139,7 @@
 			$sdbname = "";
 			$sport = 0;
 			$spwd = "";
-			
+			FS::$iMgr->showReturnMenu(true);
 			if($create)
 				$output = "<h4>Ajouter une base de données Radius au moteur</h4>";
 			else {
@@ -189,7 +189,7 @@
 				$output .= FS::$iMgr->addIndexedLine("Nom de la base","sdbname",$sdbname);
 			}
 			else {
-				$output .= "<tr><td>Adresse IP/DNS</td><td>".$saddr."</td></tr>";
+				$output .= "<tr><th>Adresse IP/DNS</th><th>".$saddr."</th></tr>";
 				$output .= "<tr><td>Port</td><td>".$sport."</td></tr>";
 				$output .= "<tr><td>Nom de la base</td><td>".$sdbname."</td></tr>";
 			}
@@ -211,7 +211,7 @@
 			$dns = 0;
 			$namedpath = "";
 			$chrootnamed = "";
-			
+			FS::$iMgr->showReturnMenu(true);
 			if($create)
 				$output = "<h4>Ajouter un serveur au moteur</h4>";
 			else {

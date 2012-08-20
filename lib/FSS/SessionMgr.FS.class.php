@@ -1,25 +1,6 @@
 <?php
-	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	*
-	* This program is free software; you can redistribute it and/or modify
-	* it under the terms of the GNU General Public License as published by
-	* the Free Software Foundation; either version 2 of the License, or
-	* (at your option) any later version.
-	*
-	* This program is distributed in the hope that it will be useful,
-	* but WITHOUT ANY WARRANTY; without even the implied warranty of
-	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	* GNU General Public License for more details.
-	*
-	* You should have received a copy of the GNU General Public License
-	* along with this program; if not, write to the Free Software
-	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-	*/
-	
 	class FSSessionMgr {
-		function FSSessionMgr($DBMgr) {
-			$this->dbMgr = $DBMgr;
+		function FSSessionMgr() {
 		}
 		
 		public function InitSessionIfNot() {
@@ -33,7 +14,7 @@
 		
 		public function isConnected() {
 			if(isset($_SESSION["uid"]) && $_SESSION["uid"] > 0)
-				return true;	
+				return true;
 		}
 		
 		public function getOnlineIP() {
@@ -67,7 +48,34 @@
 		public function Close() {
 			session_destroy();
 		}
-		
-		private $dbMgr;
+
+		public function getGroups() {
+			$groups = array();
+			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$this->getUid()."'");
+			while($data = pg_fetch_array($query)) {
+				array_push($groups,$data["gid"]);
+			}
+			$groups = array_unique($groups);
+			return $groups;
+		}
+
+		public function isInGroup($gname) {
+			$gid = FS::$pgdbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
+			if(in_array($gid,$this->getGroups()))
+				return true;
+			return false;
+		}
+
+		public function hasRight($rulename) {
+			if($this->getUid() == 1)
+				return true;
+
+			$groups = $this->getGroups();
+			for($i=0;$i<count($groups);$i++) {
+				if(FS::$pgdbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = '".$rulename."' AND gid = '".$groups[$i]."'") == "on")
+					return true;
+			}
+			return false;
+		}
 	};
 ?>

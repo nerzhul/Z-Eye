@@ -39,8 +39,8 @@
 					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau menu</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Accréditation</th><th>Connecté</th><th></th><th></th></tr>";
-					$query = FS::$dbMgr->Select("fss_menus","id,name,ulevel,isconnected","","id",2);
-					while($data = mysql_fetch_array($query)) {
+					$query = FS::$pgdbMgr->Select("z_eye_menus","id,name,ulevel,isconnected","","id",2);
+					while($data = pg_fetch_array($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>".$data["ulevel"]."</td><td>";
 						if($data["isconnected"] == -1)
 							$output .= "Non";
@@ -60,8 +60,8 @@
 					<a href=\"index.php?mod=".$this->mid."&do=4\">Nouvel élément de menu</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Lien</th><th>Accréditation</th><th>Connecté</th><th></th><th></th></tr>";
-					$query = FS::$dbMgr->Select("fss_menu_items","id,title,link,ulevel,isconnected","","id",2);
-					while($data = mysql_fetch_array($query)) {
+					$query = FS::$pgdbMgr->Select("z_eye_menu_items","id,title,link,ulevel,isconnected","","id",2);
+					while($data = pg_fetch_array($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 						$link2 = new HTTPLink($data["link"]);
 						$output .= $link2->getIt()."</td><td>".$data["ulevel"]."</td><td>";
@@ -157,10 +157,10 @@
 				<h4>Modifier les éléments</h4>
 				<table class=\"standardTable\">
 				<tr><th>Elément</th><th>Ordre</th><th></th></tr>";
-				$query = FS::$dbMgr->Select("fss_menu_link","id_menu_item,`order`","id_menu = '".$mid."'","`order`");
-				while($data = mysql_fetch_array($query)) {
-					$query2 = FS::$dbMgr->Select("fss_menu_items","id,title","id = '".$data["id_menu_item"]."'");
-					if($data2 = mysql_fetch_array($query2)) {
+				$query = FS::$pgdbMgr->Select("z_eye_menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
+				while($data = pg_fetch_array($query)) {
+					$query2 = FS::$pgdbMgr->Select("z_eye_menu_items","id,title","id = '".$data["id_menu_item"]."'");
+					if($data2 = pg_fetch_array($query2)) {
 							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>
 							<a href=\"index.php?mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]."\">";
 							$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
@@ -243,7 +243,7 @@
 			FS::$secMgr->SecuriseStringForDB($_POST["menu"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["order"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["m_elem_id"]);
-			FS::$dbMgr->Insert("fss_menu_link","id_menu,id_menu_item,`order`","'".$_POST["menu"]."','".$_POST["m_elem_id"]."','".$_POST["order"]."'");
+			FS::$pgdbMgr->Insert("z_eye_menu_link","id_menu,id_menu_item,\"order\"","'".$_POST["menu"]."','".$_POST["m_elem_id"]."','".$_POST["order"]."'");
 		}
 		
 		public function RemoveElementFromMenu() {
@@ -251,7 +251,7 @@
 			$itemid = FS::$secMgr->checkGetData("elem");
 			FS::$secMgr->SecuriseStringForDB($menuid);
 			FS::$secMgr->SecuriseStringForDB($itemid);
-			FS::$dbMgr->Delete("fss_menu_link","id_menu = '".$menuid."' AND id_menu_item = '".$itemid."'");
+			FS::$pgdbMgr->Delete("z_eye_menu_link","id_menu = '".$menuid."' AND id_menu_item = '".$itemid."'");
 			
 		}
 		

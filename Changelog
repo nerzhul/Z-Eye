@@ -66,3 +66,10 @@ Alpha 0.22
 - Added radius import from DHCP cache
 - Migrate snort from Mysql to Pgsql
 - Added cleanup script
+
+Alpha 0.23
+- Group & user management
+- Some bugfixes
+
+Alpha 0.24
+- Can now remove & add devices

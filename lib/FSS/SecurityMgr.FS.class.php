@@ -186,7 +186,7 @@
 		}
 		
 		public function SecuriseStringForDB(&$str) {
-			$str = mysql_real_escape_string($str);
+			$str = pg_escape_string($str);
 			if($this->hasJS($str))
 				$str = "";
 		}

@@ -59,6 +59,8 @@ now = datetime.datetime.now()
 print "[Z-Eye][mrtg-data-refresh] Start at: %s" % now.strftime("%Y-%m-%d %H:%M")
 zeye_log("[Z-Eye][mrtg-data-refresh] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 
+print "[Z-Eye][mrtg-data-refresh] Search datas in dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"
+zeye_log("[Z-Eye][mrtg-data-refresh] Search datas in dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
 _dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
 for file in _dir:
 	filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+file

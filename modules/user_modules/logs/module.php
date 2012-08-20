@@ -28,6 +28,7 @@
 
 		private function showLogs() {
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+			$output = "";
                         if(!FS::isAjaxCall()) {
                                 $output .= "<div id=\"contenttabs\"><ul>";
                                 $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">Statistiques</a>";

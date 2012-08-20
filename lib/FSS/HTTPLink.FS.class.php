@@ -1,22 +1,4 @@
 <?php
-	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	*
-	* This program is free software; you can redistribute it and/or modify
-	* it under the terms of the GNU General Public License as published by
-	* the Free Software Foundation; either version 2 of the License, or
-	* (at your option) any later version.
-	*
-	* This program is distributed in the hope that it will be useful,
-	* but WITHOUT ANY WARRANTY; without even the implied warranty of
-	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	* GNU General Public License for more details.
-	*
-	* You should have received a copy of the GNU General Public License
-	* along with this program; if not, write to the Free Software
-	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-	*/
-	
 	require_once(dirname(__FILE__)."/IndexedObject.FS.class.php");
 	class HTTPLink {
 		function HTTPLink($id) {
@@ -24,8 +6,8 @@
 		}
 		
 		public function getIt() {
-			$query = FS::$dbMgr->Select("fss_http_links","type,args","id = '".$this->id."'");
-			if($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_http_links","type,args","id = '".$this->id."'");
+			if($data = pg_fetch_array($query)) {
 				switch($data["type"]) {
 					case 0: // external
 						return "http://".$data["args"];
@@ -48,30 +30,31 @@
 		}
 		
 		public function Load() {
-			$query = FS::$dbMgr->Select("fss_http_links","type,args","id = '".$this->id."'");
-			if($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_http_links","type,args","id = '".$this->id."'");
+			if($data = pg_fetch_array($query)) {
 				$this->type = $data["type"];
 				$this->args = $data["args"];	
 			}
 		}
 		
 		public function Create() {
-			FS::$dbMgr->Insert("fss_http_links","type,args","'".$this->type."','".$this->args."'");
+			$id = FS::$pgdbMgr->GetMax("z_eye_http_links","id")+1;
+			FS::$pgdbMgr->Insert("z_eye_http_links","id,type,args","'".$id."','".$this->type."','".$this->args."'");
 		}
 		
 		public function SaveToDB() {
-			FS::$dbMgr->Update("fss_http_links","type = '".$this->type."', args = '".$this->args."'","id = '".$this->id."'");	
+			FS::$pgdbMgr->Update("z_eye_http_links","type = '".$this->type."', args = '".$this->args."'","id = '".$this->id."'");	
 		}
 		
 		public function Delete() {
-			FS::$dbMgr->Delete("fss_http_links","id = '".$this->id."'");
+			FS::$pgdbMgr->Delete("z_eye_http_links","id = '".$this->id."'");
 		}
 		
 		public function CreateSelect($idsel = 0) {
 			$output = "";
 			$output .= FS::$iMgr->addList("link_id");
-			$query = FS::$dbMgr->Select("fss_http_links","id");
-			while($data = mysql_fetch_array($query)) {
+			$query = FS::$pgdbMgr->Select("z_eye_http_links","id");
+			while($data = pg_fetch_array($query)) {
 				$this->id = $data["id"];
 				$this->Load();
 				$output .= FS::$iMgr->addElementTolist($this->getIt(),$data["id"], $idsel > 0 && $idsel == $data["id"] ? true : false);

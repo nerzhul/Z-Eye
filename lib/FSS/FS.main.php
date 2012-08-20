@@ -1,21 +1,4 @@
 <?php
-	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	*
-	* This program is free software; you can redistribute it and/or modify
-	* it under the terms of the GNU General Public License as published by
-	* the Free Software Foundation; either version 2 of the License, or
-	* (at your option) any later version.
-	*
-	* This program is distributed in the hope that it will be useful,
-	* but WITHOUT ANY WARRANTY; without even the implied warranty of
-	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	* GNU General Public License for more details.
-	*
-	* You should have received a copy of the GNU General Public License
-	* along with this program; if not, write to the Free Software
-	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-	*/
 	define('CLASS_EXT','.FS.class.php');
 	
 	require_once(dirname(__FILE__)."/MySQLMgr".CLASS_EXT);
@@ -33,8 +16,10 @@
 		
 		public static function LoadFSModules() {
 			// Start MySQL connector
-			FS::$dbMgr = new FSMySQLMgr();
-			FS::$dbMgr->Connect();
+			if(Config::enableMySQL()) {
+				FS::$dbMgr = new FSMySQLMgr();
+				FS::$dbMgr->Connect();
+			}
 			
 			// PostgreSQL connector
 			if(Config::enablePostgreSQL()) {
@@ -49,7 +34,7 @@
 			FS::$iMgr = new LocalInterface(FS::$dbMgr);
 			
 			// Load Session Manager
-			FS::$sessMgr = new FSSessionMgr(FS::$dbMgr);
+			FS::$sessMgr = new FSSessionMgr();
 			
 			// Load Mail Manager
 			FS::$mailMgr = new FSMailMgr();

@@ -17,17 +17,23 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../../../lib/FSS/objects/InterfaceModule.FS.class.php");
 	require_once(dirname(__FILE__)."/module.php");
-	
-	class iModule extends InterfaceModule {
-		function iModule() {
-			parent::InterfaceModule();
-			$this->conf->modulename = "iNagios";
-			$this->conf->seclevel = 5;
-			$this->conf->connected = 1;
-			$this->moduleclass = new iNagios();
-		}
-	};
+	require_once(dirname(__FILE__)."/rules.php");
+
+	if(!class_exists("MNagios")) {
+		class MNagios extends InterfaceModule {
+			function MNagios() {
+				parent::InterfaceModule();
+				$this->conf->modulename = "iNagios";
+				$this->conf->seclevel = 5;
+				$this->moduleclass = new iNagios();
+				$this->rulesclass = new rNagios();
+                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+			}
+		};
+	}
+
+	$module = new MNagios();
 ?>

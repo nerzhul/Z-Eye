@@ -72,30 +72,30 @@
 				$user->setUserLevel(4);
 	                        $user->setMail($mail);
 
-				$query = FS::$dbMgr->Select("fss_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-				if($data = mysql_fetch_array($query))
+				$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+				if($data = pg_fetch_array($query))
 				{
 					$_SESSION["uid"] = $data["uid"];
                                         $_SESSION["ulevel"] = $data["ulevel"];
-                                        FS::$dbMgr->Update("fss_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
+                                        FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
 					header("Location: ".$url);
 					return;
 				}
 				else {
 	        	                $user->Create();
-					$query = FS::$dbMgr->Select("fss_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-	                                if($data = mysql_fetch_array($query))
+					$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+	                                if($data = pg_fetch_array($query))
                                 	{
                         	                $_SESSION["uid"] = $data["uid"];
                 	                        $_SESSION["ulevel"] = $data["ulevel"];
-        	                                FS::$dbMgr->Update("fss_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
+        	                                FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
 	                                        header("Location: ".$url);
                                         	return;
                                 	}
 				}
 			} else {
-				$query = FS::$dbMgr->Select("fss_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-				if($data = mysql_fetch_array($query)) {
+				$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+				if($data = pg_fetch_array($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if($data["sha_pwd"] != $encryptPwd) {
 						$link = new HTTPLink(15);
@@ -104,7 +104,7 @@
 					}
 					$_SESSION["uid"] = $data["uid"];
 					$_SESSION["ulevel"] = $data["ulevel"];
-					FS::$dbMgr->Update("fss_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
+					FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
 					header("Location: ".$url);
 					return;
 				}

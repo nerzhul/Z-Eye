@@ -22,11 +22,11 @@
 	require_once(dirname(__FILE__)."/cisco.func.php");
 	
 	class iSwitchMgmt extends genModule{
-		function iConnect($iMgr) { parent::genModule($iMgr); }
+		function iSwitchMgmt($iMgr) { parent::genModule($iMgr); }
 		public function Load() {
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<h3>Management des Switches</h3>";
+				$output .= "<h3>Management des Equipements réseau</h3>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
@@ -42,16 +42,21 @@
 
 		private function showPortInfos() {
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
-            $port = FS::$secMgr->checkAndSecuriseGetData("p");
+		        $port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
-			if($err != NULL)
-				$output .= FS::$iMgr->printError("Erreur lors de la modification des données sur le switch !");
+			switch($err) {
+				case 1:	$output .= FS::$iMgr->printError("Echec de la modification des données sur le switch !"); break;
+				case 2: $output .= FS::$iMgr->printError("Données incorectes ou invalides"); break;
+				default: break;
+			}
 			if(!FS::isAjaxCall()) {
 				$output .= "<h4>".$port." sur ".$device."</h4>";
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."\">Configuration</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=2\">Statistiques de débit</a>";
+				$output .= "<li".((!$sh || $sh == 1) ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."\">Configuration</a>";
+				$output .= "<li".($sh == 2 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=2\">Statistiques de débit</a>";
+				$output .= "<li".($sh == 3 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&d=".$device."&p=".$port."&sh=3\">Monitoring</a>";
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -60,7 +65,6 @@
 				// Get Port ID
 				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 				$portid = getPortId($device,$port);
-				$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 				// Port modification
 				if(!$sh || $sh == 1) {
 					// # todo, place JS before output
@@ -152,6 +156,8 @@
 						$output .= "</select>";
 						$output .= "<tr><td id=\"vllabel\">";
 						$portoptlabel = "";
+						$nvlan = 1;
+						$vllist = array();
 						switch($trmode) {
 							case 1:
 								$output .= "VLAN Natif";
@@ -234,6 +240,21 @@
 					else
 						$output .= FS::$iMgr->printError("Aucun débit réseau collecté pour ce port !");
 				}
+				// Monitoring
+				else if($sh == 3) {
+					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=16");
+					$output .= FS::$iMgr->addHidden("device",$device).FS::$iMgr->addHidden("port",$port);
+					$climit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
+					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
+					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
+					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",(($climit > 0 || $wlimit) > 0 ? true : false),"Activer le monitoring")."</li><li>";
+					$output .= FS::$iMgr->addInput("desc",$desc,20,200,"Libellé")."</li><li>";
+					$output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),10,10,"Seuil avertissement (Mo)")."</li><li>";
+					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),10,10,"Seuil critique (Mo)")."</li><li>";
+					$output .= FS::$iMgr->addSubmit("","Enregister")."</li>";
+					$output .= "</ul>";
+					$output .= "</form>";
+				}
 			}
 			return $output;
 		}
@@ -247,9 +268,10 @@
 			if($od == NULL) $od = "port";
 			else if($od == "desc" || $od == "name") $od = "name";
 			else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
-				
+
 			$output = "";
 			if(!FS::isAjaxCall()) {
+				FS::$iMgr->showReturnMenu(true);
 				$output = "<h4>Equipement ";
 	
 				$output .= $device." (";
@@ -1007,25 +1029,33 @@
 		}
 
 		protected function showDeviceList() {
-			$output = "<h4>Liste des Equipements</h4>";
+			$formoutput = "<script type=\"text/javascript\">function showwait() {";
+                        $formoutput .= "$('#subpop').html('Découverte en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+                        $formoutput .= "$('#pop').show();";
+                        $formoutput .= "};</script>".FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=18");
+                        $formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
+                        $formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("","Découvrir","showwait()")."</li>";
+                        $formoutput .= "</ul></form>";
+                        $output = FS::$iMgr->addOpenableDiv($formoutput,"Découvrir un équipement");
+
                         $query = FS::$pgdbMgr->Select("device","*","","name");
 
 			$foundsw = 0;
 			$foundwif = 0;
 			$outputswitch = "<h4>Switches et routeurs</h4>";
-			$outputswitch .= "<table class=\"standardTable\"><tr><th>Nom</th><th>Adresse IP</th><th>Adresse MAC</th><th>Modèle</th><th>OS</th><th>Lieu</th><th>Numéro de série</th></tr>";
+			$outputswitch .= "<table id=\"dev\"><tr><th>Nom</th><th>Adresse IP</th><th>Adresse MAC</th><th>Modèle</th><th>OS</th><th>Lieu</th><th>Numéro de série</th></tr>";
 
 			$outputwifi = "<h4>Bornes WiFi</h4>";
-			$outputwifi .= "<table class=\"standardTable\"><tr><th>Nom</th><th>Adresse IP</th><th>Modèle</th><th>OS</th><th>Lieu</th><th>Numéro de série</th></tr>";
+			$outputwifi .= "<table id=\"dev\"><tr><th>Nom</th><th>Adresse IP</th><th>Modèle</th><th>OS</th><th>Lieu</th><th>Numéro de série</th></tr>";
 			while($data = pg_fetch_array($query)) {
 				if(preg_match("#AIR#",$data["model"])) {
 					if($foundwif == 0) $foundwif = 1;
-					$outputwifi .= "<tr><td><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>";
+					$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>";
 	                                $outputwifi .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
 				}
 				else {
 					if($foundsw == 0) $foundsw = 1;
-					$outputswitch .= "<tr><td><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
+					$outputswitch .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
 					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
 				}
 			}
@@ -1036,6 +1066,29 @@
 			if($foundwif != 0) {
                                 $output .= $outputwifi;
                                 $output .= "</table>";
+				$output .= "<script type=\"text/javascript\">
+                                $.event.props.push('dataTransfer');
+                                $('#dev #draga').on({
+                                        mouseover: function(e) { $('#trash').show(); },
+                                        mouseleave: function(e) { $('#trash').hide(); },
+                                        dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+                                        dragenter: function(e) { e.preventDefault();},
+                                        dragover: function(e) { e.preventDefault(); },
+                                        dragleave: function(e) { },
+                                        drop: function(e) {},
+                                        dragend: function() { $('#trash').hide(); }
+                                });
+                                $('#trash').on({
+                                        dragover: function(e) { e.preventDefault(); },
+                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'équipement \''+e.dataTransfer.getData('text/html')+'\' ?".
+                                                FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=17").
+                                                FS::$iMgr->addHidden("device","'+e.dataTransfer.getData('text/html')+'").
+                                                FS::$iMgr->addSubmit("","Supprimer").
+                                                FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                                $('#pop').show();
+                                        }
+                                });
+                                </script>";
                         }
 
 			if($foundsw == 0 && $foundwif == 0)
@@ -1056,21 +1109,10 @@
 
 					if($prise == NULL) $prise = "";
 					// Modify prise for switch port
-					pg_query("DELETE FROM z_eye_switch_port_prises where ip = '".$dip."' AND port = '".$port."'");
-					$sql = "INSERT INTO z_eye_switch_port_prises VALUES ('".$sw."','".$port."','".$prise."')";
+					FS::$pgdbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."' AND port = '".$port."'");
+					$sql = "INSERT IGNORE INTO z_eye_switch_port_prises VALUES ('".$sw."','".$port."','".$prise."')";
 					pg_query($sql);
 
-					if($prise != "") {
-						$piecetab = preg_split("#\.#",$prise);
-						if(isset($piecetab[0]) && isset($piecetab[1]) && isset($piecetab[2]) && !isset($piecetab[3])) {
-							if(FS::$secMgr->isNumeric($piecetab[1]) && FS::$secMgr->isNumeric($piecetab[2])) {
-								$pname = $piecetab[0].".".$piecetab[1];
-								for($i=1;$i<=$piecetab[2];$i++) {
-									mysql_query("INSERT IGNORE INTO fss_piece_prises VALUES ('".$pname."','".$i."','')");
-								}
-							}
-						}
-					}
 					// Return text for AJAX call
 					if($prise == "") $prise = "Modifier";
 					echo $prise;
@@ -1330,17 +1372,6 @@
 					pg_query("DELETE FROM z_eye_switch_port_prises where ip = '".$dip."' AND port = '".$port."'");
 					pg_query("INSERT INTO z_eye_switch_port_prises (ip,port,prise) VALUES ('".$dip."','".$port."','".$prise."')");
 
-					if($prise != "") {
-							$piecetab = preg_split("#\.#",$prise);
-							if(isset($piecetab[0]) && isset($piecetab[1]) && isset($piecetab[2]) && !isset($piecetab[3])) {
-									if(FS::$secMgr->isNumeric($piecetab[1]) && FS::$secMgr->isNumeric($piecetab[2])) {
-											$pname = $piecetab[0].".".$piecetab[1];
-											for($i=1;$i<=$piecetab[2];$i++) {
-													mysql_query("INSERT IGNORE INTO fss_piece_prises VALUES ('".$pname."','".$i."','')");
-											}
-									}
-							}
-					}
 					FS::$pgdbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
 					FS::$pgdbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$dip."' AND port = '".$port."'");
 					$sql = "UPDATE device_port SET vlan ='".$nvlan."' WHERE ip='".$dip."' and port='".$port."'";
@@ -1474,6 +1505,75 @@
 						return;
 					}
 					echo restoreStartupConfig($device);
+					return;
+				// Port monitoring
+				case 16:
+					$device = FS::$secMgr->checkAndSecurisePostData("device");
+					$port = FS::$secMgr->checkAndSecurisePostData("port");
+					$enmon = FS::$secMgr->checkAndSecurisePostData("enmon");
+					$climit = FS::$secMgr->checkAndSecurisePostData("climit");
+					$wlimit = FS::$secMgr->checkAndSecurisePostData("wlimit");
+					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
+					if(!$device || !$port) {
+						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+						return;
+					}
+
+					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+					if(!$dip) {
+						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+                                                return;
+					}
+
+					$dport = FS::$pgdbMgr->GetOneData("device_port","name","ip = '".$dip."' AND port = '".$port."'");
+					if(!$dport) {
+                                                header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+                                                return;
+                                        }
+					if($enmon == "on") {
+						if(!$climit || !$wlimit || !FS::$secMgr->isNumeric($wlimit) || !FS::$secMgr->isNumeric($climit) || $climit <= 0 || $wlimit <= 0) {
+							header("Location: index.php?mod=".$this->mid."&d=".$device."&p=".$port."&sh=3&err=2");
+	                                                return;
+						}
+						FS::$pgdbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
+						FS::$pgdbMgr->Insert("z_eye_port_monitor","device,port,climit,wlimit,description","'".$device."','".$port."','".$climit."','".$wlimit."','".$desc."'");
+					}
+					else
+						FS::$pgdbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
+					header("Location: index.php?mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
+					return;
+				case 17:
+					$device = FS::$secMgr->checkAndSecurisePostData("device");
+					if(!$device) {
+                                                header("Location: index.php?mod=".$this->mid."&err=1");
+                                                return;
+                                        }
+					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+					FS::$pgdbMgr->Delete("device_ip","ip = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("device_module","ip = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("device_port","ip = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("device_port_power","ip = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("device_port_ssid","ip = '".$dip."'");
+					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("device_power","ip = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("node","switch = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("node_ip","ip = '".$dip."'");
+                                        FS::$pgdbMgr->Delete("node_nbt","ip = '".$dip."'");
+					FS::$pgdbMgr->Delete("admin","device = '".$dip."'");
+					FS::$pgdbMgr->Delete("z_eye_port_id_cache","device = '".$device."'");
+					FS::$pgdbMgr->Delete("z_eye_port_monitor","device = '".$device."'");
+					FS::$pgdbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."'");
+					FS::$pgdbMgr->Delete("z_eye_snmp_cache","device = '".$device."'");
+					FS::$pgdbMgr->Delete("device","ip = '".$dip."'");
+					header("Location: index.php?mod=".$this->mid);
+				case 18:
+					$dip = FS::$secMgr->checkAndSecurisePostData("dip");
+					if(!$dip || !FS::$secMgr->isIP($dip)) {
+						header("Location: index.php?mod=".$this->mid."&err=1");
+                                                return;
+                                        }
+					exec("netdisco -d ".$dip);
+					header("Location: index.php?mod=".$this->mid);
 					return;
 				default: break;
 			}

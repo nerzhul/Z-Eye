@@ -31,7 +31,7 @@
 			switch($mid) {
 				case 0:
 					break;
-				default:					
+				default:
 					$dir = opendir(dirname(__FILE__)."/user_modules");
 					$found = false;
 					$moduleid = 0;
@@ -47,30 +47,21 @@
 							}
 						}
 					}
-					
+
 					if($found == false) {
 						header("Location: index.php");
 						return;
-					}				
-				
+					}
+
 					require_once(dirname(__FILE__)."/user_modules/".$mod_path."/main.php");
-					$md = new iModule();
-					
-					if(!($md->getConfig()->connected == 1 && FS::$sessMgr->isConnected() || 
-						$md->getConfig()->connected == 0 && !FS::$sessMgr->isConnected() || $md->getConfig()->connected == 2)) {
-						
+
+					if(!$module->getRulesClass()->canAccessToModule()) {
 						header("Location: index.php");
 						return;
 					}
-					
-					if($md->getConfig()->seclevel > FS::$sessMgr->getUserLevel()) {
-						header("Location: index.php");
-						return;
-					}
-							
-					$module = $md->getModuleClass();
-					$md->getModuleClass()->setModuleId($mid);
-					$md->getModuleClass()->handlePostDatas($act);
+
+					$module->getModuleClass()->setModuleId($mid);
+					$module->getModuleClass()->handlePostDatas($act);
 					
 					break;
 			}

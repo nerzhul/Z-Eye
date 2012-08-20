@@ -1,6 +1,7 @@
 <?php
 	/*
 	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -16,17 +17,23 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../../../lib/FSS/objects/InterfaceModule.FS.class.php");
 	require_once(dirname(__FILE__)."/module.php");
-	
-	class iModule extends InterfaceModule {
-		function iModule() {
-			parent::InterfaceModule();
-			$this->conf->modulename = "iDisconnect";
-			$this->conf->seclevel = 0;
-			$this->conf->connected = 1;
-			$this->moduleclass = new iDisconnect();
-		}
-	};
+	require_once(dirname(__FILE__)."/rules.php");
+
+	if(!class_exists("MDisconnect")) {
+		class MDisconnect extends InterfaceModule {
+			function MDisconnect() {
+				parent::InterfaceModule();
+				$this->conf->modulename = "iDisconnect";
+				$this->conf->seclevel = 0;
+				$this->moduleclass = new iDisconnect();
+				$this->rulesclass = new rDisconnect();
+		                       $this->conf->connected = $this->rulesclass->getConnectedState();
+			}
+		};
+	}
+
+	$module = new MDisconnect();
 ?>

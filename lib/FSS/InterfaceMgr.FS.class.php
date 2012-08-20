@@ -12,13 +12,13 @@
 		function FSInterfaceMgr($DBMgr) {
 			$this->dbMgr = $DBMgr;	
 		}
-		
+
 		public function InitComponents() {
 			$this->arr_css = array();
 			$this->arr_js = array();
 		}
-		
-		
+
+
 		// Complex methods
 		public function CreateSelectFromDB($sname,$table,$name,$idx,$cond = "", $order = "", $ordersens = 0,$selectidx = NULL, $default = false) {
 			$output = "<select name=\"".$sname."\">";
@@ -73,34 +73,47 @@
 		public function showContent() {
 			return "<div id=\"main\"></div>";
 		}
-		
-		public function loadMenu($id) {
-			$output = "";
-			$query = $this->dbMgr->Select("fss_menus","name,ulevel,isconnected","id = '".$id."'");
-			if($data = mysql_fetch_array($query)) {
-				$conn = FS::$sessMgr->isConnected();
-				if((!$conn && $data["isconnected"] == -1 || $conn && $data["isconnected"] == 1 || $data["isconnected"] == 0) &&
-				(FS::$sessMgr->getUserLevel() >= $data["ulevel"]))
-				{
-					$output .= "<ul id=\"menu\"><h3>".$data["name"]."</h3>";
-					$query2 = $this->dbMgr->Select("fss_menu_link","id_menu_item","id_menu = '".$id."'","`order`");
-					while($data2 = mysql_fetch_array($query2)) {
-						$query3 = $this->dbMgr->Select("fss_menu_items","title,link,isconnected,ulevel","id = '".$data2["id_menu_item"]."'");
-						while($data3 = mysql_fetch_array($query3))
-							if((!$conn && $data3["isconnected"] == -1 || $conn && $data3["isconnected"] == 1 || $data3["isconnected"] == 0) &&
-								(FS::$sessMgr->getUserLevel() >= $data3["ulevel"])) {
-								$link = new HTTPLink($data3["link"]);
-								$output .= "<li><a class=\"menuText\" href=\"".$link->getIt()."\">".$data3["title"]."</a>";	
+
+		protected function loadMenus($mlist) {
+                        $output = "";
+			for($i=0;$i<count($mlist);$i++) {
+				$haselemtoshow = 0;
+				$tmpoutput = "";
+				// Load menu
+				$query = FS::$pgdbMgr->Select("z_eye_menus","name,ulevel,isconnected","id = '".$mlist[$i]."'");
+                                if($data = pg_fetch_array($query)) {
+					$tmpoutput .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$data["name"]."</div><div class=\"menupopup\">";
+					// load menu elements
+					$query2 = FS::$pgdbMgr->Select("z_eye_menu_link","id_menu_item","id_menu = '".$mlist[$i]."'","\"order\"");
+                                        while($data2 = pg_fetch_array($query2)) {
+						$query3 = FS::$pgdbMgr->Select("z_eye_menu_items","title,link,isconnected,ulevel","id = '".$data2["id_menu_item"]."'");
+                                                while($data3 = pg_fetch_array($query3)) {
+							$link = new HTTPLink($data3["link"]);
+                                                        $link->Load();
+                                                        $dirpath = dirname(__FILE__)."/../../modules/user_modules/".$link->getArgs();
+							if(FS::$sessMgr->getUid() == 1 || (is_dir($dirpath))) {
+								require($dirpath."/main.php");
+								if($module->getRulesClass()->canAccessToModule()) {
+	                                                                $tmpoutput .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$data3["title"]."</a></div>";
+									$haselemtoshow = 1;
+								}
 							}
+						}
 					}
-					$output .= "</ul>";
+					$tmpoutput .= "</div></div>";
 				}
+				if($haselemtoshow) $output .= $tmpoutput;
+
 			}
-			else
-				$output .= $this->printError("Menu ".$id." undefined");
-			return $output;
-		}
-		
+                        return $output;
+                }
+
+		public function getRealNameById($id) {
+                        $user = new User();
+                        $user->LoadFromDB($id);
+                        return $user->getSubName()." ".$user->getName();
+                }
+
 		private function getJSONLink($jsonstr) {
 			$jsonstr = preg_replace("#\"#","&quot;",$jsonstr);
 			return "javascript:getPage('".$jsonstr."');";			
@@ -109,7 +122,11 @@
 		public function addJSONLink($jsonstr,$text) {
 			return "<a class=\"monoComponentt_a\" href=\"".FS::$iMgr->getJSONLink($jsonstr)."\">".$text."</a>";
 		}
-		
+
+		public function addBackLink() {
+			return "<div id=\"backarrow\"><a href=\"javascript:history.back()\">".FS::$iMgr->addImage("styles/back.png",32,32)."</a></div>";
+		}
+
 		public function addLabel($for,$value,$class = "") {
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
@@ -129,12 +146,18 @@
 			return $output;
 		}
 		
-		public function addNumericInput($name, $def_value = "", $size = 20, $length = 40) {
-			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
+		public function addNumericInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+			$output = "";
+                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
+			return $output;
 		}
 		
-		public function addIPInput($name, $def_value = "", $size = 20, $length = 40) {
-			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
+		public function addIPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+			$output = "";
+                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
+			return $output;
 		}
 		
 		public function addMacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
@@ -332,14 +355,14 @@
 			if($divname == NULL) $divname = uniqid();
 			if($liname == NULL) $liname = uniqid();
 			if($aname == NULL) $aname = uniqid();
-			$output = "<script type=\"text/javascript\">
+                        $output = "<ul style=\"list-style-type:none;padding:0;\"><li id=\"".$liname."\"><a id=\"".$aname."\" href=\"#\">".$text1."</a>
+                       		<a id=\"".$aname."2\" style=\"display:none;\" href=\"#\">".$text2."</a></li></ul>";
+                        $output .= "<div id=\"".$divname."\" style=\"display:none;\">".$content."</div>";
+			$output .= "<script type=\"text/javascript\">
                                 $(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
                                 $(\"#".$aname."2\").click(function(){ $(\"div#".$divname."\").slideUp(\"slow\");});
                                 $(\"#".$liname."\").click(function(){ $(\"#".$liname." a\").toggle();});
                                 </script>";
-                        $output .= "<ul style=\"list-style-type:none;padding:0;\"><li id=\"".$liname."\"><a id=\"".$aname."\" href=\"#\">".$text1."</a>
-                       		<a id=\"".$aname."2\" style=\"display:none;\" href=\"#\">".$text2."</a></li></ul>";
-                        $output .= "<div id=\"".$divname."\" style=\"display:none;\">".$content."</div>";
 			return $output;
 		}
 		// Simple methods

@@ -22,8 +22,6 @@
 				$output = "";
 			if(!FS::isAjaxCall()) {
 				$found = 0;
-				$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->addImage("styles/trash.png",64,64)."</div>";
-				$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->addImage("styles/edit.png",64,64)."</div>";
 				$output .= "<h4>Gestion des utilisateurs/Groupes Radius</h4>";
 				$tmpoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
 				$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
@@ -336,6 +334,7 @@
 				$output = "";
 
 				$found = 0;
+				$formoutput = "";
 				$formoutput .= "<h4>Nouvel Import Automatique</h4>";
 				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addList("subnet","","Subnet DHCP");
@@ -385,7 +384,7 @@
 		                                });
                 		                $('#trash').on({
                                 		        dragover: function(e) { e.preventDefault(); },
-		                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l'importation du subnet \''+e.dataTransfer.getData('text/html')+'\' ?".
+		                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'importation du subnet \''+e.dataTransfer.getData('text/html')+'\' ?".
                 		                                FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8").
                                 		                FS::$iMgr->addHidden("subnet","'+e.dataTransfer.getData('text/html')+'").
                 		                                FS::$iMgr->addSubmit("","Supprimer").
@@ -415,6 +414,7 @@
 
 		private function editRadiusEntry($raddb,$radhost,$radport,$radentry,$radentrytype) {
 			$output = "";
+			FS::$iMgr->showReturnMenu(true);
                 	$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
                         $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
                         $radSQLMgr = new FSMySQLMgr();

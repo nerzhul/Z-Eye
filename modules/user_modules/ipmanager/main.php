@@ -17,17 +17,23 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../../../lib/FSS/objects/InterfaceModule.FS.class.php");
 	require_once(dirname(__FILE__)."/module.php");
-	
-	class iModule extends InterfaceModule {
-		function iModule() {
-			parent::InterfaceModule();
-			$this->conf->modulename = "iIPManager";
-			$this->conf->seclevel = 4;
-			$this->conf->connected = 1;
-			$this->moduleclass = new iIPManager();
-		}
-	};
+	require_once(dirname(__FILE__)."/rules.php");
+
+	if(!class_exists("MIPManager")) {
+		class MIPManager extends InterfaceModule {
+			function MIPManager() {
+				parent::InterfaceModule();
+				$this->conf->modulename = "iIPManager";
+				$this->conf->seclevel = 4;
+				$this->moduleclass = new iIPManager();
+				$this->rulesclass = new rIPManager();
+                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+			}
+		};
+	}
+
+	$module = new MIPManager();
 ?>

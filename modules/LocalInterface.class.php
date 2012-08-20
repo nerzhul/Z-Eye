@@ -24,18 +24,22 @@
 	class LocalInterface extends FSInterfaceMgr {
 		function LocalInterface($DBMgr) {
 			parent::FSInterfaceMgr($DBMgr);
+			$this->showRetMenu = false;
 		}
-		
+
 		public function showContent() {
 			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
-			$output .= $this->showConnForm();
+			$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->addImage("styles/trash.png",64,64)."</div>";
+			$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->addImage("styles/edit.png",64,64)."</div>";
+			$tmpoutput = "";
 			if(FS::$sessMgr->isConnected())
-				$output .= $this->showSearchForm();
+				$tmpoutput .= $this->showSearchForm();
 
-			$output .= "<div id=\"main\">";
-			// header for enterprise
-			$output .= $this->showModule();
-			$output .= "</div>";
+			$tmpoutput .= "<div id=\"main\">";
+			$tmpoutput .= $this->showModule();
+			$tmpoutput .= "</div>";
+			// must be after because of return button
+			$output .= $this->showConnForm().$tmpoutput;
 			$output .= "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS";
 			$output .= " - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
 			return $output;
@@ -43,8 +47,11 @@
 
 		protected function showConnForm() {
 			$output = "<div id=\"logform\"><div id=\"menupanel\">";
+			if($this->showRetMenu) {
+				$output .= "<div id=\"menuStack\"><div id=\"menuElmt\" onclick=\"javascript:history.back()\">Retour</div></div>";
+			}
 			$menulist = array(1,7,6,3,2);
-                        $output .= $this->newShowMenu($menulist);
+                        $output .= $this->loadMenus($menulist);
 			$output .= "<div id=\"menuStack\"><div id=\"menuElmt\"><ul class=\"login\">";
 
                         $output .= "<li id=\"logintoggle\">";
@@ -98,58 +105,21 @@
 			return $output;
 		}
 
-		private function showUserMenu() {
-			$output = "<div id=\"rightmenu\">";
-			$output .= $this->loadMenu(2);
-			$output .= "</div>";
-			return $output;
-		}
-
-		private function newShowMenu($mlist) {
-			$output = "";
-			for($i=0;$i<count($mlist);$i++) {
-				$query = $this->dbMgr->Select("fss_menus","name,ulevel,isconnected","id = '".$mlist[$i]."'");
-				if($data = mysql_fetch_array($query)) {
-					$conn = FS::$sessMgr->isConnected();
-					if((!$conn && $data["isconnected"] == -1 || $conn && $data["isconnected"] == 1 || $data["isconnected"] == 0) &&
-					(FS::$sessMgr->getUserLevel() >= $data["ulevel"])) {
-						$output .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$data["name"]."</div><div class=\"menupopup\">";
-						$query2 = $this->dbMgr->Select("fss_menu_link","id_menu_item","id_menu = '".$mlist[$i]."'","`order`");
-						while($data2 = mysql_fetch_array($query2)) {
-							$query3 = $this->dbMgr->Select("fss_menu_items","title,link,isconnected,ulevel","id = '".$data2["id_menu_item"]."'");
-							while($data3 = mysql_fetch_array($query3))
-								if((!$conn && $data3["isconnected"] == -1 || $conn && $data3["isconnected"] == 1 || $data3["isconnected"] == 0) &&
-									(FS::$sessMgr->getUserLevel() >= $data3["ulevel"])) {
-									$link = new HTTPLink($data3["link"]);
-									$output .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$data3["title"]."</a></div>";
-								}
-						}
-						$output .= "</div></div>";
-					}
-				}
-			}
-			return $output;
-		}
-
-		public function getRealNameById($id) {
-			$user = new User();
-			$user->LoadFromDB($id);
-			return $user->getSubName()." ".$user->getName();
-		}
-
 		public function showModule() {
 			$output = "";
-			$module = FS::$secMgr->checkGetData("mod");
+			$module = FS::$secMgr->checkAndSecuriseGetData("mod");
 			if(!$module) $module = 0;
 
 			if($module && !FS::$secMgr->isNumeric($module))
 				$output .= $this->printError("Module inconnu !");
 			else {
 				FS::$secMgr->SecuriseStringForDB($module);
-				if($module)
+				if($module > 0)
 					$output .= $this->loadModule($module);
-				else
+				else if($module == 0)
 					$output .= $this->loadModule($this->getModuleIdByPath("default"));
+				else
+					$output .= $this->printError("Module inconnu !");
 			}
 			return $output;
 		}
@@ -173,30 +143,21 @@
 				}
 			}
 			if($found == true) {
-				
-				require_once(dirname(__FILE__)."/user_modules/".$path."/main.php");
-				$module = new iModule();
-				
-				if($module->getConfig()->connected == 1 && FS::$sessMgr->isConnected() || 
-					$module->getConfig()->connected == 0 && !FS::$sessMgr->isConnected() || $module->getConfig()->connected == 2) {
-					
-					if($module->getConfig()->seclevel <= FS::$sessMgr->getUserLevel()) {
-						
+				require(dirname(__FILE__)."/user_modules/".$path."/main.php");
+
+				if($module->getRulesClass()->canAccessToModule()) {
 						$module->getModuleClass()->setModuleId($id);
 						$output .= $module->getModuleClass()->Load();
 					}
-					else
-						$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");
-				}
 				else
-						$output .= $this->printError("Vous devez être authentifié pour accéder à ce contenu.");
+					$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");
 			}
 			else
 				$output .= $this->printError("Module inconnu !");
 
 			return $output;
 		}
-		
+
 		public function getModuleIdByPath($path) {
 			$dir = opendir(dirname(__FILE__)."/user_modules");
 			$moduleid = 0;
@@ -215,5 +176,8 @@
 			
 			return 0;
 		}
+
+		public function showReturnMenu($show) { $this->showRetMenu = $show;}
+		private $showRetMenu;
 	};
 ?>
