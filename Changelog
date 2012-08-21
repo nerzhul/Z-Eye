@@ -73,3 +73,5 @@ Alpha 0.23
 
 Alpha 0.24
 - Can now remove & add devices
+- Drop userlevel support
+- Bugfixes on switch D&D interface
