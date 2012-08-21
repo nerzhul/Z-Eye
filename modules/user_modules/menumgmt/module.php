@@ -38,10 +38,10 @@
 			$output .= "<h3>Gestion des menus</h3>";
 					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau menu</a>
 					<table class=\"standardTable\">
-					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Accréditation</th><th>Connecté</th><th></th><th></th></tr>";
-					$query = FS::$pgdbMgr->Select("z_eye_menus","id,name,ulevel,isconnected","","id",2);
+					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Connecté</th><th></th><th></th></tr>";
+					$query = FS::$pgdbMgr->Select("z_eye_menus","id,name,isconnected","","id",2);
 					while($data = pg_fetch_array($query)) {
-						$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>".$data["ulevel"]."</td><td>";
+						$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
 						if($data["isconnected"] == -1)
 							$output .= "Non";
 						else if($data["isconnected"] == 1)
@@ -59,12 +59,12 @@
 					<h3>Gestion des éléments de menu</h3>
 					<a href=\"index.php?mod=".$this->mid."&do=4\">Nouvel élément de menu</a>
 					<table class=\"standardTable\">
-					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Lien</th><th>Accréditation</th><th>Connecté</th><th></th><th></th></tr>";
-					$query = FS::$pgdbMgr->Select("z_eye_menu_items","id,title,link,ulevel,isconnected","","id",2);
+					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Lien</th><th>Connecté</th><th></th><th></th></tr>";
+					$query = FS::$pgdbMgr->Select("z_eye_menu_items","id,title,link,isconnected","","id",2);
 					while($data = pg_fetch_array($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 						$link2 = new HTTPLink($data["link"]);
-						$output .= $link2->getIt()."</td><td>".$data["ulevel"]."</td><td>";
+						$output .= $link2->getIt()."</td><td>";
 						if($data["isconnected"] == -1)
 							$output .= "Non";
 						else if($data["isconnected"] == 1)
@@ -101,8 +101,6 @@
 			$output .= "<hr>Lien ";
 			$link = new HTTPLink(0);
 			$output .= $link->CreateSelect($menuEl ? $menuEl->getLink() : 0);
-			$output .= "<hr>Accréditation ";
-			$output .= FS::$iMgr->addInput("ulevel",$menuEl ? $menuEl->getUlevel() : "");
 			$output .= "<hr>Connecté ? ";
 			$output .= FS::$iMgr->addList("isconnected");
 			$output .= FS::$iMgr->addElementToList("Non",-1,$menuEl && $menuEl->getConnected() == -1 ? true : false);
@@ -130,8 +128,6 @@
 			}
 			$output .= "Nom ";
 			$output .= FS::$iMgr->addInput("name",$menu ? $menu->getName() : "");
-			$output .= "<hr>Accréditation ";
-			$output .= FS::$iMgr->addInput("ulevel",$menu ? $menu->getUlevel() : "");
 			$output .= "<hr>Connecté ? ";
 			$output .= FS::$iMgr->addList("isconnected");
 			$output .= FS::$iMgr->addElementToList("Non",-1,$menu && $menu->getConnected() == -1 ? true : false);
@@ -175,10 +171,8 @@
 		public function RegisterMenu() {
 			$menu = new Menu();
 			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["ulevel"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
 			$menu->setName($_POST["name"]);
-			$menu->setUlevel($_POST["ulevel"]);
 			$menu->setConnected($_POST["isconnected"]);
 			$menu->Create();
 		}
@@ -187,12 +181,10 @@
 			$menu = new Menu();
 			FS::$secMgr->SecuriseStringForDB($_POST["menu_id"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["ulevel"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
 			$menu->setId($_POST["menu_id"]);
 			$menu->Load();
 			$menu->setName($_POST["name"]);
-			$menu->setUlevel($_POST["ulevel"]);
 			$menu->setConnected($_POST["isconnected"]);
 			$menu->SaveToDB();
 		}
@@ -207,11 +199,9 @@
 		public function addMenuElement() {
 			$menuEl = new MenuElement();
 			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["ulevel"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["link_id"]);
 			$menuEl->setName($_POST["name"]);
-			$menuEl->setULevel($_POST["ulevel"]);
 			$menuEl->setConn($_POST["isconnected"]);
 			$menuEl->setLink($_POST["link_id"]);
 			$menuEl->Create();
@@ -220,13 +210,11 @@
 		public function EditMenuElement() {
 			$menuEl = new MenuElement();
 			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["ulevel"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
 			FS::$secMgr->SecuriseStringForDB($_POST["link_id"]);
 			$menuEl->setId($_POST["menu_elmt"]);
 			$menuEl->Load();
 			$menuEl->setName($_POST["name"]);
-			$menuEl->setULevel($_POST["ulevel"]);
 			$menuEl->setConn($_POST["isconnected"]);
 			$menuEl->setLink($_POST["link_id"]);
 			$menuEl->SaveToDB();
