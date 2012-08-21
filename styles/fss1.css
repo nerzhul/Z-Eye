@@ -12,14 +12,12 @@ h3:hover {
 }
 
 #main {
-	background-color: rgba(255, 255, 255, 0.9);
+	background-color: rgba(255, 255, 255, 0.94);
 	height: auto;
 	margin: auto;
 	margin-top: 50px;
 	padding: 45px;
-    	-webkit-border-radius: 3px 3px 3px 3px;
-	border-radius: 3px 3px 3px 3px;
-	-moz-box-shadow: 0px 5px 7px ;
+	border-radius: 2px 2px 2px 2px;
 	-webkit-box-shadow: 0px 5px 7px ;
 	box-shadow: 0px 5px 7px;
 	font-size: 12px;
@@ -107,7 +105,7 @@ div#menuStack div {
 }
 
 .menuItem {
-	padding: 4px;
+	padding: 10px 3px;
 	margin-top: 3px;
 	width: 100px;
 }
@@ -192,12 +190,10 @@ input {
 	padding: 5px;
 	background: -moz-radial-gradient(#222222, #000000);
         background: -webkit-gradient(#222222, #000000);
-    -webkit-border-radius: 7px 7px 1px 1px;
 	border-radius: 7px 7px 1px 1px;
 	background-color: #DDDDDD;
-	-moz-box-shadow: 0px 3px 3px ;
 	-webkit-box-shadow: 0px 3px 3px ;
-    box-shadow: 0px 3px 3px;
+	box-shadow: 0px 3px 3px;
 }
 
 #onlineForm {
@@ -205,7 +201,6 @@ input {
 	margin-left: 10px;
 	margin-bottom: -5px;
 	padding: 5px;
-    -webkit-border-radius: 7px 7px 1px 1px;
 	border-radius: 7px 7px 1px 1px;
 	background-color: #DDDDDD;
 	font-size: 11px;
@@ -235,7 +230,6 @@ p#banner {
     -webkit-border-radius: 5px 5px 5px 5px;
 	border-radius: 5px 5px 5px 5px;
 	float: left;
-	-moz-box-shadow: 0px 5px 5px ;
 	-webkit-box-shadow: 0px 5px 5px ;
     box-shadow: 0px 5px 5px;
 }
@@ -250,10 +244,8 @@ p#banner {
 	position: fixed;
 	background: -moz-radial-gradient(#222222, #000000);
 	background: -webkit-gradient(#222222, #000000);
-	-moz-box-shadow: -5px 5px 15px 5px;
 	-webkit-box-shadow: -5px 5px 15px 5px
 	box-shadow: -5px 5px 15px 5px;
-    -webkit-border-radius: 5px 5px 5px 5px;
 	border-radius: 5px 5px 5px 5px;
 }
 
@@ -268,7 +260,7 @@ p#banner {
 	margin:auto; 
 	margin-top: 3px;
 	font-size: 9px;
-	color:#444;
+	color:#999;
 	text-align:center;
 }
 
@@ -301,27 +293,35 @@ p#banner {
 	font-weight: bold;
 }
 
-#module_connect {
-	font-size: 12px;
-	padding: 5px;
-	padding-bottom: 12px;
-	margin-left: 120px;
-	margin-right: 120px;
-	margin-top: 30px;
-	text-align: center;
-}
-
 table {
 	border-collapse: collapse;
+	border-spacing: 0;
 	margin: auto;
+	border: 1px solid #EEE;
 }
 
 th {
-	border: 1px solid;
-	border-color: #999;
-	padding: 3px;
+	padding: 12px;
 	text-align: center;
-	background-color: #D5D5D5;
+	background-image: -moz-linear-gradient(center top , #CC3232, #A05252);
+	background-color: #CC3232;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+th:first-child {
+	border-radius: 6px 0 0 0;
+}
+
+th:last-child {
+	border-radius: 0 6px 0 0;
+}
+
+th a {
+	color: #444;
+}
+
+th a:hover {
+	color: #333;
 }
 
 tr:hover {
@@ -329,9 +329,8 @@ tr:hover {
 }
 
 td {
-	border: 1px solid;
-	border-color: #999;
-	padding: 3px;
+	border: 1px solid #CCC;
+	padding: 8px;
 }
 
 td:hover {
@@ -413,7 +412,6 @@ a:hover {
 	padding-bottom: 10px;
 	background: -moz-radial-gradient(#222222, #000000);
 	background: -webkit-gradient(#222222, #000000);
-	-moz-box-shadow: 5px 5px 15px 5px;
 	-webkit-box-shadow: 5px 5px 15px 5px
 	box-shadow: 5px 5px 15px 5px;
 }
@@ -594,17 +592,18 @@ a:hover {
 	background-color: #333;
         border-radius: 4px 4px 4px 4px;
         position: fixed;
-	right: 20px;
-        opacity: 0.7;
+        opacity: 0.6;
         padding: 16px;
 }
 
 #trash {
+	right: 20px;
 	bottom: 20px;
 	display: none;
 }
 
 #editf {
+	right: 20px;
 	bottom: 130px;
 	display: none;
 }
