@@ -64,9 +64,9 @@
 
 			if(!$file) {
 				if(Config::getOS() == "FreeBSD")
-					$output .= FS::$iMgr->printError("Impossible de libre le fichier /usr/local/etc/netdisco/netdisco.conf");
+					$output .= FS::$iMgr->printError("Impossible de lire le fichier /usr/local/etc/netdisco/netdisco.conf");
 				else if(Config::getOS() == "Debian")
-					$output .= FS::$iMgr->printError("Impossible de libre le fichier /etc/netdisco/netdisco.conf");
+					$output .= FS::$iMgr->printError("Impossible de lire le fichier /etc/netdisco/netdisco.conf");
 			} else {
 				foreach ($file as $lineNumber => $buf) {
 					$buf = trim($buf);
