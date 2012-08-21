@@ -1066,6 +1066,8 @@
 			if($foundwif != 0) {
                                 $output .= $outputwifi;
                                 $output .= "</table>";
+			}
+			if($foundsw != 0 || $foundwif != 0) {
 				$output .= "<script type=\"text/javascript\">
                                 $.event.props.push('dataTransfer');
                                 $('#dev #draga').on({
