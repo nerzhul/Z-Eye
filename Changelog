@@ -75,3 +75,6 @@ Alpha 0.24
 - Can now remove & add devices
 - Drop userlevel support
 - Bugfixes on switch D&D interface
+
+Alpha 0.25
+- It's possible to add multiple ldap servers for authentication

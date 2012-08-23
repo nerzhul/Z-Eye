@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/cisco.func.php");
 	
 	class iSwitchMgmt extends genModule{
-		function iSwitchMgmt($iMgr) { parent::genModule($iMgr); }
+		function iSwitchMgmt() { parent::genModule(); }
 		public function Load() {
 			$output = "";
 			if(!FS::isAjaxCall())

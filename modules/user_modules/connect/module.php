@@ -1,6 +1,7 @@
 <?php
 	/*
 	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -41,22 +42,30 @@
 			$output .= "</form></div>";
 			return $output;
 		}
-		
+
 		public function TryConnect($username,$password) {
 			$output = "";
-			$errorldap = 0;
+			$ldapok = false;
+			$ldapname = "";
 			$ldapMgr = new LDAP();
-			if(!$ldapMgr->Authenticate($username, $password)) {
-                               $errorldap = 1;
-                        }
+			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
+			while($data = pg_fetch_array($query)) {
+echo "test2".$data["dn"];
+				$tmpldapMgr = new LDAP();
+				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
+				if($tmpldapMgr->Authenticate($username, $password)) {
+                        		$ldapok = true;
+					$ldapname = $data["ldapname"];
+	                                $ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
+				}
+	                }
 
 			$url = FS::$secMgr->checkAndSecurisePostData("rdr");
                         if($url == NULL || $url == "index.php") $url = "m-0.html";
 
-			echo $url;
-			if($errorldap == 0) {
+			if($ldapok) {
 	                        $ldapMgr->RootConnect();
-        	                $result = $ldapMgr->GetOneEntry(LDAPConfig::$LDAPname."=".$username);
+        	                $result = $ldapMgr->GetOneEntry($ldapname."=".$username);
                 	        if(!$result) {
         	               	    header("Location: index.php?mod=".$this->mid."&err=1");
 	                            return;
