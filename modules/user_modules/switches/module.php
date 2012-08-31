@@ -1555,6 +1555,7 @@
                                         FS::$pgdbMgr->Delete("device_module","ip = '".$dip."'");
                                         FS::$pgdbMgr->Delete("device_port","ip = '".$dip."'");
                                         FS::$pgdbMgr->Delete("device_port_power","ip = '".$dip."'");
+					FS::$pgdbMgr->Delete("device_port_wireless","ip = '".$dip."'");
                                         FS::$pgdbMgr->Delete("device_port_ssid","ip = '".$dip."'");
 					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."'");
                                         FS::$pgdbMgr->Delete("device_power","ip = '".$dip."'");
