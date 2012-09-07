@@ -91,7 +91,7 @@
 					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours <br />";
 					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours <br />";
 		
-					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
+					$output .= FS::$iMgr->submit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
 					$output .= "<div id=\"atkst\"></div>";
 					$year = date("Y");
@@ -156,7 +156,7 @@
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
 					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
-					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
+					$output .= FS::$iMgr->submit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Scans</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
@@ -185,7 +185,7 @@
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
 					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
-					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
+					$output .= FS::$iMgr->submit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Attaques TSE</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
@@ -214,7 +214,7 @@
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
 					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
-					$output .= FS::$iMgr->addSubmit("Mise à jour","Mise à jour")."<br />";
+					$output .= FS::$iMgr->submit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Attaques SSH</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";

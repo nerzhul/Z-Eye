@@ -84,7 +84,7 @@
 					}";
 					$output .= "};";
 					$output .= "function showwait() {";
-					$output .= "$('#subpop').html('Modification en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+					$output .= "$('#subpop').html('Modification en cours...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
 					$output .= "};";
 					$output .= "</script>";
@@ -95,9 +95,9 @@
 						$output .= FS::$iMgr->addHidden("sw",$device);
 						$output .= FS::$iMgr->addHidden("port",$port);
 						$output .= "<table><tr><th>Champ</th><th>Valeur</th></tr>";
-						$output .= "<tr><td>Description</td><td>".FS::$iMgr->addInput("desc",$data["name"])."</td></tr>";
+						$output .= "<tr><td>Description</td><td>".FS::$iMgr->input("desc",$data["name"])."</td></tr>";
 						$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-						$output .= "<tr><td>Prise</td><td>".FS::$iMgr->addInput("prise",$piece)."</td></tr>";
+						$output .= "<tr><td>Prise</td><td>".FS::$iMgr->input("prise",$piece)."</td></tr>";
 						$output .= "<tr><td>Adresse MAC</td><td>".$data["mac"]."</td></tr>";
 						$output .= "<tr><td>Etat / Duplex / Vitesse</td><td>";
 						if($data["up_admin"] == "down")
@@ -191,7 +191,7 @@
                                 	        }
 						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
-						$output .= "<textarea name=\"vllist\" rows=10 cols=40>".$vlanlist."</textarea>";
+						$output .= FS::$iMgr->textarea("vllist",$vlanlist,250,100);
 						$output .= "</td></tr>";
 
 						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
@@ -248,10 +248,10 @@
 					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
 					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",(($climit > 0 || $wlimit) > 0 ? true : false),"Activer le monitoring")."</li><li>";
-					$output .= FS::$iMgr->addInput("desc",$desc,20,200,"Libellé")."</li><li>";
+					$output .= FS::$iMgr->input("desc",$desc,20,200,"Libellé")."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),10,10,"Seuil avertissement (Mo)")."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),10,10,"Seuil critique (Mo)")."</li><li>";
-					$output .= FS::$iMgr->addSubmit("","Enregister")."</li>";
+					$output .= FS::$iMgr->submit("","Enregister")."</li>";
 					$output .= "</ul>";
 					$output .= "</form>";
 				}
@@ -764,7 +764,7 @@
 					$output .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
 					$output .= "$('#slogin').hide(); }};";
 					$output .= "function sendbackupreq() {";
-					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
 					srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
@@ -789,14 +789,14 @@
 					$output .= FS::$iMgr->addElementToList("Import",2);
 					$output .= "</select><br />";
 					$output .= "Adresse du serveur ".FS::$iMgr->addIPInput("srvip")."<br />";
-					$output .= "Nom de fichier ".FS::$iMgr->addInput("srvfilename")."<br />";
-					$output .= "<div id=\"slogin\" style=\"display:none;\">Utilisateur ".FS::$iMgr->addInput("srvuser");
-					$output .= " Mot de passe ".FS::$iMgr->addPasswdField("srvpwd")."</div>";
+					$output .= "Nom de fichier ".FS::$iMgr->input("srvfilename")."<br />";
+					$output .= "<div id=\"slogin\" style=\"display:none;\">Utilisateur ".FS::$iMgr->input("srvuser");
+					$output .= " Mot de passe ".FS::$iMgr->password("srvpwd")."</div>";
 					$output .= FS::$iMgr->addJSSubmit("send","Envoyer","return sendbackupreq();");
 					
 					// Copy startup-config -> running-config
 					$output .= "<script type=\"text/javascript\">function restorestartupconfig() {";
-					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+					$output .= "$('#subpop').html('Envoi de la requête en cours...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
 						var copyId = data;
@@ -885,7 +885,7 @@
 					$tmpoutput2 .= "<a onclick=\"javascript:modifyPrise('#swpr_".$convport." a',false);\"><div id=\"swpr_".$convport."l\" class=\"modport\">";
 					$tmpoutput2 .= ($swpdata == "" ? "Modifier" : $swpdata);
 					$tmpoutput2 .= "</div></a><a style=\"display: none;\">";
-								$tmpoutput2 .= FS::$iMgr->addInput("swprise-".$convport,$swpdata,10,10);
+								$tmpoutput2 .= FS::$iMgr->input("swprise-".$convport,$swpdata,10,10);
 								$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPrise('#swpr_".$convport."',true,'".$dip."','".$data["port"]."','swprise-".$convport."');\" />";
 					$tmpoutput2 .= "</a></div>";
 					$tmpoutput2 .= "</td><td>".$data["mac"]."</td><td>";
@@ -1030,13 +1030,13 @@
 
 		protected function showDeviceList() {
 			$formoutput = "<script type=\"text/javascript\">function showwait() {";
-                        $formoutput .= "$('#subpop').html('Découverte en cours...<br /><br /><br />".FS::$iMgr->addImage("styles/images/loader.gif",32,32)."');";
+                        $formoutput .= "$('#subpop').html('Découverte en cours...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
                         $formoutput .= "$('#pop').show();";
                         $formoutput .= "};</script>".FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=18");
                         $formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
                         $formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("","Découvrir","showwait()")."</li>";
                         $formoutput .= "</ul></form>";
-                        $output = FS::$iMgr->addOpenableDiv($formoutput,"Découvrir un équipement");
+                        $output = FS::$iMgr->opendiv($formoutput,"Découvrir un équipement");
 
                         $query = FS::$pgdbMgr->Select("device","*","","name");
 
@@ -1085,8 +1085,8 @@
                                         drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'équipement \''+e.dataTransfer.getData('text/html')+'\' ?".
                                                 FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=17").
                                                 FS::$iMgr->addHidden("device","'+e.dataTransfer.getData('text/html')+'").
-                                                FS::$iMgr->addSubmit("","Supprimer").
-                                                FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                                FS::$iMgr->submit("","Supprimer").
+                                                FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                                 $('#pop').show();
                                         }
                                 });

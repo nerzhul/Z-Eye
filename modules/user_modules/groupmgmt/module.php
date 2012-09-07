@@ -55,19 +55,19 @@
 				array_push($rules,$data["rulename"]);
 			$output .= $this->loadModuleRuleSets($rules);
 			$output .= FS::$iMgr->addHidden("gid",$gid);
-			$output .= FS::$iMgr->addSubmit("","Enregistrer")."</form>";
+			$output .= FS::$iMgr->submit("","Enregistrer")."</form>";
 			return $output;
 		}
 
 		private function showMain() {
 			$output = "<h3>Gestion des groupes</h3>";
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addInput("gname","",20,40,"Nom du groupe");
+			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,"Nom du groupe");
 			$formoutput .= "<h3>Options des modules</h3>";
 			$formoutput .= $this->loadModuleRuleSets();
-                        $formoutput .= "</li><li>".FS::$iMgr->addSubmit("reggrp","Ajouter")."</li>";
+                        $formoutput .= "</li><li>".FS::$iMgr->submit("reggrp","Ajouter")."</li>";
 			$formoutput .= "</ul></form>";
-			$output .= FS::$iMgr->addOpenableDiv($formoutput,"Nouveau Groupe");
+			$output .= FS::$iMgr->opendiv($formoutput,"Nouveau Groupe");
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_groups","gid,gname,description");
@@ -97,8 +97,8 @@
                                         drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer le groupe \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2").
   	                                      FS::$iMgr->addHidden("gname","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->addSubmit("","Supprimer").
-                                              FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                              FS::$iMgr->submit("","Supprimer").
+                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
                                 	}
                                 });

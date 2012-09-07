@@ -87,7 +87,7 @@
 				$output .= FS::$iMgr->addIndexedCheckLine("Détection des services instables","flapenable",$flapenable);
 				// date_format
 				$output .= FS::$iMgr->addIndexedCheckLine("Mail de l'administrateur","adminmail",$adminmail);
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 2) {

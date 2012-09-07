@@ -123,9 +123,9 @@
 					case 5: $output .= "SFTP"; break;
 				}
 			}
-			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Utilisateur</td><td>".FS::$iMgr->addInput("slogin",$slogin)."</td></tr>";
-			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe</td><td>".FS::$iMgr->addPasswdField("spwd","")."</td></tr>";
-			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe (répétition)</td><td>".FS::$iMgr->addPasswdField("spwd2","")."</td></tr>";
+			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Utilisateur</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
+			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
+			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe (répétition)</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->addIndexedLine("Chemin sur le serveur","spath",$spath);
 			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
 			$output .= "</table>";
@@ -285,7 +285,7 @@
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
 				$tmpoutput .= "<center>".($data["dhcp"] > 0 ? "X" : "")."</center></td><td><center>".($data["dns"] > 0 ? "X" : "")."</center></td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]."\">";
-				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+				$tmpoutput .= FS::$iMgr->img("styles/images/cross.png",15,15);
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
@@ -303,7 +303,7 @@
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">";
-				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+				$tmpoutput .= FS::$iMgr->img("styles/images/cross.png",15,15);
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
@@ -328,7 +328,7 @@
 				}
 				$tmpoutput .= "</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=9&addr=".$data["addr"]."&type=".$data["type"]."\">";
-				$tmpoutput .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+				$tmpoutput .= FS::$iMgr->img("styles/images/cross.png",15,15);
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)

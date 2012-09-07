@@ -48,7 +48,7 @@
 					$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
 					$tmpoutput .= FS::$iMgr->addElementToList($radpath,$radpath,$rad == $radpath);
 				}
-				if($found) $output .= $tmpoutput."</select>".FS::$iMgr->addSubmit("","Administrer")."</form>";
+				if($found) $output .= $tmpoutput."</select>".FS::$iMgr->submit("","Administrer")."</form>";
 				else $output .= FS::$iMgr->printError("Aucun serveur radius référencé");
 			}
 			if($raddb && $radhost && $radport) {
@@ -101,7 +101,7 @@
                                         $('.ugroupli'+grpidx).remove();
                                 }
 				attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-				FS::$iMgr->addInput("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
+				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
 				FS::$iMgr->addElementToList("=","=").
 				FS::$iMgr->addElementToList("==","==").
 				FS::$iMgr->addElementToList(":=",":=").
@@ -115,7 +115,7 @@
                                 FS::$iMgr->addElementToList("!~","!~").
                                 FS::$iMgr->addElementToList("=*","=*").
 				FS::$iMgr->addElementToList("!*","!*").
-				"</select> Valeur".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
+				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
 				FS::$iMgr->addElementToList("check",1).
 				FS::$iMgr->addElementToList("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertBefore('#formactions');
 				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
@@ -131,9 +131,9 @@
 				$formoutput .= FS::$iMgr->addElementToList("Adresse MAC",2);
 				//$formoutput .= FS::$iMgr->addElementToList("Code PIN",3);
 				$formoutput .= "</select></li><li>".
-				FS::$iMgr->addInput("username","",20,40,"Utilisateur")."</li><li>";
+				FS::$iMgr->input("username","",20,40,"Utilisateur")."</li><li>";
 				$formoutput .= "<fieldset id=\"userdf\" style=\"border:0; padding:0; margin-left: -1px;\"><li>".
-				FS::$iMgr->addPasswdField("pwd","","Mot de passe")."</li><li>".
+				FS::$iMgr->password("pwd","","Mot de passe")."</li><li>".
 				FS::$iMgr->addList("upwdtype","","Type de mot de passe").
 				FS::$iMgr->addElementToList("Cleartext-Password",1).
 				FS::$iMgr->addElementToList("User-Password",2).
@@ -141,10 +141,10 @@
 				FS::$iMgr->addElementToList("MD5-Password",4).
 				FS::$iMgr->addElementToList("SHA1-Password",5).
 				FS::$iMgr->addElementToList("CHAP-Password",6).
-				"</select></li></li><li id=\"formactions\">".FS::$iMgr->addButton("newgrp","Nouveau Groupe","addGrpForm()").
-				FS::$iMgr->addButton("newattr","Nouvel attribut","addAttrElmt('','','','')").
-				FS::$iMgr->addSubmit("","Enregistrer")."</li></ul></form>";
-				$output .= FS::$iMgr->addOpenableDiv($formoutput,"Nouvel Utilisateur");
+				"</select></li></li><li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").
+				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
+				FS::$iMgr->submit("","Enregistrer")."</li></ul></form>";
+				$output .= FS::$iMgr->opendiv($formoutput,"Nouvel Utilisateur");
 				$found = 0;
 				$tmpoutput = "<h4>Liste des Utilisateurs</h4>";
 				$tmpoutput .= "<script type=\"text/javascript\">
@@ -166,8 +166,8 @@
 						FS::$iMgr->addHidden("user","'+e.dataTransfer.getData('text/html')+'").
 						FS::$iMgr->addCheck("logdel",false,"Supprimer les logs ?")."<br />".
 						FS::$iMgr->addCheck("acctdel",false,"Supprimer l\\'accounting ?")."<br />".
-						FS::$iMgr->addSubmit("","Supprimer").
-						FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+						FS::$iMgr->submit("","Supprimer").
+						FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
 						$('#pop').show();
 					}
 				});
@@ -196,7 +196,7 @@
 			}
 			else if($sh == 2) {
 				$formoutput = "<script type=\"text/javascript\">attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-				FS::$iMgr->addInput("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
+				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
 				FS::$iMgr->addElementToList("=","=").
 				FS::$iMgr->addElementToList("==","==").
 				FS::$iMgr->addElementToList(":=",":=").
@@ -210,7 +210,7 @@
                                 FS::$iMgr->addElementToList("!~","!~").
                                 FS::$iMgr->addElementToList("=*","=*").
 				FS::$iMgr->addElementToList("!*","!*").
-				"</select> Valeur".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40)." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
+				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
 				FS::$iMgr->addElementToList("check",1).
 				FS::$iMgr->addElementToList("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
 				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
@@ -242,8 +242,8 @@
                                         drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer le profil \''+e.dataTransfer.getData('text/html')+'\' ?".
 						FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
                                                 FS::$iMgr->addHidden("group","'+e.dataTransfer.getData('text/html')+'").
-                                                FS::$iMgr->addSubmit("","Supprimer").
-                                                FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                                FS::$iMgr->submit("","Supprimer").
+                                                FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                                 $('#pop').show();
                                         }
                                 });
@@ -257,11 +257,11 @@
 				$formoutput .= FS::$iMgr->addElementToList("Aucun",0);
 				$formoutput .= FS::$iMgr->addElementToList("VLAN",1);
 				$formoutput .= "</select></li><li>".
-				FS::$iMgr->addInput("groupname","",20,40,"Nom du profil")."</li><li>".
-				FS::$iMgr->addButton("newattr","Nouvel attribut","addAttrElmt('','','','')").
-				FS::$iMgr->addSubmit("","Enregistrer").
+				FS::$iMgr->input("groupname","",20,40,"Nom du profil")."</li><li>".
+				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
+				FS::$iMgr->submit("","Enregistrer").
 				"</li></ul></form>";
-				$output .= FS::$iMgr->addOpenableDiv($formoutput,"Nouveau profil");
+				$output .= FS::$iMgr->opendiv($formoutput,"Nouveau profil");
 				$tmpoutput = "<h4>Liste des profils</h4>";
 				$found = 0;
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
@@ -338,9 +338,9 @@
                                 FS::$iMgr->addElementToList("SHA1-Password",5).
                                 FS::$iMgr->addElementToList("CHAP-Password",6).
                                 "</select></li><li>".FS::$iMgr->addList("ugroup","","Profil").FS::$iMgr->addElementToList("","none").
-				$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->addTextArea("csvlist","",580,330,"Liste des utilisateurs (format CSV)")."</li><li id=\"csvtooltip\">".
+				$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->textarea("csvlist","",580,330,"Liste des utilisateurs (format CSV)")."</li><li id=\"csvtooltip\">".
 				"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b></li><li>".
-				FS::$iMgr->addSubmit("","Importer")."</li></ul></form>";
+				FS::$iMgr->submit("","Importer")."</li></ul></form>";
 			}
 			else if($sh == 4) {
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
@@ -382,7 +382,7 @@
                                         	foreach($groups as $key => $value)
 							$formoutput .= FS::$iMgr->addElementToList($key,$key);
                 	                }
-					$formoutput .= "</select></li><li>".FS::$iMgr->addSubmit("reg","Ajouter")."</li></ul></form>";
+					$formoutput .= "</select></li><li>".FS::$iMgr->submit("reg","Ajouter")."</li></ul></form>";
 				}
 				if($found) {
 					$output .= $formoutput;
@@ -405,8 +405,8 @@
 		                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'importation du subnet \''+e.dataTransfer.getData('text/html')+'\' ?".
                 		                                FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8").
                                 		                FS::$iMgr->addHidden("subnet","'+e.dataTransfer.getData('text/html')+'").
-                		                                FS::$iMgr->addSubmit("","Supprimer").
-                                		                FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                		                                FS::$iMgr->submit("","Supprimer").
+                                		                FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                                 		$('#pop').show();
 		                                        }
                 		                });
@@ -460,8 +460,8 @@
                                         $('.ugroupli'+grpidx).remove();
                                 }
 				attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-				FS::$iMgr->addInput("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Valeur".
-				FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40,"")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
+				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Valeur".
+				FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
 				FS::$iMgr->addElementToList("=","=").
 				FS::$iMgr->addElementToList("==","==").
 				FS::$iMgr->addElementToList(":=",":=").
@@ -497,7 +497,7 @@
 				FS::$iMgr->addHidden("username",$radentry)."</li>";
 				if($utype == 1) {
 					$formoutput .= "<li><fieldset id=\"userdf\" style=\"border:0;\">".
-					FS::$iMgr->addPasswdField("pwd","","Mot de passe")."<br />".
+					FS::$iMgr->password("pwd","","Mot de passe")."<br />".
 					FS::$iMgr->addList("upwdtype","","Type de mot de passe").
 					FS::$iMgr->addElementToList("Cleartext-Password",1,($upwdtype && $upwdtype == "Cleartext-Password" ? true : false)).
 					FS::$iMgr->addElementToList("User-Password",2,($upwdtype && $upwdtype == "User-Password" ? true : false)).
@@ -517,7 +517,7 @@
 				$query = $radSQLMgr->Select("radcheck","attribute,op,value","username = '".$radentry."'");
 				while($data = mysql_fetch_array($query)) {
 					if(!($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept")) {
-						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->addInput("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
+						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
         	        	                FS::$iMgr->addList("attrop".$attridx).
 						FS::$iMgr->addElementToList("=","=",($data["op"] == "=" ? true : false)).
                 		                FS::$iMgr->addElementToList("==","==",($data["op"] == "==" ? true : false)).
@@ -532,7 +532,7 @@
 	                        	        FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
         	        	                FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
         		                        FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-	                	                "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+	                	                "</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
         	                	        FS::$iMgr->addElementToList("check",1,true).
 	                                	FS::$iMgr->addElementToList("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
 						$attridx++;
@@ -540,7 +540,7 @@
 				}
 				$query = $radSQLMgr->Select("radreply","attribute,op,value","username = '".$radentry."'");
                                 while($data = mysql_fetch_array($query)) {
-                                        $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->addInput("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
+                                        $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
                                         FS::$iMgr->addList("attrop".$attridx).
                                         FS::$iMgr->addElementToList("=","=",($data["op"] == "=" ? true : false)).
                                         FS::$iMgr->addElementToList("==","==",($data["op"] == "==" ? true : false)).
@@ -555,14 +555,14 @@
                                         FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
                                         FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
                                         FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-                                        "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+                                        "</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
                                         FS::$iMgr->addElementToList("check",1).
                                         FS::$iMgr->addElementToList("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
                                         $attridx++;
                                 }
-				$formoutput .= "<li id=\"formactions\">".FS::$iMgr->addButton("newgrp","Nouveau Groupe","addGrpForm()").
-				FS::$iMgr->addButton("newattr","Nouvel attribut","addAttrElmt('','','','')").
-				FS::$iMgr->addSubmit("","Enregistrer")."</form></li></ul>";
+				$formoutput .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").
+				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
+				FS::$iMgr->submit("","Enregistrer")."</form></li></ul>";
 				$output .= $formoutput;
 			}
 			else if($radentrytype == 2) {
@@ -576,7 +576,7 @@
 				$attrcount = $radSQLMgr->Count("radgroupcheck","groupname","groupname = '".$radentry."'");
 				$attrcount += $radSQLMgr->Count("radgroupreply","groupname","groupname = '".$radentry."'");
 				$formoutput = "<script type=\"text/javascript\">attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-                                FS::$iMgr->addInput("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
+                                FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->addList("attrop'+attridx+'").
                                 FS::$iMgr->addElementToList("=","=").
                                 FS::$iMgr->addElementToList("==","==").
                                 FS::$iMgr->addElementToList(":=",":=").
@@ -590,7 +590,7 @@
                                 FS::$iMgr->addElementToList("!~","!~").
                                 FS::$iMgr->addElementToList("=*","=*").
                                 FS::$iMgr->addElementToList("!*","!*").
-                                "</select> Valeur".FS::$iMgr->addInput("attrval'+attridx+'","'+attrval+'",10,40)." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
+                                "</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
                                 FS::$iMgr->addElementToList("check",1).
                                 FS::$iMgr->addElementToList("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
                                 $('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
@@ -605,7 +605,7 @@
 				$attridx = 0;
                                 $query = $radSQLMgr->Select("radgroupcheck","attribute,op,value","groupname = '".$radentry."'");
                                 while($data = mysql_fetch_array($query)) {
-                                         $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->addInput("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
+                                         $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
                                          FS::$iMgr->addList("attrop".$attridx).
                                          FS::$iMgr->addElementToList("=","=",($data["op"] == "=" ? true : false)).
                                          FS::$iMgr->addElementToList("==","==",($data["op"] == "==" ? true : false)).
@@ -620,7 +620,7 @@
                                          FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
                                          FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
                                          FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-                                         "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+                                         "</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
                                          FS::$iMgr->addElementToList("check",1,true).
                                          FS::$iMgr->addElementToList("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
                                          $attridx++;
@@ -628,7 +628,7 @@
 
                                 $query = $radSQLMgr->Select("radgroupreply","attribute,op,value","groupname = '".$radentry."'");
                                 while($data = mysql_fetch_array($query)) {
-                                        $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->addInput("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
+                                        $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
                                         FS::$iMgr->addList("attrop".$attridx).
                                         FS::$iMgr->addElementToList("=","=",($data["op"] == "=" ? true : false)).
                                         FS::$iMgr->addElementToList("==","==",($data["op"] == "==" ? true : false)).
@@ -643,12 +643,12 @@
                                         FS::$iMgr->addElementToList("!~","!~",($data["op"] == "!~" ? true : false)).
                                         FS::$iMgr->addElementToList("=*","=*",($data["op"] == "=*" ? true : false)).
                                         FS::$iMgr->addElementToList("!*","!*",($data["op"] == "!*" ? true : false)).
-                                        "</select> Valeur".FS::$iMgr->addInput("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
+                                        "</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->addList("attrtarget".$attridx).
                                         FS::$iMgr->addElementToList("check",1).
                                         FS::$iMgr->addElementToList("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
                                         $attridx++;
                                 }
-				$formoutput .= "<li>".FS::$iMgr->addButton("newattr","Nouvel attribut","addAttrElmt('','','','')").FS::$iMgr->addSubmit("","Enregistrer")."</li></ul></form>";
+				$formoutput .= "<li>".FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").FS::$iMgr->submit("","Enregistrer")."</li></ul></form>";
 				$output .= $formoutput;
 			}
 			else

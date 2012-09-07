@@ -52,7 +52,7 @@
 						$output .= "Rewrite Autres";
 					$output .= "</center></td><td><center>".$data["args"]."</center></td>";
 					$output .= "<td><a href=\"index.php?mod=".$this->mid."&act=3&link=".$data["id"]."\">";
-					$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+					$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
 					$output .= "</a></td></tr>";
 				}
 				$output .= "</table></div>";				
@@ -84,9 +84,9 @@
 			$output .= FS::$iMgr->addElementToList("Rewrite Autres",5,($lnk && $lnk->getType() == 5) ? true : false);		
 			$output .= "</select><br />Arguments ";
 			
-			$output .= FS::$iMgr->addInput("args",$lnk ? $lnk->getArgs() : "",25,130);
+			$output .= FS::$iMgr->input("args",$lnk ? $lnk->getArgs() : "",25,130);
 			$output .= "<hr>";
-			$output .= FS::$iMgr->addSubmit("reg","Enregistrer");
+			$output .= FS::$iMgr->submit("reg","Enregistrer");
 			$output .= "</form>";
 			return $output;
 		}

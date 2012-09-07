@@ -30,12 +30,12 @@
 				$output .= FS::$iMgr->printError("Pas de données à rechercher");
 			return $output;
 		}
-		
+
 		private function findRefsAndShow($search) {
 			$output = "<h3>Recherche: ".$search."</h3>";
 			if(FS::$secMgr->isMacAddr($search)) {
 				$output .= $this->showMacAddrResults($search);
-            }
+		        }
 			else if(FS::$secMgr->isIP($search)) {
 				$output .= $this->showIPAddrResults($search);
 			}
@@ -49,31 +49,44 @@
 				else
 					$output .= FS::$iMgr->printError("Aucune donnée trouvée");
 			}
-			
+
 			return $output;
 		}
-		
+
 		private function showNumericResults($search) {
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
-			
+			$swmodid = FS::$iMgr->getModuleIdByPath("switches");
+
 			// Prise number
-			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port","prise = '".$search."'");
+			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
+			$devprise = array();
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h4>Prise référencée</h4>";
+					$tmpoutput .= "<div><h4>Prise(s) référencée(s)</h4>";
 				}
 				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-				$convport = preg_replace("#\/#","-",$data["port"]);
-				$tmpoutput .= "Equipement: <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."\">".$swname."</a> (";
-				$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."#".$convport."\">".$data["port"]."</a>";
-				$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>) <br />";
+				if(!isset($devprise[$swname]))
+					$devprise[$swname] = array();
+
+				$devprise[$swname][$data["port"]] = $data["prise"];
 			}
-			if($found) $tmpoutput .= "</div>";
+			if($found) {
+				foreach($devprise as $device => $devport) {
+					$tmpoutput .= "Equipement: <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+					foreach($devport as $port => $prise) {
+						$convport = preg_replace("#\/#","-",$port);
+        		                        $tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
+	                	                $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (Prise ".$prise.")</li>";
+					}
+					$tmpoutput .= "</ul>";
+				}
+				$tmpoutput .= "</div>";
+			}
 			$found = 0;
-			
+
 			// VLAN on a device
 			$query = FS::$pgdbMgr->Select("device_vlan","ip,description","vlan = '".$search."'","ip");
 			while($data = pg_fetch_array($query)) {
@@ -82,13 +95,13 @@
 						$found = 1;
 						$tmpoutput .= "<div><h4>VLAN présent dans ces équipements</h4>";
 					}
-					$tmpoutput .= "<li> <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
+					$tmpoutput .= "<li> <a href=\"index.php?mod=".$swmodid."&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
 				}
 			}
-			
+
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
-			
+
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
@@ -96,11 +109,13 @@
 
 			return $output;
 		}
-		
+
 		private function showNamedInfos($search) {
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
+			$nbresults = 0;
+			$swmodid = FS::$iMgr->getModuleIdByPath("switches");
 
 			// Devices
 			$query = FS::$pgdbMgr->Select("device","mac,ip,description,model","name ILIKE '".$search."'");
@@ -112,22 +127,36 @@
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
 				$tmpoutput .= "<b><i>Modèle:</i></b> ".$data["model"]."<br />";
 				$tmpoutput .= "<b><i>Description: </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
+				$nbresults++;
 			}
-			
+
 			// Prise number
-			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port","prise ILIKE '".$search."'");
-			while($data = pg_fetch_array($query)) {
-				if($found == 0) {
-					$found = 1;
-					$tmpoutput .= "<div><h4>Prise référencée</h4>";
-				}
-				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-				$convport = preg_replace("#\/#","-",$data["port"]);
-				$tmpoutput .= "Equipement: <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."\">".$swname."</a> [";
-				$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."#".$convport."\">".$data["port"]."</a> ";
-				$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$swname."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",12,12)."</a>]<br />";
-			}
-			if($found) $tmpoutput .= "</div>";
+                        $query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
+                        $devprise = array();
+                        while($data = pg_fetch_array($query)) {
+                                if($found == 0) {
+                                        $found = 1;
+                                        $tmpoutput .= "<div><h4>Prise(s) référencée(s)</h4>";
+                                }
+                                $swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+                                if(!isset($devprise[$swname]))
+                                        $devprise[$swname] = array();
+
+                                $devprise[$swname][$data["port"]] = $data["prise"];
+				$nbresults++;
+                        }
+                        if($found) {
+                                foreach($devprise as $device => $devport) {
+                                        $tmpoutput .= "Equipement: <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+                                        foreach($devport as $port => $prise) {
+                                                $convport = preg_replace("#\/#","-",$port);
+                                                $tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
+                                                $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (Prise ".$prise.")</li>";
+                                        }
+                                        $tmpoutput .= "</ul>";
+                                }
+                                $tmpoutput .= "</div>";
+                        }
 			$found = 0;
 			
 			// DNS infos
@@ -156,6 +185,7 @@
 						$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a><br />";
 					else
 						$tmpoutput .= $data["recval"]."<br />";
+					$nbresults++;
 				}
 				if($found) $tmpoutput .= "</div>";
 				$found = 0;
@@ -174,13 +204,14 @@
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>";
 				$tmpoutput .= "\\\\<a href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>\\<a href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>";
 				$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
+				$nbresults++;
 			}
 			
 			if($found) $tmpoutput .= "</table></div>";
 			$found = 0;
 
 			if(strlen($tmpoutput) > 0)
-				$output .= $tmpoutput;
+				$output .= "<h4>Nombre de résultats: ".$nbresults."</h4>".$tmpoutput;
 			else
 				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
 
@@ -248,7 +279,7 @@
 					$convport = preg_replace("#\/#","-",$data["port"]);
 					$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 					$tmpoutput .= "[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
-					$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
+					$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->img("styles/images/pencil.gif",10,10)."</a>";
 					if($piece) $tmpoutput .= "/ Prise ".$piece;
 					$tmpoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
 					$tmpoutput .= "</div>";
@@ -339,7 +370,7 @@
 				$convport = preg_replace("#\/#","-",$data["port"]);
 				$tmpoutput .=  "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 				$tmpoutput .= "[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
-				$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->addImage("styles/images/pencil.gif",10,10)."</a>";
+				$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->img("styles/images/pencil.gif",10,10)."</a>";
 				$tmpoutput .= ($piece == NULL ? "" : " / Prise ".$piece);
 				$fst = preg_split("#\.#",$data["time_first"]);
 				$lst = preg_split("#\.#",$data["time_last"]);

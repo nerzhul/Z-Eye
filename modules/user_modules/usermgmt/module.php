@@ -59,7 +59,7 @@
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
-                        $output .= "<li id=\"formactions\">".FS::$iMgr->addButton("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->addSubmit("","Ajouter")."</li>";
+                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->submit("","Ajouter")."</li>";
                         $output .= "</ul></form>";
 
 			$output .= "<script type=\"text/javascript\">grpidx = ".$grpidx."; function addGrpForm() {
@@ -82,15 +82,15 @@
 	                        $output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>Annuaire: </b>".$addr."</li><li>";
                         	$output .= FS::$iMgr->addNumericInput("port",$data["port"],5,5,"Port LDAP")."</li><li>";
                 	        $output .= FS::$iMgr->addCheck("ssl",($data["ssl"] == 1 ? true : false),"SSL ?")."</li><li>";
-        	                $output .= FS::$iMgr->addInput("dn",$data["dn"],20,200,"Base DN")."</li><li>";
-	                        $output .= FS::$iMgr->addInput("rootdn",$data["rootdn"],20,200,"Root DN")."</li><li>";
-                        	$output .= FS::$iMgr->addPasswdField("rootpwd",$data["dnpwd"],"Root Pwd")."</li><li>";
-                	        $output .= FS::$iMgr->addInput("ldapname",$data["ldapname"],20,40,"Attribut Nom")."</li><li>";
-        	                $output .= FS::$iMgr->addInput("ldapsurname",$data["ldapsurname"],20,40,"Attribut Prénom")."</li><li>";
-	                        $output .= FS::$iMgr->addInput("ldapmail",$data["ldapmail"],20,40,"Attribut Mail")."</li><li>";
-                        	$output .= FS::$iMgr->addInput("ldapuid",$data["ldapuid"],20,40,"Attribut UID")."</li><li>";
-                	        $output .= FS::$iMgr->addInput("ldapfilter",$data["filter"],20,200,"Filtre LDAP")."</li><li>";
-        	                $output .= FS::$iMgr->addSubmit("","Enregistrer")."</li>";
+        	                $output .= FS::$iMgr->input("dn",$data["dn"],20,200,"Base DN")."</li><li>";
+	                        $output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,"Root DN")."</li><li>";
+                        	$output .= FS::$iMgr->password("rootpwd",$data["dnpwd"],"Root Pwd")."</li><li>";
+                	        $output .= FS::$iMgr->input("ldapname",$data["ldapname"],20,40,"Attribut Nom")."</li><li>";
+        	                $output .= FS::$iMgr->input("ldapsurname",$data["ldapsurname"],20,40,"Attribut Prénom")."</li><li>";
+	                        $output .= FS::$iMgr->input("ldapmail",$data["ldapmail"],20,40,"Attribut Mail")."</li><li>";
+                        	$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,"Attribut UID")."</li><li>";
+                	        $output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,"Filtre LDAP")."</li><li>";
+        	                $output .= FS::$iMgr->submit("","Enregistrer")."</li>";
 	                        $output .= "</ul></form>";
 			}
 			else {
@@ -153,8 +153,8 @@
                                         drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'utilisateur \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3").
                                               FS::$iMgr->addHidden("username","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->addSubmit("","Supprimer").
-                                              FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                              FS::$iMgr->submit("","Supprimer").
+                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
                                 }
                                 });</script>";
@@ -162,21 +162,21 @@
 			$output .= "<h3>Gestion des annuaires</h3>";
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<ul class=\"ulform\"><li>";
-			$formoutput .= FS::$iMgr->addInput("addr","",20,40,"Adresse de l'annuaire LDAP")."</li><li>";
+			$formoutput .= FS::$iMgr->input("addr","",20,40,"Adresse de l'annuaire LDAP")."</li><li>";
 			$formoutput .= FS::$iMgr->addNumericInput("port","389",5,5,"Port LDAP")."</li><li>";
 			$formoutput .= FS::$iMgr->addCheck("ssl",false,"SSL ?")."</li><li>";
-			$formoutput .= FS::$iMgr->addInput("dn","",20,200,"Base DN")."</li><li>";
-			$formoutput .= FS::$iMgr->addInput("rootdn","",20,200,"Root DN")."</li><li>";
-			$formoutput .= FS::$iMgr->addPasswdField("rootpwd","","Root Pwd")."</li><li>";
-			$formoutput .= FS::$iMgr->addInput("ldapname","",20,40,"Attribut Nom")."</li><li>";
-			$formoutput .= FS::$iMgr->addInput("ldapsurname","",20,40,"Attribut Prénom")."</li><li>";
-			$formoutput .= FS::$iMgr->addInput("ldapmail","",20,40,"Attribut Mail")."</li><li>";
-			$formoutput .= FS::$iMgr->addInput("ldapuid","",20,40,"Attribut UID")."</li><li>";
-			$formoutput .= FS::$iMgr->addInput("ldapfilter","",20,200,"Filtre LDAP")."</li><li>";
-			$formoutput .= FS::$iMgr->addSubmit("","Enregistrer")."</li>";
+			$formoutput .= FS::$iMgr->input("dn","",20,200,"Base DN")."</li><li>";
+			$formoutput .= FS::$iMgr->input("rootdn","",20,200,"Root DN")."</li><li>";
+			$formoutput .= FS::$iMgr->password("rootpwd","","Root Pwd")."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapname","",20,40,"Attribut Nom")."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapsurname","",20,40,"Attribut Prénom")."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapmail","",20,40,"Attribut Mail")."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapuid","",20,40,"Attribut UID")."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapfilter","",20,200,"Filtre LDAP")."</li><li>";
+			$formoutput .= FS::$iMgr->submit("","Enregistrer")."</li>";
 			$formoutput .= "</ul></form>";
 
-			$output .= FS::$iMgr->addOpenableDiv($formoutput,"Nouvel Annuaire");
+			$output .= FS::$iMgr->opendiv($formoutput,"Nouvel Annuaire");
 
 			$found = 0;
 			$tmpoutput = "";
@@ -211,8 +211,8 @@
                                         drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'annuaire \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=5").
                                               FS::$iMgr->addHidden("addr","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->addSubmit("","Supprimer").
-                                              FS::$iMgr->addButton("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                              FS::$iMgr->submit("","Supprimer").
+                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
                                 }
                                 });</script>";

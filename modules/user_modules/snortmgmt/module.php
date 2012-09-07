@@ -55,11 +55,11 @@
 				$output .= FS::$iMgr->addIndexedLine("Utilisateur","dbuser");
 				$output .= FS::$iMgr->addIndexedLine("Mot de passe","dbpwd","",true);
 				$output .= "<tr><td>Liste des LANs</td><td>";
-				$output .= "<textarea name=\"srvlist\" rows=10 cols=40>";
-			
-				$output .= "</textarea></td></tr>";	
+				$output .= FS::$iMgr->textarea("srvlist","",250,100);
+
+				$output .= "</td></tr>";
 				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 2) {
@@ -69,8 +69,8 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","endns",$dnsenable);
-				$output .= "<tr><td>Serveurs DNS</td><td><textarea name=\"srvlist\" rows=10 cols=40>".$srvlist."</textarea></td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>Serveurs DNS</td><td>".FS::$iMgr->textarea("srvlist",$srvlist,250,100)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 3) {
@@ -87,12 +87,12 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes SMTP","ensmtp",$smtpenable);
-				$output .= "<tr><td>Serveurs SMTP</td><td><textarea name=\"smtplist\" rows=10 cols=40>".$smtplist."</textarea></td></tr>";
+				$output .= "<tr><td>Serveurs SMTP</td><td>".FS::$iMgr->textarea("smtplist",$smtplist,250,100)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes IMAP","enimap",$imapenable);
-				$output .= "<tr><td>Serveurs IMAP</td><td><textarea name=\"imaplist\" rows=10 cols=40>".$imaplist."</textarea></td></tr>";
+				$output .= "<tr><td>Serveurs IMAP</td><td>".FS::$iMgr->textarea("imaplist","",250,100)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes POP","enpop",$popenable);
-				$output .= "<tr><td>Serveurs POP</td><td><textarea name=\"poplist\" rows=10 cols=40>".$poplist."</textarea></td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>Serveurs POP</td><td>".FS::$iMgr->textarea("srvlist","",250,100)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			
 			}
@@ -104,8 +104,8 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enhttp",$httpenable);
-				$output .= "<tr><td>Serveurs HTTP</td><td><textarea name=\"srvlist\" rows=10 cols=40>".$httplist."</textarea></td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>Serveurs HTTP</td><td>".FS::$iMgr->textarea("srvlist",$httplist,250,100)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 5) {
@@ -119,11 +119,11 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensql",$sqlenable);
-				$output .= "<tr><td>Serveurs SQL</td><td><textarea name=\"srvlist\" rows=10 cols=40>".$sqllist."</textarea></td></tr>";
+				$output .= "<tr><td>Serveurs SQL</td><td>".FS::$iMgr->textarea("sqllist",$sqllist,250,100)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enoracle",$oracleenable);
-				$output .= "<tr><td>Serveurs Oracle</td><td><textarea name=\"srvlist\" rows=10 cols=40>".$oraclelist."</textarea></td></tr>";
+				$output .= "<tr><td>Serveurs Oracle</td><td>".FS::$iMgr->textarea("oraclelist",$oraclelist,250,100)."</td></tr>";
 				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 6) {
@@ -140,12 +140,12 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes Telnet","entelnet",$telnetenable);
-				$output .= "<tr><td>Serveurs Telnet</td><td><textarea name=\"telnetlist\" rows=10 cols=40>".$telnetlist."</textarea></td></tr>";
+				$output .= "<tr><td>Serveurs Telnet</td><td>".FS::$iMgr->textarea("telnetlist",$telnetlist,250,100)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes SSH","enssh",$sshenable);
-				$output .= "<tr><td>Serveurs SSH</td><td><textarea name=\"sshlist\" rows=10 cols=40>".$sshlist."</textarea></td></tr>";
+				$output .= "<tr><td>Serveurs SSH</td><td>".FS::$iMgr->textarea("sshlist",$sshlist,250,100)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes TSE","entse",$tseenable);
-				$output .= "<tr><td>Serveurs TSE</td><td><textarea name=\"tselist\" rows=10 cols=40>".$tselist."</textarea></td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>Serveurs TSE</td><td>".FS::$iMgr->textarea("tselist","",250,100)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 7) {
@@ -156,8 +156,8 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enftp",$ftpenable);
-				$output .= "<tr><td>Serveurs FTP</td><td><textarea name=\"srvlist\" rows=10 cols=40>".$ftplist."</textarea></td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>Serveurs FTP</td><td>".FS::$iMgr->textarea("ftplist",$ftplist,250,100)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 8) {
@@ -168,8 +168,8 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensnmp",$snmpenable);
-				$output .= "<tr><td>Serveurs SNMP</td><td><textarea name=\"srvlist\" rows=10 cols=40>".$snmplist."</textarea></td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>Serveurs SNMP</td><td>".FS::$iMgr->textarea("snmplist",$snmplist,250,100)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 9) {
@@ -180,8 +180,8 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensip",$sipenable);
-				$output .= "<tr><td>Serveurs SIP</td><td><textarea name=\"srvlist\" rows=10 cols=40>".$siplist."</textarea></td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>Serveurs SIP</td><td>".FS::$iMgr->textarea("siplist",$siplist,250,100)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			

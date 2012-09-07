@@ -50,9 +50,9 @@
 						else
 							$output .= "Les deux";						
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
-						$output .= FS::$iMgr->addImage("styles/images/pencil.gif",15,15);
+						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=3&menu=".$data["id"]."\">";
-						$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+						$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
 						$output .= "</a></td></tr>";
 					}
 					
@@ -73,9 +73,9 @@
 						else
 							$output .= "Les deux";						
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
-						$output .= FS::$iMgr->addImage("styles/images/pencil.gif",15,15);
+						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=6&im=".$data["id"]."\">";
-						$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+						$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
 						$output .= "</a></td></tr>";
 					}
 					$output .= "</table>";				
@@ -98,7 +98,7 @@
 				$menuEl->Load();
 			}
 			$output .= "Nom ";
-			$output .= FS::$iMgr->addInput("name",$menuEl ? $menuEl->getName() : "");
+			$output .= FS::$iMgr->input("name",$menuEl ? $menuEl->getName() : "");
 			$output .= "<hr>Lien ";
 			$link = new HTTPLink(0);
 			$output .= $link->CreateSelect($menuEl ? $menuEl->getLink() : 0);
@@ -108,7 +108,7 @@
 			$output .= FS::$iMgr->addElementToList("Oui",1,$menuEl && $menuEl->getConnected() == 1 ? true : false);
 			$output .= FS::$iMgr->addElementToList("Les deux",0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
 			$output .= "</select><hr>";
-			$output .= FS::$iMgr->addSubmit("reg","Enregistrer");
+			$output .= FS::$iMgr->submit("reg","Enregistrer");
 			$output .= "</form>";
 			return $output;
 		}
@@ -128,7 +128,7 @@
 				$menu->Load();
 			}
 			$output .= "Nom ";
-			$output .= FS::$iMgr->addInput("name",$menu ? $menu->getName() : "");
+			$output .= FS::$iMgr->input("name",$menu ? $menu->getName() : "");
 			$output .= "<hr>Connecté ? ";
 			$output .= FS::$iMgr->addList("isconnected");
 			$output .= FS::$iMgr->addElementToList("Non",-1,$menu && $menu->getConnected() == -1 ? true : false);
@@ -136,7 +136,7 @@
 			$output .= FS::$iMgr->addElementToList("Les deux",0,$menu && $menu->getConnected() == 0 ? true : false);
 			$output .= "</select>";
 			$output .= "<hr>";
-			$output .= FS::$iMgr->addSubmit("reg","Enregistrer");
+			$output .= FS::$iMgr->submit("reg","Enregistrer");
 			$output .= "</form>";
 			
 			if($edit) {
@@ -147,9 +147,9 @@
 				$menuEl = new MenuElement();
 				$output .= $menuEl->CreateSelect();
 				$output .= " Place ";
-				$output .= FS::$iMgr->addInput("order","0",2,2);
+				$output .= FS::$iMgr->input("order","0",2,2);
 				$output .= FS::$iMgr->addHidden("menu",$mid);
-				$output .= FS::$iMgr->addSubmit("reg","Enregistrer");				
+				$output .= FS::$iMgr->submit("reg","Enregistrer");				
 				$output .= "</center></form>
 				<h4>Modifier les éléments</h4>
 				<table class=\"standardTable\">
@@ -160,7 +160,7 @@
 					if($data2 = pg_fetch_array($query2)) {
 							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>
 							<a href=\"index.php?mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]."\">";
-							$output .= FS::$iMgr->addImage("styles/images/cross.png",15,15);
+							$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
 							$output .= "</a></td></tr>";
 					}
 				}

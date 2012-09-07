@@ -72,7 +72,7 @@
 
 		// header/footer/content
 		
-		public function showHeader() {
+		public function header() {
 			$output = "<!DOCTYPE html>
 				<html lang=\"".Config::getSysLang()."\">
 				<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
@@ -90,12 +90,12 @@
 				<body class=\"body\">";
 			return $output;
 		}
-		
-		public function showFooter() {
+
+		public function footer() {
 			return "</body></html>";
 		}
-		
-		public function showContent() {
+
+		public function content() {
 			return "<div id=\"main\"></div>";
 		}
 
@@ -148,15 +148,15 @@
 			return "<a class=\"monoComponentt_a\" href=\"".FS::$iMgr->getJSONLink($jsonstr)."\">".$text."</a>";
 		}
 
-		public function addBackLink() {
-			return "<div id=\"backarrow\"><a href=\"javascript:history.back()\">".FS::$iMgr->addImage("styles/back.png",32,32)."</a></div>";
+		public function backLink() {
+			return "<div id=\"backarrow\"><a href=\"javascript:history.back()\">".FS::$iMgr->img("styles/back.png",32,32)."</a></div>";
 		}
 
-		public function addLabel($for,$value,$class = "") {
+		public function label($for,$value,$class = "") {
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
-		public function addTextArea($name, $def_value = "", $width=400, $height=300, $label=NULL) {
+		public function textarea($name, $def_value = "", $width=400, $height=300, $label=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<textarea name=\"".$name."\" style=\"width:".$width."px;height:".$height."px\">".$def_value."</textarea>";
@@ -164,7 +164,7 @@
 			return $output;
 		}
 		
-		public function addInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" />";
@@ -200,14 +200,14 @@
 			return "<input type=\"hidden\" id=\"".$name."\" name=\"".$name."\" value=\"".$value."\" />";	
 		}
 		
-		public function addPasswdField($name, $def_value = "", $label=NULL) {
+		public function password($name, $def_value = "", $label=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"password\" name=\"".$name."\" value=\"".$def_value."\" />";
 			return $output;
 		}
 		
-		public function addSubmit($name, $value) {
+		public function submit($name, $value) {
 			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" value=\"".$value."\" />";	
 		}
 		
@@ -215,11 +215,11 @@
 			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$function."\" />";	
 		}
 
-		public function addButton($name, $value, $js) {
+		public function button($name, $value, $js) {
                         return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
                 }
 
-		public function addRadio($name, $value, $checked = false) {
+		public function radio($name, $value, $checked = false) {
 			$output = "<input id=\"".$name."\" type=\"radio\" value=\"".$value."\" name=\"".$name."\"";
 			if($checked) $output .= " checked=\"checked\"";
 			$output .= "> ".$value;
@@ -253,9 +253,9 @@
 		public function addIndexedLine($idx,$name,$def_value = "", $pwd = false) {
 			$output = "<tr><td>".$idx."</td><td><center>";
 			if($pwd)
-				$output .= $this->addPasswdField($name,$def_value);
+				$output .= $this->password($name,$def_value);
 			else
-				$output .= $this->addInput($name,$def_value);
+				$output .= $this->input($name,$def_value);
 			$output .= "</center></td></tr>";
 			return $output;
 		}
@@ -295,7 +295,7 @@
 			return $output;
 		}
 
-		public function addProgress($name,$value,$max=100,$label=NULL) {
+		public function progress($name,$value,$max=100,$label=NULL) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<progress id=\"".$name."\" value=\"".$value."\" max=\"".$max."\"></progress><span id=\"".$name."val\"></span>";
@@ -336,7 +336,7 @@
 			return $output;
 		}
 		
-		public function addImage($path,$sizeX = 0,$sizeY = 0, $id = "") {
+		public function img($path,$sizeX = 0,$sizeY = 0, $id = "") {
 			$output = "<img src=\"".$path."\" ";
 			if(FS::$secMgr->isNumeric($sizeX) && $sizeX > 0)
 				$output .= "width=\"".$sizeX."\" ";
@@ -348,19 +348,19 @@
 			return $output;
 		}
 		
-		public function addImageWithZoom($path,$sizeX,$sizeY,$maxsizeX ,$maxsizeY,$id) {
+		public function imgWithZoom($path,$sizeX,$sizeY,$maxsizeX ,$maxsizeY,$id) {
 			$output = 
             $output = "<div id=\"".$id."\" style=\"width: ".$sizeX."px; height: ".$sizeY."px; overflow: hidden;\"><div style=\"background: url(".$path."); no-repeat; width: ".$sizeX."px; height: ".$sizeY."px;\">";
-			$output .= FS::$iMgr->addImage($path,$sizeX,$sizeY)."</div>";
+			$output .= FS::$iMgr->img($path,$sizeX,$sizeY)."</div>";
 			$output .= "<div style=\"width:".$maxsizeX."px; height:".$maxsizeY."px;\">";
-        	$output .= FS::$iMgr->addImage($path);
+        	$output .= FS::$iMgr->img($path);
         	$output .= "<div class=\"mapcontent\">";
 			$output .= "</div></div></div><script type=\"text/javascript\">$('#".$id."').mapbox({mousewheel: true});</script>";
 			return $output;
 		}
 		
-		public function addImageWithLens($path,$sizeX = 0,$sizeY = 0, $id = "", $lsize=200) {
-			$output = FS::$iMgr->addImage($path,$sizeX,$sizeY,$id);
+		public function imgWithLens($path,$sizeX = 0,$sizeY = 0, $id = "", $lsize=200) {
+			$output = FS::$iMgr->img($path,$sizeX,$sizeY,$id);
             $output .= "<script type=\"text/javascript\">$('#".$id."').imageLens(";
 			if(FS::$secMgr->isNumeric($lsize))
 				$output .= "{ lensSize: ".$lsize." }";
@@ -368,15 +368,15 @@
 			return $output;
 		}
 		
-		public function addUpload($name) {
+		public function upload($name) {
 			return "<input type=\"file\" name=\"".$name."\" />";	
 		}
 		
-		public function addCanvas($name, $width=480, $height=480) {
+		public function canvas($name, $width=480, $height=480) {
 			return "<canvas id=\"".$name."\" height=\"".$height."\" width=\"".$width."\">[Votre Navigateur ne supporte pas le HTML5]</canvas>";
 		}
 		
-		public function addOpenableDiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
+		public function opendiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
 			if($divname == NULL) $divname = uniqid();
 			if($liname == NULL) $liname = uniqid();
 			if($aname == NULL) $aname = uniqid();
@@ -391,18 +391,12 @@
 			return $output;
 		}
 		// Simple methods
-		public function addStylesheet($path) {
+		public function stylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;
 		}
 		
-		public function addJSFile($path) {
+		public function jsinc($path) {
 			$this->arr_js[count($this->arr_js)] = $path;
-		}
-		
-		public function showSVNRev() {
-			$svnrev = new SVNRevision();
-			$rev = $svnrev->getRevision();
-			return $rev;
 		}
 		
 		public function printError($msg) {
@@ -414,6 +408,5 @@
 		}
 		private $arr_css;
 		private $arr_js;
-		protected $dbMgr;
 	};
 ?>

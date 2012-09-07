@@ -153,7 +153,7 @@
 				} else if($showmodule == 2) {
 					$output .= "<h4>Recherche de réservations obsolètes</h4>";
 					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
-					$output .= "$('#obsres').html('".FS::$iMgr->addImage('styles/images/loader.gif')."');";
+					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
 					$output .= "$('#obsres').html(data);";
 					$output .= "});return false;}</script>";

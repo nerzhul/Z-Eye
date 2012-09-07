@@ -46,14 +46,14 @@
 		
 		private function showDeviceWeatherMap($device) {
 			$output = "<h2>Etat des liens de ".$device."</h2>";
-			$output .= FS::$iMgr->addImage("datas/weathermap/".$device.".png");
+			$output .= FS::$iMgr->img("datas/weathermap/".$device.".png");
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
 			$output = "<h2>Carte du réseau</h2>";
 			$imgsize = getimagesize("datas/weathermap/main-nowifi.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output .= FS::$iMgr->addImageWithZoom("datas/weathermap/main-nowifi.svg","1000","700",$sizes[1],$sizes[3],"netmapL");
+			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main-nowifi.svg","1000","700",$sizes[1],$sizes[3],"netmapL");
 			return $output;	
 		}
 		
@@ -61,7 +61,7 @@
 			$output = "<h2>Carte complète du réseau</h2><div id=\"netmapdF\">";
 			$imgsize = getimagesize("datas/weathermap/main.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output .= FS::$iMgr->addImageWithZoom("datas/weathermap/main.svg","1000","700",$sizes[1],$sizes[3],"netmapF");
+			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main.svg","1000","700",$sizes[1],$sizes[3],"netmapF");
 			return $output;	
 		}
 		

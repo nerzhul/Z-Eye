@@ -64,9 +64,9 @@
 
 			if(!$file) {
 				if(Config::getOS() == "FreeBSD")
-					$output .= FS::$iMgr->printError("Impossible de lire le fichier /usr/local/etc/netdisco/netdisco.conf");
+					$output .= FS::$iMgr->printError("Impossible de libre le fichier /usr/local/etc/netdisco/netdisco.conf");
 				else if(Config::getOS() == "Debian")
-					$output .= FS::$iMgr->printError("Impossible de lire le fichier /etc/netdisco/netdisco.conf");
+					$output .= FS::$iMgr->printError("Impossible de libre le fichier /etc/netdisco/netdisco.conf");
 			} else {
 				foreach ($file as $lineNumber => $buf) {
 					$buf = trim($buf);
@@ -119,27 +119,27 @@
 				$firstnode = fread($file,filesize("/etc/netdisco/netdisco-topology.txt"));
 			fclose($file);
 			// @TODO: load configuration file
-			$output .= "<tr><td>Suffixe DNS</td><td>".FS::$iMgr->addInput("suffix",$dnssuffix)."</td></tr>";
-			$output .= "<tr><td>Noeud principal</td><td>".FS::$iMgr->addInput("fnode",$firstnode)."</td></tr>";
+			$output .= "<tr><td>Suffixe DNS</td><td>".FS::$iMgr->input("suffix",$dnssuffix)."</td></tr>";
+			$output .= "<tr><td>Noeud principal</td><td>".FS::$iMgr->input("fnode",$firstnode)."</td></tr>";
 			$output .= "<tr><th colspan=\"2\">Configuration des timers</th></tr>";
-			$output .= "<tr><td>Expiration des noeuds</td><td>".FS::$iMgr->addInput("nodetimeout",$nodetimeout,4,4)."</td></tr>";
-			$output .= "<tr><td>Expiration des périphériques</td><td>".FS::$iMgr->addInput("devicetimeout",$devicetimeout,4,4)."</td></tr>";
+			$output .= "<tr><td>Expiration des noeuds</td><td>".FS::$iMgr->input("nodetimeout",$nodetimeout,4,4)."</td></tr>";
+			$output .= "<tr><td>Expiration des périphériques</td><td>".FS::$iMgr->input("devicetimeout",$devicetimeout,4,4)."</td></tr>";
 			$output .= "<tr><th colspan=\"2\">Base de données</th></tr>";
-			$output .= "<tr><td>Hôte PostGRESQL</td><td>".FS::$iMgr->addInput("pghost",$pghost)."</td></tr>";
-			$output .= "<tr><td>Nom de la base de données</td><td>".FS::$iMgr->addInput("dbname",$dbname)."</td></tr>";
-			$output .= "<tr><td>Utilisateur PostGRESQL</td><td>".FS::$iMgr->addInput("dbuser",$dbuser)."</td></tr>";
-			$output .= "<tr><td>Mot de passe</td><td>".FS::$iMgr->addPasswdField("dbpwd",$dbpwd)."</td></tr>";
+			$output .= "<tr><td>Hôte PostGRESQL</td><td>".FS::$iMgr->input("pghost",$pghost)."</td></tr>";
+			$output .= "<tr><td>Nom de la base de données</td><td>".FS::$iMgr->input("dbname",$dbname)."</td></tr>";
+			$output .= "<tr><td>Utilisateur PostGRESQL</td><td>".FS::$iMgr->input("dbuser",$dbuser)."</td></tr>";
+			$output .= "<tr><td>Mot de passe</td><td>".FS::$iMgr->password("dbpwd",$dbpwd)."</td></tr>";
 			$output .= "<tr><th colspan=\"2\">Configuration SNMP</th></tr>";
-			$output .= "<tr><td>Communautés en lecture</td><td>".FS::$iMgr->addInput("snmpro",$snmpro)."</td></tr>";
-			$output .= "<tr><td>Communautés en écriture</td><td>".FS::$iMgr->addInput("snmprw",$snmprw)."</td></tr>";
-			$output .= "<tr><td>Timeout des requêtes</td><td>".FS::$iMgr->addInput("snmptimeout",$snmptimeout,2,2)."</td></tr>";
-			$output .= "<tr><td>Tentatives maximales</td><td>".FS::$iMgr->addInput("snmptry",$snmptry,2,2)."</td></tr>";
+			$output .= "<tr><td>Communautés en lecture</td><td>".FS::$iMgr->input("snmpro",$snmpro)."</td></tr>";
+			$output .= "<tr><td>Communautés en écriture</td><td>".FS::$iMgr->input("snmprw",$snmprw)."</td></tr>";
+			$output .= "<tr><td>Timeout des requêtes</td><td>".FS::$iMgr->input("snmptimeout",$snmptimeout,2,2)."</td></tr>";
+			$output .= "<tr><td>Tentatives maximales</td><td>".FS::$iMgr->input("snmptry",$snmptry,2,2)."</td></tr>";
 			$output .= "<tr><td>Version SNMP</td><td>";
 			$output .= FS::$iMgr->addList("snmpver");
 			$output .= FS::$iMgr->addElementToList("1","1",$snmpver == 1 ? true : false);
 			$output .= FS::$iMgr->addElementToList("2c","2",$snmpver == 2 ? true : false);
 			$output .= "</select></td></tr>";
-			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->addSubmit("Enregistrer","Enregistrer")."</th></tr>";
+			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 			$output .= "</table></form>";
 			return $output;
 		}

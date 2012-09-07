@@ -34,11 +34,11 @@
 			}
 			$output .= "<div id=\"module_connect\"><h4>Connexion à votre espace personnel</h4>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$output .= FS::$iMgr->addInput("uname","login");
+			$output .= FS::$iMgr->input("uname","login");
 			$output .= "<br />";
-			$output .= FS::$iMgr->addPasswdField("upwd","password");
+			$output .= FS::$iMgr->password("upwd","password");
 			$output .= "<br />";
-			$output .= FS::$iMgr->addSubmit("connect","Connexion");
+			$output .= FS::$iMgr->submit("connect","Connexion");
 			$output .= "</form></div>";
 			return $output;
 		}

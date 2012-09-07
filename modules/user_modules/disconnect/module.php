@@ -24,7 +24,7 @@
 		
 		public function Load() {
 			$output = "<div id=\"module_connect\"><h4>Déconnexion</h4><form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
-			$output .= FS::$iMgr->addSubmit("disconnect","Confirmer");
+			$output .= FS::$iMgr->submit("disconnect","Confirmer");
 			$output .= "</form></div>";
 			return $output;
 		}

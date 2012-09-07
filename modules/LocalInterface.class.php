@@ -27,10 +27,10 @@
 			$this->showRetMenu = false;
 		}
 
-		public function showContent() {
+		public function content() {
 			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
-			$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->addImage("styles/trash.png",64,64)."</div>";
-			$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->addImage("styles/edit.png",64,64)."</div>";
+			$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
+			$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
 			$tmpoutput = "";
 			if(FS::$sessMgr->isConnected())
 				$tmpoutput .= $this->showSearchForm();
@@ -71,16 +71,16 @@
 			if(!FS::$sessMgr->isConnected()) {
 				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
 					$output .= "<h1>Identification</h1>";
-					$output .= $this->addLabel("uname","Utilisateur");
-					$output .= $this->addInput("uname","");
-					$output .= $this->addLabel("upwd","Mot de passe");
-					$output .= $this->addPasswdField("upwd","");
+					$output .= $this->label("uname","Utilisateur");
+					$output .= $this->input("uname","");
+					$output .= $this->label("upwd","Mot de passe");
+					$output .= $this->password("upwd","");
 					$output .= "<div class=\"clearlogform\"></div>";
-					$output .= $this->addSubmit("conn","Connexion");
+					$output .= $this->submit("conn","Connexion");
 					$output .= "</form>";
 			} else {
 				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
-				$output .= FS::$iMgr->addSubmit("disconnect","Confirmer");
+				$output .= FS::$iMgr->submit("disconnect","Confirmer");
 				$output .= "</form>";
 			}
 
@@ -95,7 +95,7 @@
 					<div class=\"contentlog clearfixlogform\">";
 			$output .= $this->addForm("index.php?mod=".$this->getModuleIdByPath("search"),"",false);
                         $output .= $this->addHidden("mod",$this->getModuleIdByPath("search"));
-			$output .= $this->addInput("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
+			$output .= $this->input("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
 			$output .= "</div></div>";
 
 			$output .= "<div class=\"tabsearchform\"><a id=\"searchopen\" class=\"open\" href=\"#\"><img src=\"styles/images/search.png\" width=\"30px\" height=\"30px\" style=\"margin-top: 10px\"/></a>
