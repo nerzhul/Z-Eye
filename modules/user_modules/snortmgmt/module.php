@@ -49,7 +49,7 @@
 			else if(!$sh || $sh == 1) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= "<tr><td colspan=\"2\">Stockage des données</td></td><td>";
+				$output .= "<tr><th colspan=\"2\">Stockage des données</th></tr>";
 				$output .= FS::$iMgr->addIndexedLine("Hôte MySQL","dbhost");
 				$output .= FS::$iMgr->addIndexedLine("Base de données","dbname");
 				$output .= FS::$iMgr->addIndexedLine("Utilisateur","dbuser");
@@ -59,29 +59,29 @@
 
 				$output .= "</td></tr>";
 				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</td></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 2) {
-				$dnsenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'DNS'");
-				$srvlist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'DNS'");
+				$dnsenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dnsenable'");
+				$srvlist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dnslist'");
 				if(!$dnsenable) $dnsenable = 0;
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","endns",$dnsenable);
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer","dnsenable",$dnsenable);
 				$output .= "<tr><td>Serveurs DNS</td><td>".FS::$iMgr->textarea("srvlist",$srvlist,250,100)."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 3) {
-				$smtpenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'SMTP'");
-				$smtplist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'SMTP'");
+				$smtpenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'smtpenable'");
+				$smtplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'smtplist'");
 				if(!$smtpenable) $smtpenable = 0;
-				$imapenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'IMAP'");
-				$imaplist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'IMAP'");
+				$imapenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'imapenable'");
+				$imaplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'imaplist'");
 				if(!$imapenable) $imapenable = 0;
-				$popenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'POP'");
-				$poplist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'POP'");
+				$popenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'popenable'");
+				$poplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'poplist'");
 				if(!$popenable) $popenable = 0;
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
@@ -89,16 +89,16 @@
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes SMTP","ensmtp",$smtpenable);
 				$output .= "<tr><td>Serveurs SMTP</td><td>".FS::$iMgr->textarea("smtplist",$smtplist,250,100)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes IMAP","enimap",$imapenable);
-				$output .= "<tr><td>Serveurs IMAP</td><td>".FS::$iMgr->textarea("imaplist","",250,100)."</td></tr>";
+				$output .= "<tr><td>Serveurs IMAP</td><td>".FS::$iMgr->textarea("imaplist",$imaplist,250,100)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes POP","enpop",$popenable);
-				$output .= "<tr><td>Serveurs POP</td><td>".FS::$iMgr->textarea("srvlist","",250,100)."</td></tr>";
+				$output .= "<tr><td>Serveurs POP</td><td>".FS::$iMgr->textarea("srvlist",$poplist,250,100)."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			
 			}
 			else if($sh == 4) {
-				$httpenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'HTTP'");
-				$httplist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'HTTP'");
+				$httpenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'httpenable'");
+				$httplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'httplist'");
 				if(!$httpenable) $httpenable = 0;
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
@@ -109,11 +109,11 @@
 				$output .= "</table></form>";
 			}
 			else if($sh == 5) {
-				$sqlenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'SQL'");
-				$sqllist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'SQL'");
+				$sqlenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sqlenable'");
+				$sqllist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sqllist'");
 				if(!$sqlenable) $sqlenable = 0;
-				$oracleenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'ORACLE'");
-				$oraclelist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'ORACLE'");
+				$oracleenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'oracleenable'");
+				$oraclelist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'oraclelist'");
 				if(!$oracleenable) $oracleenable = 0;
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
@@ -127,14 +127,14 @@
 				$output .= "</table></form>";
 			}
 			else if($sh == 6) {
-				$telnetenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'TELNET'");
-				$telnetlist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'TELNET'");
+				$telnetenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'telnetenable'");
+				$telnetlist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'telnetlist'");
 				if(!$telnetenable) $telnetenable = 0;
-				$sshenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'SSH'");
-				$sshlist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'SSH'");
+				$sshenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sshenable'");
+				$sshlist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sshlist'");
 				if(!$sshenable) $sshenable = 0;
-				$tseenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'TSE'");
-				$tselist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'TSE'");
+				$tseenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'tseenable'");
+				$tselist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'tselist'");
 				if(!$tseenable) $tseenable = 0;
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
@@ -149,8 +149,8 @@
 				$output .= "</table></form>";
 			}
 			else if($sh == 7) {
-				$ftpenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'FTP'");
-				$ftplist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'FTP'");
+				$ftpenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'ftpenable'");
+				$ftplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'ftplist'");
 				if(!$ftpenable) $ftpenable = 0;
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
@@ -161,8 +161,8 @@
 				$output .= "</table></form>";
 			}
 			else if($sh == 8) {
-				$snmpenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'SNMP'");
-				$snmplist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'SNMP'");
+				$snmpenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'snmpenable'");
+				$snmplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'snmplist'");
 				if(!$snmpenable) $snmpenable = 0;
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
@@ -173,8 +173,8 @@
 				$output .= "</table></form>";
 			}
 			else if($sh == 9) {
-				$sipenable = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleenable","rulecat = 'SIP'");
-				$siplist = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","rulecat = 'SIP'");
+				$sipenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sipenable'");
+				$siplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'siplist'");
 				if(!$sipenable) $sipenable = 0;
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
@@ -189,36 +189,18 @@
 		}
 		private function writeConfiguration() {
 			if(Config::getOS() == "Debian")
-				$file = fopen("/etc/snort/snort.conf","w");	
+				$file = fopen("/etc/snort/snort.z_eye.conf","w");	
 			else
-				$file = fopen("/usr/local/etc/snort/snort.conf","w");
+				$file = fopen("/usr/local/etc/snort/snort.z_eye.conf","w");
 			
-			$homenetworks = FS::$dbMgr->GetOneData("fss_snort_mgmt","ruleippool","HOME_NET");
+			$homenetworks = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'home_net'");
 			if(!$homenetworks) $homenetworks = "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16";
 			fwrite($file,"# Snort configuration, generated by Z-Eye (".date('d-m-Y G:i:s').")\n");
 			fwrite($file,"var HOME_NET [".$homenetworks."]\n");
 			fwrite($file,'var EXTERNAL_NET !$HOME_NET');
 			
-			if(Config::getOS() == "Debian") {
-				$RULE_PATH = "/etc/snort/rules";
-				$SO_RULE_PATH = "/etc/snort/so_rules";
-				$PREPROC_RULE_PATH = "/etc/snort/preproc_rules";
-				fwrite($file,"\nvar RULE_PATH /etc/snort/rules\n");
-				fwrite($file,"var PREPROC_RULE_PATH /etc/snort/preproc_rules\n");
-				fwrite($file,"dynamicpreprocessor directory /usr/lib/snort_dynamicpreprocessor/\n");
-				fwrite($file,"dynamicengine /usr/lib/snort_dynamicengine/libsf_engine.so\n");
-			} else {
-				$RULE_PATH = "/usr/local/etc/snort/rules";
-				$SO_RULE_PATH = "/usr/local/etc/snort/so_rules";
-				$PREPROC_RULE_PATH = "/usr/local/etc/snort/preproc_rules";
-				fwrite($file,"\nvar RULE_PATH $RULE_PATH\n");
-				fwrite($file,"var SO_RULE_PATH $SO_RULE_PATH\n");
-				fwrite($file,"var PREPROC_RULE_PATH $PREPROC_RULE_PATH\n");
-				fwrite($file,"dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor/\n");
-				fwrite($file,"dynamicengine /usr/local/lib/snort/dynamicengine/libsf_engine.so\n");
-			}
 			
-			$dns = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","DNS");
+			$dns = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dnsenable'");
 			// DNS tab
 			if($dns) {
 				fwrite($file,"var DNS_SERVERS ["."]\n");
@@ -226,13 +208,14 @@
 				fwrite($file,'include $RULE_PATH/dns.rules\n');
 			}
 			
-			$smtp = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","SMTP");
-			$imap = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","IMAP");
-			$pop = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","POP");
+			$smtp = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'smtpenable'");
+			$imap = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'imapenable'");
+			$pop = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'popenable'");
 			// Mail tab
 			// SMTP
 			if($smtp) {
-				fwrite($file,"var SMTP_SERVERS ["."]\n");
+				$smtplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'smtplist'");
+				fwrite($file,"var SMTP_SERVERS [".$smtplist."]\n");
 				fwrite($file,"portvar SMTP_PORTS ["."]\n");
 				fwrite($file,"preprocessor smtp: ports { $SMTP_PORTS } inspection_type stateful normalize cmds normalize_cmds { EXPN VRFY RCPT } alt_max_command_line_len 260 { MAIL } alt_max_command_line_len 300 { RCPT } alt_max_command_line_len 500 { HELP HELO ETRN } alt_max_command_line_len 255 { EXPN VRFY }\n");
 				fwrite($file,"include $RULE_PATH/smtp.rules\n");
@@ -240,6 +223,7 @@
 			}
 			// IMAP
 			if($imap) {
+				$imaplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'imaplist'");
 				fwrite($file,"var IMAP_SERVERS ["."]\n");
 				fwrite($file,"portvar IMAP_PORTS ["."]\n");
 				fwrite($file,"preprocessor imap: ports { $IMAP_PORTS } b64_decode_depth 0 qp_decode_depth 0 bitenc_decode_depth 0 uu_decode_depth 0\n");
@@ -255,7 +239,7 @@
 				fwrite($file,"include $RULE_PATH/pop3.rules\n");
 			}
 			
-			$http = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","HTTP");
+			$http = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'httpenable'");
 			// HTTP Tab
 			if($http) {
 				fwrite($file,"var HTTP_SERVERS ["."]\n");
@@ -278,8 +262,8 @@
 				fwrite($file,"include $SO_RULE_PATH/web-misc.rules\n");
 			}
 			
-			$sql = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","SQL");
-			$oracle = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","ORACLE");
+			$sql = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sqlenable'");
+			$oracle = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'oracleenable'");
 			// DB Tab
 			// SQL
 			if($sql) {
@@ -293,7 +277,7 @@
 				fwrite($file,"include $RULE_PATH/oracle.rules\n");
 			}
 			
-			$ftp = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","FTP");
+			$ftp = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'ftpenable'");
 			// FTP tab
 			if($ftp) {
 				fwrite($file,"var FTP_SERVERS ["."]\n");
@@ -301,9 +285,9 @@
 				fwrite($file,"include $RULE_PATH/ftp.rules\n");
 			}
 			
-			$telnet = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","telnet");
-			$ssh = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","SSH");
-			$tse = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","TSE");
+			$telnet = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'telnetenable'");
+			$ssh = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sshenable'");
+			$tse = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'tseenable'");
 			// Remote access tab
 			// Telnet
 			if($telnet) {
@@ -326,7 +310,7 @@
 				fwrite($file,"include $SO_RULE_PATH/snmp.rules\n");
 			}
 			
-			$sip = FS::$dbMgr->GetOneData("fss_snort_mgmt","enable","SIP");
+			$sip = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sipenable'");
 			if($sip) {
 				fwrite($file,"portvar SIP_PORTS ["."]\n");
 				fwrite($file,"preprocessor sip: maxsession 10000, ports { $SIP_PORTS }, methods { invite cancel ack bye register options refer subscribe update join info message notify benotify do qauth sprack publish service unsubscribe prack }, max_uri_len 512, max_call_id_len 80, max_requestName_len 20, max_from_len 256, max_to_len 256, max_via_len 1024, max_contact_len 512, max_content_len 1024\n");
@@ -357,7 +341,7 @@
 			fwrite($file,"preprocessor dcerpc2\n");
 			fwrite($file,"dcerpc2_server: default\n");
 			fwrite($file,"preprocessor ssl: noinspect_encrypted, trustservers\n");
-			fwrite($file,"output database: log, mysql, user="." password="." dbname="." host="."\n");
+			fwrite($file,"output database: log, pgsql, user="." password="." dbname="." host="."\n");
 			fwrite($file,"include classification.config\n");
 			fwrite($file,"include reference.config\n");
 			fwrite($file,"include $RULE_PATH/local.rules\n");
@@ -421,7 +405,7 @@
 			switch($act) {
 				case 1:
 					$dbhost = FS::$secMgr->checkAndSecurisePostData("dbhost");
-					$dbname = rFS::$secMgr->checkAndSecurisePostData("dbname");
+					$dbname = FS::$secMgr->checkAndSecurisePostData("dbname");
 					$dbuser = FS::$secMgr->checkAndSecurisePostData("dbuser");
 					$dbpwd = FS::$secMgr->checkAndSecurisePostData("dbpwd");
 					//$dbport = FS::$secMgr->checkAndSecurisePostData("dbport");
@@ -444,8 +428,10 @@
 							}
 						}
 					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'DNS','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'dnsenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'dnslist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnsenable',".($enable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnslist','".$srvlist."'");
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -489,10 +475,18 @@
 							}
 						}
 					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SMTP','".($enablesmtp == "on" ? 1 : 0)."','".$smtplist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'IMAP','".($enableimap == "on" ? 1 : 0)."','".$imaplist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'POP','".($enablepop == "on" ? 1 : 0)."','".$poplist."','"."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'smtpenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'smtplist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'smtpenable',".($enablesmtp == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'smtplist','".$smtplist."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'imapenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'imaplist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'imapenable',".($enableimap == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'imaplist','".$imaplist."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'popenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'poplist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'popenable',".($enablepop == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'poplist','".$poplist."'");
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -510,8 +504,10 @@
 							}
 						}
 					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'HTTP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httpenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httplist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httpenable',".($enable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httplist','".$srvlist."'");
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -542,9 +538,14 @@
 							}
 						}
 					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SQL','".($sqlenable == "on" ? 1 : 0)."','".$sqllist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'ORACLE','".($oracleenable == "on" ? 1 : 0)."','".$oraclelist."','"."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sqlenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sqllist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sqlenable',".($sqlenable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sqllist','".$sqllist."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'oracleenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'oraclelist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oracleenable',".($oracleenable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oraclelist','".$oraclelist."'");
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -589,9 +590,19 @@
 						}
 					}
 					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'TELNET','".($telnetenable == "on" ? 1 : 0)."','".$telnetlist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SSH','".($sshenable == "on" ? 1 : 0)."','".$sshlist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'TSE','".($tseenable == "on" ? 1 : 0)."','".$tselist."','"."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sshenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sshlist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sshenable',".($sshenable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sshlist','".$sshlist."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'telnetenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'telnetlist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'telnetenable',".($telnetenable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'telnetlist','".$telnetlist."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'tseenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'tselist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'tseenable',".($tseenable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'tselist','".$tselist."'");
+					
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -610,7 +621,11 @@
 						}
 					}
 					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'FTP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'ftpenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'ftplist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'ftpenable',".($enable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'ftplist','".$srvlist."'");
+
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -629,7 +644,11 @@
 						}
 					}
 					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SNMP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'snmpenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'snmplist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'snmpenable',".($enable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'snmplist','".$srvlist."'");
+					
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -648,229 +667,11 @@
 						}
 					}
 					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SIP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 2: 
-					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
-					$enable = FS::$secMgr->checkAndSecurisePostData("endns");
-									
-					$srvlist = trim($srvlist);
-					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sipenable'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'siplist'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sipenable',".($enable == "on" ? 1 : 0));
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'siplist','".$srvlist."'");
 					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'DNS','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 3:
-					$smtplist = FS::$secMgr->checkAndSecurisePostData("smtplist");
-					$enablesmtp = FS::$secMgr->checkAndSecurisePostData("ensmtp");
-					$imaplist = FS::$secMgr->checkAndSecurisePostData("imaplist");
-					$enableimap = FS::$secMgr->checkAndSecurisePostData("enimap");
-					$poplist = FS::$secMgr->checkAndSecurisePostData("poplist");
-					$enablepop = FS::$secMgr->checkAndSecurisePostData("enpop");
-									
-					$smtplist = trim($smtplist);
-					$srvs = preg_split("#[,]#",$smtplist);
-					if(strlen($smtplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					$imaplist = trim($imaplist);
-					$srvs = preg_split("#[,]#",$imaplist);
-					if(strlen($imaplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					$poplist = trim($poplist);
-					$srvs = preg_split("#[,]#",$poplist);
-					if(strlen($poplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SMTP','".($enablesmtp == "on" ? 1 : 0)."','".$smtplist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'IMAP','".($enableimap == "on" ? 1 : 0)."','".$imaplist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'POP','".($enablepop == "on" ? 1 : 0)."','".$poplist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 4:
-					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
-					$enable = FS::$secMgr->checkAndSecurisePostData("enhttp");
-									
-					$srvlist = trim($srvlist);
-					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'HTTP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 5:
-					$sqllist = FS::$secMgr->checkAndSecurisePostData("sqllist");
-					$sqlenable = FS::$secMgr->checkAndSecurisePostData("sqlenable");
-					$oraclelist = FS::$secMgr->checkAndSecurisePostData("oraclelist");
-					$oracleenable = FS::$secMgr->checkAndSecurisePostData("oracleenable");
-									
-					$sqllist = trim($sqllist);
-					$srvs = preg_split("#[,]#",$sqllist);
-					if(strlen($sqllist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					$oraclelist = trim($oraclelist);
-					$srvs = preg_split("#[,]#",$oraclelist);
-					if(strlen($oraclelist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SQL','".($sqlenable == "on" ? 1 : 0)."','".$sqllist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'ORACLE','".($oracleenable == "on" ? 1 : 0)."','".$oraclelist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 6:
-					$telnetlist = FS::$secMgr->checkAndSecurisePostData("telnetlist");
-					$telnetenable = FS::$secMgr->checkAndSecurisePostData("entelnet");
-					$sshlist = FS::$secMgr->checkAndSecurisePostData("sshlist");
-					$sshenable = FS::$secMgr->checkAndSecurisePostData("enssh");
-					$tselist = FS::$secMgr->checkAndSecurisePostData("tselist");
-					$tseenable = FS::$secMgr->checkAndSecurisePostData("entse");
-									
-					$telnetlist = trim($telnetlist);
-					$srvs = preg_split("#[,]#",$telnetlist);
-					if(strlen($telnetlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					$sshlist = trim($sshlist);
-					$srvs = preg_split("#[,]#",$sshlist);
-					if(strlen($sshlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					$tselist = trim($tselist);
-					$srvs = preg_split("#[,]#",$tselist);
-					if(strlen($tselist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'TELNET','".($telnetenable == "on" ? 1 : 0)."','".$telnetlist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SSH','".($sshenable == "on" ? 1 : 0)."','".$sshlist."','"."'");
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'TSE','".($tseenable == "on" ? 1 : 0)."','".$tselist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 7:
-					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
-					$enable = FS::$secMgr->checkAndSecurisePostData("enftp");
-									
-					$srvlist = trim($srvlist);
-					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'FTP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 8:
-					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
-					$enable = FS::$secMgr->checkAndSecurisePostData("ensnmp");
-									
-					$srvlist = trim($srvlist);
-					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SNMP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
-					$this->writeConfiguration();
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 9:
-					$srvlist = FS::$secMgr->checkAndSecurisePostData("srvlist");
-					$enable = FS::$secMgr->checkAndSecurisePostData("ensip");
-									
-					$srvlist = trim($srvlist);
-					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
-								return;
-							}
-						}
-					}
-					
-					FS::$dbMgr->Replace("fss_snort_mgmt","rulecat,ruleenable,ruleippool,ruleports","'SIP','".($enable == "on" ? 1 : 0)."','".$srvlist."','"."'");
 					$this->writeConfiguration();
 					header("Location: m-".$this->mid.".html");
 					break;
