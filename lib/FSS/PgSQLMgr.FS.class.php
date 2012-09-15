@@ -96,6 +96,8 @@
                         if($data = pg_fetch_array($query)) {
                                 $splstr = preg_split("#[\.]#",$field);
                                 $splstr = preg_replace("#`#","",$splstr);
+                                if($data["mx"] == "")
+                                	return 0;
                                 return $data["mx"];
                         }
                         return -1;

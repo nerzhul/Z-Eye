@@ -85,14 +85,12 @@
 				
 				for($i=0;$i<count($this->arr_js);$i++)
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
-				
-				$output .= "</head>
-				<body class=\"body\">";
+				$output .= "</head><body class=\"body\">";
 			return $output;
 		}
 
 		public function footer() {
-			return "</body></html>";
+			return "<script type=\"text/javascript\">$('select, input:checkbox, input:radio, textarea').uniform();</script></body></html>";
 		}
 
 		public function content() {
@@ -156,11 +154,11 @@
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
-		public function textarea($name, $def_value = "", $width=400, $height=300, $label=NULL) {
+		public function textarea($name, $def_value = "", $width=400, $height=300, $label=NULL, $tooltip = NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<textarea name=\"".$name."\" style=\"width:".$width."px;height:".$height."px\">".$def_value."</textarea>";
-
+			$output .= "<textarea id=\"".$name."\" name=\"".$name."\" style=\"width:".$width."px;height:".$height."px\">".$def_value."</textarea>";
+			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({content: '".$tooltip."', className: 'tooltip', style: false, fadeIn: 'slow', fadeOut: '400'});</script>";
 			return $output;
 		}
 		
@@ -290,7 +288,7 @@
 		
 		public function addTableSubmit($name,$value,$size = 2) {
 			$output = "<tr><td colspan=\"".$size."\"><center>";
-			$output .= $this->addSubmit($name,$value);
+			$output .= $this->submit($name,$value);
 			$output .= "</center></td></tr>";
 			return $output;
 		}
@@ -329,10 +327,10 @@
 		public function addCheck($name,$checked = false,$label="") {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<input type=\"checkbox\" name=\"".$name."\" ";
+			$output .= "<INPUT type=\"checkbox\" name=\"".$name."\" ";
 			if($checked)
 				$output .= "checked ";
-			$output .= " />";
+			$output .= "id=\"".$name."\"/>";
 			return $output;
 		}
 		
@@ -390,6 +388,11 @@
                                 </script>";
 			return $output;
 		}
+		
+		public function tabPanElmt($teid,$link,$label,$curid,$default=false) {
+			return "<li".($curid == $teid || ($default && !$teid) ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"".$link."&sh=".$teid."\">".$label."</a></li>";
+		}
+		
 		// Simple methods
 		public function stylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;

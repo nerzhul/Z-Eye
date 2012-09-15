@@ -23,7 +23,7 @@
 		function iSecReport() { parent::genModule(); }
 		public function Load() {
 			$this->snortDB = new FSPostgreSQLMgr();
-			$this->snortDB->setConfig("snort",5432,"localhost","snortuser","snort159");
+			$this->snortDB->setConfig("snort",5432,"localhost","snort","snort");
 			$this->snortDB->Connect();
 			$output = "";
 			if(!FS::isAjaxCall())
@@ -74,10 +74,10 @@
 			else {
 				if(!$showmodule || $showmodule == 1) {
 					$output .= "<h4>Rapport d'attaques compressé en base Z-Eye</h4>";
-					$totalips = $this->snortDB->Count("collected_ips","ip");
-					$totalscan = $this->snortDB->Sum("collected_ips","scans");
-					$totaltse = $this->snortDB->Sum("collected_ips","tse");
-					$totalssh = $this->snortDB->Sum("collected_ips","ssh");
+					$totalips = $this->snortDB->Count("z_eye_collected_ips","ip");
+					$totalscan = $this->snortDB->Sum("z_eye_collected_ips","scans");
+					$totaltse = $this->snortDB->Sum("z_eye_collected_ips","tse");
+					$totalssh = $this->snortDB->Sum("z_eye_collected_ips","ssh");
 					$totalatk = $totalscan + $totaltse + $totalssh;
 					
 					$output .= "Total des attaques: ".$totalatk."<br />";
@@ -106,7 +106,7 @@
 					$fields .= ",ssh";
 					
 					$sqlcalc = "(SELECT '".$sql_date."'::timestamp - '".($ec+15)." day'::interval)";
-					$sql = "select atkdate".$fields." from attack_stats where atkdate > ".$sqlcalc." ORDER BY atkdate";
+					$sql = "select atkdate".$fields." from z_eye_attack_stats where atkdate > ".$sqlcalc." ORDER BY atkdate";
 					$query = pg_query($sql);
 					$labels = $scans = $tse = $ssh = "[";
 					$cursor = 0;
@@ -161,7 +161,7 @@
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Scans</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					
-					$query = $this->snortDB->Select("collected_ips","ip,last_date,scans","","scans",1,$topmax);
+					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,scans","","scans",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["scans"]."</td></tr>";
@@ -171,7 +171,7 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = $this->snortDB->Select("attack_stats","atkdate,scans","","scans",1,$topmax);
+					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,scans","","scans",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
@@ -190,7 +190,7 @@
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Attaques TSE</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					
-					$query = $this->snortDB->Select("collected_ips","ip,last_date,tse","","tse",1,$topmax);
+					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,tse","","tse",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["tse"]."</td></tr>";
@@ -200,7 +200,7 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = $this->snortDB->Select("attack_stats","atkdate,tse","","tse",1,$topmax);
+					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,tse","","tse",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
@@ -219,7 +219,7 @@
 					
 					$tmpoutput = "<h4>Top ".$topmax." des Attaques SSH</h4><table><tr><th>Adresse IP</th><th>Dernière visite</th><th>Nombre d'actions</th></tr>";
 					
-					$query = $this->snortDB->Select("collected_ips","ip,last_date,ssh","","ssh",1,$topmax);
+					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,ssh","","ssh",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["ssh"]."</td></tr>";
@@ -229,7 +229,7 @@
 						
 					$found = 0;
 					$tmpoutput = "<h4>Les ".$topmax." jours les plus violents</h4><table><tr><th>Date</th><th>Nombre d'actions</th></tr>";
-					$query = $this->snortDB->Select("attack_stats","atkdate,ssh","","ssh",1,$topmax);
+					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,ssh","","ssh",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
