@@ -132,31 +132,17 @@
 
 			if($found) {
 				$output .= $tmpoutput."</table>";
-				$output .= "<script type=\"text/javascript\">
+				$output .= "<script type=\"text/javascript\">var datatype = 0;
                                 $.event.props.push('dataTransfer');
                                 $('#utb #dragtd').on({
                                         mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
                                         mouseleave: function(e) { $('#trash').hide(); $('#editf').hide();},
-                                        dragstart: function(e) { $('#trash').show(); $('#editf').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+                                        dragstart: function(e) { $('#trash').show(); $('#editf').show(); datatype = 1; e.dataTransfer.setData('text/html', $(this).text()); },
                                         dragenter: function(e) { e.preventDefault();},
                                         dragover: function(e) { e.preventDefault(); },
                                         dragleave: function(e) { },
                                         drop: function(e) {},
-                                        dragend: function() { $('#trash').hide(); $('#editf').hide();}
-                                });
-				$('#editf').on({
-                                        dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&user='+e.dataTransfer.getData('text/html')); }
-                                });
-                                $('#trash').on({
-                                        dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'utilisateur \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                              FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3").
-                                              FS::$iMgr->addHidden("username","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->submit("","Supprimer").
-                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
-                                              $('#pop').show();
-                                }
+                                        dragend: function() { $('#trash').hide(); $('#editf').hide(); }
                                 });</script>";
 			}
 			$output .= "<h3>Gestion des annuaires</h3>";
@@ -190,30 +176,45 @@
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";
-				$output .= "<script type=\"text/javascript\">
+				$output .= "<script type=\"text/javascript\">var datatype = 0;
                                 $.event.props.push('dataTransfer');
                                 $('#ldaptb #dragtd').on({
                                         mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
                                         mouseleave: function(e) { $('#trash').hide(); $('#editf').hide();},
-                                        dragstart: function(e) { $('#trash').show(); $('#editf').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+                                        dragstart: function(e) { $('#trash').show(); $('#editf').show(); datatype=2; e.dataTransfer.setData('text/html', $(this).text()); },
                                         dragenter: function(e) { e.preventDefault();},
                                         dragover: function(e) { e.preventDefault(); },
                                         dragleave: function(e) { },
                                         drop: function(e) {},
-                                        dragend: function() { $('#trash').hide(); $('#editf').hide();}
-                                });
-                                $('#editf').on({
+                                        dragend: function() { $('#trash').hide(); $('#editf').hide(); }
+                                });</script>";
+			}
+
+			if($found) {
+				$output .= "<script type=\"text/javascript\">
+				$('#editf').on({
                                         dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&addr='+e.dataTransfer.getData('text/html')); }
+                                        drop: function(e) { if(datatype == 1) { $(location).attr('href','index.php?mod=".$this->mid."&user='+e.dataTransfer.getData('text/html')); }
+						else if(datatype == 2) { $(location).attr('href','index.php?mod=".$this->mid."&addr='+e.dataTransfer.getData('text/html')); } 
+					}
                                 });
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'annuaire \''+e.dataTransfer.getData('text/html')+'\' ?".
+                                        drop: function(e) { if(datatype == 1) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'utilisateur \''+e.dataTransfer.getData('text/html')+'\' ?".
+                                              FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3").
+                                              FS::$iMgr->addHidden("username","'+e.dataTransfer.getData('text/html')+'").
+                                              FS::$iMgr->submit("","Supprimer").
+                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                              $('#pop').show();
+					} else if(datatype == 2) {
+						$('#subpop').html('Êtes vous sûr de vouloir supprimer l\'annuaire \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=5").
                                               FS::$iMgr->addHidden("addr","'+e.dataTransfer.getData('text/html')+'").
                                               FS::$iMgr->submit("","Supprimer").
                                               FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
+					}
+					datatype = 0;
                                 }
                                 });</script>";
 			}

@@ -81,52 +81,72 @@
 				$str_array = split('\.',$str);
 				if(count($str_array) != 4)
 					return false;
-					
 				for($i=0;$i<4;$i++)
 					if($str_array[$i] > 255)
 						return false;
-				
-				return true;				
+
+				return true;
 			}
 			else
 				return false;
 		}
-		
+
+		public function isCIDR($str) {
+                        if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\/(\d|[1-2]\d|3[0-2]))$#",$str)) {
+                                $str_array = split('\.',$str);
+                                if(count($str_array) != 4)
+                                        return false;
+
+                                for($i=0;$i<4;$i++)
+                                        if($str_array[$i] > 255)
+                                                return false;
+
+                                return true;
+			}
+                        return false;
+                }
+
+		public function isIPorCIDR($str) {
+			if($this->isIP($str) || $this->isCIDR($str))
+				return true;
+			return false;
+		}
+
 		public function isIPv6($str) {
 				if(preg_match("#^([0-9A-F]{4}:){5}[0-9A-F]{4}$#",$str))
 					return true;
-					
+
 				return false;
 		}
-		
+
 		public function isSocketPort($str) {
 			if(!$this->isNumeric($str))
 				return false;
-				
+
 			if($str < 0 || $str > 65535)
 				return false;
-				
-			return true;	
+
+			return true;
 		}
-		
+
 		public function isDNSAddr($str) {
 			if(preg_match("#^[a-z][a-z0-9.-]{1,}[a-z0-9]{2,}$#",$str))
 				return true;
-				
-			return false;			
+
+			return false;
 		}
-		
+
 		public function isMacAddr($str) {
 			if(preg_match('#^([0-9A-F]{2}:){5}[0-9A-F]{2}$#i', $str))
 				return true;
-				
+
 			return false;
 		}
-		
+
 		private function isMaskElem($num) {
 			$mask = 0;
 			$add = 256;
-			
+
 			if($num == 255)
 				return true;
 				

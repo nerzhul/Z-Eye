@@ -85,12 +85,14 @@
 				
 				for($i=0;$i<count($this->arr_js);$i++)
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
-				$output .= "</head><body class=\"body\">";
+				
+				$output .= "</head>
+				<body class=\"body\">";
 			return $output;
 		}
 
 		public function footer() {
-			return "<script type=\"text/javascript\">$('select, input:checkbox, input:radio, textarea').uniform();</script></body></html>";
+			return "</body></html>";
 		}
 
 		public function content() {
@@ -154,11 +156,11 @@
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
-		public function textarea($name, $def_value = "", $width=400, $height=300, $label=NULL, $tooltip = NULL) {
+		public function textarea($name, $def_value = "", $width=400, $height=300, $label=NULL, $tooltip=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<textarea id=\"".$name."\" name=\"".$name."\" style=\"width:".$width."px;height:".$height."px\">".$def_value."</textarea>";
-			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({content: '".$tooltip."', className: 'tooltip', style: false, fadeIn: 'slow', fadeOut: '400'});</script>";
+			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".$width."px;height:".$height."px\">".$def_value."</textarea>";
+			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
 			return $output;
 		}
 		
@@ -182,7 +184,7 @@
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
 			return $output;
 		}
-		
+
 		public function addMacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
@@ -193,18 +195,34 @@
 		public function addIPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask('".$name."');\" />";
 		}
-		
+
 		public function addHidden($name, $value) {
 			return "<input type=\"hidden\" id=\"".$name."\" name=\"".$name."\" value=\"".$value."\" />";	
 		}
-		
+
 		public function password($name, $def_value = "", $label=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"password\" name=\"".$name."\" value=\"".$def_value."\" />";
 			return $output;
 		}
-		
+
+		public function calendar($name, $def_value, $label=NULL) {
+			$output = "";
+                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+                        $output .= "<input type=\"textbox\" value=\"".$def_value."\" name=\"".$name."\" id=\"".$name."\" size=\"20\" />";
+			$output .= "<script type=\"text/javascript\">$('#".$name."').datepicker($.datepicker.regional['fr']);";
+			$output .= "$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
+			if($def_value)
+				$output .= "$('#".$name."').datepicker('setDate','".$def_value."');";
+			$output .= "</script>";
+			return $output;
+		}
+
+		public function hourlist($hname,$mname) {
+
+		}
+
 		public function submit($name, $value) {
 			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" value=\"".$value."\" />";	
 		}
@@ -217,18 +235,20 @@
                         return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
                 }
 
-		public function radio($name, $value, $checked = false) {
-			$output = "<input id=\"".$name."\" type=\"radio\" value=\"".$value."\" name=\"".$name."\"";
+		public function radio($name, $value, $checked = false, $label=NULL) {
+			$output = "";
+			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			$output .= "<input id=\"".$name."\" type=\"radio\" value=\"".$value."\" name=\"".$name."\"";
 			if($checked) $output .= " checked=\"checked\"";
 			$output .= "> ".$value;
 			return $output;
 		}
 		
-		public function addRadioList($name,$values, $checkid = NULL) {
+		public function radioList($name,$values, $checkid = NULL) {
 			if(!is_array($values)) return "";
 			$output = "";
 			for($i=0;$i<count($values);$i++)
-				$output .= $this->addRadio($name,$values[$i],$checkid == $values[$i] ? true : false);
+				$output .= $this->radio($name,$values[$i],$checkid == $values[$i] ? true : false)."<br />";
 			return $output;
 		}
 		
@@ -248,8 +268,8 @@
 			return $output;
 		}
 		
-		public function addIndexedLine($idx,$name,$def_value = "", $pwd = false) {
-			$output = "<tr><td>".$idx."</td><td><center>";
+		public function addIndexedLine($label,$name,$def_value = "", $pwd = false) {
+			$output = "<tr><td>".$label."</td><td><center>";
 			if($pwd)
 				$output .= $this->password($name,$def_value);
 			else
@@ -287,9 +307,9 @@
 		}
 		
 		public function addTableSubmit($name,$value,$size = 2) {
-			$output = "<tr><td colspan=\"".$size."\"><center>";
+			$output = "<tr><th colspan=\"".$size."\"><center>";
 			$output .= $this->submit($name,$value);
-			$output .= "</center></td></tr>";
+			$output .= "</center></th></tr>";
 			return $output;
 		}
 
@@ -327,10 +347,10 @@
 		public function addCheck($name,$checked = false,$label="") {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<INPUT type=\"checkbox\" name=\"".$name."\" ";
+			$output .= "<input type=\"checkbox\" name=\"".$name."\" ";
 			if($checked)
 				$output .= "checked ";
-			$output .= "id=\"".$name."\"/>";
+			$output .= " />";
 			return $output;
 		}
 		
@@ -373,6 +393,11 @@
 		public function canvas($name, $width=480, $height=480) {
 			return "<canvas id=\"".$name."\" height=\"".$height."\" width=\"".$width."\">[Votre Navigateur ne supporte pas le HTML5]</canvas>";
 		}
+
+		public function tabPanElmt($shid,$link,$label,$cursh,$select) {
+			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-selected\"" : "")."><a href=\"".$link."&sh=".$shid."\">".$label."</a>";
+			return $output;
+		}
 		
 		public function opendiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
 			if($divname == NULL) $divname = uniqid();
@@ -388,11 +413,6 @@
                                 </script>";
 			return $output;
 		}
-		
-		public function tabPanElmt($teid,$link,$label,$curid,$default=false) {
-			return "<li".($curid == $teid || ($default && !$teid) ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"".$link."&sh=".$teid."\">".$label."</a></li>";
-		}
-		
 		// Simple methods
 		public function stylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;

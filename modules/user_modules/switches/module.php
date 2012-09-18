@@ -1111,9 +1111,8 @@
 
 					if($prise == NULL) $prise = "";
 					// Modify prise for switch port
-					FS::$pgdbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."' AND port = '".$port."'");
-					$sql = "INSERT IGNORE INTO z_eye_switch_port_prises VALUES ('".$sw."','".$port."','".$prise."')";
-					pg_query($sql);
+					FS::$pgdbMgr->Delete("z_eye_switch_port_prises","ip = '".$sw."' AND port = '".$port."'");
+					FS::$pgdbMgr->Insert("z_eye_switch_port_prises","ip,port,prise","'".$sw."','".$port."','".$prise."'");
 
 					// Return text for AJAX call
 					if($prise == "") $prise = "Modifier";

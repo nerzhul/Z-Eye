@@ -86,3 +86,30 @@ Beta 1.3
 - Misc Bug fixes
 - Snort Management is now ready by Z-Eye Web Interface. It needs to add 
 restart/reload of the service, and need to add thin parameters
+
+Beta 1.5
+lib/FSS/InterfaceMgr
+- Debug tab
+- Fix Radio
+- hourlist
+
+lib/FSS/SecurityMgr
+- CIDR
+- ISorCIDR
+
+modules/u/snortmgmt
+- Debug des liens
+- Implémentation CIDR
+
+modules/u/usermgmt
+- Fix d'un bug sur l'édition ldap/user
+
+modules/u/radius (module.php & rules.php)
+- Debug cleartext-password
+- Règle de délégation
+- Gestion de l'alias
+
+modules/u/switches
+- Fix de la maj de la prise en AJAX
+
+added scripts/clean_radius.py

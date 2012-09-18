@@ -528,7 +528,7 @@ preprocessor http_inspect_server: server default \\\n
 			fclose($file);*/
 			return 0;
 		}
-		
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
@@ -537,20 +537,20 @@ preprocessor http_inspect_server: server default \\\n
 					$dbuser = FS::$secMgr->checkAndSecurisePostData("dbuser");
 					$dbpwd = FS::$secMgr->checkAndSecurisePostData("dbpwd");
 					//$dbport = FS::$secMgr->checkAndSecurisePostData("dbport");
-					
+
 					if(!$dbhost || !$dbname || !$dbuser || $dbpwd) {
-						
+
 					}
 					break;
-				case 2: 
+				case 2:
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("dnslist");
 					$enable = FS::$secMgr->checkAndSecurisePostData("dnsenable");
-									
+
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								header("Location: index.php?mod=".$this->mid."&err=1");
 								return;
 							}
@@ -561,7 +561,7 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnsenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnslist','".$srvlist."'");
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=2");
 					break;
@@ -575,46 +575,46 @@ preprocessor http_inspect_server: server default \\\n
 					$poplist = FS::$secMgr->checkAndSecurisePostData("poplist");
 					$popports = FS::$secMgr->checkAndSecurisePostData("popports");
 					$enablepop = FS::$secMgr->checkAndSecurisePostData("enpop");
-									
+
 					$smtplist = trim($smtplist);
 					$srvs = preg_split("#[,]#",$smtplist);
 					if(strlen($smtplist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$smtpports = trim($smtpports);
 					$ports = preg_split("#[,]#",$smtpports);
 					if(strlen($smtpports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$imaplist = trim($imaplist);
 					$srvs = preg_split("#[,]#",$imaplist);
 					if(strlen($imaplist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$imapports = trim($imapports);
 					$ports = preg_split("#[,]#",$imapports);
 					if(strlen($imapports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
@@ -624,19 +624,19 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$poplist);
 					if(strlen($poplist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$popports = trim($popports);
 					$ports = preg_split("#[,]#",$popports);
 					if(strlen($popports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
@@ -660,7 +660,7 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'poplist','".$poplist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'popports','".$popports."'");
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=3");
 					break;
@@ -668,29 +668,29 @@ preprocessor http_inspect_server: server default \\\n
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("httplist");
 					$httpports = FS::$secMgr->checkAndSecurisePostData("httpports");
 					$enable = FS::$secMgr->checkAndSecurisePostData("enhttp");
-									
+
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$httpports = trim($httpports);
 					$ports = preg_split("#[,]#",$httpports);
 					if(strlen($httpports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httpenable'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httplist'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httpports'");
@@ -698,7 +698,7 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httplist','".$srvlist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httpports','".$httpports."'");
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=4&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=4");
 					break;
@@ -708,40 +708,40 @@ preprocessor http_inspect_server: server default \\\n
 					$oraclelist = FS::$secMgr->checkAndSecurisePostData("oraclelist");
 					$oracleports = FS::$secMgr->checkAndSecurisePostData("oracleports");
 					$oracleenable = FS::$secMgr->checkAndSecurisePostData("enoracle");
-									
+
 					$sqllist = trim($sqllist);
 					$srvs = preg_split("#[,]#",$sqllist);
 					if(strlen($sqllist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$oraclelist = trim($oraclelist);
 					$srvs = preg_split("#[,]#",$oraclelist);
 					if(strlen($oraclelist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$oracleports = trim($oracleports);
 					$ports = preg_split("#[,]#",$oracleports);
 					if(strlen($oracleports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sqlenable'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sqllist'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sqlenable',".($sqlenable == "on" ? 1 : 0));
@@ -753,7 +753,7 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oraclelist','".$oraclelist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oracleports','".$oracleports."'");
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=5");
 					break;
@@ -765,51 +765,51 @@ preprocessor http_inspect_server: server default \\\n
 					$sshenable = FS::$secMgr->checkAndSecurisePostData("enssh");
 					$tselist = FS::$secMgr->checkAndSecurisePostData("tselist");
 					$tseenable = FS::$secMgr->checkAndSecurisePostData("entse");
-									
+
 					$telnetlist = trim($telnetlist);
 					$srvs = preg_split("#[,]#",$telnetlist);
 					if(strlen($telnetlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$sshlist = trim($sshlist);
 					$srvs = preg_split("#[,]#",$sshlist);
 					if(strlen($sshlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$sshports = trim($sshports);
 					$ports = preg_split("#[,]#",$sshports);
 					if(strlen($sshports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$tselist = trim($tselist);
 					$srvs = preg_split("#[,]#",$tselist);
 					if(strlen($tselist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sshenable'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sshlist'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sshports'");
@@ -824,9 +824,9 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'tselist'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'tseenable',".($tseenable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'tselist','".$tselist."'");
-					
+
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=6");
 					break;
@@ -834,29 +834,29 @@ preprocessor http_inspect_server: server default \\\n
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("ftplist");
 					$ftpports = FS::$secMgr->checkAndSecurisePostData("ftpports");
 					$enable = FS::$secMgr->checkAndSecurisePostData("enftp");
-									
+
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$ftpports = trim($ftpports);
 					$ports = preg_split("#[,]#",$ftpports);
 					if(strlen($ftpports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'ftpenable'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'ftplist'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'ftpports'");
@@ -865,32 +865,32 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'ftpports','".$ftpports."'");
 
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=7");
 					break;
 				case 8:
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("snmplist");
 					$enable = FS::$secMgr->checkAndSecurisePostData("ensnmp");
-									
+
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'snmpenable'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'snmplist'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'snmpenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'snmplist','".$srvlist."'");
-					
+
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=8");
 					break;
@@ -898,38 +898,38 @@ preprocessor http_inspect_server: server default \\\n
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("siplist");
 					$sipports = FS::$secMgr->checkAndSecurisePostData("sipports");
 					$enable = FS::$secMgr->checkAndSecurisePostData("ensip");
-									
+
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
-							if(!FS::$secMgr->isIP($srvs[$i])) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					$sipports = trim($sipports);
 					$ports = preg_split("#[,]#",$sipports);
 					if(strlen($sipports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
-								header("Location: index.php?mod=".$this->mid."&err=1");
+								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");
 								return;
 							}
 						}
 					}
-					
+
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sipenable'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'siplist'");
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sipports'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sipenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'siplist','".$srvlist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sipports','".$sipports."'");
-					
+
 					if($this->writeConfiguration() != 0)
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						header("Location: index.php?mod=".$this->mid."&sh=9&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=9");
 					break;

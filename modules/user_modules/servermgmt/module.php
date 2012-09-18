@@ -42,7 +42,7 @@
 			$output .= "</div>";
 			return $output;
 		}
-		
+
 		private function CreateOrEditDeviceSaveServer($create) {
 			$saddr = "";
 			$slogin = "";
@@ -73,15 +73,15 @@
 					return $output;
 				}
 			}
-			
+
 			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
-			
+
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
 				case 3: if($create) $output .= FS::$iMgr->printError("Ce serveur est déjà référencé !"); break;
 			}
-			
+
 			$output .= "<script type=\"text/javascript\">function arangeform() {";
 			$output .= "if(document.getElementsByName('stype')[0].value == 1) {";
 			$output .= "$('#tohide1').hide();";
@@ -93,14 +93,14 @@
 			$output .= "$('#tohide3').show();";
 			$output .= "}";
 			$output .= "};</script>";
-					
+
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 7 : 8));
-			
+
 			if($create == false) {
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);
 				$output .= FS::$iMgr->addHidden("stype",$stype);
 			}
-	
+
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
 				$output .= FS::$iMgr->addIndexedIPLine("Adresse IP","saddr",$saddr);
@@ -129,16 +129,17 @@
 			$output .= FS::$iMgr->addIndexedLine("Chemin sur le serveur","spath",$spath);
 			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
 			$output .= "</table>";
-			
+
 			return $output;
 		}
-		
+
 		private function CreateOrEditRadiusDB($create) {
 			$saddr = "";
 			$slogin = "";
 			$sdbname = "";
 			$sport = 0;
 			$spwd = "";
+			$salias = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
 				$output = "<h4>Ajouter une base de données Radius au moteur</h4>";
@@ -151,11 +152,12 @@
 					$output .= FS::$iMgr->printError("Aucune base de données à éditer spécifiée !");
 					return $output;
 				}
-				$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
+				$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
 				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$spwd = $data["pwd"];
+					$salias = $data["radalias"];
 					$sport = $port;
 					$sdbname = $dbname;
 				}
@@ -164,24 +166,24 @@
 					return $output;
 				}
 			}
-			
+
 			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
-			
+
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
 				case 2: $output .= FS::$iMgr->printError("Impossible de se connecter au serveur MySQL spécifié !"); break;
 				case 3: if($create) $output .= FS::$iMgr->printError("Ce serveur MySQL est déjà référencé !"); break;
 			}
-			
+
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 4 : 5));
-			
+
 			if($create == false) {
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);
 				$output .= FS::$iMgr->addHidden("sport",$sport);
 				$output .= FS::$iMgr->addHidden("sdbname",$sdbname);
 			}
-	
+
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
 				$output .= FS::$iMgr->addIndexedLine("Adresse IP/DNS","saddr",$saddr);
@@ -196,12 +198,13 @@
 			$output .= FS::$iMgr->addIndexedLine("Utilisateur","slogin",$slogin);
 			$output .= FS::$iMgr->addIndexedLine("Mot de passe","spwd","",true);
 			$output .= FS::$iMgr->addIndexedLine("Répétition du mot de passe","spwd2","",true);
+			$output .= FS::$iMgr->addIndexedLine("Alias","salias",$salias);
 			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
 			$output .= "</table>";
-			
+
 			return $output;
 		}
-		
+
 		private function CreateOrEditServer($create) {
 			$saddr = "";
 			$slogin = "";
@@ -426,13 +429,13 @@
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
-					if($saddr == NULL || $saddr == "" || $sport == NULL || !FS::$secMgr->isNumeric($sport) || $sdbname == NULL || $sdbname == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
+					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
+					if($saddr == NULL || $saddr == "" || $salias == NULL || $salias == "" || $sport == NULL || !FS::$secMgr->isNumeric($sport) || $sdbname == NULL || $sdbname == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
 
-					FS::$dbMgr->Close();
 					$testDBMgr = new FSMySQLMgr();
 					$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
 
@@ -446,7 +449,7 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
-					FS::$pgdbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."'");
+					FS::$pgdbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 5:
@@ -456,15 +459,15 @@
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
-					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2) {
+					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
+					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2 || $salias == NULL || $salias == "") {
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=1");
 						return;
 					}
 					if($spwd != NULL || $spwd != "") {
-						FS::$dbMgr->Close();
 						$testDBMgr = new FSMySQLMgr();
 						$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
-						
+
 						$conn = $testDBMgr->Connect();
 						if(!$conn) {
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=2");
@@ -473,7 +476,7 @@
 						FS::$dbMgr->Connect();
 						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
-					FS::$pgdbMgr->Update("z_eye_radius_db_list","login = '".$slogin."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					FS::$pgdbMgr->Update("z_eye_radius_db_list","login = '".$slogin."', radalias = '".$salias."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 6: {
@@ -482,8 +485,8 @@
 					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
 					if($saddr && $sport && $sdbname) {
 							FS::$pgdbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
-					}	
-					header('Location: m-'.$this->mid.'.html');				
+					}
+					header('Location: m-'.$this->mid.'.html');
 				}
 				case 7:
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
