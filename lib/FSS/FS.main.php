@@ -41,23 +41,23 @@
 			
 			// Load File Mgr
 			FS::$fileMgr = new FSFileMgr();
-			
+
 			// Load Ajax Mgr
 			FS::$ajaxMgr = new AjaxManager();
-			
+
 			// Load SNMP Mgr
 			if(Config::enableSNMP()) {
 				FS::$snmpMgr = new SNMPMgr();	
 			}
 		}
-		
+
 		public static function isAJAXCall() {
 			if(FS::$secMgr->checkAndSecuriseGetData("at"))
 				return true;
-				
+
 			return false;
 		}
-		
+
 		public static function isActionToDo() {
 			if(isset($_GET["act"]) && strlen($_GET["act"]) > 0 && FS::$secMgr->isNumeric($_GET["act"])) {
 				FS::$secMgr->SecuriseStringForDB($_GET["act"]);
@@ -65,7 +65,7 @@
 			}
 			return false;
 		}
-		
+
 		public static $fileMgr;
 		public static $dbMgr;
 		public static $pgdbMgr;
@@ -75,5 +75,6 @@
 		public static $mailMgr;
 		public static $ajaxMgr;
 		public static $snmpMgr;
+		public static $pdfgen;
 	};
 ?>

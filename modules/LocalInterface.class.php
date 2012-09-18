@@ -126,7 +126,7 @@
 
 		public function loadModule($id) {
 			$output = "";
-					
+
 			$dir = opendir(dirname(__FILE__)."/user_modules");
 			$found = false;
 			$moduleid = 0;
@@ -155,7 +155,7 @@
 			else
 				$output .= $this->printError("Module inconnu !");
 
-			return $output;
+			return $output."<script type=\"text/javascript\">$('textarea, input:checkbox, input:radio, input:file').uniform();</script>";
 		}
 
 		public function getModuleIdByPath($path) {

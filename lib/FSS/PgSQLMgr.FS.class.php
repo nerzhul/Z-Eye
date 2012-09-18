@@ -96,8 +96,6 @@
                         if($data = pg_fetch_array($query)) {
                                 $splstr = preg_split("#[\.]#",$field);
                                 $splstr = preg_replace("#`#","",$splstr);
-                                if($data["mx"] == "")
-                                	return 0;
                                 return $data["mx"];
                         }
                         return -1;
@@ -110,7 +108,7 @@
                                 $splstr = preg_replace("#`#","",$splstr);
                                 return $data["ct"];
                         }
-			return 0;
+			return NULL;
 		}
 		
 		public function Insert($table,$keys,$values) {

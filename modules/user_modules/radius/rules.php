@@ -23,13 +23,14 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Gestion Radius</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_radius_read",in_array("mrule_radius_read",$activerules),"Lire les données")."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->addCheck("mrule_radius_write",in_array("mrule_radius_write",$activerules),"Modifier les données")."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->addCheck("mrule_radius_read",in_array("mrule_radius_read",$activerules),"Lire les données (Admin)")."</td></tr>
+			<tr><td></td><td>".FS::$iMgr->addCheck("mrule_radius_write",in_array("mrule_radius_write",$activerules),"Gestion des données (Admin)")."</td></tr>
+			<tr><td></td><td>".FS::$iMgr->addCheck("mrule_radius_deleg",in_array("mrule_radius_deleg",$activerules),"Gestion des utilisateurs (Délégation)")."</td></tr>";
                         return $output;
                 }
 
                 public function canAccessToModule() {
-			if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_radius_read"))
+			if(FS::$sessMgr->isConnected() && (FS::$sessMgr->hasRight("mrule_radius_read") || FS::$sessMgr->hasRight("mrule_radius_deleg")))
                                 return true;
                         return false;
                 }

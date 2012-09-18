@@ -21,7 +21,7 @@
 		FS::$iMgr->jsinc("lib/jQuery/jQuery.mousewheel.js");
 		FS::$iMgr->jsinc("lib/jQuery/jQuery.mapbox.js");
 		FS::$iMgr->jsinc("lib/jQuery/jquery.uniform.min.js");
-		FS::$iMgr->jsinc("lib/jQuery/jQuery.tooltip.js");
+                FS::$iMgr->jsinc("lib/jQuery/jQuery.tooltip.js");
 		FS::$iMgr->jsinc("lib/FSS/js/FS-math.js");
 		FS::$iMgr->jsinc("lib/FSS/js/FS-Regex.js");
 		FS::$iMgr->jsinc("lib/FSS/js/FS-interface.js");

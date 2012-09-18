@@ -27,16 +27,15 @@
         * of the authors and should not be interpreted as representing official policies,
         * either expressed or implied, of the FreeBSD Project.
         */
-	require_once(dirname(__FILE__)."/../../config/db.conf.php");
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
 	require_once(dirname(__FILE__)."/../../config/".Config::getSysLang().".lang.php");
 	class FSMySQLMgr {
 		function FSMySQLMgr() {
-			$this->dbName = DbConfig::getDbName();
-			$this->dbPort = DbConfig::getDbPort();
-			$this->dbHost = DbConfig::getDbHost();
-			$this->dbPass = DbConfig::getDbPwd();
-			$this->dbUser = DbConfig::getDbUser();
+			$this->dbName = "";
+			$this->dbPort = 3306;
+			$this->dbHost = "localhost";
+			$this->dbPass = "";
+			$this->dbUser = "";
 			$this->dbConn = NULL;
 		}
 
@@ -98,7 +97,7 @@
 		public function Count($table,$field,$cond = "") {
 			$count = $this->GetOneData($table,"COUNT(".$field.")",$cond);
 			if($count == NULL)
-				return 0;
+				return NULL;
 			return $count;
 		}
 
