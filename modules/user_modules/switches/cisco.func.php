@@ -50,7 +50,7 @@
 /*			$idx = getPortIndexes($device,$pid);
 			if($idx == NULL)
 				return -2;*/
-			$dup = getFieldForPortWithPID($device,$pid/*$idx[0].".".$idx[1]*/,"1.3.6.1.2.1.10.7.2.1.19");
+			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.10.7.2.1.19");
 			$dup = explode(" ",$dup);
                         if(count($dup) != 2)
                                 return -1;
@@ -445,16 +445,22 @@
 
 		function setSwitchportModeWithPID($device, $pid, $value) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
-                   return -1;
+				return -1;
 
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
 		}
-		
+
 		function getSwitchportModeWithPID($device, $pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 		                  return -1;
 
-			return getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
+			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
+                        $state = explode(" ",$ret);
+                        if(count($state) != 2)
+                                return -1;
+
+                        $state = $state[1];
+			return $state;
 		}
 
 		function setSwitchportVoiceVlanWithPID($device, $pid, $value) {
@@ -463,7 +469,7 @@
 
                         return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
                 }
-                
+
                 function getSwitchportVoiceVlanWithPID($device, $pid) {
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 		                  return -1;
@@ -476,19 +482,21 @@
                         $value = $value[1];
                         return $value;
                 }
-		
+
 		/*
 		* Generic functions
 		*/
-		
+
 		function setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
 			if($device == "" || $field == "" || $pid == "" || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-			FS::$snmpMgr->set($dip,$field.".".$pid,$vtype,$value);
+			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+                        if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
+			snmpset($dip,$community,$field.".".$pid,$vtype,$value);
 			return 0;
 		}
-		
+
 		function getFieldForPortWithPID($device, $pid, $field) {
 			if($device == "" || $field == "" || $pid == "" /*|| !FS::$secMgr->isNumeric($pid)*/)
 				return -1;
@@ -497,7 +505,7 @@
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			return snmpget($dip,$community,$field.".".$pid);
 		}
-		
+
 		function getPortId($device,$portname) {
 			$pid = FS::$pgdbMgr->GetOneData("z_eye_port_id_cache","pid","device = '".$device."' AND portname = '".$portname."'");
 			if($pid == NULL) $pid = -1;
@@ -514,7 +522,7 @@
 		/*
 		* get Port list from a device. If there is a filter, only port with specified vlan are returned
 		*/
-		
+
 		function getPortList($device,$vlanFltr = NULL) {
 			$out = "";
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -555,7 +563,7 @@
 			}
 			return $plist;
 		}
-		
+
 		function replaceVlan($device,$oldvlan,$newvlan) {
 			$out = "";
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -578,7 +586,7 @@
 					$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
 					if($oldvlan == $nvlan)
 						setSwitchTrunkNativeVlanWithPID($device,$pid,$newvlan);
-						
+
 					$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
 					if(in_array($oldvlan,$vllist)) {
 						$vllist2 = array();
@@ -611,7 +619,7 @@
 			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 			return $rand;
 		}
-		
+
 		function restoreStartupConfig($device) {
 			$rand = rand(1,100);
 			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -624,7 +632,7 @@
 			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 			return $rand;
 		}
-		
+
 		// Save startup-config to TFTP Server
 		function exportConfigToTFTP($device,$server,$path) {
 			$rand = rand(1,100);

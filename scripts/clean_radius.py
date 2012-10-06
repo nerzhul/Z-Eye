@@ -36,7 +36,7 @@ threadCounter = 0
 
 pgsqlHost = '127.0.0.1'
 pgsqlUser = 'netdisco'
-pgsqlPwd = 'dbpassword'
+pgsqlPwd = 'netdisco'
 pgsqlDb = 'netdisco'
 
 max_threads = 30
@@ -68,6 +68,7 @@ def cleanRadius(dbhost,dbport,dbname):
 					mysqlcur.execute("DELETE FROM radcheck WHERE username = '%s'" % idx[0])
 					mysqlcur.execute("DELETE FROM radreply WHERE username = '%s'" % idx[0])
 					mysqlcur.execute("DELETE FROM radusergroup WHERE username = '%s'" % idx[0])
+				mysqlconn.commit()
 				mysqlcur.close()
 				mysqlconn.close()
 			except MySQLdb.Error, e:

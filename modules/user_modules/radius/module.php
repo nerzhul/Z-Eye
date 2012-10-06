@@ -19,6 +19,7 @@
 
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
+	require_once(dirname(__FILE__)."/../../../lib/FSS/PDFgen.FS.class.php");
 	class iRadius extends genModule{
 		function iRadius() { parent::genModule(); }
 		public function Load() {
@@ -31,7 +32,7 @@
 			if($err && FS::$secMgr->isNumeric($err)) {
 				switch($err) {
 					case 1: $output = FS::$iMgr->printError("Serveur radius non référencé !"); break;
-					case 2: $output = FS::$iMgr->printError("Les valeurs entrées ne sont pas valides !"); break;
+					case 2: $output = FS::$iMgr->printError("Certaines données entrées sont manquantes ou invalides !"); break;
 					case 3: $output = FS::$iMgr->printError("Le groupe/utilisateur inscrit est déjà référencé !"); break;
 					case 4: $output = FS::$iMgr->printError("Echec de la suppression, données invalides !"); break;
 					case 5: $output = FS::$iMgr->printError("Certains utilisateurs n'ont pas été ajoutés car déjà existants !"); break;
@@ -88,27 +89,61 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&at=2","Compte individuel",$sh,true);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&at=2&sh=2&r=".$raddb."&h=".$radhost."&p=".$radport,"Comptes en masse",$sh);
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Compte individuel",$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Comptes en masse",$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
                                 $output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
 			}
 			else if(!$sh || $sh == 1) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
+				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radSQLMgr = new FSMySQLMgr();
+                                $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                $radSQLMgr->Connect();
+
+				$output .= "<div id=\"adduserres\"></div>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10","adduser");
 				$output .= "<table><tr><th>Intitulé</th><th>Valeur</th></tr>";
 				$output .= FS::$iMgr->addIndexedLine("Nom *","radname");
 				$output .= FS::$iMgr->addIndexedLine("Prénom *","radsurname");
 				$output .= FS::$iMgr->addIndexedline("Identifiant de connexion *","radusername");
-				$output .= "<tr><td>Profil</td><td></td></tr>";
-				$output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity",array("Toujours valide","Période"),"Toujours valide");
-				$output .= FS::$iMgr->calendar("startdate","","Du ")."<br />";
-				$output .= FS::$iMgr->calendar("enddate","","Au ");
+				$output .= "<tr><td>Profil</td><td>".FS::$iMgr->addList("profil","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
+				$output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity",array(1,2),array("Toujours valide","Période"),1);
+				$output .= FS::$iMgr->calendar("startdate","","Du")."<br />";
+				$output .= FS::$iMgr->hourlist("limhours","limmins")."<br />";
+				$output .= FS::$iMgr->calendar("enddate","","Au")."<br />";
+				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
 				$output .= "</td></tr>";
 				$output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</table></form>";
+
+				$output .= "<script type=\"text/javascript\">$('#adduser').submit(function(event) {
+					event.preventDefault();
+					$.post('index.php?mod=".$this->mid."&at=3&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10', $('#adduser').serialize(), function(data) {
+						$('#adduserres').html(data);
+					});
+				});</script>";
 			}
 			else if($sh == 2) {
+				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radSQLMgr = new FSMySQLMgr();
+                                $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                $radSQLMgr->Connect();
 
+				$output .= "<div id=\"adduserlistres\"></div>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11","adduserlist");
+                                $output .= "<table><tr><th>Intitulé</th><th>Valeur</th></tr>";
+				$output .= "<tr><td>Type de génération</td><td style=\"text-align: left;\">".FS::$iMgr->radio("typegen",1,false,"Nom aléatoire")."<br />".FS::$iMgr->radio("typegen",2,false,"Préfixe ").FS::$iMgr->input("prefix","")."</td></tr>";
+                                $output .= FS::$iMgr->addIndexedNumericLine("Nombre de comptes *","nbacct","",4,4);
+                                $output .= "<tr><td>Profil</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
+                                $output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array("Toujours valide","Période"),1);
+                                $output .= FS::$iMgr->calendar("startdate2","","Du")."<br />";
+				$output .= FS::$iMgr->hourlist("limhours2","limmins2")."<br />";
+                                $output .= FS::$iMgr->calendar("enddate2","","Au")."<br />";
+                                $output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
+                                $output .= "</td></tr>";
+                                $output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</table></form>";
 			}
 			else
 				$output .= FS::$iMgr->printError("Onglet invalide !");
@@ -121,12 +156,13 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."\">Utilisateurs</a>";
-				$output .= "<li".($sh == 2 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=2\">Profils</a>";
-				$output .= "<li".($sh == 3 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=3\">Import de masse</a>";
-				$output .= "<li".($sh == 4 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=4\">Import Auto DHCP</a>";
-				$output .= "<li".($sh == 5 ? " class=\"ui-tabs-selected ui-state-active\"": "")."><a href=\"index.php?mod=".$this->mid."&at=2&r=".$raddb."&h=".$radhost."&p=".$radport."&sh=5\">Options avancées</a>";
-
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Utilisateurs",$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Profils",$sh);
+				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Import de masse",$sh);
+				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Import Auto DHCP",$sh);
+				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Compte individuel (Deleg)",$sh);
+				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Comptes en masse (Deleg)",$sh);
+				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Options avancées",$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -237,12 +273,12 @@
 					if(!$found) {
                                                 $found = 1;
                                                 $tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><tr><th>Id</th><th>Utilisateur</th><th>Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr>";
-						$query2 = $radSQLMgr->Select("z_eye_radusers","username,expiration");
+						$query2 = $radSQLMgr->Select("z_eye_radusers","username,expiration","expiration > 0");
 						while($data2 = mysql_fetch_array($query2)) {
-							if(!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y",strtotime($data2["expiration"]));
+							if(!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
 						}
                                         }
-                                        $tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["username"]."</td><td>".$data["value"]."</td><td>";
+                                        $tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"]."\">".$data["username"]."</a></td><td>".$data["value"]."</td><td>";
 					$query2 = $radSQLMgr->Select("radusergroup","groupname","username = '".$data["username"]."'");
 					$found2 = 0;
 					while($data2 = mysql_fetch_array($query2)) {
@@ -509,6 +545,56 @@
 				$output .= FS::$iMgr->addIndexedLine("Champ expiration","cleanradsqlexpfield",$radexpdate);
 				$output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</form>";
 			}
+			else if($sh == 6) {
+				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radSQLMgr = new FSMySQLMgr();
+                                $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                $radSQLMgr->Connect();
+
+				$output .= "<div id=\"adduserres\"></div>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10","adduser");
+				$output .= "<table><tr><th>Intitulé</th><th>Valeur</th></tr>";
+				$output .= FS::$iMgr->addIndexedLine("Nom *","radname");
+				$output .= FS::$iMgr->addIndexedLine("Prénom *","radsurname");
+				$output .= FS::$iMgr->addIndexedline("Identifiant de connexion *","radusername");
+				$output .= "<tr><td>Profil</td><td>".FS::$iMgr->addList("profil","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
+				$output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity",array(1,2),array("Toujours valide","Période"),1);
+				$output .= FS::$iMgr->calendar("startdate","","Du")."<br />";
+				$output .= FS::$iMgr->hourlist("limhours","limmins")."<br />";
+				$output .= FS::$iMgr->calendar("enddate","","Au")."<br />";
+				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
+				$output .= "</td></tr>";
+				$output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</table></form>";
+
+				$output .= "<script type=\"text/javascript\">$('#adduser').submit(function(event) {
+					event.preventDefault();
+					$.post('index.php?mod=".$this->mid."&at=3&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10', $('#adduser').serialize(), function(data) {
+						$('#adduserres').html(data);
+					});
+				});</script>";
+			}
+			else if($sh == 7) {
+				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+                                $radSQLMgr = new FSMySQLMgr();
+                                $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                $radSQLMgr->Connect();
+
+				$output .= "<div id=\"adduserlistres\"></div>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11","adduserlist");
+                                $output .= "<table><tr><th>Intitulé</th><th>Valeur</th></tr>";
+				$output .= "<tr><td>Type de génération</td><td style=\"text-align: left;\">".FS::$iMgr->radio("typegen",1,false,"Nom aléatoire")."<br />".FS::$iMgr->radio("typegen",2,false,"Préfixe ").FS::$iMgr->input("prefix","")."</td></tr>";
+                                $output .= FS::$iMgr->addIndexedNumericLine("Nombre de comptes *","nbacct","",4,4);
+                                $output .= "<tr><td>Profil</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
+                                $output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array("Toujours valide","Période"),1);
+                                $output .= FS::$iMgr->calendar("startdate2","","Du")."<br />";
+				$output .= FS::$iMgr->hourlist("limhours2","limmins2")."<br />";
+                                $output .= FS::$iMgr->calendar("enddate2","","Au")."<br />";
+                                $output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
+                                $output .= "</td></tr>";
+                                $output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</table></form>";
+			}
 			else {
 				$output .= FS::$iMgr->printError("Cet onglet n'existe pas !");
 			}
@@ -580,9 +666,14 @@
 				($utype == 1 ? "Normal" : "Adresse MAC");
 				$formoutput .= "</li><li>".
 				FS::$iMgr->addHidden("username",$radentry)."</li>";
+				if(FS::$pgdbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1) {
+					$creadate = $radSQLMgr->GetOneData("z_eye_radusers","creadate","username='".$radentry."'");
+                                        $formoutput .= "<li><b>Date de création du compte: </b>".$creadate."</li>";
+				}
 				if($utype == 1) {
-					$formoutput .= "<li><fieldset id=\"userdf\" style=\"border:0;\">".
-					FS::$iMgr->password("pwd","","Mot de passe")."<br />".
+					$formoutput .= "<li><fieldset id=\"userdf\" style=\"border:0;\">";
+					$pwd = $radSQLMgr->GetOneData("radcheck","value","username = '".$radentry."' AND attribute = 'Cleartext-Password' AND op = ':='");
+					$formoutput .= FS::$iMgr->password("pwd",$pwd,"Mot de passe")."<br />".
 					FS::$iMgr->addList("upwdtype","","Type de mot de passe").
 					FS::$iMgr->addElementToList("Cleartext-Password",1,($upwdtype && $upwdtype == "Cleartext-Password" ? true : false)).
 					FS::$iMgr->addElementToList("User-Password",2,($upwdtype && $upwdtype == "User-Password" ? true : false)).
@@ -599,7 +690,7 @@
 					$grpidx++;
 				}
 				$attridx = 0;
-				$query = $radSQLMgr->Select("radcheck","attribute,op,value","username = '".$radentry."'");
+				$query = $radSQLMgr->Select("radcheck","attribute,op,value","username = '".$radentry."' AND attribute <> 'Cleartext-Password'");
 				while($data = mysql_fetch_array($query)) {
 					if(!($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept")) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
@@ -648,8 +739,10 @@
 
 				// if expiration module is activated, show the options
 				if(FS::$pgdbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1) {
-					$date = $radSQLMgr->GetOneData("z_eye_radusers","expiration","username='".$radentry."'");
-					$formoutput .= "<li>".FS::$iMgr->calendar("expiretime",$date ? date("d-m-y",strtotime($date)) : "","Date d'expiration du compte")."</li>";
+					$expdate = $radSQLMgr->GetOneData("z_eye_radusers","expiration","username='".$radentry."'");
+					$startdate = $radSQLMgr->GetOneData("z_eye_radusers","startdate","username='".$radentry."'");
+					$formoutput .= "<li>".FS::$iMgr->calendar("starttime",$startdate ? date("d-m-y",strtotime($startdate)) : "","Date d'expiration du compte")."</li>";
+					$formoutput .= "<li>".FS::$iMgr->calendar("expiretime",$expdate ? date("d-m-y",strtotime($expdate)) : "","Date d'expiration du compte")."</li>";
 				}
 				$formoutput .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").
 				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
@@ -1226,6 +1319,120 @@
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_user_field','".$cleanradsqluserfield."'");
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_date_field','".$cleanradsqlexpfield."'");
 					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=5");
+					return;
+				case 10:
+					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+					$name = FS::$secMgr->checkAndSecurisePostData("radname");
+					$surname = FS::$secMgr->checkAndSecurisePostData("radsurname");
+					$username = FS::$secMgr->checkAndSecurisePostData("radusername");
+					$profil = FS::$secMgr->checkAndSecurisePostData("profil");
+					$valid = FS::$secMgr->checkAndSecurisePostData("validity");
+					$sdate = FS::$secMgr->checkAndSecurisePostData("startdate");
+					$edate = FS::$secMgr->checkAndSecurisePostData("enddate");
+					$limhs = FS::$secMgr->checkAndSecurisePostData("limhours");
+					$limms = FS::$secMgr->checkAndSecurisePostData("limmins");
+					$limhe = FS::$secMgr->checkAndSecurisePostData("limhoure");
+                                        $limme = FS::$secMgr->checkAndSecurisePostData("limmine");
+
+					if(!$raddb || !$radhost || !$radport) {
+						echo FS::$iMgr->printError("Serveur d'authentification invalide !");
+                                                //header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
+                                                return;
+                                        }
+					if(!$name || !$surname || !$username || !$valid || !$profil || ($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0 
+						|| !FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate) 
+					))) {
+						echo FS::$iMgr->printError("Certains champs sont manquants ou invalides !");
+                                                //header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+                                                return;
+                                        }
+
+					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
+                                        $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
+					if(strtotime($sdate) > strtotime($edate)) {
+						echo FS::$iMgr->printError("La date de fin est située avant la date d'activation du compte !");
+						return;
+					}
+
+                                        $radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radSQLMgr = new FSMySQLMgr();
+                                        $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+                                        $radSQLMgr->Connect();
+
+					$exist = $radSQLMgr->GetOneData("radcheck","id","username = '".$username."'");
+					if(!$exist) $exist = $radSQLMgr->GetOneData("radreply","id","username = '".$username."'");
+					if($exist) {
+						echo FS::$iMgr->printError("L'utilisateur demandé existe déjà !");
+						//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
+                                                return;
+					}
+
+					$password = FS::$secMgr->genRandStr(8);
+					$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
+					$radSQLMgr->Insert("z_eye_radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
+					$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$profil."',0");
+
+					echo FS::$iMgr->printDebug("Utilisateur créé avec succès !")."<br /><hr><b>Login: </b>".$username."<br /><b>Mot de passe: </b>".$password."<br /><b>Validité: </b>".
+						($valid == 2 ? "Du ".$sdate." au ".$edate : "Infinie")."<hr><br />";
+					return;
+				case 11:
+					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+					$typegen = FS::$secMgr->checkAndSecurisePostData("typegen");
+					$prefix = FS::$secMgr->checkAndSecurisePostData("prefix");
+					$nbacct = FS::$secMgr->checkAndSecurisePostData("nbacct");
+					$profil = FS::$secMgr->checkAndSecurisePostData("profil2");
+					$valid = FS::$secMgr->checkAndSecurisePostData("validity2");
+					$sdate = FS::$secMgr->checkAndSecurisePostData("startdate2");
+					$edate = FS::$secMgr->checkAndSecurisePostData("enddate2");
+					$limhs = FS::$secMgr->checkAndSecurisePostData("limhours2");
+					$limms = FS::$secMgr->checkAndSecurisePostData("limmins2");
+					$limhe = FS::$secMgr->checkAndSecurisePostData("limhoure2");
+                                        $limme = FS::$secMgr->checkAndSecurisePostData("limmine2");
+					if(!$raddb || !$radhost || !$radport) {
+						echo FS::$iMgr->printError("Serveur d'authentification invalide !");
+                                                //header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
+                                                return;
+                                        }
+
+					if(!$typegen || $typegen == 2 && !$prefix || !$nbacct || !$valid || !$profil || ($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0 
+						|| !FS::$secMgr->isNumeric($nbacct) || $nbacct <= 0 || !FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate) 
+					))) {
+						echo FS::$iMgr->printError("Certains champs sont manquants ou invalides !");
+                                                //header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+                                                return;
+                                        }
+					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
+                                        $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
+					if(strtotime($sdate) > strtotime($edate)) {
+						echo FS::$iMgr->printError("La date de fin est située avant la date d'activation du compte !");
+						return;
+					}
+
+                                        $radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+                                        $radSQLMgr = new FSMySQLMgr();
+                                        $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+					$radSQLMgr->Connect();
+
+					$pdf = new PDFgen();
+					$pdf->SetTitle("Compte ".($valid == 1 ? "Permanent" : "Temporaire")." - IOGS");
+					for($i=0;$i<$nbacct;$i++) {
+						$password = FS::$secMgr->genRandStr(8);
+						if($typegen == 2) $username = $prefix.($i+1);
+						else $username = FS::$secMgr->genRandStr(12);
+						$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
+						$radSQLMgr->Insert("z_eye_radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
+						$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$profil."',0");
+
+						$pdf->AddPage();
+						$pdf->WriteHTML(utf8_decode("<b>Login: </b>".$username."<br /><br /><b>Mot de passe: </b>".$password."<br /><br /><b>Validité: </b>".($valid == 2 ? "Du ".date("d/m/y H:i",strtotime($sdate))." au ".date("d/m/y H:i",strtotime($edate)) : "Infinie")));
+					}
+					$pdf->CleanOutput();
 					return;
 			}
 		}

@@ -56,11 +56,11 @@ def fetchMRTGInfos(ip,devname,devcom):
 
 pgsqlCon = None
 
-defaultSNMPRO = 'IOTA'
+defaultSNMPRO = 'public'
 
 pgsqlHost = '127.0.0.1'
 pgsqlUser = 'netdisco'
-pgsqlPwd = 'dbpassword'
+pgsqlPwd = 'netdisco'
 pgsqlDb = 'netdisco'
 
 now = datetime.datetime.now()

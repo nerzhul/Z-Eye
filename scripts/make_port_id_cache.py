@@ -37,7 +37,7 @@ defaultSNMPRO = "public"
 
 pgsqlHost = '127.0.0.1'
 pgsqlUser = 'netdisco'
-pgsqlPwd = 'dbpassword'
+pgsqlPwd = 'netdisco'
 pgsqlDb = 'netdisco'
 
 max_threads = 30
@@ -54,18 +54,25 @@ def fetchSNMPInfos(ip,devname,devcom):
 		tc_mutex.acquire()
 		threadCounter += 1
 		tc_mutex.release()
+		print "Getting Port IDs for %s" % ip
 		cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
 		pipe = os.popen('{ ' + cmd + '; }', 'r')
 		text = pipe.read()
 		pipe.close()
-		pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
-		pgcursor = pgsqlCon.cursor()
+		pgsqlCon2 = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
+		pgcursor2 = pgsqlCon2.cursor()
 		stopSwIDSearch = 0
-		pgcursor.execute("DELETE FROM z_eye_port_id_cache WHERE device = '%s'" % devname)
+		pgcursor2.execute("DELETE FROM z_eye_port_id_cache WHERE device = '%s'" % devname)
 		for line in string.split(text, "\n"):
 			pdata = string.split(line, " ")
 			if len(pdata) >= 4:
-				pname = pdata[3]
+				""" get full name, with spaces """
+				pname = ""
+				for i in xrange(3,len(pdata)):
+					pname += pdata[i]
+					if i != len(pdata)-1:
+						pname += " "
+				""" get port id """
 				pdata2 = string.split(pdata[0], ".")
 				if len(pdata2) >= 2:
 					pid = pdata2[1]
@@ -85,13 +92,14 @@ def fetchSNMPInfos(ip,devname,devcom):
 						elif len(piddata) >= 3 and piddata[2] == "No":
 							stopSwIDSearch = 1
 					""" must be there for no switch/switchport id """
-					if devname == "sr2pile1.res.iogs":
-						print "INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid)
-					pgcursor.execute("INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid))
+					pgcursor2.execute("INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid))
 		tc_mutex.acquire()
 		threadCounter = threadCounter - 1
 		tc_mutex.release()
-		pgsqlCon.close()
+
+		pgsqlCon2.commit()
+		pgcursor2.close()
+		pgsqlCon2.close()
 	except Exception, e:
 		print "[FATAL] %s" % e
 		zeye_log("[FATAL] %s" % e)

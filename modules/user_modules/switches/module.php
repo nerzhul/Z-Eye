@@ -144,9 +144,11 @@
 							$output .= "Non disponible";
 						$output .= "</td></tr>";
 						$output .= "<tr><td>Switchport Mode</td><td>";
-						$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
+						$trmode = getSwitchportModeWithPID($device,$portid);
+
+						/*$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
 						$trmode = preg_split("# #",$trmode);
-						$trmode = $trmode[1];
+						$trmode = $trmode[1];*/
 						if(getSwitchportMABState($device,$portid) == 1)
                                                         $trmode = 3;
 						$output .= FS::$iMgr->addList("trmode","arangeform()");

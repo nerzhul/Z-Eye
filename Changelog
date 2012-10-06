@@ -98,18 +98,28 @@ lib/FSS/SecurityMgr
 - ISorCIDR
 
 modules/u/snortmgmt
-- Debug des liens
-- Implémentation CIDR
+- Debug some links
+- CIDR implemtnation
 
 modules/u/usermgmt
-- Fix d'un bug sur l'édition ldap/user
+- Fix a bug when edit ldap/user
 
 modules/u/radius (module.php & rules.php)
 - Debug cleartext-password
-- Règle de délégation
-- Gestion de l'alias
+- Added delegation
+- Alias management
+- Deleg is now visible for sec admins
 
 modules/u/switches
-- Fix de la maj de la prise en AJAX
+- AJAX fix for prise 
 
 added scripts/clean_radius.py
+
+Beta 1.6
+- Bugfixes on PGSQL class
+- Bugfix when icinga not started for default module
+- Cleanups on DNS mgmt
+- Some new functions for InterfaceMgr
+
+Beta 1.7
+- Added DHCP monitoring support

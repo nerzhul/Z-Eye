@@ -230,7 +230,7 @@
 
 	// Flush subnet table
 	FS::$pgdbMgr->Delete("z_eye_dhcp_subnet_cache");
-	
+
 	if(count($sort_result) > 0) {
 		foreach ($sort_result as $class_a => $ca_keys) {
 			foreach ($ca_keys as $class_b => $cb_keys) {
@@ -243,10 +243,10 @@
 				}
 			}
 		}
-		
+
 		// Flush ip table
 		FS::$pgdbMgr->Delete("z_eye_dhcp_ip_cache");
-		
+
 		foreach ($sort_result as $class_a => $ca_keys) {
 			foreach ($ca_keys as $class_b => $cb_keys) {
 				foreach ($cb_keys as $class_c => $cc_keys) {

@@ -59,7 +59,7 @@
 				if($ordersens == 1)
 					$sql .= " DESC";
 				else if($ordersens == 2)
-					$sql .= " ASC";	
+					$sql .= " ASC";
 			}
 			if($limit > 0) {
 				if($startidx > 0)
@@ -70,7 +70,7 @@
 			}
 			return pg_query($this->dbLink,$sql);
 		}
-		
+
 		public function GetOneData($table,$field,$cond = "",$order= "",$ordersens = 0, $limit = 0, $startidx = 0) {
 			$query = $this->Select($table,$field,$cond,$order,$ordersens,$limit,$startidx);
 			if($data = pg_fetch_array($query)) {

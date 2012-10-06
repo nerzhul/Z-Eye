@@ -164,24 +164,27 @@
 			return $output;
 		}
 
-		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" />";
+			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
 			return $output;
 		}
 
-		public function addNumericInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+		public function addNumericInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
+			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
 			return $output;
 		}
 
-		public function addIPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+		public function addIPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
+			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
 			return $output;
 		}
 
@@ -409,7 +412,7 @@
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-selected\"" : "")."><a href=\"".$link."&sh=".$shid."\">".$label."</a>";
+			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-selected\"" : "")."><a href=\"".$link."&at=2&sh=".$shid."\">".$label."</a>";
 			return $output;
 		}
 		

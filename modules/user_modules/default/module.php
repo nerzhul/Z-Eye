@@ -59,68 +59,72 @@
 			// report nagios
 		        $content = file_get_contents("http://localhost/cgi-bin/icinga/status.cgi");
         		preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
-		        $body = $body[0][0];
+			if(isset($body[0][0])) {
+			        $body = $body[0][0];
 
-        		// remove all uneeded content
-		       	$body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
-	        	$body = preg_replace("/<img[^>]*>/si","",$body);
-		        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
-        		$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-		        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
-        		$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
-	        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-	        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-		        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-	        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-		        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
-	        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
-		        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
-        		$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
+        			// remove all uneeded content
+			       	$body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
+	        		$body = preg_replace("/<img[^>]*>/si","",$body);
+			        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
+        			$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
+			        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
+        			$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
+		        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
+		        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
+			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
+	        		$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
+			        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
+			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
+	        		$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
+		        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
+			        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
+        			$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
-			$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
-			$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
+				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
+				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
-			// At this time this is the table with status of all services
+				// At this time this is the table with status of all services
 
-			$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
-			$totalservices = $hsservices = 0;
-			preg_match_all("#<TR>#",$body,$totalservices);
-			$this->totalicinga = count($totalservices[0]);
+				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
+				$totalservices = $hsservices = 0;
+				preg_match_all("#<TR>#",$body,$totalservices);
+				$this->totalicinga = count($totalservices[0]);
 
-			// report nagios
-                        $content = file_get_contents("http://localhost/cgi-bin/icinga/status.cgi?servicestatustypes=28");
-                        preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
-                        $body = $body[0][0];
+				// report nagios
+                	        $content = file_get_contents("http://localhost/cgi-bin/icinga/status.cgi?servicestatustypes=28");
+                        	preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
+	                        $body = $body[0][0];
 
-                        // remove all uneeded content
-                        $body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
-                        $body = preg_replace("/<img[^>]*>/si","",$body);
-                        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
-                        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-                        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
-                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
-                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-                        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-                        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-                        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-                        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
-                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-                        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
-                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
-                        $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
+        	                // remove all uneeded content
+                	        $body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
+                        	$body = preg_replace("/<img[^>]*>/si","",$body);
+	                        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
+        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
+                	        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
+                        	$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
+	                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
+        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
+                	        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
+                        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
+	                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
+        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
+                        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
+		                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
+                	        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
+                        	$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
-                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
-                        $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
+	                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
+        	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
-			$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
-        		preg_match_all("#<TR>#",$body,$hsservices);
-			$this->hsicinga = count($hsservices[0]);
-			if(count($hsservices[0]) > 0)
-		        	$output = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">Erreur de services rapportées par Icinga: ".$this->hsicinga."/".$this->totalicinga."</h4>".$body;
-			else $output = "";
+				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
+        			preg_match_all("#<TR>#",$body,$hsservices);
+				$this->hsicinga = count($hsservices[0]);
+				if(count($hsservices[0]) > 0)
+			        	$output = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">Erreur de services rapportées par Icinga: ".$this->hsicinga."/".$this->totalicinga."</h4>".$body;
+				else $output = "";
+			}
+			else
+				$output .= "<h4 style=\"font-size:24px; text-decoration: blink; color: red\">Service de monitoring OFFLINE</h4>";
 			return $output;
 		}
 

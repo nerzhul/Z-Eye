@@ -256,20 +256,16 @@
 			
 						if($shCNAME == "on") $shCNAME = 1;
 						else $shCNAME = 0;
-						
-			
+
 						if($shSRV == "on") $shSRV = 1;
 						else $shSRV = 0;
-						
-			
+
 						if($shPTR == "on") $shPTR = 1;
 						else $shPTR = 0;
-						
-			
+
 						if($shTXT == "on") $shTXT = 1;
 						else $shTXT = 0;
-						
-			
+
 						if($shother == "on") $shother = 1;
 						else $shother = 0;
 						header("Location: index.php?mod=".$this->mid.($filtr != NULL ? "&f=".$filtr : "")."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother);
@@ -286,7 +282,8 @@
 
 					$found = false;
 					$output = "";
-					
+
+					$obsoletes = array();
 					// Search deprecated records
 					$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
 					while($data = pg_fetch_array($query)) {
@@ -295,11 +292,11 @@
 							$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 							if(!$foundrecent) {
 								if(!$found) $found = true;
-								$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$data["recval"]."<br />";
+								$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$data["recval"]."<br />";
 							}
 						}
 					}
-					
+
 					$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'CNAME'");
 					while($data = pg_fetch_array($query)) {
 						$toquery = "";
@@ -312,7 +309,7 @@
 						$out = array();
 						exec("dig -t A ".$toquery." +short|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
 						if(count($out) == 0) {
-							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / Orphelin<br />";
+							$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / Orphelin<br />";
 						}
 						else {
 							for($i=0;$i<count($out);$i++) {
@@ -321,13 +318,17 @@
 									$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 									if(!$foundrecent) {
 										if(!$found) $found = true;
-										$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$out[$i]."<br />";
+										$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$out[$i]."<br />";
 									}
 								}
 							}
 						}
 					}
-					if($found) echo "<h4>Enregistrements obsolètes trouvés !</h4>".$output;
+					if($found) {
+						echo "<h4>Enregistrements obsolètes trouvés !</h4>".$output;
+						foreach($obsoletes as $key => $value)
+							echo $value;
+					}
 					else echo FS::$iMgr->printDebug("Aucun enregistrement obsolète trouvé");
 					return;
 			}

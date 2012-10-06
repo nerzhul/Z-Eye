@@ -34,6 +34,7 @@
 			$netoutput = "";
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
+
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= "<h3>Supervision IP</h3>";
@@ -44,14 +45,16 @@
 					$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
 				$output .= $formoutput;
-				$output .= "</select>";
+				$output .= "</select> ";
+				$output .= FS::$iMgr->submit("","Consulter");
 				$output .= "</form><br />";
-				if(!$filter)
+				if(!$filter || !FS::$secMgr->isIP($filter))
 					return "Veuillez choisir le réseau IP à monitorer: <br /><br />".$output;
 
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."\">Statistiques</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sh=2\">Outils avancés</a>";
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,"Statistiques",$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&f=".$filter,"Monitoring",$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&f=".$filter,"Outils avancés",$showmodule);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -148,9 +151,10 @@
 								{ name: 'Adresses fixes', y: ".$fixedip.", color: 'orange'},
 								{ name: 'Libres', y:".$free.", color: 'green'}]
 							}]});</script>";
+					}
+					$output .= $netoutput;
 				}
-				$output .= $netoutput;
-				} else if($showmodule == 2) {
+				else if($showmodule == 2) {
 					$output .= "<h4>Recherche de réservations obsolètes</h4>";
 					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
 					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
@@ -163,10 +167,34 @@
 					$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchobsolete();");
 					$output .= "</form><div id=\"obsres\"></div>";
 				}
+				else if($showmodule == 3) {
+					$output .= "<h4>Monitoring</h4>";
+					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_dhcp_monitoring","warnuse","subnet = '".$filter."'");
+					$climit = FS::$pgdbMgr->GetOneData("z_eye_dhcp_monitoring","crituse","subnet = '".$filter."'");
+					$maxage = FS::$pgdbMgr->GetOneData("z_eye_dhcp_monitoring","maxage","subnet = '".$filter."'");
+					$enmon = FS::$pgdbMgr->GetOneData("z_eye_dhcp_monitoring","enmon","subnet = '".$filter."'");
+					$contact = FS::$pgdbMgr->GetOneData("z_eye_dhcp_monitoring","contact","subnet = '".$filter."'");
+					$output .= "<div id=\"monsubnetres\"></div>";
+	                                $output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&f=".$filter."&act=3","monsubnet");
+					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",$enmon == 1 ? true : false,"Activer le monitoring")."</li><li>";
+                                        $output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),3,3,"Seuil d'avertissement","% d'utilisation")."</li><li>";
+					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),3,3,"Seuil critique","% d'utilisation")."</li><li>";
+					$output .= FS::$iMgr->addNumericInput("maxage",($maxage > 0 ? $maxage : 0),7,7,"Age maximum","Délai maximum (en jours) avant d'avertir de l'obsolescence d'une réservation.<br />0 = pas de vérification")."</li><li>";
+					$output .= FS::$iMgr->input("contact",$contact,20,40,"Contact","@ mail recevant les alertes d'obsolescence")."</li><li>";
+					$output .= FS::$iMgr->submit("","Enregistrer")."</li></ul></form>";
+					$output .= "<script type=\"text/javascript\">$('#monsubnet').submit(function(event) {
+        	                                event.preventDefault();
+                	                        $.post('index.php?mod=".$this->mid."&at=3&f=".$filter."&act=3', $('#monsubnet').serialize(), function(data) {
+                        	                        $('#monsubnetres').html(data);
+                                	        });
+	                                });</script>";
+				}
+				else
+					$output .= FS::$iMgr->printError("Cet onglet n'existe pas");
 			}
 			return $output;
 		}
-		
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
@@ -183,23 +211,50 @@
 						return;
 					}
 
-					$found = false;
 					$output = "";
+					$obsoletes = array();
+					$found = false;
 					$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname","netid = '".$filter."' AND distributed = 3");
-					while($data = mysql_fetch_array($query)) {
-						$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$data["ip"]."' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
-						while($data2 = pg_fetch_array($query2)) {
-							if($data2["mac"] == $data["macaddr"]) {
-								$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND active = 't' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
-								if(!$foundrecent) {
-									if(!$found) $found = true;
-									$output .= $data["ip"]." / <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
-								}
+					while($data = pg_fetch_array($query)) {
+						$ltime = FS::$pgdbMgr->GetOneData("node","time_last","mac = '".$data["macaddr"]."'","time_last",1,1);
+						if($ltime) {
+							if(strtotime($ltime) < strtotime("-".$interval." day",strtotime(date("y-m-d H:i:s")))) {
+								$obsoletes[$data["ip"]] = $data["ip"]." - <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a>";
+								$obsoletes[$data["ip"]] .= " (Dernière vue ".date("d/m/y H:i",strtotime($ltime)).")";
+								$obsoletes[$data["ip"]] .= "<br />";
+								if(!$found) $found = true;
 							}
 						}
 					}
-					if($found) echo "<h4>Réservations obsolètes trouvées !</h4>".$output;
+					if($found) {
+						echo "<h4>Réservations obsolètes trouvées !</h4>";
+						foreach($obsoletes as $key => $value)
+							echo $value;
+					}
 					else echo FS::$iMgr->printDebug("Aucune réservation obsolète trouvée");
+					return;
+				case 3:
+					$filtr = FS::$secMgr->checkAndSecuriseGetData("f");
+					$warn = FS::$secMgr->checkAndSecurisePostData("wlimit");
+					$crit = FS::$secMgr->checkAndSecurisePostData("climit");
+					$maxage = FS::$secMgr->checkAndSecurisePostData("maxage");
+					$contact = FS::$secMgr->checkAndSecurisePostData("contact");
+					$enmon = FS::$secMgr->checkAndSecurisePostData("enmon");
+					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || $warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
+						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
+						echo FS::$iMgr->printError("Certaines données sont manquantes ou invalides !");
+						return;
+					}
+					$exist = FS::$pgdbMgr->GetOneData("z_eye_dhcp_subnet_cache","netid","netid = '".$filtr."'");
+					if(!$exist) {
+						echo FS::$iMgr->printError("Le subnet entré est invalide !");
+                                                return;
+                                        }
+
+					FS::$pgdbMgr->Delete("z_eye_dhcp_monitoring","subnet = '".$filtr."'");
+					if($enmon == "on")
+						FS::$pgdbMgr->Insert("z_eye_dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage","'".$filtr."','".$warn."','".$crit."','".$contact."','1','".$maxage."'");
+					echo FS::$iMgr->printDebug("Modifications enregistrées");
 					return;
 			}
 		}
