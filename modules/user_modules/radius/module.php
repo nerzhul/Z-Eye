@@ -81,6 +81,12 @@
 						$output .= $this->showRadiusDatas($raddb,$radhost,$radport);
 				}
 			}
+			else if($sh == 2) {
+
+			}
+			else
+				$output .= FS::$iMgr->printError("Onglet invalide !");
+
 			return $output;
 		}
 
