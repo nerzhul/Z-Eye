@@ -30,24 +30,24 @@
 
 			return false;
 		}
-		
+
 		public function isIPinRange($start,$end,$ip) {
 			if(ip2long($ip) < ip2long($start) || ip2long($ip) > ip2long($end))
 				return false;
-				
+
 			return true;
 		}
-		
+
 		public function isIPTouchRange($start,$end,$ip) {
 			if($this->isIPinRange($start,$end,$ip))
 				return true;
-				
+
 			if(ip2long($start)-1 == ip2long($ip) || ip2long($end)+1 == ip2long($ip))
 				return true;
-				
+
 			return false;
 		}
-		
+
 		public function isIPAfterIP($ip,$comp_ip) {
 			if(ip2long($ip) > ip2long($comp_ip))
 				return true;

@@ -34,10 +34,7 @@ from threading import Lock
 tc_mutex = Lock()
 threadCounter = 0
 
-pgsqlHost = '127.0.0.1'
-pgsqlUser = 'netdisco'
-pgsqlPwd = 'netdisco'
-pgsqlDb = 'netdisco'
+import netdiscoCfg
 
 max_threads = 30
 
@@ -53,7 +50,7 @@ def cleanRadius(dbhost,dbport,dbname):
 		tc_mutex.acquire()
                 threadCounter += 1
                 tc_mutex.release()
-		pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
+		pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
         	pgcursor = pgsqlCon.cursor()
 		pgcursor.execute("SELECT login,pwd FROM z_eye_radius_db_list where addr='%s' and port='%s' and dbname='%s'" % (dbhost,dbport,dbname))
         	pgres2 = pgcursor.fetchone()
@@ -88,7 +85,7 @@ now = datetime.datetime.now()
 zeye_log("[Z-Eye][Radius-Cleaner] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 try:
         global threadCounter
-        pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
+        pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 	pgcursor = pgsqlCon.cursor()
         pgcursor.execute("SELECT addr,port,dbname FROM z_eye_radius_options GROUP BY addr,port,dbname")
         try:

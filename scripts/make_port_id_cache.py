@@ -29,16 +29,12 @@ import os
 import time
 import string
 from threading import Lock
+import netdiscoCfg
 
 tc_mutex = Lock()
 threadCounter = 0
 
 defaultSNMPRO = "public"
-
-pgsqlHost = '127.0.0.1'
-pgsqlUser = 'netdisco'
-pgsqlPwd = 'netdisco'
-pgsqlDb = 'netdisco'
 
 max_threads = 30
 
@@ -54,12 +50,11 @@ def fetchSNMPInfos(ip,devname,devcom):
 		tc_mutex.acquire()
 		threadCounter += 1
 		tc_mutex.release()
-		print "Getting Port IDs for %s" % ip
 		cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
 		pipe = os.popen('{ ' + cmd + '; }', 'r')
 		text = pipe.read()
 		pipe.close()
-		pgsqlCon2 = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
+		pgsqlCon2 = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 		pgcursor2 = pgsqlCon2.cursor()
 		stopSwIDSearch = 0
 		pgcursor2.execute("DELETE FROM z_eye_port_id_cache WHERE device = '%s'" % devname)
@@ -112,7 +107,7 @@ print "[Z-Eye][PortId-Caching] Start at: %s" % now.strftime("%Y-%m-%d %H:%M")
 zeye_log("[Z-Eye][PortId-Caching] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 try:
 	global threadCounter
-	pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
+	pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 	pgcursor = pgsqlCon.cursor()
 	pgcursor.execute("SELECT ip,name FROM device ORDER BY ip")
 	try:

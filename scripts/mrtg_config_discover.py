@@ -29,6 +29,7 @@ import commands
 import os
 import re
 import time
+import netdiscoCfg
 
 threadCounter = 0
 
@@ -56,18 +57,13 @@ def fetchMRTGInfos(ip,devname,devcom):
 
 pgsqlCon = None
 
-defaultSNMPRO = 'public'
-
-pgsqlHost = '127.0.0.1'
-pgsqlUser = 'netdisco'
-pgsqlPwd = 'netdisco'
-pgsqlDb = 'netdisco'
+defaultSNMPRO = 'IOTA'
 
 now = datetime.datetime.now()
 print "[Z-Eye][mrtg-config-discover] Start at: %s" % now.strftime("%Y-%m-%d %H:%M")
 zeye_log("[Z-Eye][mrtg-config-discover] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 try:
-	pgsqlCon = PgSQL.connect(host=pgsqlHost,user=pgsqlUser,password=pgsqlPwd,database=pgsqlDb)
+	pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 	pgcursor = pgsqlCon.cursor()
 	pgcursor.execute("SELECT ip,name FROM device ORDER BY ip")
 	try:

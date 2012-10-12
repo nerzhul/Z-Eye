@@ -43,12 +43,12 @@
 		}
 		return $tmpbuf;
 	}
-	
+
 	FS::LoadFSModules();
-	
+
 	FS::$pgdbMgr->Delete("z_eye_dns_zone_cache");
 	FS::$pgdbMgr->Delete("z_eye_dns_zone_record_cache");
-	
+
 	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd,namedpath,chrootnamed","dns = 1");
 	while($data = pg_fetch_array($query)) {
 		$conn = ssh2_connect($data["addr"],22);

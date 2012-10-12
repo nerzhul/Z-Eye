@@ -123,3 +123,12 @@ Beta 1.6
 
 Beta 1.7
 - Added DHCP monitoring support
+- misc fixes on FSS library
+- some improvements on default module (perf & screen)
+- one fix on dnsmgmt
+- fix ipmanager bug
+- improvements on cisco & switch module
+- export netdisco config to another python module (rights 700)
+- fixes on some scripts
+- fix ip calcs & improve perf for dhcp caching
+
