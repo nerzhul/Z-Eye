@@ -37,15 +37,16 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&at=2","Général",$sh,true);
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&at=2","Accès distant",$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&at=2","DNS",$sh);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&at=2","Mail",$sh);
-				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid."&at=2","FTP",$sh);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&at=2","HTTP",$sh);
-				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&at=2","DB",$sh);
-				$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid."&at=2","SNMP",$sh);
-				$output .= FS::$iMgr->tabPanElmt(9,"index.php?mod=".$this->mid."&at=2","SIP",$sh);
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,"Général",$sh,true);
+				$output .= FS::$iMgr->tabPanElmt(10,"index.php?mod=".$this->mid,"Rapports",$sh);
+				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid,"Accès distant",$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,"DNS",$sh);
+				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,"Mail",$sh);
+				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid,"FTP",$sh);
+				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid,"HTTP",$sh);
+				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid,"DB",$sh);
+				$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid,"SNMP",$sh);
+				$output .= FS::$iMgr->tabPanElmt(9,"index.php?mod=".$this->mid,"SIP",$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
@@ -55,7 +56,7 @@
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">Stockage des données</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine("Hôte MySQL","dbhost");
+				$output .= FS::$iMgr->addIndexedLine("Hôte PgSQL","dbhost");
 				$output .= FS::$iMgr->addIndexedLine("Base de données","dbname");
 				$output .= FS::$iMgr->addIndexedLine("Utilisateur","dbuser");
 				$output .= FS::$iMgr->addIndexedLine("Mot de passe","dbpwd","",true);
@@ -217,7 +218,7 @@
 				$sipports = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'sipports'");
 				if(!$sipenable) $sipenable = 0;
 				if(!$sipports) $sipports = "5060,5061";
-				
+
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensip",$sipenable);
@@ -228,7 +229,26 @@
 				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
-			
+			else if($sh == 10) {
+				$nightreport = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_nighten'");
+				$wereport = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_ween'");
+				$nighth = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_nighthour'");
+				$nightm = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_nightmin'");
+				$nightback = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_nightback'");
+				$weh = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_wehour'");
+				$wem = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_wemin'");
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= "<table>";
+				$output .= "<tr><th colspan=\"2\">Rapports nocturnes</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer", "nightreport", $nightreport == 1 ? true : false);
+				$output .= "<tr><td>Heure d'envoi</td><td>".FS::$iMgr->hourlist("hnight","mnight",$nighth,$nightm)."</td></tr>";
+				$output .= "<tr><td>Durée antécédente</td><td>".FS::$iMgr->addNumericInput("nightintval",$nightback > 0 ? $nigthback : 7,2,2,NULL,"Correspond à l'heure de départ de collecte des données, à partir de l'heure d'envoi")."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">Rapports de fin de semaine</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine("Activer", "wereport", $wereport == 1 ? true : false);
+				$output .= "<tr><td>Heure d'envoi</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
+				$output .= FS::$iMgr->addTableSubmit("","Enregistrer");
+				$output .= "</table>";
+			}
 			return $output;
 		}
 		private function writeConfiguration() {
@@ -236,9 +256,8 @@
 				$file = fopen("/etc/snort/snort.z_eye.conf","w");	
 			else
 				$file = fopen("/usr/local/etc/snort/snort.z_eye.conf","w");
-			
 			if(!$file) return 1;
-			
+
 			$homenetworks = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'home_net'");
 			if(!$homenetworks) $homenetworks = "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16";
 			fwrite($file,"#\n# Snort configuration, generated by Z-Eye (".date('d-m-Y G:i:s').")\n#\n\n");
