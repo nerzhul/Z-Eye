@@ -19,14 +19,17 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
+	
 	class iSnortMgmt extends genModule{
-		function iSnortMgmt() { parent::genModule(); }
+		function iSnortMgmt() { parent::genModule(); $this->loc = new lSnort(); }
 		public function Load() {
-			$output = "<h3>Management de l'IDS SNORT</h3>";
+			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError("Données entrées invalides"); break;
-				case 2: $output .= FS::$iMgr->printError("Impossible d'écrire le fichier de configuration snort.z_eye.conf"); break;
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("bad-data")); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("fail-snort-conf-wr")); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("fail-cron-wr")); break;
 			}
 			$output .= $this->showMainConf();
 			return $output;
@@ -36,10 +39,11 @@
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
+				$output .= "<h3>".$this->loc->s("page-title")."</h3>";
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,"Général",$sh,true);
-				$output .= FS::$iMgr->tabPanElmt(10,"index.php?mod=".$this->mid,"Rapports",$sh);
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid,"Accès distant",$sh);
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh,true);
+				$output .= FS::$iMgr->tabPanElmt(10,"index.php?mod=".$this->mid,$this->loc->s("Reports"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid,$this->loc->s("Remote"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,"DNS",$sh);
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,"Mail",$sh);
 				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid,"FTP",$sh);
@@ -49,23 +53,23 @@
 				$output .= FS::$iMgr->tabPanElmt(9,"index.php?mod=".$this->mid,"SIP",$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
 				$output .= "</div>";
 			}
 			else if(!$sh || $sh == 1) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= "<tr><th colspan=\"2\">Stockage des données</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine("Hôte PgSQL","dbhost");
-				$output .= FS::$iMgr->addIndexedLine("Base de données","dbname");
-				$output .= FS::$iMgr->addIndexedLine("Utilisateur","dbuser");
-				$output .= FS::$iMgr->addIndexedLine("Mot de passe","dbpwd","",true);
-				$output .= "<tr><td>Liste des LANs</td><td>";
+				$output .= "<tr><th colspan=\"2\">".$this->loc->s("data-storage")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("pg-host"),"dbhost");
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Database"),"dbname");
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"dbuser");
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"dbpwd","",true);
+				$output .= "<tr><td>".$this->loc->s("lan-list")."</td><td>";
 				$output .= FS::$iMgr->textarea("srvlist","",250,100);
 
 				$output .= "</td></tr>";
 				
-				$output .= "<tr><td colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</td></tr>";
+				$output .= "<tr><td colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</td></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 2) {
@@ -74,10 +78,10 @@
 				if(!$dnsenable) $dnsenable = 0;
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","dnsenable",$dnsenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs DNS</td><td>".FS::$iMgr->textarea("dnslist",$dnslist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"dnsenable",$dnsenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$output .= "<tr><td>".$this->loc->s("srv-dns")."</td><td>".FS::$iMgr->textarea("dnslist",$dnslist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 3) {
@@ -99,18 +103,18 @@
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes SMTP","ensmtp",$smtpenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$tooltip2 = "<b>Requis: </b>Numéro de port (1-65535).<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs SMTP</td><td>".FS::$iMgr->textarea("smtplist",$smtplist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><td>Ports SMTP</td><td>".FS::$iMgr->textarea("smtpports",$smtpports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-smtp-sensor"),"ensmtp",$smtpenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$tooltip2 = $this->loc->s("tooltip-port");
+				$output .= "<tr><td>".$this->loc->s("srv-smtp")."</td><td>".FS::$iMgr->textarea("smtplist",$smtplist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-smtp")."</td><td>".FS::$iMgr->textarea("smtpports",$smtpports,250,100,NULL,$tooltip2)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes IMAP","enimap",$imapenable);
-				$output .= "<tr><td>Serveurs IMAP</td><td>".FS::$iMgr->textarea("imaplist",$imaplist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><td>Ports IMAP</td><td>".FS::$iMgr->textarea("imapports",$imapports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("srv-imap")."</td><td>".FS::$iMgr->textarea("imaplist",$imaplist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-imap")."</td><td>".FS::$iMgr->textarea("imapports",$imapports,250,100,NULL,$tooltip2)."</td></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes POP","enpop",$popenable);
-				$output .= "<tr><td>Serveurs POP</td><td>".FS::$iMgr->textarea("poplist",$poplist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><td>Ports POP</td><td>".FS::$iMgr->textarea("poppports",$popports,250,100,NULL,$tooltip2)."</td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>".$this->loc->s("srv-pop")."</td><td>".FS::$iMgr->textarea("poplist",$poplist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-pop")."</td><td>".FS::$iMgr->textarea("poppports",$popports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			
 			}
@@ -123,13 +127,13 @@
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enhttp",$httpenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$tooltip2 = "<b>Requis: </b>Numéro de port (1-65535).<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs HTTP</td><td>".FS::$iMgr->textarea("httplist",$httplist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enhttp",$httpenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$tooltip2 = $this->loc->s("tooltip-port");
+				$output .= "<tr><td>".$this->loc->s("srv-http")."</td><td>".FS::$iMgr->textarea("httplist",$httplist,250,100,NULL,$tooltip)."</td></tr>";
 				
-				$output .= "<tr><td>Ports HTTP</td><td>".FS::$iMgr->textarea("httpports",$httpports,250,100,NULL,$tooltip2)."</td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-http")."</td><td>".FS::$iMgr->textarea("httpports",$httpports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 5) {
@@ -144,15 +148,15 @@
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensql",$sqlenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$tooltip2 = "<b>Requis: </b>Numéro de port (1-65535).<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs SQL</td><td>".FS::$iMgr->textarea("sqllist",$sqllist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enoracle",$oracleenable);
-				$output .= "<tr><td>Serveurs Oracle</td><td>".FS::$iMgr->textarea("oraclelist",$oraclelist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><td>Ports Oracle</td><td>".FS::$iMgr->textarea("oracleports",$oracleports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensql",$sqlenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$tooltip2 = $this->loc->s("tooltip-port");
+				$output .= "<tr><td>".$this->loc->s("srv-sql")."</td><td>".FS::$iMgr->textarea("sqllist",$sqllist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enoracle",$oracleenable);
+				$output .= "<tr><td>".$this->loc->s("sql-oracle")."</td><td>".FS::$iMgr->textarea("oraclelist",$oraclelist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-oracle")."</td><td>".FS::$iMgr->textarea("oracleports",$oracleports,250,100,NULL,$tooltip2)."</td></tr>";
 				
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 6) {
@@ -170,16 +174,16 @@
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes Telnet","entelnet",$telnetenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$tooltip2 = "<b>Requis: </b>Numéro de port (1-65535).<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs Telnet</td><td>".FS::$iMgr->textarea("telnetlist",$telnetlist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes SSH","enssh",$sshenable);
-				$output .= "<tr><td>Serveurs SSH</td><td>".FS::$iMgr->textarea("sshlist",$sshlist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><td>Ports SSH</td><td>".FS::$iMgr->textarea("sshports",$sshports,250,100,NULL,$tooltip2)."</td></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes TSE","entse",$tseenable);
-				$output .= "<tr><td>Serveurs TSE</td><td>".FS::$iMgr->textarea("tselist",$tselist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-telnet-sensor"),"entelnet",$telnetenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$tooltip2 = $this->loc->s("tooltip-port");
+				$output .= "<tr><td>".$this->loc->s("srv-telnet")."</td><td>".FS::$iMgr->textarea("telnetlist",$telnetlist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-ssh-sensor"),"enssh",$sshenable);
+				$output .= "<tr><td>".$this->loc->s("srv-ssh")."</td><td>".FS::$iMgr->textarea("sshlist",$sshlist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-ssh")."</td><td>".FS::$iMgr->textarea("sshports",$sshports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-tse-sensor"),"entse",$tseenable);
+				$output .= "<tr><td>".$this->loc->s("srv-tse")."</td><td>".FS::$iMgr->textarea("tselist",$tselist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 7) {
@@ -191,12 +195,12 @@
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","enftp",$ftpenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$tooltip2 = "<b>Requis: </b>Numéro de port (1-65535).<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs FTP</td><td>".FS::$iMgr->textarea("ftplist",$ftplist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><td>Ports FTP</td><td>".FS::$iMgr->textarea("ftpports",$ftpports,250,100,NULL,$tooltip2)."</td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enftp",$ftpenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$tooltip2 = $this->loc->s("tooltip-port");
+				$output .= "<tr><td>".$this->loc->s("srv-ftp")."</td><td>".FS::$iMgr->textarea("ftplist",$ftplist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-ftp")."</td><td>".FS::$iMgr->textarea("ftpports",$ftpports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 8) {
@@ -206,10 +210,10 @@
 				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensnmp",$snmpenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs SNMP</td><td>".FS::$iMgr->textarea("snmplist",$snmplist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensnmp",$snmpenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$output .= "<tr><td>".$this->loc->s("srv-snmp")."</td><td>".FS::$iMgr->textarea("snmplist",$snmplist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			}
 			else if($sh == 9) {
@@ -221,11 +225,11 @@
 
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer","ensip",$sipenable);
-				$tooltip = "<b>Requis: </b>Adresse IPv4, CIDR IPv4.<br /><b>Séparateur:</b> virgule";
-				$tooltip2 = "<b>Requis: </b>Numéro de port (1-65535).<br /><b>Séparateur:</b> virgule";
-				$output .= "<tr><td>Serveurs SIP</td><td>".FS::$iMgr->textarea("siplist",$siplist,250,100,NULL,$tooltip)."</td></tr>";
-				$output .= "<tr><td>Ports SIP</td><td>".FS::$iMgr->textarea("sipports",$sipports,250,100,NULL,$tooltip2)."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensip",$sipenable);
+				$tooltip = $this->loc->s("tooltip-ipv4");
+				$tooltip2 = $this->loc->s("tooltip-port");
+				$output .= "<tr><td>".$this->loc->s("srv-sip")."</td><td>".FS::$iMgr->textarea("siplist",$siplist,250,100,NULL,$tooltip)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("port-sip")."</td><td>".FS::$iMgr->textarea("sipports",$sipports,250,100,NULL,$tooltip2)."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
 				$output .= "</table></form>";
 			}
@@ -237,16 +241,17 @@
 				$nightback = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_nightback'");
 				$weh = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_wehour'");
 				$wem = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_wemin'");
+				
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= "<tr><th colspan=\"2\">Rapports nocturnes</th></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer", "nightreport", $nightreport == 1 ? true : false);
-				$output .= "<tr><td>Heure d'envoi</td><td>".FS::$iMgr->hourlist("hnight","mnight",$nighth,$nightm)."</td></tr>";
-				$output .= "<tr><td>Durée antécédente</td><td>".FS::$iMgr->addNumericInput("nightintval",$nightback > 0 ? $nigthback : 7,2,2,NULL,"Correspond à l'heure de départ de collecte des données, à partir de l'heure d'envoi")."</td></tr>";
-				$output .= "<tr><th colspan=\"2\">Rapports de fin de semaine</th></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer", "wereport", $wereport == 1 ? true : false);
-				$output .= "<tr><td>Heure d'envoi</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
-				$output .= FS::$iMgr->addTableSubmit("","Enregistrer");
+				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-nightreport")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false);
+				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hnight","mnight",$nighth,$nightm)."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->addNumericInput("nightintval",$nightback > 0 ? $nigthback : 7,2,2,NULL,$this->loc->s("tooltip-prev-hour"))."</td></tr>";
+				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-we")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false);
+				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
+				$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Register"));
 				$output .= "</table>";
 			}
 			return $output;
@@ -951,6 +956,61 @@ preprocessor http_inspect_server: server default \\\n
 						header("Location: index.php?mod=".$this->mid."&sh=9&err=2");
 					else
 						header("Location: index.php?mod=".$this->mid."&sh=9");
+					break;
+				
+				case 10:
+					$nightreport = FS::$secMgr->checkAndSecurisePostData("nightreport");
+					$hnight = FS::$secMgr->getPost("hnight","n+=");
+					$mnight = FS::$secMgr->getPost("mnight","n+=");
+					$nightback = FS::$secMgr->getPost("nightintval","n+");
+					$wereport = FS::$secMgr->checkAndSecurisePostData("wereport");
+					$hwe = FS::$secMgr->getPost("hwe","n+=");
+					$mwe = FS::$secMgr->getPost("mwe","n+=");
+					
+					if($hnight == NULL || $hnight > 23 || $mnight == NULL || $mnight > 59 || 
+						$hwe == NULL || $hwe > 23 || $mwe == NULL || $mwe > 59 || $nightback == NULL || $nightback > 23) {
+						header("Location: index.php?mod=".$this->mid."&sh=10&err=1");
+						return;
+					}
+					
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'report_nighten'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'report_nighthour'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'report_nightmin'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'report_nightback'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'report_ween'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'report_wehour'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'report_wemin'");
+					
+					$file = fopen(dirname(__FILE__)."/../../../datas/system/snort.crontab");
+					if(!$file) {
+						header("Location: index.php?mod=".$this->mid."&sh=10&err=3");
+						return;
+					}
+						
+					if($nightreport == "on") {
+						FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'report_nighten','1'");
+						FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'report_nighthour','".$hnight."'");
+						FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'report_nightmin','".$mnight."'");
+						FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'report_nightback','".$nightback."'");
+						if(Config::getOS() == "Debian")
+							fwrite($file,$mnight." ".$hnight."\t* * * root /var/www/scripts/snort_report.py night\n");
+						else
+							fwrite($file,$mnight." ".$hnight."\t* * * root /usr/local/www/apache22/data/scripts/snort_report.py night\n");
+					}
+					
+					if($wereport == "on") {
+						FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'report_ween','1'");
+						FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'report_wehour','".$hwe."'");
+						FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'report_wemin','".$mwe."'");
+						if(Config::getOS() == "Debian")
+							fwrite($file,$mnight." ".$hnight."\t* * * root /var/www/scripts/snort_report.py we\n");
+						else
+							fwrite($file,$mnight." ".$hnight."\t* * * root /usr/local/www/apache22/data/scripts/snort_report.py we\n");
+					}
+					
+					// TODO: write special cron for tasks & create cron entries for modules
+					fclose($file);
+					header("Location: index.php?mod=".$this->mid."&sh=10");
 					break;
 				default: break;
 			}

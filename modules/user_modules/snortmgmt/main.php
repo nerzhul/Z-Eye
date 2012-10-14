@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 5;
 				$this->moduleclass = new iSnortMgmt();
 				$this->rulesclass = new rSnortMgmt();
-                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+                $this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

@@ -1,6 +1,6 @@
 <?php
         /*
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+		* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
         *
         * This program is free software; you can redistribute it and/or modify
         * it under the terms of the GNU General Public License as published by
@@ -22,16 +22,16 @@
                 function rSnortMgmt() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Moteur SNORT</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_snortmgmt_read",in_array("mrule_snortmgmt_read",$activerules),"Lire les données")."</td></tr>
+					$output = "<tr><td>Moteur SNORT</td>";
+                    $output .= "<td>".FS::$iMgr->addCheck("mrule_snortmgmt_read",in_array("mrule_snortmgmt_read",$activerules),"Lire les données")."</td></tr>
 			<tr><td></td><td>".FS::$iMgr->addCheck("mrule_snortmgmt_write",in_array("mrule_snortmgmt_write",$activerules),"Modifier les données")."</td></tr>";
-                        return $output;
+                    return $output;
                 }
 
                 public function canAccessToModule() {
-			if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_snortmgmt_read"))
-                                return true;
-                        return false;
+					if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_snortmgmt_read"))
+                   		return true;
+                    return false;
                 }
         };
 ?>

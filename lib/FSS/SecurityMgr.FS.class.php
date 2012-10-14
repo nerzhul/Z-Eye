@@ -227,6 +227,43 @@
 			return $data_new;
 
 		}
+		
+		// Function to get Post Data + check
+		public function getPost($str,$pattern) {
+			$data = $this->checkAndSecurisePostData($str);
+			// Only numerics
+			if(preg_match("#[n]#",$pattern)) {
+				if(!$this->isNumeric($data))
+					return NULL;	
+				
+				// Positive
+				if(preg_match("#[+]#",$pattern)) {
+					// Positive & zero
+					if(preg_match("#[=]#",$pattern) && $data < 0)
+						return NULL;
+					// Positive only
+					else if($data <= 0)
+						return NULL;
+				}
+				// Negative
+				else if(preg_match("#[-]#",$pattern)) {
+					// Negative & zero
+					if(preg_match("#[=]#",$pattern) && $data > 0)
+						return NULL;
+					// Negative only
+					else if($data >= 0)
+						return NULL;
+				}
+			}
+			// String a-Z
+			else if(preg_match("#[s]#",$pattern) && !$this->isAlphabetic($data))
+				return NULL;
+			// String a-Z + numerics
+			else if(preg_match("#[w]#",$pattern) && !$this->isAlphaNumeric($data))
+				return NULL;
+			
+			return $data;
+		}
 
 		public function SecuriseStringForDB(&$str) {
 			$str = pg_escape_string($str);
