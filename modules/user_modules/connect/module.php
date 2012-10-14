@@ -19,26 +19,28 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
+	
 	class iConnect extends genModule{
-		function iConnect() { parent::genModule(); }
+		function iConnect() { parent::genModule(); $this->loc = new lConnect(); }
 		public function Load() {
 			$output = "";
 			$err = FS::$secMgr->checkGetData("err");
 			if($err) {
 				FS::$secMgr->SecuriseStringForDB($err);
 				switch($err) {
-					case 1: $output .= FS::$iMgr->printError("Nom d'utilisateur et/ou mot de passe inconnu"); break;
-					default: $output .= FS::$iMgr->printError("Erreur inconnue.");	break;
+					case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-user")); break;
+					default: $output .= FS::$iMgr->printError($this->loc->s("err-unk"));	break;
 				}
 			}
-			$output .= "<div id=\"module_connect\"><h4>Connexion à votre espace personnel</h4>";
+			$output .= "<div id=\"module_connect\"><h4>".$this->loc->s("title-conn")."</h4>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$output .= FS::$iMgr->input("uname","login");
+			$output .= FS::$iMgr->input("uname",$this->loc->s("Login"));
 			$output .= "<br />";
-			$output .= FS::$iMgr->password("upwd","password");
+			$output .= FS::$iMgr->password("upwd",$this->loc->s("Password"));
 			$output .= "<br />";
-			$output .= FS::$iMgr->submit("connect","Connexion");
+			$output .= FS::$iMgr->submit("",$this->loc->s("Connect"));
 			$output .= "</form></div>";
 			return $output;
 		}
