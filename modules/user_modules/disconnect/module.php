@@ -19,12 +19,14 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
+	
 	class iDisconnect extends genModule{
-		function iDisconnect() { parent::genModule(); }
+		function iDisconnect() { parent::genModule(); $this->loc = new lDisconnect(); }
 		
 		public function Load() {
-			$output = "<div id=\"module_connect\"><h4>Déconnexion</h4><form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
-			$output .= FS::$iMgr->submit("disconnect","Confirmer");
+			$output = "<div id=\"module_connect\"><h4>".$this->loc->s("Disconnect")."</h4><form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">".$this->loc->s("confirm-disconnect")."<br /><br />";
+			$output .= FS::$iMgr->submit("",$this->loc->s("Confirm"));
 			$output .= "</form></div>";
 			return $output;
 		}
