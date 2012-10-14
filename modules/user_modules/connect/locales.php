@@ -28,10 +28,15 @@
 					"err-unk" => "Erreur inconnue",
 					"Login" => "Utilisateur",
 					"Password" => "Mot de passe",
-					"title-con" => "Connexion à votre espace personnel",
+					"title-con" => "Connexion à l'espace d'administration",
 				),
 				"en" => array(
-				
+					"Connect" => "Connect",
+					"err-bad-user" => "Invalid user/password",
+					"err-unk" => "Unknown error",
+					"Login" => "User",
+					"Password" => "Password",
+					"title-con" => "Connect to the admin panel",
 				)
 			);
 		}

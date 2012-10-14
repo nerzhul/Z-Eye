@@ -18,8 +18,10 @@
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
+	
 	class iDefault extends genModule{
-		function iDefault() { parent::genModule(); }
+		function iDefault() { parent::genModule(); $this->loc = new lDefault(); }
 
 		public function Load() {
 			$output = "";
@@ -45,9 +47,9 @@
 			$tmpoutput .= $this->showNetworkReporting();
 			$tmpoutput .= $this->showSecurityReporting();
                         $output .= "<div style=\"width: 100%; display: inline-block;\"><ul class=\"ulform\"><li>";
-                        $output .= FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga,"Etat des services")."</li><li>";
-                        $output .= FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore,"Etat du réseau")."</li><li>";
-                        $output .= FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore,"Etat de la sécurité")."</li></ul>";
+                        $output .= FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga,$this->loc->s("state-srv"))."</li><li>";
+                        $output .= FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore,$this->loc->s("state-net"))."</li><li>";
+                        $output .= FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore,$this->loc->s("state-security"))."</li></ul>";
                         $output .= "</div>";
 			$output .= $tmpoutput;
 			if(!FS::isAjaxCall()) $output .= "</div>";
@@ -120,11 +122,11 @@
         			preg_match_all("#<TR>#",$body,$hsservices);
 				$this->hsicinga = count($hsservices[0]);
 				if(count($hsservices[0]) > 0)
-			        	$output = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">Erreur de services rapportées par Icinga: ".$this->hsicinga."/".$this->totalicinga."</h4>".$body;
+			        	$output = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga").": ".$this->hsicinga."/".$this->totalicinga."</h4>".$body;
 				else $output = "";
 			}
 			else
-				$output .= "<h4 style=\"font-size:24px; text-decoration: blink; color: red\">Service de monitoring OFFLINE</h4>";
+				$output .= "<h4 style=\"font-size:24px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga-off")."</h4>";
 			return $output;
 		}
 
@@ -139,7 +141,7 @@
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">Problème de bande passante</h4><table><tr><th>Lien</th><th>Débit Entrant</th><th>Débit Sortant</th></tr>";
+					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-net")."</h4><table><tr><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("inc-bw")."</th><th>".$this->loc->s("out-bw")."</th></tr>";
 				}
 				$total++;
 				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$data["device"]."'");
@@ -228,7 +230,7 @@
 			$output = "";
 			$this->SECtotalscore = 10000;
 
-			$tmpoutput = "<h4>Attaques des 60 dernières minutes</h4>";
+			$tmpoutput = "<h4>".$this->loc->s("err-security")."</h4>";
 			$atkfound = 0;
 			$snortDB = new FSPostgreSQLMgr();
                         $snortDB->setConfig("snort",5432,"localhost","snortuser","snort159");
@@ -306,9 +308,9 @@
 				if($value["scan"] > 30 || $value["atk"] > 25) {
 					if($menace == 0) {
 						$menace = 1;
-						$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">Menace détectée !</h3>";
+						$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-detect-atk")."</h3>";
 					}
-					$output .= "<span style=\"font-size:15px;\">Adresse IP: ".long2ip($key)." (Scans ".$value["scan"]." Attaques ".$value["atk"].")</span><br />";
+					$output .= "<span style=\"font-size:15px;\">".$this->loc->s("ipaddr").": ".long2ip($key)." (Scans ".$value["scan"]." ".$this->loc->s("Attack")." ".$value["atk"].")</span><br />";
 				}
 			}
 			ksort($attacklist);
