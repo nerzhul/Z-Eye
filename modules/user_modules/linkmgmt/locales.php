@@ -35,7 +35,16 @@
 					"title-link" => "Gestion des liens",
 				),
 				"en" => array(
-					
+					"Action" => "Action",
+					"link-create" => "Link creation",
+					"link-edit" => "Link edition",
+					"Module" => "Module",
+					"New-link" => "New link",
+					"Normal" => "Normal",
+					"rewr-mod" => "Rewrite Module",
+					"rewr-other" => "Rewrite Others",
+					"Save" => "Save",
+					"title-link" => "Link management",
 				)
 			);
 		}
