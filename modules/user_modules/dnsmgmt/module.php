@@ -19,9 +19,11 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/modules/Network.FS.class.php");
+	
 	class iDNSManager extends genModule{
-		function iDNSManager() { parent::genModule(); }
+		function iDNSManager() { parent::genModule(); $this->loc = new lDNSManager(); }
 		public function Load() {
 			$output = "";
 			$output .= $this->showStats();
@@ -36,7 +38,7 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h3>Supervision DNS</h3>";
+				$output .= "<h3>".$this->loc->s("title-dns")."</h3>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 				$output .= FS::$iMgr->addList("f");
 				
@@ -77,18 +79,18 @@
 				$output .= FS::$iMgr->addCheck("ssrv",$shSRV)."SRV ";
 				$output .= FS::$iMgr->addCheck("stxt",$shTXT)."TXT ";
 				$output .= FS::$iMgr->addCheck("sptr",$shPTR)."PTR ";
-				$output .= FS::$iMgr->addCheck("sother",$shother)."Autres ";
+				$output .= FS::$iMgr->addCheck("sother",$shother).$this->loc->s("Others")." ";
 				$output .= "<br />";
-				$output .= FS::$iMgr->submit("Filtrer","Filtrer");
+				$output .= FS::$iMgr->submit("",$this->loc->s("Filter"));
 				$output .= "</form>";
 				
 				if($filter) {
 					$output .= "<div id=\"contenttabs\"><ul>";
-					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">Statistiques</a>";
-					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">Outils avancés</a>";
+					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">".$this->loc->s("Stats")."</a>";
+					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">".$this->loc->s("expert-tools")."</a>";
 					$output .= "</ul></div>";
 					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-					$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
 				}
 			} else {
 				if(!$showmodule || $showmodule == 1) {
@@ -133,7 +135,7 @@
 					else $shother = false;
 					
 					if(!$filter) {
-						$output .= FS::$iMgr->printError("Aucune zone DNS spécifiée !");
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-zone"));
 						return $output;
 					}
 					
@@ -186,7 +188,7 @@
 						if($curzone != $data["zonename"]) {
 							$curzone = $data["zonename"];
 							if($curzone != "") $dnsoutput .= "</table>";
-							$dnsoutput .= "<h4>Zone: ".$data["zonename"]."</h4><table><th>Enregistrement</th><th>Type</th><th>Valeur</th></tr>";
+							$dnsoutput .= "<h4>Zone: ".$data["zonename"]."</h4><table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th></tr>";
 						}
 						switch($data["rectype"]) {
 							case "A": case "AAAA":
@@ -211,7 +213,7 @@
 						$output .= $dnsoutput."</table>";
 				}
 				else if($showmodule == 2) {
-					$output .= "<h4>Recherche d'enregistrements obsolètes</h4>";
+					$output .= "<h4>".$this->loc->s("title-old-records")."</h4>";
 					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
 					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
@@ -220,7 +222,7 @@
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->addHidden("obsdata",$filter);
 					$output .= "Intervalle (jours) ".FS::$iMgr->addNumericInput("ival")."<br />";
-					$output .= FS::$iMgr->addJSSubmit("search","Rechercher","return searchobsolete();");
+					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
 					$output .= "</form><div id=\"obsres\"></div>";
 				}
 			}
@@ -276,7 +278,7 @@
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
 					if(!$filter || !$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
-						echo FS::$iMgr->printError("Requête invalide !");
+						echo FS::$iMgr->printError($this->loc->s("err-invalid-req"));
 						return;
 					}
 
@@ -309,7 +311,7 @@
 						$out = array();
 						exec("dig -t A ".$toquery." +short|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
 						if(count($out) == 0) {
-							$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / Orphelin<br />";
+							$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$this->loc->s("Alone")."<br />";
 						}
 						else {
 							for($i=0;$i<count($out);$i++) {
@@ -325,11 +327,11 @@
 						}
 					}
 					if($found) {
-						echo "<h4>Enregistrements obsolètes trouvés !</h4>".$output;
+						echo "<h4>".$this->loc->s("found-records")."</h4>".$output;
 						foreach($obsoletes as $key => $value)
 							echo $value;
 					}
-					else echo FS::$iMgr->printDebug("Aucun enregistrement obsolète trouvé");
+					else echo FS::$iMgr->printDebug("no-found-records"));
 					return;
 			}
 		}
