@@ -39,7 +39,20 @@
 					"User-nb" => "Nombre d'utilisateurs",
 				),
 				"en" => array(
-					
+					"Add" => "Add",
+					"Delete" => "Remove",
+					"err-already-exist" => "This group already exists !",
+					"err-bad-data" => "Invalid data(s).",
+					"err-not-exist" => "This group doesn't exists !",
+					"Groupname" => "Groupname",
+					"New-group" => "New group",
+					"Rule" => "Rule",
+					"Save" => "Save",
+					"sure-delete" => "Are you sure to remove group",
+					"title-edit" => "Group edition",
+					"title-mgmt" => "Groups management",
+					"title-opts" => "Modules' options",
+					"User-nb" => "User number",
 				)
 			);
 		}

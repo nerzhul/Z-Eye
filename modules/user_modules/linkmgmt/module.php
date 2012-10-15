@@ -19,8 +19,10 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
+	
 	class iLinkMgmt extends genModule{
-		function iLinkMgmt() { parent::genModule(); }
+		function iLinkMgmt() { parent::genModule(); $this->loc = new lLinkMgmt(); }
 		
 		public function Load() {
 			$output = "";
@@ -31,7 +33,7 @@
 					$output .= $this->showLinkForm(true);
 			}
 			else {
-				$output .= "<h3>Gestion des liens</h3>";
+				$output .= "<h3>".$this->loc->s("title-link")."</h3>";
 				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau lien</a>
 				<table class=\"standardTable\" width=\"55%\">
 				<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
