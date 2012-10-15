@@ -19,10 +19,12 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/Menu.FS.class.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/MenuElement.FS.class.php");
+	
 	class iMenuMgmt extends genModule{
-		function iMenuMgmt() { parent::genModule(); }
+		function iMenuMgmt() { parent::genModule(); $this->loc = new lLogs(); }
 		public function Load() {
 			$output = "";
 			if($do = FS::$secMgr->checkGetData("do")) {
@@ -36,19 +38,19 @@
 					$output .= $this->showMenuForm(true);
 			}
 			else {
-			$output .= "<h3>Gestion des menus</h3>";
-					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau menu</a>
+			$output .= "<h3>".$this->loc->s("title-menu-mgmt")."</h3>";
+					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-Menu")."</a>
 					<table class=\"standardTable\">
-					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Connecté</th><th></th><th></th></tr>";
+					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
 					$query = FS::$pgdbMgr->Select("z_eye_menus","id,name,isconnected","","id",2);
 					while($data = pg_fetch_array($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
 						if($data["isconnected"] == -1)
-							$output .= "Non";
+							$output .= $this->loc->s("No");
 						else if($data["isconnected"] == 1)
-							$output .= "Oui";
+							$output .= $this->loc->s("Yes");
 						else
-							$output .= "Les deux";						
+							$output .= $this->loc->s("Both");						
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
 						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=3&menu=".$data["id"]."\">";
@@ -57,21 +59,21 @@
 					}
 					
 					$output .= "</table>
-					<h3>Gestion des éléments de menu</h3>
-					<a href=\"index.php?mod=".$this->mid."&do=4\">Nouvel élément de menu</a>
+					<h3>".$this->loc->s("title-menu-node-mgmt")."</h3>
+					<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
 					<table class=\"standardTable\">
-					<tr><th width=\"20px\">Id</th><th width=\"200px\">Nom</th><th>Lien</th><th>Connecté</th><th></th><th></th></tr>";
+					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
 					$query = FS::$pgdbMgr->Select("z_eye_menu_items","id,title,link,isconnected","","id",2);
 					while($data = pg_fetch_array($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 						$link2 = new HTTPLink($data["link"]);
 						$output .= $link2->getIt()."</td><td>";
 						if($data["isconnected"] == -1)
-							$output .= "Non";
+							$output .= $this->loc->s("No");
 						else if($data["isconnected"] == 1)
-							$output .= "Oui";
+							$output .= $this->loc->s("Yes");
 						else
-							$output .= "Les deux";						
+							$output .= $this->loc->s("Both");						
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
 						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=6&im=".$data["id"]."\">";
@@ -85,7 +87,7 @@
 		
 		public function showMenuElmForm($edit = false) {
 			$output = "<h4>";
-			$output .= $edit ? "Edition de l'élément" : "Création d'un élément";
+			$output .= $edit ? $this->loc->s("elmt-edit") : $this->loc->s("elmt-create");
 			$output .= "</h4>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4));
 			$menuEl = NULL;
@@ -97,63 +99,62 @@
 				$menuEl->setId($meid);
 				$menuEl->Load();
 			}
-			$output .= "Nom ";
+			$output .= $this->loc->s("Name")." ";
 			$output .= FS::$iMgr->input("name",$menuEl ? $menuEl->getName() : "");
-			$output .= "<hr>Lien ";
+			$output .= "<hr>".$this->loc->s("Link")." ";
 			$link = new HTTPLink(0);
 			$output .= $link->CreateSelect($menuEl ? $menuEl->getLink() : 0);
-			$output .= "<hr>Connecté ? ";
+			$output .= "<hr>".$this->loc->s("Connected")." ? ";
 			$output .= FS::$iMgr->addList("isconnected");
-			$output .= FS::$iMgr->addElementToList("Non",-1,$menuEl && $menuEl->getConnected() == -1 ? true : false);
-			$output .= FS::$iMgr->addElementToList("Oui",1,$menuEl && $menuEl->getConnected() == 1 ? true : false);
-			$output .= FS::$iMgr->addElementToList("Les deux",0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("No"),-1,$menuEl && $menuEl->getConnected() == -1 ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("Yes"),1,$menuEl && $menuEl->getConnected() == 1 ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("Both"),0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
 			$output .= "</select><hr>";
-			$output .= FS::$iMgr->submit("reg","Enregistrer");
+			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
 			$output .= "</form>";
 			return $output;
 		}
 		
 		public function showMenuForm($edit = false) {
 			$output = "<h3>";
-			$output .= $edit ? "Edition du menu" : "Création d'un menu";
+			$output .= $edit ? $this->loc->s("menu-edit") : $this->loc->s("menu-create");
 			$output .= "</h3>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
 			$menu = NULL;
 			if($edit) {
-				$mid = FS::$secMgr->checkGetData("menu");
-				FS::$secMgr->SecuriseStringForDB($mid);
+				$mid = FS::$secMgr->checkAndSecuriseGetData("menu");
 				$output .= FS::$iMgr->addHidden("menu_id",$mid);
 				$menu = new Menu();
 				$menu->setId($mid);
 				$menu->Load();
 			}
-			$output .= "Nom ";
+			$output .= $this->loc->s("Name")." ";
 			$output .= FS::$iMgr->input("name",$menu ? $menu->getName() : "");
-			$output .= "<hr>Connecté ? ";
+			$output .= "<hr>".$this->loc->s("Connected")." ? ";
 			$output .= FS::$iMgr->addList("isconnected");
-			$output .= FS::$iMgr->addElementToList("Non",-1,$menu && $menu->getConnected() == -1 ? true : false);
-			$output .= FS::$iMgr->addElementToList("Oui",1,$menu && $menu->getConnected() == 1 ? true : false);
-			$output .= FS::$iMgr->addElementToList("Les deux",0,$menu && $menu->getConnected() == 0 ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("No"),-1,$menu && $menu->getConnected() == -1 ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("Yes"),1,$menu && $menu->getConnected() == 1 ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("Both"),0,$menu && $menu->getConnected() == 0 ? true : false);
 			$output .= "</select>";
 			$output .= "<hr>";
-			$output .= FS::$iMgr->submit("reg","Enregistrer");
+			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
 			$output .= "</form>";
 			
 			if($edit) {
-				$output .= "<h3>Gestion des éléments de ce menu</h3>
-				<h4>Ajouter un élément</h4>";
+				$output .= "<h3>".$this->loc->s("title-menu-node-mgmt")."</h3>
+				<h4>".$this->loc->s("add-elmt")."</h4>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=7");
-				$output .= "<center>Elément ";
+				$output .= "<center>".$this->loc->s("elmt")." ";
 				$menuEl = new MenuElement();
 				$output .= $menuEl->CreateSelect();
 				$output .= " Place ";
 				$output .= FS::$iMgr->input("order","0",2,2);
 				$output .= FS::$iMgr->addHidden("menu",$mid);
-				$output .= FS::$iMgr->submit("reg","Enregistrer");				
+				$output .= FS::$iMgr->submit("",$this->loc->s("Save"));				
 				$output .= "</center></form>
-				<h4>Modifier les éléments</h4>
+				<h4>".$this->loc->s("mod-elmt")."</h4>
 				<table class=\"standardTable\">
-				<tr><th>Elément</th><th>Ordre</th><th></th></tr>";
+				<tr><th>".$this->loc->s("elmt")."</th><th>".$this->loc->s("Order")."</th><th></th></tr>";
 				$query = FS::$pgdbMgr->Select("z_eye_menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
 				while($data = pg_fetch_array($query)) {
 					$query2 = FS::$pgdbMgr->Select("z_eye_menu_items","id,title","id = '".$data["id_menu_item"]."'");

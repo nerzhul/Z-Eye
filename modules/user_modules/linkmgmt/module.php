@@ -95,8 +95,8 @@
 		
 		public function RegisterLink() {
 			$link = new HTTPLink(0);
-			$args = FS::$secMgr->CheckAndSecurisePostData("args");
-			$type = FS::$secMgr->CheckAndSecurisePostData("type");
+			$args = FS::$secMgr->checkAndSecurisePostData("args");
+			$type = FS::$secMgr->checkAndSecurisePostData("type");
 			
 			if(!$args || !$type)
 				return;
@@ -107,9 +107,9 @@
 		}
 		
 		public function EditLink() {
-			$args = FS::$secMgr->CheckAndSecurisePostData("args");
-			$type = FS::$secMgr->CheckAndSecurisePostData("type");
-			$lid = FS::$secMgr->CheckAndSecurisePostData("link_id");
+			$args = FS::$secMgr->checkAndSecurisePostData("args");
+			$type = FS::$secMgr->checkAndSecurisePostData("type");
+			$lid = FS::$secMgr->checkAndSecurisePostData("link_id");
 			
 			if(!$args || !$type || !$lid)
 				return;
@@ -121,7 +121,7 @@
 		}
 		
 		public function RemoveLink() {
-			$lid = FS::$secMgr->CheckAndSecuriseGetData("link");
+			$lid = FS::$secMgr->checkAndSecuriseGetData("link");
 			if(!$lid)
 				return;
 				
