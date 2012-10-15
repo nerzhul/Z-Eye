@@ -19,16 +19,18 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
+	
 	class iGroupMgmt extends genModule{
-		function iGroupMgmt() { parent::genModule(); }
+		function iGroupMgmt() { parent::genModule(); $this->loc = new lGroupMgmt(); }
 		public function Load() {
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError("Ce groupe existe déjà !"); break;
-				case 2: $output .= FS::$iMgr->printError("Données invalides."); break;
-				case 3: $output .= FS::$iMgr->printError("Ce groupe n'existe pas !"); break;
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-already-exist")); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-not-exist")); break;
 			}
 			if(!FS::isAjaxCall()) {
 				$gname = FS::$secMgr->checkAndSecuriseGetData("g");
@@ -43,11 +45,11 @@
 		private function editGroup($gname) {
 			$gid = FS::$pgdbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
 			if(!$gid) {
-				return FS::$iMgr->printError("Ce groupe n'existe pas !");
+				return FS::$iMgr->printError($this->loc->s("err-not-exist"));
 			}
 
 			FS::$iMgr->showReturnMenu(true);
-			$output = "<h3>Edition du groupe '".$gname."'</h3>";
+			$output = "<h3>".$this->loc->s("title-edit")." '".$gname."'</h3>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
 			$rules = array();
 			$query = FS::$pgdbMgr->Select("z_eye_group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
@@ -55,26 +57,26 @@
 				array_push($rules,$data["rulename"]);
 			$output .= $this->loadModuleRuleSets($rules);
 			$output .= FS::$iMgr->addHidden("gid",$gid);
-			$output .= FS::$iMgr->submit("","Enregistrer")."</form>";
+			$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";
 			return $output;
 		}
 
 		private function showMain() {
-			$output = "<h3>Gestion des groupes</h3>";
+			$output = "<h3>".$this->loc->s("title-mgmt")."</h3>";
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,"Nom du groupe");
-			$formoutput .= "<h3>Options des modules</h3>";
+			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
+			$formoutput .= "<h3>".$this->loc->s("title-opts")."</h3>";
 			$formoutput .= $this->loadModuleRuleSets();
-                        $formoutput .= "</li><li>".FS::$iMgr->submit("reggrp","Ajouter")."</li>";
+                        $formoutput .= "</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>";
 			$formoutput .= "</ul></form>";
-			$output .= FS::$iMgr->opendiv($formoutput,"Nouveau Groupe");
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-group"));
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_groups","gid,gname,description");
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"grpt\"><tr><th>GID</th><th>Nom du groupe</th><th>Nombre d'utilisateurs</th></tr>";
+					$tmpoutput .= "<table id=\"grpt\"><tr><th>GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th></tr>";
 				}
 				$tmpoutput .= "<tr><td>".$data["gid"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["gname"]."</td><td>".FS::$pgdbMgr->Count("z_eye_user_group","gid","gid = '".$data["gid"]."'")."</td></tr>";
 			}
@@ -94,10 +96,10 @@
                                 });
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $('#subpop').html('Êtes vous sûr de vouloir supprimer le groupe \''+e.dataTransfer.getData('text/html')+'\' ?".
+                                        drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete")." \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2").
   	                                      FS::$iMgr->addHidden("gname","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->submit("","Supprimer").
+                                              FS::$iMgr->submit("",$this->loc->s("Delete")).
                                               FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
                                 	}
@@ -126,7 +128,7 @@
 							if(strlen($tmpoutput) > 0) {
 								if($found == 0) {
 									$found = 1;
-									$output .= "<table><tr><th>Module</th><th>Règle</th></tr>";
+									$output .= "<table><tr><th>Module</th><th>".$this->loc->s("Rule")."</th></tr>";
 								}
 								$output .= $tmpoutput;
 							}
