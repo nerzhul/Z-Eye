@@ -34,24 +34,24 @@
 			}
 			else {
 				$output .= "<h3>".$this->loc->s("title-link")."</h3>";
-				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau lien</a>
+				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-link")."</a>
 				<table class=\"standardTable\" width=\"55%\">
 				<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
 				$query = FS::$pgdbMgr->Select("z_eye_http_links","id,type,args","","id",1);
 				while($data = pg_fetch_array($query)) {
 					$output .= "<tr><td><center><a href=\"index.php?mod=".$this->mid."&do=2&link=".$data["id"]."\">".$data["id"]."</a></center></td><td><center>";
 					if($data["type"] == 0)
-						$output .= "Normal";
+						$output .= $this->loc->s("Normal");
 					else if($data["type"] == 1)
-						$output .= "Action";
+						$output .= $this->loc->s("Action");
 					else if($data["type"] == 2)
-						$output .= "Module";
+						$output .= $this->loc->s("Module");
 					else if($data["type"] == 3)
 						$output .= "JavaScript";
 					else if($data["type"] == 4)
-						$output .= "Rewrite Module";
+						$output .= $this->loc->s("rewr-mod");
 					else
-						$output .= "Rewrite Autres";
+						$output .= $this->loc->s("rewr-other");
 					$output .= "</center></td><td><center>".$data["args"]."</center></td>";
 					$output .= "<td><a href=\"index.php?mod=".$this->mid."&act=3&link=".$data["id"]."\">";
 					$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
@@ -64,7 +64,7 @@
 		
 		public function showLinkForm($edit = false) {
 			$output = "<h3>";
-			$output .= $edit ? "Edition d'un lien" : "Création d'un lien";
+			$output .= $edit ? $this->loc->s("link-edit") : $this->loc->s("link-create");
 			$output .= "</h3>";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
 			$lnk = NULL;
@@ -78,43 +78,54 @@
 			
 			$output .= "Type ";
 			$output .= FS::$iMgr->addList("type");
-			$output .= FS::$iMgr->addElementToList("Normal",0,($lnk && $lnk->getType() == 0) ? true : false);
-			$output .= FS::$iMgr->addElementToList("Action",1,($lnk && $lnk->getType() == 1) ? true : false);
-			$output .= FS::$iMgr->addElementToList("Module",2,($lnk && $lnk->getType() == 2) ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("Normal"),0,($lnk && $lnk->getType() == 0) ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("Action"),1,($lnk && $lnk->getType() == 1) ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->("Module"),2,($lnk && $lnk->getType() == 2) ? true : false);
 			$output .= FS::$iMgr->addElementToList("JavaScript",3,($lnk && $lnk->getType() == 3) ? true : false);	
-			$output .= FS::$iMgr->addElementToList("Rewrite Module",4,($lnk && $lnk->getType() == 4) ? true : false);
-			$output .= FS::$iMgr->addElementToList("Rewrite Autres",5,($lnk && $lnk->getType() == 5) ? true : false);		
+			$output .= FS::$iMgr->addElementToList($this->loc->s("rewr-mod"),4,($lnk && $lnk->getType() == 4) ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("rewr-other"),5,($lnk && $lnk->getType() == 5) ? true : false);		
 			$output .= "</select><br />Arguments ";
 			
 			$output .= FS::$iMgr->input("args",$lnk ? $lnk->getArgs() : "",25,130);
 			$output .= "<hr>";
-			$output .= FS::$iMgr->submit("reg","Enregistrer");
+			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
 			$output .= "</form>";
 			return $output;
 		}
 		
 		public function RegisterLink() {
 			$link = new HTTPLink(0);
-			FS::$secMgr->SecuriseStringForDB($_POST["args"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["type"]);
-			$link->setArgs($_POST["args"]);
-			$link->setType($_POST["type"]);
+			$args = FS::$secMgr->CheckAndSecurisePostData("args");
+			$type = FS::$secMgr->CheckAndSecurisePostData("type");
+			
+			if(!$args || !$type)
+				return;
+				
+			$link->setArgs($args);
+			$link->setType($type);
 			$link->Create();
 		}
 		
 		public function EditLink() {
-			FS::$secMgr->SecuriseStringForDB($_POST["link_id"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["args"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["type"]);
-			$link = new HTTPLink($_POST["link_id"]);
-			$link->setArgs($_POST["args"]);
-			$link->setType($_POST["type"]);
+			$args = FS::$secMgr->CheckAndSecurisePostData("args");
+			$type = FS::$secMgr->CheckAndSecurisePostData("type");
+			$lid = FS::$secMgr->CheckAndSecurisePostData("link_id");
+			
+			if(!$args || !$type || !$lid)
+				return;
+				
+			$link = new HTTPLink($lid);
+			$link->setArgs($args);
+			$link->setType($type);
 			$link->SaveToDB();
 		}
 		
 		public function RemoveLink() {
-			FS::$secMgr->SecuriseStringForDB($_GET["link"]);
-			$link = new HTTPLink($_GET["link"]);
+			$lid = FS::$secMgr->CheckAndSecuriseGetData("link");
+			if(!$lid)
+				return;
+				
+			$link = new HTTPLink($lid);
 			$link->Delete();
 		}
 		

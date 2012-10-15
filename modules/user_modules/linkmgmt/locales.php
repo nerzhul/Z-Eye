@@ -23,6 +23,15 @@
 		function lLinkMgmt() {
 			$this->locales = array(
 				"fr" => array(
+					"Action" => "Action",
+					"link-create" => "Création d'un lien",
+					"link-edit" => "Edition d'un lien",
+					"Module" => "Module",
+					"New-link" => "Nouveau lien",
+					"Normal" => "Normal",
+					"rewr-mod" => "Rewrite Module",
+					"rewr-other" => "Rewrite Autres",
+					"Save" => "Enregistrer",
 					"title-link" => "Gestion des liens",
 				),
 				"en" => array(
