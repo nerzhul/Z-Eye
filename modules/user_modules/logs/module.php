@@ -19,9 +19,11 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
+	
 	class iLogs extends genModule{
-		function iLogs() { parent::genModule(); }
+		function iLogs() { parent::genModule(); $this->loc = new lLogs(); }
 		public function Load() {
 			$output = $this->showLogs();
 			return $output;
@@ -32,11 +34,11 @@
 			$output = "";
                         if(!FS::isAjaxCall()) {
                                 $output .= "<div id=\"contenttabs\"><ul>";
-                                $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">Statistiques</a>";
-                                $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=2\">Collecteur Z_Eye</a>";
+                                $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">".$this->loc->s("Stats")."</a>";
+                                $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=2\">".$this->loc->s("Collector")."</a>";
                                 $output .= "</ul></div>";
                                 $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-                                $output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+                                $output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
                         }
 			else if(!$sh || $sh == 1) {
 				$output = "";
