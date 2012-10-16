@@ -44,7 +44,25 @@
 					"Yes" => "Oui",
 				),
 				"en" => array(
-					
+					"add-elmt" => "Add an element",
+					"Both" => "Both",
+					"Connected" => "Connected",
+					"elmt" => "Element",
+					"elmt-create" => "Element creation",
+					"elmt-edit" => "Element edition",
+					"Link" => "Link",
+					"menu-create" => "Menu creation",
+					"menu-edit" => "Menu edition",
+					"mod-elmt" => "Modify elements",
+					"Name" => "Name",
+					"New-Menu" => "New menu",
+					"New-menu-elmt" => "New menu element",
+					"No" => "No",
+					"Order" => "Order",
+					"Save" => "Save",
+					"title-menu-mgmt" => "Menu management",
+					"title-menu-node-mgmt" => "Menu elements management",
+					"Yes" => "Yes",
 				)
 			);
 		}
