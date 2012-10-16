@@ -19,15 +19,18 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
+	
 	class iNetdisco extends genModule{
-		function iNetdisco() { parent::genModule(); }
+		function iNetdisco() { parent::genModule(); $this->loc = new lNetdisco(); }
+		
 		public function Load() {
-			$output = "<h4>Management du service de découverte Netdisco</h4>";
+			$output = "<h4>".$this->loc->s("title-netdisco")."</h4>";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err == 1)
-				$output .= FS::$iMgr->printError("Les données que vous avez entré ne sont pas valides !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-data"));
 			else if ($err == -1)
-				$output .= FS::$iMgr->printDebug("Modification prise en compte.");
+				$output .= FS::$iMgr->printDebug($this->loc->("mod-ok"));
 			$output .= $this->showMainConf();
 			return $output;
 		}
@@ -35,7 +38,7 @@
 		private function showMainConf() {
 			$output = "";
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">Configuration globale</th></tr>";
+			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>";
 			if(Config::getOS() == "FreeBSD")
 				$file = file("/usr/local/etc/netdisco/netdisco.conf");
 			else if(Config::getOS() == "Debian")
@@ -64,9 +67,9 @@
 
 			if(!$file) {
 				if(Config::getOS() == "FreeBSD")
-					$output .= FS::$iMgr->printError("Impossible de libre le fichier /usr/local/etc/netdisco/netdisco.conf");
+					$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
 				else if(Config::getOS() == "Debian")
-					$output .= FS::$iMgr->printError("Impossible de libre le fichier /etc/netdisco/netdisco.conf");
+					$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /etc/netdisco/netdisco.conf");
 			} else {
 				foreach ($file as $lineNumber => $buf) {
 					$buf = trim($buf);
@@ -119,27 +122,27 @@
 				$firstnode = fread($file,filesize("/etc/netdisco/netdisco-topology.txt"));
 			fclose($file);
 			// @TODO: load configuration file
-			$output .= "<tr><td>Suffixe DNS</td><td>".FS::$iMgr->input("suffix",$dnssuffix)."</td></tr>";
-			$output .= "<tr><td>Noeud principal</td><td>".FS::$iMgr->input("fnode",$firstnode)."</td></tr>";
-			$output .= "<tr><th colspan=\"2\">Configuration des timers</th></tr>";
-			$output .= "<tr><td>Expiration des noeuds</td><td>".FS::$iMgr->input("nodetimeout",$nodetimeout,4,4)."</td></tr>";
-			$output .= "<tr><td>Expiration des périphériques</td><td>".FS::$iMgr->input("devicetimeout",$devicetimeout,4,4)."</td></tr>";
-			$output .= "<tr><th colspan=\"2\">Base de données</th></tr>";
-			$output .= "<tr><td>Hôte PostGRESQL</td><td>".FS::$iMgr->input("pghost",$pghost)."</td></tr>";
-			$output .= "<tr><td>Nom de la base de données</td><td>".FS::$iMgr->input("dbname",$dbname)."</td></tr>";
-			$output .= "<tr><td>Utilisateur PostGRESQL</td><td>".FS::$iMgr->input("dbuser",$dbuser)."</td></tr>";
-			$output .= "<tr><td>Mot de passe</td><td>".FS::$iMgr->password("dbpwd",$dbpwd)."</td></tr>";
-			$output .= "<tr><th colspan=\"2\">Configuration SNMP</th></tr>";
-			$output .= "<tr><td>Communautés en lecture</td><td>".FS::$iMgr->input("snmpro",$snmpro)."</td></tr>";
-			$output .= "<tr><td>Communautés en écriture</td><td>".FS::$iMgr->input("snmprw",$snmprw)."</td></tr>";
-			$output .= "<tr><td>Timeout des requêtes</td><td>".FS::$iMgr->input("snmptimeout",$snmptimeout,2,2)."</td></tr>";
-			$output .= "<tr><td>Tentatives maximales</td><td>".FS::$iMgr->input("snmptry",$snmptry,2,2)."</td></tr>";
-			$output .= "<tr><td>Version SNMP</td><td>";
+			$output .= "<tr><td>".$this->loc->s("dns-suffix")."</td><td>".FS::$iMgr->input("suffix",$dnssuffix)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("main-node")."</td><td>".FS::$iMgr->input("fnode",$firstnode)."</td></tr>";
+			$output .= "<tr><th colspan=\"2\">".$this->loc->s("timer-conf")."</th></tr>";
+			$output .= "<tr><td>".$this->loc->s("node-expiration")."</td><td>".FS::$iMgr->input("nodetimeout",$nodetimeout,4,4)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("device-expiration")."</td><td>".FS::$iMgr->input("devicetimeout",$devicetimeout,4,4)."</td></tr>";
+			$output .= "<tr><th colspan=\"2\">".$this->loc->s("database")."</th></tr>";
+			$output .= "<tr><td>".$this->loc->s("pg-host")."</td><td>".FS::$iMgr->input("pghost",$pghost)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("pg-db")."</td><td>".FS::$iMgr->input("dbname",$dbname)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("pg-user")."</td><td>".FS::$iMgr->input("dbuser",$dbuser)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("pg-pwd")."</td><td>".FS::$iMgr->password("dbpwd",$dbpwd)."</td></tr>";
+			$output .= "<tr><th colspan=\"2\">".$this->loc->s("snmp-conf")."</th></tr>";
+			$output .= "<tr><td>".$this->loc->s("snmp-read")."</td><td>".FS::$iMgr->input("snmpro",$snmpro)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("snmp-write")."</td><td>".FS::$iMgr->input("snmprw",$snmprw)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("snmp-timeout")."</td><td>".FS::$iMgr->input("snmptimeout",$snmptimeout,2,2)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("snmp-try")."</td><td>".FS::$iMgr->input("snmptry",$snmptry,2,2)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("snmp-version")."</td><td>";
 			$output .= FS::$iMgr->addList("snmpver");
 			$output .= FS::$iMgr->addElementToList("1","1",$snmpver == 1 ? true : false);
 			$output .= FS::$iMgr->addElementToList("2c","2",$snmpver == 2 ? true : false);
 			$output .= "</select></td></tr>";
-			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("Enregistrer","Enregistrer")."</th></tr>";
+			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Save"))."</th></tr>";
 			$output .= "</table></form>";
 			return $output;
 		}
