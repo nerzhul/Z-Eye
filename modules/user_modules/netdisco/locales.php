@@ -35,7 +35,7 @@
 					"pg-db" => "Nom de la base de données",
 					"pg-host" => "Hôte PostGreSQL",
 					"pg-pwd" => "Mot de passe",
-					"pg-user" => "Utilisateur PostGRESQL",
+					"pg-user" => "Utilisateur PostGreSQL",
 					"Save" => "Enregistrer",
 					"snmp-conf" => "Configuration SNMP",
 					"snmp-read" => "Communautés en lecture",
@@ -47,7 +47,28 @@
 					"title-netdisco" => "Management du service de découverte Netdisco",
 				),
 				"en" => array(
-					
+					"database" => "Database",
+					"device-expiration" => "Device expiration",
+					"dns-suffix" => "DNS suffix",
+					"err-invalid-data" => "Some sent datas are wrong !",
+					"err-unable-read" => "Unable to read",
+					"global-conf" => "Global configuration",
+					"main-node" => "Main node",
+					"mod-ok" => "Modification saved",
+					"node-expiration" => "Node expiration",
+					"pg-db" => "Database name",
+					"pg-host" => "PostGreSQL host",
+					"pg-pwd" => "Password",
+					"pg-user" => "PostGreSQL user",
+					"Save" => "Save",
+					"snmp-conf" => "SNMP configuration ",
+					"snmp-read" => "Reading communities",
+					"snmp-timeout" => "Requests timeout",
+					"snmp-try" => "Maximum try",
+					"snmp-version" => "SNMP version",
+					"snmp-write" => "Writing communities",
+					"timer-conf" => "Timer configuration",
+					"title-netdisco" => "Netdisco discovering service management",
 				)
 			);
 		}
