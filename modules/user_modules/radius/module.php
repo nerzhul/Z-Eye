@@ -18,10 +18,12 @@
         */
 
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/PDFgen.FS.class.php");
+	
 	class iRadius extends genModule{
-		function iRadius() { parent::genModule(); }
+		function iRadius() { parent::genModule(); $this->loc = new lRadius(); }
 		public function Load() {
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
@@ -31,12 +33,12 @@
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err && FS::$secMgr->isNumeric($err)) {
 				switch($err) {
-					case 1: $output = FS::$iMgr->printError("Serveur radius non référencé !"); break;
-					case 2: $output = FS::$iMgr->printError("Certaines données entrées sont manquantes ou invalides !"); break;
-					case 3: $output = FS::$iMgr->printError("Le groupe/utilisateur inscrit est déjà référencé !"); break;
-					case 4: $output = FS::$iMgr->printError("Echec de la suppression, données invalides !"); break;
-					case 5: $output = FS::$iMgr->printError("Certains utilisateurs n'ont pas été ajoutés car déjà existants !"); break;
-					case 6: $output = FS::$iMgr->printError("La table référencée n'est pas valide !"); break;
+					case 1: $output = FS::$iMgr->printError($this->loc->s("err-not-exist")); break;
+					case 2: $output = FS::$iMgr->printError($this->loc->s("err-miss-data")); break;
+					case 3: $output = FS::$iMgr->printError($this->loc->s("err-exist")); break;
+					case 4: $output = FS::$iMgr->printError($this->loc->s("err-delete")); break;
+					case 5: $output = FS::$iMgr->printError($this->loc->s("err-exist2")); break;
+					case 6: $output = FS::$iMgr->printError($this->loc->s("err-invalid-table")); break;
 				}
 			}
 			else
@@ -44,7 +46,7 @@
 			if(!FS::isAjaxCall()) {
 				$found = 0;
 				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-					$output .= "<h4>Outil de délégation de l'authentification</h4>";
+					$output .= "<h4>".$this->loc->s("title-deleg")."</h4>";
 					$tmpoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
                                         $query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
                                         while($data = pg_fetch_array($query)) {
@@ -52,11 +54,11 @@
                                                 $radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
                                                 $tmpoutput .= FS::$iMgr->addElementToList($data["radalias"],$radpath,$rad == $radpath);
                                         }
-                                        if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("","Gérer")."</form>";
-                                        else $output .= FS::$iMgr->printError("Aucun serveur radius référencé");
+                                        if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Manage"))."</form>";
+                                        else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
 				}
 				else {
-					$output .= "<h4>Gestion des utilisateurs/Groupes Radius</h4>";
+					$output .= "<h4>".$this->loc->s("title-usermgmt")."</h4>";
 					$tmpoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
 					$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname");
 	                	        while($data = pg_fetch_array($query)) {
@@ -64,8 +66,8 @@
 						$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
 						$tmpoutput .= FS::$iMgr->addElementToList($radpath,$radpath,$rad == $radpath);
 					}
-					if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("","Administrer")."</form>";
-					else $output .= FS::$iMgr->printError("Aucun serveur radius référencé");
+					if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Administrate"))."</form>";
+					else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
 				}
 			}
 			if($raddb && $radhost && $radport) {
@@ -85,7 +87,7 @@
 
 			}
 			else
-				$output .= FS::$iMgr->printError("Onglet invalide !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-tab"));
 
 			return $output;
 		}
@@ -99,7 +101,7 @@
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Comptes en masse",$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-                                $output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+                                $output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
 			}
 			else if(!$sh || $sh == 1) {
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
@@ -110,18 +112,19 @@
 
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10","adduser");
-				$output .= "<table><tr><th>Intitulé</th><th>Valeur</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine("Nom *","radname");
-				$output .= FS::$iMgr->addIndexedLine("Prénom *","radsurname");
-				$output .= FS::$iMgr->addIndexedline("Identifiant de connexion *","radusername");
-				$output .= "<tr><td>Profil</td><td>".FS::$iMgr->addList("profil","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
-				$output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity",array(1,2),array("Toujours valide","Période"),1);
-				$output .= FS::$iMgr->calendar("startdate","","Du")."<br />";
+				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>"$this->loc->s("Value")."</th></tr>";
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Name")." *","radname");
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Subname")." *","radsurname");
+				$output .= FS::$iMgr->addIndexedline($this->loc->s("Identifier")." *","radusername");
+				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
+				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".
+					FS::$iMgr->radioList("validity",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
+				$output .= FS::$iMgr->calendar("startdate","",$this->loc->s("From"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhours","limmins")."<br />";
-				$output .= FS::$iMgr->calendar("enddate","","Au")."<br />";
+				$output .= FS::$iMgr->calendar("enddate","",$this->loc->s("To"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
 				$output .= "</td></tr>";
-				$output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</table></form>";
+				$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"))."</table></form>";
 
 				$output .= "<script type=\"text/javascript\">$('#adduser').submit(function(event) {
 					event.preventDefault();
@@ -139,20 +142,23 @@
 
 				$output .= "<div id=\"adduserlistres\"></div>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11","adduserlist");
-                                $output .= "<table><tr><th>Intitulé</th><th>Valeur</th></tr>";
-				$output .= "<tr><td>Type de génération</td><td style=\"text-align: left;\">".FS::$iMgr->radio("typegen",1,false,"Nom aléatoire")."<br />".FS::$iMgr->radio("typegen",2,false,"Préfixe ").FS::$iMgr->input("prefix","")."</td></tr>";
-                                $output .= FS::$iMgr->addIndexedNumericLine("Nombre de comptes *","nbacct","",4,4);
-                                $output .= "<tr><td>Profil</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
-                                $output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array("Toujours valide","Période"),1);
-                                $output .= FS::$iMgr->calendar("startdate2","","Du")."<br />";
+                                $output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
+				$output .= "<tr><td>".$this->loc->s("</td><td style=\"text-align: left;\">".
+					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
+					FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
+                $output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct","",4,4);
+                $output .= "<tr><td>Profil</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").
+					$this->addGroupList($radSQLMgr)."</select></td></tr>";
+                $output .= "<tr><td>Validité</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
+                $output .= FS::$iMgr->calendar("startdate2","",$this->loc->s("From"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhours2","limmins2")."<br />";
-                                $output .= FS::$iMgr->calendar("enddate2","","Au")."<br />";
-                                $output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
-                                $output .= "</td></tr>";
-                                $output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</table></form>";
+                $output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
+                $output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
+                $output .= "</td></tr>";
+                $output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"))."</table></form>";
 			}
 			else
-				$output .= FS::$iMgr->printError("Onglet invalide !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));
 
 			return $output;
 		}
@@ -171,7 +177,7 @@
 				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,"Options avancées",$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"Unable to load tab, link may be wrong or page unavailable\");}}});</script>";
+				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
 			}
 			else if(!$sh || $sh == 1) {
                                 $radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
@@ -204,13 +210,13 @@
 				FS::$iMgr->addElementToList(":=",":=").
 				FS::$iMgr->addElementToList("+=","+=").
 				FS::$iMgr->addElementToList("!=","!=").
-                                FS::$iMgr->addElementToList(">",">").
-                                FS::$iMgr->addElementToList(">=",">=").
-                                FS::$iMgr->addElementToList("<","<").
+                FS::$iMgr->addElementToList(">",">").
+                FS::$iMgr->addElementToList(">=",">=").
+                FS::$iMgr->addElementToList("<","<").
 				FS::$iMgr->addElementToList("<=","<=").
-                                FS::$iMgr->addElementToList("=~","=~").
-                                FS::$iMgr->addElementToList("!~","!~").
-                                FS::$iMgr->addElementToList("=*","=*").
+                FS::$iMgr->addElementToList("=~","=~").
+                FS::$iMgr->addElementToList("!~","!~").
+                FS::$iMgr->addElementToList("=*","=*").
 				FS::$iMgr->addElementToList("!*","!*").
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->addList("attrtarget'+attridx+'").
 				FS::$iMgr->addElementToList("check",1).
