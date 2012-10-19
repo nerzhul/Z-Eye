@@ -59,7 +59,7 @@
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools"),$showmodule);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->("fail-tab")."\");}}});</script>";
+				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
 			} else {
 				if(!$showmodule || $showmodule == 1) {
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
@@ -181,7 +181,7 @@
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",$enmon == 1 ? true : false,$this->loc->s("En-monitor"))."</li><li>";
                                         $output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),3,3,$thsi->loc->s("warn-line"),$this->loc->s("%use"))."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),3,3,$this->loc->s("crit-line"),$this->loc->s("%use"))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("maxage",($maxage > 0 ? $maxage : 0),7,7,$this->loc->s("max-age"),$this->loc->s("tooltip-max-age")))."</li><li>";
+					$output .= FS::$iMgr->addNumericInput("maxage",($maxage > 0 ? $maxage : 0),7,7,$this->loc->s("max-age"),$this->loc->s("tooltip-max-age"))."</li><li>";
 					$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),$this->loc->s("tooltip-contact"))."</li><li>";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
 					$output .= "<script type=\"text/javascript\">$('#monsubnet').submit(function(event) {

@@ -331,7 +331,7 @@
 						foreach($obsoletes as $key => $value)
 							echo $value;
 					}
-					else echo FS::$iMgr->printDebug("no-found-records"));
+					else echo FS::$iMgr->printDebug($this->loc->s("no-found-records"));
 					return;
 			}
 		}

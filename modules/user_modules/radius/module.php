@@ -112,7 +112,7 @@
 
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10","adduser");
-				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>"$this->loc->s("Value")."</th></tr>";
+				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Name")." *","radname");
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Subname")." *","radsurname");
 				$output .= FS::$iMgr->addIndexedline($this->loc->s("Identifier")." *","radusername");
@@ -143,7 +143,7 @@
 				$output .= "<div id=\"adduserlistres\"></div>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11","adduserlist");
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$output .= "<tr><td>".$this->loc->s("</td><td style=\"text-align: left;\">".
+				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
 					FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
                 $output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct","",4,4);
@@ -267,7 +267,7 @@
 					drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
 						FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=4").
 						FS::$iMgr->addHidden("user","'+e.dataTransfer.getData('text/html')+'").
-						FS::$iMgr->addCheck("logdel",false,$this->loc->s("Delete-logs")." ?"))."<br />".
+						FS::$iMgr->addCheck("logdel",false,$this->loc->s("Delete-logs")." ?")."<br />".
 						FS::$iMgr->addCheck("acctdel",false,$this->loc->s("Delete-accounting")." ?")."<br />".
 						FS::$iMgr->submit("",$this->loc->s("Delete")).
 						FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
@@ -1436,7 +1436,7 @@
 					$radSQLMgr->Connect();
 
 					$pdf = new PDFgen();
-					$pdf->SetTitle($this->loc->s("Account").": ".($valid == 1 ? $this->loc->("Permanent") : $this->loc->s("Temporary")));
+					$pdf->SetTitle($this->loc->s("Account").": ".($valid == 1 ? $this->loc->s("Permanent") : $this->loc->s("Temporary")));
 					for($i=0;$i<$nbacct;$i++) {
 						$password = FS::$secMgr->genRandStr(8);
 						if($typegen == 2) $username = $prefix.($i+1);
@@ -1446,7 +1446,9 @@
 						$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$profil."',0");
 
 						$pdf->AddPage();
-						$pdf->WriteHTML(utf8_decode("<b>".$this->loc->s("User"): </b>".$username."<br /><br /><b>".$this->loc->s("Password").": </b>".$password."<br /><br /><b>".$this->loc->s("Validity"): </b>".($valid == 2 ? "Du ".date("d/m/y H:i",strtotime($sdate))." au ".date("d/m/y H:i",strtotime($edate)) : "Infinie")));
+						$pdf->WriteHTML(utf8_decode("<b>".$this->loc->s("User").": </b>".$username."<br /><br /><b>".$this->loc->s("Password").": </b>".$password."<br /><br /><b>".
+						$this->loc->s("Validity").": </b>".($valid == 2 ? $this->loc->s("From")." ".date("d/m/y H:i",strtotime($sdate))." ".$this->loc->s("To")." ".
+						date("d/m/y H:i",strtotime($edate)) : $this->loc->s("Infinite"))));
 					}
 					$pdf->CleanOutput();
 					return;

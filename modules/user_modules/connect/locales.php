@@ -28,7 +28,7 @@
 					"err-unk" => "Erreur inconnue",
 					"Login" => "Utilisateur",
 					"Password" => "Mot de passe",
-					"title-con" => "Connexion à l'espace d'administration",
+					"title-conn" => "Connexion à l'espace d'administration",
 				),
 				"en" => array(
 					"Connect" => "Connect",
@@ -36,7 +36,7 @@
 					"err-unk" => "Unknown error",
 					"Login" => "User",
 					"Password" => "Password",
-					"title-con" => "Connect to the admin panel",
+					"title-conn" => "Connect to the admin panel",
 				)
 			);
 		}

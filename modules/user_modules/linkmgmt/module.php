@@ -80,7 +80,7 @@
 			$output .= FS::$iMgr->addList("type");
 			$output .= FS::$iMgr->addElementToList($this->loc->s("Normal"),0,($lnk && $lnk->getType() == 0) ? true : false);
 			$output .= FS::$iMgr->addElementToList($this->loc->s("Action"),1,($lnk && $lnk->getType() == 1) ? true : false);
-			$output .= FS::$iMgr->addElementToList($this->loc->("Module"),2,($lnk && $lnk->getType() == 2) ? true : false);
+			$output .= FS::$iMgr->addElementToList($this->loc->s("Module"),2,($lnk && $lnk->getType() == 2) ? true : false);
 			$output .= FS::$iMgr->addElementToList("JavaScript",3,($lnk && $lnk->getType() == 3) ? true : false);	
 			$output .= FS::$iMgr->addElementToList($this->loc->s("rewr-mod"),4,($lnk && $lnk->getType() == 4) ? true : false);
 			$output .= FS::$iMgr->addElementToList($this->loc->s("rewr-other"),5,($lnk && $lnk->getType() == 5) ? true : false);		

@@ -30,7 +30,7 @@
 			if($err == 1)
 				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-data"));
 			else if ($err == -1)
-				$output .= FS::$iMgr->printDebug($this->loc->("mod-ok"));
+				$output .= FS::$iMgr->printDebug($this->loc->s("mod-ok"));
 			$output .= $this->showMainConf();
 			return $output;
 		}
