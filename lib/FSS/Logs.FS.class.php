@@ -22,7 +22,7 @@
 		
 		// Insert function
 		public static function i($user,$module,$level,$str) {
-			FS::$pgdbMgr->Insert("z_eye_logs","date,module,user,txt","NOW(),'".$module."','".$level."','".$user."','".$txt."'");
+			FS::$pgdbMgr->Insert("z_eye_logs","date,module,level,user,txt","NOW(),'".$module."','".$level."','".$user."','".$txt."'");
 		}
 	};	
 ?>
