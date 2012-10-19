@@ -567,7 +567,7 @@ preprocessor http_inspect_server: server default \\\n
 					$dbpwd = FS::$secMgr->checkAndSecurisePostData("dbpwd");
 					//$dbport = FS::$secMgr->checkAndSecurisePostData("dbport");
 
-					if(!$dbhost || !$dbname || !$dbuser || $dbpwd) {
+					if(!$dbhost || !$dbname || !$dbuser || !$dbpwd) {
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
@@ -575,6 +575,8 @@ preprocessor http_inspect_server: server default \\\n
 					$tmppgconn = new FSPostgreSQLMgr();
 					$tmppgconn->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
 					$tmppgconn->Connect();
+					
+					FS::$pgdbMgr->Connect();
 					
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dbhost','dbuser','dbpwd','dbname'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbhost','".$dbhost."'");
