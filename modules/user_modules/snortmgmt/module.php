@@ -65,10 +65,10 @@
 				$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("data-storage")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("pg-host",$dbhost),"dbhost");
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Database",$dbname),"dbname");
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("User",$dbuser),"dbuser");
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password",$dbpwd),"dbpwd","",true);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("pg-host"),"dbhost",$dbhost);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Database"),"dbname",$dbname);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"dbuser",$dbuser);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"dbpwd",$dbpwd,true);
 				$output .= "<tr><td>".$this->loc->s("lan-list")."</td><td>";
 				$output .= FS::$iMgr->textarea("srvlist","",250,100);
 
