@@ -563,8 +563,20 @@ preprocessor http_inspect_server: server default \\\n
 					//$dbport = FS::$secMgr->checkAndSecurisePostData("dbport");
 
 					if(!$dbhost || !$dbname || !$dbuser || $dbpwd) {
-
+						header("Location: index.php?mod=".$this->mid."&err=1");
+						return;
 					}
+					
+					$tmppgconn = new FSPostgreSQLMgr();
+					$tmppgconn->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
+					$tmppgconn->Connect();
+					
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dbhost','dbuser','dbpwd','dbname'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbhost','".$dbhost."'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbuser','".$dbuser."'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbpwd','".$dbpwd."'");
+					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbname','".$dbname."'");
+					header("Location: index.php?mod=".$this->mid);
 					break;
 				case 2:
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("dnslist");
@@ -580,8 +592,7 @@ preprocessor http_inspect_server: server default \\\n
 							}
 						}
 					}
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'dnsenable'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'dnslist'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dnsenable','dnslist'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnsenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnslist','".$srvlist."'");
 					if($this->writeConfiguration() != 0)
@@ -665,21 +676,15 @@ preprocessor http_inspect_server: server default \\\n
 							}
 						}
 					}
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'smtpenable'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'smtplist'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'smtpports'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('smtpenable','smtplist','smtpports')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'smtpenable',".($enablesmtp == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'smtplist','".$smtplist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'smtpports','".$smtpports."'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'imapenable'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'imaplist'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'imapports'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('imapenable','imaplist','imapports')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'imapenable',".($enableimap == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'imaplist','".$imaplist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'imapports','".$imapports."'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'popenable'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'poplist'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'popports'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('popenable','poplist','popports')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'popenable',".($enablepop == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'poplist','".$poplist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'popports','".$popports."'");
@@ -715,9 +720,7 @@ preprocessor http_inspect_server: server default \\\n
 						}
 					}
 
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httpenable'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httplist'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'httpports'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('httpenable','httplist','httpports')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httpenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httplist','".$srvlist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httpports','".$httpports."'");

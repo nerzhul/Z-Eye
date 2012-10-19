@@ -232,13 +232,24 @@
 
 			$tmpoutput = "<h4>".$this->loc->s("err-security")."</h4>";
 			$atkfound = 0;
+			
+			// Load snort keys for db config
+			$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
+			if($dbname == "") $dbname = "snort";
+			$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
+			if($dbhost == "") $dbhost = "localhost";
+			$dbuser = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
+			if($dbuser == "") $dbuser = "snort";
+			$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
+			if($dbpwd == "") $dbpwd = "snort";
+			
 			$snortDB = new FSPostgreSQLMgr();
-                        $snortDB->setConfig("snort",5432,"localhost","snortuser","snort159");
-                        $snortDB->Connect();
-                        $query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0' GROUP BY ip_src,ip_dst,sig_name,timestamp","timestamp",1);
-                        $tmpoutput .= "<table><tr><th>Source</th><th>Destination</th><th>Type</th></tr>";
+			$snortDB->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
+			$snortDB->Connect();
+			$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0' GROUP BY ip_src,ip_dst,sig_name,timestamp","timestamp",1);
+			$tmpoutput .= "<table><tr><th>Source</th><th>Destination</th><th>Type</th></tr>";
 
-                        $sigarray=array();
+			$sigarray=array();
 
 			$attacklist=array();
 			$scannb = 0;

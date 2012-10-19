@@ -20,9 +20,19 @@
         */
         require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 
-$snortDB = new FSPostgreSQLMgr();
-$snortDB->setConfig("snort",5432,"localhost","snortuser","snort159");
-$snortDB->Connect();
+		$snortDB = new FSPostgreSQLMgr();
+		// Load snort keys for db config
+		$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
+		if($dbname == "") $dbname = "snort";
+		$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
+		if($dbhost == "") $dbhost = "localhost";
+		$dbuser = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
+		if($dbuser == "") $dbuser = "snort";
+		$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
+		if($dbpwd == "") $dbpwd = "snort";
+
+		$snortDB->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
+		$snortDB->Connect();
 
 function cleanupSnortDB($snortDB) {
 	echo "Cleaning up old records from snort\n";
