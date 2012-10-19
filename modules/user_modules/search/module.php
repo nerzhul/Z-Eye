@@ -18,21 +18,23 @@
         */
 
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
+	
 	class iSearch extends genModule{
-		function iSearch() { parent::genModule(); }
+		function iSearch() { parent::genModule(); $this->loc = new lSearch(); }
 		public function Load() {
 			$output = "";
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			if($search && strlen($search) > 0)
 				$output .= $this->findRefsAndShow($search);
 			else
-				$output .= FS::$iMgr->printError("Pas de données à rechercher");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-search"));
 			return $output;
 		}
 
 		private function findRefsAndShow($search) {
-			$output = "<h3>Recherche: ".$search."</h3>";
+			$output = "<h3>".$this->loc->s("Search").": ".$search."</h3>";
 			if(FS::$secMgr->isMacAddr($search)) {
 				$output .= $this->showMacAddrResults($search);
 		        }
@@ -47,7 +49,7 @@
 				if(strlen($tmpoutput) > 0)
 					$output .= $tmpoutput;
 				else
-					$output .= FS::$iMgr->printError("Aucune donnée trouvée");
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 			}
 
 			return $output;
@@ -65,7 +67,7 @@
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h4>Prise(s) référencée(s)</h4>";
+					$tmpoutput .= "<div><h4>".$this->loc->s("Ref-plug")."</h4>";
 				}
 				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 				if(!isset($devprise[$swname]))
@@ -75,11 +77,11 @@
 			}
 			if($found) {
 				foreach($devprise as $device => $devport) {
-					$tmpoutput .= "Equipement: <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+					$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
 					foreach($devport as $port => $prise) {
 						$convport = preg_replace("#\/#","-",$port);
         		                        $tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-	                	                $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (Prise ".$prise.")</li>";
+	                	                $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (".$this->loc->s("Plug");" ".$prise.")</li>";
 					}
 					$tmpoutput .= "</ul>";
 				}
@@ -93,7 +95,7 @@
 				if($dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
 					if($found == 0) {
 						$found = 1;
-						$tmpoutput .= "<div><h4>VLAN présent dans ces équipements</h4>";
+						$tmpoutput .= "<div><h4>".$this->loc->s("title-vlan-device")."</h4>";
 					}
 					$tmpoutput .= "<li> <a href=\"index.php?mod=".$swmodid."&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
 				}
@@ -105,7 +107,7 @@
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
-				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 
 			return $output;
 		}
@@ -136,7 +138,7 @@
                         while($data = pg_fetch_array($query)) {
                                 if($found == 0) {
                                         $found = 1;
-                                        $tmpoutput .= "<div><h4>Prise(s) référencée(s)</h4>";
+                                        $tmpoutput .= "<div><h4>".$this->loc->s("Ref-plug")."</h4>";
                                 }
                                 $swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
                                 if(!isset($devprise[$swname]))
@@ -147,7 +149,7 @@
                         }
                         if($found) {
                                 foreach($devprise as $device => $devport) {
-                                        $tmpoutput .= "Equipement: <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+                                        $tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
                                         foreach($devport as $port => $prise) {
                                                 $convport = preg_replace("#\/#","-",$port);
                                                 $tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
@@ -213,7 +215,7 @@
 			if(strlen($tmpoutput) > 0)
 				$output .= "<h4>Nombre de résultats: ".$nbresults."</h4>".$tmpoutput;
 			else
-				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 
 			return $output;
 		}
@@ -319,7 +321,7 @@
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
-				$output .= FS::$iMgr->printError("Aucune donnée trouvée !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 			return $output;
 		}
 		
