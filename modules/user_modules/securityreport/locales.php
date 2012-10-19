@@ -67,7 +67,6 @@
 					"title-z-eye-report" => "Attack reports (compressed in Z-Eye DB)",
 					"Update" => "Update",
 					"violent-days" => " most violent days",
-					
 				)
 			);
 		}
