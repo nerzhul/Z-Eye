@@ -578,7 +578,7 @@ preprocessor http_inspect_server: server default \\\n
 					
 					FS::$pgdbMgr->Connect();
 					
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dbhost','dbuser','dbpwd','dbname'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dbhost','dbuser','dbpwd','dbname')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbhost','".$dbhost."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbuser','".$dbuser."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbpwd','".$dbpwd."'");
@@ -599,7 +599,7 @@ preprocessor http_inspect_server: server default \\\n
 							}
 						}
 					}
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dnsenable','dnslist'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dnsenable','dnslist')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnsenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnslist','".$srvlist."'");
 					if($this->writeConfiguration() != 0)
@@ -780,9 +780,7 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'sqllist'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sqlenable',".($sqlenable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sqllist','".$sqllist."'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'oracleenable'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'oraclelist'");
-					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey = 'oracleports'");
+					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('oracleenable','oraclelist','oracleports')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oracleenable',".($oracleenable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oraclelist','".$oraclelist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oracleports','".$oracleports."'");
