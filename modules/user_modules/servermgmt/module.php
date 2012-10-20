@@ -297,7 +297,7 @@
 			if($found)
 				$output .= $tmpoutput."</table>";
 			else
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-server-found"." !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-server-found")." !");
 
 			$output .= "<h4>".$this->loc->s("title-radius-db")."</h4>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-base")."</a><br />";

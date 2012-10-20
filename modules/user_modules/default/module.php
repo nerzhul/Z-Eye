@@ -46,11 +46,12 @@
 			$tmpoutput = "<div style=\"width: 100%; display: inline-block;\">".$this->showIcingaReporting()."</div>";
 			$tmpoutput .= $this->showNetworkReporting();
 			$tmpoutput .= $this->showSecurityReporting();
-                        $output .= "<div style=\"width: 100%; display: inline-block;\"><ul class=\"ulform\"><li>";
-                        $output .= FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga,$this->loc->s("state-srv"))."</li><li>";
-                        $output .= FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore,$this->loc->s("state-net"))."</li><li>";
-                        $output .= FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore,$this->loc->s("state-security"))."</li></ul>";
-                        $output .= "</div>";
+			$output .= "<div style=\"width: 100%; display: inline-block;\"><ul class=\"ulform\"><li>";
+			$output .= FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga,$this->loc->s("state-srv"))."</li><li>";
+			if($this->BWtotalscore != -1)
+				$output .= FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore,$this->loc->s("state-net"))."</li><li>";
+			$output .= FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore,$this->loc->s("state-security"))."</li></ul>";
+			$output .= "</div>";
 			$output .= $tmpoutput;
 			if(!FS::isAjaxCall()) $output .= "</div>";
 
@@ -132,12 +133,12 @@
 
 		private function showNetworkReporting() {
 			$output = "";
-			$query = FS::$pgdbMgr->Select("z_eye_port_monitor","device,port,climit,wlimit,description");
-
 			$found = 0;
 			$pbfound = 0;
 			$total = 0;
 			$this->BWscore = 0;
+			
+			$query = FS::$pgdbMgr->Select("z_eye_port_monitor","device,port,climit,wlimit,description");
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = 1;
@@ -192,29 +193,29 @@
 				}
 
 				if($outputbw > $data["climit"]*1024*1024) {
-        	        	        $outcolor = "red";
+					$outcolor = "red";
 					$this->BWscore += 1;
 				}
-	        	        else if($outputbw > $data["wlimit"]*1024*1024) {
-        	        	        $outcolor = "orange";
+				else if($outputbw > $data["wlimit"]*1024*1024) {
+						$outcolor = "orange";
 					$this->BWscore += 2;
 				}
 				else if($outputbw != 0)
 					$this->BWscore += 5;
 
 				if($outputbw > 1024*1024*1024) {
-        	                	$outputbw = round($outputbw/(1024*1024*1024),2). " Gbits";
+						$outputbw = round($outputbw/(1024*1024*1024),2). " Gbits";
 				}
-        	        	else if($outputbw > 1024*1024) {
-                	        	$outputbw = round($outputbw/(1024*1024),2). " Mbits";
+				else if($outputbw > 1024*1024) {
+						$outputbw = round($outputbw/(1024*1024),2). " Mbits";
 				}
-        		        else if($outputbw > 1024) {
-                		        $outputbw = round($outputbw/1024,2). " Kbits";
+				else if($outputbw > 1024) {
+						$outputbw = round($outputbw/1024,2). " Kbits";
 				}
 				else if($outputbw == 0) {
-        	        	        $outputbw = "0 Kbits";
-                	        	$outcolor = "red";
-	                	}
+						$outputbw = "0 Kbits";
+						$outcolor = "red";
+				}
 				if($outcolor == "red" || $outcolor == "orange") {
 					$pbfound = 1;
 					$tmpoutput .= "<td style=\"background-color: ".$incolor.";\">".$inputbw."</td><td style=\"background-color: ".$outcolor.";\">".$outputbw."</td></tr>";
@@ -222,7 +223,10 @@
 			}
 			if($pbfound) $output .= $tmpoutput;
 			$output .= "</table>";
-			$this->BWtotalscore = $total*10;
+			if($found)
+				$this->BWtotalscore = $total*10;
+			else
+				$this->BWtotalscore = -1;
 			return $output;
 		}
 
