@@ -111,7 +111,6 @@
 					}
 					fclose($file);
 				}
-				
 			}
 			if(Config::getOS() == "FreeBSD")
 				$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","r");
