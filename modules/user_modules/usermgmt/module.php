@@ -19,17 +19,19 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
+	
 	class iUserMgmt extends genModule{
-		function iUserMgmt() { parent::genModule(); }
+		function iUserMgmt() { parent::genModule(); $this->loc = new lUserMgmt(); }
 		public function Load() {
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			$output = "";
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError("Utilisateur invalide"); break;
-				case 2: $output .= FS::$iMgr->printError("Informations invalides ou manquantes"); break;
-				case 3: $output .= FS::$iMgr->printError("Données LDAP invalides, impossible de se connecter au serveur"); break;
-				case 4: $output .= FS::$iMgr->printError("Serveur déjà renseigné"); break;
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-user")); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-bad-data")); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-bad-data")); break;
+				case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-exist")); break;
 			}
 
 			$user = FS::$secMgr->checkAndSecuriseGetData("user");
@@ -45,9 +47,9 @@
 
 		private function EditUser($user) {
 			$uid = FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$user."'");
-			$output = "<h3>Modification de l'utilisateur</h3>";
+			$output = "<h3>".$this->loc->s("title-user-mod")."</h3>";
 			if(!$uid) {
-				$output .= FS::$iMgr->printError("L'utilisateur demandé n'existe pas !");
+				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
 				return $output;
 			}
 			$output = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
@@ -55,7 +57,7 @@
 			$grpidx = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
 			while($data = pg_fetch_array($query)) {
-				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->addList("ugroup".$grpidx,"","Groupe").$this->addGroupList($data["gid"])."</select>";
+				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->addList("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
@@ -75,28 +77,28 @@
 		}
 
 		private function EditServer($addr) {
-			$output = "<h3>Edition d'annuaire</h3>";
+			$output = "<h3>".$this->loc->s("title-directory")."</h3>";
 			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=6");
-	                        $output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>Annuaire: </b>".$addr."</li><li>";
-                        	$output .= FS::$iMgr->addNumericInput("port",$data["port"],5,5,"Port LDAP")."</li><li>";
+	                        $output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
+                        	$output .= FS::$iMgr->addNumericInput("port",$data["port"],5,5,$this->loc->s("ldap-port"))."</li><li>";
                 	        $output .= FS::$iMgr->addCheck("ssl",($data["ssl"] == 1 ? true : false),"SSL ?")."</li><li>";
-        	                $output .= FS::$iMgr->input("dn",$data["dn"],20,200,"Base DN")."</li><li>";
-	                        $output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,"Root DN")."</li><li>";
-                        	$output .= FS::$iMgr->password("rootpwd",$data["dnpwd"],"Root Pwd")."</li><li>";
-                	        $output .= FS::$iMgr->input("ldapname",$data["ldapname"],20,40,"Attribut Nom")."</li><li>";
-        	                $output .= FS::$iMgr->input("ldapsurname",$data["ldapsurname"],20,40,"Attribut Prénom")."</li><li>";
-	                        $output .= FS::$iMgr->input("ldapmail",$data["ldapmail"],20,40,"Attribut Mail")."</li><li>";
-                        	$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,"Attribut UID")."</li><li>";
-                	        $output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,"Filtre LDAP")."</li><li>";
-        	                $output .= FS::$iMgr->submit("","Enregistrer")."</li>";
+        	                $output .= FS::$iMgr->input("dn",$data["dn"],20,200,$this->loc->s("base-dn"))."</li><li>";
+	                        $output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,$this->loc->s("root-dn"))."</li><li>";
+                        	$output .= FS::$iMgr->password("rootpwd",$data["dnpwd"],$this->loc->s("root-pwd"))."</li><li>";
+                	        $output .= FS::$iMgr->input("ldapname",$data["ldapname"],20,40,$this->loc->s("attr-name"))."</li><li>";
+        	                $output .= FS::$iMgr->input("ldapsurname",$data["ldapsurname"],20,40,$this->loc->s("attr-subname"))."</li><li>";
+	                        $output .= FS::$iMgr->input("ldapmail",$data["ldapmail"],20,40,$this->loc->s("attr-mail"))."</li><li>";
+                        	$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,$this->loc->s("attr-uid"))."</li><li>";
+                	        $output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,$this->loc->s("ldap-filter"))."</li><li>";
+        	                $output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
 	                        $output .= "</ul></form>";
 			}
 			else {
-				$output .= FS::$iMgr->printError("Ce serveur LDAP n'existe pas");
-                                return $output;
-                        }
+				$output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist"));
+					return $output;
+			}
 
 			return $output;
 		}
@@ -110,7 +112,7 @@
 		}
 
 		private function showMain() {
-			$output = "<h3>Gestion des utilisateurs</h3>";
+			$output = "<h3>".$this->loc->s("title-usermgmt")."</h3>";
 
 			$tmpoutput = "";
 			$found = 0;
@@ -118,9 +120,12 @@
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"utb\"><tr><th>UID</th><th>Utilisateur</th><th>Type d'utilisateur</th><th>Groupes</th><th>Prénom</th><th>Nom</th><th>Mail</th><th>Dernière IP</th><th>Dernière connexion</th><th>Inscription</th></tr>";
+					$tmpoutput .= "<table id=\"utb\"><tr><th>UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
+					$this->loc->s("Groups")."</th><th>".$this->loc->s("Subname")."</th><th>".$this->loc->s("Name")."</th><th>".
+					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th></tr>";
 				}
-				$tmpoutput .= "<tr><td>".$data["uid"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["username"]."</td><td>".($data["sha_pwd"] == "" ? "Externe" : "Interne")."</td><td>";
+				$tmpoutput .= "<tr><td>".$data["uid"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["username"]."</td><td>".
+					($data["sha_pwd"] == "" ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 				$query2 = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$data["uid"]."'");
 				while($data2 = pg_fetch_array($query2)) {
 					$gname = FS::$pgdbMgr->GetOneData("z_eye_groups","gname","gid = '".$data2["gid"]."'");
@@ -145,24 +150,24 @@
                                         dragend: function() { $('#trash').hide(); $('#editf').hide(); }
                                 });</script>";
 			}
-			$output .= "<h3>Gestion des annuaires</h3>";
+			$output .= "<h3>".$this->loc->s("title-directorymgmt")."</h3>";
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<ul class=\"ulform\"><li>";
-			$formoutput .= FS::$iMgr->input("addr","",20,40,"Adresse de l'annuaire LDAP")."</li><li>";
-			$formoutput .= FS::$iMgr->addNumericInput("port","389",5,5,"Port LDAP")."</li><li>";
-			$formoutput .= FS::$iMgr->addCheck("ssl",false,"SSL ?")."</li><li>";
-			$formoutput .= FS::$iMgr->input("dn","",20,200,"Base DN")."</li><li>";
-			$formoutput .= FS::$iMgr->input("rootdn","",20,200,"Root DN")."</li><li>";
-			$formoutput .= FS::$iMgr->password("rootpwd","","Root Pwd")."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapname","",20,40,"Attribut Nom")."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapsurname","",20,40,"Attribut Prénom")."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapmail","",20,40,"Attribut Mail")."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapuid","",20,40,"Attribut UID")."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapfilter","",20,200,"Filtre LDAP")."</li><li>";
-			$formoutput .= FS::$iMgr->submit("","Enregistrer")."</li>";
+			$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
+			$formoutput .= FS::$iMgr->addNumericInput("port","389",5,5,$this->loc->s("ldap-port"))."</li><li>";
+			$formoutput .= FS::$iMgr->addCheck("ssl",false,$this->loc->s("SSL")." ?")."</li><li>";
+			$formoutput .= FS::$iMgr->input("dn","",20,200,$this->loc->s("base-dn"))."</li><li>";
+			$formoutput .= FS::$iMgr->input("rootdn","",20,200,$this->loc->s("root-dn"))."</li><li>";
+			$formoutput .= FS::$iMgr->password("rootpwd","",$this->loc->s("root-pwd"))."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapname","",20,40,$this->loc->s("attr-name"))."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapsurname","",20,40,$this->loc->s("attr-subname"))."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapmail","",20,40,$this->loc->s("attr-mail"))."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapuid","",20,40,$this->loc->s("attr-uid"))."</li><li>";
+			$formoutput .= FS::$iMgr->input("ldapfilter","",20,200,$this->loc->s("ldap-filter"))."</li><li>";
+			$formoutput .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
 			$formoutput .= "</ul></form>";
 
-			$output .= FS::$iMgr->opendiv($formoutput,"Nouvel Annuaire");
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"));
 
 			$found = 0;
 			$tmpoutput = "";
@@ -170,7 +175,8 @@
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"ldaptb\"><tr><th>Serveur</th><th>Port</th><th>BaseDN</th><th>RootDN</th><th>Filtre LDAP</th></tr>";
+					$tmpoutput .= "<table id=\"ldaptb\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
+					"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th></tr>";
 				}
 				$tmpoutput .= "<tr><td id=\"dragtd\" draggable=\"true\">".$data["addr"]."</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td></tr>";
 			}
@@ -200,18 +206,18 @@
                                 });
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { if(datatype == 1) { $('#subpop').html('Êtes vous sûr de vouloir supprimer l\'utilisateur \''+e.dataTransfer.getData('text/html')+'\' ?".
+                                        drop: function(e) { if(datatype == 1) { $('#subpop').html('".$this->loc->s("sure-remove-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3").
                                               FS::$iMgr->addHidden("username","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->submit("","Supprimer").
-                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                              FS::$iMgr->submit("",$this->loc->s("Remove")).
+                                              FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
 					} else if(datatype == 2) {
-						$('#subpop').html('Êtes vous sûr de vouloir supprimer l\'annuaire \''+e.dataTransfer.getData('text/html')+'\' ?".
+						$('#subpop').html('".$this->loc->s("sure-remove-directory")." \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=5").
                                               FS::$iMgr->addHidden("addr","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->submit("","Supprimer").
-                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
+                                              FS::$iMgr->submit("",$this->loc->s("Remove")).
+                                              FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
 					}
 					datatype = 0;
@@ -228,20 +234,20 @@
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					if(!$uid || !FS::$secMgr->isNumeric($uid)) {
 						header("Location: index.php?mod=".$this->mid."&err=2");
-                                                return;
-                                        }
+							return;
+					}
 
 					$groups = array();
 					foreach($_POST as $key => $value) {
-                                               if(preg_match("#^ugroup#",$key)) {
-							$exist = FS::$pgdbMgr->GetOneData("z_eye_groups","gname","gid = '".$value."'");
-							if(!$exist) {
-								header("Location: index.php?mod=".$this->mid."&err=2");
-								return;
-							}
-							array_push($groups,$value);
-                                               }
-                                        }
+						   if(preg_match("#^ugroup#",$key)) {
+								$exist = FS::$pgdbMgr->GetOneData("z_eye_groups","gname","gid = '".$value."'");
+								if(!$exist) {
+									header("Location: index.php?mod=".$this->mid."&err=2");
+									return;
+								}
+								array_push($groups,$value);
+						   }
+					}
 					FS::$pgdbMgr->Delete("z_eye_user_group","uid = '".$uid."'");
 					$groups = array_unique($groups);
 					for($i=0;$i<count($groups);$i++)
@@ -301,59 +307,58 @@
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					if(!$addr) {
 						header("Location: index.php?mod=".$this->mid."&err=2");
-                                                return;
-                                        }
+							return;
+					}
 
 					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
-                                        if(!$serv) {
-                                                header("Location: index.php?mod=".$this->mid."&err=4");
-                                                return;
-                                        }
+					if(!$serv) {
+							header("Location: index.php?mod=".$this->mid."&err=4");
+							return;
+					}
 
 					FS::$pgdbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 6:
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
-                                        if(!$addr) {
-                                                header("Location: index.php?mod=".$this->mid."&err=2");
-                                                return;
-                                        }
+					if(!$addr) {
+							header("Location: index.php?mod=".$this->mid."&err=2");
+							return;
+					}
 
-                                        $serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
-                                        if(!$serv) {
-                                                header("Location: index.php?mod=".$this->mid."&err=4");
-                                                return;
-                                        }
+					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
+					if(!$serv) {
+							header("Location: index.php?mod=".$this->mid."&err=4");
+							return;
+					}
 
 					$port = FS::$secMgr->checkAndSecurisePostData("port");
-                                        $ssl = FS::$secMgr->checkAndSecurisePostData("ssl");
-                                        $basedn = FS::$secMgr->checkAndSecurisePostData("dn");
-                                        $rootdn = FS::$secMgr->checkAndSecurisePostData("rootdn");
-                                        $rootpwd = FS::$secMgr->checkAndSecurisePostData("rootpwd");
-                                        $ldapname = FS::$secMgr->checkAndSecurisePostData("ldapname");
-                                        $ldapsurname = FS::$secMgr->checkAndSecurisePostData("ldapsurname");
-                                        $ldapmail = FS::$secMgr->checkAndSecurisePostData("ldapmail");
-                                        $ldapuid = FS::$secMgr->checkAndSecurisePostData("ldapuid");
-                                        $ldapfilter = FS::$secMgr->checkAndSecurisePostData("ldapfilter");
+					$ssl = FS::$secMgr->checkAndSecurisePostData("ssl");
+					$basedn = FS::$secMgr->checkAndSecurisePostData("dn");
+					$rootdn = FS::$secMgr->checkAndSecurisePostData("rootdn");
+					$rootpwd = FS::$secMgr->checkAndSecurisePostData("rootpwd");
+					$ldapname = FS::$secMgr->checkAndSecurisePostData("ldapname");
+					$ldapsurname = FS::$secMgr->checkAndSecurisePostData("ldapsurname");
+					$ldapmail = FS::$secMgr->checkAndSecurisePostData("ldapmail");
+					$ldapuid = FS::$secMgr->checkAndSecurisePostData("ldapuid");
+					$ldapfilter = FS::$secMgr->checkAndSecurisePostData("ldapfilter");
 
-                                        if(!$port || !FS::$secMgr->isNumeric($port) || !$basedn || !$rootdn || !$rootpwd || !$ldapname || !$ldapsurname || !$ldapmail || !$ldapuid || !$ldapfilter) {
-                                                header("Location: index.php?mod=".$this->mid."&err=2");
-                                                return;
-                                        }
-                                        FS::$pgdbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
+					if(!$port || !FS::$secMgr->isNumeric($port) || !$basedn || !$rootdn || !$rootpwd || !$ldapname || !$ldapsurname || !$ldapmail || !$ldapuid || !$ldapfilter) {
+							header("Location: index.php?mod=".$this->mid."&err=2");
+							return;
+					}
+					FS::$pgdbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
 					$ldapMgr = new LDAP();
-                                        $ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
-                                        if(!$ldapMgr->RootConnect()) {
-                                                header("Location: index.php?mod=".$this->mid."&err=3");
-                                                return;
-                                        }
+					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
+					if(!$ldapMgr->RootConnect()) {
+							header("Location: index.php?mod=".$this->mid."&err=3");
+							return;
+					}
 
-                                        FS::$pgdbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
-                                                "'".$addr."','".$port."','".($ssl == "on" ? 1 : 0)."','".$basedn."','".$rootdn."','".$rootpwd."','".$ldapfilter."','".$ldapuid."','".$ldapmail."','".$ldapname."','".$ldapsurname."'");
-                                        header("Location: index.php?mod=".$this->mid);
-                                        return;
-
+					FS::$pgdbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
+							"'".$addr."','".$port."','".($ssl == "on" ? 1 : 0)."','".$basedn."','".$rootdn."','".$rootpwd."','".$ldapfilter."','".$ldapuid."','".$ldapmail."','".$ldapname."','".$ldapsurname."'");
+					header("Location: index.php?mod=".$this->mid);
+					return;
 				default: break;
 			}
 		}
