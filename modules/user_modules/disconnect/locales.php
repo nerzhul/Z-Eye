@@ -19,8 +19,8 @@
 
     require_once(dirname(__FILE__)."/../../../lib/FSS/objects/Locales.FS.class.php");
     
-	class lDefault extends zLocales {
-		function lDefault() {
+	class lDisconnect extends zLocales {
+		function lDisconnect() {
 			$this->locales = array(
 				"fr" => array(
 					"Confirm" => "Confirmer",
