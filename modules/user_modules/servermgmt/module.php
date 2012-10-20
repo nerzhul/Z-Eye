@@ -19,11 +19,13 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
+	
 	class iServerMgmt extends genModule{
-		function iServerMgmt() { parent::genModule(); }
+		function iServerMgmt() { parent::genModule(); $this->loc = new lServerMgmt(); }
 		public function Load() {
-			$output = "<h3>Gestion du moteur d'analyse des serveurs</h3>";
+			$output = "<h3>".$this->loc->s("title-analysismgmt")."</h3>";
 			$do = FS::$secMgr->checkAndSecuriseGetData("do");
 			switch($do) {
 				case 1: case 2:
@@ -51,13 +53,13 @@
 			$spath = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>Ajouter un serveur de sauvegarde (configuration des équipements réseau)</h4>";
+				$output = "<h4>".$this->loc->s("title-add-backup-switch-server")."</h4>";
 			else {
-				$output = "<h4>Edition des informations du serveur de sauvegarde (configuration des équipements réseau)</h4>";
+				$output = "<h4>".$this->loc->s("title-edit-backup-switch-server")."</h4>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$type = FS::$secMgr->checkAndSecuriseGetData("type");
 				if(!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
-					$output .= FS::$iMgr->printError("Aucun serveur à éditer spécifié!");
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
 				$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
@@ -69,17 +71,17 @@
 					$spath = $data["path"];
 				}
 				else {
-					$output .= FS::$iMgr->printError("Aucun serveur enregistré avec ces coordonnées !");
+					$output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !");
 					return $output;
 				}
 			}
 
-			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
+			$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
 
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
-				case 3: if($create) $output .= FS::$iMgr->printError("Ce serveur est déjà référencé !"); break;
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
+				case 3: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 
 			$output .= "<script type=\"text/javascript\">function arangeform() {";
@@ -103,8 +105,8 @@
 
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
-				$output .= FS::$iMgr->addIndexedIPLine("Adresse IP","saddr",$saddr);
-				$output .= "<tr><td>Type de service</td><td>";
+				$output .= FS::$iMgr->addIndexedIPLine($this->loc->s("ip-addr"),"saddr",$saddr);
+				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
 				$output .= FS::$iMgr->addList("stype","arangeform();");
 				$output .= FS::$iMgr->addElementToList("TFTP",1);
 				$output .= FS::$iMgr->addElementToList("FTP",2);
@@ -114,8 +116,8 @@
 				$output .= "</td></tr>";
 			}
 			else {
-				$output .= "<tr><th>Adresse IP</th><th>".$saddr."</th></tr>";
-				$output .= "<tr><td>Type de service</td><td>";
+				$output .= "<tr><th>".$this->loc->s("ip-addr")."</th><th>".$saddr."</th></tr>";
+				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
 				switch($stype) {
 					case 1: $output .= "TFTP"; break;
 					case 2: $output .= "FTP"; break;
@@ -123,11 +125,11 @@
 					case 5: $output .= "SFTP"; break;
 				}
 			}
-			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Utilisateur</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
-			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
-			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>Mot de passe (répétition)</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
-			$output .= FS::$iMgr->addIndexedLine("Chemin sur le serveur","spath",$spath);
-			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
+			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("User")."</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
+			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
+			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("server-path"),"spath",$spath);
+			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
 			$output .= "</table>";
 
 			return $output;
@@ -142,14 +144,14 @@
 			$salias = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>Ajouter une base de données Radius au moteur</h4>";
+				$output = "<h4>".$this->loc->s("title-add-radius")."</h4>";
 			else {
-				$output = "<h4>Edition des informations de la base de données Radius</h4>";
+				$output = "<h4>".$this->loc->s("title-edit-radius")."</h4>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
 				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
 				if(!$addr || $addr == "" || !$port || !FS::$secMgr->isNumeric($port) || !$dbname || $dbname == "") {
-					$output .= FS::$iMgr->printError("Aucune base de données à éditer spécifiée !");
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
 					return $output;
 				}
 				$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
@@ -162,18 +164,18 @@
 					$sdbname = $dbname;
 				}
 				else {
-					$output .= FS::$iMgr->printError("Aucune base de données avec ces informations en base !");
+					$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
 					return $output;
 				}
 			}
 
-			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
+			$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
 
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
-				case 2: $output .= FS::$iMgr->printError("Impossible de se connecter au serveur MySQL spécifié !"); break;
-				case 3: if($create) $output .= FS::$iMgr->printError("Ce serveur MySQL est déjà référencé !"); break;
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !"); break;
+				case 3: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 4 : 5));
@@ -186,20 +188,20 @@
 
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
-				$output .= FS::$iMgr->addIndexedLine("Adresse IP/DNS","saddr",$saddr);
-				$output .= FS::$iMgr->addIndexedLine("Port","sport",$sport);
-				$output .= FS::$iMgr->addIndexedLine("Nom de la base","sdbname",$sdbname);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Port"),"sport",$sport);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("db-name"),"sdbname",$sdbname);
 			}
 			else {
-				$output .= "<tr><th>Adresse IP/DNS</th><th>".$saddr."</th></tr>";
-				$output .= "<tr><td>Port</td><td>".$sport."</td></tr>";
-				$output .= "<tr><td>Nom de la base</td><td>".$sdbname."</td></tr>";
+				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
+				$output .= "<tr><td>".$this->loc->s("Port")."</td><td>".$sport."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
 			}
-			$output .= FS::$iMgr->addIndexedLine("Utilisateur","slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine("Mot de passe","spwd","",true);
-			$output .= FS::$iMgr->addIndexedLine("Répétition du mot de passe","spwd2","",true);
-			$output .= FS::$iMgr->addIndexedLine("Alias","salias",$salias);
-			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"slogin",$slogin);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",true);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",true);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"salias",$salias);
+			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
 			$output .= "</table>";
 
 			return $output;
@@ -216,12 +218,12 @@
 			$chrootnamed = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>Ajouter un serveur au moteur</h4>";
+				$output = "<h4>".$this->loc->s("add-server")."</h4>";
 			else {
-				$output = "<h4>Edition du serveur</h4>";
+				$output = "<h4>".$this->loc->s("edit-server")."</h4>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				if(!$addr || $addr == "") {
-					$output .= FS::$iMgr->printError("Aucun serveur à éditer spécifié !");
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
 				$query = FS::$pgdbMgr->Select("z_eye_server_list","login,dhcp,dns,dhcpdpath,dhcpleasepath,chrootnamed,namedpath","addr = '".$addr."'");
@@ -236,19 +238,19 @@
 					$chrootnamed = $data["chrootnamed"];
 				}
 				else {
-					$output .= FS::$iMgr->printError("Aucun serveur avec cette adresse en base !");
+					$output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !");
 					return $output;
 				}
 			}
 			
-			$output .= "<a href=\"m-".$this->mid.".html\">Retour</a><br />";
+			$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
 			
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError("Certains champs sont invalides ou vides !"); break;
-				case 2: $output .= FS::$iMgr->printError("Impossible de se connecter au serveur spécifié !"); break;
-				case 3: $output .= FS::$iMgr->printError("Login au serveur incorrect !"); break;
-				case 4: if($create) $output .= FS::$iMgr->printError("Ce serveur est déjà référencé !"); break;
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-unable-conn")." !"); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-bad-login")." !"); break;
+				case 4: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 			
 			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
@@ -258,28 +260,29 @@
 	
 			$output .= "<table class=\"standardTable\">";
 			if($create)
-				$output .= FS::$iMgr->addIndexedLine("Adresse IP/DNS","saddr",$saddr);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 			else
-				$output .= "<tr><td>Adresse IP/DNS</td><td>".$saddr."</td></tr>";		
-			$output .= FS::$iMgr->addIndexedLine("Utilisateur SSH","slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine("Mot de passe","spwd","",true);
-			$output .= FS::$iMgr->addIndexedLine("Répétition du mot de passe","spwd2","",true);
+				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";		
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("ssh-user"),"slogin",$slogin);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",true);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",true);
 			$output .= FS::$iMgr->addIndexedCheckLine("DHCP ?","dhcp",$dhcp > 0 ? true : false);
-			$output .= FS::$iMgr->addIndexedLine("Chemin dhcpd.conf","dhcpdpath",$dhcpdpath);
-			$output .= FS::$iMgr->addIndexedLine("Chemin dhcpd.leases","dhcpleasepath",$dhcpleasepath);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath);
 			$output .= FS::$iMgr->addIndexedCheckLine("DNS ?","dns",$dns > 0 ? true : false);
-			$output .= FS::$iMgr->addIndexedLine("Chemin named.conf","namedpath",$namedpath);
-			$output .= FS::$iMgr->addIndexedLine("Chroot Path","chrootnamed",$chrootnamed);
-			$output .= FS::$iMgr->addTableSubmit("Enregistrer","Enregistrer");
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("named-conf-path"),"namedpath",$namedpath);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed);
+			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
 			$output .= "</table>";
 			
 			return $output;
 		}
 		
 		private function showServerList() {
-			$output = "<h4>Liste des serveurs</h4>";
-			$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">Nouveau Serveur</a><br />";
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Login</th><th>DHCP</th><th>DNS</th><th>Supprimer</th></tr>";
+			$output = "<h4>".$this->loc->s("title-server-list")."</h4>";
+			$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-server")."</a><br />";
+			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
+				"</th><th>DHCP</th><th>DNS</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,dhcp,dns");
 			while($data = pg_fetch_array($query)) {
@@ -294,11 +297,12 @@
 			if($found)
 				$output .= $tmpoutput."</table>";
 			else
-				$output .= FS::$iMgr->printError("Aucun serveur trouvé !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-server-found"." !");
 
-			$output .= "<h4>Liste des bases Radius</h4>";
-			$output .= "<a href=\"index.php?mod=".$this->mid."&do=4\">Nouvelle base</a><br />";
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Port</th><th>Hôte</th><th>Login</th><th>Supprimer</th></tr>";
+			$output .= "<h4>".$this->loc->s("title-radius-db")."</h4>";
+			$output .= "<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-base")."</a><br />";
+			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
+				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
 			while($data = pg_fetch_array($query)) {
@@ -312,11 +316,12 @@
 			if($found)
 				$output .= $tmpoutput."</table>";
 			else
-				$output .= FS::$iMgr->printError("Aucune base renseignée !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-db-given")." !");
 				
-			$output .= "<h4>Liste des serveurs de sauvegarde (configurations des équipements réseau)</h4>";
-			$output .= "<a href=\"index.php?mod=".$this->mid."&do=7\">Nouveau serveur</a><br />";
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>Serveur</th><th>Type</th><th>Chemin sur le serveur</th><th>Login</th><th>Supprimer</th></tr>";
+			$output .= "<h4>".$this->loc->s("title-backup-switch")."</h4>";
+			$output .= "<a href=\"index.php?mod=".$this->mid."&do=7\">".$this->loc->s("New-server")."</a><br />";
+			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
+				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
 			while($data = pg_fetch_array($query)) {
@@ -337,7 +342,7 @@
 			if($found)
 				$output .= $tmpoutput."</table>";
 			else
-				$output .= FS::$iMgr->printError("Aucune base renseignée !");
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-db-given")." !");
 			return $output;	
 		}
 		
