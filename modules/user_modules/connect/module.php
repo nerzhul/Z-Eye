@@ -52,75 +52,76 @@
 			$ldapMgr = new LDAP();
 			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
 			while($data = pg_fetch_array($query)) {
-echo "test2".$data["dn"];
 				$tmpldapMgr = new LDAP();
 				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
 				if($tmpldapMgr->Authenticate($username, $password)) {
-                        		$ldapok = true;
+					$ldapok = true;
 					$ldapname = $data["ldapname"];
-	                                $ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
+					$ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
 				}
-	                }
+			}
 
 			$url = FS::$secMgr->checkAndSecurisePostData("rdr");
-                        if($url == NULL || $url == "index.php") $url = "m-0.html";
+			if($url == NULL || $url == "index.php") $url = "m-0.html";
 
 			if($ldapok) {
-	                        $ldapMgr->RootConnect();
-        	                $result = $ldapMgr->GetOneEntry($ldapname."=".$username);
-                	        if(!$result) {
-        	               	    header("Location: index.php?mod=".$this->mid."&err=1");
-	                            return;
-	                        }
+				$ldapMgr->RootConnect();
+				$result = $ldapMgr->GetOneEntry($ldapname."=".$username);
+				if(!$result) {
+					header("Location: index.php?mod=".$this->mid."&err=1");
+					return;
+				}
 
-        	                $mail = is_array($result["supannautremail"]) ? $result["supannautremail"][0] : $result["supannautremail"];
-                	        $prenom = $result["givenname"];
-                        	$nom = $result["sn"];
-	                        $user = new User();
-        	                $user->setUsername($username);
-                	        $user->setSubName($prenom);
-                        	$user->setName($nom);
+				$mail = is_array($result["supannautremail"]) ? $result["supannautremail"][0] : $result["supannautremail"];
+				$prenom = $result["givenname"];
+				$nom = $result["sn"];
+				$user = new User();
+				$user->setUsername($username);
+				$user->setSubName($prenom);
+				$user->setName($nom);
 				$user->setUserLevel(4);
-	                        $user->setMail($mail);
+				$user->setMail($mail);
 
 				$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 				if($data = pg_fetch_array($query))
 				{
-					$_SESSION["uid"] = $data["uid"];
-                                        $_SESSION["ulevel"] = $data["ulevel"];
-                                        FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
+					$this->connectUser($data["uid"],$data["ulevel"]);
 					header("Location: ".$url);
 					return;
 				}
 				else {
-	        	                $user->Create();
+					$user->Create();
 					$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-	                                if($data = pg_fetch_array($query))
-                                	{
-                        	                $_SESSION["uid"] = $data["uid"];
-                	                        $_SESSION["ulevel"] = $data["ulevel"];
-        	                                FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
-	                                        header("Location: ".$url);
-                                        	return;
-                                	}
+					if($data = pg_fetch_array($query))
+					{
+							$this->connectUser($data["uid"],$data["ulevel"]);
+							header("Location: ".$url);
+							return;
+					}
 				}
 			} else {
 				$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 				if($data = pg_fetch_array($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if($data["sha_pwd"] != $encryptPwd) {
-						$link = new HTTPLink(15);
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
-					$_SESSION["uid"] = $data["uid"];
-					$_SESSION["ulevel"] = $data["ulevel"];
-					FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$data["uid"]."'");
+					$this->connectUser($data["uid"],$data["ulevel"]);
 					header("Location: ".$url);
 					return;
 				}
 			}
 			header("Location: index.php?mod=".$this->mid."&err=1");
+		}
+		
+		private function connectUser($uid,$ulevel) {
+			$langs = preg_split("#[;]#",$_SERVER["HTTP_ACCEPT_LANGUAGE"]);
+			if(count($langs) > 0)
+				$_SESSION["lang"] = $langs[0];
+			$_SESSION["uid"] = $uid;
+			$_SESSION["ulevel"] = $ulevel;
+			FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
 		}
 
 		public function handlePostDatas($act) {
