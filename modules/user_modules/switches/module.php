@@ -106,7 +106,7 @@
 						else if($data["up_admin"] == "up" && $data["up"] == "down")
 								$output .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
 						else if($data["up"] == "up")
-								$output .= "<span style=\"color: black;\">".$this->loc->("Active")."</span>";
+								$output .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
 						else
 								$output .= "unk";
 						$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
@@ -336,7 +336,7 @@
 						$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Model")." / ".$this->loc->s("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s(("OS")." / ".$this->loc->s("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>";
+						$output .= "<tr><td>".$this->loc->s("OS")." / ".$this->loc->s("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".$data["description"]."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Uptime")."</td><td>".$data["uptime"]."</td></tr>";
 						$found = 0;
@@ -751,7 +751,7 @@
 									}
 									else if(data == 4) {
 										$.post('index.php?at=3&mod=".$this->mid."&act=14&d=".$device."&saveid='+copyId, function(data) {
-											$('#subpop').html('".$this->loc->s($this->loc->s("Fail")." !<br />Cause: '+data); 
+											$('#subpop').html('".$this->loc->s("Fail")." !<br />Cause: '+data); 
 										});
 										setTimeout(function() { $('#pop').hide(); },5000);
 									}
@@ -992,8 +992,9 @@
 					}
 					else
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-device"));
+				}
 				else {
-					$output .= FS::$iMgr->($this->loc->s("err-no-tab"));
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
 				}
 			}
 			return $output;
