@@ -157,7 +157,7 @@
                 $output .= "</td></tr>";
                 $output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"))."</table></form>";
 			}
-			else
+			else if($sh > 2)
 				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));
 
 			return $output;

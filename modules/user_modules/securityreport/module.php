@@ -24,8 +24,18 @@
 	class iSecReport extends genModule{
 		function iSecReport() { parent::genModule(); $this->loc = new lSecReport(); }
 		public function Load() {
+			// Load snort keys for db config
+			$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
+			if($dbname == "") $dbname = "snort";
+			$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
+			if($dbhost == "") $dbhost = "localhost";
+			$dbuser = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
+			if($dbuser == "") $dbuser = "snort";
+			$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
+			if($dbpwd == "") $dbpwd = "snort";
+			
 			$this->snortDB = new FSPostgreSQLMgr();
-			$this->snortDB->setConfig("snort",5432,"localhost","snort","snort");
+			$this->snortDB->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
 			$this->snortDB->Connect();
 			$output = "";
 			if(!FS::isAjaxCall())
@@ -64,7 +74,7 @@
 			
 			if(!FS::isAjaxCall()) {
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("General"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"),$showmodule);
