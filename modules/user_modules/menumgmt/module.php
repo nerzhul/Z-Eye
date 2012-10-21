@@ -24,7 +24,7 @@
 	require_once(dirname(__FILE__)."/../../../lib/FSS/MenuElement.FS.class.php");
 	
 	class iMenuMgmt extends genModule{
-		function iMenuMgmt() { parent::genModule(); $this->loc = new lLogs(); }
+		function iMenuMgmt() { parent::genModule(); $this->loc = new lMenuMgmt(); }
 		public function Load() {
 			$output = "";
 			if($do = FS::$secMgr->checkGetData("do")) {

@@ -392,7 +392,7 @@
 				$lst = preg_split("#\.#",$data["time_last"]);
 				$tmpoutput .= ($data["domain"] != "" ? "\\\\<a href=\"index.php?mod=".$this->mid."&nb=".$data["domain"]."\">".$data["domain"]."</a>" : "").
 				"\\<a href=\"index.php?mod=".$this->mid."&node=".$data["nbname"]."\">".$data["nbname"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".
-				$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the"). ".$lst[0].")."<br />";
+				$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")<br />";
 			}
 		
 			if($found) $tmpoutput .= "</div>";
