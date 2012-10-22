@@ -1068,7 +1068,7 @@
 					if($foundsw == 0) $foundsw = 1;
 					$outputswitch .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
 					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
-					<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\"></div><script type=\"text/javascript\">
+					<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div><script type=\"text/javascript\">
 					$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
 							$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
 				}
