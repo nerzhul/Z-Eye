@@ -365,7 +365,7 @@
 					while($data2 = mysql_fetch_array($query)) {
 						if(!$found) {
 							$found = 1;
-							$output .= "<br />Groupes:<ul>";
+							$output .= "<br /><br />".$this->loc->s("Groups").":<ul>";
 						}
 						$output .= "<li>".$data2["groupname"]."</li>";
 					}
