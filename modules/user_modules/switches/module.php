@@ -1053,7 +1053,7 @@
 			$foundwif = 0;
 			$outputswitch = "<h4>Switches et routeurs</h4>";
 			$outputswitch .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
-				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr>";
+				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr>";
 
 			$outputwifi = "<h4>".$this->loc->s("title-WiFi-AP")."</h4>";
 			$outputwifi .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
@@ -1067,7 +1067,7 @@
 				else {
 					if($foundsw == 0) $foundsw = 1;
 					$outputswitch .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
-					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
+					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td><div id=\"st".$data["ip"]."\"></div></td></tr>";
 				}
 			}
 			if($foundsw != 0) {
@@ -1580,13 +1580,31 @@
 					FS::$pgdbMgr->Delete("device","ip = '".$dip."'");
 					header("Location: index.php?mod=".$this->mid);
 				case 18:
-					$dip = FS::$secMgr->checkAndSecurisePostData("dip");
-					if(!$dip || !FS::$secMgr->isIP($dip)) {
+					$dip = FS::$secMgr->getPost("dip","i4");
+					if(!$dip) {
 						header("Location: index.php?mod=".$this->mid."&err=1");
 							return;
 					}
 					exec("netdisco -d ".$dip);
 					header("Location: index.php?mod=".$this->mid);
+					return;
+				case 19:
+					$dip = FS::$secMgr->getPost("dip","i4");
+					if(!$dip) {
+						echo "<span style=\"color:red\">IP Error ".$dip."</span>";
+						return;
+					}
+					
+					$out = "";
+					exec("ping -W 1 -c 1 ".$dip." | grep ttl | wc -l|awk '{print $1}'",$out);
+					if(is_array($out))
+						echo "<span style=\"color:red;\">".$this->loc->s("err-output")." ".var_dump($out)."</span>";
+					else if($out > 1)
+						echo "<span style=\"color:red;\">".$this->loc->s("err-output-value")." ".$out."</span>";
+					else if($out == 0)
+						echo "<span style=\"color:red;\">".$this->loc->s("Offline")."</span>";
+					else if($out == 1)
+						echo "<span style=\"color:green;\">".$this->loc->s("Online")."</span>";
 					return;
 				default: break;
 			}

@@ -254,15 +254,25 @@
 					else if($data >= 0)
 						return NULL;
 				}
+				return $data;
 			}
 			// String a-Z
-			else if(preg_match("#[s]#",$pattern) && !$this->isAlphabetic($data))
-				return NULL;
+			else if(preg_match("#[s]#",$pattern) && $this->isAlphabetic($data))
+				return $data;
 			// String a-Z + numerics
 			else if(preg_match("#[w]#",$pattern) && !$this->isAlphaNumeric($data))
-				return NULL;
-			
-			return $data;
+				return $data;
+			else if(preg_match("#[i]#",$pattern)) {
+				if(preg_match("#[4]#",$pattern)) {
+					if(preg_match("#[c]#",$pattern) && $this->isIPorCIDR($data))
+						return $data
+					if($this->isIP($data))
+						return $data;
+				}
+				else if(preg_match("#[6]#",$pattern) && $this->isIPv6($data))
+					return $data;
+			}
+			return NULL;
 		}
 
 		public function SecuriseStringForDB(&$str) {
