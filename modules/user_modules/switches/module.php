@@ -1067,7 +1067,10 @@
 				else {
 					if($foundsw == 0) $foundsw = 1;
 					$outputswitch .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
-					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td><div id=\"st".$data["ip"]."\"></div></td></tr>";
+					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
+					<div id=\"st".$data["ip"]."\"></div><script type=\"text/javascript\">
+					$('#st".$data["ip"]."').post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
+							$('#st".$data["ip"]."').html(data); });</script></td></tr>";
 				}
 			}
 			if($foundsw != 0) {

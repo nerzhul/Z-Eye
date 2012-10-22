@@ -265,7 +265,7 @@
 			else if(preg_match("#[i]#",$pattern)) {
 				if(preg_match("#[4]#",$pattern)) {
 					if(preg_match("#[c]#",$pattern) && $this->isIPorCIDR($data))
-						return $data
+						return $data;
 					if($this->isIP($data))
 						return $data;
 				}
