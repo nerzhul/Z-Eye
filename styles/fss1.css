@@ -637,3 +637,11 @@ label {
 	color: #DDD;
 }
 
+.statusWARNING {
+	color: orange;
+}
+
+.statusCRITICAL {
+	color: red;
+}
+
