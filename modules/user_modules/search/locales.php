@@ -23,7 +23,7 @@
 		function lSearch() {
 			$this->locales = array(
 				"fr" => array(
-					"Accouting" => "Accouting",
+					"Accounting" => "Accounting",
 					"Alias" => "Alias",
 					"and-the" => "et le",
 					"attribution-type" => "Type d'attribution",
@@ -77,7 +77,7 @@
 					"Validity" => "Validité",
 				),
 				"en" => array(
-					"Accouting" => "Accouting",
+					"Accounting" => "Accounting",
 					"Alias" => "Alias",
 					"and-the" => "and",
 					"attribution-type" => "Attribution type",

@@ -133,32 +133,32 @@
 			}
 
 			// Prise number
-                        $query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
-                        $devprise = array();
-                        while($data = pg_fetch_array($query)) {
-                                if($found == 0) {
-                                        $found = 1;
-                                        $tmpoutput .= "<div><h4>".$this->loc->s("Ref-plug")."</h4>";
-                                }
-                                $swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-                                if(!isset($devprise[$swname]))
-                                        $devprise[$swname] = array();
+			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
+			$devprise = array();
+			while($data = pg_fetch_array($query)) {
+					if($found == 0) {
+							$found = 1;
+							$tmpoutput .= "<div><h4>".$this->loc->s("Ref-plug")."</h4>";
+					}
+					$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+					if(!isset($devprise[$swname]))
+							$devprise[$swname] = array();
 
-                                $devprise[$swname][$data["port"]] = $data["prise"];
+					$devprise[$swname][$data["port"]] = $data["prise"];
 				$nbresults++;
-                        }
-                        if($found) {
-                                foreach($devprise as $device => $devport) {
-                                        $tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
-                                        foreach($devport as $port => $prise) {
-                                                $convport = preg_replace("#\/#","-",$port);
-                                                $tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-                                                $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (".$this->loc->s("Plug")." ".$prise.")</li>";
-                                        }
-                                        $tmpoutput .= "</ul>";
-                                }
-                                $tmpoutput .= "</div>";
-                        }
+			}
+			if($found) {
+					foreach($devprise as $device => $devport) {
+							$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+							foreach($devport as $port => $prise) {
+									$convport = preg_replace("#\/#","-",$port);
+									$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
+									$tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (".$this->loc->s("Plug")." ".$prise.")</li>";
+							}
+							$tmpoutput .= "</ul>";
+					}
+					$tmpoutput .= "</div>";
+			}
 			$found = 0;
 			
 			// DNS infos
@@ -211,6 +211,8 @@
 			
 			if($found) $tmpoutput .= "</table></div>";
 			$found = 0;
+			
+			$tmpoutput .= $this->showRadiusInfos($search);
 
 			if(strlen($tmpoutput) > 0)
 				$output .= "<h4>".$this->loc->s("title-res-nb").": ".$nbresults."</h4>".$tmpoutput;
@@ -325,6 +327,130 @@
 			return $output;
 		}
 		
+		private function showRadiusInfos($search) {
+			$output = "";
+			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
+			while($data = pg_fetch_array($query)) {
+				$radSQLMgr = new FSMySQLMgr();
+				$radSQLMgr->setConfig($data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
+				$radSQLMgr->Connect();
+				
+				if(FS::$secMgr->isMacAddr($search)) {
+					$tmpsearch = $search[0].$search[1].$search[3].$search[4].".".$search[6].$search[7].$search[9].$search[10].".".$search[12].$search[13].$search[15].$search[16];
+				
+					$query2 = $radSQLMgr->Select("radacct","username,calledstationid,acctstarttime,acctstoptime","callingstationid = '".$tmpsearch."'");
+					if($data2 = mysql_fetch_array($query2)) {
+						if($found == 0) {
+							$found = 1;
+							$tmpoutput .= "<div><h4>".$this->loc->s("title-8021x-users")."</h4>";
+						}
+						$fst = preg_split("#\.#",$data2["acctstarttime"]);
+						$lst = preg_split("#\.#",$data2["acctstoptime"]);
+						$output .= $this->loc->s("User").": ".$data2["username"]." / ".$this->loc->s("Device").": <a href=\"index.php?mod=".
+						$this->mid."&s=".$data2["calledstationid"]."\">".$data2["calledstationid"]."</a>";
+						$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")<br />";
+					}
+					
+					if($found) $output .= "</div>";
+					$found = 0;
+					$totinbw = 0;
+					$totoutbw = 0;
+					$query2 = $radSQLMgr->Select("radacct","calledstationid, SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$tmpsearch."' GROUP BY calledstationid");
+					if($data2 = mysql_fetch_array($query2)) {
+						if($found == 0) {
+							$found = 1;
+							$output .= "<div><h4>".$this->loc->s("title-8021x-bw")."</h4>";
+						}
+						if($data2["input"] > 1024*1024*1024)
+							$inputbw = round($data2["input"]/1024/1024/1024,2)."Go";
+						else if($data2["input"] > 1024*1024)
+							$inputbw = round($data2["input"]/1024/1024,2)."Mo";
+						else if($data2["input"] > 1024)
+							$inputbw = round($data2["input"]/1024,2)."Ko";
+						else
+							$inputbw = $data2["input"]." ".$this->loc->s("Bytes");
+							
+						if($data2["output"] > 1024*1024*1024)
+							$outputbw = round($data2["output"]/1024/1024/1024,2)."Go";
+						else if($data2["output"] > 1024*1024)
+							$outputbw = round($data2["output"]/1024/1024,2)."Mo";
+						else if($data2["output"] > 1024)
+							$outputbw = round($data2["output"]/1024,2)."Ko";
+						else
+							$outputbw = $data2["output"]." ".$this->loc->s("Bytes");
+						$fst = preg_split("#\.#",$data2["fst"]);
+						$lst = preg_split("#\.#",$data2["lst"]);
+						$output .= $this->loc->s("Device").": ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".
+						(strlen($lst[0]) > 0 ? $this->loc->s("Between") : $this->loc->s("Since"))." ".$fst[0].(strlen($lst[0]) > 0 ? " ".$this->loc->s("and-the")." ".$lst[0] : "").")<br /><hr>";
+						$totinbw += $data2["input"];
+						$totoutbw += $data2["output"];
+					}
+					if($found) {
+						if(totinbw > 1024*1024*1024)
+							$inputbw = round(totinbw/1024/1024/1024,2)."Go";
+						else if($totinbw > 1024*1024)
+							$inputbw = round($data2["input"]/1024/1024,2)."Mo";
+						else if(totinbw > 1024)
+							$inputbw = round($totinbw/1024,2)."Ko";
+						else
+							$inputbw = $totinbw." ".$this->loc->s("Bytes");
+							
+						if($totoutbw > 1024*1024*1024)
+							$outputbw = round($totoutbw/1024/1024/1024,2)."Go";
+						else if($totoutbw > 1024*1024)
+							$outputbw = round($data2["output"]/1024/1024,2)."Mo";
+						else if($totoutbw > 1024)
+							$outputbw = round($totoutbw/1024,2)."Ko";
+						else
+							$outputbw = $totoutbw." ".$this->loc->s("Bytes");
+						$output .= "<b>".$this->loc->s("Total")."</b> Download: ".$inputbw." / Upload: ".$outputbw."</div>";
+					}
+				}
+				$found = 0;
+				if(FS::$secMgr->isMacAddr($search))
+					$tmpsearch = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
+				else
+					$tmpsearch = $search;
+                $query2 = $radSQLMgr->Select("radacct","calledstationid,acctterminatecause,acctstarttime,acctterminatecause,acctstoptime,acctinputoctets,acctoutputoctets","username = '".$tmpsearch."'",2,10);
+				while($data2 = mysql_fetch_array($query2)) {
+					if($found == 0) {
+						$found = 1;
+						$output .= "<div><h4>".$this->loc->s("Accounting")."</h4>
+						<table><tr><th>".$this->loc->s("Device")."</th><th>".$this->loc->s("start-session")."</th><th>".$this->loc->s("end-session")."</th><th>".$this->loc->s("Upload")."</th>
+						<th>".$this->loc->s("Download")."</th><th>".$this->loc->s("end-session-cause")."</th></tr>";
+					}
+					if($data2["acctinputoctets"] > 1024*1024*1024)
+							$inputbw = round($data2["acctinputoctets"]/1024/1024/1024,2)." Go";
+					else if($data2["acctinputoctets"] > 1024*1024)
+							$inputbw = round($data2["acctinputoctets"]/1024/1024,2)." Mo";
+					else if($data2["acctinputoctets"] > 1024)
+							$inputbw = round($data2["acctinputoctets"]/1024,2)." Ko";
+					else
+							$inputbw = $data2["acctinputoctets"]." ".$this->loc->s("Bytes");
+
+					if($data2["acctoutputoctets"] > 1024*1024*1024)
+							$outputbw = round($data2["acctoutputoctets"]/1024/1024/1024,2)." Go";
+					else if($data2["acctoutputoctets"] > 1024*1024)
+							$outputbw = round($data2["acctoutputoctets"]/1024/1024,2)." Mo";
+					else if($data2["acctoutputoctets"] > 1024)
+							$outputbw = round($data2["acctoutputoctets"]/1024,2)." Ko";
+					else
+							$outputbw = $data2["acctoutputoctets"]." ".$this->loc->s("Bytes");
+					$devportmac = preg_replace("[-]",":",$data2["calledstationid"]);
+					$macdevip = FS::$pgdbMgr->GetOneData("device_port","ip","mac = '".strtolower($devportmac)."'");
+					$macdev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$macdevip."'");
+					$output .= "<tr><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev."\">".$macdev."</a></td>";
+					$output .= "<td>".date("d-m-y H:i:s",strtotime($data2["acctstarttime"]))."</td><td>";
+					$output .= ($data2["acctstoptime"] != NULL ? date("d-m-y H:i:s",strtotime($data2["acctstoptime"])) : "");
+					$output .= "</td><td>".$inputbw."</td><td>".$outputbw."</td>";
+					$output .= "<td>".$data2["acctterminatecause"]."</td></tr>";
+					
+				}
+				if($found) $output .= "</table></div>";
+			}
+			return $output;
+		}
+		
 		private function showMacAddrResults($search) {
 			$output = "";
 			$tmpoutput = "";
@@ -397,7 +523,7 @@
 		
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
-			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
+			/*$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
 			while($data = pg_fetch_array($query)) {
 				$radSQLMgr = new FSMySQLMgr();
 				$radSQLMgr->setConfig($data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
@@ -477,39 +603,41 @@
 				while($data2 = mysql_fetch_array($query2)) {
 					if($found == 0) {
 						$found = 1;
-						$tmpoutput .= "<div><h4>".$this->loc->s("Accouting")."</h4>
+						$tmpoutput .= "<div><h4>".$this->loc->s("Accounting")."</h4>
 						<table><tr><th>".$this->loc->s("Device")."</th><th>".$this->loc->s("start-session")."</th><th>".$this->loc->s("end-session")."</th><th>".$this->loc->s("Upload")."</th>
 						<th>".$this->loc->s("Download")."</th><th>".$this->loc->s("end-session-cause")."</th></tr>";
 					}
 					if($data2["acctinputoctets"] > 1024*1024*1024)
-                                                $inputbw = round($data2["acctinputoctets"]/1024/1024/1024,2)." Go";
-                                        else if($data2["acctinputoctets"] > 1024*1024)
-                                                $inputbw = round($data2["acctinputoctets"]/1024/1024,2)." Mo";
-                                        else if($data2["acctinputoctets"] > 1024)
-                                                $inputbw = round($data2["acctinputoctets"]/1024,2)." Ko";
-                                        else
-                                                $inputbw = $data2["acctinputoctets"]." ".$this->loc->s("Bytes");
+							$inputbw = round($data2["acctinputoctets"]/1024/1024/1024,2)." Go";
+					else if($data2["acctinputoctets"] > 1024*1024)
+							$inputbw = round($data2["acctinputoctets"]/1024/1024,2)." Mo";
+					else if($data2["acctinputoctets"] > 1024)
+							$inputbw = round($data2["acctinputoctets"]/1024,2)." Ko";
+					else
+							$inputbw = $data2["acctinputoctets"]." ".$this->loc->s("Bytes");
 
 					if($data2["acctoutputoctets"] > 1024*1024*1024)
-                                                $outputbw = round($data2["acctoutputoctets"]/1024/1024/1024,2)." Go";
-                                        else if($data2["acctoutputoctets"] > 1024*1024)
-                                                $outputbw = round($data2["acctoutputoctets"]/1024/1024,2)." Mo";
-                                        else if($data2["acctoutputoctets"] > 1024)
-                                                $outputbw = round($data2["acctoutputoctets"]/1024,2)." Ko";
-                                        else
-                                                $outputbw = $data2["acctoutputoctets"]." ".$this->loc->s("Bytes");
+							$outputbw = round($data2["acctoutputoctets"]/1024/1024/1024,2)." Go";
+					else if($data2["acctoutputoctets"] > 1024*1024)
+							$outputbw = round($data2["acctoutputoctets"]/1024/1024,2)." Mo";
+					else if($data2["acctoutputoctets"] > 1024)
+							$outputbw = round($data2["acctoutputoctets"]/1024,2)." Ko";
+					else
+							$outputbw = $data2["acctoutputoctets"]." ".$this->loc->s("Bytes");
 					$devportmac = preg_replace("[-]",":",$data2["calledstationid"]);
 					$macdevip = FS::$pgdbMgr->GetOneData("device_port","ip","mac = '".strtolower($devportmac)."'");
 					$macdev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$macdevip."'");
 					$tmpoutput .= "<tr><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev."\">".$macdev."</a></td>";
-                                        $tmpoutput .= "<td>".date("d-m-y H:i:s",strtotime($data2["acctstarttime"]))."</td><td>";
-                                        $tmpoutput .= ($data2["acctstoptime"] != NULL ? date("d-m-y H:i:s",strtotime($data2["acctstoptime"])) : "");
+					$tmpoutput .= "<td>".date("d-m-y H:i:s",strtotime($data2["acctstarttime"]))."</td><td>";
+					$tmpoutput .= ($data2["acctstoptime"] != NULL ? date("d-m-y H:i:s",strtotime($data2["acctstoptime"])) : "");
 					$tmpoutput .= "</td><td>".$inputbw."</td><td>".$outputbw."</td>";
 					$tmpoutput .= "<td>".$data2["acctterminatecause"]."</td></tr>";
 					
 				}
 				if($found) $tmpoutput .= "</table></div>";
-			}
+			}*/
+			
+			$tmpoutput .= $this->showRadiusInfos($search);
 			
 			// Devices
 			$query = FS::$pgdbMgr->Select("device","ip,name,description,model","mac = '".$search."'");
