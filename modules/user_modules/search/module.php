@@ -411,7 +411,7 @@
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
 				else
 					$tmpsearch = $search;
-                $query2 = $radSQLMgr->Select("radacct","calledstationid,acctterminatecause,acctstarttime,acctterminatecause,acctstoptime,acctinputoctets,acctoutputoctets","username = '".$tmpsearch."'",2,10);
+                $query2 = $radSQLMgr->Select("radacct","calledstationid,acctterminatecause,acctstarttime,acctterminatecause,acctstoptime,acctinputoctets,acctoutputoctets","username = '".$tmpsearch."'","acctstarttime",1,10);
 				while($data2 = mysql_fetch_array($query2)) {
 					if($found == 0) {
 						$found = 1;
@@ -444,13 +444,13 @@
 							$macdevip = FS::$pgdbMgr->GetOneData("device_port","ip","mac = '".strtolower($devportmac)."'");
 							$macdev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$macdevip."'");
 						}
-						else if(preg_match("#^([0-9A-F]{4}[.]){2}[0-9A-F]{4}$i#",$devportmac)) {
-							$tmpmac = $devportmac[0].$devportmac[1].":".$devportmac[2].$devportmac[3].":".$devportmac[5].$devportmac[6].":".$devportmac[7].$devportmac[8].":".$devportmac[10].$devportmac[11].":"$devportmac[12].$devportmac[13];
+						else if(preg_match('#^([0-9A-Fa-f]{4}[.]){2}[0-9A-Fa-f]{4}$#',$devportmac)) {
+							$tmpmac = $devportmac[0].$devportmac[1].":".$devportmac[2].$devportmac[3].":".$devportmac[5].$devportmac[6].":".$devportmac[7].$devportmac[8].":".$devportmac[10].$devportmac[11].":".$devportmac[12].$devportmac[13];
 							$macdevip = FS::$pgdbMgr->GetOneData("device_port","ip","mac = '".strtolower($tmpmac)."'");
 							$macdev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$macdevip."'");
 						}
 					}
-					$output .= "<tr><td>".(strlen($macdev) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev."\">".$macdev."</a>" : "")."</td>";
+					$output .= "<tr><td>".(strlen($macdev) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev."\">".$macdev."</a>" : $this->loc->s("Unknown"))."</td>";
 					$output .= "<td>".date("d-m-y H:i:s",strtotime($data2["acctstarttime"]))."</td><td>";
 					$output .= ($data2["acctstoptime"] != NULL ? date("d-m-y H:i:s",strtotime($data2["acctstoptime"])) : "");
 					$output .= "</td><td>".$inputbw."</td><td>".$outputbw."</td>";
@@ -550,7 +550,7 @@
 			if(strlen($tmpoutput) > 0)
 				$output .= $tmpoutput;
 			else
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-data"));
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 			return $output;
 		}
 	};
