@@ -335,14 +335,48 @@
 				$radSQLMgr->setConfig($data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
 				$radSQLMgr->Connect();
 				
+				$found = 0;
+				
+				$query = $radSQLMgr->Select("radcheck","username","username = '".$search."'","",0,1);
+				while($data = mysql_fetch_array($query)) {
+					if(!$found) {
+						$found = 1;
+						$output .= "<h4>".$this->loc->s("Radius-user")."</h4>Nom d'utilisateur: ".$data["username"];
+					}
+				}
+				
+				if(!$found) {
+					$query = $radSQLMgr->Select("radreply","username","username = '".$search."'","",0,1);
+					while($data = mysql_fetch_array($query)) {
+						if(!$found) {
+							$found = 1;
+							$output .= "<h4>".$this->loc->s("Radius-user")."</h4>Nom d'utilisateur: ".$data["username"]".<br />Groupes:<ul>";
+						}
+					}
+				}
+				
+				if($found) {
+					$found = 0;
+					$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$search."'");
+					while($data = mysql_fetch_array($query)) {
+						if(!$found) {
+							$found = 1;
+							$output .= "<br />Groupes:<ul>";
+						}
+						$output .= "<li>".$data["groupname"]."</li>";
+					}
+					if($found) $output .= "</ul>";
+				}
+					
+				
 				if(FS::$secMgr->isMacAddr($search)) {
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].".".$search[6].$search[7].$search[9].$search[10].".".$search[12].$search[13].$search[15].$search[16];
-				
+					$found = 0;
 					$query2 = $radSQLMgr->Select("radacct","username,calledstationid,acctstarttime,acctstoptime","callingstationid = '".$tmpsearch."'");
 					if($data2 = mysql_fetch_array($query2)) {
 						if($found == 0) {
 							$found = 1;
-							$tmpoutput .= "<div><h4>".$this->loc->s("title-8021x-users")."</h4>";
+							$output .= "<div><h4>".$this->loc->s("title-8021x-users")."</h4>";
 						}
 						$fst = preg_split("#\.#",$data2["acctstarttime"]);
 						$lst = preg_split("#\.#",$data2["acctstoptime"]);
@@ -457,7 +491,10 @@
 					$output .= "<td>".$data2["acctterminatecause"]."</td></tr>";
 					
 				}
-				if($found) $output .= "</table></div>";
+				if($found) { 
+					$output .= "</table></div>";
+					$output = "<h3>".$this->loc->s("Radius-Server")." ".$data["dbname"]."@".$data["addr"].":".$data["port"]."</h3>".$output;
+				}
 			}
 			return $output;
 		}

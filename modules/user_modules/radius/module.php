@@ -48,14 +48,14 @@
 				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
 					$output .= "<h4>".$this->loc->s("title-deleg")."</h4>";
 					$tmpoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
-                                        $query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
-                                        while($data = pg_fetch_array($query)) {
-                                                if($found == 0) $found = 1;
-                                                $radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
-                                                $tmpoutput .= FS::$iMgr->addElementToList($data["radalias"],$radpath,$rad == $radpath);
-                                        }
-                                        if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Manage"))."</form>";
-                                        else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
+					$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
+					while($data = pg_fetch_array($query)) {
+							if($found == 0) $found = 1;
+							$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
+							$tmpoutput .= FS::$iMgr->addElementToList($data["radalias"],$radpath,$rad == $radpath);
+					}
+					if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Manage"))."</form>";
+					else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
 				}
 				else {
 					$output .= "<h4>".$this->loc->s("title-usermgmt")."</h4>";
@@ -83,9 +83,6 @@
 						$output .= $this->showRadiusDatas($raddb,$radhost,$radport);
 				}
 			}
-			else if($sh == 2) {
-
-			}
 			else
 				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-tab"));
 
@@ -105,10 +102,10 @@
 			}
 			else if(!$sh || $sh == 1) {
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
-                                $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
-                                $radSQLMgr = new FSMySQLMgr();
-                                $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-                                $radSQLMgr->Connect();
+				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+				$radSQLMgr = new FSMySQLMgr();
+				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+				$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10","adduser");
@@ -279,18 +276,18 @@
 					drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry='+e.dataTransfer.getData('text/html')); }
 				});
 				</script>";
-                                $query = $radSQLMgr->Select("radcheck","id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')");
+                $query = $radSQLMgr->Select("radcheck","id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')");
 				$expirationbuffer = array();
 				while($data = mysql_fetch_array($query)) {
 					if(!$found) {
-                                                $found = 1;
-                                                $tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><tr><th>Id</th><th>Utilisateur</th><th>Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr>";
+						$found = 1;
+						$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><tr><th>Id</th><th>Utilisateur</th><th>Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr>";
 						$query2 = $radSQLMgr->Select("z_eye_radusers","username,expiration","expiration > 0");
 						while($data2 = mysql_fetch_array($query2)) {
 							if(!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
 						}
-                                        }
-                                        $tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"]."\">".$data["username"]."</a></td><td>".$data["value"]."</td><td>";
+					}
+					$tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"]."\">".$data["username"]."</a></td><td>".$data["value"]."</td><td>";
 					$query2 = $radSQLMgr->Select("radusergroup","groupname","username = '".$data["username"]."'");
 					$found2 = 0;
 					while($data2 = mysql_fetch_array($query2)) {
@@ -298,7 +295,7 @@
 						else $tmpoutput .= "<br />";
 						$tmpoutput .= $data2["groupname"];
 					}
-                                        $tmpoutput .= "</td><td>";
+                    $tmpoutput .= "</td><td>";
 
 					$tmpoutput .= (isset($expirationbuffer[$data["username"]]) ? $expirationbuffer[$data["username"]] : "Jamais");
 					$tmpoutput .= "</td></tr>";
