@@ -338,19 +338,19 @@
 				$found = 0;
 				
 				$query = $radSQLMgr->Select("radcheck","username","username = '".$search."'","",0,1);
-				while($data = mysql_fetch_array($query)) {
+				while($data2 = mysql_fetch_array($query)) {
 					if(!$found) {
 						$found = 1;
-						$output .= "<h4>".$this->loc->s("Radius-user")."</h4>Nom d'utilisateur: ".$data["username"];
+						$output .= $this->loc->s("Username").": ".$data2["username"];
 					}
 				}
 				
 				if(!$found) {
 					$query = $radSQLMgr->Select("radreply","username","username = '".$search."'","",0,1);
-					while($data = mysql_fetch_array($query)) {
+					while($data2 = mysql_fetch_array($query)) {
 						if(!$found) {
 							$found = 1;
-							$output .= "<h4>".$this->loc->s("Radius-user")."</h4>Nom d'utilisateur: ".$data["username"]".<br />Groupes:<ul>";
+							$output .= $this->loc->s("Username").": ".$data2["username"];
 						}
 					}
 				}
@@ -358,12 +358,12 @@
 				if($found) {
 					$found = 0;
 					$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$search."'");
-					while($data = mysql_fetch_array($query)) {
+					while($data2 = mysql_fetch_array($query)) {
 						if(!$found) {
 							$found = 1;
 							$output .= "<br />Groupes:<ul>";
 						}
-						$output .= "<li>".$data["groupname"]."</li>";
+						$output .= "<li>".$data2["groupname"]."</li>";
 					}
 					if($found) $output .= "</ul>";
 				}

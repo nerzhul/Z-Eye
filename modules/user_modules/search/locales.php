@@ -39,6 +39,7 @@
 					"err-no-res" => "Aucun résultat trouvé",
 					"err-no-search" => "Pas de données à rechercher",
 					"First-view" => "Première vue",
+					"Groups" => "Groupes",
 					"Informations" => "Informations",
 					"ipv4-addr" => "Adresse IPv4",
 					"ipv6-addr" => "Adresse IPv6",
@@ -54,6 +55,7 @@
 					"Other" => "Autre",
 					"Plug" => "Prise",
 					"Radius-Server" => "Serveur radius",
+					"Radius-user" => "Utilisateur radius",
 					"Ref-plug" => "Prise(s) référencée(s)",
 					"Search" => "Recherche",
 					"Since" => "A partir du",
@@ -76,6 +78,7 @@
 					"Unknown" => "Inconnu",
 					"Upload" => "Upload",
 					"User" => "Utilisateur",
+					"Username" => "Nom d'utilisateur",
 					"Validity" => "Validité",
 				),
 				"en" => array(
@@ -95,6 +98,7 @@
 					"err-no-res" => "No result found",
 					"err-no-search" => "No data to find",
 					"First-view" => "First seend",
+					"Groups" => "Groups",
 					"Informations" => "Informations",
 					"ipv4-addr" => "IPv4 address",
 					"ipv6-addr" => "IPv6 address",
@@ -110,6 +114,7 @@
 					"Other" => "Other",
 					"Plug" => "Plug",
 					"Radius-Server" => "Radius server",
+					"Radius-user" => "Radius user",
 					"Ref-plug" => "Referenced plug(s)",
 					"Search" => "Search",
 					"Since" => "Since",
@@ -132,6 +137,7 @@
 					"Unknown" => "Unknown",
 					"Upload" => "Upload",
 					"User" => "User",
+					"Username" => "Username",
 					"Validity" => "Validity",
 				)
 			);
