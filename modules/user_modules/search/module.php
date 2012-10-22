@@ -336,28 +336,32 @@
 				$radSQLMgr->Connect();
 				
 				$found = 0;
-				
-				$query = $radSQLMgr->Select("radcheck","username","username = '".$search."'","",0,1);
+				// Format MAC addr for radius users
+				if(FS::$secMgr->isMacAddr($search))
+					$tmpsearch = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
+				else
+					$tmpsearch = $search;
+				$query = $radSQLMgr->Select("radcheck","username","username = '".$tmpsearch."'","",0,1);
 				while($data2 = mysql_fetch_array($query)) {
 					if(!$found) {
 						$found = 1;
-						$output .= $this->loc->s("Username").": ".$data2["username"];
+						$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
 					}
 				}
 				
 				if(!$found) {
-					$query = $radSQLMgr->Select("radreply","username","username = '".$search."'","",0,1);
+					$query = $radSQLMgr->Select("radreply","username","username = '".$tmpsearch."'","",0,1);
 					while($data2 = mysql_fetch_array($query)) {
 						if(!$found) {
 							$found = 1;
-							$output .= $this->loc->s("Username").": ".$data2["username"];
+							$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
 						}
 					}
 				}
 				
 				if($found) {
 					$found = 0;
-					$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$search."'");
+					$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$tmpsearch."'");
 					while($data2 = mysql_fetch_array($query)) {
 						if(!$found) {
 							$found = 1;
@@ -370,6 +374,7 @@
 					
 				
 				if(FS::$secMgr->isMacAddr($search)) {
+					// Format mac addr for some accounting
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].".".$search[6].$search[7].$search[9].$search[10].".".$search[12].$search[13].$search[15].$search[16];
 					$found = 0;
 					$query2 = $radSQLMgr->Select("radacct","username,calledstationid,acctstarttime,acctstoptime","callingstationid = '".$tmpsearch."'");
