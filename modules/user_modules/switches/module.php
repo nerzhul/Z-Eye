@@ -1068,9 +1068,9 @@
 					if($foundsw == 0) $foundsw = 1;
 					$outputswitch .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
 					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
-					<div id=\"st".$data["ip"]."\"></div><script type=\"text/javascript\">
+					<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\"></div><script type=\"text/javascript\">
 					$('#st".$data["ip"]."').post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
-							$('#st".$data["ip"]."').html(data); });</script></td></tr>";
+							$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
 				}
 			}
 			if($foundsw != 0) {
@@ -1600,13 +1600,13 @@
 					
 					$out = "";
 					exec("ping -W 1 -c 1 ".$dip." | grep ttl | wc -l|awk '{print $1}'",$out);
-					if(is_array($out))
+					if(!is_array($out) || count($out) > 1)
 						echo "<span style=\"color:red;\">".$this->loc->s("err-output")." ".var_dump($out)."</span>";
-					else if($out > 1)
+					else if($out[0] > 1)
 						echo "<span style=\"color:red;\">".$this->loc->s("err-output-value")." ".$out."</span>";
-					else if($out == 0)
+					else if($out[0] == 0)
 						echo "<span style=\"color:red;\">".$this->loc->s("Offline")."</span>";
-					else if($out == 1)
+					else if($out[0] == 1)
 						echo "<span style=\"color:green;\">".$this->loc->s("Online")."</span>";
 					return;
 				default: break;
