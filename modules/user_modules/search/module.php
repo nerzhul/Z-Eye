@@ -493,7 +493,7 @@
 				}
 				if($found) { 
 					$output .= "</table></div>";
-					$output = "<h3>".$this->loc->s("Radius-Server")." ".$data["dbname"]."@".$data["addr"].":".$data["port"]."</h3>".$output;
+					$output = "<h4>".$this->loc->s("Radius-Server")." (".$data["dbname"]."@".$data["addr"].":".$data["port"].")</h4>".$output;
 				}
 			}
 			return $output;
