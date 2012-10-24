@@ -20,6 +20,13 @@
 	class FSLogger {
 		function Log() {}
 		
+		/*
+		 * Level:
+		 * 0: normal
+		 * 1: warn
+		 * 2: crit
+		 */
+
 		// Insert function
 		public static function i($user,$module,$level,$str) {
 			FS::$pgdbMgr->Insert("z_eye_logs","date,module,level,user,txt","NOW(),'".$module."','".$level."','".$user."','".$txt."'");
