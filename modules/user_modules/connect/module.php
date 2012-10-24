@@ -69,7 +69,7 @@
 				$result = $ldapMgr->GetOneEntry($ldapname."=".$username);
 				if(!$result) {
 					header("Location: index.php?mod=".$this->mid."&err=1");
-					FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Unknown user)";
+					FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Unknown user)");
 					return;
 				}
 
@@ -87,7 +87,7 @@
 				if($data = pg_fetch_array($query))
 				{
 					$this->connectUser($data["uid"],$data["ulevel"]);
-					FS::$log->i("None","connect",1,"Login success for user '".$username."'";
+					FS::$log->i("None","connect",1,"Login success for user '".$username."'");
 					header("Location: ".$url);
 					return;
 				}
@@ -97,7 +97,7 @@
 					if($data = pg_fetch_array($query))
 					{
 							$this->connectUser($data["uid"],$data["ulevel"]);
-							FS::$log->i("None","connect",1,"Login success for user '".$username."'";
+							FS::$log->i("None","connect",1,"Login success for user '".$username."'");
 							header("Location: ".$url);
 							return;
 					}
@@ -107,17 +107,17 @@
 				if($data = pg_fetch_array($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if($data["sha_pwd"] != $encryptPwd) {
-						FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Bad password)";
+						FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Bad password)");
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
 					$this->connectUser($data["uid"],$data["ulevel"]);
-					FS::$log->i("None","connect",1,"Login success for user '".$username."'";
+					FS::$log->i("None","connect",1,"Login success for user '".$username."'");
 					header("Location: ".$url);
 					return;
 				}
 			}
-			FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Unknown user)";
+			FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Unknown user)");
 			header("Location: index.php?mod=".$this->mid."&err=1");
 		}
 		

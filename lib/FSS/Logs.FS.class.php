@@ -29,7 +29,9 @@
 
 		// Insert function
 		public static function i($user,$module,$level,$str) {
-			FS::$pgdbMgr->Insert("z_eye_logs","date,module,level,user,txt","NOW(),'".$module."','".$level."','".$user."','".$txt."'");
+			FS::$secMgr->SecuriseStringForDB($str);
+			FS::$secMgr->SecuriseStringForDB($module);
+			FS::$pgdbMgr->Insert("z_eye_logs","date,module,level,user,txt","NOW(),'".$module."','".$level."','".$user."','".$str."'");
 		}
 	};	
 ?>
