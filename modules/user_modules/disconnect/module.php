@@ -32,9 +32,13 @@
 		}
 		
 		public function Disconnect() {
-			$act = FS::$secMgr->checkGetData("act");
+			$act = FS::$secMgr->checkAndSecuriseGetData("act");
 			switch($act) {
-				case 1: FS::$sessMgr->Close(); break;
+				case 1: if(FS::$sessMgr->getUid()) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"disconnect",1,"User disconnected");
+						FS::$sessMgr->Close(); 
+						break;
+					}
 				default: break;
 			}
 			header("Location: index.php");
