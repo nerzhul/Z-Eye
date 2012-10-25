@@ -133,6 +133,11 @@ Beta 1.7
 - fix ip calcs & improve perf for dhcp caching
 
 Beta 1.8
-- Added support for localization, some module locales added
+- Added support for localization
 - Bugfixes
+
+Beta 1.9
+- Added support for Z-Eye web logs
+- Main switch page now check if switch is up
+- Search module also search radius users (not only MAC addr users)
 
