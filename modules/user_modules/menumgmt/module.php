@@ -229,7 +229,7 @@
 		
 		public function RemoveMenuElement() {
 			$menuEl = new MenuElement();
-			$im = FS::$secMgr->checkAndSecuriseGetData("im")
+			$im = FS::$secMgr->checkAndSecuriseGetData("im");
 			$menuEl->setId($im);
 			$menuEl->Load();
 			$menuEl->Delete();

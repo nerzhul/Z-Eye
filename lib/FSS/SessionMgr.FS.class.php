@@ -81,7 +81,7 @@
 		public function getUserName() {
 			if($this->getUid())
 				return FS::$pgdbMgr->GetOneData("z_eye_users","username","uid = '".$this->getUid()."'");
-			return NULL
+			return NULL;
 		}
 
 		public function getGroups() {

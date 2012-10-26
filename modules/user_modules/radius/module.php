@@ -1113,7 +1113,7 @@
 					$radSQLMgr->Delete("z_eye_radusers","username ='".$username."'");
 					if($logdel == "on") $radSQLMgr->Delete("radpostauth","username = '".$username."'");
 					if($acctdel == "on") $radSQLMgr->Delete("radacct","username = '".$username."'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"User '".$username."' removed".($logdel == "on" ? " Also remove logs" : "").($acctdel == "on" ? ? " Also remove acct": "");
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"User '".$username."' removed".($logdel == "on" ? " Also remove logs" : "").($acctdel == "on" ? " Also remove acct": ""));
 					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."");
 					return;
 				case 5: // group removal

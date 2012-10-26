@@ -386,7 +386,7 @@
 					}
 					FS::$pgdbMgr->Insert("z_eye_server_list","addr,login,pwd,dhcp,dns,dhcpdpath,dhcpleasepath,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','".($dhcp == "on" ? 1 : 0)."','".($dns == "on" ? 1 : 0)."','".$dhcpdpath."','".$dhcpleasepath."','".$namedpath."','".$chrootnamed."'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: "($dns == "on" ? "dns checking" : "").($dhcp == "on" ? "dhcp checking" : ""));
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: ".($dns == "on" ? "dns checking" : "").($dhcp == "on" ? "dhcp checking" : ""));
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 2: // server edition
@@ -525,7 +525,7 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
-					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr"' (type ".$stype.") for saving switch config");
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' (type ".$stype.") for saving switch config");
 					FS::$pgdbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
 					header("Location: m-".$this->mid.".html");
 					break;
