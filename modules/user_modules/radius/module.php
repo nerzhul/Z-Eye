@@ -875,22 +875,25 @@
 				case 1:
 					$rad = FS::$secMgr->checkAndSecurisePostData("radius");
 					if(!$rad) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Missing datas for radius selection");
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
 					$radcut1 = preg_split("[@]",$rad);
 					if(count($radcut1) != 2) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Wrong datas for radius selection");
 						header("Location: index.php?mod=".$this->mid."&err=1");
-                                                return;
+                        return;
 					}
 					$radcut2 = preg_split("[:]",$radcut1[1]);
 					if(count($radcut2) != 2) {
-                                                header("Location: index.php?mod=".$this->mid."&err=1");
-                                                return;
-                                        }
+							FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Wrong datas for radius selection");
+							header("Location: index.php?mod=".$this->mid."&err=1");
+							return;
+					}
 					header("Location: index.php?mod=".$this->mid."&h=".$radcut2[0]."&p=".$radcut2[1]."&r=".$radcut1[0]);
 					return;
-				case 2:
+				case 2: // User edition
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
@@ -903,28 +906,30 @@
 					if(!$username || $username == "" || !$utype || !FS::$secMgr->isNumeric($utype) ||
 						$utype < 1 || $utype > 3 || 
 						($utype == 1 && (!$upwd || $upwd == "" || !$upwdtype || $upwdtype < 1 || $upwdtype > 6))) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for user edition");
 						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 						return;
 					}
 
 					// if type 2: must be a mac addr
 					if($utype == 2 && (!FS::$secMgr->isMacAddr($username) && !preg_match('#^[0-9A-F]{12}$#i', $username))) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Wrong datas for user edition");
 						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 						return;
 					}
 
-                                	$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
-                               		$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
-                                	$radSQLMgr = new FSMySQLMgr();
-                                	$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-                                	$radSQLMgr->Connect();
+					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+					$radSQLMgr = new FSMySQLMgr();
+					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+					$radSQLMgr->Connect();
 
 					// For Edition Only, don't delete acct records
 					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
 					if($edit == 1) {
 						$radSQLMgr->Delete("radcheck","username = '".$username."'");
-        	                                $radSQLMgr->Delete("radreply","username = '".$username."'");
-                	                        $radSQLMgr->Delete("radusergroup","username = '".$username."'");
+						$radSQLMgr->Delete("radreply","username = '".$username."'");
+						$radSQLMgr->Delete("radusergroup","username = '".$username."'");
 						$radSQLMgr->Delete("z_eye_radusers","username = '".$username."'");
 					}
 					$userexist = $radSQLMgr->GetOneData("radcheck","username","username = '".$username."'");
@@ -942,8 +947,9 @@
 						else {
 							if($utype == 2) {
 								if(!FS::$secMgr->isMacAddr($username) && !preg_match('#^[0-9A-F]{12}$#i', $username)) {
+									FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Wrong datas for user edition");
 									header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
-			                                                return;
+			                        return;
 								}
 								$username = preg_replace("#[:]#","",$username);
 							}
@@ -951,11 +957,11 @@
 							$value = "Accept";
 						}
 						$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','".$attr."',':=','".$value."'");
-	                                        foreach($_POST as $key => $value) {
-                        			        if(preg_match("#^ugroup#",$key)) {
-			                                        $groupfound = $radSQLMgr->GetOneData("radgroupreply","groupname","groupname = '".$value."'");
+						foreach($_POST as $key => $value) {
+						if(preg_match("#^ugroup#",$key)) {
+								$groupfound = $radSQLMgr->GetOneData("radgroupreply","groupname","groupname = '".$value."'");
 								if(!$groupfound)
-	                        			                $groupfound = $radSQLMgr->GetOneData("radgroupcheck","groupname","groupname = '".$value."'");
+									$groupfound = $radSQLMgr->GetOneData("radgroupcheck","groupname","groupname = '".$value."'");
 								if($groupfound) {
 									$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$username."' AND groupname = '".$value."'");
 									if(!$usergroup)
@@ -964,38 +970,38 @@
 							}
 						}
 						$attrTab = array();
-	                                        foreach($_POST as $key => $value) {
-        	                                        if(preg_match("#attrval#",$key)) {
-                	                                        $key = preg_replace("#attrval#","",$key);
-                        	                                if(!isset($attrTab[$key])) $attrTab[$key] = array();
-                                	                        $attrTab[$key]["val"] = $value;
-                                        	        }
-                                                	else if(preg_match("#attrkey#",$key)) {
-	                                                        $key = preg_replace("#attrkey#","",$key);
-        	                                                if(!isset($attrTab[$key])) $attrTab[$key] = array();
-                	                                        $attrTab[$key]["key"] = $value;
-                        	                        }
-                                	                else if(preg_match("#attrop#",$key)) {
-                                        	                $key = preg_replace("#attrop#","",$key);
-                                                	        if(!isset($attrTab[$key])) $attrTab[$key] = array();
-                                                        	$attrTab[$key]["op"] = $value;
-	                                                }
-        	                                        else if(preg_match("#attrtarget#",$key)) {
-                	                                        $key = preg_replace("#attrtarget#","",$key);
-                        	                                if(!isset($attrTab[$key])) $attrTab[$key] = array();
-                                	                        $attrTab[$key]["target"] = $value;
-                                        	        }
+						foreach($_POST as $key => $value) {
+								if(preg_match("#attrval#",$key)) {
+										$key = preg_replace("#attrval#","",$key);
+										if(!isset($attrTab[$key])) $attrTab[$key] = array();
+										$attrTab[$key]["val"] = $value;
+								}
+								else if(preg_match("#attrkey#",$key)) {
+										$key = preg_replace("#attrkey#","",$key);
+										if(!isset($attrTab[$key])) $attrTab[$key] = array();
+										$attrTab[$key]["key"] = $value;
+								}
+								else if(preg_match("#attrop#",$key)) {
+										$key = preg_replace("#attrop#","",$key);
+										if(!isset($attrTab[$key])) $attrTab[$key] = array();
+										$attrTab[$key]["op"] = $value;
+								}
+								else if(preg_match("#attrtarget#",$key)) {
+										$key = preg_replace("#attrtarget#","",$key);
+										if(!isset($attrTab[$key])) $attrTab[$key] = array();
+										$attrTab[$key]["target"] = $value;
+								}
 						}
 						foreach($attrTab as $attrKey => $attrEntry) {
-	                                                if($attrEntry["target"] == "2") {
-        	                                                $radSQLMgr->Insert("radreply","id,username,attribute,op,value","'','".$username.
-                	                                        "','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
-                        	                        }
-                                	                else if($attrEntry["target"] == "1") {
-                                        	                $radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username.
-                                                	        "','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
-	                                                }
-        	                                }
+								if($attrEntry["target"] == "2") {
+										$radSQLMgr->Insert("radreply","id,username,attribute,op,value","'','".$username.
+										"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
+								}
+								else if($attrEntry["target"] == "1") {
+										$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username.
+										"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
+								}
+						}
 
 						$radSQLMgr->Delete("z_eye_radusers","username = '".$username."'");
 						$expiretime = FS::$secMgr->checkAndSecurisePostData("expiretime");
@@ -1003,42 +1009,47 @@
 							$radSQLMgr->Insert("z_eye_radusers","username,expiration","'".$username."','".date("y-m-d",strtotime($expiretime))."'");
 					}
 					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Try to add user ".$username." but user already exists");
 						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
-                                                return;
+                        return;
 					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"User '".$username."' edited/created");
 					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb);
 					break;
-				case 3:
-                                        $raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+				case 3: // Group edition
+					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 					$groupname = FS::$secMgr->checkAndSecurisePostData("groupname");
 
 					if(!$groupname) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for group edition");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
-                                                return;
-                                        }
+						return;
+					}
 
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-                                        $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-                                        $radSQLMgr = new FSMySQLMgr();
-                                        $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-                                        $radSQLMgr->Connect();
+					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+					$radSQLMgr = new FSMySQLMgr();
+					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+					$radSQLMgr->Connect();
 
 					// For Edition Only, don't delete acct/user-group links
-                                        $edit = FS::$secMgr->checkAndSecurisePostData("uedit");
-                                        if($edit == 1) {
+					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
+					if($edit == 1) {
 						$radSQLMgr->Delete("radgroupcheck","groupname = '".$groupname."'");
-	                                        $radSQLMgr->Delete("radgroupreply","groupname = '".$groupname."'");
-                                        }
+						$radSQLMgr->Delete("radgroupreply","groupname = '".$groupname."'");
+					}
 
 					$groupexist = $radSQLMgr->GetOneData("radgroupcheck","id","groupname='".$groupname."'");
 					if($groupexist && $edit != 1) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Trying to add existing group '".$groupname."'");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
 						return;
 					}
 					$groupexist = $radSQLMgr->GetOneData("radgroupreply","id","groupname='".$groupname."'");
 					if($groupexist && $edit != 1) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Trying to add existing group '".$groupname."'");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
 						return;
 					}
@@ -1075,41 +1086,44 @@
                                                         "','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
 						}
 					}
-
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Group '".$groupname."' edited/created");
 					header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."");
 					break;
-				case 4:
+				case 4: // user removal
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 					$username = FS::$secMgr->checkAndSecurisePostData("user");
 					$acctdel = FS::$secMgr->checkAndSecurisePostData("acctdel");
 					$logdel = FS::$secMgr->checkAndSecurisePostData("logdel");
 
 					if(!$raddb || !$radhost || !$radport || !$username) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing user removal");
 						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=4");
 						return;
 					}
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-                                        $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-                                        $radSQLMgr = new FSMySQLMgr();
-                                        $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-                                        $radSQLMgr->Connect();
+					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+					$radSQLMgr = new FSMySQLMgr();
+					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
+					$radSQLMgr->Connect();
 					$radSQLMgr->Delete("radcheck","username = '".$username."'");
 					$radSQLMgr->Delete("radreply","username = '".$username."'");
 					$radSQLMgr->Delete("radusergroup","username = '".$username."'");
 					$radSQLMgr->Delete("z_eye_radusers","username ='".$username."'");
 					if($logdel == "on") $radSQLMgr->Delete("radpostauth","username = '".$username."'");
 					if($acctdel == "on") $radSQLMgr->Delete("radacct","username = '".$username."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"User '".$username."' removed".($logdel == "on" ? " Also remove logs" : "").($acctdel == "on" ? ? " Also remove acct": "");
 					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."");
 					return;
-				case 5:
+				case 5: // group removal
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 					$groupname = FS::$secMgr->checkAndSecurisePostData("group");
 
 					if(!$raddb || !$radhost || !$radport || !$groupname) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for group removal");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=4");
 						return;
 					}
@@ -1124,18 +1138,20 @@
 					$radSQLMgr->Delete("radhuntgroup","groupname = '".$groupname."'");
 					FS::$pgdbMgr->Delete("z_eye_radius_dhcp_import","groupname = '".$groupname."'");
 					header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."");
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Group '".$groupname."' removed");
 					return;
 
 				case 6:
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-                                        $radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-                                        $radport = FS::$secMgr->checkAndSecuriseGetData("p");
+					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 					$utype = FS::$secMgr->checkAndSecurisePostData("usertype");
 					$pwdtype = FS::$secMgr->checkAndSecurisePostData("upwdtype");
 					$group = FS::$secMgr->checkAndSecurisePostData("ugroup");
 					$userlist = FS::$secMgr->checkAndSecurisePostData("csvlist");
 
 					if(!$raddb || !$radhost || !$radport) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some datas are missing for mass import");
 							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
 							return;
 					}
@@ -1146,6 +1162,7 @@
 					$radSQLMgr->Connect();
 
 					if(!$utype || $utype != 1 && $utype != 2 || !$userlist) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some datas are missing or invalid for mass import");
 						header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 						return;
 					}
@@ -1166,6 +1183,7 @@
 						for($i=0;$i<count($userlist);$i++) {
 							$tmp = preg_split("#[,]#",$userlist[$i]);
 							if(count($tmp) != 2 || preg_match("#[ ]#",$tmp[0])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some datas are invalid for mass import");
 								header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 								return;
 							}
@@ -1174,30 +1192,33 @@
 						$userfound = 0;
 						foreach($fmtuserlist as $user => $upwd) {
 							switch($pwdtype) {
-									case 1: $attr = "Cleartext-Password"; $value = $upwd; break;
-									case 2: $attr = "User-Password"; $value = $upwd; break;
-									case 3: $attr = "Crypt-Password"; $value = crypt($upwd); break;
-									case 4: $attr = "MD5-Password"; $value = md5($upwd); break;
-									case 5: $attr = "SHA1-Password"; $value = sha1($upwd); break;
-									case 6: $attr = "CHAP-Password"; $value = $upwd; break;
-									default:
-											header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
-											return;
+								case 1: $attr = "Cleartext-Password"; $value = $upwd; break;
+								case 2: $attr = "User-Password"; $value = $upwd; break;
+								case 3: $attr = "Crypt-Password"; $value = crypt($upwd); break;
+								case 4: $attr = "MD5-Password"; $value = md5($upwd); break;
+								case 5: $attr = "SHA1-Password"; $value = sha1($upwd); break;
+								case 6: $attr = "CHAP-Password"; $value = $upwd; break;
+								default:
+										FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Bad password type for mass import");
+										header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+										return;
 							}
 							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$user."'"))
-									$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$user."','".$attr."',':=','".$value."'");
+								$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$user."','".$attr."',':=','".$value."'");
 							if($groupfound) {
-									$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$user."' AND groupname = '".$group."'");
-									if(!$usergroup)
-										$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$user."','".$group."','1'");
+								$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$user."' AND groupname = '".$group."'");
+								if(!$usergroup)
+									$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$user."','".$group."','1'");
 							}
 						}
 						if($userfound) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some users are already found for mass import");
                             header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
 							return;
 						}
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Mass import done (list:".$userlist." group: ".$group.")");
 					}
-                                        else if($utype == 2) {
+                    else if($utype == 2) {
 						if(preg_match("#[,]#",$userlist)) {
 							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 							return;
@@ -1210,8 +1231,9 @@
 						// Match & format mac addr
 						for($i=0;$i<count($userlist);$i++) {
 							if(!FS::$secMgr->isMacAddr($userlist[$i]) && !preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) && !preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Bad fields for Mass import (MAC addr)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
-	                                                        return;
+	                            return;
 							}
 							$userlist[$i] = preg_replace("#[:-]#","",$userlist[$i]);
 							$userlist[$i] = strtolower($userlist[$i]);
@@ -1223,20 +1245,22 @@
 							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$userlist[$i]."'"))
 								$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$userlist[$i]."','Auth-Type',':=','Accept'");
 							else $userfound = 1;
-                       	                                if($groupfound) {
-                                                 		$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$userlist[$i]."' AND groupname = '".$group."'");
+							if($groupfound) {
+								$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$userlist[$i]."' AND groupname = '".$group."'");
 								if(!$usergroup)
-		                                                      	$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$userlist[$i]."','".$group."','1'");
+									$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$userlist[$i]."','".$group."','1'");
 							}
 						}
 						if($userfound) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Some users already exists for mass import");
 							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=5");
 							return;
 						}
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Mass import done (list:".$userlist." group: ".$group.")");
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=3");
 					return;
-				case 7:
+				case 7: // DHCP sync
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
@@ -1244,13 +1268,15 @@
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 
 					if(!$raddb || !$radhost || !$radport) {
-							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
-							return;
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for DHCP sync");
+						header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
+						return;
 					}
 
 					if(!$radgroup || !$subnet || !FS::$secMgr->isIP($subnet)) {
-							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=2");
-							return;
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing or invalid for DHCP sync");
+						header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=2");
+						return;
 					}
 
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
@@ -1264,45 +1290,52 @@
 						$groupexist = $radSQLMgr->GetOneData("radgroupreply","id","groupname='".$radgroup."'");
 
 					if(!$groupexist) {
-							header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
-							return;
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Group '".$radgroup."' doesn't exist, can't bind DHCP to radius");
+						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
+						return;
 					}
 
 					$subnetexist = FS::$pgdbMgr->GetOneData("z_eye_dhcp_subnet_cache","netmask","netid = '".$subnet."'");
 					if(!$subnetexist) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Subnet '".$subnet."' doesn't exist can't bind DHCP to radius");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
-                                                return;
+                        return;
 					}
 					if(!FS::$pgdbMgr->GetOneData("z_eye_radius_dhcp_import","dhcpsubnet","addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."' AND dhcpsubnet = '".$subnet."'"))
 						FS::$pgdbMgr->Insert("z_eye_radius_dhcp_import","addr,port,dbname,dhcpsubnet,groupname","'".$radhost."','".$radport."','".$raddb."','".$subnet."','".$radgroup."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"DHCP subnet '".$subnet."' bound to '".$radgroup."'");
 					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4");
 					return;
-				case 8:
+				case 8: // dhcp sync removal
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 
 					if(!$raddb || !$radhost || !$radport) {
-							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
-							return;
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some required fields are missing for DHCP sync removal");
+						header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
+						return;
 					}
 
 					if(!$subnet) {
-							header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=2");
-							return;
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"No subnet given to DHCP sync removal");
+						header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=2");
+						return;
 					}
 
 					FS::$pgdbMgr->Delete("z_eye_radius_dhcp_import","addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."' AND dhcpsubnet = '".$subnet."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Remove sync between subnet '".$subnet."' and radius");
 					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4");
 					return;
-				case 9:
+				case 9: // radius cleanup table
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 					if(!$raddb || !$radhost || !$radport) {
-							header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=5&err=6");
-							return;
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for radius cleanup table (radius server)");
+						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=5&err=6");
+						return;
 					}
 
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
@@ -1317,13 +1350,15 @@
 					$cleanradsqlexpfield = FS::$secMgr->checkAndSecurisePostData("cleanradsqlexpfield");
 
 					if($cleanradenable == "on" && (!$cleanradtable || !$cleanradsqluserfield || !$cleanradsqlexpfield)) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for radius cleanup table (data fields)");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=5&err=6");
                         return;
 					}
 
 					if($radSQLMgr->Count($cleanradtable,$cleanradsqluserfield) == NULL) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Some fields are wrong for radius cleanup table");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=5&err=6");
-							return;
+						return;
 					}
 
 					FS::$pgdbMgr->Delete("z_eye_radius_options","addr = '".$radhost."' AND port = '".$radport."' and dbname = '".$raddb."'");
@@ -1331,9 +1366,10 @@
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_table','".$cleanradtable."'");
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_user_field','".$cleanradsqluserfield."'");
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_date_field','".$cleanradsqlexpfield."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Data Creation/Edition for radius cleanup table done (table: '".$cleanradtable."' userfield: '".$cleanradsqluserfield."' date field: '".$cleanradsqlexpfield."'");
 					header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=5");
 					return;
-				case 10:
+				case 10: // account creation (deleg)
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
@@ -1350,16 +1386,18 @@
 					$limme = FS::$secMgr->checkAndSecurisePostData("limmine");
 
 					if(!$raddb || !$radhost || !$radport) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for radius deleg (radius server)");
 						echo FS::$iMgr->printError($this->loc->s("err-invalid-auth-server"));
-							//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
-							return;
+						//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
+						return;
 					}
 					if(!$name || !$surname || !$username || !$valid || !$profil || ($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0 
 						|| !FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate) 
 					))) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for radius deleg (datas)");
 						echo FS::$iMgr->printError($this->loc->s("err-field-missing"));
-							//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
-							return;
+						//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
+						return;
 					}
 
 					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
@@ -1378,9 +1416,10 @@
 					$exist = $radSQLMgr->GetOneData("radcheck","id","username = '".$username."'");
 					if(!$exist) $exist = $radSQLMgr->GetOneData("radreply","id","username = '".$username."'");
 					if($exist) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"User '".$username."' already exists (Deleg)");
 						echo FS::$iMgr->printError($this->loc->s("err-no-user"));
 						//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
-                                                return;
+                        return;
 					}
 
 					$password = FS::$secMgr->genRandStr(8);
@@ -1388,10 +1427,11 @@
 					$radSQLMgr->Insert("z_eye_radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
 					$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$profil."',0");
 
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Creating delegated user '".$username."' with password '".$password."'. Account expiration: ".($valid == 2 ? $edate: "none"));
 					echo FS::$iMgr->printDebug($this->loc->s("ok-user"))."<br /><hr><b>".$this->loc->s("User").": </b>".$username."<br /><b>".$this->loc->s("Password").": </b>".$password."<br /><b>".$this->loc->s("Validity").": </b>".
 						($valid == 2 ? $this->loc->s("From")." ".$sdate." ".$this->loc->s("To")." ".$edate : $this->loc->s("Infinite"))."<hr><br />";
 					return;
-				case 11:
+				case 11: // Rad deleg (massive)
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
@@ -1407,14 +1447,16 @@
 					$limhe = FS::$secMgr->checkAndSecurisePostData("limhoure2");
                                         $limme = FS::$secMgr->checkAndSecurisePostData("limmine2");
 					if(!$raddb || !$radhost || !$radport) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for massive creation (Deleg) (radius server)");
 						echo FS::$iMgr->printError($this->loc->s("err-invalid-auth-server"));
-							//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
-							return;
+						//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
+						return;
 					}
 
 					if(!$typegen || $typegen == 2 && !$prefix || !$nbacct || !$valid || !$profil || ($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0 
 						|| !FS::$secMgr->isNumeric($nbacct) || $nbacct <= 0 || !FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate) 
 					))) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing or invalid for massive creation (Deleg) (datas)");
 						echo FS::$iMgr->printError($this->loc->s("err-field-missing"));
 							//header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 							return;
@@ -1441,7 +1483,7 @@
 						$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
 						$radSQLMgr->Insert("z_eye_radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
 						$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$profil."',0");
-
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Create user '".$username."' with password '".$password."' for massive creation (Deleg)");
 						$pdf->AddPage();
 						$pdf->WriteHTML(utf8_decode("<b>".$this->loc->s("User").": </b>".$username."<br /><br /><b>".$this->loc->s("Password").": </b>".$password."<br /><br /><b>".
 						$this->loc->s("Validity").": </b>".($valid == 2 ? $this->loc->s("From")." ".date("d/m/y H:i",strtotime($sdate))." ".$this->loc->s("To")." ".

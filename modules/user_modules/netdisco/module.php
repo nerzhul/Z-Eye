@@ -29,6 +29,8 @@
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err == 1)
 				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-data"));
+			else if($err == 2)
+				$output .= FS::$iMgr->printError($this->loc->s("err-write-fail"));
 			else if ($err == -1)
 				$output .= FS::$iMgr->printDebug($this->loc->s("mod-ok"));
 			$output .= $this->showMainConf();
@@ -166,6 +168,8 @@
 				$file = fopen("/usr/local/etc/netdisco/netdisco.conf","w+");
 			else if(Config::getOS() == "Debian")
 				$file = fopen("/etc/netdisco/netdisco.conf","w+");
+			if(!$file)
+				return 1;
 			fwrite($file,"# ---- General Settings ----\n");
 			fwrite($file,"domain = ".$dns."\n");
 			if(Config::getOS() == "FreeBSD") {
@@ -202,6 +206,8 @@
 				$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","w+");
 			else if(Config::getOS() == "Debian")
 				$file = fopen("/etc/netdisco/netdisco-topology.txt","w+");
+			if(!$file)
+				return 1;
 			fwrite($file,$firstnode."\n");
 			fclose($file);
 			return 0;
@@ -224,10 +230,16 @@
 					$snmpver = FS::$secMgr->checkAndSecurisePostData("snmpver");
 					$fnode = FS::$secMgr->checkAndSecurisePostData("fnode");
 					if($this->checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
-						$this->writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode);
+						if($this->writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$fnode) != 0)
+							FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",2,"Fail to write netdisco configuration");
+							header("Location: index.php?mod=".$this->mid."&err=2");
+							return;
+						}
+						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",0,"Netdisco configuration changed");
 						header("Location: index.php?mod=".$this->mid."&err=-1");
 						return;
 					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Bad netdisco configuration");
 					header("Location: index.php?mod=".$this->mid."&err=1");	
 					return;
 				default: break;

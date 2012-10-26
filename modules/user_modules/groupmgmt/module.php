@@ -146,60 +146,68 @@
 					// @TODO description field
 					$gname = FS::$secMgr->checkAndSecurisePostData("gname");
 					if(!$gname) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to create group");
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
 					$exist = FS::$pgdbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
 					if($exist) {
 						header("Location: index.php?mod=".$this->mid."&err=1");
+						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"The group ".$gname." already exists");
 						return;
 					}
 					$gid = FS::$pgdbMgr->GetMax("z_eye_groups","gid")+1;
 					FS::$pgdbMgr->Insert("z_eye_groups","gid,gname","'".$gid."','".$gname."'");
 					$rules = array();
-                                        foreach($_POST as $key => $value) {
-                                               if(preg_match("#^mrule_#",$key)) {
-                                                        $rules[$key] = $value;
-                                               }
-                                        }
+					foreach($_POST as $key => $value) {
+						   if(preg_match("#^mrule_#",$key)) {
+									$rules[$key] = $value;
+						   }
+					}
 					foreach($rules as $key => $value) {
 						FS::$pgdbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"New group '".$gname."' added");
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 2:
 					$gname = FS::$secMgr->checkAndSecurisePostData("gname");
-                                        if(!$gname) {
-                                                header("Location: index.php?mod=".$this->mid."&err=2");
-                                                return;
-                                        }
+					if(!$gname) {
+							header("Location: index.php?mod=".$this->mid."&err=2");
+							FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to remove group");
+							return;
+					}
 					$gid = FS::$pgdbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
-                                        if(!$gid) {
-                                                header("Location: index.php?mod=".$this->mid."&err=1");
-                                                return;
-                                        }
+					if(!$gid) {
+							header("Location: index.php?mod=".$this->mid."&err=1");
+							FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"Unable to remove group '".$gname."', group doesn't exists");
+							return;
+					}
 					FS::$pgdbMgr->Delete("z_eye_groups","gname = '".$gname."'");
 					FS::$pgdbMgr->Delete("z_eye_group_rules","gid = '".$gid."'");
 					FS::$pgdbMgr->Delete("z_eye_user_group","gid = '".$gid."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"Group '".$gname."' removed");
 					header("Location: index.php?mod=".$this->mid);
                                         return;
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
-                                        if(!$gid) {
-                                                header("Location: index.php?mod=".$this->mid."&err=3");
-                                                return;
-                                        }
-                                        $rules = array();
-                                        foreach($_POST as $key => $value) {
-                                               if(preg_match("#^mrule_#",$key)) {
-                                                        $rules[$key] = $value;
-                                               }
-                                        }
+					if(!$gid) {
+							header("Location: index.php?mod=".$this->mid."&err=3");
+							FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to edit group");
+							return;
+					}
+					$rules = array();
+					foreach($_POST as $key => $value) {
+						   if(preg_match("#^mrule_#",$key)) {
+									$rules[$key] = $value;
+						   }
+					}
 					FS::$pgdbMgr->Delete("z_eye_group_rules","gid = '".$gid."'");
-                                        foreach($rules as $key => $value) {
-                                                FS::$pgdbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
-                                        }
-                                        header("Location: index.php?mod=".$this->mid);
+					foreach($rules as $key => $value) {
+							FS::$pgdbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
+					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"Group Id '".$gid."' edited");
+					header("Location: index.php?mod=".$this->mid);
 
 				default: break;
 			}

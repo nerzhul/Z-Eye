@@ -172,76 +172,83 @@
 		
 		public function RegisterMenu() {
 			$menu = new Menu();
-			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
-			$menu->setName($_POST["name"]);
-			$menu->setConnected($_POST["isconnected"]);
+			$name = FS::$secMgr->checkAndSecurisePostData("name");
+			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
+			$menu->setName($name);
+			$menu->setConnected($isco);
 			$menu->Create();
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' added");
 		}
 		
 		public function EditMenu() {
 			$menu = new Menu();
-			FS::$secMgr->SecuriseStringForDB($_POST["menu_id"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
-			$menu->setId($_POST["menu_id"]);
+			$menuid = FS::$secMgr->checkAndSecurisePostData("menu_id");
+			$name = FS::$secMgr->checkAndSecurisePostData("name");
+			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
+			$menu->setId($menuid);
 			$menu->Load();
-			$menu->setName($_POST["name"]);
-			$menu->setConnected($_POST["isconnected"]);
+			$menu->setName($name);
+			$menu->setConnected($isco);
 			$menu->SaveToDB();
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' (".$menuid.") edited (connected: ".$isco.")");
 		}
 		
 		public function RemoveMenu() {
 			$menu = new Menu();
-			FS::$secMgr->SecuriseStringForDB($_GET["menu"]);
-			$menu->setId($_GET["menu"]);
+			$name = FS::$secMgr->checkAndSecuriseGetData("menu");
+			$menu->setId($name);
 			$menu->Delete();
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' removed");
 		}
 		
 		public function addMenuElement() {
 			$menuEl = new MenuElement();
-			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["link_id"]);
-			$menuEl->setName($_POST["name"]);
-			$menuEl->setConn($_POST["isconnected"]);
-			$menuEl->setLink($_POST["link_id"]);
+			$name = FS::$secMgr->checkAndSecurisePostData("name");
+			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
+			$lid = FS::$secMgr->checkAndSecurisePostData("link_id");
+			$menuEl->setName($name);
+			$menuEl->setConn($isco);
+			$menuEl->setLink($lid);
 			$menuEl->Create();
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Create menu element '".$lid."' '".$name."' (isco: ".$isco.")");
 		}
 		
 		public function EditMenuElement() {
 			$menuEl = new MenuElement();
-			FS::$secMgr->SecuriseStringForDB($_POST["name"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["isconnected"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["link_id"]);
+			$name = FS::$secMgr->checAndSecurisePostData("name");
+			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
+			$lid = FS::$secMgr->checkAndSecurisePostData("link_id");
 			$menuEl->setId($_POST["menu_elmt"]);
 			$menuEl->Load();
-			$menuEl->setName($_POST["name"]);
-			$menuEl->setConn($_POST["isconnected"]);
-			$menuEl->setLink($_POST["link_id"]);
+			$menuEl->setName($name);
+			$menuEl->setConn($isco);
+			$menuEl->setLink($lid);
 			$menuEl->SaveToDB();
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu element '".$name."' edited (isco: ".$isco.")");
 		}
 		
 		public function RemoveMenuElement() {
 			$menuEl = new MenuElement();
-			$menuEl->setId(FS::$secMgr->checkGetData("im"));
+			$im = FS::$secMgr->checkAndSecuriseGetData("im")
+			$menuEl->setId($im);
 			$menuEl->Load();
 			$menuEl->Delete();
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Removed menu element id '".$im."'");
 		}
 		
 		public function addElementToMenu() {
-			FS::$secMgr->SecuriseStringForDB($_POST["menu"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["order"]);
-			FS::$secMgr->SecuriseStringForDB($_POST["m_elem_id"]);
-			FS::$pgdbMgr->Insert("z_eye_menu_link","id_menu,id_menu_item,\"order\"","'".$_POST["menu"]."','".$_POST["m_elem_id"]."','".$_POST["order"]."'");
+			$menu = FS::$secMgr->checkAndSecurisePostData("menu");
+			$order = FS::$secMgr->checkAndSecurisePostData("order");
+			$melemid = FS::$secMgr->checkAndSecurisePostData("m_elem_id");
+			FS::$pgdbMgr->Insert("z_eye_menu_link","id_menu,id_menu_item,\"order\"","'".$menu."','".$melemid."','".$order."'");
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Added element ".$melemid." to menu ".$menu." (order: ".$order.")");
 		}
 		
 		public function RemoveElementFromMenu() {
-			$menuid = FS::$secMgr->checkGetData("menu");
-			$itemid = FS::$secMgr->checkGetData("elem");
-			FS::$secMgr->SecuriseStringForDB($menuid);
-			FS::$secMgr->SecuriseStringForDB($itemid);
+			$menuid = FS::$secMgr->checkAndSecuriseGetData("menu");
+			$itemid = FS::$secMgr->checkAndSecuriseGetData("elem");
 			FS::$pgdbMgr->Delete("z_eye_menu_link","id_menu = '".$menuid."' AND id_menu_item = '".$itemid."'");
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Removed element '".$itemid."' from menu '".$menuid."'");
 			
 		}
 		

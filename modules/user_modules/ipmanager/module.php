@@ -201,8 +201,14 @@
 			switch($act) {
 				case 1:
 					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
-					if($filtr == NULL) header("Location: index.php?mod".$this->mid."");
-					else header("Location: index.php?mod=".$this->mid."&f=".$filtr);
+					if($filtr == NULL) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to filter values");
+						header("Location: index.php?mod".$this->mid."");
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User filter by ".$filtr);
+						header("Location: index.php?mod=".$this->mid."&f=".$filtr);
+					}
 					return;
 				case 2:
 					$filter = FS::$secMgr->checkAndSecurisePostData("obsdata");
@@ -210,6 +216,7 @@
 					if(!$filter || !FS::$secMgr->isIP($filter) || !$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
 						echo FS::$iMgr->printError($this->loc->s("err-invalid-req"));
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when trying to find obsolete datas");
 						return;
 					}
 
@@ -230,10 +237,16 @@
 					}
 					if($found) {
 						echo "<h4>".$this->loc->s("title-old-record")."</h4>";
-						foreach($obsoletes as $key => $value)
+						$logbuffer = "";
+						foreach($obsoletes as $key => $value) {
+							$logbuffer .= $value;
 							echo $value;
+						}
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User find obsolete datas :<br />".$logbuffer);
 					}
 					else echo FS::$iMgr->printDebug($this->loc->s("no-old-record"));
+					
+					
 					return;
 				case 3:
 					$filtr = FS::$secMgr->checkAndSecuriseGetData("f");
@@ -244,19 +257,23 @@
 					$enmon = FS::$secMgr->checkAndSecurisePostData("enmon");
 					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || $warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
 						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to monitor subnet");
 						echo FS::$iMgr->printError($this->loc->s("err-miss-data"));
 						return;
 					}
 					$exist = FS::$pgdbMgr->GetOneData("z_eye_dhcp_subnet_cache","netid","netid = '".$filtr."'");
 					if(!$exist) {
 						echo FS::$iMgr->printError($this->loc->s("err-bad-subnet"));
-                                                return;
-                                        }
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"User try to monitor inexistant subnet '".$filtr."'");
+						return;
+					}
 
 					FS::$pgdbMgr->Delete("z_eye_dhcp_monitoring","subnet = '".$filtr."'");
 					if($enmon == "on")
 						FS::$pgdbMgr->Insert("z_eye_dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage","'".$filtr."','".$warn."','".$crit."','".$contact."','1','".$maxage."'");
 					echo FS::$iMgr->printDebug($this->loc->s("modif-record"));
+					
+					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
 					return;
 			}
 		}

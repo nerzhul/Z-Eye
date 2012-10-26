@@ -348,7 +348,7 @@
 		
 		public function handlePostDatas($act) {
 			switch($act) {
-				case 1:
+				case 1: // Adding server
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -366,6 +366,7 @@
 						$dns == "on" && ($namedpath == NULL || $namedpath == "" || !FS::$secMgr->isPath($namedpath) ||
 							(($chrootnamed == NULL || $chrootnamed == "") && !FS::$secMgr->isPath($chrootnamed)))
 						) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some datas are invalid or wrong for add server");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
@@ -379,14 +380,16 @@
 						return;
 					}
 					if(FS::$pgdbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=4");
 						return;
 					}
 					FS::$pgdbMgr->Insert("z_eye_server_list","addr,login,pwd,dhcp,dns,dhcpdpath,dhcpleasepath,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','".($dhcp == "on" ? 1 : 0)."','".($dns == "on" ? 1 : 0)."','".$dhcpdpath."','".$dhcpleasepath."','".$namedpath."','".$chrootnamed."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: "($dns == "on" ? "dns checking" : "").($dhcp == "on" ? "dhcp checking" : ""));
 					header("Location: m-".$this->mid.".html");
 					break;
-				case 2:
+				case 2: // server edition
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -403,6 +406,7 @@
                                                 || $dns == "on" && ($namedpath == NULL || $namedpath == "" || !FS::$secMgr->isPath($namedpath) ||
 							(($chrootnamed == NULL || $chrootnamed == "") && !FS::$secMgr->isPath($chrootnamed)))
 						) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing/wrong for server edition");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=1");
 						return;
 					}
@@ -416,18 +420,22 @@
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&err=3");
 							return;
 						}
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit server password for server '".$saddr."'");
 						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
 					}
 					FS::$pgdbMgr->Update("z_eye_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0)."', dns = '".($dns == "on" ? 1 : 0)."', chrootnamed = '".$chrootnamed."', namedpath='".$namedpath."', dhcpdpath='".$dhcpdpath."', dhcpleasepath='".$dhcpleasepath."'","addr = '".$saddr."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit informations for server '".$server."'");
 					header("Location: m-".$this->mid.".html");
 					break;
-				case 3: {
+				case 3: { // server removal
 					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Removing server '".$srv."' from database");
 							FS::$pgdbMgr->Delete("z_eye_server_list","addr = '".$srv."'");
 					}
 					header('Location: m-'.$this->mid.'.html');
+					return;
 				}
-				case 4:
+				case 4: // add radius db
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -437,6 +445,7 @@
 					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
 					if($saddr == NULL || $saddr == "" || $salias == NULL || $salias == "" || $sport == NULL || !FS::$secMgr->isNumeric($sport) || $sdbname == NULL || $sdbname == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing or wrong for radius db adding");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
@@ -451,13 +460,15 @@
 					}
 					FS::$dbMgr->Connect();
 					if(FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
 					FS::$pgdbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
 					header("Location: m-".$this->mid.".html");
 					break;
-				case 5:
+				case 5: // radius db edition
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -479,21 +490,24 @@
 							return;
 						}
 						FS::$dbMgr->Connect();
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit password for radius db ".$sdbname."@".$saddr.":".$sport);
 						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit radius db ".$sdbname."@".$saddr.":".$sport);
 					FS::$pgdbMgr->Update("z_eye_radius_db_list","login = '".$slogin."', radalias = '".$salias."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					header("Location: m-".$this->mid.".html");
 					break;
-				case 6: {
+				case 6: { // removal of radius DB
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					$sport = FS::$secMgr->checkAndSecuriseGetData("pr");
 					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
 					if($saddr && $sport && $sdbname) {
-							FS::$pgdbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Remove Radius DB ".$sdbname."@".$saddr.":".$sport);
+						FS::$pgdbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
 					header('Location: m-'.$this->mid.'.html');
 				}
-				case 7:
+				case 7: // Save server for switch config
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -501,18 +515,21 @@
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
 					$spath = FS::$secMgr->checkAndSecurisePostData("spath");
 					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing/wrong for saving switch config");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
 
 					if(FS::$pgdbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Server '".$saddr."' already exists for saving switch config");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr"' (type ".$stype.") for saving switch config");
 					FS::$pgdbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
 					header("Location: m-".$this->mid.".html");
 					break;
-				case 8:
+				case 8: // Edit save server
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -520,9 +537,11 @@
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
 					$spath = FS::$secMgr->checkAndSecurisePostData("spath");
 					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd != $spwd2))) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing/wrong for saving switch config");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&type=".$stype."&err=1");
 						return;
 					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Update server '".$saddr."' for saving switch config");
 					FS::$pgdbMgr->Update("z_eye_save_device_servers","path = '".$spath."', pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
 					header("Location: m-".$this->mid.".html");
 					break;
@@ -530,6 +549,7 @@
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
 					if($saddr && $stype) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Delete server '".$saddr."' for saving switch config");
 							FS::$pgdbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}	
 					header('Location: m-'.$this->mid.'.html');				

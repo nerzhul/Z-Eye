@@ -104,6 +104,7 @@
 			$link->setArgs($args);
 			$link->setType($type);
 			$link->Create();
+			FS::$log->i(FS::$sessMgr->getUserName(),"linkmgmt",0,"Link added. Type: ".$type." args: ".$args);
 		}
 		
 		public function EditLink() {
@@ -118,6 +119,7 @@
 			$link->setArgs($args);
 			$link->setType($type);
 			$link->SaveToDB();
+			FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Link edited. Type: ".$type." args: ".$args);
 		}
 		
 		public function RemoveLink() {
@@ -127,6 +129,7 @@
 				
 			$link = new HTTPLink($lid);
 			$link->Delete();
+			FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Link removed '".$link."'");
 		}
 		
 		public function handlePostDatas($act) {

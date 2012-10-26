@@ -37,8 +37,8 @@
 				case 1: if(FS::$sessMgr->getUid()) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"disconnect",1,"User disconnected");
 						FS::$sessMgr->Close(); 
-						break;
 					}
+					break;
 				default: break;
 			}
 			header("Location: index.php");

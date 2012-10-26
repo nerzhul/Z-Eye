@@ -51,7 +51,7 @@
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 			}
-
+			FS::$log->i(FS::$sessMgr->getUserName(),"search",0,"searching '".$search."'");
 			return $output;
 		}
 

@@ -242,8 +242,10 @@
 					$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
 					$shother = FS::$secMgr->checkAndSecurisePostData("sother");
 					
-					if($filtr == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) 
+					if($filtr == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Some filtering values are wrong");
 						header("Location: index.php?mod".$this->mid."");
+					}
 					else {
 						if($shA == "on") $shA = 1;
 						else $shA = 0;
@@ -279,6 +281,7 @@
 					if(!$filter || !$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
 						echo FS::$iMgr->printError($this->loc->s("err-invalid-req"));
+						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Invalid data when searching obsolete datas");
 						return;
 					}
 
@@ -332,6 +335,7 @@
 							echo $value;
 					}
 					else echo FS::$iMgr->printDebug($this->loc->s("no-found-records"));
+					FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",3,"User read ".$filter." DNS zone");
 					return;
 			}
 		}

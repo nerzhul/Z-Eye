@@ -102,11 +102,11 @@
 		}
 
 		 public function Sum($table,$field,$cond = "") {
-                        $count = $this->GetOneData($table,"SUM(".$field.")",$cond);
-                        if($count == NULL)
-                                return 0;
-                        return $count;
-                }
+				$count = $this->GetOneData($table,"SUM(".$field.")",$cond);
+				if($count == NULL)
+						return 0;
+				return $count;
+		}
 		
 		public function Insert($table,$keys,$values) {
 			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";

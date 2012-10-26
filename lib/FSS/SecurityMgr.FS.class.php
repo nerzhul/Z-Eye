@@ -91,19 +91,19 @@
 		}
 
 		public function isCIDR($str) {
-                        if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\/(\d|[1-2]\d|3[0-2]))$#",$str)) {
-                                $str_array = split('\.',$str);
-                                if(count($str_array) != 4)
-                                        return false;
+			if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\/(\d|[1-2]\d|3[0-2]))$#",$str)) {
+					$str_array = split('\.',$str);
+					if(count($str_array) != 4)
+							return false;
 
-                                for($i=0;$i<4;$i++)
-                                        if($str_array[$i] > 255)
-                                                return false;
+					for($i=0;$i<4;$i++)
+							if($str_array[$i] > 255)
+									return false;
 
-                                return true;
+					return true;
 			}
-                        return false;
-                }
+				return false;
+		}
 
 		public function isIPorCIDR($str) {
 			if($this->isIP($str) || $this->isCIDR($str))
