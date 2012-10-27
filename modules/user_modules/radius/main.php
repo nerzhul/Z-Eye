@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 4;
 				$this->moduleclass = new iRadius();
 				$this->rulesclass = new rRadius();
-                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+                $this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}
