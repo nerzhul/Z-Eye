@@ -28,7 +28,6 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
-	require_once(dirname(__FILE__)."/../../config/".Config::getSysLang().".lang.php");
 	class FSMySQLMgr {
 		function FSMySQLMgr() {
 			$this->dbName = "";
@@ -43,7 +42,7 @@
 			$result = mysql_pconnect($this->dbHost.":".$this->dbPort,$this->dbUser,$this->dbPass);
 			if(!$result) {
 				$iMgr = new FSInterfaceMgr($this);
-				$iMgr->printError(Localization::$MYSQL_CONNECT_ERROR);
+				$iMgr->printError("Unable to connect to MySQL database");
 				exit(1);
 			}
 			$this->dbConn = $result;

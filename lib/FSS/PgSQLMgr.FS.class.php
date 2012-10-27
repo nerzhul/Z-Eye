@@ -30,7 +30,6 @@
 
 	require_once(dirname(__FILE__)."/../../config/pgdb.conf.php");
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
-	require_once(dirname(__FILE__)."/../../config/".Config::getSysLang().".lang.php");
 	class FSPostgreSQLMgr {
 		function FSPostgreSQLMgr() {
 			$this->dbName = PGDbConfig::getDbName();
@@ -45,7 +44,7 @@
 			$this->dbLink = pg_connect("host=".$this->dbHost. " port=".$this->dbPort." dbname=".$this->dbName." user=".$this->dbUser." password=".$this->dbPass);
 			if(!$this->dbLink) {
 				$iMgr = new FSInterfaceMgr($this);
-				$iMgr->printError(Localization::$PGSQL_CONNECT_ERROR);
+				$iMgr->printError("Unable to connect to PG database");
 				exit(1);
 			}
 		}
