@@ -560,7 +560,7 @@ preprocessor http_inspect_server: server default \\\n
 
 		public function handlePostDatas($act) {
 			switch($act) {
-				case 1:
+				case 1: // Snort Main config
 					$dbhost = FS::$secMgr->checkAndSecurisePostData("dbhost");
 					$dbname = FS::$secMgr->checkAndSecurisePostData("dbname");
 					$dbuser = FS::$secMgr->checkAndSecurisePostData("dbuser");
@@ -568,6 +568,7 @@ preprocessor http_inspect_server: server default \\\n
 					//$dbport = FS::$secMgr->checkAndSecurisePostData("dbport");
 
 					if(!$dbhost || !$dbname || !$dbuser || !$dbpwd) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for main configuration");
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
@@ -583,17 +584,25 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbuser','".$dbuser."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbpwd','".$dbpwd."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbname','".$dbname."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change snort database values to ".$dbuser.":".$dbpwd." on ".$dbname."@".$dbhost);
 					header("Location: index.php?mod=".$this->mid);
 					break;
-				case 2:
+				case 2: // DNS edit
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("dnslist");
 					$enable = FS::$secMgr->checkAndSecurisePostData("dnsenable");
 
+					if(!$srvlist) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for DNS sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+					
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for DNS sensors configuration (CIDR)");
 								header("Location: index.php?mod=".$this->mid."&err=1");
 								return;
 							}
@@ -602,12 +611,16 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dnsenable','dnslist')");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnsenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dnslist','".$srvlist."'");
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change DNS values to srvlist: ".$srvlist." enable: ".$enable);
 						header("Location: index.php?mod=".$this->mid."&sh=2");
+					}
 					break;
-				case 3:
+				case 3: // Mail conf
 					$smtplist = FS::$secMgr->checkAndSecurisePostData("smtplist");
 					$smtpports = FS::$secMgr->checkAndSecurisePostData("smtpports");
 					$enablesmtp = FS::$secMgr->checkAndSecurisePostData("ensmtp");
@@ -618,11 +631,18 @@ preprocessor http_inspect_server: server default \\\n
 					$popports = FS::$secMgr->checkAndSecurisePostData("popports");
 					$enablepop = FS::$secMgr->checkAndSecurisePostData("enpop");
 
+					if(!$smtplist || !$imaplist || !$poplist || !$smtpports || !$imapports || !$popports) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for Mail sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
+						return;
+					}
+					
 					$smtplist = trim($smtplist);
 					$srvs = preg_split("#[,]#",$smtplist);
 					if(strlen($smtplist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (SMTP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
@@ -634,6 +654,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($smtpports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (smtp port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
@@ -645,6 +666,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($imaplist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (IMAP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
@@ -656,6 +678,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($imapports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (imap port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
@@ -667,6 +690,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($poplist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (POP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
@@ -678,6 +702,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($popports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (pop port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
@@ -695,21 +720,34 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'popenable',".($enablepop == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'poplist','".$poplist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'popports','".$popports."'");
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change SMTP values to smtplist: ".$smtplist." smtpports: ".$smtpports." smtenable: ".$enablesmtp);
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change POP values to poplist: ".$poplist." popports: ".$popports." popenable: ".$enablepop);
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change IMAP values to imaplist: ".$imaplist." imapports: ".$imapports. " imapenable: ".$enableimap);
 						header("Location: index.php?mod=".$this->mid."&sh=3");
+					}
 					break;
-				case 4:
+				case 4: // HTTP config
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("httplist");
 					$httpports = FS::$secMgr->checkAndSecurisePostData("httpports");
 					$enable = FS::$secMgr->checkAndSecurisePostData("enhttp");
+					
+					if(!$srvlist || !$httpports) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for HTTP sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						return;
+					}
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for HTTP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 								return;
 							}
@@ -721,6 +759,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($httpports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for HTTP (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 								return;
 							}
@@ -731,23 +770,34 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httpenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httplist','".$srvlist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'httpports','".$httpports."'");
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change HTTP values to srvlist: ".$srvlist." ports: ".$httpports." enable: ".$enable);
 						header("Location: index.php?mod=".$this->mid."&sh=4");
+					}
 					break;
-				case 5:
+				case 5: // Sql config
 					$sqllist = FS::$secMgr->checkAndSecurisePostData("sqllist");
 					$sqlenable = FS::$secMgr->checkAndSecurisePostData("ensql");
 					$oraclelist = FS::$secMgr->checkAndSecurisePostData("oraclelist");
 					$oracleports = FS::$secMgr->checkAndSecurisePostData("oracleports");
 					$oracleenable = FS::$secMgr->checkAndSecurisePostData("enoracle");
+					
+					if(!$sqllist || !$oraclelist || !$oracleports) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for SQL sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						return;
+					}
 
 					$sqllist = trim($sqllist);
 					$srvs = preg_split("#[,]#",$sqllist);
 					if(strlen($sqllist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (SQL not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 								return;
 							}
@@ -759,6 +809,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($oraclelist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (Oracle not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 								return;
 							}
@@ -770,6 +821,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($oracleports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (Oracle port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 								return;
 							}
@@ -784,12 +836,17 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oracleenable',".($oracleenable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oraclelist','".$oraclelist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'oracleports','".$oracleports."'");
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change SQL values to sqllist: ".$sqllist." sqlenable: ".$sqlenable);
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change SQL values to oraclelist: ".$oraclelist." oracleports: ".$oracleports." oracleenable: ".$oracleenable);
 						header("Location: index.php?mod=".$this->mid."&sh=5");
+					}
 					break;
-				case 6:
+				case 6: // Remote access
 					$telnetlist = FS::$secMgr->checkAndSecurisePostData("telnetlist");
 					$telnetenable = FS::$secMgr->checkAndSecurisePostData("entelnet");
 					$sshlist = FS::$secMgr->checkAndSecurisePostData("sshlist");
@@ -797,12 +854,19 @@ preprocessor http_inspect_server: server default \\\n
 					$sshenable = FS::$secMgr->checkAndSecurisePostData("enssh");
 					$tselist = FS::$secMgr->checkAndSecurisePostData("tselist");
 					$tseenable = FS::$secMgr->checkAndSecurisePostData("entse");
+					
+					if(!$telnetlist || !$sshlist || !$tselist || !$sshports) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for remote access sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						return;
+					}
 
 					$telnetlist = trim($telnetlist);
 					$srvs = preg_split("#[,]#",$telnetlist);
 					if(strlen($telnetlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (telnet not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
@@ -814,6 +878,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($sshlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (SSH not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
@@ -825,6 +890,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($sshports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (SSH port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
@@ -836,6 +902,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($tselist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (TSE not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 								return;
 							}
@@ -857,21 +924,34 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'tseenable',".($tseenable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'tselist','".$tselist."'");
 
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change remote access values to sshlist: ".$sshlist." sshports: ".$sshports." sshenable: ".$sshenable);
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change remote access values to telnetlist: ".$telnetlist." telnetenable: ".$telnetenable);
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change remote access values to tselist: ".$tselist." tseenable: ".$tseenable);
 						header("Location: index.php?mod=".$this->mid."&sh=6");
+					}
 					break;
-				case 7:
+				case 7: // FTP sensors
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("ftplist");
 					$ftpports = FS::$secMgr->checkAndSecurisePostData("ftpports");
 					$enable = FS::$secMgr->checkAndSecurisePostData("enftp");
+					
+					if(!$srvlist || !$ftpports) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for FTP sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
+						return;
+					}
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for FTP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 								return;
 							}
@@ -883,6 +963,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($ftpports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for FTP sensors configuration (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 								return;
 							}
@@ -896,20 +977,31 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'ftplist','".$srvlist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'ftpports','".$ftpports."'");
 
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change FTP values to ftplist: ".$ftplist." ftpports: ".$ftpports." ftpenable: ".$ftpenable);
 						header("Location: index.php?mod=".$this->mid."&sh=7");
+					}
 					break;
-				case 8:
+				case 8: // SNMP
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("snmplist");
 					$enable = FS::$secMgr->checkAndSecurisePostData("ensnmp");
+					
+					if(!$srvlist) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for SNMP sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
+						return;
+					}
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SNMP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
 								return;
 							}
@@ -921,21 +1013,32 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'snmpenable',".($enable == "on" ? 1 : 0));
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'snmplist','".$srvlist."'");
 
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change SNMP values to snmplist: ".$srvlist." snmpenable: ".$enable);
 						header("Location: index.php?mod=".$this->mid."&sh=8");
+					}
 					break;
-				case 9:
+				case 9: // SIP
 					$srvlist = FS::$secMgr->checkAndSecurisePostData("siplist");
 					$sipports = FS::$secMgr->checkAndSecurisePostData("sipports");
 					$enable = FS::$secMgr->checkAndSecurisePostData("ensip");
+					
+					if(!$srvlist || !$sipports) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing for SIP sensors configuration");
+						header("Location: index.php?mod=".$this->mid."&sh=9&err=1");
+						return;
+					}
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
 					if(strlen($srvlist) > 0 && count($srvs) > 0) {
 						for($i=0;$i<count($srvs);$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SIP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");
 								return;
 							}
@@ -947,6 +1050,7 @@ preprocessor http_inspect_server: server default \\\n
 					if(strlen($sipports) > 0 && count($ports) > 0) {
 						for($i=0;$i<count($ports);$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
+								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SIP sensors configuration (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");
 								return;
 							}
@@ -960,10 +1064,14 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'siplist','".$srvlist."'");
 					FS::$pgdbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'sipports','".$sipports."'");
 
-					if($this->writeConfiguration() != 0)
+					if($this->writeConfiguration() != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort configuration !");
 						header("Location: index.php?mod=".$this->mid."&sh=9&err=2");
-					else
+					}
+					else {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change SIP values to siplist: ".$srvlist." sippports: ".$sipports." sipenable: ".$enable);
 						header("Location: index.php?mod=".$this->mid."&sh=9");
+					}
 					break;
 				
 				case 10:
@@ -977,6 +1085,7 @@ preprocessor http_inspect_server: server default \\\n
 					
 					if($hnight == NULL || $hnight > 23 || $mnight == NULL || $mnight > 59 || 
 						$hwe == NULL || $hwe > 23 || $mwe == NULL || $mwe > 59 || $nightback == NULL || $nightback > 23) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Some fields are missing/wrong for night/week report configuration");
 						header("Location: index.php?mod=".$this->mid."&sh=10&err=1");
 						return;
 					}
@@ -991,6 +1100,7 @@ preprocessor http_inspect_server: server default \\\n
 					
 					$file = fopen(dirname(__FILE__)."/../../../datas/system/snort.crontab");
 					if(!$file) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort.crontab file !");
 						header("Location: index.php?mod=".$this->mid."&sh=10&err=3");
 						return;
 					}
@@ -1018,6 +1128,7 @@ preprocessor http_inspect_server: server default \\\n
 					
 					// TODO: write special cron for tasks & create cron entries for modules
 					fclose($file);
+					FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",0,"Change night reports");
 					header("Location: index.php?mod=".$this->mid."&sh=10");
 					break;
 				default: break;

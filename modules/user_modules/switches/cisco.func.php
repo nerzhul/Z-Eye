@@ -35,6 +35,16 @@
 
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
 		}
+		
+		function getPortStateWithPID($device,$pid) {
+			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7");
+			$dup = explode(" ",$dup);
+			if(count($dup) != 2)
+					return -1;
+
+			$dup = $dup[1];
+			return $dup;
+		}
 
 		/*
 		* Link Management
@@ -47,38 +57,35 @@
 		}
 
 		function getPortDuplexWithPID($device,$pid) {
-/*			$idx = getPortIndexes($device,$pid);
-			if($idx == NULL)
-				return -2;*/
 			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.10.7.2.1.19");
 			$dup = explode(" ",$dup);
-                        if(count($dup) != 2)
-                                return -1;
+			if(count($dup) != 2)
+					return -1;
 
-                        $dup = $dup[1];
+			$dup = $dup[1];
 			return $dup;
 		}
 
-                function setPortSpeedWithPID($device,$pid,$value) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value < 1)
-                                return NULL;
-                        
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
-                }
-                
-                function getPortSpeedWithPID($device,$pid) {
+		function setPortSpeedWithPID($device,$pid,$value) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value < 1)
+					return NULL;
+			
+			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
+		}
+		
+		function getPortSpeedWithPID($device,$pid) {
 			$idx = getPortIndexes($device,$pid);
-                        if($idx == NULL)
-                                return -2;
+			if($idx == NULL)
+					return -2;
 
-                        $dup = getFieldForPortWithPID($device,$idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
-                        $dup = explode(" ",$dup);
-                        if(count($dup) != 2)
-                                return -1;
-                        
-                        $dup = $dup[1];
-                        return $dup;
-                }
+			$dup = getFieldForPortWithPID($device,$idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
+			$dup = explode(" ",$dup);
+			if(count($dup) != 2)
+					return -1;
+			
+			$dup = $dup[1];
+			return $dup;
+		}
 		/*
 		* VLAN management
 		*/
@@ -114,13 +121,13 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
-                        $state = explode(" ",$ret);
-                        if(count($state) != 2)
-                                return -1;
+			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
+			$state = explode(" ",$ret);
+			if(count($state) != 2)
+					return -1;
 
-                        $state = $state[1];
-                        return $state;
+			$state = $state[1];
+			return $state;
 		}
 
 		function setSwitchMABTypeWithPID($device,$pid,$value) {
@@ -131,17 +138,17 @@
 		}
 
 		function getSwitchportMABType($device,$pid) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                                return -1;
+				if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+						return -1;
 
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
-                        $type = explode(" ",$ret);
-                        if(count($type) != 2)
-                                return -1;
+				$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
+				$type = explode(" ",$ret);
+				if(count($type) != 2)
+						return -1;
 
-                        $type = $type[1];
-                        return $type;
-                }
+				$type = $type[1];
+				return $type;
+		}
 
 		function setSwitchportAuthFailVLAN($device,$pid,$value) {
 			// #todo disable feature
@@ -442,6 +449,19 @@
 
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3","i",$value);
 		}
+		
+		function getSwitchTrunkEncapWithPID($device, $pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+		                  return -1;
+
+			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3");
+			$state = explode(" ",$ret);
+			if(count($state) != 2)
+					return -1;
+
+			$state = $state[1];
+			return $state;
+		}
 
 		function setSwitchportModeWithPID($device, $pid, $value) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
@@ -455,33 +475,33 @@
 		                  return -1;
 
 			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
-                        $state = explode(" ",$ret);
-                        if(count($state) != 2)
-                                return -1;
+			$state = explode(" ",$ret);
+			if(count($state) != 2)
+					return -1;
 
-                        $state = $state[1];
+			$state = $state[1];
 			return $state;
 		}
 
 		function setSwitchportVoiceVlanWithPID($device, $pid, $value) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4096)
-                		   return -1;
+				if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4096)
+				   return -1;
 
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
-                }
+				return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
+		}
 
-                function getSwitchportVoiceVlanWithPID($device, $pid) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-		                  return -1;
+		function getSwitchportVoiceVlanWithPID($device, $pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+				return -1;
 
 			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1");
 			$value = explode(" ",$ret);
-                        if(count($value) != 2)
-                                return -1;
+				if(count($value) != 2)
+						return -1;
 
-                        $value = $value[1];
-                        return $value;
-                }
+				$value = $value[1];
+				return $value;
+		}
 
 		/*
 		* Generic functions

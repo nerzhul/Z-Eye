@@ -477,6 +477,7 @@
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
 					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2 || $salias == NULL || $salias == "") {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing or wrong for radius db edit");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=1");
 						return;
 					}
@@ -486,6 +487,7 @@
 
 						$conn = $testDBMgr->Connect();
 						if(!$conn) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Unable to connect to database ".$sdbname."@".$saddr);
 							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=2");
 							return;
 						}
