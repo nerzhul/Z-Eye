@@ -150,12 +150,14 @@
 						/*$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
 						$trmode = preg_split("# #",$trmode);
 						$trmode = $trmode[1];*/
-						if(getSwitchportMABState($device,$portid) == 1)
-                                                        $trmode = 3;
+						$mabstate = getSwitchportMABState($device,$portid);
+						if($mabstate == 1)
+							$trmode = 3;
 						$output .= FS::$iMgr->addList("trmode","arangeform()");
 						$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
 						$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
-						$output .= FS::$iMgr->addElementToList("802.1X - MAB",3,$trmode == 3 ? true : false);
+						if($mabstate != -1)
+							$output .= FS::$iMgr->addElementToList("802.1X - MAB",3,$trmode == 3 ? true : false);
 						$output .= "</select>";
 						$output .= "<tr><td id=\"vllabel\">";
 						$portoptlabel = "";
@@ -188,10 +190,10 @@
 						$voicevlan = getSwitchportVoiceVlanWithPID($device,$portid);
 						$output .= FS::$iMgr->addList("nvlan","");
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
-	                                        while($data = pg_fetch_array($query)) {
+	                    while($data = pg_fetch_array($query)) {
 							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
 							$voicevlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
-                                	        }
+                        }
 						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
 						$output .= FS::$iMgr->textarea("vllist",$vlanlist,250,100);
