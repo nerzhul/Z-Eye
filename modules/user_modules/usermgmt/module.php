@@ -295,7 +295,7 @@
 
 					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
 					if($serv) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port", already exists");
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", already exists");
 						header("Location: index.php?mod=".$this->mid."&err=4");
 						return;
 					}
@@ -303,7 +303,7 @@
 					$ldapMgr = new LDAP();
 					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
 					if(!$ldapMgr->RootConnect()) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port", connection fail");
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", connection fail");
 						header("Location: index.php?mod=".$this->mid."&err=3");
 						return;
 					}
@@ -323,7 +323,7 @@
 
 					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
 					if(!$serv) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove LDAP ".$addr.":".$port", not exists");
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove LDAP ".$addr.":".$port.", not exists");
 						header("Location: index.php?mod=".$this->mid."&err=4");
 						return;
 					}
@@ -342,7 +342,7 @@
 
 					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
 					if(!$serv) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to edit LDAP ".$addr.":".$port", not exists");
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to edit LDAP ".$addr.":".$port.", not exists");
 						header("Location: index.php?mod=".$this->mid."&err=4");
 						return;
 					}
@@ -367,7 +367,7 @@
 					$ldapMgr = new LDAP();
 					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
 					if(!$ldapMgr->RootConnect()) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to connect to LDAP ".$addr.":".$port", login failed");
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to connect to LDAP ".$addr.":".$port.", login failed");
 						header("Location: index.php?mod=".$this->mid."&err=3");
 						return;
 					}
