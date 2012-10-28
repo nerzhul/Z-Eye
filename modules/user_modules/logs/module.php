@@ -34,7 +34,7 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 					$output .= "<div id=\"contenttabs\"><ul>";
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("webapp"),$sh);
+					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("webapp"),$sh);
 					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Collector"),$sh);
 					//$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Stats"),$sh);
 					$output .= "</ul></div>";
@@ -45,11 +45,11 @@
 				$output = "";
 				
 				$found = false;
-				$query = FS::$pgdbMgr->Select("z_eye_logs","date,module,level,_user,txt","","date",2);
+				$query = FS::$pgdbMgr->Select("z_eye_logs","date,module,level,_user,txt","","date",1);
 				while($data = pg_fetch_array($query)) {
 					if(!$found) {
 						$found = true;
-						$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")"</th>
+						$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
 							<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr>";
 					}
 					$date = preg_split("#[.]#",$data["date"]);
@@ -60,11 +60,11 @@
 						case 2: $output .= "Crit"; break;
 						default: $output .= "Unk"; break;
 					}
-					"</td><th>".$data["_user"]."</th><th>".preg_replace("#[\n]#","<br />",$data["txt"])."</th></tr>";
+					$output .= "</td><td>".$data["_user"]."</td><td>".preg_replace("#[\n]#","<br />",$data["txt"])."</td></tr>";
 				}
 				
 				if($found) $output .= "</table>";
-				else
+				else $output .= FS::$iMgr->printError($this->loc->s("err-no-logs"));
 			}
 			else if($sh == 2) {
 				$output = "<pre>";

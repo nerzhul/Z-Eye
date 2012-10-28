@@ -87,7 +87,7 @@
 				if($data = pg_fetch_array($query))
 				{
 					$this->connectUser($data["uid"],$data["ulevel"]);
-					FS::$log->i("None","connect",1,"Login success for user '".$username."'");
+					FS::$log->i("None","connect",0,"Login success for user '".$username."'");
 					header("Location: ".$url);
 					return;
 				}
@@ -97,7 +97,7 @@
 					if($data = pg_fetch_array($query))
 					{
 							$this->connectUser($data["uid"],$data["ulevel"]);
-							FS::$log->i("None","connect",1,"Login success for user '".$username."'");
+							FS::$log->i("None","connect",0,"Login success for user '".$username."'");
 							header("Location: ".$url);
 							return;
 					}
@@ -112,7 +112,7 @@
 						return;
 					}
 					$this->connectUser($data["uid"],$data["ulevel"]);
-					FS::$log->i("None","connect",1,"Login success for user '".$username."'");
+					FS::$log->i("None","connect",0,"Login success for user '".$username."'");
 					header("Location: ".$url);
 					return;
 				}
