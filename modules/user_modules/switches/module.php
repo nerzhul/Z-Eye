@@ -288,12 +288,12 @@
 				$output .= ")</h4>";
 				
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Details"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Details"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools"),$showmodule);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
@@ -1409,7 +1409,7 @@
 						// dot1x disable
 						if($authhostmode != -1) {
 							setSwitchportAuthHostMode($sw,$pid,1);
-							$logvals["hostmode"]["dst"] = 1;
+							$logvals["authhostmode"]["dst"] = 1;
 						}
 						// set settings
 						if(setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
@@ -1476,7 +1476,7 @@
 						// Host Mode for Authentication
 						if($authhostmode != -1) {
 							setSwitchportAuthHostMode($sw,$pid,$dot1xhostmode);
-							$logvals["hostmode"]["dst"] = $dot1xhostmode;
+							$logvals["authhostmode"]["dst"] = $dot1xhostmode;
 						}
 					}
 					$logvals["hostmode"]["src"] = getPortStateWithPID($sw,$pid);
