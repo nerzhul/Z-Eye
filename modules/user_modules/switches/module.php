@@ -1284,7 +1284,7 @@
 						return;
 					}
 					
-					$logoutput = "Modify port '".$port."' on device '".$device."'";
+					$logoutput = "Modify port '".$port."' on device '".$sw."'";
 					$logvals = array();
 					$idx = getPortIndexes($sw,$pid);
 					
