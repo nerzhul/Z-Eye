@@ -745,15 +745,15 @@
 		*/
 		
 		function setPortState($device,$portname,$value) {
-			$pid = $this->getPortId($device,$portname);
+			$pid = getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return $this->setPortStateWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
+			return setPortStateWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
 		}
 		
 		function setPortDesc($device,$portname,$value) {
-			$pid = $this->getPortId($device,$portname);
+			$pid = getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
@@ -761,7 +761,7 @@
 		}
 		
 		function getPortDesc($device,$portname) {
-			return $this->getFieldForPort($device, $portname, "ifAlias");
+			return getFieldForPort($device, $portname, "ifAlias");
 		}
 		
 		function setSwitchportMode($device, $portname, $value) {
