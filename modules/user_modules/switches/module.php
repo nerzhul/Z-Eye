@@ -1311,32 +1311,55 @@
 					}
 					
 					$logvals["accessvlan"]["src"] = getSwitchAccessVLANWithPID($sw,$pid);
-					$logvals["mabst"]["src"] = getSwitchportMABState($sw,$pid);
-					$logvals["failvlan"]["src"] = getSwitchportAuthFailVLAN($sw,$pid);
-					$logvals["norespvlan"]["src"] = getSwitchportAuthNoRespVLAN($sw,$pid);
-					$logvals["controlmode"]["src"] = getSwitchportControlMode($sw,$pid);
-					$logvals["hostmode"]["src"] = getSwitchportAuthHostMode($sw,$pid);
 					$logvals["trunkencap"]["src"] = getSwitchTrunkEncapWithPID($sw,$pid);
 					$logvals["mode"]["src"] = getSwitchportModeWithPID($sw,$pid);
 					$logvals["trunkvlan"]["src"] = getSwitchportTrunkVlansWithPid($sw,$pid);
 					$logvals["nativevlan"]["src"] = getSwitchTrunkNativeVlanWithPID($sw,$pid);
+					
+					// Mab & 802.1X
+					$mabst = getSwitchportMABState($sw,$pid);
+					if($mabst != -1)
+						$logvals["mabst"]["src"] = $mabst;
+					$failvlan = getSwitchportAuthFailVLAN($sw,$pid);
+					if($failvlan != -1)
+						$logvals["failvlan"]["src"] = $failvlan;
+					$norespvlan = getSwitchportAuthNoRespVLAN($sw,$pid);
+					if($norespvlan != -1)
+						$logvals["norespvlan"]["src"] = $norespvlan;
+					$controlmode = getSwitchportControlMode($sw,$pid);
+					if($controlmode != -1)
+						$logvals["controlmode"]["src"] = $controlmode;
+					$authhostmode = getSwitchportAuthHostMode($sw,$pid);
+					if($authhostmode != -1)					
+						$logvals["authhostmode"]["src"] = $authhostmode;
+					
 					if($trunk == 1) {
 						$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
 
 						setSwitchAccessVLANWithPID($sw,$pid,1);
 						$logvals["accessvlan"]["dst"] = 1;
 						// mab disable
-						setSwitchportMABEnableWithPID($sw,$pid,2);
-						$logvals["mabst"]["dst"] = 2;
-						setSwitchportAuthFailVLAN($sw,$pid,0);
-						$logvals["failvlan"]["dst"] = 0;
-						setSwitchportAuthNoRespVLAN($sw,$pid,0);
-						$logvals["norespvlan"]["dst"] = 0;
-						setSwitchportControlMode($sw,$pid,3);
-						$logvals["controlmode"]["dst"] = 3;
+						if($mabst != -1) {
+							setSwitchportMABEnableWithPID($sw,$pid,2);
+							$logvals["mabst"]["dst"] = 2;
+						}
+						if($failvlan != -1) {
+							setSwitchportAuthFailVLAN($sw,$pid,0);
+							$logvals["failvlan"]["dst"] = 0;
+						}
+						if($norespvlan != -1) {
+							setSwitchportAuthNoRespVLAN($sw,$pid,0);
+							$logvals["norespvlan"]["dst"] = 0;
+						}
+						if($controlmode != -1) {
+							setSwitchportControlMode($sw,$pid,3);
+							$logvals["controlmode"]["dst"] = 3;
+						}
 						// dot1x disable
-						setSwitchportAuthHostMode($sw,$pid,1);
-						$logvals["hostmode"]["dst"] = 1;
+						if($authhostmode != -1) {
+							setSwitchportAuthHostMode($sw,$pid,1);
+							$logvals["hostmode"]["dst"] = 1;
+						}
                         
                         // set settings
 						if(setSwitchTrunkEncapWithPID($sw,$pid,4) != 0) {
@@ -1365,17 +1388,27 @@
 						setSwitchNoTrunkVlanWithPID($sw,$pid);
 						$logvals["trunkvlan"]["dst"] = "";
 						// mab disable
-						setSwitchportMABEnableWithPID($sw,$pid,2);
-						$logvals["mabst"]["dst"] = 2;
-						setSwitchportAuthFailVLAN($sw,$pid,0);
-						$logvals["failvlan"]["dst"] = 0;
-						setSwitchportAuthNoRespVLAN($sw,$pid,0);
-						$logvals["norespvlan"]["dst"] = 0;
-						setSwitchportControlMode($sw,$pid,3);
-						$logvals["controlmode"]["dst"] = 3;
+						if($mabst != -1) {
+							setSwitchportMABEnableWithPID($sw,$pid,2);
+							$logvals["mabst"]["dst"] = 2;
+						}
+						if($failvlan != -1) {
+							setSwitchportAuthFailVLAN($sw,$pid,0);
+							$logvals["failvlan"]["dst"] = 0;
+						}
+						if($norespvlan != -1) {
+							setSwitchportAuthNoRespVLAN($sw,$pid,0);
+							$logvals["norespvlan"]["dst"] = 0;
+						}
+						if($controlmode != -1) {
+							setSwitchportControlMode($sw,$pid,3);
+							$logvals["controlmode"]["dst"] = 3;
+						}
 						// dot1x disable
-						setSwitchportAuthHostMode($sw,$pid,1);
-						$logvals["hostmode"]["dst"] = 1;
+						if($authhostmode != -1) {
+							setSwitchportAuthHostMode($sw,$pid,1);
+							$logvals["hostmode"]["dst"] = 1;
+						}
 						// set settings
 						if(setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
 								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
@@ -1413,23 +1446,36 @@
 						$logvals["accessvlan"]["dst"] = 1;
 
 						// enable mab
-						setSwitchportMABEnableWithPID($sw,$pid,1);
-						$logvals["mabst"]["dst"] = 1;
-						$logvals["mabtype"]["src"] = getSwitchportMABType($sw,$pid);
-						// set MAB to EAP or not
-						setSwitchMABTypeWithPID($sw,$pid,$mabeap == "on" ? 2 : 1);
-						$logvals["mabtype"]["dst"] = ($mabeap == "on" ? 2 : 1);
-						// enable authfail & noresp vlans
-						setSwitchportAuthFailVLAN($sw,$pid,$nvlan);
-						$logvals["failvlan"]["dst"] = $nvlan;
-						setSwitchportAuthNoRespVLAN($sw,$pid,$nvlan);
-						$logvals["norespvlan"]["dst"] = $nvlan;
-						// authentication port-control auto
-						setSwitchportControlMode($sw,$pid,2);
-						$logvals["controlmode"]["dst"] = 2;
+						if($mabst != -1) {
+							setSwitchportMABEnableWithPID($sw,$pid,1);
+							$logvals["mabst"]["dst"] = 1;
+						}
+						$mabtype = getSwitchportMABType($sw,$pid);
+						if($mabtype != -1) {
+							$logvals["mabtype"]["src"] = $mabtype;
+							// set MAB to EAP or not
+							setSwitchMABTypeWithPID($sw,$pid,$mabeap == "on" ? 2 : 1);
+							$logvals["mabtype"]["dst"] = ($mabeap == "on" ? 2 : 1);
+						}
+						if($failvlan != -1) {
+							// enable authfail & noresp vlans
+							setSwitchportAuthFailVLAN($sw,$pid,$nvlan);
+							$logvals["failvlan"]["dst"] = $nvlan;
+						}
+						if($norespvlan != -1) {
+							setSwitchportAuthNoRespVLAN($sw,$pid,$nvlan);
+							$logvals["norespvlan"]["dst"] = $nvlan;
+						}
+						if($controlmode != -1) {
+							// authentication port-control auto
+							setSwitchportControlMode($sw,$pid,2);
+							$logvals["controlmode"]["dst"] = 2;
+						}
 						// Host Mode for Authentication
-						setSwitchportAuthHostMode($sw,$pid,$dot1xhostmode);
-						$logvals["hostmode"]["dst"] = $dot1xhostmode;
+						if($authhostmode != -1) {
+							setSwitchportAuthHostMode($sw,$pid,$dot1xhostmode);
+							$logvals["hostmode"]["dst"] = $dot1xhostmode;
+						}
 					}
 					$logvals["hostmode"]["src"] = getPortStateWithPID($sw,$pid);
 					if(setPortStateWithPID($sw,$pid,($shut == "on" ? 2 : 1)) != 0) {
