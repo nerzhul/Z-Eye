@@ -24,13 +24,25 @@
 			$this->locales = array(
 				"fr" => array(
 					"Collector" => "Collecteur Z-Eye",
+					"Date" => "Date",
+					"Entry" => "Entrée",
 					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux ou la page indisponible",
+					"Level" => "Niveau",
+					"Module" => "Module",
 					"Stats" => "Statistiques",
+					"User" => "Utilisateur",
+					"webapp" => "Application Web",
 				),
 				"en" => array(
 					"Collector" => "Z-Eye Collector",
+					"Date" => "Date",
+					"Entry" => "Entry",
 					"fail-tab" => "Unable to load tab, link may be wrong or page is unavailable",
+					"Level" => "Level",
+					"Module" => "Module",
 					"Stats" => "Statistics",
+					"User" => "User",
+					"webapp" => "Web application",
 				)
 			);
 		}

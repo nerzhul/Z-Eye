@@ -32,16 +32,39 @@
 		private function showLogs() {
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
-                        if(!FS::isAjaxCall()) {
-                                $output .= "<div id=\"contenttabs\"><ul>";
-                                $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">".$this->loc->s("Stats")."</a>";
-                                $output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=2\">".$this->loc->s("Collector")."</a>";
-                                $output .= "</ul></div>";
-                                $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-                                $output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
-                        }
+			if(!FS::isAjaxCall()) {
+					$output .= "<div id=\"contenttabs\"><ul>";
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("webapp"),$sh);
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Collector"),$sh);
+					//$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Stats"),$sh);
+					$output .= "</ul></div>";
+					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+			}
 			else if(!$sh || $sh == 1) {
 				$output = "";
+				
+				$found = false;
+				$query = FS::$pgdbMgr->Select("z_eye_logs","date,module,level,_user,txt","","date",2);
+				while($data = pg_fetch_array($query)) {
+					if(!$found) {
+						$found = true;
+						$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")"</th>
+							<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr>";
+					}
+					$date = preg_split("#[.]#",$data["date"]);
+					$output .= "<tr><td>".$date[0]."</td><td>".$data["module"]."</td><td>";
+					switch($data["level"]) {
+						case 0: $output .= "Info"; break;
+						case 1: $output .= "Warn"; break;
+						case 2: $output .= "Crit"; break;
+						default: $output .= "Unk"; break;
+					}
+					"</td><th>".$data["_user"]."</th><th>".preg_replace("#[\n]#","<br />",$data["txt"])."</th></tr>";
+				}
+				
+				if($found) $output .= "</table>";
+				else
 			}
 			else if($sh == 2) {
 				$output = "<pre>";

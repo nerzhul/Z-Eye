@@ -140,4 +140,7 @@ Beta 1.9
 - Added support for Z-Eye web logs
 - Main switch page now check if switch is up
 - Search module also search radius users (not only MAC addr users)
+- Remove MAB support on switch module for switch which can't use it.
 
+Beta 2.0
+- Freezing Beta 1.9 and fix bugs.

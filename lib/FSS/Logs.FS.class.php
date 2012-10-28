@@ -25,7 +25,6 @@
 		 * 0: normal
 		 * 1: warn
 		 * 2: crit
-		 * 3: info
 		 */
 
 		// Insert function

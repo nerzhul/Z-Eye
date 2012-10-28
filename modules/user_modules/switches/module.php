@@ -1360,7 +1360,7 @@
 						// dot1x disable
 						if($authhostmode != -1) {
 							setSwitchportAuthHostMode($sw,$pid,1);
-							$logvals["hostmode"]["dst"] = 1;
+							$logvals["authhostmode"]["dst"] = 1;
 						}
                         
                         // set settings

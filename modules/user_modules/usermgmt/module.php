@@ -81,19 +81,19 @@
 			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=6");
-	                        $output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
-                        	$output .= FS::$iMgr->addNumericInput("port",$data["port"],5,5,$this->loc->s("ldap-port"))."</li><li>";
-                	        $output .= FS::$iMgr->addCheck("ssl",($data["ssl"] == 1 ? true : false),"SSL ?")."</li><li>";
-        	                $output .= FS::$iMgr->input("dn",$data["dn"],20,200,$this->loc->s("base-dn"))."</li><li>";
-	                        $output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,$this->loc->s("root-dn"))."</li><li>";
-                        	$output .= FS::$iMgr->password("rootpwd",$data["dnpwd"],$this->loc->s("root-pwd"))."</li><li>";
-                	        $output .= FS::$iMgr->input("ldapname",$data["ldapname"],20,40,$this->loc->s("attr-name"))."</li><li>";
-        	                $output .= FS::$iMgr->input("ldapsurname",$data["ldapsurname"],20,40,$this->loc->s("attr-subname"))."</li><li>";
-	                        $output .= FS::$iMgr->input("ldapmail",$data["ldapmail"],20,40,$this->loc->s("attr-mail"))."</li><li>";
-                        	$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,$this->loc->s("attr-uid"))."</li><li>";
-                	        $output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,$this->loc->s("ldap-filter"))."</li><li>";
-        	                $output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-	                        $output .= "</ul></form>";
+				$output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
+				$output .= FS::$iMgr->addNumericInput("port",$data["port"],5,5,$this->loc->s("ldap-port"))."</li><li>";
+				$output .= FS::$iMgr->addCheck("ssl",($data["ssl"] == 1 ? true : false),"SSL ?")."</li><li>";
+				$output .= FS::$iMgr->input("dn",$data["dn"],20,200,$this->loc->s("base-dn"))."</li><li>";
+				$output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,$this->loc->s("root-dn"))."</li><li>";
+				$output .= FS::$iMgr->password("rootpwd",$data["dnpwd"],$this->loc->s("root-pwd"))."</li><li>";
+				$output .= FS::$iMgr->input("ldapname",$data["ldapname"],20,40,$this->loc->s("attr-name"))."</li><li>";
+				$output .= FS::$iMgr->input("ldapsurname",$data["ldapsurname"],20,40,$this->loc->s("attr-subname"))."</li><li>";
+				$output .= FS::$iMgr->input("ldapmail",$data["ldapmail"],20,40,$this->loc->s("attr-mail"))."</li><li>";
+				$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,$this->loc->s("attr-uid"))."</li><li>";
+				$output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,$this->loc->s("ldap-filter"))."</li><li>";
+				$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
+				$output .= "</ul></form>";
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist"));
