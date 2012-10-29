@@ -53,14 +53,14 @@
 							<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr>";
 					}
 					$date = preg_split("#[.]#",$data["date"]);
-					$output .= "<tr><td>".$date[0]."</td><td>".$data["module"]."</td><td>";
+					$lineoutput = "<tr><td>".$date[0]."</td><td>".$data["module"]."</td><td>";
 					switch($data["level"]) {
-						case 0: $output .= "Info"; break;
-						case 1: $output .= "Warn"; break;
-						case 2: $output .= "Crit"; break;
-						default: $output .= "Unk"; break;
+						case 0: $lineoutput .= "Info"; $linetouput = "<tr>".$lineoutput; break;
+                                                case 1: $lineoutput .= "Warn"; $lineoutput = "<tr style=\"background-color: #FFDD00;\">".$lineoutput; break;
+                                                case 2: $lineoutput .= "Crit"; $lineoutput = "<tr style=\"background-color: #EE0000;\">".$lineoutput; break;
+                                                default: $lineoutput .= "Unk"; $lineoutput = "<tr>".$lineoutput; break;
 					}
-					$output .= "</td><td>".$data["_user"]."</td><td>".preg_replace("#[\n]#","<br />",$data["txt"])."</td></tr>";
+					$output .= $lineoutput."</td><td>".$data["_user"]."</td><td>".preg_replace("#[\n]#","<br />",$data["txt"])."</td></tr>";
 				}
 				
 				if($found) $output .= "</table>";
