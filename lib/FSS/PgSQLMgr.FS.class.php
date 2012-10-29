@@ -82,31 +82,31 @@
 		
 		public function GetMax($table,$field,$cond = "") {
 			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
-                        if($data = pg_fetch_array($query)) {
-                                $splstr = preg_split("#[\.]#",$field);
-                                $splstr = preg_replace("#`#","",$splstr);
-                                return $data["mx"];
-                        }
+			if($data = pg_fetch_array($query)) {
+					$splstr = preg_split("#[\.]#",$field);
+					$splstr = preg_replace("#`#","",$splstr);
+					return $data["mx"];
+			}
 			return -1;
 		}
 
 		public function Sum($table,$field,$cond = "") {
-                        $query = $this->Select($table,"SUM(".$field.") as mx",$cond);
-                        if($data = pg_fetch_array($query)) {
-                                $splstr = preg_split("#[\.]#",$field);
-                                $splstr = preg_replace("#`#","",$splstr);
-                                return $data["mx"];
-                        }
-                        return -1;
-                }
+			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
+			if($data = pg_fetch_array($query)) {
+					$splstr = preg_split("#[\.]#",$field);
+					$splstr = preg_replace("#`#","",$splstr);
+					return $data["mx"];
+			}
+			return -1;
+		}
 		
 		public function Count($table,$field,$cond = "") {
 			$query = $this->Select($table,"COUNT(".$field.") as ct",$cond);
 			if($data = pg_fetch_array($query)) {
-                                $splstr = preg_split("#[\.]#",$field);
-                                $splstr = preg_replace("#`#","",$splstr);
-                                return $data["ct"];
-                        }
+				$splstr = preg_split("#[\.]#",$field);
+				$splstr = preg_replace("#`#","",$splstr);
+				return $data["ct"];
+			}
 			return NULL;
 		}
 		

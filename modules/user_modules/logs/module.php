@@ -30,14 +30,25 @@
 		}
 		
 		private function getApplicationLogs() {
+			$ufilter = FS::$secMgr->checkAndSecurisePostData("uf");
+			$appfilter = FS::$secMgr->checkAndSecurisePostData("af");
+			
+			$filter = "";
+			if($ufilter)
+				$filter .= "WHERE _user = '".$ufilter."'";
+			if($appfilter) {
+				if($ufilter) $filter .= " AND ";
+				else $filter .= "WHERE ";
+				$filter .= "module = '".$appfilter."'";
+			}
 			
 			$output = "";
 			$found = false;
-			$query = FS::$pgdbMgr->Select("z_eye_logs","date,module,level,_user,txt","","date",1);
+			$query = FS::$pgdbMgr->Select("z_eye_logs","date,module,level,_user,txt",$filter,"date",1);
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")"</th>
+					$output .= "<div id=\"logd\"><table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")"</th>
 						<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr>";
 				}
 				$date = preg_split("#[.]#",$data["date"]);
@@ -51,7 +62,7 @@
 				$output .= $lineoutput."</td><th>".$data["_user"]."</th><th>".preg_replace("#[\n]#","<br />",$data["txt"])."</th></tr>";
 			}
 			
-			if($found) $output .= "</table>";
+			if($found) $output .= "</table></div>";
 			else $output .= FS::$iMgr->printError($this->loc->s("err-no-logs"));
 			return $output;
 		}
@@ -69,7 +80,27 @@
 					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
 			}
 			else if(!$sh || $sh == 1) {
-				$output = $this->getApplicationLogs();
+				$output = "<script type=\"text/javascript\">function filterAppLogs() {
+					$.post('index.php?mod=".$this->mid."&act=1', function(data) {
+						$('#logd').html(data);
+						});
+					}</script>";
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+				$output .= FS::$iMgr->addList("uf","",$this->loc->s("User"));
+				$output .= FS::$iMgr->addElementToList("","",true);
+				$query = FS::$pgdbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",1);
+				while($data = pg_fetch_array($query))
+					$output .= FS::$iMgr->addElementToList($data["_user"],$data["_user"]);
+
+				$output .= "</select>".FS::$iMgr->addList("af","",$this->loc->s("Module"));
+				$output .= FS::$iMgr->addElementToList("","",true);
+				$query = FS::$pgdbMgr->Select("z_eye_logs","module","module = module GROUP BY module","module",1);
+				while($data = pg_fetch_array($query))
+					$output .= FS::$iMgr->addElementToList($data["module"],$data["module"]);
+					
+				$output .= "</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterAppLogs()");
+				$output .= "</form>";
+				$output .= $this->getApplicationLogs();
 			}
 			else if($sh == 2) {
 				$output = "<pre>";
@@ -94,6 +125,14 @@
 				$output .= "</pre>";
 			}
 			return $output;
+		}
+		
+		public function handlePostDatas($act) {
+			switch($act) {
+				case 1: // Ajax filtering for app log
+				echo $this->getApplicationLogs();
+				return;
+			}
 		}
 	};
 ?>
