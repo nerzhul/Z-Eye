@@ -32,14 +32,18 @@
 		private function getApplicationLogs() {
 			$ufilter = FS::$secMgr->checkAndSecurisePostData("uf");
 			$appfilter = FS::$secMgr->checkAndSecurisePostData("af");
+			$lfilter = FS::$secMgr->checkAndSecurisePostData("lf");
 			
 			$filter = "";
 			if($ufilter)
-				$filter .= "WHERE _user = '".$ufilter."'";
+				$filter .= "_user = '".$ufilter."'";
 			if($appfilter) {
-				if($ufilter) $filter .= " AND ";
-				else $filter .= "WHERE ";
+				if(strlen($filter) > 0) $filter .= " AND ";
 				$filter .= "module = '".$appfilter."'";
+			}
+			if($lfilter) {
+				if(strlen($filter) > 0) $filter .= " AND ";
+				$filter .= "level = '".$lfilter."'";
 			}
 			
 			$output = "";
@@ -48,21 +52,21 @@
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<div id=\"logd\"><table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")"</th>
+					$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
 						<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr>";
 				}
 				$date = preg_split("#[.]#",$data["date"]);
-				$lineoutput = "<tr><td>".$date[0]."</td><td>".$data["module"]."</td><td>";
+				$lineoutput = "<td>".$date[0]."</td><td>".$data["module"]."</td><td>";
 				switch($data["level"]) {
-					case 0: $lineoutput .= "Info"; $lineoutput .= "<tr>".$lineoutput; break;
-					case 1: $lineoutput .= "Warn"; $lineoutput .= "<tr style=\"background-color: #FFDD00;\">".$lineoutput; break;
-					case 2: $lineoutput .= "Crit"; $lineoutput .= "<tr style=\"background-color: #EE0000;\">".$lineoutput; break;
-					default: $lineoutput .= "Unk"; $lineoutput .= "<tr>".$lineoutput; break;
+					case 0: $lineoutput .= "Info"; $lineoutput = "<tr>".$lineoutput; break;
+					case 1: $lineoutput .= "Warn"; $lineoutput = "<tr style=\"background-color: #FFDD00;\">".$lineoutput; break;
+					case 2: $lineoutput .= "Crit"; $lineoutput = "<tr style=\"background-color: #EE0000;\">".$lineoutput; break;
+					default: $lineoutput .= "Unk"; $lineoutput = "<tr>".$lineoutput; break;
 				}
-				$output .= $lineoutput."</td><th>".$data["_user"]."</th><th>".preg_replace("#[\n]#","<br />",$data["txt"])."</th></tr>";
+				$output .= $lineoutput."</td><td>".$data["_user"]."</td><td>".preg_replace("#[\n]#","<br />",$data["txt"])."</td></tr>";
 			}
 			
-			if($found) $output .= "</table></div>";
+			if($found) $output .= "</table>";
 			else $output .= FS::$iMgr->printError($this->loc->s("err-no-logs"));
 			return $output;
 		}
@@ -81,26 +85,34 @@
 			}
 			else if(!$sh || $sh == 1) {
 				$output = "<script type=\"text/javascript\">function filterAppLogs() {
-					$.post('index.php?mod=".$this->mid."&act=1', function(data) {
+					$('#logd').fadeOut();
+					$.post('index.php?mod=".$this->mid."&act=1', $('#logf').serialize(), function(data) {
 						$('#logd').html(data);
+						$('#logd').fadeIn();
 						});
 					}</script>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-				$output .= FS::$iMgr->addList("uf","",$this->loc->s("User"));
-				$output .= FS::$iMgr->addElementToList("","",true);
-				$query = FS::$pgdbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",1);
+				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1","logf");
+				$output .= FS::$iMgr->addList("uf","filterAppLogs()");
+				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("User")."--","",true);
+				$query = FS::$pgdbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",2);
 				while($data = pg_fetch_array($query))
 					$output .= FS::$iMgr->addElementToList($data["_user"],$data["_user"]);
 
-				$output .= "</select>".FS::$iMgr->addList("af","",$this->loc->s("Module"));
-				$output .= FS::$iMgr->addElementToList("","",true);
-				$query = FS::$pgdbMgr->Select("z_eye_logs","module","module = module GROUP BY module","module",1);
+				$output .= "</select>".FS::$iMgr->addList("af","filterAppLogs()");
+				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("Module")."--","",true);
+				$query = FS::$pgdbMgr->Select("z_eye_logs","module","module = module GROUP BY module","module",2);
 				while($data = pg_fetch_array($query))
 					$output .= FS::$iMgr->addElementToList($data["module"],$data["module"]);
-					
+				
+				$output .= "</select>".FS::$iMgr->addList("lf","filterAppLogs()");
+				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("Level")."--","",true);
+				$output .= FS::$iMgr->addElementToList("Info",0);
+				$output .= FS::$iMgr->addElementToList("Warn",0);
+				$output .= FS::$iMgr->addElementToList("Crit",0);
+				
 				$output .= "</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterAppLogs()");
 				$output .= "</form>";
-				$output .= $this->getApplicationLogs();
+				$output .= "<div id=\"logd\">".$this->getApplicationLogs()."</div>";
 			}
 			else if($sh == 2) {
 				$output = "<pre>";
