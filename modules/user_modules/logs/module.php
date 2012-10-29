@@ -41,7 +41,7 @@
 				if(strlen($filter) > 0) $filter .= " AND ";
 				$filter .= "module = '".$appfilter."'";
 			}
-			if($lfilter) {
+			if($lfilter != NULL) {
 				if(strlen($filter) > 0) $filter .= " AND ";
 				$filter .= "level = '".$lfilter."'";
 			}
@@ -107,8 +107,8 @@
 				$output .= "</select>".FS::$iMgr->addList("lf","filterAppLogs()");
 				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("Level")."--","",true);
 				$output .= FS::$iMgr->addElementToList("Info",0);
-				$output .= FS::$iMgr->addElementToList("Warn",0);
-				$output .= FS::$iMgr->addElementToList("Crit",0);
+				$output .= FS::$iMgr->addElementToList("Warn",1);
+				$output .= FS::$iMgr->addElementToList("Crit",2);
 				
 				$output .= "</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterAppLogs()");
 				$output .= "</form>";
