@@ -26,7 +26,7 @@
 					"Collector" => "Collecteur Z-Eye",
 					"Date" => "Date",
 					"Entry" => "Entrée",
-					"err-no-logs" => "Aucun log trouvé",
+					"err-no-logs" => "Aucun log collecté",
 					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux ou la page indisponible",
 					"Level" => "Niveau",
 					"Module" => "Module",
