@@ -91,10 +91,12 @@
 					$output .= "</script>";
 					$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if($data = pg_fetch_array($query)) {
-						$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=9");
-						$output .= FS::$iMgr->addHidden("portid",$portid);
-						$output .= FS::$iMgr->addHidden("sw",$device);
-						$output .= FS::$iMgr->addHidden("port",$port);
+						if($portid != -1) {
+							$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=9");
+							$output .= FS::$iMgr->addHidden("portid",$portid);
+							$output .= FS::$iMgr->addHidden("sw",$device);
+							$output .= FS::$iMgr->addHidden("port",$port);
+						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
 						$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".FS::$iMgr->input("desc",$data["name"])."</td></tr>";
 						$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
@@ -216,8 +218,12 @@
 						$output .= "</select></td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->addCheck("wr")."</td></tr>";
 						$output .= "</table>";
-						$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
-						$output .= "</form>";
+						if($portid != -1) {
+							$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
+							$output .= "</form>";
+						}
+						else
+							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
 					}
 					else
 						$output .= FS::$iMgr->printError("Les données demandées n'existent pas !");

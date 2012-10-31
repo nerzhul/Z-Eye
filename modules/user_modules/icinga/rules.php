@@ -18,20 +18,20 @@
         */
 
         require_once(dirname(__FILE__)."/../../../lib/FSS/objects/Rules.FS.class.php");
-        class rNagios extends zRules {
-                function rNagios() { $this->connectedstate = 1; }
+	class rIcinga extends zRules {
+		function rIcinga() { $this->connectedstate = 1; }
 
-                public function showMgmtInterface($activerules = array()) {
-                        $output = "<tr><td>Management Icinga</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_icinga_read",in_array("mrule_icinga_read",$activerules),"Lire les données")."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->addCheck("mrule_icinga_write",in_array("mrule_icinga_write",$activerules),"Modifier les données")."</td></tr>";
+		public function showMgmtInterface($activerules = array()) {
+			$output = "<tr><td>Monitoring de services</td>";
+                        $output .= "<td>".FS::$iMgr->addCheck("mrule_icinga_read",in_array("mrule_icinga_read",$activerules),"Lire les données")."</td></tr>";
+                        $output .= "<tr><td></td><td>".FS::$iMgr->addCheck("mrule_groupmgmt_write",in_array("mrule_icinga_write",$activerules),"Modifier les données")."</td></tr>";
                         return $output;
-                }
+		}
 
-                public function canAccessToModule() {
-			if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_nagios_read"))
-                                return true;
-                        return false;
-                }
-        };
+		public function canAccessToModule() {
+			if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_icinga_read"))
+				return true;
+			return false;
+		}
+	};
 ?>

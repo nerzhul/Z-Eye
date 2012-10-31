@@ -22,18 +22,17 @@
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
-	if(!class_exists("MNagios")) {
-		class MNagios extends InterfaceModule {
-			function MNagios() {
+	if(!class_exists("Micinga")) {
+		class Mconnect extends InterfaceModule {
+			function Micinga() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iNagios";
-				$this->conf->seclevel = 5;
-				$this->moduleclass = new iNagios();
-				$this->rulesclass = new rNagios();
-                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->modulename = "iIcinga";
+				$this->conf->seclevel = 0;
+				$this->moduleclass = new iIcinga();
+				$this->rulesclass = new rIcinga();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}
-
-	$module = new MNagios();
+	$module = new Mconnect();
 ?>
