@@ -161,7 +161,8 @@
 						$hosts_list[$reserv_host] = array();
 
 					$hosts_list[$reserv_host]["state"] = $st;
-					$hosts_list[$reserv_host]["hw"] = $hw;
+					if(isset($hw))
+						$hosts_list[$reserv_host]["hw"] = $hw;
 					$hosts_list[$reserv_host]["end"] = " ";
 					$hosts_list[$reserv_host]["start"] = " ";
 					if(isset($reserv_ip))
@@ -177,7 +178,7 @@
 	 * Registering IPs and link it to radius server
 	 */
 	
-	function registerIPs($hosts_list,$server) {
+	function registerIPs($hosts_list,&$subnet_list,$server) {
 		// Flush ip table for server
 		FS::$pgdbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
@@ -195,7 +196,6 @@
 				case "expired":
 				case "abandoned":
 					$rstate = 2;
-					var_dump($value);
 					$used++;
 					break;
 				case "reserved":
@@ -302,7 +302,7 @@
 
 				readLeases($dhcpdatas,$data["addr"],$hosts_list);
 				readReserv($dhcpdatas2,$data["addr"],$subnet_list,$hosts_list);
-				registerIPs($hosts_list,$data["addr"]);
+				registerIPs($hosts_list,$subnet_list,$data["addr"]);
 				
 				if($DHCPfound == false) $DHCPfound = true;
 				else $DHCPservers .= ", ";
