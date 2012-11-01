@@ -176,8 +176,7 @@
 			$hosts_list[$value["ip"]]["ip"] = $value["ip"];
 			
 			$hosts_list[$value["ip"]]["state"] = "reserved";
-			if(isset($hosts_list[$value["ip"]]["hw"]))
-				$hosts_list[$value["ip"]]["hw"] = $value["hw"];
+			$hosts_list[$value["ip"]]["hw"] = $value["hw"];
 			$hosts_list[$value["ip"]]["end"] = " ";
 			$hosts_list[$value["ip"]]["start"] = " ";
 			$hosts_list[$value["ip"]]["hostname"] = $key;

@@ -83,7 +83,7 @@
 						$output .= $this->showRadiusDatas($raddb,$radhost,$radport);
 				}
 			}
-			else if($sh)
+			else if(isset($sh))
 				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-tab"));
 
 			return $output;
