@@ -32,7 +32,7 @@
 					"err-miss-data" => "Certaines données sont manquantes ou invalides !",
 					"err-invalid-req" => "Requête invalide !",
 					"Expert-tools" => "Outils avancés",
-					"fail-tab" => "Unable to load tab, link may be wrong or page unavailable",
+					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux ou la page indisponible",
 					"Free" => "Libre",
 					"Hostname" => "Nom d'hôte",
 					"intval-days" => "Intervalle (jours)",

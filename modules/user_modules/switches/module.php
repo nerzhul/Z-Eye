@@ -868,8 +868,8 @@
 						$output .= "</script>";
 					}
 					$tmpoutput = "<table class=\"standardTable\"><tr><th><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
-					$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">".$this->loc->s("Description")."</a></th><th>".
-						$this->loc->s("Plug")."</th><th>".$this->loc->s("MAC-addr-iface")."</th><th>Up (Link/Admin)</th>";
+					$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">".$this->loc->s("Description")."</a></th>
+						<th>".$this->loc->s("MAC-addr-iface")."</th><th>Up (Link/Admin)</th>";
 					if($iswif == false)
 						$tmpoutput .= "<th>".$this->loc->s("Duplex")." (Link/Admin)</th>";
 					$tmpoutput .= "<th>Vitesse</th>";
@@ -901,7 +901,7 @@
 									$tmpoutput2 .= FS::$iMgr->input("swprise-".$convport,$swpdata,10,10);
 									$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPrise('#swpr_".$convport."',true,'".$dip."','".$data["port"]."','swprise-".$convport."');\" />";
 						$tmpoutput2 .= "</a></div>";
-						$tmpoutput2 .= "</td><td>".$data["mac"]."</td><td>";
+						$tmpoutput2 .= "</td><td>";
 						// Editable state
 						$tmpoutput2 .= "<div id=\"swst_".$convport."\">";
 						if($data["up_admin"] == "down")

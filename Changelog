@@ -144,3 +144,8 @@ Beta 1.9
 
 Beta 2.0
 - Freezing Beta 1.9 and fix bugs.
+
+Beta 2.1
+- IPmanager now register server
+- Rewrite proper parser for DHCP discovery
+- Fix one typo on ipmanager

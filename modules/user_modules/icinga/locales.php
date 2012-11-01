@@ -23,8 +23,24 @@
 		function lIcinga() {
 			$this->locales = array(
 				"fr" => array(
+					"Contactgroups" => "Groupes de contacts",
+					"Contacts" => "Contacts",
+					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux ou la page indisponible",
+					"General" => "Général",
+					"Hosts" => "Hôtes",
+					"Hostgroups" => "Groupes d'hôtes",
+					"Services" => "Services",
+					"Timeperiods" => "Délais"
 				),
 				"en" => array(
+					"Contactgroups" => "Contact Groups",
+					"Contacts" => "Contacts",
+					"fail-tab" => "Unable to load tab, link may be wrong or page unavailable",
+					"General" => "General",
+					"Hosts" => "Hôtes",
+					"Hostgroups" => "Host Groups",
+					"Services" => "Services",
+					"Timeperiods" => "Timeperiods",
 				)
 			);
 		}
