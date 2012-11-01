@@ -23,7 +23,7 @@
 	function bufferizeDHCPFiles($conn,$file) {
 		$tmpbuf = "";
 		// show file but remove comments
-		$stream = ssh2_exec($conn,"cat ".$file." | grep -ve #");
+		$stream = ssh2_exec($conn,"cat ".$file);
 		stream_set_blocking($stream, true);
 		while ($buf = fread($stream, 4096)) {
 			$inc_path = array();

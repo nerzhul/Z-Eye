@@ -42,7 +42,7 @@
 				$output .= "<h3>".$this->loc->s("title-ip-supervision")."</h3>";
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 				$output .= FS::$iMgr->addList("f","submit()");
-				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask");
+				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
 				while($data = pg_fetch_array($query)) {
 					$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
