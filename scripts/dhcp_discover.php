@@ -22,7 +22,8 @@
 
 	function bufferizeDHCPFiles($conn,$file) {
 		$tmpbuf = "";
-		$stream = ssh2_exec($conn,"cat ".$file);
+		// show file but remove comments
+		$stream = ssh2_exec($conn,"cat ".$file." | grep -ve #");
 		stream_set_blocking($stream, true);
 		while ($buf = fread($stream, 4096)) {
 			$inc_path = array();
@@ -43,14 +44,11 @@
 	
 	function readLeases($buffer,$server,&$hosts_list) {
 		// dynamic leases
-		$tmphostlist = array();
-		// replace \n by <br />
-		$buffer = preg_replace("/\n/","<br />",$buffer);
 		// split on lease keyword
 		$leases = preg_split("/lease /",$buffer);
 		
 		for($i=0;$i<count($leases);$i++) {
-			$lease = preg_split("#<br />#",$leases[$i]);
+			$lease = preg_split("#[\n]#",$leases[$i]);
 			for($j=0;$j<count($lease);$j++) {
 				if(preg_match("#next binding state (.*);#",$lease[$j]))
 					continue;
@@ -120,57 +118,70 @@
 	 */
 	
 	function readReserv($buffer,$server,&$subnet_list,&$hosts_list) {
+		$tmphosts_list = array();
 		// static leases
-		// replace with br
-		$buffer = preg_replace("/\n/","<br />",$buffer);
-		// split for each "host" keyword
-		$reserv = preg_split("/host /",$buffer);
-		
-		for($i=0;$i<count($reserv);$i++) {
-			// split for each br
-			$resline = preg_split("#<br />#",$reserv[$i]);
-			for($j=0;$j<count($resline);$j++) {
-				if(preg_match("#(.*){#",$resline[$j],$host)) {
-					if(preg_match("#subnet(.*)#",$resline[$j],$subnet)) {
-						$subnet = preg_split("# #",$subnet[0]);
-						$net = $subnet[1];
-						$mask = $subnet[3];
-						array_push($subnet_list,array($net,$mask));
-					}
-					else {
-						$reserv_host = $host[0];
-						$reserv_host = preg_split("# #",$reserv_host);
-						$reserv_host = preg_replace("#\{#","",$reserv_host);
-						$reserv_host = $reserv_host[0];
-					}
+		// split each line
+		$resline = preg_split("#[\n]#",$buffer);
+		for($j=0;$j<count($resline);$j++) {
+			// pseudo trim
+			$resline[$j] = preg_replace("#^([ ])+#","",$resline[$j]);
+			$resline[$j] = preg_replace("#^([\t])+#","",$resline[$j]);
+			
+			if(preg_match("#(.*){#",$resline[$j],$host)) {
+				if(preg_match("#subnet(.*)#",$resline[$j],$subnet)) {
+					$subnet = preg_split("# #",$subnet[0]);
+					$net = $subnet[1];
+					$mask = $subnet[3];
+					array_push($subnet_list,array($net,$mask));
 				}
-				else if(preg_match("#hardware ethernet (.*);#",$resline[$j],$hweth)) {
-					$reserv_hw = $hweth[0];
-					$hw = preg_split("# #",$reserv_hw);
-					$hw = preg_replace("#;#","",$hw[2]);
+				else if(preg_match("#host(.*)#",$resline[$j],$reserv_host)){
+					$reserv_host = preg_split("# #",$reserv_host[0]);
+					$reserv_host = preg_replace("#\{#","",$reserv_host);
+					$reserv_host = $reserv_host[1];
 				}
-				else if(preg_match("#fixed-address (.*);#",$resline[$j],$ipaddr)) {
-					$reserv_ip = $ipaddr[0];
-					$reserv_ip = preg_split("# #",$reserv_ip);
-					$reserv_ip = preg_replace("#;#","",$reserv_ip[1]);
-				}
-				$st = "reserved";
-
-				if(isset($reserv_host) && $reserv_host != "subnet") {
-					if(!isset($hosts_list[$reserv_host]))
-						$hosts_list[$reserv_host] = array();
-
-					$hosts_list[$reserv_host]["state"] = $st;
-					if(isset($hw))
-						$hosts_list[$reserv_host]["hw"] = $hw;
-					$hosts_list[$reserv_host]["end"] = " ";
-					$hosts_list[$reserv_host]["start"] = " ";
-					if(isset($reserv_ip))
-						$hosts_list[$reserv_host]["ip"] = $reserv_ip;
-					$hosts_list[$reserv_host]["hostname"] = $reserv_host;
-					$hosts_list[$reserv_host]["server"] = $server;
-				}
+				else
+					$reserv_host = "";
 			}
+			else if(preg_match("#hardware ethernet (.*);#",$resline[$j],$hweth)) {
+				$reserv_hw = $hweth[0];
+				$hw = preg_split("# #",$reserv_hw);
+				$hw = preg_replace("#;#","",$hw[2]);
+			}
+			else if(preg_match("#fixed-address (.*);#",$resline[$j],$ipaddr)) {
+				$reserv_ip = $ipaddr[0];
+				$reserv_ip = preg_split("# #",$reserv_ip);
+				$reserv_ip = preg_replace("#;#","",$reserv_ip[1]);
+			}
+
+			if(isset($reserv_host) && $reserv_host != "") {
+				if(!isset($tmphosts_list[$reserv_host]))
+					$tmphosts_list[$reserv_host] = array();
+
+				$tmphosts_list[$reserv_host]["state"] = "reserved";
+				if(isset($hw))
+					$tmphosts_list[$reserv_host]["hw"] = $hw;
+				$tmphosts_list[$reserv_host]["end"] = " ";
+				$tmphosts_list[$reserv_host]["start"] = " ";
+				if(isset($reserv_ip))
+					$tmphosts_list[$reserv_host]["ip"] = $reserv_ip;
+				$tmphosts_list[$reserv_host]["hostname"] = $reserv_host;
+				$tmphosts_list[$reserv_host]["server"] = $server;
+			}
+		}
+		foreach($tmphosts_list as $key => $value) {
+			if(!isset($value["ip"]))
+				continue;
+			if(!isset($hosts_list[$value["ip"]]))
+				$hosts_list[$value["ip"]] = array();
+			$hosts_list[$value["ip"]]["ip"] = $value["ip"];
+			
+			$hosts_list[$value["ip"]]["state"] = "reserved";
+			if(isset($hosts_list[$value["ip"]]["hw"]))
+				$hosts_list[$value["ip"]]["hw"] = $value["hw"];
+			$hosts_list[$value["ip"]]["end"] = " ";
+			$hosts_list[$value["ip"]]["start"] = " ";
+			$hosts_list[$value["ip"]]["hostname"] = $key;
+			$hosts_list[$value["ip"]]["server"] = $server;
 		}
 	}
 	
