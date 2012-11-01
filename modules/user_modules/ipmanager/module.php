@@ -191,7 +191,7 @@
 					$output .= "<div id=\"monsubnetres\"></div>";
 	                                $output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&f=".$filter."&act=3","monsubnet");
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",$enmon == 1 ? true : false,$this->loc->s("En-monitor"))."</li><li>";
-                                        $output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),3,3,$thsi->loc->s("warn-line"),$this->loc->s("%use"))."</li><li>";
+                                        $output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),3,3,$this->loc->s("warn-line"),$this->loc->s("%use"))."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),3,3,$this->loc->s("crit-line"),$this->loc->s("%use"))."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("maxage",($maxage > 0 ? $maxage : 0),7,7,$this->loc->s("max-age"),$this->loc->s("tooltip-max-age"))."</li><li>";
 					$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),$this->loc->s("tooltip-contact"))."</li><li>";
