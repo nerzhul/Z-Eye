@@ -80,7 +80,7 @@
 						$iparray[$i]["distrib"] = 0;
 						$iparray[$i]["servers"] = array();
 					}
-					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","netid = '".$data["netid"]."'");
+					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
 					while($data2 = pg_fetch_array($query2)) {
 						// If it's reserved on a host don't override status
 						if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
