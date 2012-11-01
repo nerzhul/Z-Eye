@@ -726,7 +726,7 @@
 					$output .= "};";
 					$output .= "function checkTagForm() {
 						if($('#vlplist') == null || $('#vlplist').html().length < 1) {
-							alert('".$this->loc->s("must-verify-port")." !');
+							alert('".$this->loc->s("must-verify-ports")." !');
 							return false;
 						}
 						if(document.getElementsByName('accept')[0].checked == false) {

@@ -564,8 +564,6 @@
 					array_push($plist,$pname);
 				else {
 					$portmode = getSwitchportModeWithPID($device,$pid);
-					$portmode = explode(" ",$portmode);
-					$portmode = $portmode[1];
 					if($portmode == 1) {
 						$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
 						if(!in_array($pname,$plist) && $vlanFltr == $nvlan)
@@ -601,8 +599,6 @@
 					continue;
 				$pid = $pid[1];
 				$portmode = getSwitchportModeWithPID($device,$pid);
-				$portmode = explode(" ",$portmode);
-				$portmode = $portmode[1];
 				if($portmode == 1) {
 					$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
 					if($oldvlan == $nvlan)
