@@ -170,8 +170,8 @@
 	$dhcpdatas2 = preg_replace("/\n/","<br />",$dhcpdatas2);
 	$reserv = preg_split("/host /",$dhcpdatas2);
 	for($i=0;$i<count($reserv);$i++) {
-			$resline = preg_split("#<br />#",$reserv[$i]);
-			for($j=0;$j<count($resline);$j++) {
+		$resline = preg_split("#<br />#",$reserv[$i]);
+		for($j=0;$j<count($resline);$j++) {
 			if(preg_match("#(.*){#",$resline[$j],$host)) {
 				if(preg_match("#subnet(.*)#",$resline[$j],$subnet)) {
 					$subnet = preg_split("# #",$subnet[0]);
@@ -186,7 +186,7 @@
 					$reserv_host = $reserv_host[0];
 				}
 			}
-				else if(preg_match("#hardware ethernet (.*);#",$resline[$j],$hweth)) {
+			else if(preg_match("#hardware ethernet (.*);#",$resline[$j],$hweth)) {
 				$reserv_hw = $hweth[0];
 				$hw = preg_split("# #",$reserv_hw);
 				$hw = preg_replace("#;#","",$hw[2]);
@@ -209,6 +209,9 @@
 				if(isset($reserv_ip))
 					$hosts_list[$reserv_host]["ip"] = $reserv_ip;
 				$hosts_list[$reserv_host]["hostname"] = $reserv_host;
+				if(!isset($hosts_list[$reserv_host]["servers"]))
+					$hosts_list[$reserv_host]["servers"] = array();
+				array_push($hosts_list[$reserv_host]["servers"],"");
 			}
 		}
 	}
@@ -268,7 +271,7 @@
 						$netfound = $subnet_list[$i][0];
 				}
 
-				FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid","'".$value["ip"]."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."'");
+				FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$value["ip"]."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["servers"]."'");
 				if($rstate == 3) {
 					$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 					$query = FS::$pgdbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");

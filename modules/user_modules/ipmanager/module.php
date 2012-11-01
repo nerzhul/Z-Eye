@@ -67,7 +67,8 @@
 					$iparray = array();
 					$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
-					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th><th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>Fin du bail</th></tr>";
+					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
+						<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>Fin du bail</th><th>Serveurs</th></tr>";
 					$netobj = new FSNetwork();
 					$netobj->setNetAddr($data["netid"]);
 					$netobj->setNetMask($data["netmask"]);
@@ -77,13 +78,19 @@
 						$iparray[$i]["host"] = "";
 						$iparray[$i]["ltime"] = "";
 						$iparray[$i]["distrib"] = 0;
+						$iparray[$i]["servers"] = array();
 					}
 					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed","netid = '".$data["netid"]."'");
 					while($data2 = pg_fetch_array($query2)) {
-						$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
-						$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
-						$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
-						$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
+						// If it's reserved on a host don't override status
+						if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
+							$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
+							$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
+							$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
+							$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
+						}
+						// List servers where the data is
+						array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
 					}
 					
 					$used = 0;
@@ -133,7 +140,12 @@
 						$netoutput .= "</td><td>".$rstate."</td><td>";
 						$netoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
 						$netoutput .= $value["host"]."</td><td>";
-						$netoutput .= $value["ltime"]."</td></tr>";
+						$netoutput .= $value["ltime"]."</td><td>";
+						for($i=0;$i<count($value["servers"]);$i++) {
+							if($i > 0) $netoutput .= "<br />";
+							$netoutput .= $value["servers"][$i];
+						}
+						$netouput .= "</td></tr>";
 					}
 					$netoutput .= "</table></center><br /><hr>";
 					$netoutput .= "<script type=\"text/javascript\">
