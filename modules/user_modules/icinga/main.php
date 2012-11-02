@@ -23,7 +23,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("Micinga")) {
-		class Mconnect extends InterfaceModule {
+		class Micinga extends InterfaceModule {
 			function Micinga() {
 				parent::InterfaceModule();
 				$this->conf->modulename = "iIcinga";
@@ -34,5 +34,5 @@
 			}
 		};
 	}
-	$module = new Mconnect();
+	$module = new Micinga();
 ?>

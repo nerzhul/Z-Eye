@@ -23,7 +23,7 @@
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
 	
 	class iIcinga extends genModule{
-		function iIcinga() { parent::genModule(); $this->loc = new lConnect(); }
+		function iIcinga() { parent::genModule(); $this->loc = new lIcinga(); }
 		public function Load() {
 			$output = $this->showTabPanel();
 			return $output;
@@ -58,6 +58,7 @@
 				case 5: $output .= $this->showTimeperiodsTab(); break;
 				case 6: $output .= $this->showContactsTab(); break;
 				case 7: $output .= $this->showContactgroupsTab(); break;
+			}
 			return $output;
 		}
 		
