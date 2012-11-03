@@ -190,14 +190,21 @@
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
 				}
 				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
-				$output .= $this->loc->s("From")." ".$this->loc->s("Monday")." ".$data["mhs"].":".$data["mms"]." ".$this->loc->s("To")." ".$data["mhe"].":".$data["mme"]."<br />";
-				$output .= $this->loc->s("From")." ".$this->loc->s("Tuesday")." ".$data["tuhs"].":".$data["tums"]." ".$this->loc->s("To")." ".$data["tuhe"].":".$data["tume"]."<br />";
-				$output .= $this->loc->s("From")." ".$this->loc->s("Wednesday")." ".$data["whs"].":".$data["wms"]." ".$this->loc->s("To")." ".$data["whe"].":".$data["wme"]."<br />";
-				$output .= $this->loc->s("From")." ".$this->loc->s("Thursday")." ".$data["thhs"].":".$data["thms"]." ".$this->loc->s("To")." ".$data["thhe"].":".$data["thme"]."<br />";
-				$output .= $this->loc->s("From")." ".$this->loc->s("Friday")." ".$data["fhs"].":".$data["fms"]." ".$this->loc->s("To")." ".$data["fhe"].":".$data["fme"]."<br />";
-				$output .= $this->loc->s("From")." ".$this->loc->s("Saturday")." ".$data["sahs"].":".$data["sams"]." ".$this->loc->s("To")." ".$data["sahe"].":".$data["same"]."<br />";
-				$output .= $this->loc->s("From")." ".$this->loc->s("Sunday")." ".$data["suhs"].":".$data["sums"]." ".$this->loc->s("To")." ".$data["suhe"].":".$data["sume"];
-				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=6&cmd=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
+				$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].	
+				" ".$this->loc->s("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
+				$output .= $this->loc->s("Tuesday").	" - ".$this->loc->s("From")." ".($data["tuhs"] < 10 ? "0" : "").$data["tuhs"].	":".($data["tums"] < 10 ? "0" : "").$data["tums"].	
+				" ".$this->loc->s("To")." ".($data["tuhe"] < 10 ? "0" : "").$data["tuhe"].":".($data["tume"] < 10 ? "0" : "").$data["tume"]."<br />";
+				$output .= $this->loc->s("Wednesday").	" - ".$this->loc->s("From")." ".($data["whs"] < 10 ? "0" : "").	$data["whs"].	":".($data["wms"] < 10 ? "0" : "").	$data["wms"].	
+				" ".$this->loc->s("To")." ".($data["whe"] < 10 ? "0" : "").	$data["whe"].":".($data["wme"] < 10 ? "0" : "").$data["wme"]."<br />";
+				$output .= $this->loc->s("Thursday").	" - ".$this->loc->s("From")." ".($data["thhs"] < 10 ? "0" : "").$data["thhs"].	":".($data["thms"] < 10 ? "0" : "").$data["thms"].
+				" ".$this->loc->s("To")." ".($data["thhe"] < 10 ? "0" : "").$data["thhe"].":".($data["thme"] < 10 ? "0" : "").$data["thme"]."<br />";
+				$output .= $this->loc->s("Friday").		" - ".$this->loc->s("From")." ".($data["fhs"] < 10 ? "0" : "").	$data["fhs"].	":".($data["fms"] < 10 ? "0" : "").	$data["fms"].
+				" ".$this->loc->s("To")." ".($data["fhe"] < 10 ? "0" : "").	$data["fhe"].":".($data["fme"] < 10 ? "0" : "").$data["fme"]."<br />";
+				$output .= $this->loc->s("Saturday").	" - ".$this->loc->s("From")." ".($data["sahs"] < 10 ? "0" : "").$data["sahs"].	":".($data["sams"] < 10 ? "0" : "").$data["sams"].
+				" ".$this->loc->s("To")." ".($data["sahe"] < 10 ? "0" : "").$data["sahe"].":".($data["same"] < 10 ? "0" : "").$data["same"]."<br />";
+				$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
+				" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
+				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=6&tp=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
 					</a></tr>";
 			}
 			if($found) $output .= "</table>";
@@ -380,7 +387,7 @@
 						return;
 					}
 					
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$cmdname."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=3");
 						return;
 					}
