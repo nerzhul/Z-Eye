@@ -73,35 +73,40 @@
 		private function showHostsTab() {
 			$output = "";
 			
-			$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
-			//$formoutput .= template list
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-			
-			// Checks
-			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",10);
-			
-			// Global
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
-			
-			// Notifications
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
-			$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",0);
-			// $formoutput .= notifoptions
-			// $formoutput .= contactgroups
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
-			$formoutput .= "</table>";
-			
+			$tpexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
+			if($tpexist) {
+				$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
+				//$formoutput .= template list
+				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
+				
+				// Checks
+				$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
+				$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",10);
+				
+				// Global
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
+				
+				// Notifications
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
+				$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",0);
+				// $formoutput .= notifoptions
+				// $formoutput .= contactgroups
+				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+				$formoutput .= "</table>";
+			}
+			else
+				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
+				
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 			
 			return $output;
@@ -116,39 +121,45 @@
 		private function showServicesTab() {
 			$output = "";
 			
-			$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
-			//$formoutput .= template list
-			
-			// Global
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-			
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("active-check-en"),"actcheck",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("passive-check-en"),"pascheck",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("parallel-check"),"parcheck",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("obs-over-srv"),"obsess",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("check-freshness"),"freshness",false);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
-			
-			// Checks
-			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",10);
-			
-			// Notifications
-			$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
-			// $formoutput .= notifoptions
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",0);
-			// $formoutput .= contactgroups
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
-			$formoutput .= "</table>";
+			$tpexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
+			if($tpexist) {
+				$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
+				//$formoutput .= template list
+				
+				// Global
+				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
+				
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("active-check-en"),"actcheck",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("passive-check-en"),"pascheck",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("parallel-check"),"parcheck",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("obs-over-srv"),"obsess",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("check-freshness"),"freshness",false);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
+				
+				// Checks
+				$formoutput .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd")."</td></tr>";
+				$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",10);
+				
+				// Notifications
+				$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
+				// $formoutput .= notifoptions
+				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",0);
+				// $formoutput .= contactgroups
+				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+				$formoutput .= "</table>";
+			}
+			else
+				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"));
 			
@@ -220,20 +231,33 @@
 		
 		private function showContactsTab() {
 			$output = "";
-			
-			$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
-			//$formoutput .= template list
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Email"),"mail","");
-			$formoutput .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod")."</td></tr>";
-			//$formoutput .= srvnotifoptions
-			$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod")."</td></tr>";
-			//$formoutput .= hostnotifoptions
-			$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
-			$formoutput .= "</table>";
+			$tpexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
+			if($tpexist) {
+				$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
+				//$formoutput .= template list
+				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
+				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Email"),"mail","");
+				$formoutput .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod")."</td></tr>";
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptcrit"),"srvoptc",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptwarn"),"srvoptw",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptunreach"),"srvoptu",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptrec"),"srvoptr",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptflap"),"srvoptf",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptsched"),"srvopts",true);
+				$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd")."</td></tr>";
+				$formoutput .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod")."</td></tr>";
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptdown"),"hostoptd",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptunreach"),"hostoptu",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptrec"),"hostoptr",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptflap"),"hostoptf",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
+				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
+				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+				$formoutput .= "</table>";
+			}
+			else
+				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"));
 			
@@ -287,7 +311,7 @@
 		
 		private function getTimePeriodList($name) {
 			$output = FS::$iMgr->addList($name);
-			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name,alias","","alias");
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_timeperiods","name,alias","","alias");
 			while($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->addElementToList($data["alias"],$data["name"]);
 			}
@@ -322,11 +346,14 @@
 						return;
 					}
 					
+					// @TODO verify paths
+					
 					FS::$pgdbMgr->Insert("z_eye_icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
 					header("Location: index.php?mod=".$this->mid."&sh=8");
 					return;
 				// Remove command
 				case 2:
+					// @TODO forbid remove when use
 					$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
 					if(!$cmdname) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
@@ -335,6 +362,16 @@
 					
 					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=2");
+						return;
+					}
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","srvcmd = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
+						return;
+					}
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","hostcmd = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
 						return;
 					}
 					
@@ -432,8 +469,95 @@
 						return;
 					}
 					
+					// @ TODO forbid remove when used (service + hosts)
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","srvperiod = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						return;
+					}
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","hostperiod = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						return;
+					}
+					
 					FS::$pgdbMgr->Delete("z_eye_icinga_timeperiods","name = '".$tpname."'");
 					header("Location: index.php?mod=".$this->mid."&sh=5");
+					return;
+				// Add contact
+				case 7:
+					$name = FS::$secMgr->getPost("name","w");
+					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
+					$srvnotifperiod = FS::$secMgr->getPost("srvnotifperiod","w");
+					$srvnotifcmd = FS::$secMgr->checkAndSecurisePostData("srvnotifcmd");
+					$hostnotifperiod = FS::$secMgr->getPost("hostnotifperiod","w");
+					$hostnotifcmd = FS::$secMgr->checkAndSecurisePostData("hostnotifcmd");
+					if(!$name || !$mail || preg_match("#[ ]#",$name) || !$srvnotifperiod || !$srvnotifcmd || !$hostnotifperiod || !$hostnotifcmd) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						return;
+					}
+					
+					$srvoptc = FS::$secMgr->checkAndSecurisePostData("srvoptc");
+					$srvoptw = FS::$secMgr->checkAndSecurisePostData("srvoptw");
+					$srvoptu = FS::$secMgr->checkAndSecurisePostData("srvoptu");
+					$srvoptr = FS::$secMgr->checkAndSecurisePostData("srvoptr");
+					$srvoptf = FS::$secMgr->checkAndSecurisePostData("srvoptf");
+					$srvopts = FS::$secMgr->checkAndSecurisePostData("srvopts");
+					$hostoptd = FS::$secMgr->checkAndSecurisePostData("hostoptd");
+					$hostoptu = FS::$secMgr->checkAndSecurisePostData("hostoptu");
+					$hostoptr = FS::$secMgr->checkAndSecurisePostData("hostoptr");
+					$hostoptf = FS::$secMgr->checkAndSecurisePostData("hostoptf");
+					$hostopts = FS::$secMgr->checkAndSecurisePostData("hostopts");
+				
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","alias","name = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=3");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$srvnotifcmd."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$hostnotifcmd."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						return;
+					}
+					
+					FS::$iMgr->Insert("z_eye_icinga_contacts","name,mail,template,srvperiod,srvcmd,hostperiod,hostcmd,soptc,soptw,soptu,soptr,soptf,sopts,hoptd,hoptu,hoptr,hoptf,hopts",
+						"'".$name."','".$mail."','".$srvnotifperiod."','".$srvnotifcmd."','".$hostnotifperiod."','".$hostnotifcmd."','".($srvpoptc == "on" ? 1 : 0)."','".
+						($srvpoptw == "on" ? 1 : 0)."','".($srvpoptu == "on" ? 1 : 0)."','".($srvpoptr == "on" ? 1 : 0)."','".($srvpoptf == "on" ? 1 : 0)."','".($srvpopts == "on" ? 1 : 0)."','".
+						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
+					header("Location: index.php?mod=".$this->mid."&sh=6");
+					return;
+				// Edit contact
+				case 8:
+				// Delete contact
+				case 9:
+					// @TODO forbid remove when used
+					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
+					if(!$ctname) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$ctname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=2");
+						return;
+					}
+					
+					FS::$pgdbMgr->Delete("z_eye_icinga_contacts","name = '".$ctname."'");
+					header("Location: index.php?mod=".$this->mid."&sh=6");
 					return;
 			}
 		}
