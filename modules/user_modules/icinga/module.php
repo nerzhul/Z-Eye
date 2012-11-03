@@ -79,7 +79,7 @@
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
 			
 			// Checks
-			$formoutput .= $this->genCommandList("checkcommand");
+			$formoutput .= "<tr><td>".$this->loc->s("Command")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
 			//$formoutput .= checkperiod
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
@@ -187,10 +187,10 @@
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Email"),"mail","");
 			//$formoutput .= srvnotifperiod
 			//$formoutput .= srvnotifoptions
-			$formoutput .= $this->genCommandList("srvnotifcmd");
+			$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd")."</td></tr>";
 			//$formoutput .= hostnotifperiod
 			//$formoutput .= hostnotifoptions
-			$formoutput .= $this->genCommandList("hostnotifcmd");
+			$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table>";
 			
