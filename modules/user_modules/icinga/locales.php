@@ -65,6 +65,7 @@
 					"new-host" => "Nouvel hôte",
 					"new-service" => "Nouveau service",
 					"new-timeperiod" => "Nouvelle période temporelle",
+					"No" => "Non",
 					"notif-en" => "Notifications",
 					"notif-interval" => "Intervalle de notification",
 					"notifperiod" => "Période de notification",
@@ -94,6 +95,7 @@
 					"Tuesday" => "Mardi",
 					"Value" => "Valeur",
 					"Wednesday" => "Mercreci",
+					"Yes" => "Oui",
 				),
 				"en" => array(
 					"active-check-en" => "Active checks",
@@ -138,6 +140,7 @@
 					"new-host" => "New host",
 					"new-service" => "New service",
 					"new-timeperiod" => "New timeperiod",
+					"No" => "No",
 					"notif-en" => "Notifications",
 					"notif-interval" => "Notification interval",
 					"notifperiod" => "Notification period",
@@ -167,6 +170,7 @@
 					"Tuesday" => "Tuesday",
 					"Value" => "Value",
 					"Wednesday" => "Wednesday",
+					"Yes" => "Yes",
 				)
 			);
 		}

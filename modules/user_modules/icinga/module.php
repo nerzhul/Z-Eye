@@ -233,7 +233,12 @@
 			$output = "";
 			$tpexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
 			if($tpexist) {
-				$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+				
+				/*
+				 * Ajax new contact
+				 */
+				$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=7");
+				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
 				//$formoutput .= template list
 				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
@@ -254,13 +259,28 @@
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
 				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
-				$formoutput .= "</table>";
+				$formoutput .= "</table></form>";
 			}
 			else
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"));
 			
+			/*
+			 * Command table
+			 */
+			$found = false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name,mail,template","","name");
+			while($data = pg_fetch_array($query)) {
+				if(!$found) {
+					$found = true;
+					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
+				}
+				$output .= "<tr><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".($data["template"] == 1 ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>
+						<a href=\"index.php?mod=".$this->mid."&act=2&cmd=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
+						</a></td></tr>";
+			}
+			if($found) $output .= "</table>";
 			return $output;
 		}
 		
