@@ -517,6 +517,7 @@
 						return;
 					}
 					
+					$istpl = FS::$secMgr->checkAndSecurisePostData("istemplate");
 					$srvoptc = FS::$secMgr->checkAndSecurisePostData("srvoptc");
 					$srvoptw = FS::$secMgr->checkAndSecurisePostData("srvoptw");
 					$srvoptu = FS::$secMgr->checkAndSecurisePostData("srvoptu");
@@ -554,9 +555,9 @@
 						return;
 					}
 					
-					FS::$iMgr->Insert("z_eye_icinga_contacts","name,mail,template,srvperiod,srvcmd,hostperiod,hostcmd,soptc,soptw,soptu,soptr,soptf,sopts,hoptd,hoptu,hoptr,hoptf,hopts",
-						"'".$name."','".$mail."','".$srvnotifperiod."','".$srvnotifcmd."','".$hostnotifperiod."','".$hostnotifcmd."','".($srvpoptc == "on" ? 1 : 0)."','".
-						($srvpoptw == "on" ? 1 : 0)."','".($srvpoptu == "on" ? 1 : 0)."','".($srvpoptr == "on" ? 1 : 0)."','".($srvpoptf == "on" ? 1 : 0)."','".($srvpopts == "on" ? 1 : 0)."','".
+					FS::$pgdbMgr->Insert("z_eye_icinga_contacts","name,mail,template,srvperiod,srvcmd,hostperiod,hostcmd,soptc,soptw,soptu,soptr,soptf,sopts,hoptd,hoptu,hoptr,hoptf,hopts",
+						"'".$name."','".$mail."','".($istpl == "on" ? 1 : 0)."','".$srvnotifperiod."','".$srvnotifcmd."','".$hostnotifperiod."','".$hostnotifcmd."','".($srvoptc == "on" ? 1 : 0)."','".
+						($srvoptw == "on" ? 1 : 0)."','".($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".
 						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
 					header("Location: index.php?mod=".$this->mid."&sh=6");
 					return;
