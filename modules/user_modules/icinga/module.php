@@ -79,7 +79,7 @@
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
 			
 			// Checks
-			$formoutput .= "<tr><td>".$this->loc->s("Command")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
 			//$formoutput .= checkperiod
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
@@ -158,22 +158,49 @@
 		private function showTimeperiodsTab() {
 			$output = "";
 			
-			$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
-			//$formoutput .= template list
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","");
-			$formoutput .= "<tr><td>".$this->loc->s("Monday")."</td><td>".FS::$iMgr->hourlist("mh","mm")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".FS::$iMgr->hourlist("tuh","tum")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".FS::$iMgr->hourlist("wh","wm")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Thursday")."</td><td>".FS::$iMgr->hourlist("thh","thm")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Friday")."</td><td>".FS::$iMgr->hourlist("fh","fm")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".FS::$iMgr->hourlist("sah","sam")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".FS::$iMgr->hourlist("suh","sum")."</td></tr>";
+			/*
+			 * Ajax new Timeperiod
+			 * @TODO: support for multiple times in one day, and calendar days
+			 */
+			
+			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
+			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",false,array("length" => 120, "size" => 30));
+			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Monday")."</td><td>".FS::$iMgr->hourlist("mhs","mms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Tuesday")."</td><td>".FS::$iMgr->hourlist("tuhs","tums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Wednesday")."</td><td>".FS::$iMgr->hourlist("whs","wms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Thursday")."</td><td>".FS::$iMgr->hourlist("thhs","thms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Friday")."</td><td>".FS::$iMgr->hourlist("fhs","fms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Saturday")."</td><td>".FS::$iMgr->hourlist("sahs","sams")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Sunday")."</td><td>".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
-			$formoutput .= "</table>";
+			$formoutput .= "</table></form>";
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"));
+			
+			/*
+			 * Timeperiod table
+			 */
+			$found = false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","","name");
+			while($data = pg_fetch_array($query)) {
+				if(!$found) {
+					$found = true;
+					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
+				}
+				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
+				$output .= $this->loc->s("From")." ".$this->loc->s("Monday")." ".$data["mhs"].":".$data["mms"]." ".$this->loc->s("To")." ".$data["mhe"].":".$data["mme"]."<br />";
+				$output .= $this->loc->s("From")." ".$this->loc->s("Tuesday")." ".$data["tuhs"].":".$data["tums"]." ".$this->loc->s("To")." ".$data["tuhe"].":".$data["tume"]."<br />";
+				$output .= $this->loc->s("From")." ".$this->loc->s("Wednesday")." ".$data["whs"].":".$data["wms"]." ".$this->loc->s("To")." ".$data["whe"].":".$data["wme"]."<br />";
+				$output .= $this->loc->s("From")." ".$this->loc->s("Thursday")." ".$data["thhs"].":".$data["thms"]." ".$this->loc->s("To")." ".$data["thhe"].":".$data["thme"]."<br />";
+				$output .= $this->loc->s("From")." ".$this->loc->s("Friday")." ".$data["fhs"].":".$data["fms"]." ".$this->loc->s("To")." ".$data["fhe"].":".$data["fme"]."<br />";
+				$output .= $this->loc->s("From")." ".$this->loc->s("Saturday")." ".$data["sahs"].":".$data["sams"]." ".$this->loc->s("To")." ".$data["sahe"].":".$data["same"]."<br />";
+				$output .= $this->loc->s("From")." ".$this->loc->s("Sunday")." ".$data["suhs"].":".$data["sums"]." ".$this->loc->s("To")." ".$data["suhe"].":".$data["sume"];
+				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=6&cmd=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
+					</a></tr>";
+			}
+			if($found) $output .= "</table>";
 			return $output;
 		}
 		
@@ -294,6 +321,71 @@
 				case 3:
 					// @TODO
 					header("Location: index.php?mod=".$this->mid."&sh=8");
+					return;
+				// Add timeperiod
+				case 4:
+					$name = FS::$secMgr->checkAndSecurisePostData("name");
+					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
+					
+					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						return;
+					}
+					
+					$mhs = FS::$secMgr->getPost("mhs","n+=");
+					$mms = FS::$secMgr->getPost("mms","n+=");
+					$tuhs = FS::$secMgr->getPost("tuhs","n+=");
+					$tums = FS::$secMgr->getPost("tums","n+=");
+					$whs = FS::$secMgr->getPost("whs","n+=");
+					$wms = FS::$secMgr->getPost("wms","n+=");
+					$thhs = FS::$secMgr->getPost("thhs","n+=");
+					$thms = FS::$secMgr->getPost("thms","n+=");
+					$fhs = FS::$secMgr->getPost("fhs","n+=");
+					$fms = FS::$secMgr->getPost("fms","n+=");
+					$sahs = FS::$secMgr->getPost("sahs","n+=");
+					$sams = FS::$secMgr->getPost("sams","n+=");
+					$suhs = FS::$secMgr->getPost("suhs","n+=");
+					$sums = FS::$secMgr->getPost("sums","n+=");
+					
+					if($mhs == NULL || $mms == NULL || $tuhs == NULL || $tums == NULL || $whs == NULL || $wms == NULL || 
+						$thhs == NULL || $thms == NULL || $fhs == NULL || $fms == NULL || $sahs == NULL || $sams == NULL || 
+						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 || 
+						$whs > 23 || $wms > 59 || $thhs > 23 || $thms > 59 || $fhs > 23 || $fms > 59 || $sahs > 23 || $sams > 59 ||
+						$suhs > 23 || $sums > 59) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						return;
+					}
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$cmdname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=3");
+						return;
+					}
+					
+					FS::$pgdbMgr->Insert("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume",
+						"'".$name."','".$alias."','".$mhs."','".$mms."','".$tuhs."','".$tums."','".$whs."','".$wms."','".$thhs."','".$thms."','".$fhs."','".$fms."','".$sahs."','".$sams."','".$suhs."','".$sums.
+						"','".$mhe."','".$mme."','".$tuhe."','".$tume."','".$whe."','".$wme."','".$thhe."','".$thme."','".$fhe."','".$fme."','".$sahe."','".$same."','".$suhe."','".$sume."'");
+					header("Location: index.php?mod=".$this->mid."&sh=5");
+					return;
+				// Edit timeperiod
+				case 5:
+					//@TODO
+					header("Location: index.php?mod=".$this->mid."&sh=5");
+					return;
+				// Delete timeperiod
+				case 6:
+					$tpname = FS::$secMgr->checkAndSecuriseGetData("tp");
+					if(!$tpname) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$tpname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=2");
+						return;
+					}
+					
+					FS::$pgdbMgr->Delete("z_eye_icinga_timeperiods","name = '".$tpname."'");
+					header("Location: index.php?mod=".$this->mid."&sh=5");
 					return;
 			}
 		}
