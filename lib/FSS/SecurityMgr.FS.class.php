@@ -238,20 +238,12 @@
 				
 				// Positive
 				if(preg_match("#[+]#",$pattern)) {
-					// Positive & zero
-					if(preg_match("#[=]#",$pattern) && $data < 0)
-						return NULL;
-					// Positive only
-					else if($data <= 0)
+					if($data < 0 || !preg_match("#[=]#",$pattern) && $data == 0)
 						return NULL;
 				}
 				// Negative
 				else if(preg_match("#[-]#",$pattern)) {
-					// Negative & zero
-					if(preg_match("#[=]#",$pattern) && $data > 0)
-						return NULL;
-					// Negative only
-					else if($data >= 0)
+					if($data > 0 || !preg_match("#[=]#",$pattern) && $data > 0)
 						return NULL;
 				}
 				return $data;

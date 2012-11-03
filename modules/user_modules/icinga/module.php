@@ -167,13 +167,13 @@
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",false,array("length" => 120, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Monday")."</td><td>".FS::$iMgr->hourlist("mhs","mms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Tuesday")."</td><td>".FS::$iMgr->hourlist("tuhs","tums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Wednesday")."</td><td>".FS::$iMgr->hourlist("whs","wms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Thursday")."</td><td>".FS::$iMgr->hourlist("thhs","thms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Friday")."</td><td>".FS::$iMgr->hourlist("fhs","fms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Saturday")."</td><td>".FS::$iMgr->hourlist("sahs","sams")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("From")." ".$this->loc->s("Sunday")."</td><td>".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("thhs","thms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("fhs","fms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
@@ -352,6 +352,30 @@
 						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 || 
 						$whs > 23 || $wms > 59 || $thhs > 23 || $thms > 59 || $fhs > 23 || $fms > 59 || $sahs > 23 || $sams > 59 ||
 						$suhs > 23 || $sums > 59) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						return;
+					}
+					
+					$mhe = FS::$secMgr->getPost("mhe","n+=");
+					$mme = FS::$secMgr->getPost("mme","n+=");
+					$tuhe = FS::$secMgr->getPost("tuhe","n+=");
+					$tume = FS::$secMgr->getPost("tume","n+=");
+					$whe = FS::$secMgr->getPost("whe","n+=");
+					$wme = FS::$secMgr->getPost("wme","n+=");
+					$thhe = FS::$secMgr->getPost("thhe","n+=");
+					$thme = FS::$secMgr->getPost("thme","n+=");
+					$fhe = FS::$secMgr->getPost("fhe","n+=");
+					$fme = FS::$secMgr->getPost("fme","n+=");
+					$sahe = FS::$secMgr->getPost("sahe","n+=");
+					$same = FS::$secMgr->getPost("same","n+=");
+					$suhe = FS::$secMgr->getPost("suhe","n+=");
+					$sume = FS::$secMgr->getPost("sume","n+=");
+					
+					if($mhe == NULL || $mme == NULL || $tuhe == NULL || $tume == NULL || $whe == NULL || $wme == NULL || 
+						$thhe == NULL || $thme == NULL || $fhe == NULL || $fme == NULL || $sahe == NULL || $same == NULL || 
+						$suhe == NULL || $sume == NULL || $mhe > 23 || $mme > 59 || $tuhe > 23 || $tume > 59 || 
+						$whe > 23 || $wme > 59 || $thhe > 23 || $thme > 59 || $fhe > 23 || $fme > 59 || $sahe > 23 || $same > 59 ||
+						$suhe > 23 || $sume > 59) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
