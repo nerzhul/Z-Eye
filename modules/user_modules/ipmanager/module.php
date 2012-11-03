@@ -145,7 +145,7 @@
 							if($i > 0) $netoutput .= "<br />";
 							$netoutput .= $value["servers"][$i];
 						}
-						$netouput .= "</td></tr>";
+						$netoutput .= "</td></tr>";
 					}
 					$netoutput .= "</table></center><br /><hr>";
 					$netoutput .= "<script type=\"text/javascript\">
