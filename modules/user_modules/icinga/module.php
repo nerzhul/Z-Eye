@@ -79,7 +79,7 @@
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
 			
 			// Checks
-			//$formoutput .= checkcommand
+			$formoutput .= $this->genCommandList("checkcommand");
 			//$formoutput .= checkperiod
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
@@ -184,12 +184,13 @@
 			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
 			//$formoutput .= template list
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Email"),"mail","");
 			//$formoutput .= srvnotifperiod
 			//$formoutput .= srvnotifoptions
-			//$formoutput .= srvnotifcmd
+			$formoutput .= $this->genCommandList("srvnotifcmd");
 			//$formoutput .= hostnotifperiod
 			//$formoutput .= hostnotifoptions
-			//$formoutput .= hostnotifcmd
+			$formoutput .= $this->genCommandList("hostnotifcmd");
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table>";
 			
@@ -218,8 +219,8 @@
 			 */
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 100));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",false,array("length" => 1024, "size" => 30));
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
@@ -240,6 +241,16 @@
 						</a></td></tr>";
 			}
 			if($found) $output .= "</table>";
+			return $output;
+		}
+		
+		private function genCommandList($name) {
+			$output = FS::$iMgr->addList($name);
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name","","name");
+			while($data = pg_fetch_array($query)) {
+				$output .= FS::$iMgr->addElementToList($data["name"],$data["name"]);
+			}
+			$output .= "</select>";
 			return $output;
 		}
 
