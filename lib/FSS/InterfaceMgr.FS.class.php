@@ -173,7 +173,7 @@
 
 		public function addNumericInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
-                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+            if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
 			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
 			return $output;
@@ -281,12 +281,13 @@
 			return $output;
 		}
 		
-		public function addIndexedLine($label,$name,$def_value = "", $pwd = false) {
+		public function addIndexedLine($label,$name,$def_value = "", $pwd = false, $options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
 			if($pwd)
 				$output .= $this->password($name,$def_value);
 			else
-				$output .= $this->input($name,$def_value);
+				$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
+				(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
 			$output .= "</center></td></tr>";
 			return $output;
 		}

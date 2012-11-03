@@ -217,9 +217,9 @@
 			 * Ajax new command
 			 */
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
-			$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","");
+			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 100));
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
@@ -250,7 +250,7 @@
 					$cmdname = FS::$secMgr->checkAndSecurisePostData("name");
 					$cmd = FS::$secMgr->checkAndSecurisePostData("cmd");
 					
-					if(!$cmdname || !$cmd || preg_match("#[ ]#",$cmdname) {
+					if(!$cmdname || !$cmd || preg_match("#[ ]#",$cmdname)) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
 						return;
 					}
@@ -284,7 +284,6 @@
 					// @TODO
 					header("Location: index.php?mod=".$this->mid."&sh=8");
 					return;
-				}
 			}
 		}
 	};
