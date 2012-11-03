@@ -114,14 +114,14 @@
 
 		private function loadModuleRuleSets($activerules = array()) {
 			$output = "";
-                        $dir = opendir(dirname(__FILE__)."/../");
+			$dir = opendir(dirname(__FILE__)."/../");
 			$found = 0;
-                        while($elem = readdir($dir)) {
-                                $dirpath = dirname(__FILE__)."/../".$elem;
-                                if(is_dir($dirpath) && $elem != ".." && $elem != ".") {
-                                        $dir2 = opendir($dirpath);
-                                        while($elem2 = readdir($dir2)) {
-                                                if(is_file($dirpath."/".$elem2) && $elem2 == "rules.php") {
+			while($elem = readdir($dir)) {
+				$dirpath = dirname(__FILE__)."/../".$elem;
+				if(is_dir($dirpath) && $elem != ".." && $elem != ".") {
+					$dir2 = opendir($dirpath);
+					while($elem2 = readdir($dir2)) {
+						if(is_file($dirpath."/".$elem2) && $elem2 == "rules.php") {
 							require($dirpath."/main.php");
 
 							$tmpoutput = $module->getRulesClass()->showMgmtInterface($activerules);
@@ -133,12 +133,12 @@
 								$output .= $tmpoutput;
 							}
 						}
-                                        }
-                                }
-                        }
+					}
+				}
+			}
 			if($found) $output .= "</table>";
-                        return $output;
-                }
+			return $output;
+		}
 
 		public function handlePostDatas($act) {
 			switch($act) {
