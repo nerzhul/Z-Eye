@@ -252,7 +252,7 @@
 			else if(preg_match("#[s]#",$pattern) && $this->isAlphabetic($data))
 				return $data;
 			// String a-Z + numerics
-			else if(preg_match("#[w]#",$pattern) && !$this->isAlphaNumeric($data))
+			else if(preg_match("#[w]#",$pattern) && $this->isAlphaNumeric($data))
 				return $data;
 			// IPv4/IPv6 + CIDR
 			else if(preg_match("#[i]#",$pattern)) {
