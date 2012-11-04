@@ -73,39 +73,68 @@
 		private function showHostsTab() {
 			$output = "";
 			
-			$tpexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
-			if($tpexist) {
-				$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
-				//$formoutput .= template list
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-				
-				// Checks
-				$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
-				$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",10);
-				
-				// Global
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
-				
-				// Notifications
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
-				$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",0);
-				// $formoutput .= notifoptions
-				// $formoutput .= contactgroups
-				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
-				$formoutput .= "</table>";
-			}
-			else
+			$tpexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","");
+			if(!$tpexist) {
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
+				return $output;
+			}
+			
+			$ctexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","name","");
+			if(!$tpexist) {
+				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
+				return $output;
+			}
+			
+			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=13");
+			$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
+			//$formoutput .= template list
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","");
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("DisplayName"),"dname","");
+			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
+			$formoutput = FS::$iMgr->addList($name);
+			$formoutput .= FS::$iMgr->addElementToList("","",true);
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
+			while($data = pg_fetch_array($query)) {
+				$formoutput .= FS::$iMgr->addElementToList($data["name"]." (".$data["addr"].")",$data["name"]);
+			}
+			$formoutput .= "</select></td></tr>";
+			
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Address"),"addr","");
+			
+			// Checks
+			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
+			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",3);
+			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",1);
+			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",10);
+			
+			// Global
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
+			
+			// Notifications
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
+			$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
+			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",0);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptdown"),"hostoptd",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptunreach"),"hostoptu",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptrec"),"hostoptr",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptflap"),"hostoptf",true);
+			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
+			$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
+			
+			// icon image
+			// statusmap image
+			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+			$formoutput .= "</table></form>";				
 				
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 			
@@ -128,7 +157,9 @@
 				//$formoutput .= template list
 				
 				// Global
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
+				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Description"),"desc","",false,array("length" => 120, "size" => 30));
+				// @ TODO support hostlist
+				$formoutput .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->genHostsList("Host")."</td></tr>";
 				
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("active-check-en"),"actcheck",true);
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("passive-check-en"),"pascheck",true);
@@ -154,7 +185,8 @@
 				$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
 				// $formoutput .= notifoptions
 				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",0);
-				// $formoutput .= contactgroups
+				// @ TODO support for contact only
+				$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 				$formoutput .= "</table>";
 			}
@@ -388,6 +420,26 @@
 			$output .= "</select>";
 			return $output;
 		}
+		
+		private function genContactGroupsList($name) {
+			$output = FS::$iMgr->addList($name);
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
+			while($data = pg_fetch_array($query)) {
+				$output .= FS::$iMgr->addElementToList($data["name"]." (".$data["alias"].")",$data["name"]);
+			}
+			$output .= "</select>";
+			return $output;
+		}
+		
+		private function genHostsList($name) {
+			$output = FS::$iMgr->addList($name);
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
+			while($data = pg_fetch_array($query)) {
+				$output .= FS::$iMgr->addElementToList($data["name"]." (".$data["addr"].")",$data["name"]);
+			}
+			$output .= "</select>";
+			return $output;
+		}
 
 		public function handlePostDatas($act) {
 			switch($act) {
@@ -530,7 +582,7 @@
 						return;
 					}
 					
-					// @ TODO forbid remove when used (service + hosts)
+					// @ TODO forbid remove when used (service + host / groups ??)
 					
 					// Forbid remove if timeperiod is used
 					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","srvperiod = '".$tpname."'")) {
@@ -539,6 +591,16 @@
 					}
 					
 					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","hostperiod = '".$tpname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						return;
+					}
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","checkperiod = '".$tpname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						return;
+					}
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","notifperiod = '".$tpname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
@@ -666,8 +728,8 @@
 					return;
 				// Delete contact group
 				case 12:
-					// @TODO forbid remove when used
-					$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
+					// @TODO forbid remove when used (service, service_group)
+					$ctgname = FS::$secMgr->getPost("ctg","w");
 					if(!$ctgname) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 						return;
@@ -678,11 +740,120 @@
 						return;
 					}
 					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","contactgroup = '".$ctgname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=4");
+						return;
+					}
+					
 					FS::$pgdbMgr->Delete("z_eye_icinga_contactgroup_members","name = '".$ctgname."'");
 					FS::$pgdbMgr->Delete("z_eye_icinga_contactgroups","name = '".$ctgname."'");
 					
 					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
+				// Add host
+				case 13:
+					$name = FS::$secMgr->getPost("host","w");
+					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
+					$dname = FS::$secMgr->checkAndSecurisePostData("dname");
+					$parent = FS::$secMgr->getPost("parent","w");
+					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
+					$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
+					$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
+					$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
+					$ctg = FS::$secMgr->getPost("ctg","w");
+					
+					if(!$name || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod || !$notifperiod || !$ctg) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+				
+					// Checks
+					$tpl = FS::$secMgr->checkAndSecurisePostData("istemplate");
+					$hostoptd = FS::$secMgr->checkAndSecurisePostData("hostoptd");
+					$hostoptu = FS::$secMgr->checkAndSecurisePostData("hostoptu");
+					$hostoptr = FS::$secMgr->checkAndSecurisePostData("hostoptr");
+					$hostoptf = FS::$secMgr->checkAndSecurisePostData("hostoptf");
+					$hostopts = FS::$secMgr->checkAndSecurisePostData("hostopts");
+					$eventhdlen = FS::$secMgr->checkAndSecurisePostData("eventhdlen");
+					$flapen = FS::$secMgr->checkAndSecurisePostData("flapen");
+					$failpreden = FS::$secMgr->checkAndSecurisePostData("failpreden");
+					$perfdata = FS::$secMgr->checkAndSecurisePostData("perfdata");
+					$retstatus = FS::$secMgr->checkAndSecurisePostData("retstatus");
+					$retnonstatus = FS::$secMgr->checkAndSecurisePostData("retnonstatus");
+					$notifen = FS::$secMgr->checkAndSecurisePostData("notifen");
+					
+					// Numerics
+					$checkintval = FS::$secMgr->getPost("checkintval","n+");
+					$retcheckintval = FS::$secMgr->getPost("retcheckintval","n+");
+					$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
+					$notifintval = FS::$secMgr->getPost("notifintval","n+=");
+					
+					if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+					
+					// Now verify datas
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=3");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcommand."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+
+					FS::$pgdbMgr->Insert("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
+						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup",
+						"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
+						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
+						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
+						($hostopts == "on" ? 1 : 0)."','".$ctg."'");
+					
+					header("Location: index.php?mod=".$this->mid."&sh=2");
+					return;	
+				// Edit host
+				case 14:
+				
+					header("Location: index.php?mod=".$this->mid."&sh=2");
+					return;	
+				// Remove host
+				case 15:
+					$name = FS::$secMgr->getPost("host","w");
+					if(!$name) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						return;
+					}
+					
+					// Not exists
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","addr","name = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=2");
+						return;
+					}
+					// @ TODO forbid remove when used
+					
+					// Remove host and links with parents
+					FS::$pgdbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
+					FS::$pgdbMgr->Delete("z_eye_icinga_host_parents","parent = '".$name."'");
+					FS::$pgdbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
+					header("Location: index.php?mod=".$this->mid."&sh=2");
+					return;				
 			}
 		}
 	};
