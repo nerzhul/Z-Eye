@@ -216,14 +216,24 @@
 
 		public function checkAndSecurisePostData($data) {
 			$data_new = $this->checkPostData($data);
-			$this->SecuriseStringForDB($data_new);
+			if(is_array($data_new)) {
+				for($i=0;$i<count($data_new);$i++)
+					$this->SecuriseStringForDB($data_new[$i]);
+			}
+			else
+				$this->SecuriseStringForDB($data_new);
 			return $data_new;
 
 		}
 
 		public function checkAndSecuriseGetData($data) {
 			$data_new = $this->checkGetData($data);
-			$this->SecuriseStringForDB($data_new);
+			if(is_array($data_new)) {
+				for($i=0;$i<count($data_new);$i++)
+					$this->SecuriseStringForDB($data_new[$i]);
+			}
+			else
+				$this->SecuriseStringForDB($data_new);
 			return $data_new;
 
 		}
