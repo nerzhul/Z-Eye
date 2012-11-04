@@ -81,21 +81,24 @@
 			}
 			
 			$ctexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","name","");
-			if(!$tpexist) {
+			if(!$ctexist) {
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 				return $output;
 			}
 			
+			/*
+			 * Ajax new host
+			 */
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=13");
-			$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
 			//$formoutput .= template list
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","");
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("DisplayName"),"dname","");
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
-			$formoutput = FS::$iMgr->addList($name);
+			$formoutput .= FS::$iMgr->addList("parent");
 			$formoutput .= FS::$iMgr->addElementToList("","",true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
@@ -138,6 +141,27 @@
 				
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 			
+			/*
+			 * Host table
+			 */
+			$found = false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,alias,addr","","name");
+			while($data = pg_fetch_array($query)) {
+				if(!$found) {
+					$found = true;
+					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Address")."</th><th></th></tr>";
+				}
+				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
+				$found2 = false;
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
+				while($data2 = pg_fetch_array($query2)) {
+					if($found2) $output .= ", ";
+					else $found2 = true;
+					$output .= $data2["parent"];
+				}
+				$output .="</td><td><a href=\"index.php?mod=".$this->mid."&act=15&host=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."</a></td></tr>";
+			}
+			if($found) $output .= "</table>";
 			return $output;
 		}
 		
@@ -152,6 +176,10 @@
 			
 			$tpexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
 			if($tpexist) {
+				
+				/*
+				 * Ajax new service
+				 */
 				$formoutput = "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
 				//$formoutput .= template list
