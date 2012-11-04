@@ -587,63 +587,76 @@
 			while($data = pg_fetch_array($query)) {
 				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\tservice_notification_period\t".$data["srvperiod"]."\n\thost_notification_period\t".$data["hostperiod"]."\n\t");
 				fwrite($file,"service_notification_commands\t".$data["srvcmd"]."\n\thost_notification_commands\t".$data["hostcmd"]."\n\temail\t".$data["mail"]."\n\t");
-				fwrite($file,"host_notification_options\t");
+				
 				$found = false;
 				if($data["hoptd"] == "t") {
+					if(!$found) fwrite($file,"host_notification_options\t");
 					fwrite($file,"d");
 					$found = true;
 				}
 				if($found) fwrite($file,",");
 				if($data["hoptu"] == "t") {
+					if(!$found) fwrite($file,"host_notification_options\t");
 					fwrite($file,"u");
 					$found = true;
 				}
 				if($found) fwrite($file,",");
 				if($data["hoptr"] == "t") {
+					if(!$found) fwrite($file,"host_notification_options\t");
 					fwrite($file,"r");
 					$found = true;
 				}
 				if($found) fwrite($file,",");
 				if($data["hoptf"] == "t") {
+					if(!$found) fwrite($file,"host_notification_options\t");
 					fwrite($file,"f");
 					$found = true;
 				}
 				if($found) fwrite($file,",");
 				if($data["hopts"] == "t") {
+					if(!$found) fwrite($file,"host_notification_options\t");
 					fwrite($file,"s");
 					$found = true;
 				}
-				$found = false;
-				fwrite($file,"\n\tservice_notification_options\t");
 				
+				$found = false;
 				if($data["soptc"] == "t") {
+					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
 					fwrite($file,"c");
 					$found = true;
 				}
+				
 				if($found) fwrite($file,",");
 				if($data["soptw"] == "t") {
+					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
 					fwrite($file,"w");
 					$found = true;
 				}
+				
 				if($found) fwrite($file,",");
 				if($data["soptu"] == "t") {
+					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
 					fwrite($file,"u");
 					$found = true;
 				}
 				if($found) fwrite($file,",");
+				
 				if($data["soptr"] == "t") {
+					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
 					fwrite($file,"r");
 					$found = true;
 				}
 				if($found) fwrite($file,",");
+				
 				if($data["soptf"] == "t") {
+					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
 					fwrite($file,"f");
 					$found = true;
 				}
 				if($found) fwrite($file,",");
 				if($data["sopts"] == "t") {
+					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
 					fwrite($file,"s");
-					$found = true;
 				}
 				fwrite($file,"\n}\n\n");
 			}
@@ -689,6 +702,59 @@
 					fwrite($file,"\n\tsunday\t".$data["suhs"].":".$data["sums"]."-".$data["suhe"].":".$data["sume"]);
 				fwrite($file,"\n}\n\n");
 			}
+			
+			fclose($file);
+			
+			/*
+			 *  Write hosts
+			 */
+			 
+			$file = fopen($path."hosts.cfg","w+");
+			if(!$file)
+				return false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
+			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup","template = 'f'");
+			while($data = pg_fetch_array($query)) {
+				fwrite($file,"define host {\n\tname\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
+				fwrite($file,$data["alivecommand"]."\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkinterval"]."\n\tretry_interval\t".$data["retrycheckinterval"]."\n\t");
+				fwrite($file,"max_check_attemps\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
+				fwrite($file,"\n\tfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tprocess_perf_data\t".($data["perfdata"] == "t" ? 1 : 0)."\n\tretain_status_information\t");
+				fwrite($file,($data["retstatus"] == "t" ? 1 : 0)."\n\tretain_nonstatus_information\t".($data["retnonstatus"] == "t" ? 1 : 0)."\n\tnotifications_enabled\t".($data["notifen"] == "t" ? 1 : 0));
+				fwrite($file,"\n\tnotification_period\t".$data["notifperiod"]."\n\tnotification_interval\t".$data["notifintval"]."\n\t");
+				
+				$found = false;
+				if($data["hostoptd"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"d");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hostoptu"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"u");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hostoptr"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"r");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hostoptf"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"f");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hostopts"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"s");
+				}
+				
+				fwrite($file,"\n\tcontact_groups\t",$data["contactgroup"]);
+				
+				fwrite($file,"\n}\n\n");
 			
 			fclose($file);
 			
