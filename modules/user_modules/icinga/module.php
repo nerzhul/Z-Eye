@@ -769,6 +769,10 @@
 			}
 			fclose($file);
 			
+			/*
+			 * Hostgroups config
+			 */
+			
 			$file = fopen($path."hostgroups.cfg","w+");
 			if(!$file)
 				return false;
@@ -776,7 +780,7 @@
 			while($data = pg_fetch_array($query)) {
 				fwrite($file,"define hostgroup {\n\thostgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]);
 				$found = false;
-				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]." AND hosttype = '1'");
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '1'");
 				while($data2 = pg_fetch_array($query2)) {
 					if(!$found) {
 						$found = true;
@@ -787,7 +791,7 @@
 					
 				}
 				$found = false;
-				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]." AND hosttype = '2'");
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '2'");
 				while($data2 = pg_fetch_array($query2)) {
 					if(!$found) {
 						$found = true;
@@ -799,6 +803,73 @@
 				fwrite($file,"\n}\n\n");
 			}
 			
+			fclose($file);
+			
+			/*
+			 * Services config
+			 */
+			 
+			$file = fopen($path."services.cfg","w+");
+			if(!$file)
+				return false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
+			retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptf,srvopts,notifintval,ctg,srvoptr",
+			"template = 'f'");
+			
+			
+			"host,hosttype,"
+			
+			while($data = pg_fetch_array($query)) {
+				fwrite($file,"define service {\n\tname\t".$data["name"]."\n\tcheck_command\t".$data["checkcmd"]."\n\t");
+				if($data["hosttype"] == 1)
+					fwrite("host_name\t".$data["host"]);
+				else
+					fwrite("hostgroup_name\t".$data["host"]);
+				fwrite($file,"\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkintval"]."\n\tretry_interval\t".$data["retcheckintval"]."\n\t");
+				fwrite($file,"max_check_attempts\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
+				fwrite($file,"\n\tfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tprocess_perf_data\t".($data["perfdata"] == "t" ? 1 : 0)."\n\tretain_status_information\t");
+				fwrite($file,($data["retstatus"] == "t" ? 1 : 0)."\n\tretain_nonstatus_information\t".($data["retnonstatus"] == "t" ? 1 : 0)."\n\tnotifications_enabled\t".($data["notifen"] == "t" ? 1 : 0));
+				fwrite($file,"\n\tnotification_period\t".$data["notifperiod"]."\n\tnotification_interval\t".$data["notifintval"]."\n\tactive_checks_enabled\t".($data["actcheck"] == "t" ? 1 : 0));
+				fwrite($file,"\n\tpassive_checks_enabled\t".($data["pascheck"] == "t" ? 1 : 0)."\n\tobsess_over_service\t".($data["obsess"] == "t" ? 1 : 0)."\n\tcheck_freshness\t".($data["freshness"] == "t" ? 1 : 0));
+				fwrite($file,"\n\trfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tparallelize_check\t".($data["parcheck"] == "t" ? 1 : 0)."\n\tcontact_groups\t".$data["ctg"]."\n\t");
+				
+				$found = false;
+				if($data["srvoptc"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"c");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["srvoptw"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"w");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["srvoptu"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"u");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["srvoptr"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"r");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["srvoptf"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"f");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["srvopts"] == "t") {
+					if(!$found) fwrite($file,"notification_options\t");
+					fwrite($file,"s");
+				}
+				fwrite($file,"\n}\n\n");
+			}
 			fclose($file);
 			// @TODO write file to restart service
 			return true;
