@@ -563,14 +563,104 @@
 		private function writeConfiguration() {
 			$path = dirname(__FILE__)."/../../../datas/icinga-config/";
 				
-			// Write commands
-			$file = fopen($path."commands.conf","w+");
+			/*
+			 *  Write commands
+			 */
+			 
+			$file = fopen($path."commands.cfg","w+");
 			if(!$file)
 				return false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name,cmd");
 			while($data = pg_fetch_array($query))
 				fwrite($file,"define command {\n\tcommand_name\t".$data["name"]."\n\tcommand_line\t".$data["cmd"]."\n}\n\n");
+			
+			fclose($file);
+			
+			/*
+			 *  Write contact & contactgroups
+			 */
+			 
+			$file = fopen($path."contacts.cfg","w+");
+			if(!$file)
+				return false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts","template = 'f'");
+			while($data = pg_fetch_array($query)) {
+				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\tservice_notification_period\t".$data["srvperiod"]."\n\thost_notification_period\t".$data["hostperiod"]."\n\t");
+				fwrite($file,"service_notification_commands\t".$data["srvcmd"]."\n\thost_notification_commands\t".$data["hostcmd"]."\n\temail\t".$data["mail"]."\n\t");
+				fwrite($file,"host_notification_options\t");
+				$found = false;
+				if($data["hoptd"] == "t") {
+					fwrite($file,"d");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hoptu"] == "t") {
+					fwrite($file,"u");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hoptr"] == "t") {
+					fwrite($file,"r");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hoptf"] == "t") {
+					fwrite($file,"f");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["hopts"] == "t") {
+					fwrite($file,"s");
+					$found = true;
+				}
+				$found = false;
+				fwrite($file,"\n\tservice_notification_options\t");
 				
+				if($data["soptc"] == "t") {
+					fwrite($file,"c");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["soptw"] == "t") {
+					fwrite($file,"w");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["soptu"] == "t") {
+					fwrite($file,"u");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["soptr"] == "t") {
+					fwrite($file,"r");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["soptf"] == "t") {
+					fwrite($file,"f");
+					$found = true;
+				}
+				if($found) fwrite($file,",");
+				if($data["sopts"] == "t") {
+					fwrite($file,"s");
+					$found = true;
+				}
+				fwrite($file,"\n}\n\n");
+			}
+			
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,alias");
+			while($data = pg_fetch_array($query)) {
+				fwrite($file,"define contactgroup {\n\tcontactgroup_name\t".$data["name"]."\n\t".$data["alias"]."\n\tmembers\t");
+				$query2 = FS::$pgdbMgr->Select("z_eye_contactgroup_members","member","name = '".$data["name"]."'");
+				$found = false;
+				while($data2 = pg_fetch_array($query2)) {
+					if($found) fwrite($file,",");
+					else $found = true;
+					fwrite($file,$data["member"]);
+				}
+				fwrite($file("\n}\n\n");
+			}
+			
 			fclose($file);
 			
 			// @TODO write file to restart service
