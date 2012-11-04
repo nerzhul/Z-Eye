@@ -795,6 +795,7 @@
 					else fwrite($file,",");
 					fwrite($file,$data2["host"]);
 				}
+				fwrite($file,"\n}\n\n");
 			}
 			
 			fclose($file);
