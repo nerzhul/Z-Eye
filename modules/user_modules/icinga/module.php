@@ -561,13 +561,10 @@
 		}
 
 		private function writeConfiguration() {
-			if(Config::getOS() == "Debian")
-				$path = "/etc/icinga/";
-			else
-				$path = "/usr/local/etc/icinga/";
+			$path = dirname(__FILE__)."/../../../datas/icinga-config/";
 				
 			// Write commands
-			$file = fopen($path."objects/commands.conf","w+");
+			$file = fopen($path."commands.conf","w+");
 			if(!$file)
 				return false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name,cmd");
@@ -796,7 +793,7 @@
 					$hostoptf = FS::$secMgr->checkAndSecurisePostData("hostoptf");
 					$hostopts = FS::$secMgr->checkAndSecurisePostData("hostopts");
 				
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","alias","name = '".$name."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=3");
 						return;
 					}
@@ -856,7 +853,7 @@
 					}
 					
 					// Forbid remove if in existing contact group
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","name","member = '".$ctname."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroup_members","name","member = '".$ctname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
