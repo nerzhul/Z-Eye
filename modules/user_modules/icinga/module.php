@@ -198,9 +198,11 @@
 			foreach($hostlist as $host => $value)
 				$formoutput .= FS::$iMgr->addElementToList($host,$value[0]."$".$value[1]);
 			$formoutput .= "</select></td></tr>";
+			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"))
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
+			
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hostgroups","name,alias","","name");
 			while($data = pg_fetch_array($query)) {
@@ -1082,25 +1084,23 @@
 						return;
 					}
 					
-					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 					
 					if($members) {
 						for($i=0;$i<count($members);$i++) {
-							if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$members[$i]."'")) {
-								header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+							$mt = preg_split("#[$]#",$members[$i]);
+							if(count($mt) != 2 && !FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
+								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
-					}
-					
-					if($members) {
 						for($i=0;$i<count($members);$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
-							if(count($mt) == 2 && ($mt[1] == 1 || $mt[1] == 2))
-								FS::$pgdbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[0]."','".$mt[1]."'");
+							if(count($mt) == 2 && ($mt[0] == 1 || $mt[0] == 2))
+								FS::$pgdbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[1]."','".$mt[0]."'");
 						}
 					}
 					FS::$pgdbMgr->Insert("z_eye_icinga_hostgroups","name,alias","'".$name."','".$alias."'");
@@ -1128,7 +1128,7 @@
 				
 					// Delete hostgroup and members
 					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroup_members","name = '".$name."'");
-					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroup_members","member = '".$name."' AND hosttype = 2");
+					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = 2");
 					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
 					header("Location: index.php?mod=".$this->mid."&sh=3");
 					return;
