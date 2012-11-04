@@ -98,7 +98,7 @@
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","");
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("DisplayName"),"dname","");
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
-			$formoutput .= FS::$iMgr->addList("parent");
+			$formoutput .= FS::$iMgr->addList("parent[]");
 			$formoutput .= FS::$iMgr->addElementToList("","",true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
@@ -783,7 +783,7 @@
 					$name = FS::$secMgr->getPost("name","w");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$dname = FS::$secMgr->checkAndSecurisePostData("dname");
-					$parent = FS::$secMgr->getPost("parent","w");
+					$parent = FS::$secMgr->checkAndSecurisePostData("parent");
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
 					$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
@@ -827,9 +827,13 @@
 						return;
 					}
 					
-					if($parent && !FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
-						return;
+					if($parent) {
+						for($i=0;$i<count($parent);$i++) {
+							if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent[$i]."'")) {
+								header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+								return;
+							}
+						}
 					}
 					
 					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcommand."'")) {
@@ -853,7 +857,11 @@
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
 						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."'");
-					if($parent)	FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent."'");
+					if($parent) {
+						for($i=0;$i<count($parent);$i++) {
+							FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
+						}
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;	
 				// Edit host
