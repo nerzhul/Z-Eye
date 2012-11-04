@@ -672,21 +672,21 @@
 				return false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume");
 			while($data = pg_fetch_array($query)) {
-				fwrite($file,"define timeperiod {\n\timeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\t");
-				if(strtotime($mhs.":".$mms) < strtotime($mhe.":".$mme))
-					fwrite($file,"\n\tmonday\t".$mhs.":".$mms."-".$mhe.":".$mme);
-				if(strtotime($tuhs.":".$tums) < strtotime($tuhe.":".$tume))
-					fwrite($file,"\n\ttuesday\t".$tuhs.":".$tums."-".$tuhe.":".$tume);
-				if(strtotime($whs.":".$wms) < strtotime($whe.":".$wme))
-					fwrite($file,"\n\twednesday\t".$whs.":".$wms."-".$whe.":".$wme);
-				if(strtotime($thhs.":".$thms) < strtotime($thhe.":".$thme))
-					fwrite($file,"\n\tthursday\t".$thhs.":".$thms."-".$thhe.":".$thme);
-				if(strtotime($fhs.":".$fms) < strtotime($fhe.":".$fme))
-					fwrite($file,"\n\tfriday\t".$fhs.":".$fms."-".$fhe.":".$fme);
-				if(strtotime($sahs.":".$sams) < strtotime($sahe.":".$same))
-					fwrite($file,"\n\tsaturday\t".$sahs.":".$sams."-".$sahe.":".$same);
-				if(strtotime($suhs.":".$sums) < strtotime($suhe.":".$sume))
-					fwrite($file,"\n\tsunday\t".$suhs.":".$sums."-".$suhe.":".$sume);
+				fwrite($file,"define timeperiod {\n\ttimeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\t");
+				if(strtotime($data["mhs"].":".$data["mms"]) < strtotime($data["mhe"].":".$data["mme"]))
+					fwrite($file,"\n\tmonday\t".$data["mhs"].":".$data["mms"]."-".$data["mhe"].":".$data["mme"]);
+				if(strtotime($data["tuhs"].":".$data["tums"]) < strtotime($data["tuhe"].":".$data["tume"]))
+					fwrite($file,"\n\ttuesday\t".$data["tuhs"].":".$data["tums"]."-".$data["tuhe"].":".$data["tume"]);
+				if(strtotime($data["whs"].":".$data["wms"]) < strtotime($data["whe"].":".$data["wme"]))
+					fwrite($file,"\n\twednesday\t".$data["whs"].":".$data["wms"]."-".$data["whe"].":".$data["wme"]);
+				if(strtotime($data["thhs"].":".$data["thms"]) < strtotime($data["thhe"].":".$data["thme"]))
+					fwrite($file,"\n\tthursday\t".$data["thhs"].":".$data["thms"]."-".$data["thhe"].":".$data["thme"]);
+				if(strtotime($data["fhs"].":".$data["fms"]) < strtotime($data["fhe"].":".$data["fme"]))
+					fwrite($file,"\n\tfriday\t".$data["fhs"].":".$data["fms"]."-".$data["fhe"].":".$data["fme"]);
+				if(strtotime($data["sahs"].":".$data["sams"]) < strtotime($data["sahe"].":".$data["same"]))
+					fwrite($file,"\n\tsaturday\t".$data["sahs"].":".$data["sams"]."-".$data["sahe"].":".$data["same"]);
+				if(strtotime($data["suhs"].":".$data["sums"]) < strtotime($data["suhe"].":".$data["sume"]))
+					fwrite($file,"\n\tsunday\t".$data["suhs"].":".$data["sums"]."-".$data["suhe"].":".$data["sume"]);
 				fwrite($file,"\n}\n\n");
 			}
 			
