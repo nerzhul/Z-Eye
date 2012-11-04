@@ -23,26 +23,28 @@
 import os
 
 def restartIcinga():
-	icingaFile = open("/tmp/icinga_restart", 'r')
-	if icingaFile:
-		if icingaFile.read() = "1":
-			cmd = "service icinga restart"
-			pipe = os.popen('{ ' + cmd + '; }', 'r')
-			text = pipe.read()
-			pipe.close()
-			os.remove("/tmp/icinga_restart")
-		icingaFile.close()
+	if os.path.exists("/tmp/icinga_restart"):
+		icingaFile = open("/tmp/icinga_restart", 'r')
+		if icingaFile:
+			if icingaFile.read() = "1":
+				cmd = "service icinga restart"
+				pipe = os.popen('{ ' + cmd + '; }', 'r')
+				text = pipe.read()
+				pipe.close()
+				os.remove("/tmp/icinga_restart")
+			icingaFile.close()
 		
 def restartSnort():
-	snortFile = open("/tmp/snort_restart", 'r')
-	if snortFile:
-		if snortFile.read() = "1":
-			cmd = "service snort restart"
-			pipe = os.popen('{ ' + cmd + '; }', 'r')
-			text = pipe.read()
-			pipe.close()
-			os.remove("/tmp/icinga_restart")
-		snortFile.close()
+	if os.path.exists("/tmp/snort_restart"):
+		snortFile = open("/tmp/snort_restart", 'r')
+		if snortFile:
+			if snortFile.read() = "1":
+				cmd = "service snort restart"
+				pipe = os.popen('{ ' + cmd + '; }', 'r')
+				text = pipe.read()
+				pipe.close()
+				os.remove("/tmp/icinga_restart")
+			snortFile.close()
 		
 restartIcinga()
 restartSnort()

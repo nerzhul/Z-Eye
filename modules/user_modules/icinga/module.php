@@ -573,8 +573,8 @@
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name,cmd");
 			while($data = pg_fetch_array($query))
 				fwrite($file,"define command {\n\tcommand_name\t".$data["name"]."\n\tcommand_line\t".$data["cmd"]."\n}\n\n");
-			
-			
+				
+			fclose($file);
 			
 			// @TODO write file to restart service
 			return true;
