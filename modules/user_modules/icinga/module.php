@@ -672,7 +672,7 @@
 				return false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume");
 			while($data = pg_fetch_array($query)) {
-				fwrite($file,"define timeperiod {\n\ttimeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\t");
+				fwrite($file,"define timeperiod {\n\ttimeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]);
 				if(strtotime($data["mhs"].":".$data["mms"]) < strtotime($data["mhe"].":".$data["mme"]))
 					fwrite($file,"\n\tmonday\t".$data["mhs"].":".$data["mms"]."-".$data["mhe"].":".$data["mme"]);
 				if(strtotime($data["tuhs"].":".$data["tums"]) < strtotime($data["tuhe"].":".$data["tume"]))
