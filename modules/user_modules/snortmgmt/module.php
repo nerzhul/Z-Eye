@@ -552,9 +552,11 @@ preprocessor http_inspect_server: server default \\\n
 			
 			fclose($file);
 			
-			/*$file = fopen(dirname(__FILE__)."/../../../datas/tmp/snort");
-			fwrite($file,"1");
-			fclose($file);*/
+			$file = fopen("/tmp/snort_restart");
+			if($file) {
+				fwrite($file,"1");
+				fclose($file);
+			}
 			return 0;
 		}
 

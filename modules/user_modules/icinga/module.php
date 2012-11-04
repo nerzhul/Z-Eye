@@ -228,7 +228,7 @@
 				 */
 				$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=16");
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
+				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",false);
 				//$formoutput .= template list
 				
 				// Global
@@ -560,6 +560,25 @@
 			return $output;
 		}
 
+		private function writeConfiguration() {
+			if(Config::getOS() == "Debian")
+				$path = "/etc/icinga/";
+			else
+				$path = "/usr/local/etc/icinga/";
+				
+			// Write commands
+			$file = fopen($path."objects/commands.conf","w+");
+			if(!$file)
+				return false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name,cmd");
+			while($data = pg_fetch_array($query))
+				fwrite($file,"define command {\n\tcommand_name\t".$data["name"]."\n\tcommand_line\t".$data["cmd"]."\n}\n\n");
+			
+			
+			
+			// @TODO write file to restart service
+			return true;
+		}
 		public function handlePostDatas($act) {
 			switch($act) {
 				// Add command
@@ -580,6 +599,10 @@
 					// @TODO verify paths
 					
 					FS::$pgdbMgr->Insert("z_eye_icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=8");
 					return;
 				// Remove command
@@ -608,11 +631,19 @@
 					}
 					
 					FS::$pgdbMgr->Delete("z_eye_icinga_commands","name = '".$cmdname."'");
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=8");
 					return;
 				// Edit command
 				case 3:
 					// @TODO
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=8");
 					return;
 				// Add timeperiod
@@ -681,11 +712,19 @@
 					FS::$pgdbMgr->Insert("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume",
 						"'".$name."','".$alias."','".$mhs."','".$mms."','".$tuhs."','".$tums."','".$whs."','".$wms."','".$thhs."','".$thms."','".$fhs."','".$fms."','".$sahs."','".$sams."','".$suhs."','".$sums.
 						"','".$mhe."','".$mme."','".$tuhe."','".$tume."','".$whe."','".$wme."','".$thhe."','".$thme."','".$fhe."','".$fme."','".$sahe."','".$same."','".$suhe."','".$sume."'");
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=5");
 					return;
 				// Edit timeperiod
 				case 5:
 					//@TODO
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=5");
 					return;
 				// Delete timeperiod
@@ -725,6 +764,10 @@
 					}
 					
 					FS::$pgdbMgr->Delete("z_eye_icinga_timeperiods","name = '".$tpname."'");
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=5");
 					return;
 				// Add contact
@@ -783,10 +826,22 @@
 						"'".$name."','".$mail."','".($istpl == "on" ? 1 : 0)."','".$srvnotifperiod."','".$srvnotifcmd."','".$hostnotifperiod."','".$hostnotifcmd."','".($srvoptc == "on" ? 1 : 0)."','".
 						($srvoptw == "on" ? 1 : 0)."','".($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".
 						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=6");
 					return;
 				// Edit contact
 				case 8:
+					// @TODO
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=5");
+						return;
+					}
+					header("Location: index.php?mod=".$this->mid."&sh=6");
+					return;
 				// Delete contact
 				case 9:
 					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
@@ -807,6 +862,11 @@
 					}
 					
 					FS::$pgdbMgr->Delete("z_eye_icinga_contacts","name = '".$ctname."'");
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=6");
 					return;
 				// Add contact group
@@ -839,10 +899,21 @@
 					for($i=0;$i<count($cts);$i++) {
 						FS::$pgdbMgr->Insert("z_eye_icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
 					}
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
 				// Edit contact group
 				case 11:
+					// @TODO
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
 				// Delete contact group
@@ -867,6 +938,10 @@
 					FS::$pgdbMgr->Delete("z_eye_icinga_contactgroup_members","name = '".$ctgname."'");
 					FS::$pgdbMgr->Delete("z_eye_icinga_contactgroups","name = '".$ctgname."'");
 					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
 				// Add host
@@ -953,11 +1028,21 @@
 							FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
 						}
 					}
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;	
 				// Edit host
 				case 14:
-				
+					// @TODO
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;	
 				// Remove host
@@ -980,11 +1065,16 @@
 					FS::$pgdbMgr->Delete("z_eye_icinga_host_parents","parent = '".$name."'");
 					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroup_members","member = '".$name."' AND hosttype = 1");
 					FS::$pgdbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;
 				// add service
 				case 16:
-					$name = FS::$secMgr->getPost("desc","w");
+					$name = FS::$secMgr->checkAndSecurisePostData("desc");
 					$host = FS::$secMgr->checkAndSecurisePostData("host");
 					$checkcmd = FS::$secMgr->getPost("checkcmd","w");
 					$checkperiod = FS::$secMgr->getPost("checkperiod","w");
@@ -1029,7 +1119,7 @@
 					}
 					
 					$mt = preg_split("#[$]#",$host);
-					if(count($mt) != 2 || ($mt[0] != 1 && $mt[0] != 2) {
+					if(count($mt) != 2 || ($mt[0] != 1 && $mt[0] != 2)) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
@@ -1061,18 +1151,28 @@
 
 					
 					FS::$pgdbMgr->Insert("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
-					retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
-					"'".$name."','".$mt[1]."','".$mt[0]."','".($actcheck == "on" ? 1 : 0)."','".($pascheck == "on" ? 1 : 0)."','".($parcheck == "on" ? 1 : 0)."','".($obsess == "on" ? 1 : 0).
-					"','".($freshness == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
-					($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".$checkcmd."','".
-					$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".$notifperiod."','".($srvoptc == "on" ? 1 : 0)."','".($srvoptw == "on" ? 1 : 0)."','".
-					($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".$notifintval."','".$ctg."','".
-					($tpl == "on" ? 1 : 0)."'");
+						retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
+						"'".$name."','".$mt[1]."','".$mt[0]."','".($actcheck == "on" ? 1 : 0)."','".($pascheck == "on" ? 1 : 0)."','".($parcheck == "on" ? 1 : 0)."','".($obsess == "on" ? 1 : 0).
+						"','".($freshness == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
+						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".$checkcmd."','".
+						$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".$notifperiod."','".($srvoptc == "on" ? 1 : 0)."','".($srvoptw == "on" ? 1 : 0)."','".
+						($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".$notifintval."','".$ctg."','".
+						($tpl == "on" ? 1 : 0)."'");
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=4&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=4");
 					return;
 				// edit service
 				case 17:
-				
+					// @TODO
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=4&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=4");
 					return;
 				// remove service
@@ -1092,6 +1192,11 @@
 					// membertype 1 = service, 2 = servicegroup
 					FS::$pgdbMgr->Delete("z_eye_icinga_servicegroups","member = '".$name."' AND membertype = 1");
 					FS::$pgdbMgr->Delete("z_eye_icinga_services","name = '".$name."'");
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=4&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=4");
 					return;
 				// Add hostgroup
@@ -1124,8 +1229,22 @@
 						}
 					}
 					FS::$pgdbMgr->Insert("z_eye_icinga_hostgroups","name,alias","'".$name."','".$alias."'");
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
+						return;
+					}
+					header("Location: index.php?mod=".$this->mid."&sh=3");
+					return;
 				// Edit hostgroup
 				case 20:
+					// @TODO
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
+						return;
+					}
+					header("Location: index.php?mod=".$this->mid."&sh=3");
+					return;
 				// remove hostgroup
 				case 21:
 					$name = FS::$secMgr->checkAndSecuriseGetData("hg");
@@ -1150,6 +1269,11 @@
 					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroup_members","name = '".$name."'");
 					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = 2");
 					FS::$pgdbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
+					
+					if(!$this->writeConfiguration()) {
+						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
+						return;
+					}
 					header("Location: index.php?mod=".$this->mid."&sh=3");
 					return;
 			}
