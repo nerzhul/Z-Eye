@@ -342,13 +342,14 @@
 			return $output;
 		}
 		
-		public function addList($name,$js = "",$label=NULL) {
+		public function addList($name,$js = "",$label=NULL, $multival=false) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<select name=\"".$name."\" id=\"".$name."\"";
 			if(strlen($js) > 0)
 				$output .= " onchange=\"javascript:".$js.";\" ";
-			
+			if($multival)
+				$output .= " multiple=\"multiple\" ";
 			$output .= ">";
 			return $output;
 		}

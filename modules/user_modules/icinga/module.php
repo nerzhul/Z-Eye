@@ -276,8 +276,8 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".($data["template"] == 1 ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>
-						<a href=\"index.php?mod=".$this->mid."&act=2&cmd=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
+				$output .= "<tr><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>
+						<a href=\"index.php?mod=".$this->mid."&act=9&ct=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
 						</a></td></tr>";
 			}
 			if($found) $output .= "</table>";
@@ -286,6 +286,46 @@
 		
 		private function showContactgroupsTab() {
 			$output = "";
+			
+			/*
+			 * Ajax new contactgroup
+			 */
+			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
+			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->addList("cts","",NULL,true);
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","","name");
+			while($data = pg_fetch_array($query)) {
+				$formoutput .= FS::$iMgr->addElementToList($data["name"],$data["name"]);
+			}
+			$formoutput .= "</select></td></tr>";
+			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+			$formoutput .= "</table></form>";
+			
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"));
+			
+			/*
+			 * Contactgroup table
+			 */
+			$found = false;
+			$contactgroups = array();
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,member","","name");
+			while($data = pg_fetch_array($query)) {
+				if(!$found) $found = true;
+				if(!isset($contactgroups[$data["name"]])) $contactgroups[$data["name"]] = array();
+				array_push($contactgroups[$data["name"]],$data["member"]);
+			}
+			if($found) {
+				$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
+				foreach($contactgroups as $key => $value) {
+					$output .= "<tr><td>".$key."</td><td>";
+					
+					$output .= "<td>
+						<a href=\"index.php?mod=".$this->mid."&act=12&ctg=".$key."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
+						</a></td></td></tr>";
+				}
+				$output .= "</table>";
+			}
 			
 			return $output;
 		}
@@ -373,7 +413,7 @@
 					return;
 				// Remove command
 				case 2:
-					// @TODO forbid remove when use
+					// @TODO forbid remove when use (host + service)
 					$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
 					if(!$cmdname) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
@@ -385,12 +425,13 @@
 						return;
 					}
 					
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","srvcmd = '".$name."'")) {
+					// Forbid remove if command is used
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","srvcmd = '".$cmdname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
 						return;
 					}
 					
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","hostcmd = '".$name."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","hostcmd = '".$cmdname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
 						return;
 					}
@@ -491,12 +532,13 @@
 					
 					// @ TODO forbid remove when used (service + hosts)
 					
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","srvperiod = '".$name."'")) {
+					// Forbid remove if timeperiod is used
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","srvperiod = '".$tpname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","hostperiod = '".$name."'")) {
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","name","hostperiod = '".$tpname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
@@ -535,23 +577,24 @@
 						return;
 					}
 					
+					// Timeperiods don't exist
 					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 					
 					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 					
 					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$srvnotifcmd."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 					
 					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$hostnotifcmd."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 					
@@ -565,7 +608,6 @@
 				case 8:
 				// Delete contact
 				case 9:
-					// @TODO forbid remove when used
 					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
 					if(!$ctname) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -577,8 +619,45 @@
 						return;
 					}
 					
+					// Forbid remove if in existing contact group
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","name","member = '".$ctname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
+						return;
+					}
+					
 					FS::$pgdbMgr->Delete("z_eye_icinga_contacts","name = '".$ctname."'");
 					header("Location: index.php?mod=".$this->mid."&sh=6");
+					return;
+				// Add contact group
+				case 10:
+					$name = FS::$secMgr->getPost("name","w");
+					$cts = FS::$secMgr->checkAndSecurisePostData("cts");
+					
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","member","name = '".$name."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=3");
+						return;
+					}
+					header("Location: index.php?mod=".$this->mid."&sh=7");
+					return;
+				// Edit contact group
+				case 11:
+					header("Location: index.php?mod=".$this->mid."&sh=7");
+					return;
+				// Delete contact group
+				case 12:
+					// @TODO forbid remove when used
+					$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
+					if(!$ctgname) {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
+						return;
+					}
+					
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","member","name = '".$ctgname."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
+						return;
+					}
+					
+					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
 			}
 		}
