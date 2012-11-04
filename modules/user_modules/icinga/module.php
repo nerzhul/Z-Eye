@@ -185,19 +185,7 @@
 			// Global
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",false,array("length" => 60, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".FS::$iMgr->addList("members[]","",NULL,true);
-			
-			$hostlist = array();
-			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
-			while($data = pg_fetch_array($query))
-				$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
-			$query = FS::$pgdbMgr->Select("z_eye_icinga_hostgroups","name");
-			while($data = pg_fetch_array($query))
-				$hostlist[$this->loc->s("Hostgroup").": ".$data["name"]] = array(2,$data["name"]);
-			ksort($hostlist);
-			foreach($hostlist as $host => $value)
-				$formoutput .= FS::$iMgr->addElementToList($host,$value[0]."$".$value[1]);
-			$formoutput .= "</select></td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
@@ -246,7 +234,7 @@
 				// Global
 				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Description"),"desc","",false,array("length" => 120, "size" => 30));
 				// @ TODO support hostlist
-				$formoutput .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->genHostsList("host")."</td></tr>";
+				$formoutput .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false)."</td></tr>";
 				
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("active-check-en"),"actcheck",true);
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("passive-check-en"),"pascheck",true);
@@ -547,6 +535,27 @@
 			while($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->addElementToList($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
+			$output .= "</select>";
+			return $output;
+		}
+		
+		private function getHostOrGroupList($name,$multi) {
+			$output = FS::$iMgr->addList($name,"",NULL,$multi);
+			
+			$hostlist = array();
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
+			while($data = pg_fetch_array($query))
+				$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
+
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_hostgroups","name");
+			while($data = pg_fetch_array($query))
+				$hostlist[$this->loc->s("Hostgroup").": ".$data["name"]] = array(2,$data["name"]);
+
+			ksort($hostlist);
+
+			foreach($hostlist as $host => $value)
+				$output .= FS::$iMgr->addElementToList($host,$value[0]."$".$value[1]);
+
 			$output .= "</select>";
 			return $output;
 		}
@@ -1018,6 +1027,12 @@
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
+					
+					$mt = preg_split("#[$]#",$host);
+					if(count($mt) != 2 || ($mt[0] != 1 && $mt[0] != 2) {
+						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						return;
+					}
 
 					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcmd."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
@@ -1034,15 +1049,20 @@
 						return;
 					}
 					
-					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$host."'")) {
+					if($mt[0] == 1 && !FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
+						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						return;
+					}
+					
+					if($mt[0] == 2 && !FS::$pgdbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$mt[1]."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
-					// @TODO support for hostgroups
+					
 					FS::$pgdbMgr->Insert("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
 					retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
-					"'".$name."','".$host."','1','".($actcheck == "on" ? 1 : 0)."','".($pascheck == "on" ? 1 : 0)."','".($parcheck == "on" ? 1 : 0)."','".($obsess == "on" ? 1 : 0).
+					"'".$name."','".$mt[1]."','".$mt[0]."','".($actcheck == "on" ? 1 : 0)."','".($pascheck == "on" ? 1 : 0)."','".($parcheck == "on" ? 1 : 0)."','".($obsess == "on" ? 1 : 0).
 					"','".($freshness == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 					($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".$checkcmd."','".
 					$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".$notifperiod."','".($srvoptc == "on" ? 1 : 0)."','".($srvoptw == "on" ? 1 : 0)."','".
