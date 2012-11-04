@@ -149,7 +149,7 @@
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Address")."</th><th></th></tr>";
+					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Address")."</th><th>".$this->loc->s("Parent")."</th><th></th></tr>";
 				}
 				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
 				$found2 = false;
@@ -780,7 +780,7 @@
 					return;
 				// Add host
 				case 13:
-					$name = FS::$secMgr->getPost("host","w");
+					$name = FS::$secMgr->getPost("name","w");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$dname = FS::$secMgr->checkAndSecurisePostData("dname");
 					$parent = FS::$secMgr->getPost("parent","w");
@@ -827,7 +827,7 @@
 						return;
 					}
 					
-					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent."'")) {
+					if($parent && !FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
@@ -848,12 +848,12 @@
 					}
 
 					FS::$pgdbMgr->Insert("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
-						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup",
+						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template",
 						"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
-						($hostopts == "on" ? 1 : 0)."','".$ctg."'");
-					FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent."'");
+						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."'");
+					if($parent)	FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent."'");
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;	
 				// Edit host
@@ -863,7 +863,7 @@
 					return;	
 				// Remove host
 				case 15:
-					$name = FS::$secMgr->getPost("host","w");
+					$name = FS::$secMgr->checkAndSecuriseGetData("host");
 					if(!$name) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 						return;
