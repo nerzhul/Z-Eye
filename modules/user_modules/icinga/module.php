@@ -757,7 +757,10 @@
 				$found = false;
 				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
 				while($data2 = pg_fetch_array($query2)) {
-					if(!$found) fwrite($file,"\n\tparents\t");
+					if(!$found) {
+						$found = true;
+						fwrite($file,"\n\tparents\t");
+					}
 					else fwrite($file,",");
 					fwrite($file,$data2["parent"]);
 				}
@@ -766,21 +769,29 @@
 			}
 			fclose($file);
 			
-			$file = fopen($path."hosts.cfg","w+");
+			$file = fopen($path."hostgroups.cfg","w+");
 			if(!$file)
 				return false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hostgroups","name,alias");
 			while($data = pg_fetch_array($query)) {
 				fwrite($file,"define hostgroup {\n\thostgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]);
+				$found = false;
 				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","name,host,hosttype","hosttype = '1'");
 				while($data2 = pg_fetch_array($query2)) {
-					if(!$found) fwrite($file,"\n\tmembers\t");
+					if(!$found) fwrite($file,"\n\tmembers\t"); {
+						$found = true;
+					}
 					else fwrite($file,",");
 					fwrite($file,$data2["host"]);
+					
 				}
+				$found = false;
 				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","name,host,hosttype","hosttype = '2'");
 				while($data2 = pg_fetch_array($query2)) {
-					if(!$found) fwrite($file,"\n\thostgroup_members\t");
+					if(!$found) {
+						$found = true;
+						fwrite($file,"\n\thostgroup_members\t");
+					}
 					else fwrite($file,",");
 					fwrite($file,$data2["host"]);
 				}
