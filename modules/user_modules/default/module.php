@@ -127,7 +127,7 @@
 				else $output = "";
 			}
 			else
-				$output .= "<h4 style=\"font-size:24px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga-off")."</h4>";
+				$output = "<h4 style=\"font-size:24px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga-off")."</h4>";
 			return $output;
 		}
 

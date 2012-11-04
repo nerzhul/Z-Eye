@@ -650,15 +650,44 @@
 			
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,alias");
 			while($data = pg_fetch_array($query)) {
-				fwrite($file,"define contactgroup {\n\tcontactgroup_name\t".$data["name"]."\n\t".$data["alias"]."\n\tmembers\t");
-				$query2 = FS::$pgdbMgr->Select("z_eye_contactgroup_members","member","name = '".$data["name"]."'");
+				fwrite($file,"define contactgroup {\n\tcontactgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tmembers\t");
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_contactgroup_members","member","name = '".$data["name"]."'");
 				$found = false;
 				while($data2 = pg_fetch_array($query2)) {
 					if($found) fwrite($file,",");
 					else $found = true;
-					fwrite($file,$data["member"]);
+					fwrite($file,$data2["member"]);
 				}
-				fwrite($file("\n}\n\n");
+				fwrite($file,"\n}\n\n");
+			}
+			
+			fclose($file);
+			
+			/*
+			 *  Timeperiods
+			 */
+			 
+			$file = fopen($path."timeperiods.cfg","w+");
+			if(!$file)
+				return false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume");
+			while($data = pg_fetch_array($query)) {
+				fwrite($file,"define timeperiod {\n\timeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\t");
+				if(strtotime($mhs.":".$mms) < strtotime($mhe.":".$mme))
+					fwrite($file,"\n\tmonday\t".$mhs.":".$mms."-".$mhe.":".$mme);
+				if(strtotime($tuhs.":".$tums) < strtotime($tuhe.":".$tume))
+					fwrite($file,"\n\ttuesday\t".$tuhs.":".$tums."-".$tuhe.":".$tume);
+				if(strtotime($whs.":".$wms) < strtotime($whe.":".$wme))
+					fwrite($file,"\n\twednesday\t".$whs.":".$wms."-".$whe.":".$wme);
+				if(strtotime($thhs.":".$thms) < strtotime($thhe.":".$thme))
+					fwrite($file,"\n\tthursday\t".$thhs.":".$thms."-".$thhe.":".$thme);
+				if(strtotime($fhs.":".$fms) < strtotime($fhe.":".$fme))
+					fwrite($file,"\n\tfriday\t".$fhs.":".$fms."-".$fhe.":".$fme);
+				if(strtotime($sahs.":".$sams) < strtotime($sahe.":".$same))
+					fwrite($file,"\n\tsaturday\t".$sahs.":".$sams."-".$sahe.":".$same);
+				if(strtotime($suhs.":".$sums) < strtotime($suhe.":".$sume))
+					fwrite($file,"\n\tsunday\t".$suhs.":".$sums."-".$suhe.":".$sume);
+				fwrite($file,"\n}\n\n");
 			}
 			
 			fclose($file);
