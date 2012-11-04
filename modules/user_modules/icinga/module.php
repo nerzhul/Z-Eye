@@ -294,7 +294,7 @@
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->addList("cts","",NULL,true);
-			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","","name");
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
 				$formoutput .= FS::$iMgr->addElementToList($data["name"],$data["name"]);
 			}
