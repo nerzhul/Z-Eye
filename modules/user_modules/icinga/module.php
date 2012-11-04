@@ -293,6 +293,7 @@
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",false,array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->addList("cts[]","",NULL,true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
@@ -308,25 +309,24 @@
 			 * Contactgroup table
 			 */
 			$found = false;
-			$contactgroups = array();
-			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,member","","name");
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
 			while($data = pg_fetch_array($query)) {
-				if(!$found) $found = true;
-				if(!isset($contactgroups[$data["name"]])) $contactgroups[$data["name"]] = array();
-				array_push($contactgroups[$data["name"]],$data["member"]);
-			}
-			if($found) {
-				$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
-				foreach($contactgroups as $key => $value) {
-					$output .= "<tr><td>".$key."</td><td>";
-					
-					$output .= "<td>
-						<a href=\"index.php?mod=".$this->mid."&act=12&ctg=".$key."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
-						</a></td></td></tr>";
+				if(!$found) {
+					$found = true;
+					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
 				}
-				$output .= "</table>";
+				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
+				$found2 = false;
+				while($data2 = pg_fetch_array($query2)) {
+					if($found2) $output .= ", ";
+					else $found2 = true;
+					$output .= $data2["member"];
+				}
+				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=12&ctg=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
+						</a></td></tr>";
 			}
-			
+			if($found) $output .= "</table>";
 			return $output;
 		}
 		
@@ -631,11 +631,32 @@
 				// Add contact group
 				case 10:
 					$name = FS::$secMgr->getPost("name","w");
+					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$cts = FS::$secMgr->checkAndSecurisePostData("cts");
 					
-					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","member","name = '".$name."'")) {
+					if(!$name || !$alias || !$cts || $cts == "") {
+						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
+						return;
+					}
+					
+					// ctg exists
+					if(FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=3");
 						return;
+					}
+					
+					// some members don't exist
+					for($i=0;$i<count($cts);$i++) {
+						if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$cts[$i]."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
+							return;
+						}
+					}
+					
+					// Add it
+					FS::$pgdbMgr->Insert("z_eye_icinga_contactgroups","name,alias","'".$name."','".$alias."'");
+					for($i=0;$i<count($cts);$i++) {
+						FS::$pgdbMgr->Insert("z_eye_icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
@@ -652,10 +673,13 @@
 						return;
 					}
 					
-					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","member","name = '".$ctgname."'")) {
+					if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$ctgname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
 						return;
 					}
+					
+					FS::$pgdbMgr->Delete("z_eye_icinga_contactgroup_members","name = '".$ctgname."'");
+					FS::$pgdbMgr->Delete("z_eye_icinga_contactgroups","name = '".$ctgname."'");
 					
 					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
