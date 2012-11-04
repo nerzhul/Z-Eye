@@ -717,7 +717,7 @@
 			while($data = pg_fetch_array($query)) {
 				fwrite($file,"define host {\n\tname\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
 				fwrite($file,$data["alivecommand"]."\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkinterval"]."\n\tretry_interval\t".$data["retrycheckinterval"]."\n\t");
-				fwrite($file,"max_check_attemps\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
+				fwrite($file,"max_check_attempts\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
 				fwrite($file,"\n\tfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tprocess_perf_data\t".($data["perfdata"] == "t" ? 1 : 0)."\n\tretain_status_information\t");
 				fwrite($file,($data["retstatus"] == "t" ? 1 : 0)."\n\tretain_nonstatus_information\t".($data["retnonstatus"] == "t" ? 1 : 0)."\n\tnotifications_enabled\t".($data["notifen"] == "t" ? 1 : 0));
 				fwrite($file,"\n\tnotification_period\t".$data["notifperiod"]."\n\tnotification_interval\t".$data["notifintval"]."\n\t");
@@ -754,10 +754,39 @@
 				
 				fwrite($file,"\n\tcontact_groups\t",$data["contactgroup"]);
 				
+				$found = false;
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
+				while($data2 = pg_fetch_array($query2)) {
+					if(!$found) fwrite($file,"\n\tparents\t");
+					else fwrite($file,",");
+					fwrite($file,$data2["parent"]);
+				}
+				
 				fwrite($file,"\n}\n\n");
-			
+			}
 			fclose($file);
 			
+			$file = fopen($path."hosts.cfg","w+");
+			if(!$file)
+				return false;
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_hostgroups","name,alias");
+			while($data = pg_fetch_array($query)) {
+				fwrite($file,"define hostgroup {\n\thostgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]);
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","name,host,hosttype","hosttype = '1'");
+				while($data2 = pg_fetch_array($query2)) {
+					if(!$found) fwrite($file,"\n\tmembers\t");
+					else fwrite($file,",");
+					fwrite($file,$data2["host"]);
+				}
+				$query2 = FS::$pgdbMgr->Select("z_eye_icinga_hostgroup_members","name,host,hosttype","hosttype = '2'");
+				while($data2 = pg_fetch_array($query2)) {
+					if(!$found) fwrite($file,"\n\thostgroup_members\t");
+					else fwrite($file,",");
+					fwrite($file,$data2["host"]);
+				}
+			}
+			
+			fclose($file);
 			// @TODO write file to restart service
 			return true;
 		}
