@@ -825,7 +825,7 @@
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
 						($hostopts == "on" ? 1 : 0)."','".$ctg."'");
-					
+					FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent."'");
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;	
 				// Edit host
