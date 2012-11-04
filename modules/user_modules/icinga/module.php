@@ -1427,7 +1427,7 @@
 				case 19:
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
-					$members = FS::$secMgr->checkAndSecurisePostData("member");
+					$members = FS::$secMgr->checkAndSecurisePostData("members");
 					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 						return;
@@ -1452,6 +1452,11 @@
 								FS::$pgdbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[1]."','".$mt[0]."'");
 						}
 					}
+					else {
+						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						return;
+					}
+					
 					FS::$pgdbMgr->Insert("z_eye_icinga_hostgroups","name,alias","'".$name."','".$alias."'");
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
