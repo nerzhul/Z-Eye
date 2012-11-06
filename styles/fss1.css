@@ -57,6 +57,29 @@ h3:hover {
 	margin-left: -200px;
 }
 
+#notification {
+        position: fixed;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+        bottom: 0;
+        font-weight: bold;
+        color: white;
+        width: 100%;
+		display: none;
+}
+
+#subnotification {
+        border-radius: 10px 10px 0 0;
+        display: inline-block;
+        padding: 10px;
+        margin-left: 5px;
+        margin-right: 5px;
+        min-width: 420px;
+        font-size: 12px;
+        background-color: rgba(0,0,0,0.9);
+}
+
 #menuStack {
 	float: left;
 }

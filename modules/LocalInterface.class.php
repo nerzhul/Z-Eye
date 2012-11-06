@@ -40,9 +40,17 @@
 			$tmpoutput .= "</div>";
 			// must be after because of return button
 			$output .= $this->showConnForm().$tmpoutput;
+			$output .= "<div id=\"notification\"><div id=\"subnotification\"></div></div>";
 			$output .= "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS";
 			$output .= " - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
 			return $output;
+		}
+		
+		public function showNotification($text) {
+			return "$('#subnotification').html(".$text."); $('#notification').slideDown();
+						setTimeout(function() {
+							$('#notification').slideUp();
+						},5000);";
 		}
 
 		protected function showConnForm() {

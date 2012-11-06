@@ -139,7 +139,7 @@
 			$saddr = "";
 			$slogin = "";
 			$sdbname = "";
-			$sport = 0;
+			$sport = 3306;
 			$spwd = "";
 			$salias = "";
 			FS::$iMgr->showReturnMenu(true);
@@ -178,7 +178,7 @@
 				case 3: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 4 : 5));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 4 : 5),array("id" => "cesrv"));
 
 			if($create == false) {
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);
@@ -189,7 +189,7 @@
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Port"),"sport",$sport);
+				$output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Port"),"sport",array("value" => $sport));
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("db-name"),"sdbname",$sdbname);
 			}
 			else {
@@ -204,6 +204,12 @@
 			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
 			$output .= "</table>";
 
+			$output .= "<script type=\"text/javascript\">$('#cesrv').submit(function(event) {
+					event.preventDefault();
+					$.post('index.php?mod=".$this->mid."&act=".($create ? 4 : 5)."', $('#cesrv').serialize(), function(data) {
+						".FS::$iMgr->showNotification("data")."						
+					});
+				});</script>";
 			return $output;
 		}
 
@@ -446,7 +452,8 @@
 					if($saddr == NULL || $saddr == "" || $salias == NULL || $salias == "" || $sport == NULL || !FS::$secMgr->isNumeric($sport) || $sdbname == NULL || $sdbname == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing or wrong for radius db adding");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
+						echo "test1";
+						//header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
 
@@ -455,18 +462,21 @@
 
 					$conn = $testDBMgr->Connect();
 					if($conn != 0) {
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=2");
+						//header("Location: index.php?mod=".$this->mid."&do=".$act."&err=2");
+						echo "test2";
 						return;
 					}
 					FS::$dbMgr->Connect();
 					if(FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
+						//header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
+						echo "test3";
 						return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
 					FS::$pgdbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
-					header("Location: m-".$this->mid.".html");
+					//header("Location: m-".$this->mid.".html");
+					echo "end";
 					break;
 				case 5: // radius db edition
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");

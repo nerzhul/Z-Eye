@@ -147,7 +147,7 @@
 		public function addNumericInput($name, $def_value = "", $options = array()) {
 			$output = "";
             if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
 			if(isset($options["tooltip"])) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
 			return $output;
 		}
@@ -262,7 +262,7 @@
 		
 		public function addIndexedNumericLine($label,$name,$options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
-			$output .= $this->addNumericInput($name,(isset($options["value"]) ? $options["value"] : ""),$options());
+			$output .= $this->addNumericInput($name,(isset($options["value"]) ? $options["value"] : ""),$options);
 			$output .= "</center></td></tr>";
 			return $output;
 		}
