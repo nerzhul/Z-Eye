@@ -238,19 +238,14 @@
 			return $output;
 		}
 		
-		public function addForm($link,$id="",$post=true) {
+		public function form($link,$options=array()) {
 			$output = "<form action=\"".$link."\" ";
-			if(strlen($id) > 0)
-				$output .= "id=\"".$id."\" ";
-			$output .= "method=\"".($post ? "POST" : "GET")."\" >";
-			return $output;
-		}
-		
-		public function addFormWithReturn($link,$jsfunct,$id="") {
-			$output = "<form action=\"".$link->getIt()."\" ";			
-			if(strlen($id) > 0)
-				$output .= "id=\"".$id."\" ";
-			$output .= "method=\"POST\" onsubmit=\"return ".$jsfunct.";\">";
+			if(isset($options["id"]) && strlen($options["id"]) > 0)
+				$output .= "id=\"".$options["id"]."\" ";
+			$output .= "method=\"".((isset($options["post"]) && $options["post"]) ? "POST" : "GET")."\"";
+			if(isset($options["js"]))
+				$output .= " onsubmit=\"return ".$options["js"].";\ ";
+			$output .= ">";
 			return $output;
 		}
 		
