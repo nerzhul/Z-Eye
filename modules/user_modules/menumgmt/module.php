@@ -215,8 +215,7 @@
 		
 		public function EditMenuElement() {
 			$menuEl = new MenuElement();
-			$name = 
-FS::$secMgr->checkAndSecurisePostData("name");
+			$name = FS::$secMgr->checkAndSecurisePostData("name");
 			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
 			$lid = FS::$secMgr->checkAndSecurisePostData("link_id");
 			$menuEl->setId($_POST["menu_elmt"]);
