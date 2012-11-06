@@ -198,8 +198,8 @@
 				$output .= "<tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
 			}
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",true);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",true);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",array("pwd" => true));
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",array("pwd" => true));
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"salias",$salias);
 			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
 			$output .= "</table>";
@@ -264,8 +264,8 @@
 			else
 				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";		
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("ssh-user"),"slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",true);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",true);
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",array("pwd" => true));
+			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",array("pwd" => true));
 			$output .= FS::$iMgr->addIndexedCheckLine("DHCP ?","dhcp",$dhcp > 0 ? true : false);
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath);
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath);

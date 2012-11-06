@@ -149,3 +149,5 @@ Beta 2.1
 - IPmanager now register server
 - Rewrite proper parser for DHCP discovery
 - Fix one typo on ipmanager
+- Implement icinga module to manage Icinga
+- Cleanup some code

@@ -183,8 +183,8 @@
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=19");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			// Global
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",false,array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table></form>";
@@ -232,7 +232,7 @@
 				//$formoutput .= template list
 				
 				// Global
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Description"),"desc","",false,array("length" => 120, "size" => 30));
+				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Description"),"desc","",array("length" => 120, "size" => 30));
 				// @ TODO support hostlist
 				$formoutput .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false)."</td></tr>";
 				
@@ -307,8 +307,8 @@
 			
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",false,array("length" => 120, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme")."</td></tr>";
@@ -422,8 +422,8 @@
 			 */
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",false,array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->addList("cts[]","",NULL,true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
@@ -474,8 +474,8 @@
 			 */
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",false,array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",false,array("length" => 1024, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
 			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			

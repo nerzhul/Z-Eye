@@ -42,33 +42,6 @@
 			$this->arr_js = array();
 		}
 
-
-		// Complex methods
-		public function CreateSelectFromDB($sname,$table,$name,$idx,$cond = "", $order = "", $ordersens = 0,$selectidx = NULL, $default = false) {
-			$output = "<select name=\"".$sname."\">";
-			$count = 0;
-			if($default) {
-				$output .= "<option value=\"none\"";
-				if($selectidx == NULL)
-					$output .= " selected=\"selected\"";
-				$output .= ">------------</option>";
-				
-			}
-				
-			$query = FS::$dbMgr->Select($table,$name.','.$idx,$cond,$order,$ordersens);
-			while($data = mysql_fetch_array($query)) {
-				$count++;
-				$output .= "<option value=\"".$data[$idx]."\"";
-				if($selectidx == $data[$idx])
-					$output .= " selected=\"selected\"";
-				$output .= ">".$data[$name]."</option>";
-			}
-			if($count == 0 && !$default)
-				$output .= "<option>------------</option>";
-			$output .= "</select>";
-			return $output;			
-		}
-
 		// header/footer/content
 		
 		public function header() {
@@ -281,9 +254,9 @@
 			return $output;
 		}
 		
-		public function addIndexedLine($label,$name,$def_value = "", $pwd = false, $options = array()) {
+		public function addIndexedLine($label,$name,$def_value = "", $options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
-			if($pwd)
+			if(isset($options["pwd"]) && $options["pwd"])
 				$output .= $this->password($name,$def_value);
 			else
 				$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
