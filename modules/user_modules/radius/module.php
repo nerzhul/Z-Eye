@@ -143,7 +143,7 @@
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
 					FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
-                $output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct","",4,4);
+                $output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4, "length" => 4));
                 $output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").
 					$this->addGroupList($radSQLMgr)."</select></td></tr>";
                 $output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
@@ -596,7 +596,7 @@
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 				FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
-				$output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct","",4,4);
+				$output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4,"length" => 4));
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").
 				$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);

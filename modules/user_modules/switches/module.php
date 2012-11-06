@@ -260,8 +260,8 @@
 					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",(($climit > 0 || $wlimit) > 0 ? true : false),$this->loc->s("enable-monitor"))."</li><li>";
 					$output .= FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),10,10,$this->loc->s("warn-step"))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),10,10,$this->loc->s("crit-step"))."</li><li>";
+					$output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
+					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>";
 					$output .= FS::$iMgr->submit("","Enregister")."</li>";
 					$output .= "</ul>";
 					$output .= "</form>";

@@ -100,8 +100,8 @@
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
 					$output .= FS::$iMgr->addHidden("mod",$this->mid);
-					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,2,2)." jours <br />";
-					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,3,3)." jours <br />";
+					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,array("size" => 2, "length" => 2))." jours <br />";
+					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,array("size" => 3, "length" => 3))." jours <br />";
 		
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
@@ -167,7 +167,7 @@
 					$found = 0;
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
-					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
+					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
 					
@@ -196,7 +196,7 @@
 					$found = 0;
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
-					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
+					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
 					
@@ -225,7 +225,7 @@
 					$found = 0;
 					
 					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
-					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,3,3)." <br />";
+					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
 					

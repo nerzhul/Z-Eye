@@ -82,7 +82,7 @@
 			if($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=6");
 				$output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
-				$output .= FS::$iMgr->addNumericInput("port",$data["port"],5,5,$this->loc->s("ldap-port"))."</li><li>";
+				$output .= FS::$iMgr->addNumericInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
 				$output .= FS::$iMgr->addCheck("ssl",($data["ssl"] == 1 ? true : false),"SSL ?")."</li><li>";
 				$output .= FS::$iMgr->input("dn",$data["dn"],20,200,$this->loc->s("base-dn"))."</li><li>";
 				$output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,$this->loc->s("root-dn"))."</li><li>";
@@ -154,7 +154,7 @@
 			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<ul class=\"ulform\"><li>";
 			$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
-			$formoutput .= FS::$iMgr->addNumericInput("port","389",5,5,$this->loc->s("ldap-port"))."</li><li>";
+			$formoutput .= FS::$iMgr->addNumericInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
 			$formoutput .= FS::$iMgr->addCheck("ssl",false,$this->loc->s("SSL")." ?")."</li><li>";
 			$formoutput .= FS::$iMgr->input("dn","",20,200,$this->loc->s("base-dn"))."</li><li>";
 			$formoutput .= FS::$iMgr->input("rootdn","",20,200,$this->loc->s("root-dn"))."</li><li>";

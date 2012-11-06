@@ -252,7 +252,7 @@
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-nightreport")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false);
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hnight","mnight",$nighth,$nightm)."</td></tr>";
-				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->addNumericInput("nightintval",$nightback > 0 ? $nigthback : 7,2,2,NULL,$this->loc->s("tooltip-prev-hour"))."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->addNumericInput("nightintval",$nightback > 0 ? $nigthback : 7,array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-prev-hour")))."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-we")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false);
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";

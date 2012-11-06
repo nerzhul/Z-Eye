@@ -151,3 +151,4 @@ Beta 2.1
 - Fix one typo on ipmanager
 - Implement icinga module to manage Icinga
 - Cleanup some code
+- Rewrite addIndexedNumericLine and addNumericInput
