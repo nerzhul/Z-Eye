@@ -57,7 +57,7 @@
 				$output .= "</div>";
 			}
 			else if(!$sh || $sh == 1) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				// Load snort keys for db config
 				$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
 				$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
@@ -81,7 +81,7 @@
 				$dnsenable = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dnsenable'");
 				$dnslist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dnslist'");
 				if(!$dnsenable) $dnsenable = 0;
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"dnsenable",$dnsenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -106,7 +106,7 @@
 				if(!$popenable) $popenable = 0;
 				if(!$popports) $popports = "109,110,995";
 				
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-smtp-sensor"),"ensmtp",$smtpenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -130,7 +130,7 @@
 				if(!$httpenable) $httpenable = 0;
 				if(!$httpports) $httpports = "80,443";
 				
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enhttp",$httpenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -151,7 +151,7 @@
 				if(!$oracleenable) $oracleenable = 0;
 				if(!$oracleports) $oracleports = "1525,1527,1529,2005";
 				
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensql",$sqlenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -177,7 +177,7 @@
 				$tselist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'tselist'");
 				if(!$tseenable) $tseenable = 0;
 				
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-telnet-sensor"),"entelnet",$telnetenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -198,7 +198,7 @@
 				if(!$ftpenable) $ftpenable = 0;
 				if(!$ftpports) $ftpports = "21";
 				
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enftp",$ftpenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -213,7 +213,7 @@
 				$snmplist = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'snmplist'");
 				if(!$snmpenable) $snmpenable = 0;
 				
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensnmp",$snmpenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -228,7 +228,7 @@
 				if(!$sipenable) $sipenable = 0;
 				if(!$sipports) $sipports = "5060,5061";
 
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensip",$sipenable);
 				$tooltip = $this->loc->s("tooltip-ipv4");
@@ -247,7 +247,7 @@
 				$weh = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_wehour'");
 				$wem = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'report_wemin'");
 				
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-nightreport")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false);

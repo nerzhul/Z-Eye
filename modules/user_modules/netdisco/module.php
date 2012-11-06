@@ -39,7 +39,7 @@
 
 		private function showMainConf() {
 			$output = "";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>";
 			if(Config::getOS() == "FreeBSD")
 				$file = file("/usr/local/etc/netdisco/netdisco.conf");

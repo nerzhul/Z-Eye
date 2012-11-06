@@ -92,7 +92,7 @@
 					$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if($data = pg_fetch_array($query)) {
 						if($portid != -1) {
-							$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=9");
+							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9");
 							$output .= FS::$iMgr->addHidden("portid",$portid);
 							$output .= FS::$iMgr->addHidden("sw",$device);
 							$output .= FS::$iMgr->addHidden("port",$port);
@@ -253,7 +253,7 @@
 				}
 				// Monitoring
 				else if($sh == 3) {
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=16");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
 					$output .= FS::$iMgr->addHidden("device",$device).FS::$iMgr->addHidden("port",$port);
 					$climit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
 					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
@@ -738,7 +738,7 @@
 					$output .= "</script>";
 					$output .= "<h4>".$this->loc->s("title-retag")."</h4>";
 					if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&d=".$device."&act=11");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=11");
 					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->addNumericInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
@@ -1049,7 +1049,7 @@
 			$formoutput = "<script type=\"text/javascript\">function showwait() {";
                         $formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
                         $formoutput .= "$('#pop').show();";
-                        $formoutput .= "};</script>".FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=18");
+                        $formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18");
                         $formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
                         $formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
                         $formoutput .= "</ul></form>";
@@ -1105,7 +1105,7 @@
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
                                         drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                                FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=17").
+                                                FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
                                                 FS::$iMgr->addHidden("device","'+e.dataTransfer.getData('text/html')+'").
                                                 FS::$iMgr->submit("",$this->loc->s("Remove")).
                                                 FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');

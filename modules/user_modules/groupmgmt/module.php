@@ -50,7 +50,7 @@
 
 			FS::$iMgr->showReturnMenu(true);
 			$output = "<h3>".$this->loc->s("title-edit")." '".$gname."'</h3>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
 			$rules = array();
 			$query = FS::$pgdbMgr->Select("z_eye_group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
 			while($data = pg_fetch_array($query))
@@ -63,7 +63,7 @@
 
 		private function showMain() {
 			$output = "<h3>".$this->loc->s("title-mgmt")."</h3>";
-			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
 			$formoutput .= "<h3>".$this->loc->s("title-opts")."</h3>";
 			$formoutput .= $this->loadModuleRuleSets();
@@ -97,7 +97,7 @@
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
                                         drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                              FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2").
+                                              FS::$iMgr->form("index.php?mod=".$this->mid."&act=2").
   	                                      FS::$iMgr->addHidden("gname","'+e.dataTransfer.getData('text/html')+'").
                                               FS::$iMgr->submit("",$this->loc->s("Delete")).
                                               FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');

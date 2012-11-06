@@ -35,7 +35,7 @@
 				}
 			}
 			$output .= "<div id=\"module_connect\"><h4>".$this->loc->s("title-conn")."</h4>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$output .= FS::$iMgr->input("uname",$this->loc->s("Login"));
 			$output .= "<br />";
 			$output .= FS::$iMgr->password("upwd",$this->loc->s("Password"));

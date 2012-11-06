@@ -89,7 +89,7 @@
 			$output = "<h4>";
 			$output .= $edit ? $this->loc->s("elmt-edit") : $this->loc->s("elmt-create");
 			$output .= "</h4>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4));
 			$menuEl = NULL;
 			if($edit) {
 				$meid = FS::$secMgr->checkGetData("im");
@@ -119,7 +119,7 @@
 			$output = "<h3>";
 			$output .= $edit ? $this->loc->s("menu-edit") : $this->loc->s("menu-create");
 			$output .= "</h3>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
 			$menu = NULL;
 			if($edit) {
 				$mid = FS::$secMgr->checkAndSecuriseGetData("menu");
@@ -143,7 +143,7 @@
 			if($edit) {
 				$output .= "<h3>".$this->loc->s("title-menu-node-mgmt")."</h3>
 				<h4>".$this->loc->s("add-elmt")."</h4>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=7");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
 				$output .= "<center>".$this->loc->s("elmt")." ";
 				$menuEl = new MenuElement();
 				$output .= $menuEl->CreateSelect();

@@ -40,7 +40,7 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= "<h3>".$this->loc->s("title-ip-supervision")."</h3>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$output .= FS::$iMgr->addList("f","submit()");
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
 				while($data = pg_fetch_array($query)) {
@@ -175,7 +175,7 @@
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
 					$output .= "$('#obsres').html(data);";
 					$output .= "});return false;}</script>";
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->addHidden("obsdata",$filter);
 					$output .= $this->loc->s("intval-days")." ".FS::$iMgr->addNumericInput("ival")."<br />";
 					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
@@ -189,7 +189,7 @@
 					$enmon = FS::$pgdbMgr->GetOneData("z_eye_dhcp_monitoring","enmon","subnet = '".$filter."'");
 					$contact = FS::$pgdbMgr->GetOneData("z_eye_dhcp_monitoring","contact","subnet = '".$filter."'");
 					$output .= "<div id=\"monsubnetres\"></div>";
-	                                $output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&f=".$filter."&act=3","monsubnet");
+	                                $output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",$enmon == 1 ? true : false,$this->loc->s("En-monitor"))."</li><li>";
                                         $output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";

@@ -242,7 +242,7 @@
 			$output = "<form action=\"".$link."\" ";
 			if(isset($options["id"]) && strlen($options["id"]) > 0)
 				$output .= "id=\"".$options["id"]."\" ";
-			$output .= "method=\"".((isset($options["post"]) && $options["post"]) ? "POST" : "GET")."\"";
+			$output .= "method=\"".((isset($options["get"]) && $options["get"]) ? "GET" : "POST")."\"";
 			if(isset($options["js"]))
 				$output .= " onsubmit=\"return ".$options["js"].";\ ";
 			$output .= ">";

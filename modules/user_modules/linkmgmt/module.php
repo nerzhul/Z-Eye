@@ -66,7 +66,7 @@
 			$output = "<h3>";
 			$output .= $edit ? $this->loc->s("link-edit") : $this->loc->s("link-create");
 			$output .= "</h3>";
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
 			$lnk = NULL;
 			if($edit) {
 				$lid = FS::$secMgr->checkGetData("link");

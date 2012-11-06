@@ -52,7 +52,7 @@
 				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
 				return $output;
 			}
-			$output = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
                         $output .= "<ul class=\"ulform\"><li><b>Nom d'utilisateur:</b> ".$user.FS::$iMgr->addHidden("uid",$uid)."</li>";
 			$grpidx = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
@@ -80,7 +80,7 @@
 			$output = "<h3>".$this->loc->s("title-directory")."</h3>";
 			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=6");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
 				$output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
 				$output .= FS::$iMgr->addNumericInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
 				$output .= FS::$iMgr->addCheck("ssl",($data["ssl"] == 1 ? true : false),"SSL ?")."</li><li>";
@@ -151,7 +151,7 @@
                                 });</script>";
 			}
 			$output .= "<h3>".$this->loc->s("title-directorymgmt")."</h3>";
-			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<ul class=\"ulform\"><li>";
 			$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
 			$formoutput .= FS::$iMgr->addNumericInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
@@ -207,14 +207,14 @@
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
                                         drop: function(e) { if(datatype == 1) { $('#subpop').html('".$this->loc->s("sure-remove-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                              FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3").
+                                              FS::$iMgr->form("index.php?mod=".$this->mid."&act=3").
                                               FS::$iMgr->addHidden("username","'+e.dataTransfer.getData('text/html')+'").
                                               FS::$iMgr->submit("",$this->loc->s("Remove")).
                                               FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
 					} else if(datatype == 2) {
 						$('#subpop').html('".$this->loc->s("sure-remove-directory")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                              FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=5").
+                                              FS::$iMgr->form("index.php?mod=".$this->mid."&act=5").
                                               FS::$iMgr->addHidden("addr","'+e.dataTransfer.getData('text/html')+'").
                                               FS::$iMgr->submit("",$this->loc->s("Remove")).
                                               FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');

@@ -98,7 +98,7 @@
 					$output .= $this->loc->s("nb-tse-atk").": ".$totaltse."<br />";
 					$output .= $this->loc->s("nb-ssh-atk").": ".$totalssh."<br /><hr>";
 					
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 					$output .= FS::$iMgr->addHidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,array("size" => 2, "length" => 2))." jours <br />";
 					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,array("size" => 3, "length" => 3))." jours <br />";
@@ -166,7 +166,7 @@
 				else if($showmodule == 2) {
 					$found = 0;
 					
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
 					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
@@ -195,7 +195,7 @@
 				else if($showmodule == 3) {
 					$found = 0;
 					
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=3");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
 					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("Mise à jour","Mise à jour")."<br />";
 					$output .= "</form>";
@@ -224,7 +224,7 @@
 				else if($showmodule == 4) {
 					$found = 0;
 					
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
 					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";

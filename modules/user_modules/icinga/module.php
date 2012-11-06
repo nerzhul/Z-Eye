@@ -91,7 +91,7 @@
 			/*
 			 * Ajax new host
 			 */
-			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=13");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",false);
 			//$formoutput .= template list
@@ -180,7 +180,7 @@
 			/*
 			 * Ajax new hostgroup
 			 */
-			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=19");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			// Global
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
@@ -226,7 +226,7 @@
 				/*
 				 * Ajax new service
 				 */
-				$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=16");
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",false);
 				//$formoutput .= template list
@@ -305,7 +305,7 @@
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
 			
-			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=4");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
@@ -367,7 +367,7 @@
 				/*
 				 * Ajax new contact
 				 */
-				$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=7");
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
 				//$formoutput .= template list
@@ -420,7 +420,7 @@
 			/*
 			 * Ajax new contactgroup
 			 */
-			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=10");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=10");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
@@ -472,7 +472,7 @@
 			/*
 			 * Ajax new command
 			 */
-			$formoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));

@@ -39,7 +39,7 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= "<h3>".$this->loc->s("title-dns")."</h3>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$output .= FS::$iMgr->addList("f");
 				
 				$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
@@ -219,7 +219,7 @@
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
 					$output .= "$('#obsres').html(data);";
 					$output .= "});return false;}</script>";
-					$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=2");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->addHidden("obsdata",$filter);
 					$output .= "Intervalle (jours) ".FS::$iMgr->addNumericInput("ival")."<br />";
 					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");

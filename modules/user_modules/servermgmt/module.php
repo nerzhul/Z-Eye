@@ -96,7 +96,7 @@
 			$output .= "}";
 			$output .= "};</script>";
 
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 7 : 8));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 7 : 8));
 
 			if($create == false) {
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);
@@ -178,7 +178,7 @@
 				case 3: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 4 : 5));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 4 : 5));
 
 			if($create == false) {
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);
@@ -253,7 +253,7 @@
 				case 4: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 			
-			$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
 			
 			if($create == false)
 				$output .= FS::$iMgr->addHidden("saddr",$saddr);

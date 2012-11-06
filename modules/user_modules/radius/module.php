@@ -47,7 +47,7 @@
 				$found = 0;
 				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
 					$output .= "<h4>".$this->loc->s("title-deleg")."</h4>";
-					$tmpoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
+					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
 					$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
 					while($data = pg_fetch_array($query)) {
 							if($found == 0) $found = 1;
@@ -59,7 +59,7 @@
 				}
 				else {
 					$output .= "<h4>".$this->loc->s("title-usermgmt")."</h4>";
-					$tmpoutput = FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
+					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->addList("radius","submit()");
 					$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname");
 	                	        while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
@@ -108,7 +108,7 @@
 				$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserres\"></div>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10","adduser");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Name")." *","radname");
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Subname")." *","radsurname");
@@ -138,7 +138,7 @@
 				$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserlistres\"></div>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11","adduserlist");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11",array("id" => "adduserlist"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
@@ -224,7 +224,7 @@
 					$('.attrli'+attridx).remove();
 				}</script>";
 
-				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
+				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= "<ul class=\"ulform\"><li>".
 				FS::$iMgr->addList("utype","changeUForm()",$this->loc->s("Auth-Type"));
 				$formoutput .= FS::$iMgr->addElementToList($this->loc->s("User"),1);
@@ -262,7 +262,7 @@
 				$('#trash').on({
 					dragover: function(e) { e.preventDefault(); },
 					drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-						FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=4").
+						FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=4").
 						FS::$iMgr->addHidden("user","'+e.dataTransfer.getData('text/html')+'").
 						FS::$iMgr->addCheck("logdel",false,$this->loc->s("Delete-logs")." ?")."<br />".
 						FS::$iMgr->addCheck("acctdel",false,$this->loc->s("Delete-accounting")." ?")."<br />".
@@ -348,7 +348,7 @@
 				$('#trash').on({
 					dragover: function(e) { e.preventDefault(); },
 					drop: function(e) { $('#subpop').html('".$this->loc->s("Delete-profil")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-					FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
+					FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
 					FS::$iMgr->addHidden("group","'+e.dataTransfer.getData('text/html')+'").
 					FS::$iMgr->submit("",$this->loc->s("Delete")).
 					FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
@@ -360,7 +360,7 @@
 						drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=2&radentry='+e.dataTransfer.getData('text/html')); }
 				});
 				</script>";
-				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
+				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addList("radgrptpl","addTemplAttributes()","Template");
 				$formoutput .= FS::$iMgr->addElementToList($this->loc->s("None"),0);
 				$formoutput .= FS::$iMgr->addElementToList("VLAN",1);
@@ -433,7 +433,7 @@
 								$('#uptype').hide(); $('#csvtooltip').html('');
 						}
 				}; </script>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=6"); // #todo change this
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=6"); // #todo change this
 				$output .= "<ul class=\"ulform\"><li width=\"100%\">".FS::$iMgr->addList("usertype","changeUForm()","Type d'authentification");
 				$output .= FS::$iMgr->addElementToList($this->loc->s("User"),1);
 				$output .= FS::$iMgr->addElementToList($this->loc->s("Mac-addr"),2);
@@ -462,7 +462,7 @@
 				$found = 0;
 				$formoutput = "";
 				$formoutput .= "<h4>".$this->loc->s("title-auto-import")."</h4>";
-				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
+				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addList("subnet","","Subnet DHCP");
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask");
 				while($data = pg_fetch_array($query)) {
@@ -511,7 +511,7 @@
 						$('#trash').on({
 								dragover: function(e) { e.preventDefault(); },
 								drop: function(e) { $('#subpop').html('".$this->loc->s("Delete-subnet-import")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-										FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8").
+										FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8").
 										FS::$iMgr->addHidden("subnet","'+e.dataTransfer.getData('text/html')+'").
 										FS::$iMgr->submit("","Supprimer").
 										FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
@@ -541,7 +541,7 @@
                                 $radSQLMgr->Connect();
 
 				$output .= "<h4>".$this->loc->s("title-cleanusers")."</h4>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=9");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=9");
 				$output .= "<table>";
 
 				$radexpenable = FS::$pgdbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
@@ -563,7 +563,7 @@
 				$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserres\"></div>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10","adduser");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>Valeur</th></tr>";
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Name")." *","radname");
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Subname")." *","radsurname");
@@ -592,7 +592,7 @@
 				$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserlistres\"></div>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11","adduserlist");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11",array("id" => "adduserlist"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 				FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
@@ -671,7 +671,7 @@
 					$utype = 2;
 				else
 					$utype = 1;
-				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
+				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= FS::$iMgr->addHidden("uedit",1);
 				$formoutput .= "<h4>".$this->loc->s("title-usermod")." '".$radentry."'</h4>";
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addHidden("utype",$utype)."<b>".$this->loc->s("User-type").": </b>".
@@ -797,7 +797,7 @@
 				}</script>";
 				$formoutput .= "<h4>Modification du groupe '".$radentry."'</h4>";
 				$formoutput .= "<ul class=\"ulform\">";
-				$formoutput .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
+				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
                 $formoutput .= FS::$iMgr->addHidden("uedit",1).FS::$iMgr->addHidden("groupname",$radentry);
 				$attridx = 0;
 				$query = $radSQLMgr->Select("radgroupcheck","attribute,op,value","groupname = '".$radentry."'");

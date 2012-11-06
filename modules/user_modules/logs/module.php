@@ -91,7 +91,7 @@
 						$('#logd').fadeIn();
 						});
 					}</script>";
-				$output .= FS::$iMgr->addForm("index.php?mod=".$this->mid."&act=1","logf");
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
 				$output .= FS::$iMgr->addList("uf","filterAppLogs()");
 				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("User")."--","",true);
 				$query = FS::$pgdbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",2);

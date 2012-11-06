@@ -152,3 +152,4 @@ Beta 2.1
 - Implement icinga module to manage Icinga
 - Cleanup some code
 - Rewrite addIndexedNumericLine and addNumericInput
+- Rename addForm to form and remove addFormWithReturn
