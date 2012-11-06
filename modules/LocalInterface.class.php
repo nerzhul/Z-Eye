@@ -46,11 +46,25 @@
 			return $output;
 		}
 		
-		public function showNotification($text) {
-			return "$('#subnotification').html(".$text."); $('#notification').slideDown();
+		public function showNotification($text,$timeout = 5000) {
+			return "<script type=\"text/javascript\">
+						$('#subnotification').html(data); 
+						$('#notification').slideDown();
 						setTimeout(function() {
 							$('#notification').slideUp();
-						},5000);";
+						},".$timeout.");
+					</script>"
+		}
+		public function callbackNotification($link,$id,$timeout = 5000) {
+			return "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {
+					event.preventDefault();
+					$.post('".$link."', $('#".$id."').serialize(), function(data) {
+						$('#subnotification').html(data); $('#notification').slideDown();
+						setTimeout(function() {
+							$('#notification').slideUp();
+						},".$timeout.");
+					});
+				});</script>";
 		}
 
 		protected function showConnForm() {
