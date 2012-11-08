@@ -198,7 +198,7 @@
                         }
 						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
-						$output .= FS::$iMgr->textarea("vllist",$vlanlist,250,100);
+						$output .= FS::$iMgr->textarea("vllist",$vlanlist,array("width" => 250, "height" => 100));
 						$output .= "</td></tr>";
 
 						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";

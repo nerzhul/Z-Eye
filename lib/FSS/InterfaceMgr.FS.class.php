@@ -128,11 +128,15 @@
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
-		public function textarea($name, $def_value = "", $width=400, $height=300, $label=NULL, $tooltip=NULL) {
+		public function textarea($name, $def_value = "", $options=array()) {
 			$output = "";
-                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".$width."px;height:".$height."px\">".$def_value."</textarea>";
-			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
+			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
+			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".(isset($options["width"]) ? $options["width"] : 400).
+				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\">".$def_value."</textarea>";
+			if(isset($options["tooltip"])) {
+				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".
+					$options["tooltip"]."\"});</script>";
+			}
 			return $output;
 		}
 
