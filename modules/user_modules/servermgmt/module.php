@@ -129,7 +129,7 @@
 			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
 			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("server-path"),"spath",$spath);
-			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 
 			return $output;
@@ -201,7 +201,7 @@
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",array("pwd" => true));
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",array("pwd" => true));
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"salias",$salias);
-			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 
 			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".($create ? 4 : 5),"cesrv");
@@ -273,7 +273,7 @@
 			$output .= FS::$iMgr->addIndexedCheckLine("DNS ?","dns",$dns > 0 ? true : false);
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("named-conf-path"),"namedpath",$namedpath);
 			$output .= FS::$iMgr->addIndexedLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed);
-			$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"));
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 			
 			return $output;

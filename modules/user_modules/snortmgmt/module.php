@@ -200,10 +200,8 @@
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enftp",$ftpenable);
-				$tooltip = $this->loc->s("tooltip-ipv4");
-				$tooltip2 = $this->loc->s("tooltip-port");
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("port-ftp"),"ftpports",$ftpports,array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $tooltip2))."</td></tr>";
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-ipv4")));
+				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("port-ftp"),"ftpports",$ftpports,array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")))."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Register"))."</th></tr>";
 				$output .= "</table></form>";
 			}
@@ -255,7 +253,7 @@
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-we")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false);
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
-				$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table>";
 			}
 			return $output;

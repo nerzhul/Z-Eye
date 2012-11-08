@@ -230,8 +230,8 @@
 		}
 
 		public function button($name, $value, $js) {
-                        return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
-                }
+				return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
+		}
 
 		public function radio($name, $value, $checked = false, $label=NULL) {
 			$output = "";
@@ -299,12 +299,12 @@
 			return $output;	
 		}
 
-		public function addTableSubmit($name,$value,$size = 2,$js=NULL) {
-			$output = "<tr><th colspan=\"".$size."\"><center>";
+		public function tableSubmit($label,$options = array()) {
+			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
 			if($js)
-				$output .= $this->addJSSubmit($name,$value,$js);
+				$output .= $this->addJSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,(isset($options["js"]) ? $options["js"] : NULL));
 			else
-				$output .= $this->submit($name,$value);
+				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$label);
 			$output .= "</center></th></tr>";
 			return $output;
 		}
@@ -313,11 +313,11 @@
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<progress id=\"".$name."\" value=\"".$value."\" max=\"".$max."\"></progress><span id=\"".$name."val\"></span>";
-                        $output .= "<script type=\"text/javascript\">
-                        eltBar = document.getElementById(\"".$name."\");
-                        eltPct = document.getElementById(\"".$name."val\");
-                        eltPct.innerHTML = ' ' + Math.round(eltBar.position * 100) + \"%\";
-                        </script>";
+			$output .= "<script type=\"text/javascript\">
+				eltBar = document.getElementById(\"".$name."\");
+				eltPct = document.getElementById(\"".$name."val\");
+				eltPct.innerHTML = ' ' + Math.round(eltBar.position * 100) + \"%\";
+				</script>";
 			return $output;
 		}
 		

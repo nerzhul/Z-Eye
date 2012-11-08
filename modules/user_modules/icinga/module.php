@@ -137,7 +137,7 @@
 			
 			// icon image
 			// statusmap image
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";				
 				
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
@@ -186,7 +186,7 @@
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
@@ -267,7 +267,7 @@
 				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",array("value" => 0));
 				// @ TODO support for contact not only contactlist
 				$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
-				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
 			}
 			else
@@ -316,7 +316,7 @@
 			$formoutput .= "<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("fhs","fms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"));
@@ -388,7 +388,7 @@
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptflap"),"hostoptf",true);
 				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
-				$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
 			}
 			else
@@ -430,7 +430,7 @@
 				$formoutput .= FS::$iMgr->addElementToList($data["name"],$data["name"]);
 			}
 			$formoutput .= "</select></td></tr>";
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"));
@@ -476,7 +476,7 @@
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
-			$formoutput .= FS::$iMgr->addTableSubmit("",$this->loc->s("Add"));
+			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"));

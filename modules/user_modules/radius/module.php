@@ -121,7 +121,7 @@
 				$output .= FS::$iMgr->calendar("enddate","",$this->loc->s("To"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
 				$output .= "</td></tr>";
-				$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"))."</table></form>";
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
 
 				$output .= "<script type=\"text/javascript\">$('#adduser').submit(function(event) {
 					event.preventDefault();
@@ -152,7 +152,7 @@
                 $output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
                 $output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
                 $output .= "</td></tr>";
-                $output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"))."</table></form>";
+                $output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
 			}
 			else if($sh && $sh > 2)
 				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));
@@ -553,7 +553,7 @@
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable);
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser);
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate);
-				$output .= FS::$iMgr->addTableSubmit("","Enregistrer")."</form>";
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</form>";
 			}
 			else if($sh == 6) {
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
@@ -575,7 +575,7 @@
 				$output .= FS::$iMgr->calendar("enddate","",$this->loc->s("To"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
 				$output .= "</td></tr>";
-				$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"))."</table></form>";
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
 
 				$output .= "<script type=\"text/javascript\">$('#adduser').submit(function(event) {
 					event.preventDefault();
@@ -605,7 +605,7 @@
 				$output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
 				$output .= "</td></tr>";
-				$output .= FS::$iMgr->addTableSubmit("",$this->loc->s("Save"))."</table></form>";
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));
