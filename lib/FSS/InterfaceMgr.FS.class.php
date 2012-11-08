@@ -139,6 +139,13 @@
 			}
 			return $output;
 		}
+		
+		public function tabledTextArea($label,$name,$options = array()) {
+			$output = "<tr><td>".$label."</td><td><center>";
+			$output .= $this->textarea($name,(isset($options["value"]) ? $options["value"] : ""),$options);
+			$output .= "</center></td></tr>";
+			return $output;
+		}
 
 		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
