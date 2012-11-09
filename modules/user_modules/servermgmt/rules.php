@@ -23,8 +23,8 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Gestion des serveurs</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_servermgmt_read",in_array("mrule_servermgmt_read",$activerules),"Lire les données")."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->addCheck("mrule_servermgmt_write",in_array("mrule_servermgmt_read",$activerules),"Modifier les données")."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_servermgmt_read",array("check" => in_array("mrule_servermgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>
+			<tr><td></td><td>".FS::$iMgr->check("mrule_servermgmt_write",array("check" => in_array("mrule_servermgmt_read",$activerules),"label" => "Modifier les données"))."</td></tr>";
                         return $output;
                 }
 

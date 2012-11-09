@@ -294,7 +294,7 @@
 
 		public function addIndexedCheckLine($label, $name, $checked = false) {
 			$output = "<tr><td>".$label."</td><td><center>";
-			$output .= $this->addCheck($name, $checked);
+			$output .= $this->check($name, array("check" => $checked));
 			$output .= "</center></td></tr>";
 			return $output;	
 		}
@@ -341,11 +341,11 @@
 			return $output;
 		}
 		
-		public function addCheck($name,$checked = false,$label="") {
+		public function check($name,$options = array()) {
 			$output = "";
-			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<input type=\"checkbox\" name=\"".$name."\" ";
-			if($checked)
+			if(isset($options["check"]) && $options["check"]))
 				$output .= "checked ";
 			$output .= " />";
 			return $output;

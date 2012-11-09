@@ -112,7 +112,7 @@
 						else
 								$output .= "unk";
 						$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->addCheck("shut",($data["up_admin"] == "down" ? true : false))."</td></tr>";
+						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false))."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
                                                 $sp = getPortSpeedWithPID($device,$portid);
 						if($sp > 0) {
@@ -204,7 +204,7 @@
 						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
 						$mabeap = getSwitchportMABType($device,$portid);
 						$dot1xhostmode = getSwitchportAuthHostMode($device,$portid);
-						$output .= FS::$iMgr->addCheck("mabeap",$mabeap == 2 ? true : false)." EAP<br />";
+						$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
 						$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->addList("dot1xhostmode","");
 						$output .= FS::$iMgr->addElementToList($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
 						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
@@ -216,7 +216,7 @@
 						$output .= FS::$iMgr->addList("voicevlan","");
 						$output .= $voicevlanoutput;
 						$output .= "</select></td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->addCheck("wr")."</td></tr>";
+						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->check("wr")."</td></tr>";
 						$output .= "</table>";
 						if($portid != -1) {
 							$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
@@ -258,7 +258,7 @@
 					$climit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
 					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
 					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
-					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->addCheck("enmon",(($climit > 0 || $wlimit) > 0 ? true : false),$this->loc->s("enable-monitor"))."</li><li>";
+					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),"label" => $this->loc->s("enable-monitor")))."</li><li>";
 					$output .= FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
 					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>";
@@ -741,7 +741,7 @@
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=11");
 					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->addNumericInput("oldvl")."<br />";
 					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->addNumericInput("newvl")."<br />";
-					$output .= "Confirmer ".FS::$iMgr->addCheck("accept",false);
+					$output .= "Confirmer ".FS::$iMgr->check("accept");
 					$output .= FS::$iMgr->addJSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
 					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
 					

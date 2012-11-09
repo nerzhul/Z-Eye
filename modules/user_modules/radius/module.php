@@ -264,8 +264,8 @@
 					drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
 						FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=4").
 						FS::$iMgr->addHidden("user","'+e.dataTransfer.getData('text/html')+'").
-						FS::$iMgr->addCheck("logdel",false,$this->loc->s("Delete-logs")." ?")."<br />".
-						FS::$iMgr->addCheck("acctdel",false,$this->loc->s("Delete-accounting")." ?")."<br />".
+						FS::$iMgr->check("logdel",array("label" => $this->loc->s("Delete-logs")." ?"))."<br />".
+						FS::$iMgr->check("acctdel",array("label" => $this->loc->s("Delete-accounting")." ?"))."<br />".
 						FS::$iMgr->submit("",$this->loc->s("Delete")).
 						FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
 						$('#pop').show();

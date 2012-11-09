@@ -23,7 +23,7 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Moteur Netdisco</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_maps_read",in_array("mrule_maps_read",$activerules),"Lire les données")."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_maps_read",array("check" => in_array("mrule_maps_read",$activerules),"label" => "Lire les données"))."</td></tr>";
                         return $output;
                 }
 

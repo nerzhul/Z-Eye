@@ -72,14 +72,14 @@
 				}
 				$output .= $formoutput;
 				$output .= "</select><br />";
-				$output .= FS::$iMgr->addCheck("sa",$shA)."A ";
-				$output .= FS::$iMgr->addCheck("saaaa",$shAAAA)."AAAA ";
-				$output .= FS::$iMgr->addCheck("scname",$shCNAME)."CNAME ";
-				$output .= FS::$iMgr->addCheck("sns",$shNS)."NS ";
-				$output .= FS::$iMgr->addCheck("ssrv",$shSRV)."SRV ";
-				$output .= FS::$iMgr->addCheck("stxt",$shTXT)."TXT ";
-				$output .= FS::$iMgr->addCheck("sptr",$shPTR)."PTR ";
-				$output .= FS::$iMgr->addCheck("sother",$shother).$this->loc->s("Others")." ";
+				$output .= FS::$iMgr->check("sa",array("check" => $shA))."A ";
+				$output .= FS::$iMgr->check("saaaa",array("check" => $shAAAA))."AAAA ";
+				$output .= FS::$iMgr->check("scname",array("check" => $shCNAME))."CNAME ";
+				$output .= FS::$iMgr->check("sns",array("check" => $shNS))."NS ";
+				$output .= FS::$iMgr->check("ssrv",array("check" => $shSRV))."SRV ";
+				$output .= FS::$iMgr->check("stxt",array("check" => $shTXT))."TXT ";
+				$output .= FS::$iMgr->check("sptr",array("check" => $shPTR))."PTR ";
+				$output .= FS::$iMgr->check("sother",array("check" => $shother)).$this->loc->s("Others")." ";
 				$output .= "<br />";
 				$output .= FS::$iMgr->submit("",$this->loc->s("Filter"));
 				$output .= "</form>";

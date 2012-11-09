@@ -23,7 +23,7 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Rapports de sécurité</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_securityreport_read",in_array("mrule_securityreport_read",$activerules),"Lire les données")."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_securityreport_read",array("check" => in_array("mrule_securityreport_read",$activerules),"label" => "Lire les données"))."</td></tr>";
                         return $output;
                 }
 

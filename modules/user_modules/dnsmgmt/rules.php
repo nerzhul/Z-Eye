@@ -23,7 +23,7 @@
 
                 public function showMgmtInterface($activerules = array()) {
                 	$output = "<tr><td>Supervision DNS</td>";
-			$output .= "<td>".FS::$iMgr->addCheck("mrule_dnsmgmt_read",in_array("mrule_dnsmgmt_read",$activerules),"Lire les données")."</td></tr>";
+			$output .= "<td>".FS::$iMgr->check("mrule_dnsmgmt_read",array("check" => in_array("mrule_dnsmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>";
 			return $output;
                 }
 

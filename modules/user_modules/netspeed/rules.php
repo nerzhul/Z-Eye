@@ -23,14 +23,14 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Cartographie Réseau</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_netspeed_read",in_array("mrule_netspeed_read",$activerules),"Lire les données")."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_netspeed_read",array("check" => in_array("mrule_netspeed_read",$activerules),"label" => "Lire les données"))."</td></tr>";
                         return $output;
                 }
 
                 public function canAccessToModule() {
-			if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_netspeed_read"))
-				return true;
-                        return false;
+					if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_netspeed_read"))
+						return true;
+					return false;
                 }
         };
 ?>

@@ -23,8 +23,8 @@
 
 		public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Monitoring de services</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_icinga_read",in_array("mrule_icinga_read",$activerules),"Lire les données")."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->addCheck("mrule_groupmgmt_write",in_array("mrule_icinga_write",$activerules),"Modifier les données")."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_icinga_read",array("check" => in_array("mrule_icinga_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_groupmgmt_write",array("check" => in_array("mrule_icinga_write",$activerules),"label" => "Modifier les données"))."</td></tr>";
                         return $output;
 		}
 

@@ -144,7 +144,7 @@
 			$output .= FS::$iMgr->addElementToList("1","1",$snmpver == 1 ? true : false);
 			$output .= FS::$iMgr->addElementToList("2c","2",$snmpver == 2 ? true : false);
 			$output .= "</select></td></tr>";
-			$output .= "<tr><th colspan=\"2\">".FS::$iMgr->submit("",$this->loc->s("Save"))."</th></tr>";
+			$output .= "<tr>".FS::$iMgr->tableSubmit($this->loc->s("Save"))."</tr>";
 			$output .= "</table></form>";
 			return $output;
 		}

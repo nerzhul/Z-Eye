@@ -23,8 +23,8 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Gestion des Switches</td>";
-                        $output .= "<td>".FS::$iMgr->addCheck("mrule_switches_read",in_array("mrule_switches_read",$activerules),"Lire les données")."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->addCheck("mrule_switches_write",in_array("mrule_switches_write",$activerules),"Modifier les données")."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_switches_read",array("check" => in_array("mrule_switches_read",$activerules),"label" => "Lire les données"))."</td></tr>
+			<tr><td></td><td>".FS::$iMgr->check("mrule_switches_write",array("check" => in_array("mrule_switches_write",$activerules),"label" => "Modifier les données"))."</td></tr>";
                         return $output;
                 }
 

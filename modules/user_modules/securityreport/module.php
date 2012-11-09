@@ -197,7 +197,7 @@
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
 					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
-					$output .= FS::$iMgr->submit("Mise à jour","Mise à jour")."<br />";
+					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
 					
 					$tmpoutput = "<h4>Top ".$topmax." (".$this->loc->s("TSE-atk").")</h4><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
