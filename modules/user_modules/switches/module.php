@@ -92,7 +92,7 @@
 					$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if($data = pg_fetch_array($query)) {
 						if($portid != -1) {
-							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9");
+							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9",array("id" => "swpomod"));
 							$output .= FS::$iMgr->addHidden("portid",$portid);
 							$output .= FS::$iMgr->addHidden("sw",$device);
 							$output .= FS::$iMgr->addHidden("port",$port);
@@ -221,6 +221,7 @@
 						if($portid != -1) {
 							$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
 							$output .= "</form>";
+							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod");
 						}
 						else
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
@@ -1281,14 +1282,20 @@
 					$wr = FS::$secMgr->checkAndSecurisePostData("wr");
 					if($port == NULL || $sw == NULL || $trunk == NULL || $nvlan == NULL) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (plug edit)");
-						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
+						if(FS::isAjaxCall())
+							echo "Some fields are missing (port, switch, trunk or native vlan)";
+						else
+							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 						return;
 					}
 					
 					$pid = getPortId($sw,$port);
 					if($pid == -1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"PID is incorrect (plug edit)");
-						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+						if(FS::isAjaxCall())
+							echo "PID is incorrect (".$pid.")";
+						else
+							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
 					
@@ -1299,7 +1306,10 @@
 					if($duplex && FS::$secMgr->isNumeric($duplex)) {
 						if($duplex < 1 || $duplex > 4) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are wrong: duplex (plug edit)");
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
+							if(FS::isAjaxCall())
+								echo "Duplex field is wrong (".$duplex.")";
+							else
+								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 							return;
 						}
 						
@@ -1419,16 +1429,25 @@
 						}
 						// set settings
 						if(setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
-								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+								if(FS::isAjaxCall())
+									echo "Fail to set Switchport mode";
+								else
+									header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 						}
 						$logvals["mode"]["dst"] = $trunk;
 						if(setSwitchTrunkEncapWithPID($sw,$pid,5) != 0) {
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							if(FS::isAjaxCall())
+								echo "Fail to set Switchport Trunk encapsulated VLANs";
+							else
+								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 						}
 						$logvals["trunkencap"]["dst"] = 5;
 						if(setSwitchAccessVLANWithPID($sw,$pid,$nvlan) != 0) {
+							if(FS::isAjaxCall())
+								echo "Fail to set Switchport Access Vlan";
+							else
 								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 						}
@@ -1438,8 +1457,11 @@
 						$dot1xhostmode = FS::$secMgr->checkAndSecurisePostData("dot1xhostmode");
 						$mabeap = FS::$secMgr->checkAndSecurisePostData("mabeap");
 						if($dot1xhostmode < 1 || $dot1xhostmode > 4) {
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
-								return;
+							if(FS::isAjaxCall())
+								echo "Dot1x hostmode is wrong (".$dot1xhostmode.")";
+							else
+								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							return;
 						}
 						// switchport mode access & no vlan assigned
 						setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
@@ -1487,13 +1509,19 @@
 					}
 					$logvals["hostmode"]["src"] = getPortStateWithPID($sw,$pid);
 					if(setPortStateWithPID($sw,$pid,($shut == "on" ? 2 : 1)) != 0) {
-						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+						if(FS::isAjaxCall())
+							echo "Fail to set switchport shut/no shut state";
+						else
+							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
 					$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
 					$logvals["voicevlan"]["src"] = getSwitchportVoiceVlanWithPID($sw,$pid);
 					if(setSwitchportVoiceVlanWithPID($sw,$pid,$voicevlan) != 0) {
-						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+						if(FS::isAjaxCall())
+							echo "Fail to set switchport voice vlan";
+						else
+							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
 					$logvals["voicevlan"]["dst"] = $voicevlan;
@@ -1531,7 +1559,10 @@
 							$logoutput .= "\n".$keys.": ".$values["src"]." => ".$values["dst"];
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,$logoutput);
-					header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
+					if(FS::isAjaxCall())
+						echo "Done !";
+					else
+						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				case 10: // replace vlan portlist
 					echo "<h4>".$this->loc->s("title-port-modiflist")."</h4>";

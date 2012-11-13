@@ -404,10 +404,10 @@
                        		<a id=\"".$aname."2\" style=\"display:none;\" href=\"#\">".$text2."</a></li></ul>";
                         $output .= "<div id=\"".$divname."\" style=\"display:none;\">".$content."</div>";
 			$output .= "<script type=\"text/javascript\">
-                                $(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
-                                $(\"#".$aname."2\").click(function(){ $(\"div#".$divname."\").slideUp(\"slow\");});
-                                $(\"#".$liname."\").click(function(){ $(\"#".$liname." a\").toggle();});
-                                </script>";
+				$(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
+				$(\"#".$aname."2\").click(function(){ $(\"div#".$divname."\").slideUp(\"slow\");});
+				$(\"#".$liname."\").click(function(){ $(\"#".$liname." a\").toggle();});
+				</script>";
 			return $output;
 		}
 		// Simple methods

@@ -58,7 +58,7 @@
 		public function callbackNotification($link,$id,$timeout = 5000) {
 			return "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {
 					event.preventDefault();
-					$.post('".$link."', $('#".$id."').serialize(), function(data) {
+					$.post('".$link."&at=3', $('#".$id."').serialize(), function(data) {
 						$('#subnotification').html(data); $('#notification').slideDown();
 						setTimeout(function() {
 							$('#notification').slideUp();

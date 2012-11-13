@@ -67,11 +67,21 @@
 					$iparray = array();
 					$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
-					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
-						<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>Fin du bail</th><th>Serveurs</th></tr>";
+					
 					$netobj = new FSNetwork();
 					$netobj->setNetAddr($data["netid"]);
 					$netobj->setNetMask($data["netmask"]);
+					
+					$swfound = false;
+					
+					// Bufferize switch list
+					$switchlist = array();
+					
+					$query2 = FS::$pgdbMgr->Select("device","ip,name");
+					while($data2 = pg_fetch_array($query2))
+						$switchlist[$data2["ip"]] = $data2["name"];
+					
+					// Initiate network IPs
 					for($i=($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
 						$iparray[$i] = array();
 						$iparray[$i]["mac"] = "";
@@ -79,7 +89,11 @@
 						$iparray[$i]["ltime"] = "";
 						$iparray[$i]["distrib"] = 0;
 						$iparray[$i]["servers"] = array();
+						$iparray[$i]["switch"] = "";
+						$iparray[$i]["port"] = "";
 					}
+					
+					// Fetch datas
 					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
 					while($data2 = pg_fetch_array($query2)) {
 						// If it's reserved on a host don't override status
@@ -91,12 +105,29 @@
 						}
 						// List servers where the data is
 						array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
+						if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
+							$sw = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'","time_last",2);
+							$port = FS::$pgdbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'","time_last",2);
+							if($sw && $port) {
+								$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
+								$iparray[ip2long($data2["ip"])]["port"] = $port;
+								$swfound = true;
+							}
+						}
+
 					}
 					
 					$used = 0;
 					$reserv = 0;
 					$free = 0;
 					$fixedip = 0;
+					
+					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
+						<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
+					if($swfound)
+						$netoutput .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
+					$netoutput .= "Fin du bail</th><th>Serveurs</th></tr>";
+						
 					foreach($iparray as $key => $value) {
 						$rstate = "";
 						$style = "";
@@ -140,6 +171,13 @@
 						$netoutput .= "</td><td>".$rstate."</td><td>";
 						$netoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
 						$netoutput .= $value["host"]."</td><td>";
+						// Show switch column only of a switch is here
+						if($swfound) {
+							$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "");
+							$netoutput .= "</td><td>";
+							$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "");
+							$netoutput .= "</td><td>";
+						}
 						$netoutput .= $value["ltime"]."</td><td>";
 						for($i=0;$i<count($value["servers"]);$i++) {
 							if($i > 0) $netoutput .= "<br />";

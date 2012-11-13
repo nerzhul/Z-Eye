@@ -155,3 +155,4 @@ Beta 2.1
 - Rename addForm to form and remove addFormWithReturn
 - Rename addTableSubmit to tableSubmit, and cleanup code
 - Create function tabledTextArea
+- IPManager now show the switch & port on IP tables
