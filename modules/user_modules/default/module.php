@@ -120,6 +120,8 @@
         	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
 				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
+				$body = preg_replace("#<TH[^>]*><input(.+)checkbox(.+)></TH>#","",$body);
+                                $body = preg_replace("#<TD[^>]*><input(.+)checkbox(.+)></TD>#","",$body);
         			preg_match_all("#<TR#",$body,$hsservices);
 				$this->hsicinga = count($hsservices[0])-1;
 				if(count($hsservices[0]) > 0)
