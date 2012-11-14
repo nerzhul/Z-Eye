@@ -60,7 +60,7 @@
 
 		private function showIcingaReporting() {
 			// report nagios
-		        $content = file_get_contents("http://localhost/cgi-bin/icinga/status.cgi");
+		        $content = file_get_contents("http://127.0.0.1/cgi-bin/icinga/status.cgi");
         		preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
 			if(isset($body[0][0])) {
 			        $body = $body[0][0];
@@ -88,10 +88,10 @@
 
 				// At this time this is the table with status of all services
 
-				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
+//				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
 				$totalservices = $hsservices = 0;
-				preg_match_all("#<TR>#",$body,$totalservices);
-				$this->totalicinga = count($totalservices[0]);
+				preg_match_all("#<TR#",$body,$totalservices);
+				$this->totalicinga = count($totalservices[0])-1;
 
 				// report nagios
                 	        $content = file_get_contents("http://localhost/cgi-bin/icinga/status.cgi?servicestatustypes=28");
@@ -120,8 +120,8 @@
         	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
 				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
-        			preg_match_all("#<TR>#",$body,$hsservices);
-				$this->hsicinga = count($hsservices[0]);
+        			preg_match_all("#<TR#",$body,$hsservices);
+				$this->hsicinga = count($hsservices[0])-1;
 				if(count($hsservices[0]) > 0)
 			        	$output = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga").": ".$this->hsicinga."/".$this->totalicinga."</h4>".$body;
 				else $output = "";
