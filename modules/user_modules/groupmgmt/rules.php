@@ -23,7 +23,7 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Gestion des groupes</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_groupmgmt_read",array("check" => in_array("mrule_groupmgmt_read",$activerules),"label" => "Lire les données")⁾."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_groupmgmt_read",array("check" => in_array("mrule_groupmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>";
 			$output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_groupmgmt_write",array("check" => in_array("mrule_groupmgmt_write",$activerules),"label" => "Modifier les données"))."</td></tr>";
                         return $output;
                 }

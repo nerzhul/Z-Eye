@@ -53,7 +53,7 @@
 						setTimeout(function() {
 							$('#notification').slideUp();
 						},".$timeout.");
-					</script>"
+					</script>";
 		}
 		public function callbackNotification($link,$id,$timeout = 5000) {
 			return "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {

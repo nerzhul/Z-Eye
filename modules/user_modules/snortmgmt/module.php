@@ -70,7 +70,7 @@
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"dbuser",$dbuser);
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"dbpwd",$dbpwd,true);
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("lan-list"),"srvlist",array("width" => 250, "height" => 100));
-				$output .= .FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table></form>";
 			}
 			else if($sh == 2) {
@@ -229,7 +229,7 @@
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sip"),"siplist",array("value" => $siplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-sip"),"sipports",array("value" => $sipports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save");
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 				$output .= "</table></form>";
 			}
 			else if($sh == 10) {

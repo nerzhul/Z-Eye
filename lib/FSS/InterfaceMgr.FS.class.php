@@ -345,7 +345,7 @@
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<input type=\"checkbox\" name=\"".$name."\" ";
-			if(isset($options["check"]) && $options["check"]))
+			if(isset($options["check"]) && $options["check"])
 				$output .= "checked ";
 			$output .= " />";
 			return $output;
