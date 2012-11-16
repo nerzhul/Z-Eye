@@ -508,7 +508,7 @@
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
-			
+			$search = preg_replace("#[-]#",":",$search);
 			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed","macaddr = '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {

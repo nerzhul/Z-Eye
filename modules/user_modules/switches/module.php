@@ -192,10 +192,10 @@
 						$voicevlan = getSwitchportVoiceVlanWithPID($device,$portid);
 						$output .= FS::$iMgr->addList("nvlan","");
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
-	                    while($data = pg_fetch_array($query)) {
+				                while($data = pg_fetch_array($query)) {
 							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
 							$voicevlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
-                        }
+			                        }
 						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
 						$output .= FS::$iMgr->textarea("vllist",$vlanlist,array("width" => 250, "height" => 100));
@@ -221,7 +221,7 @@
 						if($portid != -1) {
 							$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
 							$output .= "</form>";
-							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod");
+							//$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod");
 						}
 						else
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
@@ -1056,6 +1056,12 @@
                         $formoutput .= "</ul></form>";
                         $output = FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
+			$formoutput .= FS::$iMgr->submit("",$this->loc->s("save-all-switches"));
+			$formoutput .= "</form>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20","saveall",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
+
                         $query = FS::$pgdbMgr->Select("device","*","","name");
 
 			$foundsw = 0;
@@ -1181,7 +1187,7 @@
 					if(FS::$pgdbMgr->GetOneData("device_port","type","ip = '".$sw."' AND port = '".$port."'") != NULL) {
 						if($this->setPortDuplex($sw,$port,$dup) == 0) {
 							if($save == "true")
-									writeMemory($sw);
+								writeMemory($sw);
 
 							$duplex = "auto";
 							if($dup == 1) $duplex = "half";
@@ -1553,15 +1559,15 @@
 					else if ($trunk == 2) {
 						FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$nvlan."','t',NOW(),NOW()");
 					}
-					
+
 					foreach($logvals as $keys => $values) {
 						if($values["src"] != $values["dst"])
 							$logoutput .= "\n".$keys.": ".$values["src"]." => ".$values["dst"];
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,$logoutput);
-					if(FS::isAjaxCall())
+					/*if(FS::isAjaxCall())
 						echo "Done !";
-					else
+					else*/
 						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				case 10: // replace vlan portlist
@@ -1784,7 +1790,6 @@
 						echo "<span style=\"color:red\">IP Error ".$dip."</span>";
 						return;
 					}
-					
 					$out = "";
 					exec("ping -W 1 -c 1 ".$dip." | grep ttl | wc -l|awk '{print $1}'",$out);
 					if(!is_array($out) || count($out) > 1)
@@ -1795,6 +1800,16 @@
 						echo "<span style=\"color:red;\">".$this->loc->s("Offline")."</span>";
 					else if($out[0] == 1)
 						echo "<span style=\"color:green;\">".$this->loc->s("Online")."</span>";
+					return;
+				case 20: // Save all devices
+					$query = FS::$pgdbMgr->Select("device","name");
+					while($data = pg_fetch_array($query)) {
+						writeMemory($data["name"]);
+					}
+					if(FS::isAjaxCall())
+						echo $this->loc->s("saveorder-terminated");
+					else
+						header("Location: index.php?mod=".$this->mid);
 					return;
 				default: break;
 			}

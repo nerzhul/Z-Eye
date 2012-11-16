@@ -201,6 +201,7 @@
 			$output .= "$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
 			if($def_value)
 				$output .= "$('#".$name."').datepicker('setDate','".$def_value."');";
+			$output .= "$('#".$name."').hide();";
 			$output .= "</script>";
 			return $output;
 		}
@@ -373,10 +374,10 @@
 			$output .= "</div></div></div><script type=\"text/javascript\">$('#".$id."').mapbox({mousewheel: true});</script>";
 			return $output;
 		}
-		
+
 		public function imgWithLens($path,$sizeX = 0,$sizeY = 0, $id = "", $lsize=200) {
 			$output = FS::$iMgr->img($path,$sizeX,$sizeY,$id);
-            $output .= "<script type=\"text/javascript\">$('#".$id."').imageLens(";
+		        $output .= "<script type=\"text/javascript\">$('#".$id."').imageLens(";
 			if(FS::$secMgr->isNumeric($lsize))
 				$output .= "{ lensSize: ".$lsize." }";
 			$output .=");</script>";
@@ -384,7 +385,7 @@
 		}
 		
 		public function upload($name) {
-			return "<input type=\"file\" name=\"".$name."\" />";	
+			return "<input type=\"file\" name=\"".$name."\" />";
 		}
 		
 		public function canvas($name, $width=480, $height=480) {

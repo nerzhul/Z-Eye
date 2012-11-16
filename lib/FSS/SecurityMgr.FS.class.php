@@ -136,7 +136,7 @@
 		}
 
 		public function isMacAddr($str) {
-			if(preg_match('#^([0-9A-F]{2}:){5}[0-9A-F]{2}$#i', $str))
+			if(preg_match('#^([0-9A-F]{2}:){5}[0-9A-F]{2}$#i', $str) || preg_match('#^([0-9A-F]{2}-){5}[0-9A-F]{2}$#i', $str))
 				return true;
 
 			return false;

@@ -45,26 +45,41 @@
 			$output .= " - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
 			return $output;
 		}
-		
+
 		public function showNotification($text,$timeout = 5000) {
 			return "<script type=\"text/javascript\">
-						$('#subnotification').html(data); 
-						$('#notification').slideDown();
-						setTimeout(function() {
-							$('#notification').slideUp();
-						},".$timeout.");
-					</script>";
+				$('#subnotification').html('".addslashes($text)."');
+				$('#notification').slideDown();
+				setTimeout(function() {
+					$('#notification').slideUp();
+				},".$timeout.");
+			</script>";
 		}
-		public function callbackNotification($link,$id,$timeout = 5000) {
-			return "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {
-					event.preventDefault();
-					$.post('".$link."&at=3', $('#".$id."').serialize(), function(data) {
-						$('#subnotification').html(data); $('#notification').slideDown();
-						setTimeout(function() {
-							$('#notification').slideUp();
-						},".$timeout.");
-					});
-				});</script>";
+		public function callbackNotification($link,$id,$options = array()) {
+			$output = "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {";
+			// Locking screen if needed
+			if(isset($options["lock"]) && $options["lock"] == true) {
+                                $output .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); $('#pop').show();";
+                        }
+			// Starting notification
+			if(isset($options["snotif"]) && strlen($options["snotif"]) > 0) {
+				$output .= "$('#subnotification').html('".addslashes($options["snotif"])."');
+                                $('#notification').slideDown();
+       	                        setTimeout(function() {
+               	                        $('#notification').slideUp();
+                       	        },".(isset($options["stimeout"]) && $options["stimeout"] > 1000 ? $options["stimeout"] : 5000).");";
+			}
+			$output .= "event.preventDefault();
+				$.post('".$link."&at=3', $('#".$id."').serialize(), function(data) {
+					$('#subnotification').html(data); $('#notification').slideDown();
+					setTimeout(function() {
+						$('#notification').slideUp();
+					},".(isset($options["timeout"]) && $options["timeout"] > 1000 ? $options["timeout"] : 5000).");";
+					if(isset($options["lock"]) && $options["lock"] == true) {
+                         		       $output .= "$('#pop').hide();";
+	                		}
+			$output .= "}); });</script>";
+			return $output;
 		}
 
 		protected function showConnForm() {
@@ -115,7 +130,7 @@
 			$output = "<div id=\"searchform\">
 				<div id=\"searchpanel\">
 					<div class=\"contentlog clearfixlogform\">";
-			$output .= $this->form("index.php?mod=".$this->getModuleIdByPath("search"));
+			$output .= $this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1));
                         $output .= $this->addHidden("mod",$this->getModuleIdByPath("search"));
 			$output .= $this->input("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
 			$output .= "</div></div>";
