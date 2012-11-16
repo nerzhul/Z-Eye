@@ -156,3 +156,5 @@ Beta 2.1
 - Rename addTableSubmit to tableSubmit, and cleanup code
 - Create function tabledTextArea
 - IPManager now show the switch & port on IP tables
+- It's possible to save all switches by a simple button
+- isMacAddr recognize aa-bb-cc-dd-ee-ff addresses
