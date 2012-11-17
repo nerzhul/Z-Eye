@@ -36,7 +36,7 @@ h3:hover {
 	height: 100%;
 	background-color: black;
 	opacity: 0.9;
-	z-index: 999;
+	z-index: 900;
 	margin-top: -50px;
 	margin-left: -8px;
 }
@@ -66,7 +66,8 @@ h3:hover {
         font-weight: bold;
         color: white;
         width: 100%;
-		display: none;
+	display: none;
+	z-index: 999;
 }
 
 #subnotification {

@@ -84,10 +84,10 @@
 						$('#mabtr').show();
 					}";
 					$output .= "};";
-					$output .= "function showwait() {";
+					/*$output .= "function showwait() {";
 					$output .= "$('#subpop').html('".$this->loc->s("mod-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
 					$output .= "$('#pop').show();";
-					$output .= "};";
+					$output .= "};";*/
 					$output .= "</script>";
 					$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if($data = pg_fetch_array($query)) {
@@ -219,9 +219,10 @@
 						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->check("wr")."</td></tr>";
 						$output .= "</table>";
 						if($portid != -1) {
-							$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
+							//$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
+							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
 							$output .= "</form>";
-							//$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod");
+							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
 						}
 						else
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
@@ -1565,9 +1566,9 @@
 							$logoutput .= "\n".$keys.": ".$values["src"]." => ".$values["dst"];
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,$logoutput);
-					/*if(FS::isAjaxCall())
+					if(FS::isAjaxCall())
 						echo "Done !";
-					else*/
+					else
 						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				case 10: // replace vlan portlist

@@ -59,25 +59,25 @@
 			$output = "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {";
 			// Locking screen if needed
 			if(isset($options["lock"]) && $options["lock"] == true) {
-                                $output .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); $('#pop').show();";
-                        }
+				$output .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); $('#pop').show();";
+			}
 			// Starting notification
 			if(isset($options["snotif"]) && strlen($options["snotif"]) > 0) {
 				$output .= "$('#subnotification').html('".addslashes($options["snotif"])."');
-                                $('#notification').slideDown();
-       	                        setTimeout(function() {
-               	                        $('#notification').slideUp();
-                       	        },".(isset($options["stimeout"]) && $options["stimeout"] > 1000 ? $options["stimeout"] : 5000).");";
+				$('#notification').slideDown();
+				setTimeout(function() {
+						$('#notification').slideUp();
+				},".(isset($options["stimeout"]) && $options["stimeout"] > 1000 ? $options["stimeout"] : 5000).");";
 			}
 			$output .= "event.preventDefault();
 				$.post('".$link."&at=3', $('#".$id."').serialize(), function(data) {
-					$('#subnotification').html(data); $('#notification').slideDown();
-					setTimeout(function() {
-						$('#notification').slideUp();
-					},".(isset($options["timeout"]) && $options["timeout"] > 1000 ? $options["timeout"] : 5000).");";
-					if(isset($options["lock"]) && $options["lock"] == true) {
-                         		       $output .= "$('#pop').hide();";
-	                		}
+				$('#subnotification').html(data); $('#notification').slideDown();
+				setTimeout(function() {
+					$('#notification').slideUp();
+				},".(isset($options["timeout"]) && $options["timeout"] > 1000 ? $options["timeout"] : 5000).");";
+				if(isset($options["lock"]) && $options["lock"] == true) {
+					output .= "$('#pop').hide();";
+				}
 			$output .= "}); });</script>";
 			return $output;
 		}
