@@ -1049,21 +1049,15 @@
 
 		protected function showDeviceList() {
 			$formoutput = "<script type=\"text/javascript\">function showwait() {";
-                        $formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-                        $formoutput .= "$('#pop').show();";
-                        $formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18");
-                        $formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
-                        $formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
-                        $formoutput .= "</ul></form>";
-                        $output = FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
+			$formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
+			$formoutput .= "$('#pop').show();";
+			$formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18");
+			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
+			$formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
+			$formoutput .= "</ul></form>";
+			$output = FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
-			$formoutput .= FS::$iMgr->submit("",$this->loc->s("save-all-switches"));
-			$formoutput .= "</form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20","saveall",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true));
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
-
-                        $query = FS::$pgdbMgr->Select("device","*","","name");
+			$query = FS::$pgdbMgr->Select("device","*","","name");
 
 			$foundsw = 0;
 			$foundwif = 0;
@@ -1088,6 +1082,13 @@
 					$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
 							$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
 				}
+			}
+			if($foundsw != 0 || $foundwif != 0) {
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
+				$formoutput .= FS::$iMgr->submit("",$this->loc->s("save-all-switches"));
+				$formoutput .= "</form>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20","saveall",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
 			}
 			if($foundsw != 0) {
 				$output .= $outputswitch;
@@ -1124,7 +1125,7 @@
                         }
 
 			if($foundsw == 0 && $foundwif == 0)
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-device"));
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
 			return $output;
 		}
 		
