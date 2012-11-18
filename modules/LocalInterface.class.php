@@ -76,7 +76,7 @@
 					$('#notification').slideUp();
 				},".(isset($options["timeout"]) && $options["timeout"] > 1000 ? $options["timeout"] : 5000).");";
 				if(isset($options["lock"]) && $options["lock"] == true) {
-					output .= "$('#pop').hide();";
+					$output .= "$('#pop').hide();";
 				}
 			$output .= "}); });</script>";
 			return $output;
