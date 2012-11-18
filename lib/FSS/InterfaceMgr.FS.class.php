@@ -307,8 +307,8 @@
 
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
-			if($js)
-				$output .= $this->addJSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,(isset($options["js"]) ? $options["js"] : NULL));
+			if(isset($options["js"]))
+				$output .= $this->addJSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,$options["js"]);
 			else
 				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$label);
 			$output .= "</center></th></tr>";
