@@ -248,34 +248,34 @@
 				$found = 0;
 				$tmpoutput = "<h4>".$this->loc->s("title-userlist")."</h4>";
 				$tmpoutput .= "<script type=\"text/javascript\">
-				$.event.props.push('dataTransfer');
-				$('#raduser #dragtd').on({
-					mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
-					mouseleave: function(e) { $('#trash').hide(); $('#editf').hide(); },
-					dragstart: function(e) { $('#trash').show(); $('#editf').show(); e.dataTransfer.setData('text/html', $(this).text()); },
-					dragenter: function(e) { e.preventDefault();},
-					dragover: function(e) { e.preventDefault(); },
-					dragleave: function(e) { },
-					drop: function(e) {},
-					dragend: function() { $('#trash').hide(); $('#editf').hide();}
-				});
-				$('#trash').on({
-					dragover: function(e) { e.preventDefault(); },
-					drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-						FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=4").
-						FS::$iMgr->addHidden("user","'+e.dataTransfer.getData('text/html')+'").
-						FS::$iMgr->check("logdel",array("label" => $this->loc->s("Delete-logs")." ?"))."<br />".
-						FS::$iMgr->check("acctdel",array("label" => $this->loc->s("Delete-accounting")." ?"))."<br />".
-						FS::$iMgr->submit("",$this->loc->s("Delete")).
-						FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-						$('#pop').show();
-					}
-				});
-				$('#editf').on({
-					dragover: function(e) { e.preventDefault(); },
-					drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry='+e.dataTransfer.getData('text/html')); }
-				});
-				</script>";
+					$.event.props.push('dataTransfer');
+					$('#raduser #dragtd').on({
+						mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
+						mouseleave: function(e) { $('#trash').hide(); $('#editf').hide(); },
+						dragstart: function(e) { $('#trash').show(); $('#editf').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+						dragenter: function(e) { e.preventDefault();},
+						dragover: function(e) { e.preventDefault(); },
+						dragleave: function(e) { },
+						drop: function(e) {},
+						dragend: function() { $('#trash').hide(); $('#editf').hide();}
+					});
+					$('#trash').on({
+						dragover: function(e) { e.preventDefault(); },
+						drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
+							FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=4").
+							FS::$iMgr->addHidden("user","'+e.dataTransfer.getData('text/html')+'").
+							FS::$iMgr->check("logdel",array("label" => $this->loc->s("Delete-logs")." ?"))."<br />".
+							FS::$iMgr->check("acctdel",array("label" => $this->loc->s("Delete-accounting")." ?"))."<br />".
+							FS::$iMgr->submit("",$this->loc->s("Delete")).
+							FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
+							$('#pop').show();
+						}
+					});
+					$('#editf').on({
+						dragover: function(e) { e.preventDefault(); },
+						drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry='+e.dataTransfer.getData('text/html')); }
+					});
+					</script>";
                 $query = $radSQLMgr->Select("radcheck","id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')");
 				$expirationbuffer = array();
 				while($data = mysql_fetch_array($query)) {

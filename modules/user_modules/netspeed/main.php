@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 4;
 				$this->moduleclass = new iNetSpeed();
 				$this->rulesclass = new rNetspeed();
-                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

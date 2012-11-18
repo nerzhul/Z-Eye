@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 4;
 				$this->moduleclass = new iSecReport();
 				$this->rulesclass = new rSecurityReport();
-	                        $this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

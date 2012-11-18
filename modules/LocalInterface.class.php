@@ -91,17 +91,17 @@
                         $output .= $this->loadMenus($menulist);
 			$output .= "<div id=\"menuStack\"><div id=\"menuElmt\"><ul class=\"login\">";
 
-                        $output .= "<li id=\"logintoggle\">";
-                        if(!FS::$sessMgr->isConnected())
-                                $output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>";
-                        else
-                                $output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
-                        $output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
-                        </li></ul></div></div>";
+			$output .= "<li id=\"logintoggle\">";
+			if(!FS::$sessMgr->isConnected())
+					$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>";
+			else
+					$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
+			$output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
+			</li></ul></div></div>";
 			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
 			$output .= "<h1>Bienvenue sur Z-Eye</h1>";
 
-                        $output .= "<p class=\"grey\">Cette interface permet de monitorer et d'administrer les services</p>";
+			$output .= "<p class=\"grey\">Cette interface permet de monitorer et d'administrer les services</p>";
 
 			$output .= "</div><div class=\"left\">";
 			

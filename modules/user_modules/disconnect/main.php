@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 0;
 				$this->moduleclass = new iDisconnect();
 				$this->rulesclass = new rDisconnect();
-		                       $this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

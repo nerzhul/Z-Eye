@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 4;
 				$this->moduleclass = new iSwitchMgmt();
 				$this->rulesclass = new rSwitchMgmt();
-                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+                $this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

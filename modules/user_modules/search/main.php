@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 4;
 				$this->moduleclass = new iSearch();
 				$this->rulesclass = new rSearch();
-                        	$this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

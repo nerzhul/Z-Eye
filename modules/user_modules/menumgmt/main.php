@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 6;
 				$this->moduleclass = new iMenuMgmt();
 				$this->rulesclass = new rMenuMgmt();
-	                        $this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

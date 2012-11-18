@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 5;
 				$this->moduleclass = new iGroupMgmt();
 				$this->rulesclass = new rGroupMgmt();
-	                        $this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

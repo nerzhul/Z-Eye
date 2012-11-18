@@ -222,12 +222,17 @@
 			return $output;
 		}
 
-		public function submit($name, $value) {
-			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" value=\"".$value."\" />";
+		public function submit($name, $value, $options = array()) {
+			$output = "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" />";
+			if(isset($options["tooltip"])) {
+				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".
+					$options["tooltip"]."\"});</script>";
+			}
+			return $output;
 		}
 
 		public function addJSSubmit($name, $value, $function) {
-			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$function."\" />";
+			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" onclick=\"".$function."\" />";
 		}
 
 		public function button($name, $value, $js) {

@@ -1048,14 +1048,26 @@
 		}
 
 		protected function showDeviceList() {
-			$formoutput = "<script type=\"text/javascript\">function showwait() {";
-			$formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-			$formoutput .= "$('#pop').show();";
-			$formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18");
-			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
-			$formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
-			$formoutput .= "</ul></form>";
-			$output = FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
+			$output = "";
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-some-backup-fail")); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-some-field-missing")); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-no-rights")); break;
+				case -1: $output .= FS::$iMgr->printSuccess($this->loc->s("done-with-success")); break;
+				default: break;
+			}
+
+			if(FS::$sessMgr->hasRight("mrule_switches_discover")) {
+				$formoutput = "<script type=\"text/javascript\">function showwait() {";
+				$formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
+				$formoutput .= "$('#pop').show();";
+				$formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
+				$formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
+				$formoutput .= "</ul></form>";
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
+			}
 
 			$query = FS::$pgdbMgr->Select("device","*","","name");
 
@@ -1072,7 +1084,7 @@
 				if(preg_match("#AIR#",$data["model"])) {
 					if($foundwif == 0) $foundwif = 1;
 					$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>";
-	                                $outputwifi .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
+					$outputwifi .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
 				}
 				else {
 					if($foundsw == 0) $foundsw = 1;
@@ -1084,45 +1096,61 @@
 				}
 			}
 			if($foundsw != 0 || $foundwif != 0) {
-				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
-				$formoutput .= FS::$iMgr->submit("",$this->loc->s("save-all-switches"));
-				$formoutput .= "</form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20","saveall",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true));
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
+				$rightsok = false;
+				if(FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
+					$rightsok = true;
+					// Write all devices button
+					$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
+					$formoutput .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => $this->loc->s("tooltip-save")));
+					$formoutput .= "</form>";
+					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20","saveall",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true));
+				}
+				if(FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
+					$rightsok = true;
+					// Backup all devices button
+					$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=21",array("id" => "backupall"));
+					$formoutput .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => $this->loc->s("tooltip-backup")));
+					$formoutput .= "</form>";
+					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21","backupall",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true));
+				}
+				if($rightsok) {
+					// Openable divs
+					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
+				}
 			}
 			if($foundsw != 0) {
 				$output .= $outputswitch;
 				$output .= "</table>";
 			}
 			if($foundwif != 0) {
-                                $output .= $outputwifi;
-                                $output .= "</table>";
+				$output .= $outputwifi;
+				$output .= "</table>";
 			}
 			if($foundsw != 0 || $foundwif != 0) {
 				$output .= "<script type=\"text/javascript\">
-                                $.event.props.push('dataTransfer');
-                                $('#dev #draga').on({
-                                        mouseover: function(e) { $('#trash').show(); },
-                                        mouseleave: function(e) { $('#trash').hide(); },
-                                        dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
-                                        dragenter: function(e) { e.preventDefault();},
-                                        dragover: function(e) { e.preventDefault(); },
-                                        dragleave: function(e) { },
-                                        drop: function(e) {},
-                                        dragend: function() { $('#trash').hide(); }
-                                });
-                                $('#trash').on({
-                                        dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                                FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
-                                                FS::$iMgr->addHidden("device","'+e.dataTransfer.getData('text/html')+'").
-                                                FS::$iMgr->submit("",$this->loc->s("Remove")).
-                                                FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-                                                $('#pop').show();
-                                        }
-                                });
-                                </script>";
-                        }
+					$.event.props.push('dataTransfer');
+					$('#dev #draga').on({
+							mouseover: function(e) { $('#trash').show(); },
+							mouseleave: function(e) { $('#trash').hide(); },
+							dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+							dragenter: function(e) { e.preventDefault();},
+							dragover: function(e) { e.preventDefault(); },
+							dragleave: function(e) { },
+							drop: function(e) {},
+							dragend: function() { $('#trash').hide(); }
+					});
+					$('#trash').on({
+							dragover: function(e) { e.preventDefault(); },
+							drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
+									FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
+									FS::$iMgr->addHidden("device","'+e.dataTransfer.getData('text/html')+'").
+									FS::$iMgr->submit("",$this->loc->s("Remove")).
+									FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
+									$('#pop').show();
+							}
+					});
+					</script>";
+			}
 
 			if($foundsw == 0 && $foundwif == 0)
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
@@ -1775,10 +1803,15 @@
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Remove device '".$device."' from Z-Eye");
 					header("Location: index.php?mod=".$this->mid);
 				case 18: // Device discovery
+					if(!FS::$sessMgr->hasRight("mrule_switches_discover")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");
+						header("Location: index.php?mod=".$this->mid."&err=3");
+						return;
+					}
 					$dip = FS::$secMgr->getPost("dip","i4");
 					if(!$dip) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (device discovery)");
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
 					exec("netdisco -d ".$dip);
@@ -1804,6 +1837,11 @@
 						echo "<span style=\"color:green;\">".$this->loc->s("Online")."</span>";
 					return;
 				case 20: // Save all devices
+					if(!FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to save all devices !");
+						header("Location: index.php?mod=".$this->mid."&err=3");
+						return;
+					}
 					$query = FS::$pgdbMgr->Select("device","name");
 					while($data = pg_fetch_array($query)) {
 						writeMemory($data["name"]);
@@ -1811,7 +1849,66 @@
 					if(FS::isAjaxCall())
 						echo $this->loc->s("saveorder-terminated");
 					else
-						header("Location: index.php?mod=".$this->mid);
+						header("Location: index.php?mod=".$this->mid."&err=-1");
+					return;
+				case 21: // Backup all devices
+					if(!FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to backup all devices !");
+						header("Location: index.php?mod=".$this->mid."&err=3");
+						return;
+					}
+					$output = "";
+					$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","addr,type,path,login,pwd");
+					while($data = pg_fetch_array($query)) {
+						if(!FS::$secMgr->isIP($data["addr"]))
+							continue;
+							
+						$query2 = FS::$pgdbMgr->Select("device","ip,name");
+						while($data2 = pg_fetch_array($query2)) {
+							if($data["type"] == 1)
+								$copyId = exportConfigToTFTP($data2["name"],$data["addr"],$data["path"]."conf-".$data2["name"]);
+							else if($data["type"] == 2 || $data["type"] == 4 || $data["type"] == 5)
+								$copyId = exportConfigToAuthServer($data2["name"],$data["addr"],$data["type"],$data["path"]."conf-".$data2["name"],$data["login"],$data["pwd"]);
+							
+							sleep(1);
+							$copyState = getCopyState($data2["name"],$copyId);
+							while($copyState == 2) {
+								sleep(1);
+								$copyState = getCopyState($data2["name"],$copyId);
+							}
+							
+							if($copyState == 4) {
+								$copyErr = getCopyError($data2["name"],$copyId);
+								$output .= "Backup fail for device ".$data2["name"]." (reason: ";
+								switch($copyErr) {
+									case 2: $output .= "bad filename/path/rights"; break;
+									case 3: $output .= "timeout"; break;
+									case 4: $output .= "no memory available"; break;
+									case 5: $output .= "config error"; break;
+									case 6: $output .= "unsupported protocol"; break;
+									case 7:	$output .= "config apply fail"; break;
+									default: $output .= "unknown"; break;
+								}
+								$output .= ")<br />";
+							}
+						}
+					}
+					if(FS::isAjaxCall()) {
+						if(strlen($output) > 0) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"switches",1,"Some devices cannot be backup: ".$output);
+							echo $this->loc->s("err-thereis-errors")."<br />".$output;
+						}
+						else
+							echo $this->loc->s("backuporder-terminated");
+					}
+					else {
+						if(strlen($output) > 0) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"switches",1,"Some devices cannot be backup: ".$output);
+							header("Location: index.php?mod=".$this->mid."&err=1");
+						}
+						else
+							header("Location: index.php?mod=".$this->mid);
+					}
 					return;
 				default: break;
 			}

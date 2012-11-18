@@ -30,7 +30,7 @@
 				$this->conf->seclevel = 5;
 				$this->moduleclass = new iUserMgmt();
 				$this->rulesclass = new rUserMgmt();
-                	        $this->conf->connected = $this->rulesclass->getConnectedState();
+				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}
