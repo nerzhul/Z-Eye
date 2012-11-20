@@ -1846,6 +1846,8 @@
 					while($data = pg_fetch_array($query)) {
 						writeMemory($data["name"]);
 					}
+					
+					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"User ".FS::$sessMgr->getUserName()." saved all devices");
 					if(FS::isAjaxCall())
 						echo $this->loc->s("saveorder-terminated");
 					else
@@ -1898,16 +1900,20 @@
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",1,"Some devices cannot be backup: ".$output);
 							echo $this->loc->s("err-thereis-errors")."<br />".$output;
 						}
-						else
+						else {
+							FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"User ".FS::$sessMgr->getUserName()." backup all devices");
 							echo $this->loc->s("backuporder-terminated");
+						}
 					}
 					else {
 						if(strlen($output) > 0) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",1,"Some devices cannot be backup: ".$output);
 							header("Location: index.php?mod=".$this->mid."&err=1");
 						}
-						else
+						else {
+							FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"User ".FS::$sessMgr->getUserName()." backup all devices");
 							header("Location: index.php?mod=".$this->mid);
+						}
 					}
 					return;
 				default: break;
