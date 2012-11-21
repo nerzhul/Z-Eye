@@ -110,7 +110,7 @@
 			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Address"),"addr","");
 			
 			// Checks
-			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand")."</td></tr>";
+			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand","check-host-alive")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",array("value" => 3));
 			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",array("value" => 1));
@@ -509,11 +509,11 @@
 			return $output;
 		}
 		
-		private function genCommandList($name) {
+		private function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->addList($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name","","name");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["name"],$data["name"]);
+				$output .= FS::$iMgr->addElementToList($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
 			}
 			$output .= "</select>";
 			return $output;
