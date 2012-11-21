@@ -1382,7 +1382,7 @@
 					$notifperiod = FS::$secMgr->getPost("notifperiod","w");
 					$ctg = FS::$secMgr->getPost("ctg","w");
 					
-					if(!$name || !$host || !$checkcmd || !$checkperiod || !$notifperiod || !$ctg) {
+					if(!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$notifperiod || !$ctg) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
