@@ -117,6 +117,14 @@
                         	$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
 	                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
+				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
+                                $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*><tr[^>]*>(.*?)<\/tr><\/TD>\n<\/TR>\n<\/TABLE>#i',"$4",$body);
+                                // flapping cleanup
+                                $body = preg_replace('#<tr[^>]*><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><\/tr><tr><td[^>]*>(.*)<\/tr$
+                                $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)\n<\/TR>\n<\/TABLE>\n<\/TD>\n<\/TR>\n<\/TABLE>\n<\/TD>#i',"$$
+                                $body = preg_replace('#<TABLE[^>]*><TR>(.*?)\n<\/TR><\/TABLE>#i',"$1",$body);
+                                $body = preg_replace('#<TABLE[^>]*>\n<TR>\n(.*)<\/TR>\n<\/TABLE>#i',"$1",$body);
+                                $body = preg_replace('#<TD[^>]*>\n<TD[^>]*>\n(.*)\n<\/TD>\n<\/TR><\/TABLE>#i',"<TD>$1</TD>",$body);
         	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
 				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
