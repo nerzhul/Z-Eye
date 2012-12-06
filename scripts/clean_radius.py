@@ -84,9 +84,8 @@ def cleanRadius(dbhost,dbport,dbname):
 now = datetime.datetime.now()
 zeye_log("[Z-Eye][Radius-Cleaner] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 try:
-        global threadCounter
         pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
-		pgcursor = pgsqlCon.cursor()
+	pgcursor = pgsqlCon.cursor()
         pgcursor.execute("SELECT addr,port,dbname FROM z_eye_radius_options GROUP BY addr,port,dbname")
         try:
                 pgres = pgcursor.fetchall()

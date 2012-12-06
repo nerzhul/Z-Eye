@@ -161,3 +161,8 @@ Beta 2.2
 - It's possible to save all switches by a simple button
 - isMacAddr recognize aa-bb-cc-dd-ee-ff addresses
 - it's possible to backup all switches by a simple button
+
+Beta 2.3
+- PortSecurity can now be managed
+- CDP can be enabled/disabled on each port
+- tooltip can be used on check and lists

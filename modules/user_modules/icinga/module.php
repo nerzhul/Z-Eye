@@ -1375,13 +1375,13 @@
 					return;
 				// add service
 				case 16:
-					$name = FS::$secMgr->checkAndSecurisePostData("desc");
+					$name = trim(FS::$secMgr->checkAndSecurisePostData("desc"));
 					$host = FS::$secMgr->checkAndSecurisePostData("host");
 					$checkcmd = FS::$secMgr->getPost("checkcmd","w");
 					$checkperiod = FS::$secMgr->getPost("checkperiod","w");
 					$notifperiod = FS::$secMgr->getPost("notifperiod","w");
 					$ctg = FS::$secMgr->getPost("ctg","w");
-					
+
 					if(!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$notifperiod || !$ctg) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;

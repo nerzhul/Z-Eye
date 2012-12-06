@@ -102,6 +102,9 @@
 						$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
 						$output .= "<tr><td>".$this->loc->s("Plug")."</td><td>".FS::$iMgr->input("prise",$piece)."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
+						$mtu = getPortMtuWithPID($device,$portid);
+						if($mtu != -1)
+							$output .= "<tr><td>".$this->loc->s("MTU")."</td><td>".$mtu."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Duplex")." / ".$this->loc->s("Speed")."</td><td>";
 						if($data["up_admin"] == "down")
 								$output .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
@@ -134,17 +137,19 @@
 						else
 							$output .= $this->loc->s("Unavailable");
 						$output .= "</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
 						$dup = getPortDuplexWithPID($device,$portid);
-						/*if($dup > 0 && $dup < 5) {
-							$output .= FS::$iMgr->addList("duplex");
-							$output .= FS::$iMgr->addElementToList("Auto",4,$dup == 1 ? true : false);
-							$output .= FS::$iMgr->addElementToList("Half",1,$dup == 2 ? true : false);
-							$output .= FS::$iMgr->addElementToList("Full",2,$dup == 3 ? true : false);
-							$output .= "</select>";
+						if($dup != -1) {
+							$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
+							if($dup > 0 && $dup < 5) {
+								$output .= FS::$iMgr->addList("duplex");
+								$output .= FS::$iMgr->addElementToList("Auto",4,$dup == 1 ? true : false);
+								$output .= FS::$iMgr->addElementToList("Half",1,$dup == 2 ? true : false);
+								$output .= FS::$iMgr->addElementToList("Full",2,$dup == 3 ? true : false);
+								$output .= "</select>";
+							}
+							else
+								$output .= $this->loc->s("Unavailable");
 						}
-						else*/
-							$output .= $this->loc->s("Unavailable");
 						$output .= "</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("switchport-mode")."</td><td>";
 						$trmode = getSwitchportModeWithPID($device,$portid);
@@ -191,6 +196,10 @@
 						$voicevlanoutput = FS::$iMgr->addElementToList($this->loc->s("None"),4096);
 						$voicevlan = getSwitchportVoiceVlanWithPID($device,$portid);
 						$output .= FS::$iMgr->addList("nvlan","");
+						// Added none for VLAN fail
+						if($trmode == 3)
+							$output .= FS::$iMgr->addElementToList($this->loc->s("None"),0,$nvlan == 0 ? true : false);
+
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 				                while($data = pg_fetch_array($query)) {
 							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
@@ -216,6 +225,38 @@
 						$output .= FS::$iMgr->addList("voicevlan","");
 						$output .= $voicevlanoutput;
 						$output .= "</select></td></tr>";
+						$portsecen = getPortSecEnableWithPID($device,$portid);
+                                                if($portsecen != -1) {
+							$output .= "<tr><td colspan=\"2\">".$this->loc->s("portsecurity")."</td></tr>";
+							// check for enable/disable PortSecurity
+							$output .= "<tr><td>".$this->loc->s("portsec-enable")."</td><td>".FS::$iMgr->check("psen",array("check" => $portsecen == 1 ? true : false))."</td></tr>";
+							// Active Status for PortSecurity
+							$output .= "<tr><td>".$this->loc->s("portsec-status")."</td><td>";
+                                                        $portsecstatus = getPortSecStatusWithPID($device,$portid);
+							switch($portsecstatus) {
+								case 1: $output .= $this->loc->s("Active"); break;
+								case 2: $output .= $this->loc->s("Inactive"); break;
+								case 3: $output .= "<span style=\"color:red;\">".$this->loc->s("Violation")."</span>"; break;
+								default: $output .= $this->loc->s("unk"); break;
+							}
+                                                        $output .= "</td></tr>";
+							// Action when violation is performed
+							$psviolact = getPortSecViolActWithPID($device,$portid);
+							$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->addList("psviolact","",NULL,false,array("tooltip" => $this->loc->s("portsec-viol-tooltip")));
+							$output .= FS::$iMgr->addElementToList($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
+							$output .= FS::$iMgr->addElementToList($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
+							$output .= FS::$iMgr->addElementToList($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
+							$output .= "</select>";
+							// Maximum MAC addresses before violation mode
+							$psmaxmac = getPortSecMaxMACWithPID($device,$portid);
+							$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->addNumericInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => $this->loc->s("portsec-maxmac-tooltip")))."</td></tr>";
+						}
+						$cdp = getPortCDPEnableWithPID($device,$portid);
+						if($cdp != -1) {
+							$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("cdp-enable")."</td><td>".FS::$iMgr->check("cdpen",array("check" => $cdp == 1 ? true : false, "tooltip" => $this->loc->s("cdp-tooltip")))."</td></tr>";
+						}
+
 						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->check("wr")."</td></tr>";
 						$output .= "</table>";
 						if($portid != -1) {
@@ -1092,7 +1133,7 @@
 					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
 					<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div><script type=\"text/javascript\">
 					$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
-							$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
+					$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
 				}
 			}
 			if($foundsw != 0 || $foundwif != 0) {
@@ -1310,6 +1351,7 @@
 					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 					$prise = FS::$secMgr->checkAndSecurisePostData("prise");
 					$shut = FS::$secMgr->checkAndSecurisePostData("shut");
+					$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 					$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 					$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
 					$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
@@ -1324,7 +1366,7 @@
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 						return;
 					}
-					
+
 					$pid = getPortId($sw,$port);
 					if($pid == -1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"PID is incorrect (plug edit)");
@@ -1334,11 +1376,11 @@
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
-					
+
 					$logoutput = "Modify port '".$port."' on device '".$sw."'";
 					$logvals = array();
 					$idx = getPortIndexes($sw,$pid);
-					
+
 					if($duplex && FS::$secMgr->isNumeric($duplex)) {
 						if($duplex < 1 || $duplex > 4) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are wrong: duplex (plug edit)");
@@ -1348,7 +1390,7 @@
 								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 							return;
 						}
-						
+
 						if($idx != NULL) {
 							$logvals["duplex"]["src"] = getPortDuplexWithPID($sw,$pid);
 							setPortDuplexWithPid($sw,$idx[0].".".$idx[1],$duplex);
@@ -1363,13 +1405,13 @@
 							$logvals["speed"]["dst"] = $speed;
 						}
 					}
-					
+
 					$logvals["accessvlan"]["src"] = getSwitchAccessVLANWithPID($sw,$pid);
 					$logvals["trunkencap"]["src"] = getSwitchTrunkEncapWithPID($sw,$pid);
 					$logvals["mode"]["src"] = getSwitchportModeWithPID($sw,$pid);
 					$logvals["trunkvlan"]["src"] = getSwitchportTrunkVlansWithPid($sw,$pid);
 					$logvals["nativevlan"]["src"] = getSwitchTrunkNativeVlanWithPID($sw,$pid);
-					
+
 					// Mab & 802.1X
 					$mabst = getSwitchportMABState($sw,$pid);
 					if($mabst != -1)
@@ -1384,9 +1426,9 @@
 					if($controlmode != -1)
 						$logvals["controlmode"]["src"] = $controlmode;
 					$authhostmode = getSwitchportAuthHostMode($sw,$pid);
-					if($authhostmode != -1)					
+					if($authhostmode != -1)
 						$logvals["authhostmode"]["src"] = $authhostmode;
-					
+
 					if($trunk == 1) {
 						$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
 
@@ -1414,8 +1456,8 @@
 							setSwitchportAuthHostMode($sw,$pid,1);
 							$logvals["authhostmode"]["dst"] = 1;
 						}
-                        
-                        // set settings
+
+			                        // set settings
 						if(setSwitchTrunkEncapWithPID($sw,$pid,4) != 0) {
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
@@ -1488,7 +1530,7 @@
 								return;
 						}
 						$logvals["accessvlan"]["dst"] = $nvlan;
-						
+
 					} else if($trunk == 3) {
 						$dot1xhostmode = FS::$secMgr->checkAndSecurisePostData("dot1xhostmode");
 						$mabeap = FS::$secMgr->checkAndSecurisePostData("mabeap");
@@ -1502,8 +1544,8 @@
 						// switchport mode access & no vlan assigned
 						setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
 						$logvals["nativevlan"]["dst"] = 1;
-                        setSwitchNoTrunkVlanWithPID($sw,$pid);
-                        $logvals["trunkvlan"]["dst"] = "";
+			                        setSwitchNoTrunkVlanWithPID($sw,$pid);
+                        			$logvals["trunkvlan"]["dst"] = "";
 						setSwitchportModeWithPID($sw,$pid,2);
 						$logvals["mode"]["dst"] = 2;
 						setSwitchTrunkEncapWithPID($sw,$pid,5);
@@ -1564,6 +1606,34 @@
 					$logvals["desc"]["src"] = getPortDesc($sw,$pid);
 					setPortDescWithPID($sw,$pid,$desc);
 					$logvals["desc"]["dst"] = $desc;
+
+					$cdpstate = getPortCDPEnableWithPID($sw,$pid);
+					if($cdpstate != -1) {
+						$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
+						setPortCDPEnableWithPID($sw,$pid,$cdpen == "on" ? 1 : 2);
+						$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
+					}
+
+					$portsecen = getPortSecEnableWithPID($sw,$pid);
+                                        if($portsecen != -1) {
+						$psen = FS::$secMgr->checkAndSecurisePostData("psen");
+						$logvals["psen"]["src"] = ($portsecen == 1 ? true : false);
+                                                setPortSecEnableWithPID($sw,$pid,$psen == "on" ? 1 : 2);
+                                                $logvals["psen"]["dst"] = ($psen == "on" ? true : false);
+
+						$portsecvact = getPortSecViolActWithPID($sw,$pid);
+						$psviolact = FS::$secMgr->checkAndSecurisePostData("psviolact");
+						$logvals["psviolact"]["src"] = $portsecvact;
+                                                setPortSecViolActWithPID($sw,$pid,$psviolact);
+                                                $logvals["psviolact"]["dst"] = $psviolact;
+
+						$psecmaxmac = getPortSecMaxMACWithPID($sw,$pid);
+                                                $psmaxmac = FS::$secMgr->checkAndSecurisePostData("psmaxmac");
+                                                $logvals["psmaxmac"]["src"] = $psecmaxmac;
+                                                setPortSecMaxMACWithPID($sw,$pid,$psmaxmac);
+                                                $logvals["psmaxmac"]["dst"] = $psmaxmac;
+					}
+
 					if($wr == "on")
 						writeMemory($sw);
 
@@ -1596,7 +1666,7 @@
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,$logoutput);
 					if(FS::isAjaxCall())
-						echo "Done !";
+						echo $this->loc->s("done-with-success");
 					else
 						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;

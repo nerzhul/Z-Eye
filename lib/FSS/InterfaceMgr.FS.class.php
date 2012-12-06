@@ -327,7 +327,7 @@
 			return $output;
 		}
 		
-		public function addList($name,$js = "",$label=NULL, $multival=false) {
+		public function addList($name,$js = "",$label=NULL, $multival=false, $options=array()) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<select name=\"".$name."\" id=\"".$name."\"";
@@ -336,6 +336,8 @@
 			if($multival)
 				$output .= " multiple=\"multiple\" ";
 			$output .= ">";
+			if($options["tooltip"])
+				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
 			return $output;
 		}
 		
@@ -350,10 +352,12 @@
 		public function check($name,$options = array()) {
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<input type=\"checkbox\" name=\"".$name."\" ";
+			$output .= "<input type=\"checkbox\" name=\"".$name."\" id=\"".$name."\" ";
 			if(isset($options["check"]) && $options["check"])
 				$output .= "checked ";
 			$output .= " />";
+			if(isset($options["tooltip"]))
+				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
 			return $output;
 		}
 		

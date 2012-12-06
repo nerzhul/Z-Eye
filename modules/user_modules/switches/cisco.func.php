@@ -33,11 +33,11 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || ($value != 1 && $value != 2))
 				return NULL;
 
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
+			return setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
 		}
-		
+
 		function getPortStateWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7");
+			$dup = getFieldForPortWithPID($device,$pid,"ifAdminStatus");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -50,6 +50,18 @@
 		/*
 		* Link Management
 		*/
+
+		function getPortMtuWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"ifMtu");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                        	return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+
 		function setPortDuplexWithPID($device,$pid,$value) {
 			if($value < 1 || $value > 4)
 				return NULL;
@@ -58,7 +70,7 @@
 		}
 
 		function getPortDuplexWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.10.7.2.1.19");
+			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.522.3.15.5");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -764,9 +776,9 @@
 		function setSwitchportMode($device, $portname, $value) {
 			$pid = getPortId($device,$portname);
 			if($pid == -1)
-				return -1;
+			return -1;
 
-            return setSwitchportModeWithPID($device,$pid,$value);
+	        	return setSwitchportModeWithPID($device,$pid,$value);
 		}
 		
 		function getSwitchportMode($device, $portname, $value) {
@@ -774,7 +786,7 @@
 			if($pid == -1)
 				return -1;
 
-            return getSwitchportModeWithPID($device,$pid,$value);
+	            return getSwitchportModeWithPID($device,$pid,$value);
 		}
 		
 		function setSwitchNoTrunkVlan($device,$portname) {
@@ -793,7 +805,7 @@
 			if($pid == -1)
 				return -1;
 
-            return setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
+			return setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
 		}
 		
 		function setSwitchTrunkVlan($device,$portname,$values) {
@@ -843,7 +855,94 @@
 
 			return setSwitchTrunkEncapWithPID($device,$pid,$value);
 		}
-		
+
+		/*
+		* Port Security
+		*/
+
+		function getPortSecStatusWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.2");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function getPortSecEnableWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortSecEnableWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                                return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
+                }
+
+		function getPortSecViolActWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortSecViolActWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
+                                return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
+                }
+
+		function getPortSecMaxMACWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortSecMaxMACWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 6144)
+                                return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
+                }
+
+
+		/*
+		* special
+		*/
+
+		function getPortCDPEnableWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortCDPEnableWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                        	return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
+                }
+
 		function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
 				return -1;
