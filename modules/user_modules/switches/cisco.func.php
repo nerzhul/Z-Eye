@@ -203,6 +203,26 @@
                         return $vlan;
                 }
 
+		function setSwitchportAuthDeadVLAN($device,$pid,$value) {
+                        // @todo disable feature
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
+                                return 1;
+                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
+                }
+
+                function getSwitchportAuthDeadVLAN($device,$pid) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.3.1.3");
+                        $vlan = explode(" ",$ret);
+                        if(count($vlan) != 2)
+                                return -1;
+
+                        $vlan = $vlan[1];
+                        return $vlan;
+                }
+
 		// authentication port-control 1,2,3
 		function setSwitchportControlMode($device,$pid,$value) {
 			// 1: unauthorized / 2: auto / 3: authorized / 3: disable feature

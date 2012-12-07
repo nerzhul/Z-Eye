@@ -336,7 +336,7 @@
 			if($multival)
 				$output .= " multiple=\"multiple\" ";
 			$output .= ">";
-			if($options["tooltip"])
+			if(isset($options["tooltip"]))
 				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
 			return $output;
 		}

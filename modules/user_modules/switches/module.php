@@ -71,17 +71,23 @@
 					// # todo, place JS before output
 					$output .= "<script type=\"text/javascript\">function arangeform() {";
 					$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
-					$output .= "$('#vltr').show();
-						$('#mabtr').hide();
+					$output .= "$('#vltr').show('slow');
+						if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
+						if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
+						if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
 						$('#vllabel').html('".$this->loc->s("native-vlan")."');
 					} else if(document.getElementsByName('trmode')[0].value == 2) {
-						$('#vltr').hide();
-						$('#mabtr').hide();
+						if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
+						if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
+						if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
+						if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
 						$('#vllabel').html('".$this->loc->s("Vlan")."');
 					} else if(document.getElementsByName('trmode')[0].value == 3) {
-						$('#vltr').hide();
+						if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
 						$('#vllabel').html('".$this->loc->s("fail-vlan")."');
-						$('#mabtr').show();
+						if($('#mabtr').is(':hidden')) $('#mabtr').show('slow');
+						if($('#mabdead').is(':hidden')) $('#mabdead').show('slow');
+						if($('#mabnoresp').is(':hidden')) $('#mabnoresp').show('slow');
 					}";
 					$output .= "};";
 					/*$output .= "function showwait() {";
@@ -103,18 +109,16 @@
 						$output .= "<tr><td>".$this->loc->s("Plug")."</td><td>".FS::$iMgr->input("prise",$piece)."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = getPortMtuWithPID($device,$portid);
-						if($mtu != -1)
-							$output .= "<tr><td>".$this->loc->s("MTU")."</td><td>".$mtu."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Duplex")." / ".$this->loc->s("Speed")."</td><td>";
+						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
 						if($data["up_admin"] == "down")
 								$output .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
 						else if($data["up_admin"] == "up" && $data["up"] == "down")
-								$output .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
+							$output .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
 						else if($data["up"] == "up")
-								$output .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
+							$output .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
 						else
-								$output .= "unk";
-						$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
+							$output .= "unk";
+						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false))."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
                                                 $sp = getPortSpeedWithPID($device,$portid);
@@ -184,7 +188,7 @@
 							case 3:
 								$output .= $this->loc->s("fail-vlan");
 								$portoptlabel = $this->loc->s("MAB-opt");
-								$nvlan = getSwitchportAuthNoRespVLAN($device,$portid);
+								$nvlan = getSwitchportAuthFailVLAN($device,$portid);
 								break;
 						}
 						$output .= "</td><td id=\"vln\">";
@@ -200,17 +204,40 @@
 						if($trmode == 3)
 							$output .= FS::$iMgr->addElementToList($this->loc->s("None"),0,$nvlan == 0 ? true : false);
 
+						$deadvlan = getSwitchportAuthDeadVLAN($device,$portid);
+						$deadvlanoutput = "";
+						$norespvlan = getSwitchportAuthNoRespVLAN($device,$portid);
+						$norespvlanoutput = "";
+
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 				                while($data = pg_fetch_array($query)) {
 							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
 							$voicevlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
+							$deadvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$deadvlan == $data["vlan"] ? true : false);
+							$norespvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$norespvlan == $data["vlan"] ? true : false);
 			                        }
 						$output .= "</select></td></tr>";
-						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
+						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
 						$output .= FS::$iMgr->textarea("vllist",$vlanlist,array("width" => 250, "height" => 100));
 						$output .= "</td></tr>";
+						/*
+						* MAB tables
+						*/
 
-						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
+						// NoResp Vlan
+                                                $output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-noresp")."</td><td>";
+                                                $output .= FS::$iMgr->addList("norespvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-noresp-tooltip")));
+                                                $output .= FS::$iMgr->addElementToList($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
+                                                $output .= $norespvlanoutput;
+                                                $output .= "</select></td></tr>";
+						// Dead Vlan
+						$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-dead")."</td><td>";
+						$output .= FS::$iMgr->addList("deadvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-dead-tooltip")));
+						$output .= FS::$iMgr->addElementToList($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
+						$output .= $deadvlanoutput;
+						$output .= "</select></td></tr>";
+						// Other options
+						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-opt")."</td><td>";
 						$mabeap = getSwitchportMABType($device,$portid);
 						$dot1xhostmode = getSwitchportAuthHostMode($device,$portid);
 						$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
@@ -220,7 +247,9 @@
 						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
 						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
 						$output .= "</select>";
-
+						/*
+						* Voice vlan
+						*/
 						$output .= "</td></tr><tr><td>".$this->loc->s("voice-vlan")."</td><td>";
 						$output .= FS::$iMgr->addList("voicevlan","");
 						$output .= $voicevlanoutput;
@@ -1422,6 +1451,9 @@
 					$norespvlan = getSwitchportAuthNoRespVLAN($sw,$pid);
 					if($norespvlan != -1)
 						$logvals["norespvlan"]["src"] = $norespvlan;
+					$deadvlan = getSwitchportAuthDeadVLAN($sw,$pid);
+                                        if($deadvlan != -1)
+                                                $logvals["deadvlan"]["src"] = $deadvlan;
 					$controlmode = getSwitchportControlMode($sw,$pid);
 					if($controlmode != -1)
 						$logvals["controlmode"]["src"] = $controlmode;
@@ -1447,6 +1479,10 @@
 							setSwitchportAuthNoRespVLAN($sw,$pid,0);
 							$logvals["norespvlan"]["dst"] = 0;
 						}
+						if($deadvlan != -1) {
+                                                        setSwitchportAuthDeadVLAN($sw,$pid,0);
+                                                        $logvals["deadvlan"]["dst"] = 0;
+                                                }
 						if($controlmode != -1) {
 							setSwitchportControlMode($sw,$pid,3);
 							$logvals["controlmode"]["dst"] = 3;
@@ -1496,6 +1532,10 @@
 							setSwitchportAuthNoRespVLAN($sw,$pid,0);
 							$logvals["norespvlan"]["dst"] = 0;
 						}
+						if($deadvlan != -1) {
+                                                        setSwitchportAuthDeadVLAN($sw,$pid,0);
+                                                        $logvals["deadvlan"]["dst"] = 0;
+                                                }
 						if($controlmode != -1) {
 							setSwitchportControlMode($sw,$pid,3);
 							$logvals["controlmode"]["dst"] = 3;
@@ -1534,6 +1574,8 @@
 					} else if($trunk == 3) {
 						$dot1xhostmode = FS::$secMgr->checkAndSecurisePostData("dot1xhostmode");
 						$mabeap = FS::$secMgr->checkAndSecurisePostData("mabeap");
+						$noresp = FS::$secMgr->checkAndSecurisePostData("norespvlan");
+						$dead = FS::$secMgr->checkAndSecurisePostData("deadvlan");
 						if($dot1xhostmode < 1 || $dot1xhostmode > 4) {
 							if(FS::isAjaxCall())
 								echo "Dot1x hostmode is wrong (".$dot1xhostmode.")";
@@ -1571,9 +1613,13 @@
 							$logvals["failvlan"]["dst"] = $nvlan;
 						}
 						if($norespvlan != -1) {
-							setSwitchportAuthNoRespVLAN($sw,$pid,$nvlan);
-							$logvals["norespvlan"]["dst"] = $nvlan;
+							setSwitchportAuthNoRespVLAN($sw,$pid,$noresp);
+							$logvals["norespvlan"]["dst"] = $noresp;
 						}
+						if($deadvlan != -1) {
+                                                        setSwitchportAuthDeadVLAN($sw,$pid,$dead);
+                                                        $logvals["deadvlan"]["dst"] = $dead;
+                                                }
 						if($controlmode != -1) {
 							// authentication port-control auto
 							setSwitchportControlMode($sw,$pid,2);
