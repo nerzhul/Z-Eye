@@ -47,7 +47,7 @@
 			else {
 				$tmpoutput = $this->showNamedInfos($search);
 				if(strlen($tmpoutput) > 0)
-					$output .= $tmpoutput;
+					$output .= "<div id=\"searchres\">".$tmpoutput."</div>";
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 			}
@@ -136,31 +136,62 @@
 			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
 			$devprise = array();
 			while($data = pg_fetch_array($query)) {
-					if($found == 0) {
-							$found = 1;
-							$tmpoutput .= "<div><h4>".$this->loc->s("Ref-plug")."</h4>";
-					}
-					$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-					if(!isset($devprise[$swname]))
-							$devprise[$swname] = array();
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= "<div><h4>".$this->loc->s("Ref-plug")."</h4>";
+				}
+				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				if(!isset($devprise[$swname]))
+					$devprise[$swname] = array();
 
-					$devprise[$swname][$data["port"]] = $data["prise"];
+				$devprise[$swname][$data["port"]] = $data["prise"];
 				$nbresults++;
 			}
 			if($found) {
-					foreach($devprise as $device => $devport) {
-							$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
-							foreach($devport as $port => $prise) {
-									$convport = preg_replace("#\/#","-",$port);
-									$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-									$tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (".$this->loc->s("Plug")." ".$prise.")</li>";
-							}
-							$tmpoutput .= "</ul>";
+				foreach($devprise as $device => $devport) {
+					$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+					foreach($devport as $port => $prise) {
+						$convport = preg_replace("#\/#","-",$port);
+						$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
+						$tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ";
+						$tmpoutput .= "<br /><b>".$this->loc->s("Plug").":</b> ".$prise."</li>";
 					}
-					$tmpoutput .= "</div>";
+					$tmpoutput .= "</ul><br />";
+				}
+				$tmpoutput .= "</div>";
 			}
 			$found = 0;
-			
+			// Search device_ports
+			$devportname = array();
+			$query = FS::$pgdbMgr->Select("device_port","ip,port,name","name ILIKE '%".$search."%'","ip,port");
+			while($data = pg_fetch_array($query)) {
+				if($found == 0)
+					$found = 1;
+				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				$prise =  FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
+				if(!isset($devportname[$swname]))
+                                        $devportname[$swname] = array();
+
+                                $devportname[$swname][$data["port"]] = array($data["name"],$prise);
+
+				$nbresults++;
+			}
+			if($found) {
+				$tmpoutput .= "<div><h4>".$this->loc->s("Ref-desc")."</h4>";
+				foreach($devportname as $device => $devport) {
+                                        $tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+					foreach($devport as $port => $portdata) {
+						$convport = preg_replace("#\/#","-",$port);
+						$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
+	        	                        $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ";
+	               	        	        $tmpoutput .= "<br /><b>".$this->loc->s("Description").":</b> ".$portdata[0];
+						if($portdata[1]) $tmpoutput .= "<br /><b>".$this->loc->s("Plug").":</b> ".$portdata[1];
+						$tmpoutput .= "</li>";
+					}
+					$tmpoutput .= "</ul>";
+				}
+				$tmpoutput .= "</div>";
+			}
 			// DNS infos
 			$searchsplit = preg_split("#\.#",$search);
 			if(count($searchsplit) > 1) {
@@ -215,9 +246,7 @@
 			$tmpoutput .= $this->showRadiusInfos($search);
 
 			if(strlen($tmpoutput) > 0)
-				$output .= "<h4>".$this->loc->s("title-res-nb").": ".$nbresults."</h4>".$tmpoutput;
-			else
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
+				$output .= "<h4><center>".$this->loc->s("title-res-nb").": ".$nbresults."</center></h4>".$tmpoutput;
 
 			return $output;
 		}

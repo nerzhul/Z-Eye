@@ -18,8 +18,8 @@ h3:hover {
 	margin-top: 50px;
 	padding: 45px;
 	border-radius: 8px;
-	-webkit-box-shadow: inset 0px 2px 4px rgba(0,0,0,0.9);
-	box-shadow: inset 0px 2px 4px rgba(0,0,0,0.9);
+	-webkit-box-shadow: inset 0px 2px 4px rgba(0,0,0,0.7);
+	box-shadow: inset 0px 2px 4px rgba(0,0,0,0.7);
 	font-size: 12px;
 	text-align: center;
 }
@@ -100,6 +100,7 @@ div#menuStack div {
 	border-radius: 4px;
 	border-bottom: 1px solid #AAA;
 	margin-left: -25px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
 }
 
 
@@ -134,7 +135,7 @@ div#menuStack div {
 	width: 150px;
 }
 
-.menuItem:hover { background-color: #FFF; font-weight: bold; overflow: hidden;}
+.menuItem:hover { background-color: #FFF; font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
 
 #searchform {
         height: 50px;
@@ -399,7 +400,7 @@ a:hover {
         vertical-align: center;
         height: 28px;
         margin-top: 10px;
-        border-radius: 3px 3px 3px 3px;
+        border-radius: 3px;
         cursor: pointer;
 }
 
@@ -669,3 +670,15 @@ label {
 	color: red;
 }
 
+#searchres {
+	text-align: left;
+	display: inline-block;
+}
+
+#searchres li {
+	margin-bottom: 10px;
+}
+
+#searchres li:hover {
+	background-color: rgba(245, 235, 235, 0.94);
+}
