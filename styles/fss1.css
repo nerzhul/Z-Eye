@@ -17,8 +17,8 @@ h3:hover {
 	margin: auto;
 	margin-top: 50px;
 	padding: 45px;
-	border-radius: 7px;
-	-webkit-box-shadow: inset 0px 2px 4px rgba(0,0,0,0.9); 
+	border-radius: 8px;
+	-webkit-box-shadow: inset 0px 2px 4px rgba(0,0,0,0.9);
 	box-shadow: inset 0px 2px 4px rgba(0,0,0,0.9);
 	font-size: 12px;
 	text-align: center;
@@ -53,8 +53,8 @@ h3:hover {
 	padding: 20px;
 	top: 50%;
 	left: 50%;
-	margin-top: -100px;
-	margin-left: -200px;
+        margin-top: -100px;
+        margin-left: -200px;
 }
 
 #notification {
@@ -82,7 +82,7 @@ h3:hover {
 }
 
 #menuStack {
-	float: left;
+	display: inline-block;
 }
 
 div#menuStack div.menupopup { display: none; }
@@ -97,8 +97,9 @@ div#menuStack div {
 	position: absolute;
 	display: block;
 	background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
-	border-radius: 2px 2px 2px 2px;
-	border: 1px solid #AAA;
+	border-radius: 4px;
+	border-bottom: 1px solid #AAA;
+	margin-left: -25px;
 }
 
 
@@ -130,8 +131,7 @@ div#menuStack div {
 
 .menuItem {
 	padding: 10px 3px;
-	margin-top: 3px;
-	width: 100px;
+	width: 150px;
 }
 
 .menuItem:hover { background-color: #FFF; font-weight: bold; overflow: hidden;}
@@ -483,7 +483,7 @@ a:hover {
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
-	opacity: 0.9;
+	opacity: 0.93;
 }
 
 #logform:hover {
@@ -506,7 +506,7 @@ a:hover {
 	z-index: 18;
 	display:inline-block;
 	background-color: #EEE;
-	border: 1px solid #999;
+	border-bottom: 1px solid #999;
 	border-radius: 0 0 10px 10px;
 }
 
