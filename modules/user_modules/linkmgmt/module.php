@@ -71,7 +71,7 @@
 			if($edit) {
 				$lid = FS::$secMgr->checkGetData("link");
 				FS::$secMgr->SecuriseStringForDB($lid);
-				$output .= FS::$iMgr->addHidden("link_id",$lid);
+				$output .= FS::$iMgr->hidden("link_id",$lid);
 				$lnk = new HTTPLink($lid);
 				$lnk->Load();
 			}

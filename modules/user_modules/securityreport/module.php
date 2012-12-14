@@ -99,7 +99,7 @@
 					$output .= $this->loc->s("nb-ssh-atk").": ".$totalssh."<br /><hr>";
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-					$output .= FS::$iMgr->addHidden("mod",$this->mid);
+					$output .= FS::$iMgr->hidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,array("size" => 2, "length" => 2))." jours <br />";
 					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,array("size" => 3, "length" => 3))." jours <br />";
 		

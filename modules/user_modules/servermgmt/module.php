@@ -99,8 +99,8 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 7 : 8));
 
 			if($create == false) {
-				$output .= FS::$iMgr->addHidden("saddr",$saddr);
-				$output .= FS::$iMgr->addHidden("stype",$stype);
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("stype",$stype);
 			}
 
 			$output .= "<table class=\"standardTable\">";
@@ -181,9 +181,9 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 4 : 5),array("id" => "cesrv"));
 
 			if($create == false) {
-				$output .= FS::$iMgr->addHidden("saddr",$saddr);
-				$output .= FS::$iMgr->addHidden("sport",$sport);
-				$output .= FS::$iMgr->addHidden("sdbname",$sdbname);
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("sport",$sport);
+				$output .= FS::$iMgr->hidden("sdbname",$sdbname);
 			}
 
 			$output .= "<table class=\"standardTable\">";
@@ -257,7 +257,7 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
 			
 			if($create == false)
-				$output .= FS::$iMgr->addHidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
 	
 			$output .= "<table class=\"standardTable\">";
 			if($create)

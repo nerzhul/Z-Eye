@@ -131,7 +131,7 @@
 				<div id=\"searchpanel\">
 					<div class=\"contentlog clearfixlogform\">";
 			$output .= $this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1));
-                        $output .= $this->addHidden("mod",$this->getModuleIdByPath("search"));
+                        $output .= $this->hidden("mod",$this->getModuleIdByPath("search"));
 			$output .= $this->input("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
 			$output .= "</div></div>";
 

@@ -263,7 +263,7 @@
 						dragover: function(e) { e.preventDefault(); },
 						drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
 							FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=4").
-							FS::$iMgr->addHidden("user","'+e.dataTransfer.getData('text/html')+'").
+							FS::$iMgr->hidden("user","'+e.dataTransfer.getData('text/html')+'").
 							FS::$iMgr->check("logdel",array("label" => $this->loc->s("Delete-logs")." ?"))."<br />".
 							FS::$iMgr->check("acctdel",array("label" => $this->loc->s("Delete-accounting")." ?"))."<br />".
 							FS::$iMgr->submit("",$this->loc->s("Delete")).
@@ -349,7 +349,7 @@
 					dragover: function(e) { e.preventDefault(); },
 					drop: function(e) { $('#subpop').html('".$this->loc->s("Delete-profil")." \''+e.dataTransfer.getData('text/html')+'\' ?".
 					FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
-					FS::$iMgr->addHidden("group","'+e.dataTransfer.getData('text/html')+'").
+					FS::$iMgr->hidden("group","'+e.dataTransfer.getData('text/html')+'").
 					FS::$iMgr->submit("",$this->loc->s("Delete")).
 					FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
 					$('#pop').show();
@@ -512,7 +512,7 @@
 								dragover: function(e) { e.preventDefault(); },
 								drop: function(e) { $('#subpop').html('".$this->loc->s("Delete-subnet-import")." \''+e.dataTransfer.getData('text/html')+'\' ?".
 										FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8").
-										FS::$iMgr->addHidden("subnet","'+e.dataTransfer.getData('text/html')+'").
+										FS::$iMgr->hidden("subnet","'+e.dataTransfer.getData('text/html')+'").
 										FS::$iMgr->submit("","Supprimer").
 										FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
 										$('#pop').show();
@@ -672,12 +672,12 @@
 				else
 					$utype = 1;
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
-				$formoutput .= FS::$iMgr->addHidden("uedit",1);
+				$formoutput .= FS::$iMgr->hidden("uedit",1);
 				$formoutput .= "<h4>".$this->loc->s("title-usermod")." '".$radentry."'</h4>";
-				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addHidden("utype",$utype)."<b>".$this->loc->s("User-type").": </b>".
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->hidden("utype",$utype)."<b>".$this->loc->s("User-type").": </b>".
 				($utype == 1 ? "Normal" : $this->loc->s("Mac-addr"));
 				$formoutput .= "</li><li>".
-				FS::$iMgr->addHidden("username",$radentry)."</li>";
+				FS::$iMgr->hidden("username",$radentry)."</li>";
 				if(FS::$pgdbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1) {
 					$creadate = $radSQLMgr->GetOneData("z_eye_radusers","creadate","username='".$radentry."'");
 					$formoutput .= "<li><b>".$this->loc->s("Creation-date").": </b>".$creadate."</li>";
@@ -798,7 +798,7 @@
 				$formoutput .= "<h4>Modification du groupe '".$radentry."'</h4>";
 				$formoutput .= "<ul class=\"ulform\">";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
-                $formoutput .= FS::$iMgr->addHidden("uedit",1).FS::$iMgr->addHidden("groupname",$radentry);
+                $formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);
 				$attridx = 0;
 				$query = $radSQLMgr->Select("radgroupcheck","attribute,op,value","groupname = '".$radentry."'");
 				while($data = mysql_fetch_array($query)) {

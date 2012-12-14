@@ -182,7 +182,7 @@
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask('".$name."');\" />";
 		}
 
-		public function addHidden($name, $value) {
+		public function hidden($name, $value) {
 			return "<input type=\"hidden\" id=\"".$name."\" name=\"".$name."\" value=\"".$value."\" />";
 		}
 

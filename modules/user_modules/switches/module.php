@@ -99,9 +99,9 @@
 					if($data = pg_fetch_array($query)) {
 						if($portid != -1) {
 							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9",array("id" => "swpomod"));
-							$output .= FS::$iMgr->addHidden("portid",$portid);
-							$output .= FS::$iMgr->addHidden("sw",$device);
-							$output .= FS::$iMgr->addHidden("port",$port);
+							$output .= FS::$iMgr->hidden("portid",$portid);
+							$output .= FS::$iMgr->hidden("sw",$device);
+							$output .= FS::$iMgr->hidden("port",$port);
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
 						$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".FS::$iMgr->input("desc",$data["name"])."</td></tr>";
@@ -330,7 +330,7 @@
 				// Monitoring
 				else if($sh == 3) {
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
-					$output .= FS::$iMgr->addHidden("device",$device).FS::$iMgr->addHidden("port",$port);
+					$output .= FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port);
 					$climit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
 					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
 					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
@@ -1217,7 +1217,7 @@
 							dragover: function(e) { e.preventDefault(); },
 							drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
 									FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
-									FS::$iMgr->addHidden("device","'+e.dataTransfer.getData('text/html')+'").
+									FS::$iMgr->hidden("device","'+e.dataTransfer.getData('text/html')+'").
 									FS::$iMgr->submit("",$this->loc->s("Remove")).
 									FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
 									$('#pop').show();

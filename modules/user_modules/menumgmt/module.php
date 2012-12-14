@@ -94,7 +94,7 @@
 			if($edit) {
 				$meid = FS::$secMgr->checkGetData("im");
 				FS::$secMgr->SecuriseStringForDB($meid);
-				$output .= FS::$iMgr->addHidden("menu_elmt",$meid);
+				$output .= FS::$iMgr->hidden("menu_elmt",$meid);
 				$menuEl = new MenuElement();
 				$menuEl->setId($meid);
 				$menuEl->Load();
@@ -123,7 +123,7 @@
 			$menu = NULL;
 			if($edit) {
 				$mid = FS::$secMgr->checkAndSecuriseGetData("menu");
-				$output .= FS::$iMgr->addHidden("menu_id",$mid);
+				$output .= FS::$iMgr->hidden("menu_id",$mid);
 				$menu = new Menu();
 				$menu->setId($mid);
 				$menu->Load();
@@ -149,7 +149,7 @@
 				$output .= $menuEl->CreateSelect();
 				$output .= " Place ";
 				$output .= FS::$iMgr->input("order","0",2,2);
-				$output .= FS::$iMgr->addHidden("menu",$mid);
+				$output .= FS::$iMgr->hidden("menu",$mid);
 				$output .= FS::$iMgr->submit("",$this->loc->s("Save"));				
 				$output .= "</center></form>
 				<h4>".$this->loc->s("mod-elmt")."</h4>
