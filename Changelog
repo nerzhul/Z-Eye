@@ -166,3 +166,9 @@ Beta 2.3
 - PortSecurity can now be managed
 - CDP can be enabled/disabled on each port
 - tooltip can be used on check and lists
+- Use multiselect on vlan trunking selection
+- Search in port desc is now possible
+- Fix bug on ldap account creation
+
+Beta 2.4
+- Radius record filtering
