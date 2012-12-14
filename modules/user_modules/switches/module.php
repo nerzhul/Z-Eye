@@ -192,11 +192,6 @@
 								break;
 						}
 						$output .= "</td><td id=\"vln\">";
-
-						$vlanlist = "";
-						for($i=0;$i<count($vllist);$i++)
-							$vlanlist .= $vllist[$i].",";
-						$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
 						$voicevlanoutput = FS::$iMgr->addElementToList($this->loc->s("None"),4096);
 						$voicevlan = getSwitchportVoiceVlanWithPID($device,$portid);
 						$output .= FS::$iMgr->addList("nvlan","");
@@ -208,6 +203,9 @@
 						$deadvlanoutput = "";
 						$norespvlan = getSwitchportAuthNoRespVLAN($device,$portid);
 						$norespvlanoutput = "";
+						$trunkvlanoutput = "";
+						$trunkall = true;
+						$vlannb = 0;
 
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 				                while($data = pg_fetch_array($query)) {
@@ -215,10 +213,16 @@
 							$voicevlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
 							$deadvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$deadvlan == $data["vlan"] ? true : false);
 							$norespvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$norespvlan == $data["vlan"] ? true : false);
+							$trunkvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],in_array($data["vlan"],$vllist) ? true : false);
+							if($trunkall && in_array($data["vlan"],$vllist)) $trunkall = false;
+							$vlannb++;
 			                        }
 						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
-						$output .= FS::$iMgr->textarea("vllist",$vlanlist,array("width" => 250, "height" => 100));
+						$output .= FS::$iMgr->addList("vllist[]","",NULL,true,array("size" => round($vlannb/4)));
+			                        $output .= FS::$iMgr->addElementToList($this->loc->s("All"),"all",$trunkall);
+						$output .= $trunkvlanoutput;
+						$output .= "</select>";
 						$output .= "</td></tr>";
 						/*
 						* MAB tables
@@ -1504,9 +1508,17 @@
 							return;
 						}
 						$logvals["mode"]["dst"] = $trunk;
-						if(setSwitchTrunkVlanWithPID($sw,$pid,$vlanlist) != 0) {
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
-							return;
+						if(in_array("all",$vlanlist)) {
+							if(setSwitchNoTrunkVlanWithPID($sw,$pid) != 0) {
+                                                                header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+                                                                return;
+                                                        }
+						}
+						else {
+							if(setSwitchTrunkVlanWithPID($sw,$pid,$vlanlist) != 0) {
+								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+								return;
+							}
 						}
 						$logvals["trunkvlan"]["dst"] = $vlanlist;
 						if(setSwitchTrunkNativeVlanWithPID($sw,$pid,$nvlan) != 0) {
@@ -1696,10 +1708,12 @@
 					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."' AND port='".$port."'");
 					$vllist = FS::$secMgr->checkAndSecurisePostData("vllist");
 					if($trunk == 1) {
-						if($vllist != NULL) {
-							$vlantab = preg_split("/,/",$vllist);
-							for($i=0;$i<count($vlantab);$i++)
-								FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vlantab[$i]."','f',NOW(),NOW()");
+						if($vllist) {
+							// Insert VLAN in database only if not in trunk All mode
+							if(!in_array("all",$vllist)) {
+								for($i=0;$i<count($vllist);$i++)
+									FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vllist[$i]."','f',NOW(),NOW()");
+							}
 						}
 					}
 					else if ($trunk == 2) {
@@ -1707,8 +1721,17 @@
 					}
 
 					foreach($logvals as $keys => $values) {
-						if($values["src"] != $values["dst"])
+						if(is_array($values["src"]) || is_array($values["dst"])) {
+							if(count(array_diff($values["src"],$values["dst"])) != 0) {
+								$logoutput .= "\n".$keys.": ";
+								for($i=0;$i<count($values["src"]);$i++) $logoutput .= $values["src"][$i].",";
+								$logoutput .= " => ";
+								for($i=0;$i<count($values["dst"]);$i++) $logoutput .= $values["dst"][$i].",";
+							}
+						}
+						else if($values["src"] != $values["dst"]) {
 							$logoutput .= "\n".$keys.": ".$values["src"]." => ".$values["dst"];
+						}
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,$logoutput);
 					if(FS::isAjaxCall())
@@ -1725,13 +1748,13 @@
 						echo FS::$iMgr->printError($this->loc->s("err-no-device"));	
 						return;
 					}
-					
+
 					if(!$vlan || !FS::$secMgr->isNumeric($vlan)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing/wrong (vlan replacement, portlist)");
 						echo FS::$iMgr->printError($this->loc->s("err-vlan-fail")." !");
 						return;
 					}
-					
+
 					$plist = getPortList($device,$vlan);
 
 					if(count($plist) > 0) {

@@ -201,7 +201,6 @@
 			$output .= "$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
 			if($def_value)
 				$output .= "$('#".$name."').datepicker('setDate','".$def_value."');";
-			$output .= "$('#".$name."').hide();";
 			$output .= "</script>";
 			return $output;
 		}
@@ -335,6 +334,8 @@
 				$output .= " onchange=\"javascript:".$js.";\" ";
 			if($multival)
 				$output .= " multiple=\"multiple\" ";
+			if(isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]))
+				$output .= " size=\"".$options["size"]."\" ";
 			$output .= ">";
 			if(isset($options["tooltip"]))
 				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";

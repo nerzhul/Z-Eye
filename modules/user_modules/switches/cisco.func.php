@@ -288,10 +288,6 @@
 		function setSwitchTrunkVlanWithPID($device,$pid,$values) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || (!is_array($values) && !preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values)))
 				return -1;
-			if(!is_array($values))
-				$res = preg_split("/,/",$values);
-			else
-				$res = $values;
 			/* 
 			* For each VLAN from 1 to 4096, set bit value to 1 if vlan is allowed, else set to 0
 			* Each byte is converted to a hex string, and chained
@@ -300,7 +296,7 @@
 			$tmpstr="";
 			$count=0;
 			for($i=0;$i<1024;$i++) {
-				if(in_array($i,$res))
+				if(in_array($i,$values))
 						$tmpstr .= "1";
 				else
 						$tmpstr .= "0";
