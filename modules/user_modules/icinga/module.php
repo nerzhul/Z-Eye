@@ -100,7 +100,7 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname","");
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
 			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true);
-			$formoutput .= FS::$iMgr->selElmt("","",true);
+			$formoutput .= FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
 				$formoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
@@ -172,25 +172,23 @@
 		private function showHostgroupsTab() {
 			$output = "";
 			$hostexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","");
-			if(!$hostexist) {
+			if(!$hostexist)
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-hosts"));
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
+			else {
+				/*
+				 * Ajax new hostgroup
+				 */
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
+				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+				// Global
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
+				$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
+				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
+				$formoutput .= "</table></form>";
 			}
-			
-			/*
-			 * Ajax new hostgroup
-			 */
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
-			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			// Global
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
-			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
-			
+
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hostgroups","name,alias","","name");
 			while($data = pg_fetch_array($query)) {
@@ -715,7 +713,7 @@
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
 			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup","template = 'f'");
 			while($data = pg_fetch_array($query)) {
-				fwrite($file,"define host {\n\tname\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
+				fwrite($file,"define host {\n\thost_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
 				fwrite($file,$data["alivecommand"]."\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkinterval"]."\n\tretry_interval\t".$data["retrycheckinterval"]."\n\t");
 				fwrite($file,"max_check_attempts\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
 				fwrite($file,"\n\tfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tprocess_perf_data\t".($data["perfdata"] == "t" ? 1 : 0)."\n\tretain_status_information\t");
@@ -1294,7 +1292,7 @@
 						return;
 					}
 					
-					if($parent) {
+					if($parent && !in_array("none",$parent)) {
 						for($i=0;$i<count($parent);$i++) {
 							if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent[$i]."'")) {
 								header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
@@ -1324,7 +1322,7 @@
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
 						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."'");
-					if($parent) {
+					if($parent && !in_array("none",$parent)) {
 						for($i=0;$i<count($parent);$i++) {
 							FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
 						}
