@@ -93,11 +93,11 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",false);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 			//$formoutput .= template list
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","");
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("DisplayName"),"dname","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname","");
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
 			$formoutput .= FS::$iMgr->addList("parent[]","",NULL,true);
 			$formoutput .= FS::$iMgr->addElementToList("","",true);
@@ -107,32 +107,32 @@
 			}
 			$formoutput .= "</select></td></tr>";
 			
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Address"),"addr","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr","");
 			
 			// Checks
 			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand","check-host-alive")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",array("value" => 3));
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",array("value" => 1));
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",array("value" => 10));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => 3, "type" => "num"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => 1, "type" => "num"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => 10, "type" => "num"));
 			
 			// Global
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",true,array("type" => "chk"));
 			
 			// Notifications
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",true,array("type" => "chk"));
 			$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",array("value" => 0));
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptdown"),"hostoptd",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptunreach"),"hostoptu",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptrec"),"hostoptr",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptflap"),"hostoptf",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval","",array("value" => 0, "type" => "num"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
 			$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 			
 			// icon image
@@ -183,8 +183,8 @@
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			// Global
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
@@ -228,43 +228,43 @@
 				 */
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",false);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 				//$formoutput .= template list
 				
 				// Global
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Description"),"desc","",array("length" => 120, "size" => 30));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc","",array("length" => 120, "size" => 30));
 				// @ TODO support hostlist
 				$formoutput .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false)."</td></tr>";
 				
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("active-check-en"),"actcheck",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("passive-check-en"),"pascheck",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("parallel-check"),"parcheck",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("obs-over-srv"),"obsess",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("check-freshness"),"freshness",false);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("active-check-en"),"actcheck",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("passive-check-en"),"pascheck",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("parallel-check"),"parcheck",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("obs-over-srv"),"obsess",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-freshness"),"freshness",false,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",true,array("type" => "chk"));
 				
 				// Checks
 				$formoutput .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd")."</td></tr>";
 				$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",array("value" => 3));
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",array("value" => 1));
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",array("value" => 10));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => 3, "type" => "num"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => 1, "type" => "num"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => 10, "type" => "num"));
 				
 				// Notifications
 				$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptcrit"),"srvoptc",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptwarn"),"srvoptw",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptunreach"),"srvoptu",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptrec"),"srvoptr",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptflap"),"srvoptf",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptsched"),"srvopts",true);
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",array("value" => 0));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval","",array("value" => 0, "type" => "num"));
 				// @ TODO support for contact not only contactlist
 				$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
@@ -307,8 +307,8 @@
 			
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme")."</td></tr>";
@@ -369,24 +369,24 @@
 				 */
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",true,array("type" => "chk"));
 				//$formoutput .= template list
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Email"),"mail","");
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Email"),"mail","");
 				$formoutput .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptcrit"),"srvoptc",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptwarn"),"srvoptw",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptunreach"),"srvoptu",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptrec"),"srvoptr",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptflap"),"srvoptf",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptsched"),"srvopts",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",true,array("type" => "chk"));
 				$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd")."</td></tr>";
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptdown"),"hostoptd",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptunreach"),"hostoptu",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptrec"),"hostoptr",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptflap"),"hostoptf",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
@@ -422,8 +422,8 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=10");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->addList("cts[]","",NULL,true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
@@ -474,8 +474,8 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			

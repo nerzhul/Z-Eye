@@ -105,7 +105,7 @@
 
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
-				$output .= FS::$iMgr->addIndexedIPLine($this->loc->s("ip-addr"),"saddr",$saddr);
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
 				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
 				$output .= FS::$iMgr->addList("stype","arangeform();");
 				$output .= FS::$iMgr->addElementToList("TFTP",1);
@@ -128,7 +128,7 @@
 			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("User")."</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
 			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
 			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("server-path"),"spath",$spath);
+			$output .= FS::$iMgr->idxLine($this->loc->s("server-path"),"spath",$spath);
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 
@@ -188,19 +188,19 @@
 
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
-				$output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Port"),"sport",array("value" => $sport));
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("db-name"),"sdbname",$sdbname);
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname);
 			}
 			else {
 				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Port")."</td><td>".$sport."</td></tr>";
 				$output .= "<tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
 			}
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"salias",$salias);
+			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",$slogin);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias);
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 
@@ -261,18 +261,18 @@
 	
 			$output .= "<table class=\"standardTable\">";
 			if($create)
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 			else
 				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";		
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("ssh-user"),"slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedCheckLine("DHCP ?","dhcp",$dhcp > 0 ? true : false);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath);
-			$output .= FS::$iMgr->addIndexedCheckLine("DNS ?","dns",$dns > 0 ? true : false);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("named-conf-path"),"namedpath",$namedpath);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed);
+			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine("DHCP ?","dhcp",$dhcp > 0 ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath);
+			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath);
+			$output .= FS::$iMgr->idxLine("DNS ?","dns",$dns > 0 ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath);
+			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed);
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 			

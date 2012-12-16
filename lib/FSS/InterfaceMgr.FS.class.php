@@ -265,43 +265,23 @@
 			return $output;
 		}
 		
-		public function addIndexedLine($label,$name,$def_value = "", $options = array()) {
+		public function idxLine($label,$name,$def_value = "", $options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
-			if(isset($options["pwd"]) && $options["pwd"])
-				$output .= $this->password($name,$def_value);
+			if(isset($options["type"])) {
+				switch($options["type"]) {
+					case "chk": $output .= $this->check($name, array("check" => $def_value)); break;
+					case "ip": $output .= $this->IPInput($name,$def_value); break;
+					case "ipmask": $output .= $this->IPMaskInput($name,$def_value); break;
+					case "num": $output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options); break;
+					case "pwd": $output .= $this->password($name,$def_value); break;
+					default: break;
+				}
+			}
 			else
 				$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
-				(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
+					(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
 			$output .= "</center></td></tr>";
 			return $output;
-		}
-		
-		public function addIndexedNumericLine($label,$name,$options = array()) {
-			$output = "<tr><td>".$label."</td><td><center>";
-			$output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options);
-			$output .= "</center></td></tr>";
-			return $output;
-		}
-		
-		public function addIndexedIPLine($idx,$name,$def_value = "") {
-			$output = "<tr><td>".$idx."</td><td><center>";
-			$output .= $this->IPInput($name,$def_value);
-			$output .= "</center></td></tr>";
-			return $output;
-		}
-
-		public function addIndexedIPMaskLine($idx,$name,$def_value = "") {
-			$output = "<tr><td>".$idx."</td><td><center>";
-			$output .= $this->IPMaskInput($name,$def_value);
-			$output .= "</center></td></tr>";
-			return $output;
-		}
-
-		public function addIndexedCheckLine($label, $name, $checked = false) {
-			$output = "<tr><td>".$label."</td><td><center>";
-			$output .= $this->check($name, array("check" => $checked));
-			$output .= "</center></td></tr>";
-			return $output;	
 		}
 
 		public function tableSubmit($label,$options = array()) {

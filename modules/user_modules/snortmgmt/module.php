@@ -65,10 +65,10 @@
 				$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("data-storage")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("pg-host"),"dbhost",$dbhost);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Database"),"dbname",$dbname);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"dbuser",$dbuser);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"dbpwd",$dbpwd,array("pwd" => true));
+				$output .= FS::$iMgr->idxLine($this->loc->s("pg-host"),"dbhost",$dbhost);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Database"),"dbname",$dbname);
+				$output .= FS::$iMgr->idxLine($this->loc->s("User"),"dbuser",$dbuser);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"dbpwd",$dbpwd,array("type" => "pwd"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("lan-list"),"srvlist",array("width" => 250, "height" => 100));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table></form>";
@@ -79,7 +79,7 @@
 				if(!$dnsenable) $dnsenable = 0;
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"dnsenable",$dnsenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"dnsenable",$dnsenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-dns"),"dnslist",array("value" => $dnslist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
@@ -104,15 +104,15 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-smtp-sensor"),"ensmtp",$smtpenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-smtp-sensor"),"ensmtp",$smtpenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-smtp"),"smtplist",array("value" => $smtplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-smtp"),"smtpports",array("value" => $smtpports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes IMAP","enimap",$imapenable);
+				$output .= FS::$iMgr->idxLine("Activer les sondes IMAP","enimap",$imapenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-imap"),"imaplist",array("value" => $imaplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-imap"),"imapports",array("value" => $imapports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes POP","enpop",$popenable);
+				$output .= FS::$iMgr->idxLine("Activer les sondes POP","enpop",$popenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-pop"),"poplist",array("value" => $poplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-pop"),"poppports",array("value" => $popports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
@@ -128,7 +128,7 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enhttp",$httpenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enhttp",$httpenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-http"),"httplist",array("value" => $httplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
@@ -149,11 +149,11 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensql",$sqlenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensql",$sqlenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sql"),"sqllist",array("value" => $sqllist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enoracle",$oracleenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enoracle",$oracleenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("sql-oracle"),"oraclelist",array("value" => $oraclelist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-oracle"),"oracleports",array("value" => $oracleports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
 				
@@ -175,14 +175,14 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-telnet-sensor"),"entelnet",$telnetenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-telnet-sensor"),"entelnet",$telnetenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-telnet"),"telnetlist",array("value" => $telnetlist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-ssh-sensor"),"enssh",$sshenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-ssh-sensor"),"enssh",$sshenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ssh"),"sshlist",array("value" => $sshlist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ssh"),"sshports",array("value" => $sshports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-tse-sensor"),"entse",$tseenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-tse-sensor"),"entse",$tseenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-tse"),"tselist",array("value" => $tselist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tableSubmit("",$this->loc->s("Register"));
 				$output .= "</table></form>";
@@ -196,7 +196,7 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enftp",$ftpenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enftp",$ftpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-ipv4")));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ftp"),"ftpports",$ftpports,array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")))."</td></tr>";
 				$output .= FS::$iMgr->tableSubmit("",$this->loc->s("Register"));
@@ -209,7 +209,7 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensnmp",$snmpenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensnmp",$snmpenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-snmp"),"snmplist",array("value" => $snmplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
@@ -224,7 +224,7 @@
 
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensip",$sipenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensip",$sipenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sip"),"siplist",array("value" => $siplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
@@ -244,11 +244,11 @@
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-nightreport")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false,array("type" => "chk"));
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hnight","mnight",$nighth,$nightm)."</td></tr>";
 				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->numInput("nightintval",$nightback > 0 ? $nigthback : 7,array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-prev-hour")))."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-we")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false,array("type" => "chk"));
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table>";

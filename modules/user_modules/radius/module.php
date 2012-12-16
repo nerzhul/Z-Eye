@@ -110,9 +110,9 @@
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Name")." *","radname");
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Subname")." *","radsurname");
-				$output .= FS::$iMgr->addIndexedline($this->loc->s("Identifier")." *","radusername");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername");
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".
 					FS::$iMgr->radioList("validity",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
@@ -143,16 +143,16 @@
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
 					FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
-                $output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4, "length" => 4));
-                $output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").
+		                $output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct","",array("size" => 4, "length" => 4, "type" => "num"));
+	        	        $output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").
 					$this->addGroupList($radSQLMgr)."</select></td></tr>";
-                $output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
-                $output .= FS::$iMgr->calendar("startdate2","",$this->loc->s("From"))."<br />";
+		                $output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
+                		$output .= FS::$iMgr->calendar("startdate2","",$this->loc->s("From"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhours2","limmins2")."<br />";
-                $output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
-                $output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
-                $output .= "</td></tr>";
-                $output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
+		                $output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
+                		$output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
+		                $output .= "</td></tr>";
+                		$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
 			}
 			else if($sh && $sh > 2)
 				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));
@@ -517,10 +517,10 @@
 				$radexpuser = FS::$pgdbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_user_field' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 				$radexpdate = FS::$pgdbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_date_field' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 				
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("enable-autoclean"),"cleanradsqlenable",($radexpenable == 1 ? true : false));
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate);
+				$output .= FS::$iMgr->idxLine($this->loc->s("enable-autoclean"),"cleanradsqlenable", ($radexpenable == 1 ? true : false), array("type" => "chk"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser);
+				$output .= FS::$iMgr->idxLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate);
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</form>";
 			}
 			else if($sh == 6) {
@@ -533,9 +533,9 @@
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>Valeur</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Name")." *","radname");
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Subname")." *","radsurname");
-				$output .= FS::$iMgr->addIndexedline($this->loc->s("Identifier")." *","radusername");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername");
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil","","").FS::$iMgr->addElementToList("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity",array(1,2),array("Toujours valide","Période"),1);
 				$output .= FS::$iMgr->calendar("startdate","",$this->loc->s("From"))."<br />";
@@ -564,7 +564,7 @@
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 				FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
-				$output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4,"length" => 4));
+				$output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct","",array("size" => 4,"length" => 4, "type" => "num"));
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->addList("profil2","","").FS::$iMgr->addElementToList("","none").
 				$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
@@ -1386,7 +1386,7 @@
 					if($cleanradenable == "on" && (!$cleanradtable || !$cleanradsqluserfield || !$cleanradsqlexpfield)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing for radius cleanup table (data fields)");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=5&err=6");
-                        return;
+                        			return;
 					}
 
 					if($radSQLMgr->Count($cleanradtable,$cleanradsqluserfield) == NULL) {
@@ -1396,7 +1396,7 @@
 					}
 
 					FS::$pgdbMgr->Delete("z_eye_radius_options","addr = '".$radhost."' AND port = '".$radport."' and dbname = '".$raddb."'");
-					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_enable','1'");
+					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_enable','".($cleanradenable == "on" ? 1 : 0)."'");
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_table','".$cleanradtable."'");
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_user_field','".$cleanradsqluserfield."'");
 					FS::$pgdbMgr->Insert("z_eye_radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_date_field','".$cleanradsqlexpfield."'");
