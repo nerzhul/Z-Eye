@@ -68,7 +68,7 @@
 				
 				$query = FS::$pgdbMgr->Select("z_eye_dns_zone_cache","zonename","","zonename");
 				while($data = pg_fetch_array($query)) {
-					$formoutput .= FS::$iMgr->addElementTolist($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
+					$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
 				}
 				$output .= $formoutput;
 				$output .= "</select><br />";
