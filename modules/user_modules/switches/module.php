@@ -123,17 +123,17 @@
 						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
                                                 $sp = getPortSpeedWithPID($device,$portid);
 						if($sp > 0) {
-							$output .= FS::$iMgr->addList("speed");
-							$output .= FS::$iMgr->addElementToList("Auto",1,$sp == 1 ? true : false);
+							$output .= FS::$iMgr->select("speed");
+							$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
 							if(preg_match("#Ethernet#",$port)) {
-								$output .= FS::$iMgr->addElementToList("10 Mbits",10000000,$sp == 10000000 ? true : false);
+								$output .= FS::$iMgr->selElmt("10 Mbits",10000000,$sp == 10000000 ? true : false);
 								if(preg_match("#FastEthernet#",$port))
-									$output .= FS::$iMgr->addElementToList("100 Mbits",100000000,$sp == 100000000 ? true : false);
+									$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
 								if(preg_match("#GigabitEthernet#",$port)) {
-									$output .= FS::$iMgr->addElementToList("100 Mbits",100000000,$sp == 100000000 ? true : false);
-									$output .= FS::$iMgr->addElementToList("1 Gbit",1000000000,$sp == 1000000000 ? true : false);
+									$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
+									$output .= FS::$iMgr->selElmt("1 Gbit",1000000000,$sp == 1000000000 ? true : false);
 									if(preg_match("#TenGigabitEthernet#",$port))
-										$output .= FS::$iMgr->addElementToList("10 Gbits",10,$sp == 10 ? true : false);
+										$output .= FS::$iMgr->selElmt("10 Gbits",10,$sp == 10 ? true : false);
 								}
 							}
 							$output .= "</select>";
@@ -145,10 +145,10 @@
 						if($dup != -1) {
 							$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
 							if($dup > 0 && $dup < 5) {
-								$output .= FS::$iMgr->addList("duplex");
-								$output .= FS::$iMgr->addElementToList("Auto",4,$dup == 1 ? true : false);
-								$output .= FS::$iMgr->addElementToList("Half",1,$dup == 2 ? true : false);
-								$output .= FS::$iMgr->addElementToList("Full",2,$dup == 3 ? true : false);
+								$output .= FS::$iMgr->select("duplex");
+								$output .= FS::$iMgr->selElmt("Auto",4,$dup == 1 ? true : false);
+								$output .= FS::$iMgr->selElmt("Half",1,$dup == 2 ? true : false);
+								$output .= FS::$iMgr->selElmt("Full",2,$dup == 3 ? true : false);
 								$output .= "</select>";
 							}
 							else
@@ -164,11 +164,11 @@
 						$mabstate = getSwitchportMABState($device,$portid);
 						if($mabstate == 1)
 							$trmode = 3;
-						$output .= FS::$iMgr->addList("trmode","arangeform()");
-						$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
-						$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
+						$output .= FS::$iMgr->select("trmode","arangeform()");
+						$output .= FS::$iMgr->selElmt("Access",2,$trmode == 2 ? true : false);
+						$output .= FS::$iMgr->selElmt("Trunk",1,$trmode == 1 ? true : false);
 						if($mabstate != -1)
-							$output .= FS::$iMgr->addElementToList("802.1X - MAB",3,$trmode == 3 ? true : false);
+							$output .= FS::$iMgr->selElmt("802.1X - MAB",3,$trmode == 3 ? true : false);
 						$output .= "</select>";
 						$output .= "<tr><td id=\"vllabel\">";
 						$portoptlabel = "";
@@ -192,12 +192,12 @@
 								break;
 						}
 						$output .= "</td><td id=\"vln\">";
-						$voicevlanoutput = FS::$iMgr->addElementToList($this->loc->s("None"),4096);
+						$voicevlanoutput = FS::$iMgr->selElmt($this->loc->s("None"),4096);
 						$voicevlan = getSwitchportVoiceVlanWithPID($device,$portid);
-						$output .= FS::$iMgr->addList("nvlan","");
+						$output .= FS::$iMgr->select("nvlan","");
 						// Added none for VLAN fail
 						if($trmode == 3)
-							$output .= FS::$iMgr->addElementToList($this->loc->s("None"),0,$nvlan == 0 ? true : false);
+							$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$nvlan == 0 ? true : false);
 
 						$deadvlan = getSwitchportAuthDeadVLAN($device,$portid);
 						$deadvlanoutput = "";
@@ -209,18 +209,18 @@
 
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 				                while($data = pg_fetch_array($query)) {
-							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
-							$voicevlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
-							$deadvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$deadvlan == $data["vlan"] ? true : false);
-							$norespvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$norespvlan == $data["vlan"] ? true : false);
-							$trunkvlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],in_array($data["vlan"],$vllist) ? true : false);
+							$output .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
+							$voicevlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
+							$deadvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$deadvlan == $data["vlan"] ? true : false);
+							$norespvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$norespvlan == $data["vlan"] ? true : false);
+							$trunkvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],in_array($data["vlan"],$vllist) ? true : false);
 							if($trunkall && in_array($data["vlan"],$vllist)) $trunkall = false;
 							$vlannb++;
 			                        }
 						$output .= "</select></td></tr>";
 						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
-						$output .= FS::$iMgr->addList("vllist[]","",NULL,true,array("size" => round($vlannb/4)));
-			                        $output .= FS::$iMgr->addElementToList($this->loc->s("All"),"all",$trunkall);
+						$output .= FS::$iMgr->select("vllist[]","",NULL,true,array("size" => round($vlannb/4)));
+			                        $output .= FS::$iMgr->selElmt($this->loc->s("All"),"all",$trunkall);
 						$output .= $trunkvlanoutput;
 						$output .= "</select>";
 						$output .= "</td></tr>";
@@ -230,14 +230,14 @@
 
 						// NoResp Vlan
                                                 $output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-noresp")."</td><td>";
-                                                $output .= FS::$iMgr->addList("norespvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-noresp-tooltip")));
-                                                $output .= FS::$iMgr->addElementToList($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
+                                                $output .= FS::$iMgr->select("norespvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-noresp-tooltip")));
+                                                $output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
                                                 $output .= $norespvlanoutput;
                                                 $output .= "</select></td></tr>";
 						// Dead Vlan
 						$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-dead")."</td><td>";
-						$output .= FS::$iMgr->addList("deadvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-dead-tooltip")));
-						$output .= FS::$iMgr->addElementToList($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
+						$output .= FS::$iMgr->select("deadvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-dead-tooltip")));
+						$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
 						$output .= $deadvlanoutput;
 						$output .= "</select></td></tr>";
 						// Other options
@@ -245,17 +245,17 @@
 						$mabeap = getSwitchportMABType($device,$portid);
 						$dot1xhostmode = getSwitchportAuthHostMode($device,$portid);
 						$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
-						$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->addList("dot1xhostmode","");
-						$output .= FS::$iMgr->addElementToList($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
-						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
-						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
-						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
+						$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode","");
+						$output .= FS::$iMgr->selElmt($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
+						$output .= FS::$iMgr->selElmt($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
+						$output .= FS::$iMgr->selElmt($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
+						$output .= FS::$iMgr->selElmt($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
 						$output .= "</select>";
 						/*
 						* Voice vlan
 						*/
 						$output .= "</td></tr><tr><td>".$this->loc->s("voice-vlan")."</td><td>";
-						$output .= FS::$iMgr->addList("voicevlan","");
+						$output .= FS::$iMgr->select("voicevlan","");
 						$output .= $voicevlanoutput;
 						$output .= "</select></td></tr>";
 						$portsecen = getPortSecEnableWithPID($device,$portid);
@@ -275,10 +275,10 @@
                                                         $output .= "</td></tr>";
 							// Action when violation is performed
 							$psviolact = getPortSecViolActWithPID($device,$portid);
-							$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->addList("psviolact","",NULL,false,array("tooltip" => $this->loc->s("portsec-viol-tooltip")));
-							$output .= FS::$iMgr->addElementToList($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
-							$output .= FS::$iMgr->addElementToList($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
-							$output .= FS::$iMgr->addElementToList($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
+							$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact","",NULL,false,array("tooltip" => $this->loc->s("portsec-viol-tooltip")));
+							$output .= FS::$iMgr->selElmt($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
+							$output .= FS::$iMgr->selElmt($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
+							$output .= FS::$iMgr->selElmt($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
 							$output .= "</select>";
 							// Maximum MAC addresses before violation mode
 							$psmaxmac = getPortSecMaxMACWithPID($device,$portid);
@@ -864,15 +864,15 @@
 					$output .= "};";
 					$output .= "</script>";
 					$output .= "<h4>".$this->loc->s("title-transfer-conf")."</h4>";
-					$output .= $this->loc->s("Server-type")." ".FS::$iMgr->addList("exportm","arangeform();");
-					$output .= FS::$iMgr->addElementToList("TFTP",1);
-					$output .= FS::$iMgr->addElementToList("FTP",2);
-					$output .= FS::$iMgr->addElementToList("SCP",4);
-					$output .= FS::$iMgr->addElementToList("SFTP",5);
+					$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
+					$output .= FS::$iMgr->selElmt("TFTP",1);
+					$output .= FS::$iMgr->selElmt("FTP",2);
+					$output .= FS::$iMgr->selElmt("SCP",4);
+					$output .= FS::$iMgr->selElmt("SFTP",5);
 					$output .= "</select><br />";
-					$output .= $this->loc->s("transfer-way")." ".FS::$iMgr->addList("io");
-					$output .= FS::$iMgr->addElementToList($this->loc->s("Export"),1);
-					$output .= FS::$iMgr->addElementToList($this->loc->s("Import"),2);
+					$output .= $this->loc->s("transfer-way")." ".FS::$iMgr->select("io");
+					$output .= FS::$iMgr->selElmt($this->loc->s("Export"),1);
+					$output .= FS::$iMgr->selElmt($this->loc->s("Import"),2);
 					$output .= "</select><br />";
 					$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />";
 					$output .= $this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />";

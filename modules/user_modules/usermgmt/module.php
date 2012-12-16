@@ -57,7 +57,7 @@
 			$grpidx = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
 			while($data = pg_fetch_array($query)) {
-				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->addList("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
+				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
@@ -107,7 +107,7 @@
 			$output = "";
 			$query = FS::$pgdbMgr->Select("z_eye_groups","gid,gname");
 			while($data = pg_fetch_array($query))
-				$output .= FS::$iMgr->addElementToList($data["gname"],$data["gid"],$gid == $data["gid"] ? true : false);
+				$output .= FS::$iMgr->selElmt($data["gname"],$data["gid"],$gid == $data["gid"] ? true : false);
 			return $output;
 		}
 

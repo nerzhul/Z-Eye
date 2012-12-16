@@ -99,11 +99,11 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","");
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname","");
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
-			$formoutput .= FS::$iMgr->addList("parent[]","",NULL,true);
-			$formoutput .= FS::$iMgr->addElementToList("","",true);
+			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true);
+			$formoutput .= FS::$iMgr->selElmt("","",true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
-				$formoutput .= FS::$iMgr->addElementToList($data["name"]." (".$data["addr"].")",$data["name"]);
+				$formoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
 			$formoutput .= "</select></td></tr>";
 			
@@ -424,10 +424,10 @@
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->addList("cts[]","",NULL,true);
+			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
-				$formoutput .= FS::$iMgr->addElementToList($data["name"],$data["name"]);
+				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"]);
 			}
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
@@ -500,47 +500,47 @@
 		}
 		
 		private function getTimePeriodList($name) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_timeperiods","name,alias","","alias");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["alias"],$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"]);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function genCommandList($name,$tocheck = NULL) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name","","name");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
+				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function genContactGroupsList($name) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["name"]." (".$data["alias"].")",$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"]);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function genHostsList($name) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["name"]." (".$data["addr"].")",$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function getHostOrGroupList($name,$multi) {
-			$output = FS::$iMgr->addList($name,"",NULL,$multi);
+			$output = FS::$iMgr->select($name,"",NULL,$multi);
 			
 			$hostlist = array();
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
@@ -554,7 +554,7 @@
 			ksort($hostlist);
 
 			foreach($hostlist as $host => $value)
-				$output .= FS::$iMgr->addElementToList($host,$value[0]."$".$value[1]);
+				$output .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1]);
 
 			$output .= "</select>";
 			return $output;

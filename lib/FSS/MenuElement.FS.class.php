@@ -56,7 +56,7 @@
 		}
 
 		public function CreateSelect($idsel = 0) {
-			$output = FS::$iMgr->addList("m_elem_id");
+			$output = FS::$iMgr->select("m_elem_id");
 			$query = FS::$pgdbMgr->Select("z_eye_menu_items","id");
 			while($data = pg_fetch_array($query)) {
 				$this->id = $data["id"];

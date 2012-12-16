@@ -92,23 +92,23 @@
 						});
 					}</script>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
-				$output .= FS::$iMgr->addList("uf","filterAppLogs()");
-				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("User")."--","",true);
+				$output .= FS::$iMgr->select("uf","filterAppLogs()");
+				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
 				$query = FS::$pgdbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",2);
 				while($data = pg_fetch_array($query))
-					$output .= FS::$iMgr->addElementToList($data["_user"],$data["_user"]);
+					$output .= FS::$iMgr->selElmt($data["_user"],$data["_user"]);
 
-				$output .= "</select>".FS::$iMgr->addList("af","filterAppLogs()");
-				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("Module")."--","",true);
+				$output .= "</select>".FS::$iMgr->select("af","filterAppLogs()");
+				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
 				$query = FS::$pgdbMgr->Select("z_eye_logs","module","module = module GROUP BY module","module",2);
 				while($data = pg_fetch_array($query))
-					$output .= FS::$iMgr->addElementToList($data["module"],$data["module"]);
+					$output .= FS::$iMgr->selElmt($data["module"],$data["module"]);
 				
-				$output .= "</select>".FS::$iMgr->addList("lf","filterAppLogs()");
-				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("Level")."--","",true);
-				$output .= FS::$iMgr->addElementToList("Info",0);
-				$output .= FS::$iMgr->addElementToList("Warn",1);
-				$output .= FS::$iMgr->addElementToList("Crit",2);
+				$output .= "</select>".FS::$iMgr->select("lf","filterAppLogs()");
+				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Level")."--","",true);
+				$output .= FS::$iMgr->selElmt("Info",0);
+				$output .= FS::$iMgr->selElmt("Warn",1);
+				$output .= FS::$iMgr->selElmt("Crit",2);
 				
 				$output .= "</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterAppLogs()");
 				$output .= "</form>";

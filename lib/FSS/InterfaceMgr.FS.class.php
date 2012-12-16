@@ -206,15 +206,15 @@
 		}
 
 		public function hourlist($hname,$mname,$hselect=0,$mselect=0) {
-			$output = $this->addList($hname);
+			$output = $this->select($hname);
 			for($i=0;$i<24;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-				$output .= $this->addElementToList($txt,$i,$hselect == $i);
+				$output .= $this->selElmt($txt,$i,$hselect == $i);
 			}
-			$output .= "</select> h ".$this->addList($mname);
+			$output .= "</select> h ".$this->select($mname);
 			for($i=0;$i<60;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-                                $output .= $this->addElementToList($txt,$i,$mselect == $i);
+                                $output .= $this->selElmt($txt,$i,$mselect == $i);
                         }
 			$output .= "</select>";
 
@@ -306,7 +306,7 @@
 			return $output;
 		}
 		
-		public function addList($name,$js = "",$label=NULL, $multival=false, $options=array()) {
+		public function select($name,$js = "",$label=NULL, $multival=false, $options=array()) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<select name=\"".$name."\" id=\"".$name."\"";
@@ -322,7 +322,7 @@
 			return $output;
 		}
 		
-		public function addElementToList($name,$value,$selected = false) {
+		public function selElmt($name,$value,$selected = false) {
 			$output = "<option value=\"".$value."\"";
 			if($selected)
 				$output .= " selected=\"selected\"";

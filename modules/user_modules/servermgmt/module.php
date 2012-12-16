@@ -107,11 +107,11 @@
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
 				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
-				$output .= FS::$iMgr->addList("stype","arangeform();");
-				$output .= FS::$iMgr->addElementToList("TFTP",1);
-				$output .= FS::$iMgr->addElementToList("FTP",2);
-				$output .= FS::$iMgr->addElementToList("SCP",4);
-				$output .= FS::$iMgr->addElementToList("SFTP",5);
+				$output .= FS::$iMgr->select("stype","arangeform();");
+				$output .= FS::$iMgr->selElmt("TFTP",1);
+				$output .= FS::$iMgr->selElmt("FTP",2);
+				$output .= FS::$iMgr->selElmt("SCP",4);
+				$output .= FS::$iMgr->selElmt("SFTP",5);
 				$output .= "</select>";
 				$output .= "</td></tr>";
 			}

@@ -81,7 +81,7 @@
 		
 		public function CreateSelect($idsel = 0) {
 			$output = "";
-			$output .= FS::$iMgr->addList("link_id");
+			$output .= FS::$iMgr->select("link_id");
 			$query = FS::$pgdbMgr->Select("z_eye_http_links","id");
 			while($data = pg_fetch_array($query)) {
 				$this->id = $data["id"];

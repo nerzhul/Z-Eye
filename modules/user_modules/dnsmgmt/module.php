@@ -40,7 +40,7 @@
 			if(!FS::isAjaxCall()) {
 				$output .= "<h3>".$this->loc->s("title-dns")."</h3>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-				$output .= FS::$iMgr->addList("f");
+				$output .= FS::$iMgr->select("f");
 				
 				$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
 				if($shA == NULL) $shA = 1;

@@ -140,9 +140,9 @@
 			$output .= "<tr><td>".$this->loc->s("snmp-timeout")."</td><td>".FS::$iMgr->input("snmptimeout",$snmptimeout,2,2)."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("snmp-try")."</td><td>".FS::$iMgr->input("snmptry",$snmptry,2,2)."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("snmp-version")."</td><td>";
-			$output .= FS::$iMgr->addList("snmpver");
-			$output .= FS::$iMgr->addElementToList("1","1",$snmpver == 1 ? true : false);
-			$output .= FS::$iMgr->addElementToList("2c","2",$snmpver == 2 ? true : false);
+			$output .= FS::$iMgr->select("snmpver");
+			$output .= FS::$iMgr->selElmt("1","1",$snmpver == 1 ? true : false);
+			$output .= FS::$iMgr->selElmt("2c","2",$snmpver == 2 ? true : false);
 			$output .= "</select></td></tr>";
 			$output .= "<tr>".FS::$iMgr->tableSubmit($this->loc->s("Save"))."</tr>";
 			$output .= "</table></form>";
