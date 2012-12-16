@@ -215,8 +215,8 @@
 					$output .= "});return false;}</script>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->hidden("obsdata",$filter);
-					$output .= $this->loc->s("intval-days")." ".FS::$iMgr->addNumericInput("ival")."<br />";
-					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
+					$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
+					$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
 					$output .= "</form><div id=\"obsres\"></div>";
 				}
 				else if($showmodule == 3) {
@@ -229,9 +229,9 @@
 					$output .= "<div id=\"monsubnetres\"></div>";
 	                                $output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1 ? true : false,"label" => $this->loc->s("En-monitor")))."</li><li>";
-                                        $output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => $this->loc->s("tooltip-max-age")))."</li><li>";
+                                        $output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
+					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
+					$output .= FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => $this->loc->s("tooltip-max-age")))."</li><li>";
 					$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),$this->loc->s("tooltip-contact"))."</li><li>";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
 					$output .= "<script type=\"text/javascript\">$('#monsubnet').submit(function(event) {

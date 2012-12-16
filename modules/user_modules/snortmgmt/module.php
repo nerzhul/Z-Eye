@@ -68,7 +68,7 @@
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("pg-host"),"dbhost",$dbhost);
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Database"),"dbname",$dbname);
 				$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"dbuser",$dbuser);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"dbpwd",$dbpwd,true);
+				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"dbpwd",$dbpwd,array("pwd" => true));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("lan-list"),"srvlist",array("width" => 250, "height" => 100));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table></form>";
@@ -197,8 +197,8 @@
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enftp",$ftpenable);
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-ipv4")));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("port-ftp"),"ftpports",$ftpports,array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")))."</td></tr>";
+				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-ipv4")));
+				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ftp"),"ftpports",$ftpports,array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")))."</td></tr>";
 				$output .= FS::$iMgr->tableSubmit("",$this->loc->s("Register"));
 				$output .= "</table></form>";
 			}
@@ -246,7 +246,7 @@
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-nightreport")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false);
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hnight","mnight",$nighth,$nightm)."</td></tr>";
-				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->addNumericInput("nightintval",$nightback > 0 ? $nigthback : 7,array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-prev-hour")))."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->numInput("nightintval",$nightback > 0 ? $nigthback : 7,array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-prev-hour")))."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-we")."</th></tr>";
 				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false);
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";

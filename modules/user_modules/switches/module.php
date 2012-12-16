@@ -282,7 +282,7 @@
 							$output .= "</select>";
 							// Maximum MAC addresses before violation mode
 							$psmaxmac = getPortSecMaxMACWithPID($device,$portid);
-							$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->addNumericInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => $this->loc->s("portsec-maxmac-tooltip")))."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => $this->loc->s("portsec-maxmac-tooltip")))."</td></tr>";
 						}
 						$cdp = getPortCDPEnableWithPID($device,$portid);
 						if($cdp != -1) {
@@ -293,7 +293,6 @@
 						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->check("wr")."</td></tr>";
 						$output .= "</table>";
 						if($portid != -1) {
-							//$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
 							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
 							$output .= "</form>";
 							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
@@ -336,8 +335,8 @@
 					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),"label" => $this->loc->s("enable-monitor")))."</li><li>";
 					$output .= FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>";
+					$output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
+					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>";
 					$output .= FS::$iMgr->submit("","Enregister")."</li>";
 					$output .= "</ul>";
 					$output .= "</form>";
@@ -815,11 +814,11 @@
 					$output .= "<h4>".$this->loc->s("title-retag")."</h4>";
 					if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=11");
-					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->addNumericInput("oldvl")."<br />";
-					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->addNumericInput("newvl")."<br />";
+					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
+					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->check("accept");
-					$output .= FS::$iMgr->addJSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
-					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
+					$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
+					$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
 					
 					// Common JS
 					$output .= "<script type=\"text/javascript\">function checkCopyState(copyId) {
@@ -875,11 +874,11 @@
 					$output .= FS::$iMgr->addElementToList($this->loc->s("Export"),1);
 					$output .= FS::$iMgr->addElementToList($this->loc->s("Import"),2);
 					$output .= "</select><br />";
-					$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->addIPInput("srvip")."<br />";
+					$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />";
 					$output .= $this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />";
 					$output .= "<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser");
 					$output .= " ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>";
-					$output .= FS::$iMgr->addJSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
+					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
 					
 					// Copy startup-config -> running-config
 					$output .= "<script type=\"text/javascript\">function restorestartupconfig() {";
@@ -894,7 +893,7 @@
 					$output .= "};";
 					$output .= "</script>";
 					$output .= "<h4>".$this->loc->s("title-restore-startup")."</h4>";
-					$output .= FS::$iMgr->addJSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
+					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
 					return $output;
 				}
 				else if($showmodule == 5) {
@@ -1137,8 +1136,8 @@
 				$formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
 				$formoutput .= "$('#pop').show();";
 				$formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
-				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
-				$formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
+				$formoutput .= "</li><li>".FS::$iMgr->JSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
 				$formoutput .= "</ul></form>";
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 			}

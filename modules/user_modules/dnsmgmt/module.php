@@ -221,8 +221,8 @@
 					$output .= "});return false;}</script>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->hidden("obsdata",$filter);
-					$output .= "Intervalle (jours) ".FS::$iMgr->addNumericInput("ival")."<br />";
-					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
+					$output .= "Intervalle (jours) ".FS::$iMgr->numInput("ival")."<br />";
+					$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
 					$output .= "</form><div id=\"obsres\"></div>";
 				}
 			}

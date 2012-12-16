@@ -75,14 +75,14 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			if(!FS::isAjaxCall()) {
-					$output .= "<div id=\"contenttabs\"><ul>";
-					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("webapp"),$sh);
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Collector"),$sh);
-					//$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Stats"),$sh);
-					$output .= "</ul></div>";
-					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
-			}
+				$output .= "<div id=\"contenttabs\"><ul>";
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("webapp"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Collector"),$sh);
+				//$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Stats"),$sh);
+				$output .= "</ul></div>";
+				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+		}
 			else if(!$sh || $sh == 1) {
 				$output = "<script type=\"text/javascript\">function filterAppLogs() {
 					$('#logd').fadeOut();

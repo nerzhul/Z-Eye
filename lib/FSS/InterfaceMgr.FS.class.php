@@ -139,7 +139,7 @@
 			}
 			return $output;
 		}
-		
+
 		public function tabledTextArea($label,$name,$options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
 			$output .= $this->textarea($name,(isset($options["value"]) ? $options["value"] : ""),$options);
@@ -155,15 +155,15 @@
 			return $output;
 		}
 
-		public function addNumericInput($name, $def_value = "", $options = array()) {
+		public function numInput($name, $def_value = "", $options = array()) {
 			$output = "";
-            if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
+		        if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
 			if(isset($options["tooltip"])) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
 			return $output;
 		}
 
-		public function addIPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
+		public function IPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
@@ -171,14 +171,14 @@
 			return $output;
 		}
 
-		public function addMacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+		public function MacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMAC('".$name."');\" />";
 			return $output;
 		}
 
-		public function addIPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
+		public function IPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask('".$name."');\" />";
 		}
 
@@ -230,7 +230,7 @@
 			return $output;
 		}
 
-		public function addJSSubmit($name, $value, $function) {
+		public function JSSubmit($name, $value, $function) {
 			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" onclick=\"".$function."\" />";
 		}
 
@@ -278,21 +278,21 @@
 		
 		public function addIndexedNumericLine($label,$name,$options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
-			$output .= $this->addNumericInput($name,(isset($options["value"]) ? $options["value"] : ""),$options);
+			$output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options);
 			$output .= "</center></td></tr>";
 			return $output;
 		}
 		
 		public function addIndexedIPLine($idx,$name,$def_value = "") {
 			$output = "<tr><td>".$idx."</td><td><center>";
-			$output .= $this->addIPInput($name,$def_value);
+			$output .= $this->IPInput($name,$def_value);
 			$output .= "</center></td></tr>";
 			return $output;
 		}
 
 		public function addIndexedIPMaskLine($idx,$name,$def_value = "") {
 			$output = "<tr><td>".$idx."</td><td><center>";
-			$output .= $this->addIPInput($name,$def_value);
+			$output .= $this->IPMaskInput($name,$def_value);
 			$output .= "</center></td></tr>";
 			return $output;
 		}
@@ -307,7 +307,7 @@
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
 			if(isset($options["js"]))
-				$output .= $this->addJSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,$options["js"]);
+				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,$options["js"]);
 			else
 				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$label);
 			$output .= "</center></th></tr>";
