@@ -92,7 +92,7 @@
 								require($dirpath."/main.php");
 								if($module->getRulesClass()->canAccessToModule()) {
 	                                                                $tmpoutput .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$data3["title"]."</a></div>";
-									$haselemtoshow = 1;
+								$haselemtoshow = 1;
 								}
 							}
 						}
@@ -128,15 +128,19 @@
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
+		private function tooltip($obj,$text) {
+			$output = '<script type="text/javascript">$("#'.$obj.'").mouseenter(function(){$("#tooltip").show("fast",function(){
+			$("#tooltip").html("'.addslashes($text).'");});}).mouseleave(function(){$("#tooltip").hide("fast",function(){
+			$("#tooltip").html("");});});</script>';
+			return $output;
+		}
+
 		public function textarea($name, $def_value = "", $options=array()) {
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".(isset($options["width"]) ? $options["width"] : 400).
 				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\">".$def_value."</textarea>";
-			if(isset($options["tooltip"])) {
-				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".
-					$options["tooltip"]."\"});</script>";
-			}
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 
@@ -151,7 +155,7 @@
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" />";
-			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
+			if($tooltip) $output .= $this->tooltip($name,$tooltip);
 			return $output;
 		}
 
@@ -159,7 +163,7 @@
 			$output = "";
 		        if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
-			if(isset($options["tooltip"])) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 
@@ -167,7 +171,7 @@
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
-			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
+			if($tooltip) $output .= $this->tooltip($name,$tooltip);
 			return $output;
 		}
 
@@ -223,10 +227,7 @@
 
 		public function submit($name, $value, $options = array()) {
 			$output = "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" />";
-			if(isset($options["tooltip"])) {
-				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".
-					$options["tooltip"]."\"});</script>";
-			}
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 
@@ -317,8 +318,7 @@
 			if(isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]))
 				$output .= " size=\"".$options["size"]."\" ";
 			$output .= ">";
-			if(isset($options["tooltip"]))
-				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 		
@@ -337,8 +337,7 @@
 			if(isset($options["check"]) && $options["check"])
 				$output .= "checked ";
 			$output .= " />";
-			if(isset($options["tooltip"]))
-				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 		

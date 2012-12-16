@@ -98,6 +98,13 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","");
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname","");
+			$formoutput .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
+			$formoutput .= FS::$iMgr->select("icon");
+			$formoutput .= FS::$iMgr->selElmt("Aucun","");
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_icons","id,name","","name");
+			while($data = pg_fetch_array($query))
+				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["id"]);
+			$formoutput .= "</select></td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
 			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true);
 			$formoutput .= FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
@@ -711,7 +718,7 @@
 			if(!$file)
 				return false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
-			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup","template = 'f'");
+			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,iconid","template = 'f'");
 			while($data = pg_fetch_array($query)) {
 				fwrite($file,"define host {\n\thost_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
 				fwrite($file,$data["alivecommand"]."\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkinterval"]."\n\tretry_interval\t".$data["retrycheckinterval"]."\n\t");
@@ -762,7 +769,13 @@
 					else fwrite($file,",");
 					fwrite($file,$data2["parent"]);
 				}
-				
+				if($data["iconid"] && FS::$secMgr->isNumeric($data["iconid"])) {
+					$iconpath = FS::$pgdbMgr->GetOneData("z_eye_icinga_icons","path","id = '".$data["iconid"]."'");
+					if($iconpath) {
+						fwrite($file,"\n\ticon_image\t".$iconpath);
+						fwrite($file,"\n\tstatusmap_image\t".$iconpath);
+					}
+				}
 				fwrite($file,"\n}\n\n");
 			}
 			fclose($file);
@@ -1249,13 +1262,15 @@
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$dname = FS::$secMgr->checkAndSecurisePostData("dname");
 					$parent = FS::$secMgr->checkAndSecurisePostData("parent");
+					$icon = FS::$secMgr->checkAndSecurisePostData("icon");
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
 					$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
 					$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
 					$ctg = FS::$secMgr->getPost("ctg","w");
 					
-					if(!$name || preg_match("#[ ]#",$name) || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod || !$notifperiod || !$ctg) {
+					if(!$name || preg_match("#[ ]#",$name) || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
+						 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon)) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
@@ -1317,11 +1332,11 @@
 					}
 
 					FS::$pgdbMgr->Insert("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
-						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template",
+						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid",
 						"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
-						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."'");
+						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".$icon."'");
 					if($parent && !in_array("none",$parent)) {
 						for($i=0;$i<count($parent);$i++) {
 							FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");

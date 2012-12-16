@@ -39,8 +39,8 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= "<h3>".$this->loc->s("title-dns")."</h3>";
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-				$output .= FS::$iMgr->select("f");
+				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+				$formoutput .= FS::$iMgr->select("f");
 				
 				$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
 				if($shA == NULL) $shA = 1;
@@ -62,36 +62,41 @@
 				
 				$shTXT = FS::$secMgr->checkAndSecuriseGetData("stxt");
 				if($shTXT == NULL) $shTXT = 1;
-				
+
 				$shother = FS::$secMgr->checkAndSecuriseGetData("sother");
 				if($shother == NULL) $shother = 1;
-				
+
+				$found = false;
 				$query = FS::$pgdbMgr->Select("z_eye_dns_zone_cache","zonename","","zonename");
 				while($data = pg_fetch_array($query)) {
+					if(!$found) $found = true;
 					$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
 				}
-				$output .= $formoutput;
-				$output .= "</select><br />";
-				$output .= FS::$iMgr->check("sa",array("check" => $shA))."A ";
-				$output .= FS::$iMgr->check("saaaa",array("check" => $shAAAA))."AAAA ";
-				$output .= FS::$iMgr->check("scname",array("check" => $shCNAME))."CNAME ";
-				$output .= FS::$iMgr->check("sns",array("check" => $shNS))."NS ";
-				$output .= FS::$iMgr->check("ssrv",array("check" => $shSRV))."SRV ";
-				$output .= FS::$iMgr->check("stxt",array("check" => $shTXT))."TXT ";
-				$output .= FS::$iMgr->check("sptr",array("check" => $shPTR))."PTR ";
-				$output .= FS::$iMgr->check("sother",array("check" => $shother)).$this->loc->s("Others")." ";
-				$output .= "<br />";
-				$output .= FS::$iMgr->submit("",$this->loc->s("Filter"));
-				$output .= "</form>";
-				
-				if($filter) {
-					$output .= "<div id=\"contenttabs\"><ul>";
-					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">".$this->loc->s("Stats")."</a>";
-					$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">".$this->loc->s("expert-tools")."</a>";
-					$output .= "</ul></div>";
-					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+				if($found) {
+					$output .= $formoutput;
+					$output .= "</select><br />";
+					$output .= FS::$iMgr->check("sa",array("check" => $shA))."A ";
+					$output .= FS::$iMgr->check("saaaa",array("check" => $shAAAA))."AAAA ";
+					$output .= FS::$iMgr->check("scname",array("check" => $shCNAME))."CNAME ";
+					$output .= FS::$iMgr->check("sns",array("check" => $shNS))."NS ";
+					$output .= FS::$iMgr->check("ssrv",array("check" => $shSRV))."SRV ";
+					$output .= FS::$iMgr->check("stxt",array("check" => $shTXT))."TXT ";
+					$output .= FS::$iMgr->check("sptr",array("check" => $shPTR))."PTR ";
+					$output .= FS::$iMgr->check("sother",array("check" => $shother)).$this->loc->s("Others")." ";
+					$output .= "<br />";
+					$output .= FS::$iMgr->submit("",$this->loc->s("Filter"));
+					$output .= "</form>";
+					if($filter) {
+						$output .= "<div id=\"contenttabs\"><ul>";
+						$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">".$this->loc->s("Stats")."</a>";
+						$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">".$this->loc->s("expert-tools")."</a>";
+						$output .= "</ul></div>";
+						$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+						$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+					}
 				}
+				else
+					$output .= FS::$iMgr->printError($this->loc->s("no-data-found"));
 			} else {
 				if(!$showmodule || $showmodule == 1) {
 					$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
@@ -182,33 +187,49 @@
 						if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 					}
 					
-					$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","zonename,record,rectype,recval",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
+					$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","zonename,record,rectype,recval,server",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
 					$curzone = "";
+					$dnsrecords = array();
 					while($data = pg_fetch_array($query)) {
 						if($curzone != $data["zonename"]) {
 							$curzone = $data["zonename"];
 							if($curzone != "") $dnsoutput .= "</table>";
-							$dnsoutput .= "<h4>Zone: ".$data["zonename"]."</h4><table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th></tr>";
+							$dnsoutput .= "<h4>Zone: ".$filter."</h4><table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr>";
 						}
-						switch($data["rectype"]) {
-							case "A": case "AAAA":
-								$style = "background-color: #FFFF80;"; break;
-							case "CNAME":
-								$style = "background-color: #BFFFBF;"; break;
-							case "SRV":
-								$style = "background-color: #B3FFFF;"; break;
-							case "NS":
-								$style = "background-color: #FF8888;"; break;
-							default: $style = ""; break;
-						}
-						$dnsoutput .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$data["record"]."</td><td>".$data["rectype"]."</td><td>";
-						if($data["rectype"] == "A")
-							$dnsoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$data["recval"]."\">".$data["recval"]."</a>";
-						else
-							$dnsoutput .= $data["recval"];
-						$dnsoutput .= "</td></tr>";
+						if(!isset($dnsrecords[$data["record"]])) $dnsrecords[$data["record"]] = array();
+						if(!isset($dnsrecords[$data["record"]][$data["rectype"]])) $dnsrecords[$data["record"]][$data["rectype"]] = array();
+						if(!isset($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]])) $dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]] = array();
+						array_push($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]],$data["server"]);
 					}
-					
+					foreach($dnsrecords as $recordname => $records) {
+						foreach($records as $recordtype => $records2) {
+							foreach($records2 as $recordval => $servers) {
+								switch($recordtype) {
+									case "A": case "AAAA":
+										$style = "background-color: #FFFF80;"; break;
+									case "CNAME":
+										$style = "background-color: #BFFFBF;"; break;
+									case "SRV":
+										$style = "background-color: #B3FFFF;"; break;
+									case "NS":
+										$style = "background-color: #FF8888;"; break;
+									default: $style = ""; break;
+								}
+								$dnsoutput .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
+								if($recordtype == "A")
+									$dnsoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$recordval."\">".$recordval."</a>";
+								else
+									$dnsoutput .= $recordval;
+								$dnsoutput .= "</td><td>";
+								for($i=0;$i<count($servers);$i++) {
+									$dnsoutput .= $servers[$i];
+									if($i != count($servers)) $dnsoutput .= "<br />";
+								}
+								$dnsoutput .= "</td></tr>";
+							}
+						}
+					}
+
 					if(strlen($dnsoutput) > 0)
 						$output .= $dnsoutput."</table>";
 				}

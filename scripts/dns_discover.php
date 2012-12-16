@@ -66,7 +66,6 @@
 				if($DNSfound == false) $DNSfound = true;
 				else $DNSServers .= ", ";
 				$DNSServers .= $data["addr"];
-
 				$zones = preg_split("/zone /",$dns_stream_datas);
 				for($i=0;$i<count($zones);$i++) {
 					$zone = preg_split("#\n#",$zones[$i]);
@@ -112,7 +111,7 @@
 							if(count($record) == 3) {
 								if(strlen($record[0]) > 0)
 									$currecord = $record[0];
-								FS::$pgdbMgr->Insert("z_eye_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."'");
+								FS::$pgdbMgr->Insert("z_eye_dns_zone_record_cache","zonename,record,rectype,recval,server","'".$zonename."','".(strlen($recsuffix) > 0 ? $recsuffix.".":"").$currecord."','".$record[1]."','".$record[2]."','".$data["addr"]."'");
 							}
 							else if(count($record) == 2) {
 								/*if(preg_match('#\$ORIGIN#',$record[0]) && $record[1] != $zonename)
@@ -125,7 +124,7 @@
 									if($k != count($record) -1)
 										$tmprec .= " ";
 								}
-								FS::$pgdbMgr->Insert("z_eye_dns_zone_record_cache","zonename,record,rectype,recval","'".$zonename."','".$currecord."','".$record[1]."','".$tmprec."'");
+								FS::$pgdbMgr->Insert("z_eye_dns_zone_record_cache","zonename,record,rectype,recval,server","'".$zonename."','".$currecord."','".$record[1]."','".$tmprec."','".$data["addr"]."'");
 							}
 						}
 					}

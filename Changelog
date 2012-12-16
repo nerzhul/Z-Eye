@@ -172,3 +172,12 @@ Beta 2.3
 
 Beta 2.4
 - Radius record filtering
+- Code cleanup
+
+Beta 2.5
+- Rename many interface function
+- Merge all addXXLine to idxLine
+- Implement DNS multi-server support (also bufferize datas)
+
+Beta 2.6
+- Rewrite tooltip functionality and remove external JS lib

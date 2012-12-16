@@ -31,6 +31,7 @@
 			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
 			$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
 			$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
+			$output .= "<div id=\"tooltip\">"."</div>";
 			$tmpoutput = "";
 			if(FS::$sessMgr->isConnected())
 				$tmpoutput .= $this->showSearchForm();

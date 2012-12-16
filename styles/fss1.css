@@ -613,12 +613,22 @@ a:hover {
 	color: red;
 }
 
-#editf, #trash {
+#editf, #trash, #tooltip {
 	background-color: #333;
         border-radius: 4px 4px 4px 4px;
         position: fixed;
         opacity: 0.6;
         padding: 16px;
+}
+
+#tooltip {
+	right: 20px;
+	top: 50px;
+	display:none;
+	color: white;
+	font-size: 12px;
+	max-width: 400px;
+	opacity: 0.8;
 }
 
 #trash {

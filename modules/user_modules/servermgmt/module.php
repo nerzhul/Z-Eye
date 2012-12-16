@@ -268,11 +268,11 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine("DHCP ?","dhcp",$dhcp > 0 ? true : false,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath);
-			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath);
+			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath,array("tooltip" => $this->loc->s("tooltip-rights")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath,array("tooltip" => $this->loc->s("tooltip-rights")));
 			$output .= FS::$iMgr->idxLine("DNS ?","dns",$dns > 0 ? true : false,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath);
-			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed);
+			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => $this->loc->s("tooltip-rights")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => $this->loc->s("tooltip-rights")));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 			

@@ -104,9 +104,9 @@
 							$output .= FS::$iMgr->hidden("port",$port);
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
-						$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".FS::$iMgr->input("desc",$data["name"])."</td></tr>";
+						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => $this->loc->s("tooltip-desc")));
 						$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-						$output .= "<tr><td>".$this->loc->s("Plug")."</td><td>".FS::$iMgr->input("prise",$piece)."</td></tr>";
+						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => $this->loc->s("tooltip-plug")));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = getPortMtuWithPID($device,$portid);
 						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";

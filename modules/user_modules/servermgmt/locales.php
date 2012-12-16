@@ -65,6 +65,7 @@
 					"title-edit-radius" => "Edition des informations de la base de données Radius",
 					"title-radius-db" => "Liste des bases Radius",
 					"title-server-list" => "Liste des serveurs",
+					"tooltip-rights" => "Attention l'utilisateur doit avoir des droits de lecture. Créer un groupe et y ajouter votre utilisateur SSH est une bonne idée",
 					"Type" => "Type",
 					"User" => "Utilisateur",
 				),
@@ -111,6 +112,7 @@
 					"title-edit-radius" => "Edit Radius DB",
 					"title-radius-db" => "Radius DB list",
 					"title-server-list" => "Server list",
+					"tooltip-rights" => "Warning, your user need read rights. Use a special group (and add your SSH user into) may be a good idea",
 					"Type" => "Type",
 					"User" => "User",
 				)
