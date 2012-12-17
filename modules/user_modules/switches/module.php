@@ -119,11 +119,11 @@
 						else
 							$output .= "unk";
 						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false))."</td></tr>";
+						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false, "tooltip" => $this->loc->s("tooltip-shut")))."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
                                                 $sp = getPortSpeedWithPID($device,$portid);
 						if($sp > 0) {
-							$output .= FS::$iMgr->select("speed");
+							$output .= FS::$iMgr->select("speed","",null,false,array("tooltip" => $this->loc->s("tooltip-speed")));
 							$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
 							if(preg_match("#Ethernet#",$port)) {
 								$output .= FS::$iMgr->selElmt("10 Mbits",10000000,$sp == 10000000 ? true : false);
@@ -255,7 +255,7 @@
 						* Voice vlan
 						*/
 						$output .= "</td></tr><tr><td>".$this->loc->s("voice-vlan")."</td><td>";
-						$output .= FS::$iMgr->select("voicevlan","");
+						$output .= FS::$iMgr->select("voicevlan","",null,false,array("tooltip" => $this->loc->s("tooltip-voicevlan")));
 						$output .= $voicevlanoutput;
 						$output .= "</select></td></tr>";
 						$portsecen = getPortSecEnableWithPID($device,$portid);

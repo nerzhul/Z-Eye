@@ -129,9 +129,9 @@
 		}
 
 		private function tooltip($obj,$text) {
-			$output = '<script type="text/javascript">$("#'.$obj.'").mouseenter(function(){$("#tooltip").show("fast",function(){
-			$("#tooltip").html("'.addslashes($text).'");});}).mouseleave(function(){$("#tooltip").hide("fast",function(){
-			$("#tooltip").html("");});});</script>';
+			$output = '<script type="text/javascript">$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($text).'");
+			$("#tooltip").fadeIn("fast");}).mouseleave(function(){$("#tooltip").fadeOut("fast",function(){
+			});});</script>';
 			return $output;
 		}
 
