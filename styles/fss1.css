@@ -629,6 +629,8 @@ a:hover {
 	font-size: 12px;
 	max-width: 400px;
 	opacity: 0.8;
+	text-align: justify;
+	text-justify: inter-word;
 }
 
 #trash {

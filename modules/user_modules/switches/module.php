@@ -290,7 +290,7 @@
 							$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => $this->loc->s("cdp-tooltip")))."</td></tr>";
 						}
 
-						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk"));
+						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => $this->loc->s("tooltip-save")));
 						$output .= "</table>";
 						if($portid != -1) {
 							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
