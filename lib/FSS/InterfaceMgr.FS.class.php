@@ -270,7 +270,7 @@
 			$output = "<tr><td>".$label."</td><td><center>";
 			if(isset($options["type"])) {
 				switch($options["type"]) {
-					case "chk": $output .= $this->check($name, array("check" => $def_value)); break;
+					case "chk": $options["check"] = $def_value; $output .= $this->check($name, $options); break;
 					case "ip": $output .= $this->IPInput($name,$def_value); break;
 					case "ipmask": $output .= $this->IPMaskInput($name,$def_value); break;
 					case "num": $output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options); break;

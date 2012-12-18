@@ -287,10 +287,10 @@
 						$cdp = getPortCDPEnableWithPID($device,$portid);
 						if($cdp != -1) {
 							$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
-							$output .= "<tr><td>".$this->loc->s("cdp-enable")."</td><td>".FS::$iMgr->check("cdpen",array("check" => $cdp == 1 ? true : false, "tooltip" => $this->loc->s("cdp-tooltip")))."</td></tr>";
+							$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => $this->loc->s("cdp-tooltip")))."</td></tr>";
 						}
 
-						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->check("wr")."</td></tr>";
+						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk"));
 						$output .= "</table>";
 						if($portid != -1) {
 							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
