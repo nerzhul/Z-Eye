@@ -96,37 +96,23 @@ div#menuStack div {
 .menupopup {
 	position: absolute;
 	display: block;
-	background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
-	border-radius: 4px;
-	border-bottom: 1px solid #AAA;
-	margin-left: -25px;
+	background-image: -moz-linear-gradient(center top , #232323 0px, #050505 100%);
+	border-bottom: 1px solid #111;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
-}
-
-
-#menuElmt {
-	display: inline-block;
-	padding: 12px 6px 12px 6px;
-	margin-top: 1px;
-	background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
-        vertical-align: center;
-        border-radius: 2px 2px 2px 2px;
-        cursor: pointer;
-	width: 100px;
 }
 
 #menuTitle {
 	display: inline-block;
 	padding: 12px 6px 12px 6px;
 	margin-top: 1px;
-	background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
-        vertical-align: center;
-        border-radius: 2px 2px 2px 2px;
-        cursor: pointer;
+	background-image: -moz-linear-gradient(center top , #232323 0px, #050505 100%);
+	vertical-align: center;
+	cursor: pointer;
 	width: 100px;
 }
-#menuElmt:hover, #menuTitle:hover {
-	background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
+
+#menuTitle:hover {
+	background-image: -moz-linear-gradient(center top , #050505 0px, #232323 100%);
 	font-weight: bold;
 }
 
@@ -135,49 +121,13 @@ div#menuStack div {
 	width: 150px;
 }
 
-.menuItem:hover { background-color: #FFF; font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
-
-#searchform {
-        height: 50px;
-	margin-left: -10px;
-        margin-top: 50px;
-        position: fixed;
-        width: auto;
-        opacity: 0.95;
-}
-
-.tabsearchform {
-        background-color: #FFF;
-        height: 100%;
-        top: 0;
-        z-index: 750;
-        border-radius: 0 4px 4px 0;
-        width: 50px;
-	padding-left: 10px;
-        float: left;
-        box-shadow: 0 1px 1px 1px;
-}
-
-#searchpanel {
-        width: auto;
-        height: 100%;
-        background: #FFF;
-        overflow: hidden;
-        position: relative;
-        z-index: 9;
-        display: none;
-        float: left;
-        box-shadow: 0 1px 1px 1px;
-        padding-left: 10px;
-        padding-right: 10px;
-}
+.menuItem:hover { background-color: #000; font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
 
 .searchButton {
         background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
         border: 1px solid #CCC;
         vertical-align: center;
         height: 28px;
-        margin-top: 10px;
         border-radius: 3px 3px 3px 3px;
         cursor: pointer;
 }
@@ -466,12 +416,12 @@ a:hover {
 .clearfixlogform {height: 1%;}
 .clearfixlogform {display: block;}
 
-#menuElmt ul.login {
+#menuTitle ul.login {
 	margin: 0;
 	margin-left: -20px;
 }
 
-#menuElmt ul.login li {
+#menuTitle ul.login li {
 	margin-left: -20px;
 	display: block;
 }
@@ -482,9 +432,11 @@ a:hover {
 	width: 100%;
 	z-index: 20;
 	text-align: center;
-	margin-left: auto;
+	margin-left: -8px;
 	margin-right: auto;
-	opacity: 0.93;
+	opacity: 0.97;
+	color: white;
+	background-image: -moz-linear-gradient(center top , #232323 0px, #050505 100%);
 }
 
 #logform:hover {
@@ -495,24 +447,19 @@ a:hover {
 	display: inline-block;
 	width: 100%;
 	height: auto;
-	color: #333;
+	color: #CCC;
 	overflow: hidden;
 	z-index: 3;
 	display: none;
 }
 
 #menupanel {
-	opacity: 1.0;
-	overflow: hidden;
 	z-index: 18;
 	display:inline-block;
-	background-color: #EEE;
-	border-bottom: 1px solid #999;
-	border-radius: 0 0 10px 10px;
 }
 
 #menupanel a {
-	color: #111;
+	color: #EEE;
 	text-decoration: none;
 	font-size: 12px;
 	font-style: normal;
@@ -600,6 +547,16 @@ a:hover {
 
 #logpanel .contentlog input:focus.field {
 	background: #545454;
+}
+
+#search {
+	position: fixed;
+	top: 4px;
+	right: 10px;
+}
+
+#search input {
+	margin-left: 20px;
 }
 
 *[draggable=true] {

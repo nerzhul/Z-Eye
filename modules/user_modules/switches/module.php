@@ -290,7 +290,7 @@
 							$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => $this->loc->s("cdp-tooltip")))."</td></tr>";
 						}
 
-						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => $this->loc->s("tooltip-save")));
+						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => $this->loc->s("tooltip-saveone")));
 						$output .= "</table>";
 						if($portid != -1) {
 							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
@@ -1952,7 +1952,10 @@
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
-					exec("netdisco -d ".$dip);
+					if(Config::getOS() == "FreeBSD)
+						exec("/usr/local/bin/netdisco -d ".$dip);
+					else
+						exec("netdisco -d ".$dip);
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Launch discovering for device '".$dip."'");
 					header("Location: index.php?mod=".$this->mid);
 					return;

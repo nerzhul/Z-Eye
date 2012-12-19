@@ -181,3 +181,6 @@ Beta 2.5
 
 Beta 2.6
 - Rewrite tooltip functionality and remove external JS lib
+- Fix a bug on make_portid_cache.py when there is a few switches, which
+	quit program before discovering datas
+- Modernize interface

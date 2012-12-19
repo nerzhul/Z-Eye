@@ -127,6 +127,8 @@ try:
 			else:
 				devcom = defaultSNMPRO
 			thread.start_new_thread(fetchSNMPInfos,(devip,devname,devcom))
+		""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
+		time.sleep(1)
 	except StandardError, e:
 		print "[Z-Eye][PortId-Caching] Fatal Error: %s" % e
 		zeye_log("[Z-Eye][PortId-Caching] Fatal Error: %s" % e)
