@@ -65,7 +65,7 @@
 		}
 		
 		private function showGeneralTab() {
-			$output = "";
+			$output = FS::$iMgr->printError($this->loc->s("not-implemented"));
 			
 			return $output;
 		}

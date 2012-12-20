@@ -30,7 +30,7 @@ threadCounter = 0
 max_threads = 20
 
 def zeye_log(text):
-        logfile = open("/var/www/datas/logs/z_eye_collector.log","a")
+        logfile = open("/usr/local/www/z-eye/datas/logs/z_eye_collector.log","a")
         logfile.writelines("%s\n"  % text)
         logfile.close()
 

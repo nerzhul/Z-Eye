@@ -22,5 +22,5 @@
 
 pgHost = "127.0.0.1"
 pgUser = "netdisco"
-pgPwd = "dbpassword"
+pgPwd = "netdisco"
 pgDB = "netdisco"

@@ -33,7 +33,7 @@ import netdiscoCfg
 threadCounter = 0
 
 def zeye_log(text):
-	logfile = open("/var/www/datas/logs/z_eye_collector.log","a")
+	logfile = open("/usr/local/www/z-eye/datas/logs/z_eye_collector.log","a")
 	logfile.writelines("%s\n"  % text)
 	logfile.close()
 
@@ -45,8 +45,8 @@ def fetchMRTGInfos(ip,devname,devcom):
                 pipe = os.popen('{ ' + cmd + '; }', 'r')
                 text = pipe.read()
                 pipe.close()
-                text = re.sub("\/var\/www\/mrtg","/var/www/datas/rrd",text)
-                cfgfile = open("/var/www/datas/mrtg-config/mrtg-%s.cfg" % devname,"w")
+                text = re.sub("\/var\/www\/mrtg","/usr/local/www/z-eye/datas/rrd",text)
+                cfgfile = open("/usr/local/www/z-eye/datas/mrtg-config/mrtg-%s.cfg" % devname,"w")
                 cfgfile.writelines(text)
                 cfgfile.close()
 		threadCounter = threadCounter - 1

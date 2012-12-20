@@ -38,7 +38,7 @@ import netdiscoCfg
 max_threads = 30
 
 def zeye_log(text):
-        logfile = open("/var/www/datas/logs/z_eye_radius_cleaner.log","a")
+        logfile = open("/usr/local/www/z-eye/datas/logs/z_eye_radius_cleaner.log","a")
 	print "%s\n"  % text
         logfile.writelines("%s\n"  % text)
         logfile.close()
