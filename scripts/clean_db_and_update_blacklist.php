@@ -1,8 +1,6 @@
 <?php
-
-/*
-        * Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-        * Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	/*
+        * Copyright (C) 2010-2012 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
         *
         * This program is free software; you can redistribute it and/or modify
         * it under the terms of the GNU General Public License as published by
@@ -20,7 +18,6 @@
         */
         require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 
-$snortDB = new FSPostgreSQLMgr();
 // Load snort keys for db config
 $dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
 if($dbname == "") $dbname = "snort";

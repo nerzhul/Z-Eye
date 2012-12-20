@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2012 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -1952,10 +1951,7 @@
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
-					if(Config::getOS() == "FreeBSD)
-						exec("/usr/local/bin/netdisco -d ".$dip);
-					else
-						exec("netdisco -d ".$dip);
+					exec("netdisco -d ".$dip);
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Launch discovering for device '".$dip."'");
 					header("Location: index.php?mod=".$this->mid);
 					return;

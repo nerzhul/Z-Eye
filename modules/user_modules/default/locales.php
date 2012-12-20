@@ -1,6 +1,6 @@
 <?php
-	/*
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+    /*
+    * Copyright (C) 2010-2012 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
     *
     * This program is free software; you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
     * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
     */
 
-    require_once(dirname(__FILE__)."/../../../lib/FSS/objects/Locales.FS.class.php");
-    
+	require_once(dirname(__FILE__)."/../../../lib/FSS/objects/Locales.FS.class.php");
+
 	class lDefault extends zLocales {
 		function lDefault() {
 			$this->locales = array(

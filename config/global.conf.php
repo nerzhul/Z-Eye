@@ -11,7 +11,6 @@
 		4: sha1(md5(sha1.username).uid)*/
 		private static $cryptlevel = 1;
 		private static $favicon = false;
-		private static $svnrev = true;
 		private static $pgsqlen = true;
 		private static $snmpen = true;
 		private static $defaultlang = "fr";
@@ -22,7 +21,6 @@
 		public static function getOS() { return Config::$OS; }
 		public static function getCryptLevel() { return Config::$cryptlevel; }
 		public static function hasFavicon() { return Config::$favicon; }
-		public static function showSVNrev() { return Config::$svnrev; }
 		public static function enablePostgreSQL() { return Config::$pgsqlen; }
 		public static function enableSNMP() { return Config::$snmpen; }
 		public static function getDefaultLang() { return Config::$defaultlang; }
