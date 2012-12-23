@@ -192,3 +192,4 @@ Beta 3.0
 
 Beta 3.1
 - IP Manager now distinguish Free adresses from available (and distributed) addresses
+- Fix jQueryUI calendar

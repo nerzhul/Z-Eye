@@ -208,7 +208,7 @@
 					if($reserv > 0) $netoutput .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
 					if($fixedip > 0) $netoutput .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
 					if($distrib > 0) $netoutput .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
-					$netoutput .= "{ name: '".$this->loc->s("Free")."', y:".$free.", color: 'green'}]
+					$netoutput .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
 							}]});</script>";
 					}
 					$output .= $netoutput;
