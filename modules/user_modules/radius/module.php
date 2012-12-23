@@ -46,7 +46,7 @@
 			if(!FS::isAjaxCall()) {
 				$found = 0;
 				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-					$output .= "<h4>".$this->loc->s("title-deleg")."</h4>";
+					$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
 					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 					$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
 					while($data = pg_fetch_array($query)) {
@@ -58,7 +58,7 @@
 					else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
 				}
 				else {
-					$output .= "<h4>".$this->loc->s("title-usermgmt")."</h4>";
+					$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
 					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 					$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname");
 	                	        while($data = pg_fetch_array($query)) {
@@ -338,7 +338,7 @@
 				FS::$iMgr->submit("",$this->loc->s("Save")).
 				"</li></ul></form>";
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Profil"));
-				$tmpoutput = "<h4>".$this->loc->s("title-profillist")."</h4>";
+				$tmpoutput = "<h3>".$this->loc->s("title-profillist")."</h3>";
 				$found = 0;
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
@@ -389,7 +389,7 @@
 						$grouplist .= FS::$iMgr->selElmt($groups[$i],$groups[$i]);
 				}
 
-				$output .= "<h4>".$this->loc->s("title-mass-import")."</h4>";
+				$output .= "<h3>".$this->loc->s("title-mass-import")."</h3>";
 				$output .= "<script type=\"text/javascript\"> function changeUForm() {
 						if(document.getElementsByName('usertype')[0].value == 1) {
 								$('#uptype').show(); $('#csvtooltip').html(\"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b>\");
@@ -429,7 +429,7 @@
 
 				$found = 0;
 				$formoutput = "";
-				$formoutput .= "<h4>".$this->loc->s("title-auto-import")."</h4>";
+				$formoutput .= "<h3>".$this->loc->s("title-auto-import")."</h3>";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("subnet","","Subnet DHCP");
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask");
@@ -491,7 +491,7 @@
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) {
 							$found = 1;
-							$tmpoutput .= "<h4>".$this->loc->s("title-auto-import2")."</h4><table id=\"radsubnet\"><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
+							$tmpoutput .= "<h3>".$this->loc->s("title-auto-import2")."</h3><table id=\"radsubnet\"><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
 							$this->loc->s("Radius-profile")."</th></tr>";
 						}
 						$tmpoutput .= "<tr><td draggable=\"true\" id=\"dragtd\">".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td></tr>";
@@ -508,7 +508,7 @@
                                 $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
                                 $radSQLMgr->Connect();
 
-				$output .= "<h4>".$this->loc->s("title-cleanusers")."</h4>";
+				$output .= "<h3>".$this->loc->s("title-cleanusers")."</h3>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=9");
 				$output .= "<table>";
 
@@ -586,7 +586,7 @@
 			$output = "";
 			$ug = FS::$secMgr->checkAndSecurisePostData("ug");
 			$uf = FS::$secMgr->checkAndSecurisePostData("uf");
-			$tmpoutput = "<h4>".$this->loc->s("title-userlist")."</h4>";
+			$tmpoutput = "<h3>".$this->loc->s("title-userlist")."</h3>";
 			$tmpoutput .= "<script type=\"text/javascript\">
 				$.event.props.push('dataTransfer');
 				$('#raduser #dragtd').on({
@@ -707,7 +707,7 @@
 					$utype = 1;
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= FS::$iMgr->hidden("uedit",1);
-				$formoutput .= "<h4>".$this->loc->s("title-usermod")." '".$radentry."'</h4>";
+				$formoutput .= "<h3>".$this->loc->s("title-usermod")." '".$radentry."'</h3>";
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->hidden("utype",$utype)."<b>".$this->loc->s("User-type").": </b>".
 				($utype == 1 ? "Normal" : $this->loc->s("Mac-addr"));
 				$formoutput .= "</li><li>".
@@ -829,7 +829,7 @@
 				function delAttrElmt(attridx) {
 						$('.attrli'+attridx).remove();
 				}</script>";
-				$formoutput .= "<h4>Modification du groupe '".$radentry."'</h4>";
+				$formoutput .= "<h3>Modification du groupe '".$radentry."'</h3>";
 				$formoutput .= "<ul class=\"ulform\">";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
                 $formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);

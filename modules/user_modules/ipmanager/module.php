@@ -38,7 +38,8 @@
 
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h3>".$this->loc->s("title-ip-supervision")."</h3>";
+				$output .= "<h1>".$this->loc->s("title-ip-supervision")."</h1>";
+				$output .= $this->loc->s("choose-net");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$output .= FS::$iMgr->select("f","submit()");
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
@@ -50,7 +51,7 @@
 				$output .= FS::$iMgr->submit("","Consulter");
 				$output .= "</form><br />";
 				if(!$filter || !FS::$secMgr->isIP($filter))
-					return $this->loc->s("choose-net").": <br /><br />".$output;
+					return $output;
 
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats"),$showmodule);
@@ -64,7 +65,7 @@
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
 				while($data = pg_fetch_array($query)) {
 					$iparray = array();
-					$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
+					$netoutput .= "<h3>Réseau : ".$data["netid"]."/".$data["netmask"]."</h3>";
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
 					
 					$netobj = new FSNetwork();
@@ -119,6 +120,7 @@
 					$used = 0;
 					$reserv = 0;
 					$free = 0;
+					$distrib = 0;
 					$fixedip = 0;
 					
 					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
@@ -145,6 +147,11 @@
 								$rstate = $this->loc->s("Reserved");
 								$style = "background-color: #FFFF80;";
 								$reserv++;
+								break;
+							case 4:
+								$rstate = $this->loc->s("Distributed");
+								$style = "background-color: #BFFBFF;";
+								$distrib++;
 								break;
 							default: {
 									$rstate = $this->loc->s("Free");
@@ -196,11 +203,12 @@
 										enabled: true,formatter: function() { return '<b>'+this.point.name+'</b>: '+
 										this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
 							}}},
-							series: [{ type: 'pie', data: 
-								[{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },
-								{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},
-								{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},
-								{ name: '".$this->loc->s("Free")."', y:".$free.", color: 'green'}]
+							series: [{ type: 'pie', data: [";
+					if($used > 0) $netoutput .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
+					if($reserv > 0) $netoutput .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
+					if($fixedip > 0) $netoutput .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
+					if($distrib > 0) $netoutput .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+					$netoutput .= "{ name: '".$this->loc->s("Free")."', y:".$free.", color: 'green'}]
 							}]});</script>";
 					}
 					$output .= $netoutput;

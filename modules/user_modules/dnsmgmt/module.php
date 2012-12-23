@@ -37,7 +37,7 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h3>".$this->loc->s("title-dns")."</h3>";
+				$output .= "<h1>".$this->loc->s("title-dns")."</h1>";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$formoutput .= FS::$iMgr->select("f");
 				
@@ -193,7 +193,7 @@
 						if($curzone != $data["zonename"]) {
 							$curzone = $data["zonename"];
 							if($curzone != "") $dnsoutput .= "</table>";
-							$dnsoutput .= "<h4>Zone: ".$filter."</h4><table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr>";
+							$dnsoutput .= "<h3>Zone: ".$filter."</h3><table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr>";
 						}
 						if(!isset($dnsrecords[$data["record"]])) $dnsrecords[$data["record"]] = array();
 						if(!isset($dnsrecords[$data["record"]][$data["rectype"]])) $dnsrecords[$data["record"]][$data["rectype"]] = array();
@@ -233,7 +233,7 @@
 						$output .= $dnsoutput."</table>";
 				}
 				else if($showmodule == 2) {
-					$output .= "<h4>".$this->loc->s("title-old-records")."</h4>";
+					$output .= "<h3>".$this->loc->s("title-old-records")."</h3>";
 					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
 					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
@@ -350,7 +350,7 @@
 						}
 					}
 					if($found) {
-						echo "<h4>".$this->loc->s("found-records")."</h4>".$output;
+						echo "<h3>".$this->loc->s("found-records")."</h3>".$output;
 						foreach($obsoletes as $key => $value)
 							echo $value;
 					}

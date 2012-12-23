@@ -24,7 +24,7 @@
 	class iServerMgmt extends genModule{
 		function iServerMgmt() { parent::genModule(); $this->loc = new lServerMgmt(); }
 		public function Load() {
-			$output = "<h3>".$this->loc->s("title-analysismgmt")."</h3>";
+			$output = "<h1>".$this->loc->s("title-analysismgmt")."</h1>";
 			$do = FS::$secMgr->checkAndSecuriseGetData("do");
 			switch($do) {
 				case 1: case 2:
@@ -52,9 +52,9 @@
 			$spath = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>".$this->loc->s("title-add-backup-switch-server")."</h4>";
+				$output = "<h2>".$this->loc->s("title-add-backup-switch-server")."</h2>";
 			else {
-				$output = "<h4>".$this->loc->s("title-edit-backup-switch-server")."</h4>";
+				$output = "<h2>".$this->loc->s("title-edit-backup-switch-server")."</h2>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$type = FS::$secMgr->checkAndSecuriseGetData("type");
 				if(!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
@@ -143,9 +143,9 @@
 			$salias = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>".$this->loc->s("title-add-radius")."</h4>";
+				$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
 			else {
-				$output = "<h4>".$this->loc->s("title-edit-radius")."</h4>";
+				$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
 				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
@@ -218,9 +218,9 @@
 			$chrootnamed = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>".$this->loc->s("add-server")."</h4>";
+				$output = "<h2>".$this->loc->s("add-server")."</h2>";
 			else {
-				$output = "<h4>".$this->loc->s("edit-server")."</h4>";
+				$output = "<h2>".$this->loc->s("edit-server")."</h2>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				if(!$addr || $addr == "") {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
@@ -279,7 +279,7 @@
 		}
 		
 		private function showServerList() {
-			$output = "<h4>".$this->loc->s("title-server-list")."</h4>";
+			$output = "<h2>".$this->loc->s("title-server-list")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-server")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
 				"</th><th>DHCP</th><th>DNS</th><th>".$this->loc->s("Remove")."</th></tr>";
@@ -299,7 +299,7 @@
 			else
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-server-found")." !");
 
-			$output .= "<h4>".$this->loc->s("title-radius-db")."</h4>";
+			$output .= "<h2>".$this->loc->s("title-radius-db")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-base")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
@@ -318,7 +318,7 @@
 			else
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-db-given")." !");
 				
-			$output .= "<h4>".$this->loc->s("title-backup-switch")."</h4>";
+			$output .= "<h2>".$this->loc->s("title-backup-switch")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=7\">".$this->loc->s("New-server")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";

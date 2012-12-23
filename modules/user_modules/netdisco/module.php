@@ -24,7 +24,7 @@
 		function iNetdisco() { parent::genModule(); $this->loc = new lNetdisco(); }
 		
 		public function Load() {
-			$output = "<h4>".$this->loc->s("title-netdisco")."</h4>";
+			$output = "<h1>".$this->loc->s("title-netdisco")."</h1>";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err == 1)
 				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-data"));

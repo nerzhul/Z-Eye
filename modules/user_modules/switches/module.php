@@ -26,7 +26,7 @@
 		public function Load() {
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<h3>".$this->loc->s("title-network-device-mgmt")."</h3>";
+				$output .= "<h1>".$this->loc->s("title-network-device-mgmt")."</h1>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
@@ -52,7 +52,7 @@
 				default: break;
 			}
 			if(!FS::isAjaxCall()) {
-				$output .= "<h4>".$port." sur ".$device."</h4>";
+				$output .= "<h2>".$port." sur ".$device."</h2>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
@@ -357,7 +357,7 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				FS::$iMgr->showReturnMenu(true);
-				$output = "<h4>".$this->loc->s("Device")." ";
+				$output = "<h2>".$this->loc->s("Device")." ";
 	
 				$output .= $device." (";
 				$output .= $dip;
@@ -365,7 +365,7 @@
 				$dloc = FS::$pgdbMgr->GetOneData("device","location","name = '".$device."'");
 				if($dloc != NULL)
 				$output .= " - ".$dloc;
-				$output .= ")</h4>";
+				$output .= ")</h2>";
 				
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$showmodule);
@@ -404,7 +404,7 @@
 						$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
 					}
 					if($found == 1) {
-						$output .= "<h4>".$this->loc->s("Internal-mod")."</h4>";
+						$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
 						$output .= $this->showDeviceModules($devmod,1);
 					}
 	
@@ -413,7 +413,7 @@
 				else if($showmodule == 2) {
 					$query = FS::$pgdbMgr->Select("device","*","name ='".$device."'");
 					if($data = pg_fetch_array($query)) {
-						$output .= "<h4>".$this->loc->s("Device-detail")."</h4>";
+						$output .= "<h3>".$this->loc->s("Device-detail")."</h3>";
 						$output .= "<table class=\"standardTable\">";
 						$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
@@ -470,7 +470,7 @@
 						$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
 					}
 					if($found == 1) {
-						$output .= "<h4>".$this->loc->s("frontview")."</h4>";
+						$output .= "<h3>".$this->loc->s("frontview")."</h3>";
 						$output .= "<script>
 							// 3750 48 ports	
 							var c3750p48x = [59,71,87,98,115,126,143,154,171,182,199,210,227,238,254,266,299,310,326,338,355,366,382,394,
@@ -810,7 +810,7 @@
 						return true;
 					};";
 					$output .= "</script>";
-					$output .= "<h4>".$this->loc->s("title-retag")."</h4>";
+					$output .= "<h3>".$this->loc->s("title-retag")."</h3>";
 					if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=11");
 					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
@@ -862,7 +862,7 @@
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
-					$output .= "<h4>".$this->loc->s("title-transfer-conf")."</h4>";
+					$output .= "<h3>".$this->loc->s("title-transfer-conf")."</h3>";
 					$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
 					$output .= FS::$iMgr->selElmt("TFTP",1);
 					$output .= FS::$iMgr->selElmt("FTP",2);
@@ -891,12 +891,12 @@
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
-					$output .= "<h4>".$this->loc->s("title-restore-startup")."</h4>";
+					$output .= "<h3>".$this->loc->s("title-restore-startup")."</h3>";
 					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
 					return $output;
 				}
 				else if($showmodule == 5) {
-					$output .= "<h4>".$this->loc->s("VLANlist")."</h4>";
+					$output .= "<h3>".$this->loc->s("VLANlist")."</h3>";
 					$found = 0;
 					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 					$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
@@ -1145,11 +1145,11 @@
 
 			$foundsw = 0;
 			$foundwif = 0;
-			$outputswitch = "<h4>Switches et routeurs</h4>";
+			$outputswitch = "<h2>".$this->loc->s("title-router-switch")."</h2>";
 			$outputswitch .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
 				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr>";
 
-			$outputwifi = "<h4>".$this->loc->s("title-WiFi-AP")."</h4>";
+			$outputwifi = "<h2>".$this->loc->s("title-WiFi-AP")."</h2>";
 			$outputwifi .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
 				$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr>";
 			while($data = pg_fetch_array($query)) {
@@ -1738,7 +1738,7 @@
 						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				case 10: // replace vlan portlist
-					echo "<h4>".$this->loc->s("title-port-modiflist")."</h4>";
+					echo "<h3>".$this->loc->s("title-port-modiflist")."</h3>";
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 					if(!$device) {

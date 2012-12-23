@@ -1,10 +1,14 @@
 /* CSS Document */
 
-.body { 
-	background-color: #BBB;
+body { 
+	background-color: #5e0000;
 	font-family: Arial, Helvetica, sans-serif;
 	background-attachment: fixed;
-	background-image: url("images/background-fss.jpg");
+	background-image: linear-gradient(#000,#3e0000);
+	background-image: -moz-linear-gradient(#000,#3e0000);
+	background-image: -ms-linear-gradient(#000,#3e0000);
+	background-image: -o-linear-gradient(#000,#3e0000);
+	background-image: -webkit-linear-gradient(#000,#3e0000);
 }
 
 h3:hover {
@@ -15,13 +19,44 @@ h3:hover {
 	background-color: rgba(245, 245, 245, 0.94);
 	height: auto;
 	margin: auto;
-	margin-top: 50px;
+	margin-top: -10px;
 	padding: 45px;
-	border-radius: 8px;
-	-webkit-box-shadow: inset 0px 2px 2px rgba(0,0,0,0.7);
-	box-shadow: inset 0px 2px 2px rgba(0,0,0,0.7);
+	padding-top: 70px;
+	border-radius: 0px 0px 8px 8px;
+	-webkit-box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.7);
+	box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.7);
 	font-size: 12px;
 	text-align: center;
+	min-height: 200px;
+}
+
+#main h1 {
+        color: white;
+        background-color: #7e0000;
+        border-radius: 2px 0px 0px 2px;
+        margin-bottom: 30px;
+        margin-top: 30px;
+        margin-left: 2%;
+        margin-right: -45px;
+        padding: 3px;
+        font-size: 18px;
+        padding-left: 55px;
+        text-align: left;
+}
+
+#main h2 {
+        color: white;
+        background-color: #5e0000;
+        border-radius: 2px 0px 0px 2px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        margin-left: 7%;
+        margin-right: -45px;
+        padding: 3px;
+        font-size: 17px;
+        padding-left: 55px;
+        text-align: left;
+
 }
 
 #loghello {
@@ -96,11 +131,12 @@ div#menuStack div {
 .menupopup {
 	position: absolute;
 	display: block;
-	background-image: linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -moz-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -o-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -webkit-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -ms-linear-gradient(center top , #232323 0px, #050505 100%);
+	background-color: #050505;
+	background-image: linear-gradient(#232323, #050505);
+	background-image: -moz-linear-gradient(#232323, #050505);
+	background-image: -o-linear-gradient(#232323, #050505);
+	background-image: -webkit-linear-gradient(#232323, #050505);
+	background-image: -ms-linear-gradient(#232323, #050505);
 	border-bottom: 1px solid #111;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
 }
@@ -109,11 +145,11 @@ div#menuStack div {
 	display: inline-block;
 	padding: 12px 6px 12px 6px;
 	margin-top: 1px;
-	background-image: -moz-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -moz-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -o-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -webkit-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -ms-linear-gradient(center top , #232323 0px, #050505 100%);
+	background-image: -moz-linear-gradient(#232323, #050505);
+	background-image: -moz-linear-gradient(#232323, #050505);
+	background-image: -o-linear-gradient(#232323, #050505);
+	background-image: -webkit-linear-gradient(#232323, #050505);
+	background-image: -ms-linear-gradient(#232323, #050505);
 	vertical-align: center;
 	cursor: pointer;
 	width: 100px;
@@ -136,7 +172,11 @@ div#menuStack div {
 .menuItem:hover { background-color: #000; font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
 
 .searchButton {
-        background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
+	background-image: linear-gradient(#FAFAFA, #DCDCDC);
+        background-image: -moz-linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -ms-linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -o-linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -webkit-linear-gradient(#FAFAFA, #DCDCDC);
         border: 1px solid #CCC;
         vertical-align: center;
         height: 28px;
@@ -145,7 +185,11 @@ div#menuStack div {
 }
 
 .searchButton:hover {
-        background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
+        background-image: linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -moz-linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -ms-linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -o-linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -webkit-linear-gradient(#DCDCDC, #FAFAFA);	
 }
 
 input {
@@ -169,30 +213,6 @@ input {
 	float: left;
 }
 
-#connFormHorizontal {
-	float: right;
-	margin-left: 10px;
-	margin-right: 10px;
-	margin-bottom: -5px;
-	padding: 5px;
-	background: -moz-radial-gradient(#222222, #000000);
-        background: -webkit-gradient(#222222, #000000);
-	border-radius: 7px 7px 1px 1px;
-	background-color: #DDDDDD;
-	-webkit-box-shadow: 0px 3px 3px ;
-	box-shadow: 0px 3px 3px;
-}
-
-#onlineForm {
-	float: right;
-	margin-left: 10px;
-	margin-bottom: -5px;
-	padding: 5px;
-	border-radius: 7px 7px 1px 1px;
-	background-color: #DDDDDD;
-	font-size: 11px;
-}
-
 pre {
 	font-family: "Courier New", Courier, monospace;
 	text-align: left;
@@ -214,11 +234,11 @@ p#banner {
 }
 
 #canvas_banner {
-    -webkit-border-radius: 5px 5px 5px 5px;
+	-webkit-border-radius: 5px 5px 5px 5px;
 	border-radius: 5px 5px 5px 5px;
 	float: left;
 	-webkit-box-shadow: 0px 5px 5px ;
-    box-shadow: 0px 5px 5px;
+	box-shadow: 0px 5px 5px;
 }
 
 #menus {
@@ -284,23 +304,27 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 	margin: auto;
-	border: 1px solid #EEE;
+	border: 1px solid #CCC;
 }
 
 th {
 	padding: 12px;
 	text-align: center;
-	background-image: -moz-linear-gradient(center top , #CC3232, #A05252);
-	background-color: #CC3232;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+	color: white;
+	background-image: linear-gradient(#7A0000, #8A0000);
+	background-image: -moz-linear-gradient(#7A0000, #8A0000);
+	background-image: -ms-linear-gradient(#7A0000, #8A0000);
+	background-image: -o-linear-gradient(#7A0000, #8A0000);
+	background-image: -webkit-linear-gradient(#7A0000, #8A0000);
+	background-color: #7A0000;
 }
 
 th:first-child {
-	border-radius: 6px 0 0 0;
+	border-radius: 4px 0 0 0;
 }
 
 th:last-child {
-	border-radius: 0 6px 0 0;
+	border-radius: 0 4px 0 0;
 }
 
 th a {
@@ -448,11 +472,12 @@ a:hover {
 	margin-right: auto;
 	opacity: 0.97;
 	color: white;
-	background-image: -linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -moz-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -o-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -webkit-linear-gradient(center top , #232323 0px, #050505 100%);
-	background-image: -ms-linear-gradient(center top , #232323 0px, #050505 100%);
+	background-color: #050505;
+	background-image: -linear-gradient(#232323, #050505);
+	background-image: -moz-linear-gradient(#232323, #050505);
+	background-image: -o-linear-gradient(#232323, #050505);
+	background-image: -webkit-linear-gradient(#232323, #050505);
+	background-image: -ms-linear-gradient(#232323, #050505);
 }
 
 #logform:hover {

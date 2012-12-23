@@ -59,7 +59,7 @@
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
 				
 				$output .= "</head>
-				<body class=\"body\">";
+				<body>";
 			return $output;
 		}
 

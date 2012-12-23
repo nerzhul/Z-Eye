@@ -184,3 +184,11 @@ Beta 2.6
 - Fix a bug on make_portid_cache.py when there is a few switches, which
 	quit program before discovering datas
 - Modernize interface
+
+Beta 3.0
+- Misc fixes
+- Installer now asks for SNORT listening interface
+- Some interface design
+
+Beta 3.1
+- IP Manager now distinguish Free adresses from available (and distributed) addresses

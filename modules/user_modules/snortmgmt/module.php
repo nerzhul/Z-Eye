@@ -38,7 +38,7 @@
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h3>".$this->loc->s("page-title")."</h3>";
+				$output .= "<h1>".$this->loc->s("page-title")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh,true);
 				$output .= FS::$iMgr->tabPanElmt(10,"index.php?mod=".$this->mid,$this->loc->s("Reports"),$sh);
@@ -197,7 +197,7 @@
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enftp",$ftpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-ipv4")));
-				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ftp"),"ftpports",$ftpports,array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")))."</td></tr>";
+				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ftp"),"ftpports",array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")));
 				$output .= FS::$iMgr->tableSubmit("",$this->loc->s("Register"));
 				$output .= "</table></form>";
 			}
