@@ -267,7 +267,9 @@
 					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
 					$output .= FS::$iMgr->hidden("filter",$filter);
-					$output .= FS::$iMgr->slider("hstslide","daterange",1,365,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
+					$mindate = FS::$pgdbMgr->GetMin("z_eye_dhcp_ip_history","collecteddate");
+					$diff = ceil(abs(strtotime(date("Y-m-d"))-strtotime($mindate))/(365*60*60*24));
+					$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
 					$output .= FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
 				}
 				else
@@ -290,7 +292,10 @@
 					case 4: $results[$data["collecteddate"]]["avail"] = $data["ct"]; break;
 				}
 			}
-			$labels = $baux = $reserv = $avail = $total = "";
+			$netobj = new FSNetwork();
+                        $netobj->setNetAddr($filter);
+                        $netobj->setNetMask(FS::$pgdbMgr->GetOneData("z_eye_dhcp_subnet_cache","netmask","netid ='".$filter."'"));
+			$labels = $baux = $reserv = $avail = $free = $total = "";
 			$reservshow = $bauxshow = $availshow = false;
 			foreach($results as $date => $values) {
 				if($labels == "") {
@@ -301,9 +306,11 @@
         	                        $reserv .= (isset($values["reserv"]) ? $values["reserv"] : 0);
 					if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
                 	                $avail .= (isset($values["avail"]) ? $values["avail"] : 0);
-					$total .= ((isset($values["baux"]) ? $values["baux"] : 0)+
-						(isset($values["reserv"]) ? $values["reserv"] : 0)+
-						(isset($values["avail"]) ? $values["avail"] : 0));
+					$totdistrib = ((isset($values["baux"]) ? $values["baux"] : 0)+
+                                                (isset($values["reserv"]) ? $values["reserv"] : 0)+
+                                                (isset($values["avail"]) ? $values["avail"] : 0));
+					$total .= $totdistrib;
+					$free .= ($netobj->getMaxHosts() - $totdistrib);
 				}
 				else {
 					$labels .= ",'".$date."'";
@@ -313,9 +320,11 @@
                 	                $reserv .= ",".(isset($values["reserv"]) ? $values["reserv"] : 0);
 					if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
                                         $avail .= ",".(isset($values["avail"]) ? $values["avail"] : 0);
-					$total .= ",".((isset($values["baux"]) ? $values["baux"] : 0)+
-                        	                (isset($values["reserv"]) ? $values["reserv"] : 0)+
-                                	        (isset($values["avail"]) ? $values["avail"] : 0));
+					$totdistrib = ((isset($values["baux"]) ? $values["baux"] : 0)+
+                                                (isset($values["reserv"]) ? $values["reserv"] : 0)+
+                                                (isset($values["avail"]) ? $values["avail"] : 0));
+                                        $total .= ",".$totdistrib;
+                                        $free .= ",".($netobj->getMaxHosts() - $totdistrib);
 				}
 			}
 			$output .= "<script type=\"text/javascript\">$(function(){ var hstgr;
@@ -328,7 +337,9 @@
                                         legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
                                         	x: -10, y: 100 },
                                         series: [ { name: '".addslashes($this->loc->s("Used")."s")."',
-						data: [".$total."], color: 'black' },";
+						data: [".$total."], color: 'black' },
+						{ name: '".addslashes($this->loc->s("Free")."s")."',
+                                                data: [".$free."], color: 'green' },";
 					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
 						data: [".$baux."], color: 'red' },";
 					if($reservshow) $output .= "{ name: '".addslashes($this->loc->s("Reservations"))."',

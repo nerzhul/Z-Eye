@@ -90,6 +90,16 @@
 			return -1;
 		}
 
+		public function GetMin($table,$field,$cond = "") {
+                        $query = $this->Select($table,"MIN(".$field.") as mn",$cond);
+                        if($data = pg_fetch_array($query)) {
+                                        $splstr = preg_split("#[\.]#",$field);
+                                        $splstr = preg_replace("#`#","",$splstr);
+                                        return $data["mn"];
+                        }
+                        return -1;
+                }
+
 		public function Sum($table,$field,$cond = "") {
 			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
 			if($data = pg_fetch_array($query)) {

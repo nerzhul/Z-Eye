@@ -20,8 +20,7 @@
 		}
 
 		public function getMaxHosts() {
-			$longMask = ip2long($this->net_mask);
-			return ~$longMask-1;
+			return ip2long("255.255.255.255")-ip2long($this->net_mask)+1;
 		}
 
 		public function isUsableIP($ip) {

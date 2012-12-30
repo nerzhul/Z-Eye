@@ -23,7 +23,7 @@
 		function lIPManager() {
 			$this->locales = array(
 				"fr" => array(
-					"Available-s" => "Disponibles",
+					"Available-s" => "Distribuables",
 					"bad-datas" => "Requête invalide !",
 					"bad-filter" => "Filtre invalide !",
 					"Baux" => "Baux",
@@ -77,7 +77,7 @@
 					"%use" => "% d'utilisation",
 				),
 				"en" => array(
-					"Available-s" => "Available",
+					"Available-s" => "Distributable",
 					"bad-datas" => "Invalid request",
 					"bad-filter" => "Bad filter",
 					"Baux" => "Leases",
