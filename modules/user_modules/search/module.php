@@ -268,7 +268,7 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			
-			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","macaddr,hostname,leasetime,distributed","ip = '".$search."'");
+			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -278,8 +278,8 @@
 					$tmpoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
 				if(strlen($data["macaddr"]) > 0)
 					$tmpoutput .= $this->loc->s("link-mac-addr").": <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
-				$tmpoutput .= $this->loc->s("attribution-type").": ".($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))."<br />";
-				if($data["distributed"] != 3)
+				$tmpoutput .= $this->loc->s("attribution-type").": ".($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
+				if($data["distributed"] != 3 && $data["distributed"] != 4)
 					$tmpoutput .= $this->loc->s("Validity")." : ".$data["leasetime"]."<br />";
 			}
 			
@@ -538,7 +538,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			$search = preg_replace("#[-]#",":",$search);
-			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed","macaddr = '".$search."'");
+			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed,server","macaddr = '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -548,7 +548,7 @@
 					$tmpoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
 				if(strlen($data["ip"]) > 0)
 					$tmpoutput .= $this->loc->s("link-ip").": <a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a><br />";
-				$tmpoutput .= $this->loc->s("attribution-type").": ".($data["distributed"] != 3 ? "Dynamique" : "Statique")."<br />";
+				$tmpoutput .= $this->loc->s("attribution-type").": ".($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("static"))." (".$data["server"].")<br />";
 				if($data["distributed"] != 3)
 					$tmpoutput .= $this->loc->s("Validity")." : ".$data["leasetime"]."<br />";
 			}

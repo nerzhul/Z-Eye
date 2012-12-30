@@ -55,6 +55,7 @@
 
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools"),$showmodule);
 				$output .= "</ul></div>";
@@ -73,14 +74,14 @@
 					$netobj->setNetMask($data["netmask"]);
 					
 					$swfound = false;
-					
+
 					// Bufferize switch list
 					$switchlist = array();
-					
+
 					$query2 = FS::$pgdbMgr->Select("device","ip,name");
 					while($data2 = pg_fetch_array($query2))
 						$switchlist[$data2["ip"]] = $data2["name"];
-					
+
 					// Initiate network IPs
 					for($i=($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
 						$iparray[$i] = array();
@@ -92,7 +93,7 @@
 						$iparray[$i]["switch"] = "";
 						$iparray[$i]["port"] = "";
 					}
-					
+
 					// Fetch datas
 					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
 					while($data2 = pg_fetch_array($query2)) {
@@ -128,7 +129,7 @@
 					if($swfound)
 						$netoutput .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
 					$netoutput .= "Fin du bail</th><th>Serveurs</th></tr>";
-						
+
 					foreach($iparray as $key => $value) {
 						$rstate = "";
 						$style = "";
@@ -247,6 +248,67 @@
                         	                        $('#monsubnetres').html(data);
                                 	        });
 	                                });</script>";
+				}
+				else if($showmodule == 4) {
+					$output .= "<h3>".$this->loc->s("title-history-1d")."</h3><div id=\"hst1d\"></div>";
+
+					$results = array();
+					$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_history","count(ip) as ct,distributed,collecteddate","collecteddate > (NOW()- '1 day'::interval) and netid = '".$filter."' GROUP BY distributed,collecteddate ORDER BY collecteddate");
+					while($data = pg_fetch_array($query)) {
+						if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
+						switch($data["distributed"]) {
+							case 1: break;
+							case 2: $results[$data["collecteddate"]]["baux"] = $data["ct"]; break;
+							case 3: $results[$data["collecteddate"]]["reserv"] = $data["ct"]; break;
+							case 4: $results[$data["collecteddate"]]["avail"] = $data["ct"]; break;
+						}
+					}
+					$labels = $baux = $reserv = $avail = $total = "";
+					$reservshow = $bauxshow = $availshow = false;
+					foreach($results as $date => $values) {
+						if($labels == "") {
+							$labels .= "'".$date."'";
+							if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
+	                                                $baux .= (isset($values["baux"]) ? $values["baux"] : 0);
+							if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
+        	                                        $reserv .= (isset($values["reserv"]) ? $values["reserv"] : 0);
+							if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
+                	                                $avail .= (isset($values["avail"]) ? $values["avail"] : 0);
+							$total .= ((isset($values["baux"]) ? $values["baux"] : 0)+
+								(isset($values["reserv"]) ? $values["reserv"] : 0)+
+								(isset($values["avail"]) ? $values["avail"] : 0));
+						}
+						else {
+							$labels .= ",'".$date."'";
+							if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
+							$baux .= ",".(isset($values["baux"]) ? $values["baux"] : 0);
+							if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
+                	                                $reserv .= ",".(isset($values["reserv"]) ? $values["reserv"] : 0);
+							if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
+                        	                        $avail .= ",".(isset($values["avail"]) ? $values["avail"] : 0);
+							$total .= ",".((isset($values["baux"]) ? $values["baux"] : 0)+
+                                                                (isset($values["reserv"]) ? $values["reserv"] : 0)+
+                                                                (isset($values["avail"]) ? $values["avail"] : 0));
+						}
+					}
+					$output .= "<script type=\"text/javascript\">$(function(){ var hst1d;
+                                                        $(document).ready(function() { hst1d = new Highcharts.Chart({
+                                                        chart: { renderTo: 'hst1d', type: 'line' },
+                                                        title: { text: '' },
+							tooltip: { crosshairs: true },
+                                                        xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round(count($results)/10)." },
+                                                        yAxis: { title: { text: 'Nombre d\'adresses' } },
+                                                        legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
+                                                                        x: -10, y: 100 },
+                                                        series: [ { name: '".addslashes($this->loc->s("Used")."s")."',
+									data: [".$total."], color: 'black' },";
+					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
+									data: [".$baux."], color: 'red' },";
+					if($reservshow) $output .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
+									data: [".$reserv."], color: 'yellow' },";
+					if($availshow) $output .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
+									data: [".$avail."], color: 'cyan' }";
+					$output .= "]});});});</script>";
 				}
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("no-tab"));

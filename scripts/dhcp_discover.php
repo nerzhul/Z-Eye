@@ -130,7 +130,11 @@
 				for($i=ip2long($range[1]);$i<=ip2long($range[2]);$i++) {
 					if(!isset($hosts_list[long2ip($i)]))
 		                                $hosts_list[long2ip($i)] = array();
-					$hosts_list[long2ip($i)]["state"] = "distributed";
+					if(!isset($hosts_list[long2ip($i)]["state"]))
+						$hosts_list[long2ip($i)]["state"] = "distributed";
+					else if(isset($hosts_list[long2ip($i)]["end"]) && $hosts_list[long2ip($i)]["end"] < date("Y/m/d"))
+						$hosts_list[long2ip($i)]["state"] = "distributed";
+					$hosts_list[long2ip($i)]["server"] = $server;
 				}
 			}
 
@@ -194,6 +198,7 @@
 	 */
 	
 	function registerIPs($hosts_list,&$subnet_list,$server) {
+		global $execdate;
 		// Flush ip table for server
 		FS::$pgdbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
@@ -242,6 +247,8 @@
 					}
 
 					FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
+					if($rstate == 2 || $rstate == 3 || $rstate == 4)
+						FS::$pgdbMgr->Insert("z_eye_dhcp_ip_history","ip,distributed,netid,server,collecteddate","'".$host."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
 					if($rstate == 3) {
 						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 						$query = FS::$pgdbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
@@ -264,15 +271,17 @@
 				}
 			}
 		}
-		}
-	
+	}
+
 	FS::LoadFSModules();
 
 	echo "[".Config::getWebsiteName()."][DHCP-Sync] started at ".date('d-m-Y G:i:s')."\n";
         $start_time = microtime(true);
 
+	$execdate = date("Y-m-d G:i:00");
+
 	$subnet_list = array();
-	
+
 	$dhcpdatas2 = "";
 	$DHCPfound = false;
 	$DHCPconnerr = false;

@@ -159,8 +159,6 @@
 							});
 						})(jQuery);
 						</script>";
-					$output .= "</body></html>";
-					$output .= "</body></html>";
 				}
 				else if($showmodule == 2) {
 					$found = 0;
