@@ -39,20 +39,26 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= "<h1>".$this->loc->s("title-ip-supervision")."</h1>";
-				$output .= $this->loc->s("choose-net");
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-				$output .= FS::$iMgr->select("f","submit()");
+				$netfound = false;
+				$tmpoutput = $this->loc->s("choose-net");
+				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+				$tmpoutput .= FS::$iMgr->select("f","submit()");
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
 				while($data = pg_fetch_array($query)) {
+					if(!$netfound) $netfound = true;
 					$formoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
-				$output .= $formoutput;
-				$output .= "</select> ";
-				$output .= FS::$iMgr->submit("","Consulter");
-				$output .= "</form><br />";
-				if(!$filter || !FS::$secMgr->isIP($filter))
-					return $output;
+				$tmpoutput .= $formoutput;
+				$tmpoutput .= "</select> ";
+				$tmpoutput .= FS::$iMgr->submit("","Consulter");
+				$tmpoutput .= "</form><br />";
+				if(!$netfound)
+                                        return $output.= FS::$iMgr->printError($this->loc->s("no-net-found"));
 
+				if($filter && !FS::$secMgr->isIP($filter))
+					return $output.FS::$iMgr->printError($this->loc->s("bad-filter"));
+
+				$output .= $tmpoutput;
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History"),$showmodule);

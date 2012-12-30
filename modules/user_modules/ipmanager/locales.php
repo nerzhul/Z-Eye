@@ -24,6 +24,7 @@
 			$this->locales = array(
 				"fr" => array(
 					"Available-s" => "Disponibles",
+					"bad-filter" => "Filtre invalide !",
 					"Baux" => "Baux",
 					"choose-net" => "Veuillez choisir le réseau IP à monitorer",
 					"Contact" => "Contact",
@@ -46,6 +47,7 @@
 					"max-age" => "Age maximum",
 					"modif-record" => "Modifications enregistrées",
 					"Monitoring" => "Monitoring",
+					"no-net-found" => "Aucun réseau distribué par DHCP découvert",
 					"no-old-record" => "Aucune réservation obsolète trouvée",
 					"no-tab" => "Cet onglet n'existe pas",
 					"Port" => "Port",
@@ -72,6 +74,7 @@
 				),
 				"en" => array(
 					"Available-s" => "Available",
+					"bad-filter" => "Bad filter",
 					"Baux" => "Leases",
 					"choose-net" => "Please choose an IP network to monitor",
 					"Contact" => "Contact",
@@ -94,6 +97,7 @@
 					"max-age" => "Max age",
 					"modif-record" => "Saved",
 					"Monitoring" => "Monitoring",
+					"no-net-found" => "No DHCP distributed network found",
 					"no-old-record" => "No old record found ",
 					"no-tab" => "This tab doesn't exist",
 					"Port" => "Port",
