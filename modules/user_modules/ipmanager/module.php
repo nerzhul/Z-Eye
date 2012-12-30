@@ -256,69 +256,86 @@
 	                                });</script>";
 				}
 				else if($showmodule == 4) {
-					$output .= "<h3>".$this->loc->s("title-history-1d")."</h3><div id=\"hst1d\"></div>";
+					$output .= "<script type=\"text/javascript\">function historyDateChange() {
+						$('#hstcontent').fadeOut();
+						$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
+							$('#hstcontent').html(data);
+							$('#hstcontent').fadeIn();
+							});
+						}</script>";
 
-					$results = array();
-					$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_history","count(ip) as ct,distributed,collecteddate","collecteddate > (NOW()- '1 day'::interval) and netid = '".$filter."' GROUP BY distributed,collecteddate ORDER BY collecteddate");
-					while($data = pg_fetch_array($query)) {
-						if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
-						switch($data["distributed"]) {
-							case 1: break;
-							case 2: $results[$data["collecteddate"]]["baux"] = $data["ct"]; break;
-							case 3: $results[$data["collecteddate"]]["reserv"] = $data["ct"]; break;
-							case 4: $results[$data["collecteddate"]]["avail"] = $data["ct"]; break;
-						}
-					}
-					$labels = $baux = $reserv = $avail = $total = "";
-					$reservshow = $bauxshow = $availshow = false;
-					foreach($results as $date => $values) {
-						if($labels == "") {
-							$labels .= "'".$date."'";
-							if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
-	                                                $baux .= (isset($values["baux"]) ? $values["baux"] : 0);
-							if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
-        	                                        $reserv .= (isset($values["reserv"]) ? $values["reserv"] : 0);
-							if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
-                	                                $avail .= (isset($values["avail"]) ? $values["avail"] : 0);
-							$total .= ((isset($values["baux"]) ? $values["baux"] : 0)+
-								(isset($values["reserv"]) ? $values["reserv"] : 0)+
-								(isset($values["avail"]) ? $values["avail"] : 0));
-						}
-						else {
-							$labels .= ",'".$date."'";
-							if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
-							$baux .= ",".(isset($values["baux"]) ? $values["baux"] : 0);
-							if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
-                	                                $reserv .= ",".(isset($values["reserv"]) ? $values["reserv"] : 0);
-							if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
-                        	                        $avail .= ",".(isset($values["avail"]) ? $values["avail"] : 0);
-							$total .= ",".((isset($values["baux"]) ? $values["baux"] : 0)+
-                                                                (isset($values["reserv"]) ? $values["reserv"] : 0)+
-                                                                (isset($values["avail"]) ? $values["avail"] : 0));
-						}
-					}
-					$output .= "<script type=\"text/javascript\">$(function(){ var hst1d;
-                                                        $(document).ready(function() { hst1d = new Highcharts.Chart({
-                                                        chart: { renderTo: 'hst1d', type: 'line' },
-                                                        title: { text: '' },
-							tooltip: { crosshairs: true },
-                                                        xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round(count($results)/10)." },
-                                                        yAxis: { title: { text: 'Nombre d\'adresses' } },
-                                                        legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
-                                                                        x: -10, y: 100 },
-                                                        series: [ { name: '".addslashes($this->loc->s("Used")."s")."',
-									data: [".$total."], color: 'black' },";
-					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
-									data: [".$baux."], color: 'red' },";
-					if($reservshow) $output .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
-									data: [".$reserv."], color: 'yellow' },";
-					if($availshow) $output .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
-									data: [".$avail."], color: 'cyan' }";
-					$output .= "]});});});</script>";
+					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
+					$output .= FS::$iMgr->hidden("filter",$filter);
+					$output .= FS::$iMgr->slider("hstslide","daterange",1,365,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
+					$output .= FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
 				}
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("no-tab"));
 			}
+			return $output;
+		}
+
+		private function showHistory($filter,$interval = 1) {
+			$output = "<h3>".$this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days")."</h3>";
+			$output .= "<div id=\"hstgr\"></div>";
+			$results = array();
+			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_history","count(ip) as ct,distributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and netid = '".$filter."' GROUP BY distributed,collecteddate ORDER BY collecteddate");
+			while($data = pg_fetch_array($query)) {
+				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
+				switch($data["distributed"]) {
+					case 1: break;
+					case 2: $results[$data["collecteddate"]]["baux"] = $data["ct"]; break;
+					case 3: $results[$data["collecteddate"]]["reserv"] = $data["ct"]; break;
+					case 4: $results[$data["collecteddate"]]["avail"] = $data["ct"]; break;
+				}
+			}
+			$labels = $baux = $reserv = $avail = $total = "";
+			$reservshow = $bauxshow = $availshow = false;
+			foreach($results as $date => $values) {
+				if($labels == "") {
+					$labels .= "'".$date."'";
+					if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
+	                                $baux .= (isset($values["baux"]) ? $values["baux"] : 0);
+					if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
+        	                        $reserv .= (isset($values["reserv"]) ? $values["reserv"] : 0);
+					if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
+                	                $avail .= (isset($values["avail"]) ? $values["avail"] : 0);
+					$total .= ((isset($values["baux"]) ? $values["baux"] : 0)+
+						(isset($values["reserv"]) ? $values["reserv"] : 0)+
+						(isset($values["avail"]) ? $values["avail"] : 0));
+				}
+				else {
+					$labels .= ",'".$date."'";
+					if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
+					$baux .= ",".(isset($values["baux"]) ? $values["baux"] : 0);
+					if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
+                	                $reserv .= ",".(isset($values["reserv"]) ? $values["reserv"] : 0);
+					if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
+                                        $avail .= ",".(isset($values["avail"]) ? $values["avail"] : 0);
+					$total .= ",".((isset($values["baux"]) ? $values["baux"] : 0)+
+                        	                (isset($values["reserv"]) ? $values["reserv"] : 0)+
+                                	        (isset($values["avail"]) ? $values["avail"] : 0));
+				}
+			}
+			$output .= "<script type=\"text/javascript\">$(function(){ var hstgr;
+                        	$(document).ready(function() { hstgr = new Highcharts.Chart({
+                                	chart: { renderTo: 'hstgr', type: 'line' },
+                                        title: { text: '' },
+					tooltip: { crosshairs: true },
+                                        xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round(count($results)/10)." },
+                                        yAxis: { title: { text: 'Nombre d\'adresses' } },
+                                        legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
+                                        	x: -10, y: 100 },
+                                        series: [ { name: '".addslashes($this->loc->s("Used")."s")."',
+						data: [".$total."], color: 'black' },";
+					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
+						data: [".$baux."], color: 'red' },";
+					if($reservshow) $output .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
+						data: [".$reserv."], color: 'yellow' },";
+					if($availshow) $output .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
+						data: [".$avail."], color: 'cyan' }";
+			$output .= "]});});});</script>";
 			return $output;
 		}
 
@@ -400,6 +417,14 @@
 					
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
 					return;
+				case 4:
+					$filter = FS::$secMgr->checkAndSecurisePostData("filter");
+					$daterange = FS::$secMgr->checkAndSecurisePostData("daterange");
+					if(!$filter || !$daterange || !FS::$secMgr->isNumeric($daterange) || $daterange < 1) {
+						echo FS::$iMgr->printError($this->loc->s("bad-datas"));
+						return;
+					}
+					echo $this->showHistory($filter,$daterange);
 			}
 		}
 	};

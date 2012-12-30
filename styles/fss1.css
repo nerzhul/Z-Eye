@@ -116,7 +116,7 @@ h3:hover {
         background-color: rgba(0,0,0,0.9);
 }
 
-#menuStack {
+#menuStack, #hstslide {
 	display: inline-block;
 }
 

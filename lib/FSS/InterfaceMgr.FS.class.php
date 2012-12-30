@@ -186,6 +186,30 @@
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask('".$name."');\" />";
 		}
 
+		public function slider($slidername, $name, $min, $max, $options = array()) {
+			if(isset($options["hidden"]))
+				$output = FS::$iMgr->hidden($name,(isset($options["value"]) ? $options["value"] : 0));
+			else
+				$output = FS::$iMgr->input($name,(isset($options["value"]) ? $options["value"] : 0));
+			$output .= "<script type=\"text/javascript\">$(function() {
+                        	$('#".$slidername."').slider({
+					range: 'min',
+					min: ".$min.",
+					max:".$max.",";
+
+			if(isset($options["value"])) $output .= "value: ".$options["value"].",";
+
+			$output .= "slide: function(event,ui) { $('#".$name."').val(".(isset($options["valoverride"]) ? $options["valoverride"] : "ui.value").");";
+			if(isset($options["hidden"])) $output .= "$('#".$name."label').html(ui.value);";
+			$output .= "}
+				});
+                        });</script>";
+			$output .= "<div id=\"".$slidername."\" ".(isset($options["width"]) ? "style=\"width: ".$options["width"]."\" " : "")."></div>";
+			if(isset($options["hidden"])) $output .= "<br /><span id=\"".$name."label\">".
+				(isset($options["value"]) ? $options["value"] : 0)."</span> ".$options["hidden"]."<br />";
+			return $output;
+		}
+
 		public function hidden($name, $value) {
 			return "<input type=\"hidden\" id=\"".$name."\" name=\"".$name."\" value=\"".$value."\" />";
 		}
@@ -317,6 +341,8 @@
 				$output .= " multiple=\"multiple\" ";
 			if(isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]))
 				$output .= " size=\"".$options["size"]."\" ";
+			if(isset($options["style"]))
+				$output .= " style=\"".$style."\" ";
 			$output .= ">";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
