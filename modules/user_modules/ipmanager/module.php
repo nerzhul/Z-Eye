@@ -305,6 +305,7 @@
 			$lastvalues = array();
 			end($results);
 			$lastres = key($results);
+			$totalvals = 0;
 			foreach($results as $date => $values) {
 				if($labels == "") {
 					// Bufferize vals
@@ -326,6 +327,7 @@
                                         $free .= ($netobj->getMaxHosts() - $totdistrib);
                                         // Save this occur
                                         $lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
+					$totalvals++;
 				}
 				else {
 					// Bufferize vals
@@ -347,6 +349,7 @@
 						$totdistrib = ($bauxval+$reservval+$availval);
                 	                        $total .= ",".$totdistrib;
                         	                $free .= ",".($netobj->getMaxHosts() - $totdistrib);
+						$totalvals++;
 					}
 					// Save this occur
 					$lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
@@ -357,7 +360,7 @@
                                 	chart: { renderTo: 'hstgr', type: 'line' },
                                         title: { text: '' },
 					tooltip: { crosshairs: true },
-                                        xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round(count($results)/10)." },
+                                        xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round($totalvals/10)." },
                                         yAxis: { title: { text: 'Nombre d\'adresses' } },
                                         legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
                                         	x: -10, y: 100 },
