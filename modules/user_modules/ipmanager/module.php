@@ -296,36 +296,60 @@
 			$netobj = new FSNetwork();
                         $netobj->setNetAddr($filter);
                         $netobj->setNetMask(FS::$pgdbMgr->GetOneData("z_eye_dhcp_subnet_cache","netmask","netid ='".$filter."'"));
+
+			// JS Table
 			$labels = $baux = $reserv = $avail = $free = $total = "";
+			// To show or not if no data
 			$reservshow = $bauxshow = $availshow = false;
+			// Show only modifications
+			$lastvalues = array();
+			end($results);
+			$lastres = key($results);
 			foreach($results as $date => $values) {
 				if($labels == "") {
-					$labels .= "'".$date."'";
-					if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
-	                                $baux .= (isset($values["baux"]) ? $values["baux"] : 0);
-					if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
-        	                        $reserv .= (isset($values["reserv"]) ? $values["reserv"] : 0);
-					if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
-                	                $avail .= (isset($values["avail"]) ? $values["avail"] : 0);
-					$totdistrib = ((isset($values["baux"]) ? $values["baux"] : 0)+
-                                                (isset($values["reserv"]) ? $values["reserv"] : 0)+
-                                                (isset($values["avail"]) ? $values["avail"] : 0));
-					$total .= $totdistrib;
-					$free .= ($netobj->getMaxHosts() - $totdistrib);
+					// Bufferize vals
+                                        $bauxval = (isset($values["baux"]) ? $values["baux"] : 0);
+                                        $reservval = (isset($values["reserv"]) ? $values["reserv"] : 0);
+                                        $availval = (isset($values["avail"]) ? $values["avail"] : 0);
+
+                                        // Write js table
+                                        $labels .= "'".$date."'";
+                                        if($bauxval > 0) $bauxshow = true;
+                                        $baux .= $bauxval;
+                                        if($reservval > 0) $reservshow = true;
+                                        $reserv .= $reservval;
+                                        if($availval > 0) $availshow = true;
+                                        $avail .= $availval;
+
+                                        $totdistrib = ($bauxval+$reservval+$availval);
+                                        $total .= $totdistrib;
+                                        $free .= ($netobj->getMaxHosts() - $totdistrib);
+                                        // Save this occur
+                                        $lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
 				}
 				else {
-					$labels .= ",'".$date."'";
-					if(isset($values["baux"]) && $values["baux"] > 0) $bauxshow = true;
-					$baux .= ",".(isset($values["baux"]) ? $values["baux"] : 0);
-					if(isset($values["reserv"]) && $values["reserv"] > 0) $reservshow = true;
-                	                $reserv .= ",".(isset($values["reserv"]) ? $values["reserv"] : 0);
-					if(isset($values["avail"]) && $values["avail"] > 0) $availshow = true;
-                                        $avail .= ",".(isset($values["avail"]) ? $values["avail"] : 0);
-					$totdistrib = ((isset($values["baux"]) ? $values["baux"] : 0)+
-                                                (isset($values["reserv"]) ? $values["reserv"] : 0)+
-                                                (isset($values["avail"]) ? $values["avail"] : 0));
-                                        $total .= ",".$totdistrib;
-                                        $free .= ",".($netobj->getMaxHosts() - $totdistrib);
+					// Bufferize vals
+					$bauxval = (isset($values["baux"]) ? $values["baux"] : 0);
+					$reservval = (isset($values["reserv"]) ? $values["reserv"] : 0);
+					$availval = (isset($values["avail"]) ? $values["avail"] : 0);
+
+					if($bauxval != $lastvalues["baux"] || $reservval != $lastvalues["reserv"] ||
+						$availval != $lastvalues["avail"] || $date == $lastres) {
+						// Write js table
+						$labels .= ",'".$date."'";
+						if($bauxval > 0) $bauxshow = true;
+						$baux .= ",".$bauxval;
+						if($reservval > 0) $reservshow = true;
+                	                	$reserv .= ",".$reservval;
+						if($availval > 0) $availshow = true;
+        	                                $avail .= ",".$availval;
+
+						$totdistrib = ($bauxval+$reservval+$availval);
+                	                        $total .= ",".$totdistrib;
+                        	                $free .= ",".($netobj->getMaxHosts() - $totdistrib);
+					}
+					// Save this occur
+					$lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
 				}
 			}
 			$output .= "<script type=\"text/javascript\">$(function(){ var hstgr;
