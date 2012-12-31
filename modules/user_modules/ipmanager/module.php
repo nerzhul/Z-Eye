@@ -267,8 +267,9 @@
 					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
 					$output .= FS::$iMgr->hidden("filter",$filter);
-					$mindate = FS::$pgdbMgr->GetMin("z_eye_dhcp_ip_history","collecteddate");
-					$diff = ceil(abs(strtotime(date("Y-m-d"))-strtotime($mindate))/(365*60*60*24));
+					$date = FS::$pgdbMgr->GetMin("z_eye_dhcp_ip_history","collecteddate");
+					if(!$date) $date = "now";
+					$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
 					$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
 					$output .= FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
 				}
