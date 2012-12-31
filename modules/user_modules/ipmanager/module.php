@@ -257,12 +257,10 @@
 				}
 				else if($showmodule == 4) {
 					$output .= "<script type=\"text/javascript\">function historyDateChange() {
-						$('#hstcontent').fadeOut();
+						$('#hstcontent').hide(\"slow\",function() { $('#hstcontent').html(''); 
 						$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
-							$('#hstcontent').html(data);
-							$('#hstcontent').fadeIn();
-							});
-						}</script>";
+							$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
+						}); }); }</script>";
 
 					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
