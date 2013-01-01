@@ -248,7 +248,7 @@
 
 					FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
 					if($rstate == 2 || $rstate == 3 || $rstate == 4)
-						FS::$pgdbMgr->Insert("z_eye_dhcp_ip_history","ip,distributed,netid,server,collecteddate","'".$host."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
+						FS::$pgdbMgr->Insert("z_eye_dhcp_ip_history","ip,mac,distributed,netid,server,collecteddate","'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
 					if($rstate == 3) {
 						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 						$query = FS::$pgdbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
