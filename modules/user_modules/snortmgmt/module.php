@@ -594,8 +594,9 @@ preprocessor http_inspect_server: server default \\\n
 					
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for DNS sensors configuration (CIDR)");
 								header("Location: index.php?mod=".$this->mid."&err=1");
@@ -634,8 +635,9 @@ preprocessor http_inspect_server: server default \\\n
 					
 					$smtplist = trim($smtplist);
 					$srvs = preg_split("#[,]#",$smtplist);
-					if(strlen($smtplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($smtplist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (SMTP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -646,8 +648,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$smtpports = trim($smtpports);
 					$ports = preg_split("#[,]#",$smtpports);
-					if(strlen($smtpports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($smtpports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (smtp port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -658,8 +661,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$imaplist = trim($imaplist);
 					$srvs = preg_split("#[,]#",$imaplist);
-					if(strlen($imaplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($imaplist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (IMAP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -670,8 +674,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$imapports = trim($imapports);
 					$ports = preg_split("#[,]#",$imapports);
-					if(strlen($imapports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($imapports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (imap port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -682,8 +687,9 @@ preprocessor http_inspect_server: server default \\\n
 					
 					$poplist = trim($poplist);
 					$srvs = preg_split("#[,]#",$poplist);
-					if(strlen($poplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($poplist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (POP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -694,8 +700,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$popports = trim($popports);
 					$ports = preg_split("#[,]#",$popports);
-					if(strlen($popports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($popports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (pop port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -739,8 +746,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for HTTP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
@@ -751,8 +759,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$httpports = trim($httpports);
 					$ports = preg_split("#[,]#",$httpports);
-					if(strlen($httpports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($httpports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for HTTP (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
@@ -789,8 +798,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sqllist = trim($sqllist);
 					$srvs = preg_split("#[,]#",$sqllist);
-					if(strlen($sqllist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($sqllist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (SQL not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
@@ -801,8 +811,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$oraclelist = trim($oraclelist);
 					$srvs = preg_split("#[,]#",$oraclelist);
-					if(strlen($oraclelist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($oraclelist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (Oracle not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
@@ -813,8 +824,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$oracleports = trim($oracleports);
 					$ports = preg_split("#[,]#",$oracleports);
-					if(strlen($oracleports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($oracleports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (Oracle port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
@@ -858,8 +870,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$telnetlist = trim($telnetlist);
 					$srvs = preg_split("#[,]#",$telnetlist);
-					if(strlen($telnetlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($telnetlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (telnet not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -870,8 +883,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sshlist = trim($sshlist);
 					$srvs = preg_split("#[,]#",$sshlist);
-					if(strlen($sshlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($sshlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (SSH not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -882,8 +896,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sshports = trim($sshports);
 					$ports = preg_split("#[,]#",$sshports);
-					if(strlen($sshports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($sshports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (SSH port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -894,8 +909,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$tselist = trim($tselist);
 					$srvs = preg_split("#[,]#",$tselist);
-					if(strlen($tselist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($tselist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (TSE not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -943,8 +959,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for FTP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
@@ -955,8 +972,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$ftpports = trim($ftpports);
 					$ports = preg_split("#[,]#",$ftpports);
-					if(strlen($ftpports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($ftpports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for FTP sensors configuration (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
@@ -993,8 +1011,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SNMP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
@@ -1030,8 +1049,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SIP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");
@@ -1042,8 +1062,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sipports = trim($sipports);
 					$ports = preg_split("#[,]#",$sipports);
-					if(strlen($sipports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($sipports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SIP sensors configuration (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");

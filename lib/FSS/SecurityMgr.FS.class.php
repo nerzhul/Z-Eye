@@ -217,7 +217,8 @@
 		public function checkAndSecurisePostData($data) {
 			$data_new = $this->checkPostData($data);
 			if(is_array($data_new)) {
-				for($i=0;$i<count($data_new);$i++)
+				$count = count($data_new);
+				for($i=0;$i<$count;$i++)
 					$this->SecuriseStringForDB($data_new[$i]);
 			}
 			else
@@ -229,7 +230,8 @@
 		public function checkAndSecuriseGetData($data) {
 			$data_new = $this->checkGetData($data);
 			if(is_array($data_new)) {
-				for($i=0;$i<count($data_new);$i++)
+				$count = count($data_new);
+				for($i=0;$i<$count;$i++)
 					$this->SecuriseStringForDB($data_new[$i]);
 			}
 			else

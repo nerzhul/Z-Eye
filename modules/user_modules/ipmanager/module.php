@@ -89,7 +89,8 @@
 						$switchlist[$data2["ip"]] = $data2["name"];
 
 					// Initiate network IPs
-					for($i=($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
+					$lastip = $netobj->getLastUsableIPLong()+1;
+					for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
 						$iparray[$i] = array();
 						$iparray[$i]["mac"] = "";
 						$iparray[$i]["host"] = "";
@@ -192,7 +193,8 @@
 							$netoutput .= "</td><td>";
 						}
 						$netoutput .= $value["ltime"]."</td><td>";
-						for($i=0;$i<count($value["servers"]);$i++) {
+						$count = count($value["servers"]);
+						for($i=0;$i<$count;$i++) {
 							if($i > 0) $netoutput .= "<br />";
 							$netoutput .= $value["servers"][$i];
 						}

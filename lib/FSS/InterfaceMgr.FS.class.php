@@ -1,6 +1,6 @@
 <?php
         /*
-        * Copyright (c) 2012, Loïc BLOT, CNRS <http://www.unix-experience.fr>
+        * Copyright (c) 2010-2012, Loïc BLOT, CNRS <http://www.unix-experience.fr>
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@
 
 	class FSInterfaceMgr {
 		function FSInterfaceMgr($DBMgr) {
-			$this->dbMgr = $DBMgr;	
 		}
 
 		public function InitComponents() {
@@ -50,12 +49,13 @@
 				<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
 				<head>
 				<title>".Config::getWebsiteName()."</title>";
-				for($i=0;$i<count($this->arr_css);$i++)
+				$count = count($this->arr_css);
+				for($i=0;$i<$count;$i++)
 					$output .= "<link rel=\"stylesheet\" href=\"".$this->arr_css[$i]."\" type=\"text/css\" />";
 				if(Config::hasFavicon())
 					$output .= "<link rel=\"shortcut icon\" href=\"/favicon.ico\" />";
-				
-				for($i=0;$i<count($this->arr_js);$i++)
+				$count = count($this->arr_js);
+				for($i=0;$i<$count;$i++)
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
 				
 				$output .= "</head>
@@ -73,7 +73,8 @@
 
 		protected function loadMenus($mlist) {
                         $output = "";
-			for($i=0;$i<count($mlist);$i++) {
+			$count = count($mlist);
+			for($i=0;$i<$count;$i++) {
 				$haselemtoshow = 0;
 				$tmpoutput = "";
 				// Load menu
@@ -274,7 +275,8 @@
 		public function radioList($name,$values, $labels, $checkid = NULL) {
 			if(!is_array($values)) return "";
 			$output = "";
-			for($i=0;$i<count($values);$i++)
+			$count = count($values);
+			for($i=0;$i<$count;$i++)
 				$output .= $this->radio($name,$values[$i],$checkid == $values[$i] ? true : false, $labels[$i])."<br />";
 			return $output;
 		}

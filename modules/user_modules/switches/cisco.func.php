@@ -401,13 +401,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -418,13 +420,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -435,13 +439,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -452,13 +458,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -580,7 +588,8 @@
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
-			for($i=0;$i<count($out);$i++) {
+			$count = count($out);
+			for($i=0;$i<$count;$i++) {
 				$pdata = explode(" ",$out[$i]);
 				$pname = $pdata[3];
 				$pid = explode(".",$pdata[0]);
@@ -618,7 +627,8 @@
 			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
-			for($i=0;$i<count($out);$i++) {
+			$count = count($out);
+			for($i=0;$i<$count;$i++) {
 				$pdata = explode(" ",$out[$i]);
 				$pname = $pdata[3];
 				$pid = explode(".",$pdata[0]);
@@ -634,7 +644,8 @@
 					$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
 					if(in_array($oldvlan,$vllist)) {
 						$vllist2 = array();
-						for($j=0;$j<count($vllist);$j++) {
+						$countvl = count($vllist);
+						for($j=0;$j<$countvl;$j++) {
 							if($vllist[$j] != $oldvlan)
 								array_push($vllist2,$vllist[$j]);
 						}

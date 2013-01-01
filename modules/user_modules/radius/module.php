@@ -385,8 +385,9 @@
 				while($data = mysql_fetch_array($query)) {
 						if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 				}
-				for($i=0;$i<count($groups);$i++) {
-						$grouplist .= FS::$iMgr->selElmt($groups[$i],$groups[$i]);
+				$count = count($groups);
+				for($i=0;$i<$count;$i++) {
+					$grouplist .= FS::$iMgr->selElmt($groups[$i],$groups[$i]);
 				}
 
 				$output .= "<h3>".$this->loc->s("title-mass-import")."</h3>";
@@ -898,7 +899,8 @@
 			while($data = mysql_fetch_array($query)) {
 				if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 			}
-			for($i=0;$i<count($groups);$i++) {
+			$count = count($groups);
+			for($i=0;$i<$count;$i++) {
 				$output .= FS::$iMgr->selElmt($groups[$i],$groups[$i],($groups[$i] == $selectEntry ? true : false));
 			}
 			return $output;
@@ -1214,7 +1216,8 @@
 						// Delete empty entries
 						$userlist = array_filter($userlist);
 						$fmtuserlist = array();
-						for($i=0;$i<count($userlist);$i++) {
+						$count = count($userlist);
+						for($i=0;$i<$count;$i++) {
 							$tmp = preg_split("#[,]#",$userlist[$i]);
 							if(count($tmp) != 2 || preg_match("#[ ]#",$tmp[0])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some datas are invalid for mass import");
@@ -1263,11 +1266,12 @@
 						// Delete empty entries
 						$userlist = array_filter($userlist);
 						// Match & format mac addr
-						for($i=0;$i<count($userlist);$i++) {
+						$count = count($userlist);
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isMacAddr($userlist[$i]) && !preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) && !preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Bad fields for Mass import (MAC addr)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
-	                            return;
+				                        	return;
 							}
 							$userlist[$i] = preg_replace("#[:-]#","",$userlist[$i]);
 							$userlist[$i] = strtolower($userlist[$i]);
@@ -1275,7 +1279,8 @@
 						// Delete duplicate entries
 						$userlist = array_unique($userlist);
 						$userfound = 0;
-						for($i=0;$i<count($userlist);$i++) {
+						$count = count($userlist);
+						for($i=0;$i<$count;$i++) {
 							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$userlist[$i]."'"))
 								$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$userlist[$i]."','Auth-Type',':=','Accept'");
 							else $userfound = 1;

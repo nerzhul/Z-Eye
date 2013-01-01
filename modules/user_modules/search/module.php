@@ -194,12 +194,13 @@
 			}
 			// DNS infos
 			$searchsplit = preg_split("#\.#",$search);
-			if(count($searchsplit) > 1) {
+			$count = count($searchsplit);
+			if($count > 1) {
 				$hostname = $searchsplit[0];
 				$dnszone = "";
-				for($i=1;$i<count($searchsplit);$i++) {
+				for($i=1;$i<$count;$i++) {
 					$dnszone .= $searchsplit[$i];
-					if($i != count($searchsplit)-1)
+					if($i != $count-1)
 						$dnszone .= ".";
 				}
 				$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");

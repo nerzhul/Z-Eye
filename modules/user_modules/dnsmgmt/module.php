@@ -220,7 +220,8 @@
 								else
 									$dnsoutput .= $recordval;
 								$dnsoutput .= "</td><td>";
-								for($i=0;$i<count($servers);$i++) {
+								$count = count($servers);
+								for($i=0;$i<$count;$i++) {
 									$dnsoutput .= $servers[$i];
 									if($i != count($servers)) $dnsoutput .= "<br />";
 								}
@@ -337,7 +338,8 @@
 							$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$this->loc->s("Alone")."<br />";
 						}
 						else {
-							for($i=0;$i<count($out);$i++) {
+							$count = count($out);
+							for($i=0;$i<$count;$i++) {
 								$query2 = FS::$pgdbMgr->Select("node_ip","mac,time_last","ip = '".$out[$i]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 								while($data2 = pg_fetch_array($query2)) {
 									$foundrecent = FS::$pgdbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);

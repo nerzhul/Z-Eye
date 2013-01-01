@@ -251,7 +251,8 @@
 					}
 					FS::$pgdbMgr->Delete("z_eye_user_group","uid = '".$uid."'");
 					$groups = array_unique($groups);
-					for($i=0;$i<count($groups);$i++)
+					$count = count($groups);
+					for($i=0;$i<$count;$i++)
 						FS::$pgdbMgr->Insert("z_eye_user_group","uid,gid","'".$uid."','".$groups[$i]."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User ".$uid." edited");
 					header("Location: index.php?mod=".$this->mid);

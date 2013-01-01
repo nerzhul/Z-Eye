@@ -1,6 +1,6 @@
 <?php
 	/*
-        * Copyright (c) 2010-2012, Loïc BLOT, CNRS <http://www.unix-experience.fr>
+        * Copyright (c) 2012, Loïc BLOT, CNRS
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,9 @@
 	require_once(dirname(__FILE__)."/lib/FSS/FS.main.php");
 	require_once(dirname(__FILE__)."/modules/ActionMgr.class.php");
 	require_once(dirname(__FILE__)."/modules/Ajax.class.php");
+
+	//$start_time = microtime(true);
+
 	FS::LoadFSModules();
 	if(FS::isAJAXCall()) {
 		FS::$ajaxMgr->handle();
@@ -59,4 +62,8 @@
 		echo FS::$iMgr->content();
 		echo FS::$iMgr->footer();
 	}
+	/* For optimize times
+	$end_time = microtime(true);
+        $script_time = $end_time - $start_time;
+	echo $script_time; */
 ?>

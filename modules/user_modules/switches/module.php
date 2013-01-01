@@ -308,7 +308,8 @@
 					if($file) {
 						$filebuffer = "";
 						$stopbuffer = 0;
-						for($i=0;$i<count($file);$i++) {
+						$count = count($file);
+						for($i=0;$i<$count;$i++) {
 							$file[$i] = preg_replace("#src=\"(.*)\"#","src=\"datas/rrd/$1\"",$file[$i]);
 							if(preg_match("#<head>#",$file[$i]) || preg_match("#<div id=\"footer#",$file[$i]) || 
 								 preg_match("#<div id=\"legend#",$file[$i]))
@@ -568,7 +569,8 @@
 						</script>";
 						$swlist = $this->getDeviceSwitches($devmod,1);
 						$swlist = preg_split("#\/#",$swlist);
-						for($i=count($swlist)-1;$i>=0;$i--) {
+						$countsw = count($swlist)-1;
+						for($i=$countsw;$i>=0;--$i) {
 							switch($swlist[$i]) {
 								case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
 									$poearr = array();
@@ -603,9 +605,10 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
 									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
@@ -626,14 +629,16 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var poetab = [";
-									for($j=1;$j<=count($poearr);$j++) {
+									$count = count($poearr);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $poearr[$j];
-										if($j < count($poearr)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; drawContext('canvas_".($i+1)."',1,ptab,gptab,poetab);</script>";
 									break;
@@ -672,9 +677,10 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
 									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
@@ -695,14 +701,16 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
-																   $output .= "]; var powport = [";
-									for($j=1;$j<=count($poearr);$j++) {
+									$output .= "]; var powport = [";
+									$count = count($poearr);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $poearr[$j];
-										if($j < count($poearr)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; drawContext('canvas_".($i+1)."',2,ptab,gptab,powport);</script>";
 									break;
@@ -745,9 +753,10 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
 									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN ('GigabitEthernet".($i+1)."/0/25', 'GigabitEthernet".($i+1)."/0/26',
@@ -769,14 +778,16 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=25;$j<=(25+count($arr_res));$j++) {
+									$count = count($arr_res);
+									for($j=25;$j<=(25+$count);$j++) {
 										$output .= $arr_res[$j];
-										if($j < (24+count($arr_res))) $output .= ",";
+										if($j < (24+$count)) $output .= ",";
 									}
-																   $output .= "]; var powport = [";
-									for($j=1;$j<=count($poearr);$j++) {
+									$output .= "]; var powport = [";
+									$count = count($poearr);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $poearr[$j];
-										if($j < count($poearr)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; drawContext('canvas_".($i+1)."',3,ptab,gptab,powport);</script>";
 									break;
@@ -1087,7 +1098,8 @@
 				return "";
 			if(!isset($devmod[$idx])) return "";
 			$output = "<ul>";
-			for($i=0;$i<count($devmod[$idx]);$i++) {
+			$count = count($devmod[$idx]);
+			for($i=0;$i<$count;$i++) {
 				$output .= "<li>" .$devmod[$idx][$i]["desc"]." (".$devmod[$idx][$i]["name"].") ";
 				if(strlen($devmod[$idx][$i]["hwver"]) > 0)
 					$output .= "[hw: ".$devmod[$idx][$i]["hwver"]."] ";
@@ -1112,9 +1124,10 @@
 		private function getDeviceSwitches($devmod,$idx) {
 			if(!isset($devmod[$idx])) return "";
 			$output = "";
-			for($i=0;$i<count($devmod[$idx]);$i++) {
+			$count = count($devmod[$idx]);
+			for($i=0;$i<$count;$i++) {
 				$output .= $devmod[$idx][$i]["desc"];
-				if($i+1<count($devmod[$idx])) $output .= "/";
+				if($i+1<$count) $output .= "/";
 			}
 			return $output;
 		}
@@ -1709,7 +1722,8 @@
 						if($vllist) {
 							// Insert VLAN in database only if not in trunk All mode
 							if(!in_array("all",$vllist)) {
-								for($i=0;$i<count($vllist);$i++)
+								$count = count($vllist);
+								for($i=0;$i<$count;$i++)
 									FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vllist[$i]."','f',NOW(),NOW()");
 							}
 						}
@@ -1722,9 +1736,11 @@
 						if(is_array($values["src"]) || is_array($values["dst"])) {
 							if(count(array_diff($values["src"],$values["dst"])) != 0) {
 								$logoutput .= "\n".$keys.": ";
-								for($i=0;$i<count($values["src"]);$i++) $logoutput .= $values["src"][$i].",";
+								$count = count($values["src"]);
+								for($i=0;$i<$count;$i++) $logoutput .= $values["src"][$i].",";
 								$logoutput .= " => ";
-								for($i=0;$i<count($values["dst"]);$i++) $logoutput .= $values["dst"][$i].",";
+								$count = count($values["dst"]);
+								for($i=0;$i<$count;$i++) $logoutput .= $values["dst"][$i].",";
 							}
 						}
 						else if($values["src"] != $values["dst"]) {
@@ -1754,10 +1770,10 @@
 					}
 
 					$plist = getPortList($device,$vlan);
-
-					if(count($plist) > 0) {
+					$count = count($plist);
+					if($count > 0) {
 						echo "<ul>";
-						for($i=0;$i<count($plist);$i++)
+						for($i=0;$i<$count;$i++)
 							echo "<li>".$plist[$i]."</li>";
 						echo "</ul>";
 					}

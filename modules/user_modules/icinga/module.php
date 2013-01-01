@@ -1199,7 +1199,8 @@
 					}
 					
 					// some members don't exist
-					for($i=0;$i<count($cts);$i++) {
+					$count = count($cts);
+					for($i=0;$i<$count;$i++) {
 						if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$cts[$i]."'")) {
 							header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 							return;
@@ -1208,7 +1209,7 @@
 					
 					// Add it
 					FS::$pgdbMgr->Insert("z_eye_icinga_contactgroups","name,alias","'".$name."','".$alias."'");
-					for($i=0;$i<count($cts);$i++) {
+					for($i=0;$i<$count;$i++) {
 						FS::$pgdbMgr->Insert("z_eye_icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
 					}
 					
@@ -1308,7 +1309,8 @@
 					}
 					
 					if($parent && !in_array("none",$parent)) {
-						for($i=0;$i<count($parent);$i++) {
+						$count = count($parent);
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent[$i]."'")) {
 								header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 								return;
@@ -1338,7 +1340,8 @@
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
 						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".$icon."'");
 					if($parent && !in_array("none",$parent)) {
-						for($i=0;$i<count($parent);$i++) {
+						$count = count($parent);
+						for($i=0;$i<$count;$i++) {
 							FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
 						}
 					}
@@ -1529,14 +1532,15 @@
 					}
 					
 					if($members) {
-						for($i=0;$i<count($members);$i++) {
+						$count = count($members);
+						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) != 2 && !FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
-						for($i=0;$i<count($members);$i++) {
+						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) == 2 && ($mt[0] == 1 || $mt[0] == 2))
 								FS::$pgdbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[1]."','".$mt[0]."'");
