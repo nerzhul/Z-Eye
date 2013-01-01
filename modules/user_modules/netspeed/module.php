@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -26,7 +25,7 @@
 		public function Load() {
 			$output = "";
 			if(!FS::isAJAXCall()) {
-				$output .= "<h3>".$this->loc->s("title-bw")."</h3>";
+				$output .= "<h1>".$this->loc->s("title-bw")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">".$this->loc->s("main-map")."</a>";
 				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1\">".$this->loc->s("precise-map")."</a>";
@@ -47,12 +46,12 @@
 		}
 		
 		private function showDeviceWeatherMap($device) {
-			$output = "<h2>".$this->loc->s("link-state")." ".$device."</h2>";
+			$output = "<h3>".$this->loc->s("link-state")." ".$device."</h3>";
 			$output .= FS::$iMgr->img("datas/weathermap/".$device.".png");
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
-			$output = "<h2>".$this->loc->s("net-map")."</h2>";
+			$output = "<h3>".$this->loc->s("net-map")."</h3>";
 			$imgsize = getimagesize("datas/weathermap/main-nowifi.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
 			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main-nowifi.svg","1000","700",$sizes[1],$sizes[3],"netmapL");

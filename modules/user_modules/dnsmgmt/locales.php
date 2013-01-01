@@ -1,6 +1,6 @@
 <?php
-	/*
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+    /*
+    * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
     *
     * This program is free software; you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,12 @@
 					"fail-tab" => "Unable to load tab, link may be wrong or page unavailable",
 					"Filter" => "Filtrer",
 					"found-records" => "Enregistrements obsolètes trouvés !",
+					"no-data-found" => "Aucune donnée collectée",
 					"no-found-records" => "Aucun enregistrement obsolète trouvé",
 					"Others" => "Autres",
 					"Record" => "Enregistrement",
 					"Search" => "Rechercher",
+					"Servers" => "Serveur(s)",
 					"Stats" => "Statistiques",
 					"title-dns" => "Supervision DNS",
 					"title-old-records" => "Recherche d'enregistrements obsolètes",
@@ -47,10 +49,12 @@
 					"fail-tab" => "Unable to load tab, link may be wrong or page unavailable",
 					"Filter" => "Filter",
 					"found-records" => "Old records found !",
+					"no-data-found" => "No data collected",
 					"no-found-records" => "No old records found",
 					"Others" => "Others",
 					"Record" => "Record",
 					"Search" => "Search",
+					"Servers" => "Server(s)",
 					"Stats" => "Statistics",
 					"title-dns" => "DNS supervision",
 					"title-old-records" => "Search old records",

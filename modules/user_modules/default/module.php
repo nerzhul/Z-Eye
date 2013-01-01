@@ -1,7 +1,6 @@
 <?php
 	/*
-        * Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-        * Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+        * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
         *
         * This program is free software; you can redistribute it and/or modify
         * it under the terms of the GNU General Public License as published by
@@ -117,22 +116,23 @@
                         	$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
 	                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
-				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-                                $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*><tr[^>]*>(.*?)<\/tr><\/TD>\n<\/TR>\n<\/TABLE>#i',"$4",$body);
-                                // flapping cleanup
-                                $body = preg_replace('#<tr[^>]*><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><\/tr><tr><td[^>]*>(.*)<\/tr$
-                                $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)\n<\/TR>\n<\/TABLE>\n<\/TD>\n<\/TR>\n<\/TABLE>\n<\/TD>#i',"$$
-                                $body = preg_replace('#<TABLE[^>]*><TR>(.*?)\n<\/TR><\/TABLE>#i',"$1",$body);
-                                $body = preg_replace('#<TABLE[^>]*>\n<TR>\n(.*)<\/TR>\n<\/TABLE>#i',"$1",$body);
-                                $body = preg_replace('#<TD[^>]*>\n<TD[^>]*>\n(.*)\n<\/TD>\n<\/TR><\/TABLE>#i',"<TD>$1</TD>",$body);
         	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
+				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*><tr[^>]*>(.*?)<\/tr><\/TD>\n<\/TR>\n<\/TABLE>#i',"$4",$body);
+				// flapping cleanup
+				$body = preg_replace('#<tr[^>]*><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><\/tr><tr><td[^>]*>(.*)<\/tr><\/table>(.*)<\/TD>#i',"$4",$body);
+				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)\n<\/TR>\n<\/TABLE>\n<\/TD>\n<\/TR>\n<\/TABLE>\n<\/TD>#i',"$1</TR><TR>",$body);
+				$body = preg_replace('#<TABLE[^>]*><TR>(.*?)\n<\/TR><\/TABLE>#i',"$1",$body);
+				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n(.*)<\/TR>\n<\/TABLE>#i',"$1",$body);
+				$body = preg_replace('#<TD[^>]*>\n<TD[^>]*>\n(.*)\n<\/TD>\n<\/TR><\/TABLE>#i',"<TD>$1</TD>",$body);
+				// other cleanup
+				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
 				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
 				$body = preg_replace("#<TH[^>]*><input(.+)checkbox(.+)></TH>#","",$body);
                                 $body = preg_replace("#<TD[^>]*><input(.+)checkbox(.+)></TD>#","",$body);
         			preg_match_all("#<TR#",$body,$hsservices);
 				$this->hsicinga = count($hsservices[0])-1;
-				if(count($hsservices[0]) > 0)
+				if($this->hsicinga > 0)
 			        	$output = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga").": ".$this->hsicinga."/".$this->totalicinga."</h4>".$body;
 				else $output = "";
 			}
@@ -147,7 +147,7 @@
 			$pbfound = 0;
 			$total = 0;
 			$this->BWscore = 0;
-			
+
 			$query = FS::$pgdbMgr->Select("z_eye_port_monitor","device,port,climit,wlimit,description");
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {

@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -39,22 +38,30 @@
 
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h3>".$this->loc->s("title-ip-supervision")."</h3>";
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-				$output .= FS::$iMgr->addList("f","submit()");
+				$output .= "<h1>".$this->loc->s("title-ip-supervision")."</h1>";
+				$netfound = false;
+				$tmpoutput = $this->loc->s("choose-net");
+				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+				$tmpoutput .= FS::$iMgr->select("f","submit()");
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
 				while($data = pg_fetch_array($query)) {
-					$formoutput .= FS::$iMgr->addElementTolist($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
+					if(!$netfound) $netfound = true;
+					$formoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
-				$output .= $formoutput;
-				$output .= "</select> ";
-				$output .= FS::$iMgr->submit("","Consulter");
-				$output .= "</form><br />";
-				if(!$filter || !FS::$secMgr->isIP($filter))
-					return $this->loc->s("choose-net").": <br /><br />".$output;
+				$tmpoutput .= $formoutput;
+				$tmpoutput .= "</select> ";
+				$tmpoutput .= FS::$iMgr->submit("","Consulter");
+				$tmpoutput .= "</form><br />";
+				if(!$netfound)
+                                        return $output.= FS::$iMgr->printError($this->loc->s("no-net-found"));
 
+				if($filter && !FS::$secMgr->isIP($filter))
+					return $output.FS::$iMgr->printError($this->loc->s("bad-filter"));
+
+				$output .= $tmpoutput;
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats"),$showmodule);
+				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools"),$showmodule);
 				$output .= "</ul></div>";
@@ -65,7 +72,7 @@
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
 				while($data = pg_fetch_array($query)) {
 					$iparray = array();
-					$netoutput .= "<h4>Réseau : ".$data["netid"]."/".$data["netmask"]."</h4>";
+					$netoutput .= "<h3>Réseau : ".$data["netid"]."/".$data["netmask"]."</h3>";
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
 					
 					$netobj = new FSNetwork();
@@ -73,16 +80,17 @@
 					$netobj->setNetMask($data["netmask"]);
 					
 					$swfound = false;
-					
+
 					// Bufferize switch list
 					$switchlist = array();
-					
+
 					$query2 = FS::$pgdbMgr->Select("device","ip,name");
 					while($data2 = pg_fetch_array($query2))
 						$switchlist[$data2["ip"]] = $data2["name"];
-					
+
 					// Initiate network IPs
-					for($i=($netobj->getFirstUsableIPLong());$i<=($netobj->getLastUsableIPLong());$i++) {
+					$lastip = $netobj->getLastUsableIPLong()+1;
+					for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
 						$iparray[$i] = array();
 						$iparray[$i]["mac"] = "";
 						$iparray[$i]["host"] = "";
@@ -92,7 +100,7 @@
 						$iparray[$i]["switch"] = "";
 						$iparray[$i]["port"] = "";
 					}
-					
+
 					// Fetch datas
 					$query2 = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
 					while($data2 = pg_fetch_array($query2)) {
@@ -120,6 +128,7 @@
 					$used = 0;
 					$reserv = 0;
 					$free = 0;
+					$distrib = 0;
 					$fixedip = 0;
 					
 					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
@@ -127,7 +136,7 @@
 					if($swfound)
 						$netoutput .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
 					$netoutput .= "Fin du bail</th><th>Serveurs</th></tr>";
-						
+
 					foreach($iparray as $key => $value) {
 						$rstate = "";
 						$style = "";
@@ -146,6 +155,11 @@
 								$rstate = $this->loc->s("Reserved");
 								$style = "background-color: #FFFF80;";
 								$reserv++;
+								break;
+							case 4:
+								$rstate = $this->loc->s("Distributed");
+								$style = "background-color: #BFFBFF;";
+								$distrib++;
 								break;
 							default: {
 									$rstate = $this->loc->s("Free");
@@ -179,7 +193,8 @@
 							$netoutput .= "</td><td>";
 						}
 						$netoutput .= $value["ltime"]."</td><td>";
-						for($i=0;$i<count($value["servers"]);$i++) {
+						$count = count($value["servers"]);
+						for($i=0;$i<$count;$i++) {
 							if($i > 0) $netoutput .= "<br />";
 							$netoutput .= $value["servers"][$i];
 						}
@@ -197,11 +212,12 @@
 										enabled: true,formatter: function() { return '<b>'+this.point.name+'</b>: '+
 										this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
 							}}},
-							series: [{ type: 'pie', data: 
-								[{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },
-								{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},
-								{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},
-								{ name: '".$this->loc->s("Free")."', y:".$free.", color: 'green'}]
+							series: [{ type: 'pie', data: [";
+					if($used > 0) $netoutput .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
+					if($reserv > 0) $netoutput .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
+					if($fixedip > 0) $netoutput .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
+					if($distrib > 0) $netoutput .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+					$netoutput .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
 							}]});</script>";
 					}
 					$output .= $netoutput;
@@ -214,9 +230,9 @@
 					$output .= "$('#obsres').html(data);";
 					$output .= "});return false;}</script>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
-					$output .= FS::$iMgr->addHidden("obsdata",$filter);
-					$output .= $this->loc->s("intval-days")." ".FS::$iMgr->addNumericInput("ival")."<br />";
-					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
+					$output .= FS::$iMgr->hidden("obsdata",$filter);
+					$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
+					$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Search"),"return searchobsolete();");
 					$output .= "</form><div id=\"obsres\"></div>";
 				}
 				else if($showmodule == 3) {
@@ -229,9 +245,9 @@
 					$output .= "<div id=\"monsubnetres\"></div>";
 	                                $output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1 ? true : false,"label" => $this->loc->s("En-monitor")))."</li><li>";
-                                        $output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => $this->loc->s("tooltip-max-age")))."</li><li>";
+                                        $output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
+					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
+					$output .= FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => $this->loc->s("tooltip-max-age")))."</li><li>";
 					$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),$this->loc->s("tooltip-contact"))."</li><li>";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
 					$output .= "<script type=\"text/javascript\">$('#monsubnet').submit(function(event) {
@@ -241,9 +257,124 @@
                                 	        });
 	                                });</script>";
 				}
+				else if($showmodule == 4) {
+					$output .= "<script type=\"text/javascript\">function historyDateChange() {
+						$('#hstcontent').hide(\"slow\",function() { $('#hstcontent').html(''); 
+						$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
+							$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
+						}); }); }</script>";
+
+					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
+					$output .= FS::$iMgr->hidden("filter",$filter);
+					$date = FS::$pgdbMgr->GetMin("z_eye_dhcp_ip_history","collecteddate");
+					if(!$date) $date = "now";
+					$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
+					$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
+					$output .= FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
+				}
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("no-tab"));
 			}
+			return $output;
+		}
+
+		private function showHistory($filter,$interval = 1) {
+			$output = "<h3>".$this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days")."</h3>";
+			$output .= "<div id=\"hstgr\"></div>";
+			$results = array();
+			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_history","count(ip) as ct,distributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and netid = '".$filter."' GROUP BY distributed,collecteddate ORDER BY collecteddate");
+			while($data = pg_fetch_array($query)) {
+				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
+				switch($data["distributed"]) {
+					case 1: break;
+					case 2: $results[$data["collecteddate"]]["baux"] = $data["ct"]; break;
+					case 3: $results[$data["collecteddate"]]["reserv"] = $data["ct"]; break;
+					case 4: $results[$data["collecteddate"]]["avail"] = $data["ct"]; break;
+				}
+			}
+			$netobj = new FSNetwork();
+                        $netobj->setNetAddr($filter);
+                        $netobj->setNetMask(FS::$pgdbMgr->GetOneData("z_eye_dhcp_subnet_cache","netmask","netid ='".$filter."'"));
+
+			// JS Table
+			$labels = $baux = $reserv = $avail = $free = $total = "";
+			// To show or not if no data
+			$reservshow = $bauxshow = $availshow = false;
+			// Show only modifications
+			$lastvalues = array();
+			end($results);
+			$lastres = key($results);
+			$totalvals = 0;
+			foreach($results as $date => $values) {
+				if($labels == "") {
+					// Bufferize vals
+                                        $bauxval = (isset($values["baux"]) ? $values["baux"] : 0);
+                                        $reservval = (isset($values["reserv"]) ? $values["reserv"] : 0);
+                                        $availval = (isset($values["avail"]) ? $values["avail"] : 0);
+
+                                        // Write js table
+                                        $labels .= "'".$date."'";
+                                        if($bauxval > 0) $bauxshow = true;
+                                        $baux .= $bauxval;
+                                        if($reservval > 0) $reservshow = true;
+                                        $reserv .= $reservval;
+                                        if($availval > 0) $availshow = true;
+                                        $avail .= $availval;
+
+                                        $totdistrib = ($bauxval+$reservval+$availval);
+                                        $total .= $totdistrib;
+                                        $free .= ($netobj->getMaxHosts() - $totdistrib);
+                                        // Save this occur
+                                        $lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
+					$totalvals++;
+				}
+				else {
+					// Bufferize vals
+					$bauxval = (isset($values["baux"]) ? $values["baux"] : 0);
+					$reservval = (isset($values["reserv"]) ? $values["reserv"] : 0);
+					$availval = (isset($values["avail"]) ? $values["avail"] : 0);
+
+					if($bauxval != $lastvalues["baux"] || $reservval != $lastvalues["reserv"] ||
+						$availval != $lastvalues["avail"] || $date == $lastres) {
+						// Write js table
+						$labels .= ",'".$date."'";
+						if($bauxval > 0) $bauxshow = true;
+						$baux .= ",".$bauxval;
+						if($reservval > 0) $reservshow = true;
+                	                	$reserv .= ",".$reservval;
+						if($availval > 0) $availshow = true;
+        	                                $avail .= ",".$availval;
+
+						$totdistrib = ($bauxval+$reservval+$availval);
+                	                        $total .= ",".$totdistrib;
+                        	                $free .= ",".($netobj->getMaxHosts() - $totdistrib);
+						$totalvals++;
+					}
+					// Save this occur
+					$lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
+				}
+			}
+			$output .= "<script type=\"text/javascript\">$(function(){ var hstgr;
+                        	$(document).ready(function() { hstgr = new Highcharts.Chart({
+                                	chart: { renderTo: 'hstgr', type: 'line' },
+                                        title: { text: '' },
+					tooltip: { crosshairs: true },
+                                        xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round($totalvals/10)." },
+                                        yAxis: { title: { text: 'Nombre d\'adresses' } },
+                                        legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
+                                        	x: -10, y: 100 },
+                                        series: [ { name: '".addslashes($this->loc->s("Used")."s")."',
+						data: [".$total."], color: 'black' },
+						{ name: '".addslashes($this->loc->s("Free")."s")."',
+                                                data: [".$free."], color: 'green' },";
+					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
+						data: [".$baux."], color: 'red' },";
+					if($reservshow) $output .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
+						data: [".$reserv."], color: 'yellow' },";
+					if($availshow) $output .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
+						data: [".$avail."], color: 'cyan' }";
+			$output .= "]});});});</script>";
 			return $output;
 		}
 
@@ -325,6 +456,14 @@
 					
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
 					return;
+				case 4:
+					$filter = FS::$secMgr->checkAndSecurisePostData("filter");
+					$daterange = FS::$secMgr->checkAndSecurisePostData("daterange");
+					if(!$filter || !$daterange || !FS::$secMgr->isNumeric($daterange) || $daterange < 1) {
+						echo FS::$iMgr->printError($this->loc->s("bad-datas"));
+						return;
+					}
+					echo $this->showHistory($filter,$daterange);
 			}
 		}
 	};

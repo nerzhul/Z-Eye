@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -56,7 +55,7 @@
 			while($data = pg_fetch_array($query))
 				array_push($rules,$data["rulename"]);
 			$output .= $this->loadModuleRuleSets($rules);
-			$output .= FS::$iMgr->addHidden("gid",$gid);
+			$output .= FS::$iMgr->hidden("gid",$gid);
 			$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";
 			return $output;
 		}
@@ -98,7 +97,7 @@
                                         dragover: function(e) { e.preventDefault(); },
                                         drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete")." \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->form("index.php?mod=".$this->mid."&act=2").
-  	                                      FS::$iMgr->addHidden("gname","'+e.dataTransfer.getData('text/html')+'").
+  	                                      FS::$iMgr->hidden("gname","'+e.dataTransfer.getData('text/html')+'").
                                               FS::$iMgr->submit("",$this->loc->s("Delete")).
                                               FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();

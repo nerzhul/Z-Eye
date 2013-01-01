@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+* Copyright (C) 2010-2012 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -39,7 +38,7 @@ defaultSNMPRO = "public"
 max_threads = 30
 
 def zeye_log(text):
-        logfile = open("/var/www/datas/logs/z_eye_collector.log","a")
+        logfile = open("/usr/local/www/z-eye/datas/logs/z_eye_collector.log","a")
         logfile.writelines("%s\n"  % text)
         logfile.close()
 
@@ -127,6 +126,8 @@ try:
 			else:
 				devcom = defaultSNMPRO
 			thread.start_new_thread(fetchSNMPInfos,(devip,devname,devcom))
+		""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
+		time.sleep(1)
 	except StandardError, e:
 		print "[Z-Eye][PortId-Caching] Fatal Error: %s" % e
 		zeye_log("[Z-Eye][PortId-Caching] Fatal Error: %s" % e)

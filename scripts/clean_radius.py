@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+* Copyright (C) 2010-2012 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -39,7 +38,7 @@ import netdiscoCfg
 max_threads = 30
 
 def zeye_log(text):
-        logfile = open("/var/www/datas/logs/z_eye_radius_cleaner.log","a")
+        logfile = open("/usr/local/www/z-eye/datas/logs/z_eye_radius_cleaner.log","a")
 	print "%s\n"  % text
         logfile.writelines("%s\n"  % text)
         logfile.close()
@@ -84,9 +83,8 @@ def cleanRadius(dbhost,dbport,dbname):
 now = datetime.datetime.now()
 zeye_log("[Z-Eye][Radius-Cleaner] Start at: %s" % now.strftime("%Y-%m-%d %H:%M"))
 try:
-        global threadCounter
         pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
-		pgcursor = pgsqlCon.cursor()
+	pgcursor = pgsqlCon.cursor()
         pgcursor.execute("SELECT addr,port,dbname FROM z_eye_radius_options GROUP BY addr,port,dbname")
         try:
                 pgres = pgcursor.fetchall()

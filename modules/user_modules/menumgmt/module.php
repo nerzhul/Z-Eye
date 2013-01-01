@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -94,7 +93,7 @@
 			if($edit) {
 				$meid = FS::$secMgr->checkGetData("im");
 				FS::$secMgr->SecuriseStringForDB($meid);
-				$output .= FS::$iMgr->addHidden("menu_elmt",$meid);
+				$output .= FS::$iMgr->hidden("menu_elmt",$meid);
 				$menuEl = new MenuElement();
 				$menuEl->setId($meid);
 				$menuEl->Load();
@@ -105,10 +104,10 @@
 			$link = new HTTPLink(0);
 			$output .= $link->CreateSelect($menuEl ? $menuEl->getLink() : 0);
 			$output .= "<hr>".$this->loc->s("Connected")." ? ";
-			$output .= FS::$iMgr->addList("isconnected");
-			$output .= FS::$iMgr->addElementToList($this->loc->s("No"),-1,$menuEl && $menuEl->getConnected() == -1 ? true : false);
-			$output .= FS::$iMgr->addElementToList($this->loc->s("Yes"),1,$menuEl && $menuEl->getConnected() == 1 ? true : false);
-			$output .= FS::$iMgr->addElementToList($this->loc->s("Both"),0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
+			$output .= FS::$iMgr->select("isconnected");
+			$output .= FS::$iMgr->selElmt($this->loc->s("No"),-1,$menuEl && $menuEl->getConnected() == -1 ? true : false);
+			$output .= FS::$iMgr->selElmt($this->loc->s("Yes"),1,$menuEl && $menuEl->getConnected() == 1 ? true : false);
+			$output .= FS::$iMgr->selElmt($this->loc->s("Both"),0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
 			$output .= "</select><hr>";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
 			$output .= "</form>";
@@ -123,7 +122,7 @@
 			$menu = NULL;
 			if($edit) {
 				$mid = FS::$secMgr->checkAndSecuriseGetData("menu");
-				$output .= FS::$iMgr->addHidden("menu_id",$mid);
+				$output .= FS::$iMgr->hidden("menu_id",$mid);
 				$menu = new Menu();
 				$menu->setId($mid);
 				$menu->Load();
@@ -131,10 +130,10 @@
 			$output .= $this->loc->s("Name")." ";
 			$output .= FS::$iMgr->input("name",$menu ? $menu->getName() : "");
 			$output .= "<hr>".$this->loc->s("Connected")." ? ";
-			$output .= FS::$iMgr->addList("isconnected");
-			$output .= FS::$iMgr->addElementToList($this->loc->s("No"),-1,$menu && $menu->getConnected() == -1 ? true : false);
-			$output .= FS::$iMgr->addElementToList($this->loc->s("Yes"),1,$menu && $menu->getConnected() == 1 ? true : false);
-			$output .= FS::$iMgr->addElementToList($this->loc->s("Both"),0,$menu && $menu->getConnected() == 0 ? true : false);
+			$output .= FS::$iMgr->select("isconnected");
+			$output .= FS::$iMgr->selElmt($this->loc->s("No"),-1,$menu && $menu->getConnected() == -1 ? true : false);
+			$output .= FS::$iMgr->selElmt($this->loc->s("Yes"),1,$menu && $menu->getConnected() == 1 ? true : false);
+			$output .= FS::$iMgr->selElmt($this->loc->s("Both"),0,$menu && $menu->getConnected() == 0 ? true : false);
 			$output .= "</select>";
 			$output .= "<hr>";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
@@ -149,7 +148,7 @@
 				$output .= $menuEl->CreateSelect();
 				$output .= " Place ";
 				$output .= FS::$iMgr->input("order","0",2,2);
-				$output .= FS::$iMgr->addHidden("menu",$mid);
+				$output .= FS::$iMgr->hidden("menu",$mid);
 				$output .= FS::$iMgr->submit("",$this->loc->s("Save"));				
 				$output .= "</center></form>
 				<h4>".$this->loc->s("mod-elmt")."</h4>

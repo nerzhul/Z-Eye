@@ -1,6 +1,6 @@
 <?php
         /*
-        * Copyright (c) 2012, Loïc BLOT, CNRS
+        * Copyright (c) 2010-2013, Loïc BLOT, CNRS <http://www.unix-experience.fr>
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@
 		}
 
 		public function CreateSelect($idsel = 0) {
-			$output = FS::$iMgr->addList("m_elem_id");
+			$output = FS::$iMgr->select("m_elem_id");
 			$query = FS::$pgdbMgr->Select("z_eye_menu_items","id");
 			while($data = pg_fetch_array($query)) {
 				$this->id = $data["id"];

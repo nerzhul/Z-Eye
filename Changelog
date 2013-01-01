@@ -162,3 +162,35 @@ Beta 2.2
 - isMacAddr recognize aa-bb-cc-dd-ee-ff addresses
 - it's possible to backup all switches by a simple button
 - New rights for discovering/saving all/backup all
+
+Beta 2.3
+- PortSecurity can now be managed
+- CDP can be enabled/disabled on each port
+- tooltip can be used on check and lists
+- Use multiselect on vlan trunking selection
+- Search in port desc is now possible
+- Fix bug on ldap account creation
+
+Beta 2.4
+- Radius record filtering
+- Code cleanup
+
+Beta 2.5
+- Rename many interface function
+- Merge all addXXLine to idxLine
+- Implement DNS multi-server support (also bufferize datas)
+
+Beta 2.6
+- Rewrite tooltip functionality and remove external JS lib
+- Fix a bug on make_portid_cache.py when there is a few switches, which
+	quit program before discovering datas
+- Modernize interface
+
+Beta 3.0
+- Misc fixes
+- Installer now asks for SNORT listening interface
+- Some interface design
+
+Beta 3.1
+- IP Manager now distinguish Free adresses from available (and distributed) addresses
+- Fix jQueryUI calendar

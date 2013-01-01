@@ -1,8 +1,6 @@
 <?php
-
-/*
-        * Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-        * Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	/*
+        * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
         *
         * This program is free software; you can redistribute it and/or modify
         * it under the terms of the GNU General Public License as published by
@@ -20,19 +18,22 @@
         */
         require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 
-		$snortDB = new FSPostgreSQLMgr();
-		// Load snort keys for db config
-		$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
-		if($dbname == "") $dbname = "snort";
-		$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
-		if($dbhost == "") $dbhost = "localhost";
-		$dbuser = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
-		if($dbuser == "") $dbuser = "snort";
-		$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
-		if($dbpwd == "") $dbpwd = "snort";
+$snortDB = new FSPostgreSQLMgr();
+// Load snort keys for db config
+/*$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
+if($dbname == "") $dbname = "snort";
+$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
+if($dbhost == "") $dbhost = "localhost";
+$dbuser = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
+if($dbuser == "") $dbuser = "snort";
+$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
+if($dbpwd == "") $dbpwd = "snort";
 
-		$snortDB->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
-		$snortDB->Connect();
+$snortDB->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
+$snortDB->Connect();*/
+
+$snortDB->setConfig("snort",5432,"localhost","snortuser","snort159");
+$snortDB->Connect();
 
 function cleanupSnortDB($snortDB) {
 	echo "Cleaning up old records from snort\n";
@@ -117,8 +118,15 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
 	// mise à jour du total des anciens enregistrements
 	$reportcount = 0;
 	// TODO: autres types d'enregistrements
-	$sql = "select ip_src,timestamp from acid_event where sig_name in('BAD-TRAFFIC SSH brute force login attempt','SSH Connection Attempt','(snort_decoder) WARNING: ICMP Original IP Header Not IPv4!','(snort decoder) IPV6 truncated header','(snort_decoder) WARNING: TCP Data Offset is less than 5!','(snort_decoder): Truncated Tcp Options','WEB-MISC robots.txt access','MISC MS Terminal Server no encryption session initiation attempt','COMMUNITY WEB-MISC Cisco IOS HTTP Router Management Service Infinite Loop DoS','COMMUNITY WEB-PHP thinkWMS index.php SQL injection attempt','WEB-MISC ICQ Webfront HTTP DOS','WEB-ATTACKS cc command attempt','WEB-MISC /doc/ access','WEB-MISC apache ?M=D directory list attempt','WEB-PHP Setup.php access','COMMUNITY WEB-PHP AppServ main.php appserv_root param access','WEB-PHP remote include path','WEB-ATTACKS rm command attempt','WEB-MISC /.... access','WEB-MISC /etc/passwd','COMMUNITY WEB-MISC mod_jrun overflow attempt','WEB-ATTACKS wget command attempt','WEB-ATTACKS ps command attempt','WEB-ATTACKS netcat command attempt','WEB-ATTACKS mail command attempt','WEB-MISC /etc/passwd','WEB-PHP /_admin access','WEB-PHP test.php access','WEB-PHP Mambo upload.php access','WEB-PHP Setup.php access','(portscan) Open Port','ICMP PING CyberKit 2.2 Windows','ICMP PING NMAP','MISC MS Terminal server request','WEB-MISC sqlmap SQL injection scan attempt') and timestamp < (";
-	$sql .= $sqlcalc.") group by ip_src,timestamp order by ip_src";
+	$siglist = "'BAD-TRAFFIC SSH brute force login attempt','SSH Connection Attempt','(snort_decoder) WARNING: ICMP Original IP Header Not IPv4!',";
+	$siglist .= "'(snort decoder) IPV6 truncated header','(snort_decoder) WARNING: TCP Data Offset is less than 5!','(snort_decoder): Truncated Tcp Options','WEB-MISC robots.txt access',";
+	$siglist .= "'MISC MS Terminal Server no encryption session initiation attempt','COMMUNITY WEB-MISC Cisco IOS HTTP Router Management Service Infinite Loop DoS','COMMUNITY WEB-PHP thinkWMS index.php SQL";
+	$siglist .= " injection attempt','WEB-MISC ICQ Webfront HTTP DOS','WEB-ATTACKS cc command attempt','WEB-MISC /doc/ access','WEB-MISC apache ?M=D directory list attempt','WEB-PHP Setup.php access',";
+	$siglist .= "'COMMUNITY WEB-PHP AppServ main.php appserv_root param access','WEB-PHP remote include path','WEB-ATTACKS rm command attempt','WEB-MISC /.... access','WEB-MISC /etc/passwd',";
+	$siglist .= "'COMMUNITY WEB-MISC mod_jrun overflow attempt','WEB-ATTACKS wget command attempt','WEB-ATTACKS ps command attempt','WEB-ATTACKS netcat command attempt','WEB-ATTACKS mail command attempt',";
+	$siglist .= "'WEB-MISC /etc/passwd','WEB-PHP /_admin access','WEB-PHP test.php access','WEB-PHP Mambo upload.php access','WEB-PHP Setup.php access','(portscan) Open Port','ICMP PING CyberKit 2.2 Windows',";
+	$siglist .= "'ICMP PING NMAP','MISC MS Terminal server request','WEB-MISC sqlmap SQL injection scan attempt'";
+	$sql = "select ip_src,timestamp from acid_event where sig_name in(".$siglist.") and timestamp < (".$sqlcalc.") group by ip_src,timestamp order by ip_src";
 	$query = pg_query($sql);
         while($data = pg_fetch_array($query)) {
 		$count = $snortDB->Count("acid_event","cid","ip_src = '".$data["ip_src"]."' and timestamp < '".$sql_date."' and sig_name in('SSH Connection Attempt','BAD-TRAFFIC SSH brute force login attempt')");
@@ -136,7 +144,7 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
 		$count = $snortDB->Count("acid_event","cid","ip_src = '".$data["ip_src"]."' and timestamp < '".$sql_date."' and sig_name in('(snort_decoder) WARNING: ICMP Original IP Header Not IPv4!','(snort decoder) IPV6 truncated header','(snort_decoder) WARNING: TCP Data Offset is less than 5!','(snort_decoder): Truncated Tcp Options')");
                 $cnerr = $count;
 
-		$lastdate = $snortDB->GetMax("acid_event","timestamp","ip_src = '".$data["ip_src"]."' and timestamp < '".$sql_date."' and sig_name in('WEB-MISC robots.txt access','MISC MS Terminal Server no encryption session initiation attempt','WEB-ATTACKS ps command attempt','WEB-ATTACKS netcat command attempt','COMMUNITY WEB-MISC Cisco IOS HTTP Router Management Service Infinite Loop DoS','COMMUNITY WEB-PHP thinkWMS index.php SQL injection attempt','WEB-MISC ICQ Webfront HTTP DOS','WEB-ATTACKS cc command attempt','WEB-MISC /doc/ access','WEB-MISC apache ?M=D directory list attempt','WEB-PHP Setup.php access','WEB-MISC /etc/passwd','WEB-PHP /_admin access','WEB-PHP test.php access','WEB-PHP Mambo upload.php access','WEB-PHP Setup.php access','ICMP PING CyberKit 2.2 Windows','ICMP PING NMAP','(portscan) Open Port','MISC MS Terminal server request','SSH Connection Attempt','BAD-TRAFFIC SSH brute force login attempt','WEB-MISC sqlmap SQL injection scan attempt')");
+		$lastdate = $snortDB->GetMax("acid_event","timestamp","ip_src = '".$data["ip_src"]."' and timestamp < '".$sql_date."' and sig_name in(".$siglist.")");
 
 		// TODO : compter autre chose
 		$totalscan = 0;
@@ -146,7 +154,7 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
 		$totalssh = 0;
 
                 $exist = false;
-		$query2 = $snortDB->Select("collected_ips","ssh,webaccess,neterrors,tse,scans","ip = '".long2ip($data["ip_src"])."'");
+		$query2 = $snortDB->Select("z_eye_collected_ips","ssh,webaccess,neterrors,tse,scans","ip = '".long2ip($data["ip_src"])."'");
                 if($data2 = pg_fetch_array($query2)) {
                         $totalweb = $data2["webaccess"];
 			$totalnerr = $data2["neterrors"];
@@ -163,11 +171,11 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
 		$totalssh += $cssh;
 
                 if($exist) {
-                        $sql2 = "UPDATE collected_ips set ssh = '".$totalssh."', neterrors = '".$totalnerr."', webaccess = '".$totalweb."', scans = '".$totalscan."', tse = '".$totaltse."', last_date = '".$lastdate."' WHERE ip = '".long2ip($data["ip_src"])."'";
+                        $sql2 = "UPDATE z_eye_collected_ips set ssh = '".$totalssh."', neterrors = '".$totalnerr."', webaccess = '".$totalweb."', scans = '".$totalscan."', tse = '".$totaltse."', last_date = '".$lastdate."' WHERE ip = '".long2ip($data["ip_src"])."'";
                         pg_query($sql2);
                 }
 		else {
-			$sql2 = "INSERT INTO collected_ips(ip,ssh,scans,tse,webaccess,neterrors,last_date) VALUES ('".long2ip($data["ip_src"])."','".$totalssh."','".$totalscan."','".$totaltse."','".$totalweb."','".$totalnerr."','".$lastdate."')";
+			$sql2 = "INSERT INTO z_eye_collected_ips(ip,ssh,scans,tse,webaccess,neterrors,last_date) VALUES ('".long2ip($data["ip_src"])."','".$totalssh."','".$totalscan."','".$totaltse."','".$totalweb."','".$totalnerr."','".$lastdate."')";
 			pg_query($sql2);
 		}
 
@@ -196,7 +204,7 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
 		$data["timestamp"] = $data["timestamp"][0];
 
 		$exist = false;
-		$query2 = $snortDB->Select("attack_stats","scans,tse,ssh,webaccess,neterrors","atkdate = '".$data["timestamp"]."'");
+		$query2 = $snortDB->Select("z_eye_attack_stats","scans,tse,ssh,webaccess,neterrors","atkdate = '".$data["timestamp"]."'");
                 if($data2 = pg_fetch_array($query2)) {
                         $exist = true;
 			$nbscan+=$data2["scans"];
@@ -206,11 +214,11 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
                         $nbnerr+=$data2["neterrors"];
                 }
 		if($exist) {
-			$sql2 = "UPDATE attack_stats set ssh = '".$nbssh."', neterrors = '".$nbnerr."', webaccess = '".$nbweb."', scans = '".$nbscan."', tse = '".$nbtse."' WHERE atkdate = '".$data["timestamp"]."'";
+			$sql2 = "UPDATE z_eye_attack_stats set ssh = '".$nbssh."', neterrors = '".$nbnerr."', webaccess = '".$nbweb."', scans = '".$nbscan."', tse = '".$nbtse."' WHERE atkdate = '".$data["timestamp"]."'";
 			pg_query($sql2);
 		}
 		else {
-			$sql2 = "INSERT INTO attack_stats(atkdate,ssh,scans,tse,webaccess,neterrors) VALUES ('".$data["timestamp"]."','".$nbssh."','".$nbscan."','".$nbtse."','".$nbweb."','".$nbnerr."')";
+			$sql2 = "INSERT INTO z_eye_attack_stats(atkdate,ssh,scans,tse,webaccess,neterrors) VALUES ('".$data["timestamp"]."','".$nbssh."','".$nbscan."','".$nbtse."','".$nbweb."','".$nbnerr."')";
 			pg_query($sql2);
 		}
 	}

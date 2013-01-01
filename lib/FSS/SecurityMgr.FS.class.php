@@ -1,6 +1,6 @@
 <?php
         /*
-        * Copyright (c) 2012, Loïc BLOT, CNRS
+        * Copyright (c) 2010-2013, Loïc BLOT, CNRS <http://www.unix-experience.fr>
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -217,7 +217,8 @@
 		public function checkAndSecurisePostData($data) {
 			$data_new = $this->checkPostData($data);
 			if(is_array($data_new)) {
-				for($i=0;$i<count($data_new);$i++)
+				$count = count($data_new);
+				for($i=0;$i<$count;$i++)
 					$this->SecuriseStringForDB($data_new[$i]);
 			}
 			else
@@ -229,7 +230,8 @@
 		public function checkAndSecuriseGetData($data) {
 			$data_new = $this->checkGetData($data);
 			if(is_array($data_new)) {
-				for($i=0;$i<count($data_new);$i++)
+				$count = count($data_new);
+				for($i=0;$i<$count;$i++)
 					$this->SecuriseStringForDB($data_new[$i]);
 			}
 			else

@@ -1,6 +1,6 @@
 <?php
         /*
-        * Copyright (c) 2012, Loïc BLOT, CNRS
+        * Copyright (c) 2010-2013, Loïc BLOT, CNRS <http://www.unix-experience.fr>
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@
 
 	class FSInterfaceMgr {
 		function FSInterfaceMgr($DBMgr) {
-			$this->dbMgr = $DBMgr;	
 		}
 
 		public function InitComponents() {
@@ -50,16 +49,17 @@
 				<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
 				<head>
 				<title>".Config::getWebsiteName()."</title>";
-				for($i=0;$i<count($this->arr_css);$i++)
+				$count = count($this->arr_css);
+				for($i=0;$i<$count;$i++)
 					$output .= "<link rel=\"stylesheet\" href=\"".$this->arr_css[$i]."\" type=\"text/css\" />";
 				if(Config::hasFavicon())
 					$output .= "<link rel=\"shortcut icon\" href=\"/favicon.ico\" />";
-				
-				for($i=0;$i<count($this->arr_js);$i++)
+				$count = count($this->arr_js);
+				for($i=0;$i<$count;$i++)
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
 				
 				$output .= "</head>
-				<body class=\"body\">";
+				<body>";
 			return $output;
 		}
 
@@ -73,7 +73,8 @@
 
 		protected function loadMenus($mlist) {
                         $output = "";
-			for($i=0;$i<count($mlist);$i++) {
+			$count = count($mlist);
+			for($i=0;$i<$count;$i++) {
 				$haselemtoshow = 0;
 				$tmpoutput = "";
 				// Load menu
@@ -92,7 +93,7 @@
 								require($dirpath."/main.php");
 								if($module->getRulesClass()->canAccessToModule()) {
 	                                                                $tmpoutput .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$data3["title"]."</a></div>";
-									$haselemtoshow = 1;
+								$haselemtoshow = 1;
 								}
 							}
 						}
@@ -128,18 +129,22 @@
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
+		private function tooltip($obj,$text) {
+			$output = '<script type="text/javascript">$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($text).'");
+			$("#tooltip").fadeIn("fast");}).mouseleave(function(){$("#tooltip").fadeOut("fast",function(){
+			});});</script>';
+			return $output;
+		}
+
 		public function textarea($name, $def_value = "", $options=array()) {
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".(isset($options["width"]) ? $options["width"] : 400).
 				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\">".$def_value."</textarea>";
-			if(isset($options["tooltip"])) {
-				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".
-					$options["tooltip"]."\"});</script>";
-			}
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
-		
+
 		public function tabledTextArea($label,$name,$options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
 			$output .= $this->textarea($name,(isset($options["value"]) ? $options["value"] : ""),$options);
@@ -151,38 +156,62 @@
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" />";
-			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
+			if($tooltip) $output .= $this->tooltip($name,$tooltip);
 			return $output;
 		}
 
-		public function addNumericInput($name, $def_value = "", $options = array()) {
+		public function numInput($name, $def_value = "", $options = array()) {
 			$output = "";
-            if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
+		        if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
-			if(isset($options["tooltip"])) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$options["tooltip"]."\"});</script>";
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 
-		public function addIPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
+		public function IPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
-			if($tooltip) $output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".$tooltip."\"});</script>";
+			if($tooltip) $output .= $this->tooltip($name,$tooltip);
 			return $output;
 		}
 
-		public function addMacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
+		public function MacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMAC('".$name."');\" />";
 			return $output;
 		}
 
-		public function addIPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
+		public function IPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask('".$name."');\" />";
 		}
 
-		public function addHidden($name, $value) {
+		public function slider($slidername, $name, $min, $max, $options = array()) {
+			if(isset($options["hidden"]))
+				$output = FS::$iMgr->hidden($name,(isset($options["value"]) ? $options["value"] : 0));
+			else
+				$output = FS::$iMgr->input($name,(isset($options["value"]) ? $options["value"] : 0));
+			$output .= "<script type=\"text/javascript\">$(function() {
+                        	$('#".$slidername."').slider({
+					range: 'min',
+					min: ".$min.",
+					max:".$max.",";
+
+			if(isset($options["value"])) $output .= "value: ".$options["value"].",";
+
+			$output .= "slide: function(event,ui) { $('#".$name."').val(".(isset($options["valoverride"]) ? $options["valoverride"] : "ui.value").");";
+			if(isset($options["hidden"])) $output .= "$('#".$name."label').html(ui.value);";
+			$output .= "}
+				});
+                        });</script>";
+			$output .= "<div id=\"".$slidername."\" ".(isset($options["width"]) ? "style=\"width: ".$options["width"]."\" " : "")."></div>";
+			if(isset($options["hidden"])) $output .= "<br /><span id=\"".$name."label\">".
+				(isset($options["value"]) ? $options["value"] : 0)."</span> ".$options["hidden"]."<br />";
+			return $output;
+		}
+
+		public function hidden($name, $value) {
 			return "<input type=\"hidden\" id=\"".$name."\" name=\"".$name."\" value=\"".$value."\" />";
 		}
 
@@ -201,21 +230,20 @@
 			$output .= "$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
 			if($def_value)
 				$output .= "$('#".$name."').datepicker('setDate','".$def_value."');";
-			$output .= "$('#".$name."').hide();";
 			$output .= "</script>";
 			return $output;
 		}
 
 		public function hourlist($hname,$mname,$hselect=0,$mselect=0) {
-			$output = $this->addList($hname);
+			$output = $this->select($hname);
 			for($i=0;$i<24;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-				$output .= $this->addElementToList($txt,$i,$hselect == $i);
+				$output .= $this->selElmt($txt,$i,$hselect == $i);
 			}
-			$output .= "</select> h ".$this->addList($mname);
+			$output .= "</select> h ".$this->select($mname);
 			for($i=0;$i<60;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-                                $output .= $this->addElementToList($txt,$i,$mselect == $i);
+                                $output .= $this->selElmt($txt,$i,$mselect == $i);
                         }
 			$output .= "</select>";
 
@@ -224,14 +252,11 @@
 
 		public function submit($name, $value, $options = array()) {
 			$output = "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" />";
-			if(isset($options["tooltip"])) {
-				$output .= "<script type=\"text/javascript\">$('#".$name."').wTooltip({className: 'tooltip', fadeIn: '200', fadeOut: '100', content: \"".
-					$options["tooltip"]."\"});</script>";
-			}
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 
-		public function addJSSubmit($name, $value, $function) {
+		public function JSSubmit($name, $value, $function) {
 			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" onclick=\"".$function."\" />";
 		}
 
@@ -250,7 +275,8 @@
 		public function radioList($name,$values, $labels, $checkid = NULL) {
 			if(!is_array($values)) return "";
 			$output = "";
-			for($i=0;$i<count($values);$i++)
+			$count = count($values);
+			for($i=0;$i<$count;$i++)
 				$output .= $this->radio($name,$values[$i],$checkid == $values[$i] ? true : false, $labels[$i])."<br />";
 			return $output;
 		}
@@ -266,49 +292,29 @@
 			return $output;
 		}
 		
-		public function addIndexedLine($label,$name,$def_value = "", $options = array()) {
+		public function idxLine($label,$name,$def_value = "", $options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
-			if(isset($options["pwd"]) && $options["pwd"])
-				$output .= $this->password($name,$def_value);
+			if(isset($options["type"])) {
+				switch($options["type"]) {
+					case "chk": $options["check"] = $def_value; $output .= $this->check($name, $options); break;
+					case "ip": $output .= $this->IPInput($name,$def_value); break;
+					case "ipmask": $output .= $this->IPMaskInput($name,$def_value); break;
+					case "num": $output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options); break;
+					case "pwd": $output .= $this->password($name,$def_value); break;
+					default: break;
+				}
+			}
 			else
 				$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
-				(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
+					(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
 			$output .= "</center></td></tr>";
 			return $output;
-		}
-		
-		public function addIndexedNumericLine($label,$name,$options = array()) {
-			$output = "<tr><td>".$label."</td><td><center>";
-			$output .= $this->addNumericInput($name,(isset($options["value"]) ? $options["value"] : ""),$options);
-			$output .= "</center></td></tr>";
-			return $output;
-		}
-		
-		public function addIndexedIPLine($idx,$name,$def_value = "") {
-			$output = "<tr><td>".$idx."</td><td><center>";
-			$output .= $this->addIPInput($name,$def_value);
-			$output .= "</center></td></tr>";
-			return $output;
-		}
-
-		public function addIndexedIPMaskLine($idx,$name,$def_value = "") {
-			$output = "<tr><td>".$idx."</td><td><center>";
-			$output .= $this->addIPInput($name,$def_value);
-			$output .= "</center></td></tr>";
-			return $output;
-		}
-
-		public function addIndexedCheckLine($label, $name, $checked = false) {
-			$output = "<tr><td>".$label."</td><td><center>";
-			$output .= $this->check($name, array("check" => $checked));
-			$output .= "</center></td></tr>";
-			return $output;	
 		}
 
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
 			if(isset($options["js"]))
-				$output .= $this->addJSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,$options["js"]);
+				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,$options["js"]);
 			else
 				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$label);
 			$output .= "</center></th></tr>";
@@ -327,7 +333,7 @@
 			return $output;
 		}
 		
-		public function addList($name,$js = "",$label=NULL, $multival=false) {
+		public function select($name,$js = "",$label=NULL, $multival=false, $options=array()) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<select name=\"".$name."\" id=\"".$name."\"";
@@ -335,11 +341,16 @@
 				$output .= " onchange=\"javascript:".$js.";\" ";
 			if($multival)
 				$output .= " multiple=\"multiple\" ";
+			if(isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]))
+				$output .= " size=\"".$options["size"]."\" ";
+			if(isset($options["style"]))
+				$output .= " style=\"".$style."\" ";
 			$output .= ">";
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 		
-		public function addElementToList($name,$value,$selected = false) {
+		public function selElmt($name,$value,$selected = false) {
 			$output = "<option value=\"".$value."\"";
 			if($selected)
 				$output .= " selected=\"selected\"";
@@ -350,10 +361,11 @@
 		public function check($name,$options = array()) {
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<input type=\"checkbox\" name=\"".$name."\" ";
+			$output .= "<input type=\"checkbox\" name=\"".$name."\" id=\"".$name."\" ";
 			if(isset($options["check"]) && $options["check"])
 				$output .= "checked ";
 			$output .= " />";
+			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
 		

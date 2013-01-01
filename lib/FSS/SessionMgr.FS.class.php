@@ -1,6 +1,6 @@
 <?php
         /*
-        * Copyright (c) 2012, Loïc BLOT, CNRS
+        * Copyright (c) 2010-2013, Loïc BLOT, CNRS <http://www.unix-experience.fr>
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -106,7 +106,8 @@
 				return true;
 
 			$groups = $this->getGroups();
-			for($i=0;$i<count($groups);$i++) {
+			$count = count($groups);
+			for($i=0;$i<$count;$i++) {
 				if(FS::$pgdbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = '".$rulename."' AND gid = '".$groups[$i]."'") == "on")
 					return true;
 			}

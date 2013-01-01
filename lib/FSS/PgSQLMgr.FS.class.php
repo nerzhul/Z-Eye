@@ -1,6 +1,6 @@
 <?php
         /*
-        * Copyright (c) 2012, Loïc BLOT, CNRS
+        * Copyright (c) 2010-2013, Loïc BLOT, CNRS <http://www.unix-experience.fr>
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -89,6 +89,16 @@
 			}
 			return -1;
 		}
+
+		public function GetMin($table,$field,$cond = "") {
+                        $query = $this->Select($table,"MIN(".$field.") as mn",$cond);
+                        if($data = pg_fetch_array($query)) {
+                                        $splstr = preg_split("#[\.]#",$field);
+                                        $splstr = preg_replace("#`#","",$splstr);
+                                        return $data["mn"];
+                        }
+                        return -1;
+                }
 
 		public function Sum($table,$field,$cond = "") {
 			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);

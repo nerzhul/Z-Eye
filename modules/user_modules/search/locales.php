@@ -1,6 +1,6 @@
 <?php
-	/*
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+    /*
+    * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
     *
     * This program is free software; you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@
 					"Plug" => "Prise",
 					"Radius-Server" => "Serveur radius",
 					"Radius-user" => "Utilisateur radius",
+					"Ref-desc" => "Description(s) référencée(s)",
 					"Ref-plug" => "Prise(s) référencée(s)",
 					"Search" => "Recherche",
 					"Since" => "A partir du",
@@ -115,6 +116,7 @@
 					"Plug" => "Plug",
 					"Radius-Server" => "Radius server",
 					"Radius-user" => "Radius user",
+					"Ref-desc" => "Referenced description(s)",
 					"Ref-plug" => "Referenced plug(s)",
 					"Search" => "Search",
 					"Since" => "Since",

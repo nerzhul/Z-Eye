@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -39,7 +38,7 @@
 			$this->snortDB->Connect();
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<h3>".$this->loc->s("title-attack-report")."</h3>";
+				$output .= "<h1>".$this->loc->s("title-attack-report")."</h1>";
 			$output .= $this->loadAttackGraph();
 			return $output;
 		}
@@ -85,7 +84,7 @@
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {
-					$output .= "<h4>".$this->loc->s("title-z-eye-report")."</h4>";
+					$output .= "<h3>".$this->loc->s("title-z-eye-report")."</h3>";
 					$totalips = $this->snortDB->Count("z_eye_collected_ips","ip");
 					$totalscan = $this->snortDB->Sum("z_eye_collected_ips","scans");
 					$totaltse = $this->snortDB->Sum("z_eye_collected_ips","tse");
@@ -99,9 +98,9 @@
 					$output .= $this->loc->s("nb-ssh-atk").": ".$totalssh."<br /><hr>";
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-					$output .= FS::$iMgr->addHidden("mod",$this->mid);
-					$output .= "Pas: ".FS::$iMgr->addNumericInput("ech",$ech,array("size" => 2, "length" => 2))." jours <br />";
-					$output .= "Echelle: ".FS::$iMgr->addNumericInput("ec",$ec,array("size" => 3, "length" => 3))." jours <br />";
+					$output .= FS::$iMgr->hidden("mod",$this->mid);
+					$output .= "Pas: ".FS::$iMgr->numInput("ech",$ech,array("size" => 2, "length" => 2))." jours <br />";
+					$output .= "Echelle: ".FS::$iMgr->numInput("ec",$ec,array("size" => 3, "length" => 3))." jours <br />";
 		
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
@@ -160,18 +159,16 @@
 							});
 						})(jQuery);
 						</script>";
-					$output .= "</body></html>";
-					$output .= "</body></html>";
 				}
 				else if($showmodule == 2) {
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
-					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
+					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
 					
-					$tmpoutput = "<h4>Top ".$topmax." (".$this->loc->s("Scans").")</h4><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = "<h3>Top ".$topmax." (".$this->loc->s("Scans").")</h3><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					
 					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,scans","","scans",1,$topmax);
 					while($data = pg_fetch_array($query)) {
@@ -182,7 +179,7 @@
 						$output .= $tmpoutput."</table>";
 						
 					$found = 0;
-					$tmpoutput = "<h4>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h4><table><tr><th>Date</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = "<h3>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h3><table><tr><th>Date</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,scans","","scans",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
@@ -196,11 +193,11 @@
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
-					$output .= "Maximum: ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
+					$output .= "Maximum: ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
 					
-					$tmpoutput = "<h4>Top ".$topmax." (".$this->loc->s("TSE-atk").")</h4><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = "<h3>Top ".$topmax." (".$this->loc->s("TSE-atk").")</h3><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					
 					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,tse","","tse",1,$topmax);
 					while($data = pg_fetch_array($query)) {
@@ -211,7 +208,7 @@
 						$output .= $tmpoutput."</table>";
 						
 					$found = 0;
-					$tmpoutput = "<h4>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h4><table><tr><th>".$this->loc->s("Date")."<th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = "<h3>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h3><table><tr><th>".$this->loc->s("Date")."<th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,tse","","tse",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;
@@ -225,11 +222,11 @@
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
-					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->addNumericInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
+					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
 					
-					$tmpoutput = "<h4>Top ".$topmax." (".$this->loc->s("SSH-atk").")</h4><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = "<h3>Top ".$topmax." (".$this->loc->s("SSH-atk").")</h3><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					
 					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,ssh","","ssh",1,$topmax);
 					while($data = pg_fetch_array($query)) {
@@ -240,7 +237,7 @@
 						$output .= $tmpoutput."</table>";
 						
 					$found = 0;
-					$tmpoutput = "<h4>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h4><table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = "<h3>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h3><table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,ssh","","ssh",1,$topmax);
 					while($data = pg_fetch_array($query)) {
 						if($found == 0) $found = 1;

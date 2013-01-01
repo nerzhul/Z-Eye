@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -34,6 +33,7 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			
 			if(!FS::isAjaxCall()) {
+				$output .= "<h1>".$this->loc->s("title-icinga")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Hosts"),$sh);
@@ -66,7 +66,7 @@
 		}
 		
 		private function showGeneralTab() {
-			$output = "";
+			$output = FS::$iMgr->printError($this->loc->s("not-implemented"));
 			
 			return $output;
 		}
@@ -93,46 +93,53 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",false);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 			//$formoutput .= template list
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","");
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("DisplayName"),"dname","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname","");
+			$formoutput .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
+			$formoutput .= FS::$iMgr->select("icon");
+			$formoutput .= FS::$iMgr->selElmt("Aucun","");
+			$query = FS::$pgdbMgr->Select("z_eye_icinga_icons","id,name","","name");
+			while($data = pg_fetch_array($query))
+				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["id"]);
+			$formoutput .= "</select></td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
-			$formoutput .= FS::$iMgr->addList("parent[]","",NULL,true);
-			$formoutput .= FS::$iMgr->addElementToList("","",true);
+			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true);
+			$formoutput .= FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
-				$formoutput .= FS::$iMgr->addElementToList($data["name"]." (".$data["addr"].")",$data["name"]);
+				$formoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
 			$formoutput .= "</select></td></tr>";
 			
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Address"),"addr","");
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr","");
 			
 			// Checks
 			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand","check-host-alive")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",array("value" => 3));
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",array("value" => 1));
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",array("value" => 10));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => 3, "type" => "num"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => 1, "type" => "num"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => 10, "type" => "num"));
 			
 			// Global
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",true,array("type" => "chk"));
 			
 			// Notifications
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",true,array("type" => "chk"));
 			$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
-			$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",array("value" => 0));
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptdown"),"hostoptd",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptunreach"),"hostoptu",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptrec"),"hostoptr",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptflap"),"hostoptf",true);
-			$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval","",array("value" => 0, "type" => "num"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",true,array("type" => "chk"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
 			$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 			
 			// icon image
@@ -172,25 +179,23 @@
 		private function showHostgroupsTab() {
 			$output = "";
 			$hostexist = FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","");
-			if(!$hostexist) {
+			if(!$hostexist)
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-hosts"));
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
+			else {
+				/*
+				 * Ajax new hostgroup
+				 */
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
+				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+				// Global
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
+				$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
+				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
+				$formoutput .= "</table></form>";
 			}
-			
-			/*
-			 * Ajax new hostgroup
-			 */
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
-			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			// Global
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
-			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-			
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
-			
+
 			$found = false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hostgroups","name,alias","","name");
 			while($data = pg_fetch_array($query)) {
@@ -228,43 +233,43 @@
 				 */
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",false);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 				//$formoutput .= template list
 				
 				// Global
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Description"),"desc","",array("length" => 120, "size" => 30));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc","",array("length" => 120, "size" => 30));
 				// @ TODO support hostlist
 				$formoutput .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false)."</td></tr>";
 				
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("active-check-en"),"actcheck",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("passive-check-en"),"pascheck",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("parallel-check"),"parcheck",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("obs-over-srv"),"obsess",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("check-freshness"),"freshness",false);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("notif-en"),"notifen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("eventhdl-en"),"eventhdlen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("flap-en"),"flapen",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("failpredict-en"),"failpreden",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("perfdata"),"perfdata",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainstatus"),"retstatus",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("retainnonstatus"),"retnonstatus",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("active-check-en"),"actcheck",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("passive-check-en"),"pascheck",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("parallel-check"),"parcheck",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("obs-over-srv"),"obsess",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-freshness"),"freshness",false,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",true,array("type" => "chk"));
 				
 				// Checks
 				$formoutput .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd")."</td></tr>";
 				$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("check-interval"),"checkintval",array("value" => 3));
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("retry-check-interval"),"retcheckintval",array("value" => 1));
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("max-check"),"maxcheck",array("value" => 10));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => 3, "type" => "num"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => 1, "type" => "num"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => 10, "type" => "num"));
 				
 				// Notifications
 				$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptcrit"),"srvoptc",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptwarn"),"srvoptw",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptunreach"),"srvoptu",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptrec"),"srvoptr",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptflap"),"srvoptf",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptsched"),"srvopts",true);
-				$formoutput .= FS::$iMgr->addIndexedNumericLine($this->loc->s("notif-interval"),"notifintval",array("value" => 0));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval","",array("value" => 0, "type" => "num"));
 				// @ TODO support for contact not only contactlist
 				$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
@@ -307,8 +312,8 @@
 			
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme")."</td></tr>";
@@ -369,24 +374,24 @@
 				 */
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("is-template"),"istemplate",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",true,array("type" => "chk"));
 				//$formoutput .= template list
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","");
-				$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Email"),"mail","");
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Email"),"mail","");
 				$formoutput .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptcrit"),"srvoptc",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptwarn"),"srvoptw",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptunreach"),"srvoptu",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptrec"),"srvoptr",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptflap"),"srvoptf",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srvoptsched"),"srvopts",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",true,array("type" => "chk"));
 				$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd")."</td></tr>";
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptdown"),"hostoptd",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptunreach"),"hostoptu",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptrec"),"hostoptr",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptflap"),"hostoptf",true);
-				$formoutput .= FS::$iMgr->addIndexedCheckLine($this->loc->s("hostoptsched"),"hostopts",true);
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",true,array("type" => "chk"));
+				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
@@ -422,12 +427,12 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=10");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->addList("cts[]","",NULL,true);
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
+			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
-				$formoutput .= FS::$iMgr->addElementToList($data["name"],$data["name"]);
+				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"]);
 			}
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
@@ -474,8 +479,8 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->addIndexedLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 			
@@ -500,47 +505,47 @@
 		}
 		
 		private function getTimePeriodList($name) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_timeperiods","name,alias","","alias");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["alias"],$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"]);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function genCommandList($name,$tocheck = NULL) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_commands","name","","name");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
+				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function genContactGroupsList($name) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["name"]." (".$data["alias"].")",$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"]);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function genHostsList($name) {
-			$output = FS::$iMgr->addList($name);
+			$output = FS::$iMgr->select($name);
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = pg_fetch_array($query)) {
-				$output .= FS::$iMgr->addElementToList($data["name"]." (".$data["addr"].")",$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
 			$output .= "</select>";
 			return $output;
 		}
 		
 		private function getHostOrGroupList($name,$multi) {
-			$output = FS::$iMgr->addList($name,"",NULL,$multi);
+			$output = FS::$iMgr->select($name,"",NULL,$multi);
 			
 			$hostlist = array();
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
@@ -554,7 +559,7 @@
 			ksort($hostlist);
 
 			foreach($hostlist as $host => $value)
-				$output .= FS::$iMgr->addElementToList($host,$value[0]."$".$value[1]);
+				$output .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1]);
 
 			$output .= "</select>";
 			return $output;
@@ -713,9 +718,9 @@
 			if(!$file)
 				return false;
 			$query = FS::$pgdbMgr->Select("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
-			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup","template = 'f'");
+			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,iconid","template = 'f'");
 			while($data = pg_fetch_array($query)) {
-				fwrite($file,"define host {\n\tname\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
+				fwrite($file,"define host {\n\thost_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
 				fwrite($file,$data["alivecommand"]."\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkinterval"]."\n\tretry_interval\t".$data["retrycheckinterval"]."\n\t");
 				fwrite($file,"max_check_attempts\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
 				fwrite($file,"\n\tfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tprocess_perf_data\t".($data["perfdata"] == "t" ? 1 : 0)."\n\tretain_status_information\t");
@@ -764,7 +769,13 @@
 					else fwrite($file,",");
 					fwrite($file,$data2["parent"]);
 				}
-				
+				if($data["iconid"] && FS::$secMgr->isNumeric($data["iconid"])) {
+					$iconpath = FS::$pgdbMgr->GetOneData("z_eye_icinga_icons","path","id = '".$data["iconid"]."'");
+					if($iconpath) {
+						fwrite($file,"\n\ticon_image\t".$iconpath);
+						fwrite($file,"\n\tstatusmap_image\t".$iconpath);
+					}
+				}
 				fwrite($file,"\n}\n\n");
 			}
 			fclose($file);
@@ -1188,7 +1199,8 @@
 					}
 					
 					// some members don't exist
-					for($i=0;$i<count($cts);$i++) {
+					$count = count($cts);
+					for($i=0;$i<$count;$i++) {
 						if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$cts[$i]."'")) {
 							header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 							return;
@@ -1197,7 +1209,7 @@
 					
 					// Add it
 					FS::$pgdbMgr->Insert("z_eye_icinga_contactgroups","name,alias","'".$name."','".$alias."'");
-					for($i=0;$i<count($cts);$i++) {
+					for($i=0;$i<$count;$i++) {
 						FS::$pgdbMgr->Insert("z_eye_icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
 					}
 					
@@ -1251,13 +1263,15 @@
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$dname = FS::$secMgr->checkAndSecurisePostData("dname");
 					$parent = FS::$secMgr->checkAndSecurisePostData("parent");
+					$icon = FS::$secMgr->checkAndSecurisePostData("icon");
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
 					$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
 					$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
 					$ctg = FS::$secMgr->getPost("ctg","w");
 					
-					if(!$name || preg_match("#[ ]#",$name) || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod || !$notifperiod || !$ctg) {
+					if(!$name || preg_match("#[ ]#",$name) || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
+						 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon)) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
@@ -1294,8 +1308,9 @@
 						return;
 					}
 					
-					if($parent) {
-						for($i=0;$i<count($parent);$i++) {
+					if($parent && !in_array("none",$parent)) {
+						$count = count($parent);
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent[$i]."'")) {
 								header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 								return;
@@ -1319,13 +1334,14 @@
 					}
 
 					FS::$pgdbMgr->Insert("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
-						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template",
+						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid",
 						"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
-						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."'");
-					if($parent) {
-						for($i=0;$i<count($parent);$i++) {
+						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".$icon."'");
+					if($parent && !in_array("none",$parent)) {
+						$count = count($parent);
+						for($i=0;$i<$count;$i++) {
 							FS::$pgdbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
 						}
 					}
@@ -1375,13 +1391,13 @@
 					return;
 				// add service
 				case 16:
-					$name = FS::$secMgr->checkAndSecurisePostData("desc");
+					$name = trim(FS::$secMgr->checkAndSecurisePostData("desc"));
 					$host = FS::$secMgr->checkAndSecurisePostData("host");
 					$checkcmd = FS::$secMgr->getPost("checkcmd","w");
 					$checkperiod = FS::$secMgr->getPost("checkperiod","w");
 					$notifperiod = FS::$secMgr->getPost("notifperiod","w");
 					$ctg = FS::$secMgr->getPost("ctg","w");
-					
+
 					if(!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$notifperiod || !$ctg) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
@@ -1516,14 +1532,15 @@
 					}
 					
 					if($members) {
-						for($i=0;$i<count($members);$i++) {
+						$count = count($members);
+						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) != 2 && !FS::$pgdbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
-						for($i=0;$i<count($members);$i++) {
+						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) == 2 && ($mt[0] == 1 || $mt[0] == 2))
 								FS::$pgdbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[1]."','".$mt[0]."'");

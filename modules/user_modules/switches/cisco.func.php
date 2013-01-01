@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -33,11 +32,11 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || ($value != 1 && $value != 2))
 				return NULL;
 
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
+			return setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
 		}
-		
+
 		function getPortStateWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7");
+			$dup = getFieldForPortWithPID($device,$pid,"ifAdminStatus");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -50,6 +49,18 @@
 		/*
 		* Link Management
 		*/
+
+		function getPortMtuWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"ifMtu");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                        	return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+
 		function setPortDuplexWithPID($device,$pid,$value) {
 			if($value < 1 || $value > 4)
 				return NULL;
@@ -58,7 +69,7 @@
 		}
 
 		function getPortDuplexWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.2.1.10.7.2.1.19");
+			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.522.3.15.5");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -191,6 +202,26 @@
                         return $vlan;
                 }
 
+		function setSwitchportAuthDeadVLAN($device,$pid,$value) {
+                        // @todo disable feature
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
+                                return 1;
+                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
+                }
+
+                function getSwitchportAuthDeadVLAN($device,$pid) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+                                return -1;
+
+                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.3.1.3");
+                        $vlan = explode(" ",$ret);
+                        if(count($vlan) != 2)
+                                return -1;
+
+                        $vlan = $vlan[1];
+                        return $vlan;
+                }
+
 		// authentication port-control 1,2,3
 		function setSwitchportControlMode($device,$pid,$value) {
 			// 1: unauthorized / 2: auto / 3: authorized / 3: disable feature
@@ -256,10 +287,6 @@
 		function setSwitchTrunkVlanWithPID($device,$pid,$values) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || (!is_array($values) && !preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values)))
 				return -1;
-			if(!is_array($values))
-				$res = preg_split("/,/",$values);
-			else
-				$res = $values;
 			/* 
 			* For each VLAN from 1 to 4096, set bit value to 1 if vlan is allowed, else set to 0
 			* Each byte is converted to a hex string, and chained
@@ -268,7 +295,7 @@
 			$tmpstr="";
 			$count=0;
 			for($i=0;$i<1024;$i++) {
-				if(in_array($i,$res))
+				if(in_array($i,$values))
 						$tmpstr .= "1";
 				else
 						$tmpstr .= "0";
@@ -374,13 +401,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -391,13 +420,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -408,13 +439,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -425,13 +458,15 @@
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE")
 				$trunkNoVlan = false;
-			for($i=0;$i<strlen($hstr);$i++) {
+			$strlen = strlen($hstr);
+			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
 				$vlanbyteslen = strlen($vlanbytes);
 				// add initial zero to get 4 chars
 				for($j=$vlanbyteslen;$j<4;$j++)
 					$vlanbytes = "0".$vlanbytes;
-				for($j=0;$j<strlen($vlanbytes);$j++) {
+				$vlanbyteslen = strlen($vlanbytes);
+				for($j=0;$j<$vlanbyteslen;$j++) {
 					if($vlanbytes[$j] == "1")
 						array_push($vlanlist,$vlid);
 					$vlid++;
@@ -553,7 +588,8 @@
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
-			for($i=0;$i<count($out);$i++) {
+			$count = count($out);
+			for($i=0;$i<$count;$i++) {
 				$pdata = explode(" ",$out[$i]);
 				$pname = $pdata[3];
 				$pid = explode(".",$pdata[0]);
@@ -591,7 +627,8 @@
 			$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
-			for($i=0;$i<count($out);$i++) {
+			$count = count($out);
+			for($i=0;$i<$count;$i++) {
 				$pdata = explode(" ",$out[$i]);
 				$pname = $pdata[3];
 				$pid = explode(".",$pdata[0]);
@@ -607,7 +644,8 @@
 					$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
 					if(in_array($oldvlan,$vllist)) {
 						$vllist2 = array();
-						for($j=0;$j<count($vllist);$j++) {
+						$countvl = count($vllist);
+						for($j=0;$j<$countvl;$j++) {
 							if($vllist[$j] != $oldvlan)
 								array_push($vllist2,$vllist[$j]);
 						}
@@ -764,9 +802,9 @@
 		function setSwitchportMode($device, $portname, $value) {
 			$pid = getPortId($device,$portname);
 			if($pid == -1)
-				return -1;
+			return -1;
 
-            return setSwitchportModeWithPID($device,$pid,$value);
+	        	return setSwitchportModeWithPID($device,$pid,$value);
 		}
 		
 		function getSwitchportMode($device, $portname, $value) {
@@ -774,7 +812,7 @@
 			if($pid == -1)
 				return -1;
 
-            return getSwitchportModeWithPID($device,$pid,$value);
+	            return getSwitchportModeWithPID($device,$pid,$value);
 		}
 		
 		function setSwitchNoTrunkVlan($device,$portname) {
@@ -793,7 +831,7 @@
 			if($pid == -1)
 				return -1;
 
-            return setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
+			return setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
 		}
 		
 		function setSwitchTrunkVlan($device,$portname,$values) {
@@ -843,7 +881,94 @@
 
 			return setSwitchTrunkEncapWithPID($device,$pid,$value);
 		}
-		
+
+		/*
+		* Port Security
+		*/
+
+		function getPortSecStatusWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.2");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function getPortSecEnableWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortSecEnableWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                                return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
+                }
+
+		function getPortSecViolActWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortSecViolActWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
+                                return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
+                }
+
+		function getPortSecMaxMACWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortSecMaxMACWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 6144)
+                                return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
+                }
+
+
+		/*
+		* special
+		*/
+
+		function getPortCDPEnableWithPID($device,$pid) {
+                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2");
+                        $dup = explode(" ",$dup);
+                        if(count($dup) != 2)
+                                return -1;
+
+                        $dup = $dup[1];
+                        return $dup;
+                }
+
+		function setPortCDPEnableWithPID($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                        	return -1;
+
+                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
+                }
+
 		function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
 				return -1;

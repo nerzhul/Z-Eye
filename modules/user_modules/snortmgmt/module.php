@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -39,7 +38,7 @@
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h3>".$this->loc->s("page-title")."</h3>";
+				$output .= "<h1>".$this->loc->s("page-title")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh,true);
 				$output .= FS::$iMgr->tabPanElmt(10,"index.php?mod=".$this->mid,$this->loc->s("Reports"),$sh);
@@ -65,10 +64,10 @@
 				$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("data-storage")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("pg-host"),"dbhost",$dbhost);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Database"),"dbname",$dbname);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"dbuser",$dbuser);
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"dbpwd",$dbpwd,true);
+				$output .= FS::$iMgr->idxLine($this->loc->s("pg-host"),"dbhost",$dbhost);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Database"),"dbname",$dbname);
+				$output .= FS::$iMgr->idxLine($this->loc->s("User"),"dbuser",$dbuser);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"dbpwd",$dbpwd,array("type" => "pwd"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("lan-list"),"srvlist",array("width" => 250, "height" => 100));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table></form>";
@@ -79,7 +78,7 @@
 				if(!$dnsenable) $dnsenable = 0;
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"dnsenable",$dnsenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"dnsenable",$dnsenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-dns"),"dnslist",array("value" => $dnslist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
@@ -104,15 +103,15 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-smtp-sensor"),"ensmtp",$smtpenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-smtp-sensor"),"ensmtp",$smtpenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-smtp"),"smtplist",array("value" => $smtplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-smtp"),"smtpports",array("value" => $smtpports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes IMAP","enimap",$imapenable);
+				$output .= FS::$iMgr->idxLine("Activer les sondes IMAP","enimap",$imapenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-imap"),"imaplist",array("value" => $imaplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-imap"),"imapports",array("value" => $imapports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
-				$output .= FS::$iMgr->addIndexedCheckLine("Activer les sondes POP","enpop",$popenable);
+				$output .= FS::$iMgr->idxLine("Activer les sondes POP","enpop",$popenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-pop"),"poplist",array("value" => $poplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-pop"),"poppports",array("value" => $popports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
@@ -128,7 +127,7 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enhttp",$httpenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enhttp",$httpenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-http"),"httplist",array("value" => $httplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
@@ -149,11 +148,11 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensql",$sqlenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensql",$sqlenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sql"),"sqllist",array("value" => $sqllist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enoracle",$oracleenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enoracle",$oracleenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("sql-oracle"),"oraclelist",array("value" => $oraclelist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-oracle"),"oracleports",array("value" => $oracleports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
 				
@@ -175,14 +174,14 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-telnet-sensor"),"entelnet",$telnetenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-telnet-sensor"),"entelnet",$telnetenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-telnet"),"telnetlist",array("value" => $telnetlist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-ssh-sensor"),"enssh",$sshenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-ssh-sensor"),"enssh",$sshenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ssh"),"sshlist",array("value" => $sshlist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ssh"),"sshports",array("value" => $sshports, "width" => 250, "height" => 100, "tooltip" => $tooltip2));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("en-tse-sensor"),"entse",$tseenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("en-tse-sensor"),"entse",$tseenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-tse"),"tselist",array("value" => $tselist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tableSubmit("",$this->loc->s("Register"));
 				$output .= "</table></form>";
@@ -196,9 +195,9 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"enftp",$ftpenable);
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-ipv4")));
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("port-ftp"),"ftpports",$ftpports,array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")))."</td></tr>";
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enftp",$ftpenable,array("type" => "chk"));
+				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-ipv4")));
+				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ftp"),"ftpports",array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => $this->loc->s("tooltip-port")));
 				$output .= FS::$iMgr->tableSubmit("",$this->loc->s("Register"));
 				$output .= "</table></form>";
 			}
@@ -209,7 +208,7 @@
 				
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensnmp",$snmpenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensnmp",$snmpenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-snmp"),"snmplist",array("value" => $snmplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
@@ -224,7 +223,7 @@
 
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"),"ensip",$sipenable);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensip",$sipenable,array("type" => "chk"));
 				$tooltip = $this->loc->s("tooltip-ipv4");
 				$tooltip2 = $this->loc->s("tooltip-port");
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sip"),"siplist",array("value" => $siplist, "width" => 250, "height" => 100, "tooltip" => $tooltip));
@@ -244,11 +243,11 @@
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-nightreport")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false,array("type" => "chk"));
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hnight","mnight",$nighth,$nightm)."</td></tr>";
-				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->addNumericInput("nightintval",$nightback > 0 ? $nigthback : 7,array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-prev-hour")))."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("prev-hour")."</td><td>".FS::$iMgr->numInput("nightintval",$nightback > 0 ? $nigthback : 7,array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-prev-hour")))."</td></tr>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-we")."</th></tr>";
-				$output .= FS::$iMgr->addIndexedCheckLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false,array("type" => "chk"));
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table>";
@@ -595,8 +594,9 @@ preprocessor http_inspect_server: server default \\\n
 					
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for DNS sensors configuration (CIDR)");
 								header("Location: index.php?mod=".$this->mid."&err=1");
@@ -635,8 +635,9 @@ preprocessor http_inspect_server: server default \\\n
 					
 					$smtplist = trim($smtplist);
 					$srvs = preg_split("#[,]#",$smtplist);
-					if(strlen($smtplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($smtplist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (SMTP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -647,8 +648,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$smtpports = trim($smtpports);
 					$ports = preg_split("#[,]#",$smtpports);
-					if(strlen($smtpports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($smtpports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (smtp port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -659,8 +661,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$imaplist = trim($imaplist);
 					$srvs = preg_split("#[,]#",$imaplist);
-					if(strlen($imaplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($imaplist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (IMAP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -671,8 +674,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$imapports = trim($imapports);
 					$ports = preg_split("#[,]#",$imapports);
-					if(strlen($imapports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($imapports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (imap port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -683,8 +687,9 @@ preprocessor http_inspect_server: server default \\\n
 					
 					$poplist = trim($poplist);
 					$srvs = preg_split("#[,]#",$poplist);
-					if(strlen($poplist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($poplist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (POP not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -695,8 +700,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$popports = trim($popports);
 					$ports = preg_split("#[,]#",$popports);
-					if(strlen($popports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($popports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Mail sensors configuration (pop port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
@@ -740,8 +746,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for HTTP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
@@ -752,8 +759,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$httpports = trim($httpports);
 					$ports = preg_split("#[,]#",$httpports);
-					if(strlen($httpports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($httpports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for HTTP (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
@@ -790,8 +798,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sqllist = trim($sqllist);
 					$srvs = preg_split("#[,]#",$sqllist);
-					if(strlen($sqllist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($sqllist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (SQL not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
@@ -802,8 +811,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$oraclelist = trim($oraclelist);
 					$srvs = preg_split("#[,]#",$oraclelist);
-					if(strlen($oraclelist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($oraclelist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (Oracle not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
@@ -814,8 +824,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$oracleports = trim($oracleports);
 					$ports = preg_split("#[,]#",$oracleports);
-					if(strlen($oracleports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($oracleports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SQL sensors configuration (Oracle port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
@@ -859,8 +870,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$telnetlist = trim($telnetlist);
 					$srvs = preg_split("#[,]#",$telnetlist);
-					if(strlen($telnetlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($telnetlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (telnet not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -871,8 +883,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sshlist = trim($sshlist);
 					$srvs = preg_split("#[,]#",$sshlist);
-					if(strlen($sshlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($sshlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (SSH not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -883,8 +896,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sshports = trim($sshports);
 					$ports = preg_split("#[,]#",$sshports);
-					if(strlen($sshports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($sshports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (SSH port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -895,8 +909,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$tselist = trim($tselist);
 					$srvs = preg_split("#[,]#",$tselist);
-					if(strlen($tselist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($tselist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for Remote access sensors configuration (TSE not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -944,8 +959,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for FTP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
@@ -956,8 +972,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$ftpports = trim($ftpports);
 					$ports = preg_split("#[,]#",$ftpports);
-					if(strlen($ftpports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($ftpports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for FTP sensors configuration (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
@@ -994,8 +1011,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SNMP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
@@ -1031,8 +1049,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$srvlist = trim($srvlist);
 					$srvs = preg_split("#[,]#",$srvlist);
-					if(strlen($srvlist) > 0 && count($srvs) > 0) {
-						for($i=0;$i<count($srvs);$i++) {
+					$count = count($srvs);
+					if(strlen($srvlist) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SIP sensors configuration (not a CIDR)");
 								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");
@@ -1043,8 +1062,9 @@ preprocessor http_inspect_server: server default \\\n
 
 					$sipports = trim($sipports);
 					$ports = preg_split("#[,]#",$sipports);
-					if(strlen($sipports) > 0 && count($ports) > 0) {
-						for($i=0;$i<count($ports);$i++) {
+					$count = count($ports);
+					if(strlen($sipports) > 0 && $count > 0) {
+						for($i=0;$i<$count;$i++) {
 							if($ports[$i]<1||$ports[$i]>65535) {
 								FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",1,"Some fields are wrong for SIP sensors configuration (port = ".$ports[$i].")");
 								header("Location: index.php?mod=".$this->mid."&sh=9&err=1");

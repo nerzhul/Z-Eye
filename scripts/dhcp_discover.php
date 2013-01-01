@@ -1,7 +1,6 @@
 <?php
 	/*
-        * Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-        * Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+        * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
         *
         * This program is free software; you can redistribute it and/or modify
         * it under the terms of the GNU General Public License as published by
@@ -23,7 +22,7 @@
 	function bufferizeDHCPFiles($conn,$file) {
 		$tmpbuf = "";
 		// show file but remove comments
-		$stream = ssh2_exec($conn,"cat ".$file);
+		$stream = ssh2_exec($conn,"cat ".$file."");
 		stream_set_blocking($stream, true);
 		while ($buf = fread($stream, 4096)) {
 			$inc_path = array();
@@ -126,7 +125,19 @@
 			// pseudo trim
 			$resline[$j] = preg_replace("#^([ ])+#","",$resline[$j]);
 			$resline[$j] = preg_replace("#^([\t])+#","",$resline[$j]);
-			
+
+			if(preg_match("#range (.+) (.+);#",$resline[$j],$range)) {
+				for($i=ip2long($range[1]);$i<=ip2long($range[2]);$i++) {
+					if(!isset($hosts_list[long2ip($i)]))
+		                                $hosts_list[long2ip($i)] = array();
+					if(!isset($hosts_list[long2ip($i)]["state"]))
+						$hosts_list[long2ip($i)]["state"] = "distributed";
+					else if(isset($hosts_list[long2ip($i)]["end"]) && $hosts_list[long2ip($i)]["end"] < date("Y/m/d"))
+						$hosts_list[long2ip($i)]["state"] = "distributed";
+					$hosts_list[long2ip($i)]["server"] = $server;
+				}
+			}
+
 			if(preg_match("#(.*){#",$resline[$j],$host)) {
 				if(preg_match("#subnet(.*)#",$resline[$j],$subnet)) {
 					$subnet = preg_split("# #",$subnet[0]);
@@ -164,8 +175,6 @@
 				$tmphosts_list[$reserv_host]["start"] = " ";
 				if(isset($reserv_ip))
 					$tmphosts_list[$reserv_host]["ip"] = $reserv_ip;
-				$tmphosts_list[$reserv_host]["hostname"] = $reserv_host;
-				$tmphosts_list[$reserv_host]["server"] = $server;
 			}
 		}
 		foreach($tmphosts_list as $key => $value) {
@@ -174,7 +183,7 @@
 			if(!isset($hosts_list[$value["ip"]]))
 				$hosts_list[$value["ip"]] = array();
 			$hosts_list[$value["ip"]]["ip"] = $value["ip"];
-			
+
 			$hosts_list[$value["ip"]]["state"] = "reserved";
 			$hosts_list[$value["ip"]]["hw"] = $value["hw"];
 			$hosts_list[$value["ip"]]["end"] = " ";
@@ -189,11 +198,10 @@
 	 */
 	
 	function registerIPs($hosts_list,&$subnet_list,$server) {
+		global $execdate;
 		// Flush ip table for server
 		FS::$pgdbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
-			$used = 0;
-			$reserv = 0;
 
 			if(isset($value["state"])) $rstate = $value["state"];
 			else $rstate = 0;
@@ -206,11 +214,12 @@
 				case "expired":
 				case "abandoned":
 					$rstate = 2;
-					$used++;
 					break;
 				case "reserved":
 					$rstate = 3;
-					$reserv++;
+					break;
+				case "distributed":
+					$rstate = 4;
 					break;
 				default:
 					$rstate = 0;
@@ -228,16 +237,18 @@
 				else $iend = "";
 
 				$netfound = "";
-				if(isset($value["ip"])) {
+				if($host) {
 					for($i=0;$i<count($subnet_list)&&$netfound==false;$i++) {
 						$netclass = new FSNetwork();
 						$netclass->setNetAddr($subnet_list[$i][0]);
 						$netclass->setNetMask($subnet_list[$i][1]);
-						if($netclass->isUsableIP($value["ip"]))
+						if($netclass->isUsableIP($host))
 							$netfound = $subnet_list[$i][0];
 					}
 
-					FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$value["ip"]."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
+					FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
+					if($rstate == 2 || $rstate == 3 || $rstate == 4)
+						FS::$pgdbMgr->Insert("z_eye_dhcp_ip_history","ip,distributed,netid,server,collecteddate","'".$host."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
 					if($rstate == 3) {
 						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 						$query = FS::$pgdbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
@@ -260,15 +271,17 @@
 				}
 			}
 		}
-		}
-	
+	}
+
 	FS::LoadFSModules();
 
 	echo "[".Config::getWebsiteName()."][DHCP-Sync] started at ".date('d-m-Y G:i:s')."\n";
         $start_time = microtime(true);
 
+	$execdate = date("Y-m-d G:i:00");
+
 	$subnet_list = array();
-	
+
 	$dhcpdatas2 = "";
 	$DHCPfound = false;
 	$DHCPconnerr = false;
@@ -315,7 +328,6 @@
 				registerIPs($hosts_list,$subnet_list,$data["addr"]);
 				
 				if($DHCPfound == false) $DHCPfound = true;
-				else $DHCPservers .= ", ";
 			}
 		}
 	}

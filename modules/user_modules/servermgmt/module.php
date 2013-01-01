@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -25,7 +24,7 @@
 	class iServerMgmt extends genModule{
 		function iServerMgmt() { parent::genModule(); $this->loc = new lServerMgmt(); }
 		public function Load() {
-			$output = "<h3>".$this->loc->s("title-analysismgmt")."</h3>";
+			$output = "<h1>".$this->loc->s("title-analysismgmt")."</h1>";
 			$do = FS::$secMgr->checkAndSecuriseGetData("do");
 			switch($do) {
 				case 1: case 2:
@@ -53,9 +52,9 @@
 			$spath = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>".$this->loc->s("title-add-backup-switch-server")."</h4>";
+				$output = "<h2>".$this->loc->s("title-add-backup-switch-server")."</h2>";
 			else {
-				$output = "<h4>".$this->loc->s("title-edit-backup-switch-server")."</h4>";
+				$output = "<h2>".$this->loc->s("title-edit-backup-switch-server")."</h2>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$type = FS::$secMgr->checkAndSecuriseGetData("type");
 				if(!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
@@ -99,19 +98,19 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 7 : 8));
 
 			if($create == false) {
-				$output .= FS::$iMgr->addHidden("saddr",$saddr);
-				$output .= FS::$iMgr->addHidden("stype",$stype);
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("stype",$stype);
 			}
 
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
-				$output .= FS::$iMgr->addIndexedIPLine($this->loc->s("ip-addr"),"saddr",$saddr);
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
 				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
-				$output .= FS::$iMgr->addList("stype","arangeform();");
-				$output .= FS::$iMgr->addElementToList("TFTP",1);
-				$output .= FS::$iMgr->addElementToList("FTP",2);
-				$output .= FS::$iMgr->addElementToList("SCP",4);
-				$output .= FS::$iMgr->addElementToList("SFTP",5);
+				$output .= FS::$iMgr->select("stype","arangeform();");
+				$output .= FS::$iMgr->selElmt("TFTP",1);
+				$output .= FS::$iMgr->selElmt("FTP",2);
+				$output .= FS::$iMgr->selElmt("SCP",4);
+				$output .= FS::$iMgr->selElmt("SFTP",5);
 				$output .= "</select>";
 				$output .= "</td></tr>";
 			}
@@ -128,7 +127,7 @@
 			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("User")."</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
 			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
 			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("server-path"),"spath",$spath);
+			$output .= FS::$iMgr->idxLine($this->loc->s("server-path"),"spath",$spath);
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 
@@ -144,9 +143,9 @@
 			$salias = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>".$this->loc->s("title-add-radius")."</h4>";
+				$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
 			else {
-				$output = "<h4>".$this->loc->s("title-edit-radius")."</h4>";
+				$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
 				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
@@ -181,26 +180,26 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 4 : 5),array("id" => "cesrv"));
 
 			if($create == false) {
-				$output .= FS::$iMgr->addHidden("saddr",$saddr);
-				$output .= FS::$iMgr->addHidden("sport",$sport);
-				$output .= FS::$iMgr->addHidden("sdbname",$sdbname);
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("sport",$sport);
+				$output .= FS::$iMgr->hidden("sdbname",$sdbname);
 			}
 
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
-				$output .= FS::$iMgr->addIndexedNumericLine($this->loc->s("Port"),"sport",array("value" => $sport));
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("db-name"),"sdbname",$sdbname);
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname);
 			}
 			else {
 				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Port")."</td><td>".$sport."</td></tr>";
 				$output .= "<tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
 			}
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("User"),"slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Alias"),"salias",$salias);
+			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",$slogin);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias);
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 
@@ -219,9 +218,9 @@
 			$chrootnamed = "";
 			FS::$iMgr->showReturnMenu(true);
 			if($create)
-				$output = "<h4>".$this->loc->s("add-server")."</h4>";
+				$output = "<h2>".$this->loc->s("add-server")."</h2>";
 			else {
-				$output = "<h4>".$this->loc->s("edit-server")."</h4>";
+				$output = "<h2>".$this->loc->s("edit-server")."</h2>";
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				if(!$addr || $addr == "") {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
@@ -257,22 +256,22 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($create ? 1 : 2));
 			
 			if($create == false)
-				$output .= FS::$iMgr->addHidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
 	
 			$output .= "<table class=\"standardTable\">";
 			if($create)
-				$output .= FS::$iMgr->addIndexedLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 			else
 				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";		
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("ssh-user"),"slogin",$slogin);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password"),"spwd","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("Password-repeat"),"spwd2","",array("pwd" => true));
-			$output .= FS::$iMgr->addIndexedCheckLine("DHCP ?","dhcp",$dhcp > 0 ? true : false);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath);
-			$output .= FS::$iMgr->addIndexedCheckLine("DNS ?","dns",$dns > 0 ? true : false);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("named-conf-path"),"namedpath",$namedpath);
-			$output .= FS::$iMgr->addIndexedLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed);
+			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine("DHCP ?","dhcp",$dhcp > 0 ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath,array("tooltip" => $this->loc->s("tooltip-rights")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath,array("tooltip" => $this->loc->s("tooltip-rights")));
+			$output .= FS::$iMgr->idxLine("DNS ?","dns",$dns > 0 ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => $this->loc->s("tooltip-rights")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => $this->loc->s("tooltip-rights")));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 			
@@ -280,7 +279,7 @@
 		}
 		
 		private function showServerList() {
-			$output = "<h4>".$this->loc->s("title-server-list")."</h4>";
+			$output = "<h2>".$this->loc->s("title-server-list")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-server")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
 				"</th><th>DHCP</th><th>DNS</th><th>".$this->loc->s("Remove")."</th></tr>";
@@ -300,7 +299,7 @@
 			else
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-server-found")." !");
 
-			$output .= "<h4>".$this->loc->s("title-radius-db")."</h4>";
+			$output .= "<h2>".$this->loc->s("title-radius-db")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-base")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
@@ -319,7 +318,7 @@
 			else
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-db-given")." !");
 				
-			$output .= "<h4>".$this->loc->s("title-backup-switch")."</h4>";
+			$output .= "<h2>".$this->loc->s("title-backup-switch")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=7\">".$this->loc->s("New-server")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";

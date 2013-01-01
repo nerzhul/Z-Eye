@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -53,11 +52,11 @@
 				return $output;
 			}
 			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
-                        $output .= "<ul class=\"ulform\"><li><b>Nom d'utilisateur:</b> ".$user.FS::$iMgr->addHidden("uid",$uid)."</li>";
+                        $output .= "<ul class=\"ulform\"><li><b>Nom d'utilisateur:</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
 			$grpidx = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
 			while($data = pg_fetch_array($query)) {
-				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->addList("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
+				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
@@ -81,8 +80,8 @@
 			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
-				$output .= "<ul class=\"ulform\">".FS::$iMgr->addHidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
-				$output .= FS::$iMgr->addNumericInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
+				$output .= "<ul class=\"ulform\">".FS::$iMgr->hidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
+				$output .= FS::$iMgr->numInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
 				$output .= FS::$iMgr->check("ssl",array("check" => ($data["ssl"] == 1 ? true : false),"label" => "SSL ?"))."</li><li>";
 				$output .= FS::$iMgr->input("dn",$data["dn"],20,200,$this->loc->s("base-dn"))."</li><li>";
 				$output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,$this->loc->s("root-dn"))."</li><li>";
@@ -107,7 +106,7 @@
 			$output = "";
 			$query = FS::$pgdbMgr->Select("z_eye_groups","gid,gname");
 			while($data = pg_fetch_array($query))
-				$output .= FS::$iMgr->addElementToList($data["gname"],$data["gid"],$gid == $data["gid"] ? true : false);
+				$output .= FS::$iMgr->selElmt($data["gname"],$data["gid"],$gid == $data["gid"] ? true : false);
 			return $output;
 		}
 
@@ -154,7 +153,7 @@
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<ul class=\"ulform\"><li>";
 			$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
-			$formoutput .= FS::$iMgr->addNumericInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
+			$formoutput .= FS::$iMgr->numInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
 			$formoutput .= FS::$iMgr->check("ssl",array("label" => $this->loc->s("SSL")." ?"))."</li><li>";
 			$formoutput .= FS::$iMgr->input("dn","",20,200,$this->loc->s("base-dn"))."</li><li>";
 			$formoutput .= FS::$iMgr->input("rootdn","",20,200,$this->loc->s("root-dn"))."</li><li>";
@@ -208,14 +207,14 @@
                                         dragover: function(e) { e.preventDefault(); },
                                         drop: function(e) { if(datatype == 1) { $('#subpop').html('".$this->loc->s("sure-remove-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->form("index.php?mod=".$this->mid."&act=3").
-                                              FS::$iMgr->addHidden("username","'+e.dataTransfer.getData('text/html')+'").
+                                              FS::$iMgr->hidden("username","'+e.dataTransfer.getData('text/html')+'").
                                               FS::$iMgr->submit("",$this->loc->s("Remove")).
                                               FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
 					} else if(datatype == 2) {
 						$('#subpop').html('".$this->loc->s("sure-remove-directory")." \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->form("index.php?mod=".$this->mid."&act=5").
-                                              FS::$iMgr->addHidden("addr","'+e.dataTransfer.getData('text/html')+'").
+                                              FS::$iMgr->hidden("addr","'+e.dataTransfer.getData('text/html')+'").
                                               FS::$iMgr->submit("",$this->loc->s("Remove")).
                                               FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
                                               $('#pop').show();
@@ -252,7 +251,8 @@
 					}
 					FS::$pgdbMgr->Delete("z_eye_user_group","uid = '".$uid."'");
 					$groups = array_unique($groups);
-					for($i=0;$i<count($groups);$i++)
+					$count = count($groups);
+					for($i=0;$i<$count;$i++)
 						FS::$pgdbMgr->Insert("z_eye_user_group","uid,gid","'".$uid."','".$groups[$i]."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User ".$uid." edited");
 					header("Location: index.php?mod=".$this->mid);

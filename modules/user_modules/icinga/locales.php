@@ -1,6 +1,6 @@
 <?php
-	/*
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+    /*
+    * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
     *
     * This program is free software; you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,7 @@
 					"Hostgroup" => "Groupe d'hôtes",
 					"Hostgroups" => "Groupes d'hôtes",
 					"Hosttype" => "Type d'hôte",
+					"Icon" => "Icône",
 					"is-template" => "Modèle ?",
 					"max-check" => "Vérifications max (avant notification)",
 					"Members" => "Membres",
@@ -77,6 +78,8 @@
 					"new-service" => "Nouveau service",
 					"new-timeperiod" => "Nouvelle période temporelle",
 					"No" => "Non",
+					"None" => "Aucun",
+					"not-implemented" => "Pas encore implémenté !",
 					"notif-en" => "Notifications",
 					"notif-interval" => "Intervalle de notification",
 					"notifperiod" => "Période de notification",
@@ -104,6 +107,7 @@
 					"Template" => "Modèle",
 					"Thursday" => "Jeudi",
 					"Timeperiods" => "Périodes temporelles",
+					"title-icinga" => "Gestion du moniteur de services Icinga",
 					"To" => "à",
 					"Tuesday" => "Mardi",
 					"Value" => "Valeur",
@@ -152,6 +156,7 @@
 					"Hostgroup" => "Hostgroup",
 					"Hostgroups" => "Hostgroups",
 					"Hosttype" => "Host type",
+					"Icon" => "Icon",
 					"is-template" => "Template ?",
 					"max-check" => "Max checks (before notification)",
 					"Members" => "Membres",
@@ -165,6 +170,8 @@
 					"new-service" => "New service",
 					"new-timeperiod" => "New timeperiod",
 					"No" => "No",
+					"None" => "None",
+					"not-implemented" => "Not implemented yet !",
 					"notif-en" => "Notifications",
 					"notif-interval" => "Notification interval",
 					"notifperiod" => "Notification period",
@@ -192,6 +199,7 @@
 					"Template" => "Template",
 					"Thursday" => "Thursday",
 					"Timeperiods" => "Timeperiods",
+					"title-icinga" => "Icinga services monitor management",
 					"To" => "To",
 					"Tuesday" => "Tuesday",
 					"Value" => "Value",

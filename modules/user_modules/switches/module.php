@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -27,7 +26,7 @@
 		public function Load() {
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<h3>".$this->loc->s("title-network-device-mgmt")."</h3>";
+				$output .= "<h1>".$this->loc->s("title-network-device-mgmt")."</h1>";
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
@@ -53,7 +52,7 @@
 				default: break;
 			}
 			if(!FS::isAjaxCall()) {
-				$output .= "<h4>".$port." sur ".$device."</h4>";
+				$output .= "<h2>".$port." sur ".$device."</h2>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
@@ -71,17 +70,23 @@
 					// # todo, place JS before output
 					$output .= "<script type=\"text/javascript\">function arangeform() {";
 					$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
-					$output .= "$('#vltr').show();
-						$('#mabtr').hide();
+					$output .= "$('#vltr').show('slow');
+						if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
+						if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
+						if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
 						$('#vllabel').html('".$this->loc->s("native-vlan")."');
 					} else if(document.getElementsByName('trmode')[0].value == 2) {
-						$('#vltr').hide();
-						$('#mabtr').hide();
+						if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
+						if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
+						if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
+						if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
 						$('#vllabel').html('".$this->loc->s("Vlan")."');
 					} else if(document.getElementsByName('trmode')[0].value == 3) {
-						$('#vltr').hide();
+						if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
 						$('#vllabel').html('".$this->loc->s("fail-vlan")."');
-						$('#mabtr').show();
+						if($('#mabtr').is(':hidden')) $('#mabtr').show('slow');
+						if($('#mabdead').is(':hidden')) $('#mabdead').show('slow');
+						if($('#mabnoresp').is(':hidden')) $('#mabnoresp').show('slow');
 					}";
 					$output .= "};";
 					/*$output .= "function showwait() {";
@@ -93,40 +98,41 @@
 					if($data = pg_fetch_array($query)) {
 						if($portid != -1) {
 							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9",array("id" => "swpomod"));
-							$output .= FS::$iMgr->addHidden("portid",$portid);
-							$output .= FS::$iMgr->addHidden("sw",$device);
-							$output .= FS::$iMgr->addHidden("port",$port);
+							$output .= FS::$iMgr->hidden("portid",$portid);
+							$output .= FS::$iMgr->hidden("sw",$device);
+							$output .= FS::$iMgr->hidden("port",$port);
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
-						$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".FS::$iMgr->input("desc",$data["name"])."</td></tr>";
+						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => $this->loc->s("tooltip-desc")));
 						$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-						$output .= "<tr><td>".$this->loc->s("Plug")."</td><td>".FS::$iMgr->input("prise",$piece)."</td></tr>";
+						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => $this->loc->s("tooltip-plug")));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Duplex")." / ".$this->loc->s("Speed")."</td><td>";
+						$mtu = getPortMtuWithPID($device,$portid);
+						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
 						if($data["up_admin"] == "down")
 								$output .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
 						else if($data["up_admin"] == "up" && $data["up"] == "down")
-								$output .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
+							$output .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
 						else if($data["up"] == "up")
-								$output .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
+							$output .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
 						else
-								$output .= "unk";
-						$output .= " / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"])." / ".$data["speed"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false))."</td></tr>";
+							$output .= "unk";
+						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
+						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false, "tooltip" => $this->loc->s("tooltip-shut")))."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
                                                 $sp = getPortSpeedWithPID($device,$portid);
 						if($sp > 0) {
-							$output .= FS::$iMgr->addList("speed");
-							$output .= FS::$iMgr->addElementToList("Auto",1,$sp == 1 ? true : false);
+							$output .= FS::$iMgr->select("speed","",null,false,array("tooltip" => $this->loc->s("tooltip-speed")));
+							$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
 							if(preg_match("#Ethernet#",$port)) {
-								$output .= FS::$iMgr->addElementToList("10 Mbits",10000000,$sp == 10000000 ? true : false);
+								$output .= FS::$iMgr->selElmt("10 Mbits",10000000,$sp == 10000000 ? true : false);
 								if(preg_match("#FastEthernet#",$port))
-									$output .= FS::$iMgr->addElementToList("100 Mbits",100000000,$sp == 100000000 ? true : false);
+									$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
 								if(preg_match("#GigabitEthernet#",$port)) {
-									$output .= FS::$iMgr->addElementToList("100 Mbits",100000000,$sp == 100000000 ? true : false);
-									$output .= FS::$iMgr->addElementToList("1 Gbit",1000000000,$sp == 1000000000 ? true : false);
+									$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
+									$output .= FS::$iMgr->selElmt("1 Gbit",1000000000,$sp == 1000000000 ? true : false);
 									if(preg_match("#TenGigabitEthernet#",$port))
-										$output .= FS::$iMgr->addElementToList("10 Gbits",10,$sp == 10 ? true : false);
+										$output .= FS::$iMgr->selElmt("10 Gbits",10,$sp == 10 ? true : false);
 								}
 							}
 							$output .= "</select>";
@@ -134,17 +140,19 @@
 						else
 							$output .= $this->loc->s("Unavailable");
 						$output .= "</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
 						$dup = getPortDuplexWithPID($device,$portid);
-						/*if($dup > 0 && $dup < 5) {
-							$output .= FS::$iMgr->addList("duplex");
-							$output .= FS::$iMgr->addElementToList("Auto",4,$dup == 1 ? true : false);
-							$output .= FS::$iMgr->addElementToList("Half",1,$dup == 2 ? true : false);
-							$output .= FS::$iMgr->addElementToList("Full",2,$dup == 3 ? true : false);
-							$output .= "</select>";
+						if($dup != -1) {
+							$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
+							if($dup > 0 && $dup < 5) {
+								$output .= FS::$iMgr->select("duplex");
+								$output .= FS::$iMgr->selElmt("Auto",4,$dup == 1 ? true : false);
+								$output .= FS::$iMgr->selElmt("Half",1,$dup == 2 ? true : false);
+								$output .= FS::$iMgr->selElmt("Full",2,$dup == 3 ? true : false);
+								$output .= "</select>";
+							}
+							else
+								$output .= $this->loc->s("Unavailable");
 						}
-						else*/
-							$output .= $this->loc->s("Unavailable");
 						$output .= "</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("switchport-mode")."</td><td>";
 						$trmode = getSwitchportModeWithPID($device,$portid);
@@ -155,11 +163,11 @@
 						$mabstate = getSwitchportMABState($device,$portid);
 						if($mabstate == 1)
 							$trmode = 3;
-						$output .= FS::$iMgr->addList("trmode","arangeform()");
-						$output .= FS::$iMgr->addElementToList("Access",2,$trmode == 2 ? true : false);
-						$output .= FS::$iMgr->addElementToList("Trunk",1,$trmode == 1 ? true : false);
+						$output .= FS::$iMgr->select("trmode","arangeform()");
+						$output .= FS::$iMgr->selElmt("Access",2,$trmode == 2 ? true : false);
+						$output .= FS::$iMgr->selElmt("Trunk",1,$trmode == 1 ? true : false);
 						if($mabstate != -1)
-							$output .= FS::$iMgr->addElementToList("802.1X - MAB",3,$trmode == 3 ? true : false);
+							$output .= FS::$iMgr->selElmt("802.1X - MAB",3,$trmode == 3 ? true : false);
 						$output .= "</select>";
 						$output .= "<tr><td id=\"vllabel\">";
 						$portoptlabel = "";
@@ -179,47 +187,111 @@
 							case 3:
 								$output .= $this->loc->s("fail-vlan");
 								$portoptlabel = $this->loc->s("MAB-opt");
-								$nvlan = getSwitchportAuthNoRespVLAN($device,$portid);
+								$nvlan = getSwitchportAuthFailVLAN($device,$portid);
 								break;
 						}
 						$output .= "</td><td id=\"vln\">";
-
-						$vlanlist = "";
-						for($i=0;$i<count($vllist);$i++)
-							$vlanlist .= $vllist[$i].",";
-						$vlanlist = substr($vlanlist,0,strlen($vlanlist)-1);
-						$voicevlanoutput = FS::$iMgr->addElementToList($this->loc->s("None"),4096);
+						$voicevlanoutput = FS::$iMgr->selElmt($this->loc->s("None"),4096);
 						$voicevlan = getSwitchportVoiceVlanWithPID($device,$portid);
-						$output .= FS::$iMgr->addList("nvlan","");
+						$output .= FS::$iMgr->select("nvlan","");
+						// Added none for VLAN fail
+						if($trmode == 3)
+							$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$nvlan == 0 ? true : false);
+
+						$deadvlan = getSwitchportAuthDeadVLAN($device,$portid);
+						$deadvlanoutput = "";
+						$norespvlan = getSwitchportAuthNoRespVLAN($device,$portid);
+						$norespvlanoutput = "";
+						$trunkvlanoutput = "";
+						$trunkall = true;
+						$vlannb = 0;
+
 						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 				                while($data = pg_fetch_array($query)) {
-							$output .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
-							$voicevlanoutput .= FS::$iMgr->addElementToList($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
+							$output .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
+							$voicevlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
+							$deadvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$deadvlan == $data["vlan"] ? true : false);
+							$norespvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$norespvlan == $data["vlan"] ? true : false);
+							$trunkvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],in_array($data["vlan"],$vllist) ? true : false);
+							if($trunkall && in_array($data["vlan"],$vllist)) $trunkall = false;
+							$vlannb++;
 			                        }
 						$output .= "</select></td></tr>";
-						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
-						$output .= FS::$iMgr->textarea("vllist",$vlanlist,array("width" => 250, "height" => 100));
+						$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
+						$output .= FS::$iMgr->select("vllist[]","",NULL,true,array("size" => round($vlannb/4)));
+			                        $output .= FS::$iMgr->selElmt($this->loc->s("All"),"all",$trunkall);
+						$output .= $trunkvlanoutput;
+						$output .= "</select>";
 						$output .= "</td></tr>";
+						/*
+						* MAB tables
+						*/
 
-						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>Vlans encapsulés</td><td>";
+						// NoResp Vlan
+                                                $output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-noresp")."</td><td>";
+                                                $output .= FS::$iMgr->select("norespvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-noresp-tooltip")));
+                                                $output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
+                                                $output .= $norespvlanoutput;
+                                                $output .= "</select></td></tr>";
+						// Dead Vlan
+						$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-dead")."</td><td>";
+						$output .= FS::$iMgr->select("deadvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-dead-tooltip")));
+						$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
+						$output .= $deadvlanoutput;
+						$output .= "</select></td></tr>";
+						// Other options
+						$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-opt")."</td><td>";
 						$mabeap = getSwitchportMABType($device,$portid);
 						$dot1xhostmode = getSwitchportAuthHostMode($device,$portid);
 						$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
-						$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->addList("dot1xhostmode","");
-						$output .= FS::$iMgr->addElementToList($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
-						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
-						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
-						$output .= FS::$iMgr->addElementToList($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
+						$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode","");
+						$output .= FS::$iMgr->selElmt($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
+						$output .= FS::$iMgr->selElmt($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
+						$output .= FS::$iMgr->selElmt($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
+						$output .= FS::$iMgr->selElmt($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
 						$output .= "</select>";
-
+						/*
+						* Voice vlan
+						*/
 						$output .= "</td></tr><tr><td>".$this->loc->s("voice-vlan")."</td><td>";
-						$output .= FS::$iMgr->addList("voicevlan","");
+						$output .= FS::$iMgr->select("voicevlan","",null,false,array("tooltip" => $this->loc->s("tooltip-voicevlan")));
 						$output .= $voicevlanoutput;
 						$output .= "</select></td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Save-switch")." ?</td><td>".FS::$iMgr->check("wr")."</td></tr>";
+						$portsecen = getPortSecEnableWithPID($device,$portid);
+                                                if($portsecen != -1) {
+							$output .= "<tr><td colspan=\"2\">".$this->loc->s("portsecurity")."</td></tr>";
+							// check for enable/disable PortSecurity
+							$output .= "<tr><td>".$this->loc->s("portsec-enable")."</td><td>".FS::$iMgr->check("psen",array("check" => $portsecen == 1 ? true : false))."</td></tr>";
+							// Active Status for PortSecurity
+							$output .= "<tr><td>".$this->loc->s("portsec-status")."</td><td>";
+                                                        $portsecstatus = getPortSecStatusWithPID($device,$portid);
+							switch($portsecstatus) {
+								case 1: $output .= $this->loc->s("Active"); break;
+								case 2: $output .= $this->loc->s("Inactive"); break;
+								case 3: $output .= "<span style=\"color:red;\">".$this->loc->s("Violation")."</span>"; break;
+								default: $output .= $this->loc->s("unk"); break;
+							}
+                                                        $output .= "</td></tr>";
+							// Action when violation is performed
+							$psviolact = getPortSecViolActWithPID($device,$portid);
+							$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact","",NULL,false,array("tooltip" => $this->loc->s("portsec-viol-tooltip")));
+							$output .= FS::$iMgr->selElmt($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
+							$output .= FS::$iMgr->selElmt($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
+							$output .= FS::$iMgr->selElmt($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
+							$output .= "</select>";
+							// Maximum MAC addresses before violation mode
+							$psmaxmac = getPortSecMaxMACWithPID($device,$portid);
+							$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => $this->loc->s("portsec-maxmac-tooltip")))."</td></tr>";
+						}
+						$cdp = getPortCDPEnableWithPID($device,$portid);
+						if($cdp != -1) {
+							$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
+							$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => $this->loc->s("cdp-tooltip")))."</td></tr>";
+						}
+
+						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => $this->loc->s("tooltip-saveone")));
 						$output .= "</table>";
 						if($portid != -1) {
-							//$output .= "<center><br />".FS::$iMgr->addJSSubmit("",$this->loc->s("Save"),"showwait();")."</center>";
 							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
 							$output .= "</form>";
 							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
@@ -236,7 +308,8 @@
 					if($file) {
 						$filebuffer = "";
 						$stopbuffer = 0;
-						for($i=0;$i<count($file);$i++) {
+						$count = count($file);
+						for($i=0;$i<$count;$i++) {
 							$file[$i] = preg_replace("#src=\"(.*)\"#","src=\"datas/rrd/$1\"",$file[$i]);
 							if(preg_match("#<head>#",$file[$i]) || preg_match("#<div id=\"footer#",$file[$i]) || 
 								 preg_match("#<div id=\"legend#",$file[$i]))
@@ -256,14 +329,14 @@
 				// Monitoring
 				else if($sh == 3) {
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
-					$output .= FS::$iMgr->addHidden("device",$device).FS::$iMgr->addHidden("port",$port);
+					$output .= FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port);
 					$climit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
 					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
 					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),"label" => $this->loc->s("enable-monitor")))."</li><li>";
 					$output .= FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
-					$output .= FS::$iMgr->addNumericInput("climit",($climit > 0 ? $climit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>";
+					$output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
+					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>";
 					$output .= FS::$iMgr->submit("","Enregister")."</li>";
 					$output .= "</ul>";
 					$output .= "</form>";
@@ -285,7 +358,7 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				FS::$iMgr->showReturnMenu(true);
-				$output = "<h4>".$this->loc->s("Device")." ";
+				$output = "<h2>".$this->loc->s("Device")." ";
 	
 				$output .= $device." (";
 				$output .= $dip;
@@ -293,7 +366,7 @@
 				$dloc = FS::$pgdbMgr->GetOneData("device","location","name = '".$device."'");
 				if($dloc != NULL)
 				$output .= " - ".$dloc;
-				$output .= ")</h4>";
+				$output .= ")</h2>";
 				
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$showmodule);
@@ -332,7 +405,7 @@
 						$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
 					}
 					if($found == 1) {
-						$output .= "<h4>".$this->loc->s("Internal-mod")."</h4>";
+						$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
 						$output .= $this->showDeviceModules($devmod,1);
 					}
 	
@@ -341,7 +414,7 @@
 				else if($showmodule == 2) {
 					$query = FS::$pgdbMgr->Select("device","*","name ='".$device."'");
 					if($data = pg_fetch_array($query)) {
-						$output .= "<h4>".$this->loc->s("Device-detail")."</h4>";
+						$output .= "<h3>".$this->loc->s("Device-detail")."</h3>";
 						$output .= "<table class=\"standardTable\">";
 						$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
@@ -398,7 +471,7 @@
 						$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
 					}
 					if($found == 1) {
-						$output .= "<h4>".$this->loc->s("frontview")."</h4>";
+						$output .= "<h3>".$this->loc->s("frontview")."</h3>";
 						$output .= "<script>
 							// 3750 48 ports	
 							var c3750p48x = [59,71,87,98,115,126,143,154,171,182,199,210,227,238,254,266,299,310,326,338,355,366,382,394,
@@ -496,7 +569,8 @@
 						</script>";
 						$swlist = $this->getDeviceSwitches($devmod,1);
 						$swlist = preg_split("#\/#",$swlist);
-						for($i=count($swlist)-1;$i>=0;$i--) {
+						$countsw = count($swlist)-1;
+						for($i=$countsw;$i>=0;--$i) {
 							switch($swlist[$i]) {
 								case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
 									$poearr = array();
@@ -531,9 +605,10 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
 									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
@@ -554,14 +629,16 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var poetab = [";
-									for($j=1;$j<=count($poearr);$j++) {
+									$count = count($poearr);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $poearr[$j];
-										if($j < count($poearr)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; drawContext('canvas_".($i+1)."',1,ptab,gptab,poetab);</script>";
 									break;
@@ -600,9 +677,10 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
 									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
@@ -623,14 +701,16 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
-																   $output .= "]; var powport = [";
-									for($j=1;$j<=count($poearr);$j++) {
+									$output .= "]; var powport = [";
+									$count = count($poearr);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $poearr[$j];
-										if($j < count($poearr)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; drawContext('canvas_".($i+1)."',2,ptab,gptab,powport);</script>";
 									break;
@@ -673,9 +753,10 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=1;$j<=count($arr_res);$j++) {
+									$count = count($arr_res);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $arr_res[$j];
-										if($j < count($arr_res)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
 									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN ('GigabitEthernet".($i+1)."/0/25', 'GigabitEthernet".($i+1)."/0/26',
@@ -697,14 +778,16 @@
 									}
 	
 									uksort($arr_res,"strnatcasecmp");
-									for($j=25;$j<=(25+count($arr_res));$j++) {
+									$count = count($arr_res);
+									for($j=25;$j<=(25+$count);$j++) {
 										$output .= $arr_res[$j];
-										if($j < (24+count($arr_res))) $output .= ",";
+										if($j < (24+$count)) $output .= ",";
 									}
-																   $output .= "]; var powport = [";
-									for($j=1;$j<=count($poearr);$j++) {
+									$output .= "]; var powport = [";
+									$count = count($poearr);
+									for($j=1;$j<=$count;$j++) {
 										$output .= $poearr[$j];
-										if($j < count($poearr)) $output .= ",";
+										if($j < $count) $output .= ",";
 									}
 									$output .= "]; drawContext('canvas_".($i+1)."',3,ptab,gptab,powport);</script>";
 									break;
@@ -738,14 +821,14 @@
 						return true;
 					};";
 					$output .= "</script>";
-					$output .= "<h4>".$this->loc->s("title-retag")."</h4>";
+					$output .= "<h3>".$this->loc->s("title-retag")."</h3>";
 					if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=11");
-					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->addNumericInput("oldvl")."<br />";
-					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->addNumericInput("newvl")."<br />";
+					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
+					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->check("accept");
-					$output .= FS::$iMgr->addJSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
-					$output .= FS::$iMgr->addJSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
+					$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
+					$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
 					
 					// Common JS
 					$output .= "<script type=\"text/javascript\">function checkCopyState(copyId) {
@@ -790,22 +873,22 @@
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
-					$output .= "<h4>".$this->loc->s("title-transfer-conf")."</h4>";
-					$output .= $this->loc->s("Server-type")." ".FS::$iMgr->addList("exportm","arangeform();");
-					$output .= FS::$iMgr->addElementToList("TFTP",1);
-					$output .= FS::$iMgr->addElementToList("FTP",2);
-					$output .= FS::$iMgr->addElementToList("SCP",4);
-					$output .= FS::$iMgr->addElementToList("SFTP",5);
+					$output .= "<h3>".$this->loc->s("title-transfer-conf")."</h3>";
+					$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
+					$output .= FS::$iMgr->selElmt("TFTP",1);
+					$output .= FS::$iMgr->selElmt("FTP",2);
+					$output .= FS::$iMgr->selElmt("SCP",4);
+					$output .= FS::$iMgr->selElmt("SFTP",5);
 					$output .= "</select><br />";
-					$output .= $this->loc->s("transfer-way")." ".FS::$iMgr->addList("io");
-					$output .= FS::$iMgr->addElementToList($this->loc->s("Export"),1);
-					$output .= FS::$iMgr->addElementToList($this->loc->s("Import"),2);
+					$output .= $this->loc->s("transfer-way")." ".FS::$iMgr->select("io");
+					$output .= FS::$iMgr->selElmt($this->loc->s("Export"),1);
+					$output .= FS::$iMgr->selElmt($this->loc->s("Import"),2);
 					$output .= "</select><br />";
-					$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->addIPInput("srvip")."<br />";
+					$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />";
 					$output .= $this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />";
 					$output .= "<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser");
 					$output .= " ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>";
-					$output .= FS::$iMgr->addJSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
+					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
 					
 					// Copy startup-config -> running-config
 					$output .= "<script type=\"text/javascript\">function restorestartupconfig() {";
@@ -819,12 +902,12 @@
 					$output .= "return false;";
 					$output .= "};";
 					$output .= "</script>";
-					$output .= "<h4>".$this->loc->s("title-restore-startup")."</h4>";
-					$output .= FS::$iMgr->addJSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
+					$output .= "<h3>".$this->loc->s("title-restore-startup")."</h3>";
+					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
 					return $output;
 				}
 				else if($showmodule == 5) {
-					$output .= "<h4>".$this->loc->s("VLANlist")."</h4>";
+					$output .= "<h3>".$this->loc->s("VLANlist")."</h3>";
 					$found = 0;
 					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
 					$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
@@ -1015,7 +1098,8 @@
 				return "";
 			if(!isset($devmod[$idx])) return "";
 			$output = "<ul>";
-			for($i=0;$i<count($devmod[$idx]);$i++) {
+			$count = count($devmod[$idx]);
+			for($i=0;$i<$count;$i++) {
 				$output .= "<li>" .$devmod[$idx][$i]["desc"]." (".$devmod[$idx][$i]["name"].") ";
 				if(strlen($devmod[$idx][$i]["hwver"]) > 0)
 					$output .= "[hw: ".$devmod[$idx][$i]["hwver"]."] ";
@@ -1040,9 +1124,10 @@
 		private function getDeviceSwitches($devmod,$idx) {
 			if(!isset($devmod[$idx])) return "";
 			$output = "";
-			for($i=0;$i<count($devmod[$idx]);$i++) {
+			$count = count($devmod[$idx]);
+			for($i=0;$i<$count;$i++) {
 				$output .= $devmod[$idx][$i]["desc"];
-				if($i+1<count($devmod[$idx])) $output .= "/";
+				if($i+1<$count) $output .= "/";
 			}
 			return $output;
 		}
@@ -1063,8 +1148,8 @@
 				$formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
 				$formoutput .= "$('#pop').show();";
 				$formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
-				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->addIPInput("dip","",20,40,"Adresse IP:");
-				$formoutput .= "</li><li>".FS::$iMgr->addJSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
+				$formoutput .= "</li><li>".FS::$iMgr->JSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
 				$formoutput .= "</ul></form>";
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 			}
@@ -1073,11 +1158,11 @@
 
 			$foundsw = 0;
 			$foundwif = 0;
-			$outputswitch = "<h4>Switches et routeurs</h4>";
+			$outputswitch = "<h2>".$this->loc->s("title-router-switch")."</h2>";
 			$outputswitch .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
 				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr>";
 
-			$outputwifi = "<h4>".$this->loc->s("title-WiFi-AP")."</h4>";
+			$outputwifi = "<h2>".$this->loc->s("title-WiFi-AP")."</h2>";
 			$outputwifi .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
 				$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr>";
 			while($data = pg_fetch_array($query)) {
@@ -1092,7 +1177,7 @@
 					$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
 					<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div><script type=\"text/javascript\">
 					$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
-							$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
+					$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
 				}
 			}
 			if($foundsw != 0 || $foundwif != 0) {
@@ -1143,7 +1228,7 @@
 							dragover: function(e) { e.preventDefault(); },
 							drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
 									FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
-									FS::$iMgr->addHidden("device","'+e.dataTransfer.getData('text/html')+'").
+									FS::$iMgr->hidden("device","'+e.dataTransfer.getData('text/html')+'").
 									FS::$iMgr->submit("",$this->loc->s("Remove")).
 									FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
 									$('#pop').show();
@@ -1310,6 +1395,7 @@
 					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 					$prise = FS::$secMgr->checkAndSecurisePostData("prise");
 					$shut = FS::$secMgr->checkAndSecurisePostData("shut");
+					$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 					$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 					$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
 					$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
@@ -1324,7 +1410,7 @@
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 						return;
 					}
-					
+
 					$pid = getPortId($sw,$port);
 					if($pid == -1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"PID is incorrect (plug edit)");
@@ -1334,11 +1420,11 @@
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
-					
+
 					$logoutput = "Modify port '".$port."' on device '".$sw."'";
 					$logvals = array();
 					$idx = getPortIndexes($sw,$pid);
-					
+
 					if($duplex && FS::$secMgr->isNumeric($duplex)) {
 						if($duplex < 1 || $duplex > 4) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are wrong: duplex (plug edit)");
@@ -1348,7 +1434,7 @@
 								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 							return;
 						}
-						
+
 						if($idx != NULL) {
 							$logvals["duplex"]["src"] = getPortDuplexWithPID($sw,$pid);
 							setPortDuplexWithPid($sw,$idx[0].".".$idx[1],$duplex);
@@ -1363,13 +1449,13 @@
 							$logvals["speed"]["dst"] = $speed;
 						}
 					}
-					
+
 					$logvals["accessvlan"]["src"] = getSwitchAccessVLANWithPID($sw,$pid);
 					$logvals["trunkencap"]["src"] = getSwitchTrunkEncapWithPID($sw,$pid);
 					$logvals["mode"]["src"] = getSwitchportModeWithPID($sw,$pid);
 					$logvals["trunkvlan"]["src"] = getSwitchportTrunkVlansWithPid($sw,$pid);
 					$logvals["nativevlan"]["src"] = getSwitchTrunkNativeVlanWithPID($sw,$pid);
-					
+
 					// Mab & 802.1X
 					$mabst = getSwitchportMABState($sw,$pid);
 					if($mabst != -1)
@@ -1380,13 +1466,16 @@
 					$norespvlan = getSwitchportAuthNoRespVLAN($sw,$pid);
 					if($norespvlan != -1)
 						$logvals["norespvlan"]["src"] = $norespvlan;
+					$deadvlan = getSwitchportAuthDeadVLAN($sw,$pid);
+                                        if($deadvlan != -1)
+                                                $logvals["deadvlan"]["src"] = $deadvlan;
 					$controlmode = getSwitchportControlMode($sw,$pid);
 					if($controlmode != -1)
 						$logvals["controlmode"]["src"] = $controlmode;
 					$authhostmode = getSwitchportAuthHostMode($sw,$pid);
-					if($authhostmode != -1)					
+					if($authhostmode != -1)
 						$logvals["authhostmode"]["src"] = $authhostmode;
-					
+
 					if($trunk == 1) {
 						$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
 
@@ -1405,6 +1494,10 @@
 							setSwitchportAuthNoRespVLAN($sw,$pid,0);
 							$logvals["norespvlan"]["dst"] = 0;
 						}
+						if($deadvlan != -1) {
+                                                        setSwitchportAuthDeadVLAN($sw,$pid,0);
+                                                        $logvals["deadvlan"]["dst"] = 0;
+                                                }
 						if($controlmode != -1) {
 							setSwitchportControlMode($sw,$pid,3);
 							$logvals["controlmode"]["dst"] = 3;
@@ -1414,8 +1507,8 @@
 							setSwitchportAuthHostMode($sw,$pid,1);
 							$logvals["authhostmode"]["dst"] = 1;
 						}
-                        
-                        // set settings
+
+			                        // set settings
 						if(setSwitchTrunkEncapWithPID($sw,$pid,4) != 0) {
 							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
@@ -1426,9 +1519,17 @@
 							return;
 						}
 						$logvals["mode"]["dst"] = $trunk;
-						if(setSwitchTrunkVlanWithPID($sw,$pid,$vlanlist) != 0) {
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
-							return;
+						if(in_array("all",$vlanlist)) {
+							if(setSwitchNoTrunkVlanWithPID($sw,$pid) != 0) {
+                                                                header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+                                                                return;
+                                                        }
+						}
+						else {
+							if(setSwitchTrunkVlanWithPID($sw,$pid,$vlanlist) != 0) {
+								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+								return;
+							}
 						}
 						$logvals["trunkvlan"]["dst"] = $vlanlist;
 						if(setSwitchTrunkNativeVlanWithPID($sw,$pid,$nvlan) != 0) {
@@ -1454,6 +1555,10 @@
 							setSwitchportAuthNoRespVLAN($sw,$pid,0);
 							$logvals["norespvlan"]["dst"] = 0;
 						}
+						if($deadvlan != -1) {
+                                                        setSwitchportAuthDeadVLAN($sw,$pid,0);
+                                                        $logvals["deadvlan"]["dst"] = 0;
+                                                }
 						if($controlmode != -1) {
 							setSwitchportControlMode($sw,$pid,3);
 							$logvals["controlmode"]["dst"] = 3;
@@ -1488,10 +1593,12 @@
 								return;
 						}
 						$logvals["accessvlan"]["dst"] = $nvlan;
-						
+
 					} else if($trunk == 3) {
 						$dot1xhostmode = FS::$secMgr->checkAndSecurisePostData("dot1xhostmode");
 						$mabeap = FS::$secMgr->checkAndSecurisePostData("mabeap");
+						$noresp = FS::$secMgr->checkAndSecurisePostData("norespvlan");
+						$dead = FS::$secMgr->checkAndSecurisePostData("deadvlan");
 						if($dot1xhostmode < 1 || $dot1xhostmode > 4) {
 							if(FS::isAjaxCall())
 								echo "Dot1x hostmode is wrong (".$dot1xhostmode.")";
@@ -1502,8 +1609,8 @@
 						// switchport mode access & no vlan assigned
 						setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
 						$logvals["nativevlan"]["dst"] = 1;
-                        setSwitchNoTrunkVlanWithPID($sw,$pid);
-                        $logvals["trunkvlan"]["dst"] = "";
+			                        setSwitchNoTrunkVlanWithPID($sw,$pid);
+                        			$logvals["trunkvlan"]["dst"] = "";
 						setSwitchportModeWithPID($sw,$pid,2);
 						$logvals["mode"]["dst"] = 2;
 						setSwitchTrunkEncapWithPID($sw,$pid,5);
@@ -1529,9 +1636,13 @@
 							$logvals["failvlan"]["dst"] = $nvlan;
 						}
 						if($norespvlan != -1) {
-							setSwitchportAuthNoRespVLAN($sw,$pid,$nvlan);
-							$logvals["norespvlan"]["dst"] = $nvlan;
+							setSwitchportAuthNoRespVLAN($sw,$pid,$noresp);
+							$logvals["norespvlan"]["dst"] = $noresp;
 						}
+						if($deadvlan != -1) {
+                                                        setSwitchportAuthDeadVLAN($sw,$pid,$dead);
+                                                        $logvals["deadvlan"]["dst"] = $dead;
+                                                }
 						if($controlmode != -1) {
 							// authentication port-control auto
 							setSwitchportControlMode($sw,$pid,2);
@@ -1564,6 +1675,34 @@
 					$logvals["desc"]["src"] = getPortDesc($sw,$pid);
 					setPortDescWithPID($sw,$pid,$desc);
 					$logvals["desc"]["dst"] = $desc;
+
+					$cdpstate = getPortCDPEnableWithPID($sw,$pid);
+					if($cdpstate != -1) {
+						$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
+						setPortCDPEnableWithPID($sw,$pid,$cdpen == "on" ? 1 : 2);
+						$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
+					}
+
+					$portsecen = getPortSecEnableWithPID($sw,$pid);
+                                        if($portsecen != -1) {
+						$psen = FS::$secMgr->checkAndSecurisePostData("psen");
+						$logvals["psen"]["src"] = ($portsecen == 1 ? true : false);
+                                                setPortSecEnableWithPID($sw,$pid,$psen == "on" ? 1 : 2);
+                                                $logvals["psen"]["dst"] = ($psen == "on" ? true : false);
+
+						$portsecvact = getPortSecViolActWithPID($sw,$pid);
+						$psviolact = FS::$secMgr->checkAndSecurisePostData("psviolact");
+						$logvals["psviolact"]["src"] = $portsecvact;
+                                                setPortSecViolActWithPID($sw,$pid,$psviolact);
+                                                $logvals["psviolact"]["dst"] = $psviolact;
+
+						$psecmaxmac = getPortSecMaxMACWithPID($sw,$pid);
+                                                $psmaxmac = FS::$secMgr->checkAndSecurisePostData("psmaxmac");
+                                                $logvals["psmaxmac"]["src"] = $psecmaxmac;
+                                                setPortSecMaxMACWithPID($sw,$pid,$psmaxmac);
+                                                $logvals["psmaxmac"]["dst"] = $psmaxmac;
+					}
+
 					if($wr == "on")
 						writeMemory($sw);
 
@@ -1580,10 +1719,13 @@
 					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."' AND port='".$port."'");
 					$vllist = FS::$secMgr->checkAndSecurisePostData("vllist");
 					if($trunk == 1) {
-						if($vllist != NULL) {
-							$vlantab = preg_split("/,/",$vllist);
-							for($i=0;$i<count($vlantab);$i++)
-								FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vlantab[$i]."','f',NOW(),NOW()");
+						if($vllist) {
+							// Insert VLAN in database only if not in trunk All mode
+							if(!in_array("all",$vllist)) {
+								$count = count($vllist);
+								for($i=0;$i<$count;$i++)
+									FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vllist[$i]."','f',NOW(),NOW()");
+							}
 						}
 					}
 					else if ($trunk == 2) {
@@ -1591,17 +1733,28 @@
 					}
 
 					foreach($logvals as $keys => $values) {
-						if($values["src"] != $values["dst"])
+						if(is_array($values["src"]) || is_array($values["dst"])) {
+							if(count(array_diff($values["src"],$values["dst"])) != 0) {
+								$logoutput .= "\n".$keys.": ";
+								$count = count($values["src"]);
+								for($i=0;$i<$count;$i++) $logoutput .= $values["src"][$i].",";
+								$logoutput .= " => ";
+								$count = count($values["dst"]);
+								for($i=0;$i<$count;$i++) $logoutput .= $values["dst"][$i].",";
+							}
+						}
+						else if($values["src"] != $values["dst"]) {
 							$logoutput .= "\n".$keys.": ".$values["src"]." => ".$values["dst"];
+						}
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,$logoutput);
 					if(FS::isAjaxCall())
-						echo "Done !";
+						echo $this->loc->s("done-with-success");
 					else
 						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				case 10: // replace vlan portlist
-					echo "<h4>".$this->loc->s("title-port-modiflist")."</h4>";
+					echo "<h3>".$this->loc->s("title-port-modiflist")."</h3>";
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 					if(!$device) {
@@ -1609,18 +1762,18 @@
 						echo FS::$iMgr->printError($this->loc->s("err-no-device"));	
 						return;
 					}
-					
+
 					if(!$vlan || !FS::$secMgr->isNumeric($vlan)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing/wrong (vlan replacement, portlist)");
 						echo FS::$iMgr->printError($this->loc->s("err-vlan-fail")." !");
 						return;
 					}
-					
-					$plist = getPortList($device,$vlan);
 
-					if(count($plist) > 0) {
+					$plist = getPortList($device,$vlan);
+					$count = count($plist);
+					if($count > 0) {
 						echo "<ul>";
-						for($i=0;$i<count($plist);$i++)
+						for($i=0;$i<$count;$i++)
 							echo "<li>".$plist[$i]."</li>";
 						echo "</ul>";
 					}

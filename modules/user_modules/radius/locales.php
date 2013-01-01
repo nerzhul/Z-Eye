@@ -1,6 +1,6 @@
 <?php
-	/*
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+    /*
+    * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
     *
     * This program is free software; you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@
 					"err-not-exist" => "Serveur radius non référencé !",
 					"expiration-field" => "Champ expiration",
 					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux, ou la page indisponible",
+					"Filter" => "Filtrer",
 					"From" => "Du",
 					"Generation-type" => "Type de génération",
 					"Group" => "Groupe",
@@ -79,6 +80,7 @@
 					"New-User" => "Nouvel Utilisateur",
 					"None" => "Aucun",
 					"ok-user" => "Utilisateur créé avec succès !",
+					"Other" => "Autre",
 					"Password" => "Mot de passe",
 					"Permanent" => "Permanent",
 					"Period" => "Période",
@@ -87,7 +89,7 @@
 					"Profilname" => "Nom du profil",
 					"Profils" => "Profils",
 					"Pwd-Type" => "Type de mot de passe",
-					"Radius-profil" => "Profil Radius",
+					"Radius-profile" => "Profil Radius",
 					"random-name" => "Nom aléatoire",
 					"Save" => "Enregistrer",
 					"SQL-table" => "Table SQL",
@@ -105,6 +107,7 @@
 					"title-usermod" => "Modification de l'utilisateur",
 					"title-usermgmt" => "Gestion des utilisateurs/Groupes Radius",
 					"To" => "Au",
+					"Type" => "Type",
 					"User" => "Utilisateur",
 					"user-field" => "Champ utilisateur",
 					"User-nb" => "Nombre d'utilisateurs",
@@ -151,6 +154,7 @@
 					"err-not-exist" => "No radius server",
 					"expiration-field" => "Expiration field",
 					"fail-tab" => "Unable to load tab, link may be wrong or page unavailable",
+					"Filter" => "Filter",
 					"From" => "From",
 					"Generation-type" => "Generation type",
 					"Group" => "Group",
@@ -169,6 +173,7 @@
 					"New-User" => "New User",
 					"None" => "None",
 					"ok-user" => "User creation successfull !",
+					"Other" => "Autre",
 					"Password" => "Password",
 					"Permanent" => "Permanent",
 					"Period" => "Period",
@@ -177,7 +182,7 @@
 					"Profilname" => "Profile name",
 					"Profils" => "Profiles",
 					"Pwd-Type" => "Password type",
-					"Radius-profil" => "Radius profile",
+					"Radius-profile" => "Radius profile",
 					"random-name" => "Random name",
 					"Save" => "Save",
 					"SQL-table" => "SQL table",
@@ -195,6 +200,7 @@
 					"title-usermod" => "User edition",
 					"title-usermgmt" => "Radius user/group edition",
 					"To" => "To",
+					"Type" => "Type",
 					"User" => "User",
 					"user-field" => "User field",
 					"User-nb" => "User number",

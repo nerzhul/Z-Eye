@@ -1,6 +1,6 @@
 <?php
         /*
-        * Copyright (c) 2012, Loïc BLOT, CNRS
+        * Copyright (c) 2010-2013, Loïc BLOT, CNRS <http://www.unix-experience.fr>
         * All rights reserved.
         *
         * Redistribution and use in source and binary forms, with or without
@@ -33,12 +33,12 @@
 		function User() {}
 
 		public function LoadByName($username) {
-			$uid = FS::$dbMgr->GetOneData("fss_users","uid","username = '".$username."'");
+			$uid = FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$username."'");
 			$this->LoadFromDB($uid);
 		}
 
 		public function LoadFromDB($uid) {
-			$query = FS::$dbMgr->Select("fss_users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
+			$query = FS::$pgdbMgr->Select("z_eye_users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
 			if($data = mysql_fetch_array($query)) {
 				$this->id = $uid;
 				$this->username = $data["username"];
@@ -53,11 +53,12 @@
 		}
 
 		public function Create() {
-			FS::$dbMgr->Insert("fss_users","username, ulevel, subname, name, mail, join_date, last_ip","'".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0'");
+			$id = FS::$pgdbMgr->GetMax("chronos_http_links","id")+1;
+			FS::$pgdbMgr->Insert("z_eye_users","uid, username, ulevel, subname, name, mail, join_date, last_ip","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0'");
 		}
 		
 		public function SaveToDB() {
-			FS::$dbMgr->Update("fss_users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
+			FS::$pgdbMgr->Update("z_eye_users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
 			last_ip = '".$this->lastip."', last_conn = '".$this->lastconn."', ulevel = '".$this->ulevel."'","uid = '".$_SESSION["uid"]."'");
 		}
 		

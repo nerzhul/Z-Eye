@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -25,7 +24,7 @@
 		function iNetdisco() { parent::genModule(); $this->loc = new lNetdisco(); }
 		
 		public function Load() {
-			$output = "<h4>".$this->loc->s("title-netdisco")."</h4>";
+			$output = "<h1>".$this->loc->s("title-netdisco")."</h1>";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err == 1)
 				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-data"));
@@ -140,9 +139,9 @@
 			$output .= "<tr><td>".$this->loc->s("snmp-timeout")."</td><td>".FS::$iMgr->input("snmptimeout",$snmptimeout,2,2)."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("snmp-try")."</td><td>".FS::$iMgr->input("snmptry",$snmptry,2,2)."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("snmp-version")."</td><td>";
-			$output .= FS::$iMgr->addList("snmpver");
-			$output .= FS::$iMgr->addElementToList("1","1",$snmpver == 1 ? true : false);
-			$output .= FS::$iMgr->addElementToList("2c","2",$snmpver == 2 ? true : false);
+			$output .= FS::$iMgr->select("snmpver");
+			$output .= FS::$iMgr->selElmt("1","1",$snmpver == 1 ? true : false);
+			$output .= FS::$iMgr->selElmt("2c","2",$snmpver == 2 ? true : false);
 			$output .= "</select></td></tr>";
 			$output .= "<tr>".FS::$iMgr->tableSubmit($this->loc->s("Save"))."</tr>";
 			$output .= "</table></form>";

@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -75,14 +74,14 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			if(!FS::isAjaxCall()) {
-					$output .= "<div id=\"contenttabs\"><ul>";
-					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("webapp"),$sh);
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Collector"),$sh);
-					//$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Stats"),$sh);
-					$output .= "</ul></div>";
-					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
-			}
+				$output .= "<div id=\"contenttabs\"><ul>";
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("webapp"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Collector"),$sh);
+				//$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Stats"),$sh);
+				$output .= "</ul></div>";
+				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+		}
 			else if(!$sh || $sh == 1) {
 				$output = "<script type=\"text/javascript\">function filterAppLogs() {
 					$('#logd').fadeOut();
@@ -92,23 +91,23 @@
 						});
 					}</script>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
-				$output .= FS::$iMgr->addList("uf","filterAppLogs()");
-				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("User")."--","",true);
+				$output .= FS::$iMgr->select("uf","filterAppLogs()");
+				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
 				$query = FS::$pgdbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",2);
 				while($data = pg_fetch_array($query))
-					$output .= FS::$iMgr->addElementToList($data["_user"],$data["_user"]);
+					$output .= FS::$iMgr->selElmt($data["_user"],$data["_user"]);
 
-				$output .= "</select>".FS::$iMgr->addList("af","filterAppLogs()");
-				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("Module")."--","",true);
+				$output .= "</select>".FS::$iMgr->select("af","filterAppLogs()");
+				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
 				$query = FS::$pgdbMgr->Select("z_eye_logs","module","module = module GROUP BY module","module",2);
 				while($data = pg_fetch_array($query))
-					$output .= FS::$iMgr->addElementToList($data["module"],$data["module"]);
+					$output .= FS::$iMgr->selElmt($data["module"],$data["module"]);
 				
-				$output .= "</select>".FS::$iMgr->addList("lf","filterAppLogs()");
-				$output .= FS::$iMgr->addElementToList("--".$this->loc->s("Level")."--","",true);
-				$output .= FS::$iMgr->addElementToList("Info",0);
-				$output .= FS::$iMgr->addElementToList("Warn",1);
-				$output .= FS::$iMgr->addElementToList("Crit",2);
+				$output .= "</select>".FS::$iMgr->select("lf","filterAppLogs()");
+				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Level")."--","",true);
+				$output .= FS::$iMgr->selElmt("Info",0);
+				$output .= FS::$iMgr->selElmt("Warn",1);
+				$output .= FS::$iMgr->selElmt("Crit",2);
 				
 				$output .= "</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterAppLogs()");
 				$output .= "</form>";

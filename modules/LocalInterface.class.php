@@ -1,7 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2007-2012 Frost Sapphire Studios <http://www.frostsapphirestudios.com/>
-	* Copyright (C) 2012 Loïc BLOT, CNRS <http://www.frostsapphirestudios.com/>
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -31,11 +30,9 @@
 			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
 			$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
 			$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
-			$tmpoutput = "";
-			if(FS::$sessMgr->isConnected())
-				$tmpoutput .= $this->showSearchForm();
-
-			$tmpoutput .= "<div id=\"main\">";
+			$output .= "<div id=\"tooltip\"></div>";
+			
+			$tmpoutput = "<div id=\"main\">";
 			$tmpoutput .= $this->showModule();
 			$tmpoutput .= "</div>";
 			// must be after because of return button
@@ -85,11 +82,11 @@
 		protected function showConnForm() {
 			$output = "<div id=\"logform\"><div id=\"menupanel\">";
 			if($this->showRetMenu) {
-				$output .= "<div id=\"menuStack\"><div id=\"menuElmt\" onclick=\"javascript:history.back()\">Retour</div></div>";
+				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\" onclick=\"javascript:history.back()\">Retour</div></div>";
 			}
 			$menulist = array(1,7,6,3,2);
                         $output .= $this->loadMenus($menulist);
-			$output .= "<div id=\"menuStack\"><div id=\"menuElmt\"><ul class=\"login\">";
+			$output .= "<div id=\"menuStack\"><div id=\"menuTitle\"><ul class=\"login\">";
 
 			$output .= "<li id=\"logintoggle\">";
 			if(!FS::$sessMgr->isConnected())
@@ -98,6 +95,10 @@
 					$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
 			$output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
 			</li></ul></div></div>";
+			
+			if(FS::$sessMgr->isConnected())
+				$output .= $this->showSearchForm();
+				
 			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
 			$output .= "<h1>Bienvenue sur Z-Eye</h1>";
 
@@ -121,23 +122,22 @@
 				$output .= "</form>";
 			}
 
-			$output .= "</div></div></div></div></div>";
+			$output .= "</div></div></div>";
+		
+			
+				
+			$output .= "</div></div>";
 
 			return $output;
 		}
 
 		protected function showSearchForm() {
-			$output = "<div id=\"searchform\">
-				<div id=\"searchpanel\">
-					<div class=\"contentlog clearfixlogform\">";
+			$output = "<div id=\"menuStack\">
+				<div id=\"menuItem\"><div id=\"search\">";
 			$output .= $this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1));
-                        $output .= $this->addHidden("mod",$this->getModuleIdByPath("search"));
+                        $output .= $this->hidden("mod",$this->getModuleIdByPath("search"));
 			$output .= $this->input("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
-			$output .= "</div></div>";
-
-			$output .= "<div class=\"tabsearchform\"><a id=\"searchopen\" class=\"open\" href=\"#\"><img src=\"styles/images/search.png\" width=\"30px\" height=\"30px\" style=\"margin-top: 10px\"/></a>
-				<a id=\"searchclose\" style=\"display: none;\" class=\"close\" href=\"#\"><img src=\"styles/images/search.png\" width=\"30px\" height=\"30px\" style=\"margin-top: 10px\"/></a></div>
-			</div>";
+			$output .= "</div></div></div>";
 		
 			return $output;
 		}
