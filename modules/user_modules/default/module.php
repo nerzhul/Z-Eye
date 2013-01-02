@@ -39,7 +39,7 @@
 			                       $('#reports').fadeIn(2500);
         			        });
 		        	}, 30000);</script>";
-				$output .= "<h2>Speed Reporting</h2>";
+				$output .= "<h1>Speed Reporting</h1>";
 			}
 			$output .= "<div id=\"reports\">";
 			$tmpoutput = "<div style=\"width: 100%; display: inline-block;\">".$this->showIcingaReporting()."</div>";

@@ -39,10 +39,58 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= "<h1>".$this->loc->s("title-ip-supervision")."</h1>";
+
+				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+					$err = FS::$secMgr->checkAndSecuriseGetData("err");
+					switch($err) {
+						case 1: $output .= FS::$iMgr->printError($this->loc->s("bad-datas")); break;
+						case 2: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-not-match")); break;
+						case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-conn-failed")); break;
+						case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-auth-failed")); break;
+						case 5: $output .= FS::$iMgr->printError($this->loc->s("err-already-exists")); break;
+						case 6: {
+							$file = FS::$secMgr->checkAndSecuriseGetData("file");
+							if($file)
+								$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." '".$file."'");
+							else
+								$output .= FS::$iMgr->printError($this->loc->s("bad-datas"));
+							break;
+						}
+						default: break;
+					}
+					// To add servers
+        	                        $formoutput = "<h2>".$this->loc->s("title-add-server")."</h2>".
+						FS::$iMgr->form("index.php?mod=".$this->mid."&act=5").
+                	                	"<ul class=\"ulform\"><li>".$this->loc->s("note-needed")."<li>
+						<li>".FS::$iMgr->input("addr","",20,128,$this->loc->s("server-addr"))." (*)</li>
+						<li>".FS::$iMgr->input("sshuser","",20,128,$this->loc->s("ssh-user"))." (*)</li>
+						<li>".FS::$iMgr->password("sshpwd","",$this->loc->s("ssh-pwd"))." (*)</li>
+						<li>".FS::$iMgr->password("sshpwd2","",$this->loc->s("ssh-pwd-repeat"))." (*)</li>
+						<li>".FS::$iMgr->input("dhcpdpath","",30,980,$this->loc->s("dhcpd-path"))." (*)</li>
+						<li>".FS::$iMgr->input("leasepath","",30,980,$this->loc->s("lease-path"))." (*)</li>
+						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"))."</li>
+						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"))."</li>
+                        	        	<li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li>
+                                		</ul></form>";
+					// To delete servers
+					$found = false;
+					$tmpoutput = "<h2>".$this->loc->s("title-remove-server")."</h2>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
+					$tmpoutput .= "<ul class=\"ulform\">".$this->loc->s("Server").": ".FS::$iMgr->select("daddr");
+					$query = FS::$pgdbMgr->Select("z_eye_dhcp_servers","addr,sshuser");
+					while($data = pg_fetch_array($query)) {
+						if(!$found) $found = true;
+						$tmpoutput .= "<li>".FS::$iMgr->selElmt($data["sshuser"]."@".$data["addr"],$data["addr"])."</li>";
+					}
+					$tmpoutput .= "</select><li>".FS::$iMgr->submit("",$this->loc->s("Remove"))."</li></form></ul>";
+					if($found) $formoutput .= $tmpoutput;
+	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"));
+        	                }
+
 				$netfound = false;
 				$tmpoutput = $this->loc->s("choose-net");
 				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$tmpoutput .= FS::$iMgr->select("f","submit()");
+				$formoutput = "";
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
 				while($data = pg_fetch_array($query)) {
 					if(!$netfound) $netfound = true;
@@ -55,18 +103,20 @@
 				if(!$netfound)
                                         return $output.= FS::$iMgr->printError($this->loc->s("no-net-found"));
 
-				if($filter && !FS::$secMgr->isIP($filter))
-					return $output.FS::$iMgr->printError($this->loc->s("bad-filter"));
-
 				$output .= $tmpoutput;
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools"),$showmodule);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+
+				if($filter) {
+					if(!FS::$secMgr->isIP($filter))
+						return $output.FS::$iMgr->printError($this->loc->s("bad-filter"));
+					$output .= "<div id=\"contenttabs\"><ul>";
+					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats"),$showmodule);
+					$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History"),$showmodule);
+					$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring"),$showmodule);
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools"),$showmodule);
+					$output .= "</ul></div>";
+					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+				}
 			} else {
 				if(!$showmodule || $showmodule == 1) {
 				$query = FS::$pgdbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
@@ -74,11 +124,11 @@
 					$iparray = array();
 					$netoutput .= "<h3>Réseau : ".$data["netid"]."/".$data["netmask"]."</h3>";
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
-					
+
 					$netobj = new FSNetwork();
 					$netobj->setNetAddr($data["netid"]);
 					$netobj->setNetMask($data["netmask"]);
-					
+
 					$swfound = false;
 
 					// Bufferize switch list
@@ -124,13 +174,13 @@
 						}
 
 					}
-					
+
 					$used = 0;
 					$reserv = 0;
 					$free = 0;
 					$distrib = 0;
 					$fixedip = 0;
-					
+
 					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
 						<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
 					if($swfound)
@@ -364,10 +414,10 @@
                                         yAxis: { title: { text: 'Nombre d\'adresses' } },
                                         legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
                                         	x: -10, y: 100 },
-                                        series: [ { name: '".addslashes($this->loc->s("Used")."s")."',
-						data: [".$total."], color: 'black' },
-						{ name: '".addslashes($this->loc->s("Free")."s")."',
-                                                data: [".$free."], color: 'green' },";
+                                        series: [ { name: '".addslashes($this->loc->s("Usable")."s")."',
+						data: [".$total."], color: 'green' },
+						{ name: '".addslashes($this->loc->s("not-usable")."s")."',
+                                                data: [".$free."], color: 'black' },";
 					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
 						data: [".$baux."], color: 'red' },";
 					if($reservshow) $output .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
@@ -376,6 +426,22 @@
 						data: [".$avail."], color: 'cyan' }";
 			$output .= "]});});});</script>";
 			return $output;
+		}
+
+		private function writeConfigToServer($server = NULL) {
+
+
+			$conns = array();
+			$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd","dhcp = 1");
+		        while($data = pg_fetch_array($query)) {
+		                $conn = ssh2_connect($data["addr"],22);
+                		if(!$conn) {
+		                        return $this->loc->s("error-fail-connect-ssh").$data["addr"];
+		                }
+                		else if(!ssh2_auth_password($conn, $data["login"], $data["pwd"])) {
+                			return "Authentication error for server '".$data["addr"]."' with login '".$data["login"];
+		                }
+			}
 		}
 
 		public function handlePostDatas($act) {
@@ -453,7 +519,7 @@
 					if($enmon == "on")
 						FS::$pgdbMgr->Insert("z_eye_dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage","'".$filtr."','".$warn."','".$crit."','".$contact."','1','".$maxage."'");
 					echo FS::$iMgr->printDebug($this->loc->s("modif-record"));
-					
+
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
 					return;
 				case 4:
@@ -464,6 +530,114 @@
 						return;
 					}
 					echo $this->showHistory($filter,$daterange);
+				// Add DHCP server
+				case 5:
+					$saddr = FS::$secMgr->checkAndSecurisePostData("addr");
+                                        $slogin = FS::$secMgr->checkAndSecurisePostData("sshuser");
+                                        $spwd = FS::$secMgr->checkAndSecurisePostData("sshpwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("sshpwd2");
+                                        $dhcpdpath = FS::$secMgr->checkAndSecurisePostData("dhcpdpath");
+                                        $leasepath = FS::$secMgr->checkAndSecurisePostData("leasepath");
+					$reservconfpath = FS::$secMgr->checkAndSecurisePostData("reservconfpath");
+					$subnetconfpath = FS::$secMgr->checkAndSecurisePostData("subnetconfpath");
+                                        if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
+                                                $dhcpdpath == NULL || $dhcpdpath == "" || !FS::$secMgr->isPath($dhcpdpath) ||
+                                                $leasepath == NULL || $leasepath == "" || !FS::$secMgr->isPath($leasepath) ||
+						$reservconfpath && ($reservconfpath == "" || !FS::$secMgr->isPath($reservconfpath)) ||
+						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath))
+                                        ) {
+                                                FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
+                                                header("Location: index.php?mod=".$this->mid."&err=1");
+                                                return;
+                                        }
+					if($spwd != $spwd2) {
+						header("Location: index.php?mod=".$this->mid."&err=2");
+                                                return;
+                                        }
+
+                                        $conn = ssh2_connect($saddr,22);
+                                        if(!$conn) {
+                                                header("Location: index.php?mod=".$this->mid."&err=3");
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"SSH Connection failed for '".$saddr."'");
+                                                return;
+                                        }
+					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
+                                                header("Location: index.php?mod=".$this->mid."&err=4");
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
+                                                return;
+                                        }
+                                        if(FS::$pgdbMgr->GetOneData("z_eye_dhcp_servers","sshuser","addr ='".$saddr."'")) {
+                                                FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
+                                                header("Location: index.php?mod=".$this->mid."&err=5");
+                                                return;
+                                        }
+					/*
+					* We try to read files
+					*/
+					// dhcpd.conf
+					$stream = ssh2_exec($conn,"if [ -r ".$dhcpdpath." ]; then; echo 0; else; echo 1; fi;");
+					$cmdret = "";
+		        	        stream_set_blocking($stream, true);
+	        	        	while ($buf = fread($stream, 4096))
+						$cmdret .= $buf;
+
+					if($cmdret != 0) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
+						header("Location: index.php?mod=".$this->mid."&err=6&file=".$dhcpdpath);
+                                                return;
+					}
+
+					// dhcpd.leases
+					$stream = ssh2_exec($conn,"if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;");
+                                        $cmdret = "";
+                                        stream_set_blocking($stream, true);
+                                        while ($buf = fread($stream, 4096))
+                                                $cmdret .= $buf;
+
+                                        if($cmdret != 0) {
+                                                FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$leasepath."' on '".$saddr."'");
+                                                header("Location: index.php?mod=".$this->mid."&err=6&file=".$leasepath);
+                                                return;
+                                        }
+
+					if($reservconfpath && strlen($reservconfpath) > 0) {
+						$stream = ssh2_exec($conn,"if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;");
+        	                                $cmdret = "";
+                	                        stream_set_blocking($stream, true);
+                        	                while ($buf = fread($stream, 4096))
+                                	                $cmdret .= $buf;
+
+                                        	if($cmdret != 0) {
+                                                	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
+	                                                header("Location: index.php?mod=".$this->mid."&err=6&file=".$reservconfpath);
+        	                                        return;
+                	                        }
+					}
+
+					if($subnetconfpath && strlen($subnetconfpath) > 0) {
+						$stream = ssh2_exec($conn,"if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;");
+        	                                $cmdret = "";
+                	                        stream_set_blocking($stream, true);
+                        	                while ($buf = fread($stream, 4096))
+                                	                $cmdret .= $buf;
+
+                                        	if($cmdret != 0) {
+                                                	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
+	                                                header("Location: index.php?mod=".$this->mid."&err=6&file=".$subnetconfpath);
+        	                                        return;
+                	                        }
+					}
+
+					FS::$pgdbMgr->Insert("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
+						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
+					header("Location: m-".$this->mid.".html");
+					return;
+				// Delete DHCP Server
+				case 6:
+
+					header("Location: m-".$this->mid.".html");
+                                        return;
 			}
 		}
 	};
