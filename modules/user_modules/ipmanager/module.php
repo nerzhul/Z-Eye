@@ -43,7 +43,7 @@
 				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
 					switch($err) {
-						case 1: $output .= FS::$iMgr->printError($this->loc->s("bad-datas")); break;
+						case 1: case 7: case 8: $output .= FS::$iMgr->printError($this->loc->s("bad-datas")); break;
 						case 2: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-not-match")); break;
 						case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-conn-failed")); break;
 						case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-auth-failed")); break;
@@ -81,7 +81,8 @@
 						if(!$found) $found = true;
 						$tmpoutput .= "<li>".FS::$iMgr->selElmt($data["sshuser"]."@".$data["addr"],$data["addr"])."</li>";
 					}
-					$tmpoutput .= "</select><li>".FS::$iMgr->submit("",$this->loc->s("Remove"))."</li></form></ul>";
+					$tmpoutput .= "</select><li>".FS::$iMgr->submit("",$this->loc->s("Remove"))."</li><li>".
+						FS::$iMgr->check("histrm",array("label" => $this->loc->s("remove-history")))."</form></ul>";
 					if($found) $formoutput .= $tmpoutput;
 	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"));
         	                }
@@ -530,6 +531,7 @@
 						return;
 					}
 					echo $this->showHistory($filter,$daterange);
+					return;
 				// Add DHCP server
 				case 5:
 					$saddr = FS::$secMgr->checkAndSecurisePostData("addr");
@@ -635,7 +637,27 @@
 					return;
 				// Delete DHCP Server
 				case 6:
+					$addr = FS::$secMgr->checkAndSecurisePostData("daddr");
+					$histrm = FS::$secMgr->checkAndSecurisePostData("histrm");
+					if(!$addr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"No DHCP server specified to remove");
+						header("Location: index.php?mod=".$this->mid."&err=7");
+						return;
+					}
 
+					if(!FS::$pgdbMgr->GetOneData("z_eye_dhcp_servers","sshuser","addr = '".$addr."'")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Unknown DHCP server specified to remove");
+						header("Location: index.php?mod=".$this->mid."&err=8");
+						return;
+					}
+
+					if($histrm == "on")
+						FS::$pgdbMgr->Delete("z_eye_dhcp_ip_history","server = '".$addr."'");
+
+					FS::$pgdbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$addr."'");
+					// Later
+					// FS::$pgdbMgr->Delete("z_eye_dhcp_subnet_cache","server = '".$addr."'");
+					FS::$pgdbMgr->Delete("z_eye_dhcp_servers","addr = '".$addr."'");
 					header("Location: m-".$this->mid.".html");
                                         return;
 			}

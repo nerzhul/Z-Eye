@@ -39,6 +39,10 @@
 		}
 
 		public function Connect() {
+			if($this->dbConn) {
+				mysql_close($this->dbConn);
+				$this->dbConn = false;
+			}
 			$result = mysql_pconnect($this->dbHost.":".$this->dbPort,$this->dbUser,$this->dbPass);
 			if(!$result) {
 				$iMgr = new FSInterfaceMgr($this);

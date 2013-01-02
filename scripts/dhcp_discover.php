@@ -285,7 +285,7 @@
 	$dhcpdatas2 = "";
 	$DHCPfound = false;
 	$DHCPconnerr = false;
-	$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,pwd,dhcpdpath,dhcpleasepath","dhcp = 1");
+	$query = FS::$pgdbMgr->Select("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath");
 	while($data = pg_fetch_array($query)) {
 		$dhcpdatas = "";
 		if($data["dhcpdpath"] == NULL || $data["dhcpdpath"] == "" || !FS::$secMgr->isPath($data["dhcpdpath"])) {
@@ -294,8 +294,8 @@
 			continue;
 		}
 
-		if($data["dhcpleasepath"] == NULL || $data["dhcpleasepath"] == "" || !FS::$secMgr->isPath($data["dhcpleasepath"])) {
-				echo "Chemin dhcpd.conf invalide pour le serveur ".$data["addr"].": ".$data["dhcpleasepath"]."\n";
+		if($data["leasespath"] == NULL || $data["leasespath"] == "" || !FS::$secMgr->isPath($data["leasespath"])) {
+				echo "Chemin dhcpd.conf invalide pour le serveur ".$data["addr"].": ".$data["leasespath"]."\n";
 				$DHCPconnerr = true;
 				continue;
 		}
@@ -305,13 +305,13 @@
 			$DHCPconnerr = true;
 		}
 		else {
-			if(!ssh2_auth_password($conn, $data["login"], $data["pwd"])) {
-				echo "Authentication error for server '".$data["addr"]."' with login '".$data["login"]."'\n";
+			if(!ssh2_auth_password($conn, $data["sshuser"], $data["sshpwd"])) {
+				echo "Authentication error for server '".$data["addr"]."' with login '".$data["sshuser"]."'\n";
 				$DHCPconnerr = true;
 			}
 			else {
 				echo "Collecte des données sur le serveur ".$data["addr"]."\n";
-				$stream = ssh2_exec($conn,"cat ".$data["dhcpleasepath"]);
+				$stream = ssh2_exec($conn,"cat ".$data["leasespath"]);
 				stream_set_blocking($stream, true);
 
 				while ($buf = fread($stream, 4096)) {
