@@ -140,11 +140,15 @@
 		}
 
 		public function setConfig($dbn,$dbport,$dbh,$dbu,$dbp) {
+			if($dbn == $this->dbName && $dbport == $this->dbPort && $dbh == $this->dbHost && $dbu == $this->dbUser
+				&& $this->dbLink)
+				return 1;
                         $this->dbName = $dbn;
                         $this->dbPort = $dbport;
                         $this->dbHost = $dbh;
                         $this->dbUser = $dbu;
                         $this->dbPass = $dbp;
+			return 0;
                 }
 
 		private $dbName;

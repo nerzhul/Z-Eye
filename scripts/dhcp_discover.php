@@ -259,9 +259,9 @@
 							$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 							$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 							$radSQLMgr = new FSMySQLMgr();
-							$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-							$radSQLMgr->Connect();
-							
+							if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd) == 0)
+								$radSQLMgr->Connect();
+
 							if(!$radSQLMgr->GetOneData("radusergroup","username","username = '".$macaddr."' AND groupname = '".$data["groupname"]."'"))
 								$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$macaddr."','".$data["groupname"]."','0'");
 							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$macaddr."' AND attribute = 'Auth-Type' AND op = ':=' AND value = 'Accept'"))

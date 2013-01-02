@@ -39,10 +39,8 @@
 		}
 
 		public function Connect() {
-			if($this->dbConn) {
-				mysql_close($this->dbConn);
-				$this->dbConn = false;
-			}
+			$this->Close();
+
 			$result = mysql_pconnect($this->dbHost.":".$this->dbPort,$this->dbUser,$this->dbPass);
 			if(!$result) {
 				$iMgr = new FSInterfaceMgr($this);
@@ -136,11 +134,15 @@
 		}
 		
 		public function setConfig($dbn,$dbport,$dbh,$dbu,$dbp) {
+			if($dbn == $this->dbName && $dbport == $this->dbPort && $dbh == $this->dbHost &&
+				$dbu == $this->dbUser && $this->dbConn)
+				return 1;
 			$this->dbName = $dbn;
 			$this->dbPort = $dbport;
 			$this->dbHost = $dbh;
 			$this->dbUser = $dbu;
 			$this->dbPass = $dbp;
+			return 0;
 		}
 		
 		public function Close() {

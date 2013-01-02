@@ -104,8 +104,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd) == 0)
+					$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
@@ -134,8 +134,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+					$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserlistres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11",array("id" => "adduserlist"));
@@ -180,8 +180,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+					$radSQLMgr->Connect();
 				$formoutput = "<script type=\"text/javascript\"> function changeUForm() {
 					if(document.getElementsByName('utype')[0].value == 1) {
 						$('#userdf').show();
@@ -343,8 +343,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+					$radSQLMgr->Connect();
 
 				$groups=array();
 				$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
@@ -373,8 +373,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+					$radSQLMgr->Connect();
 				$grouplist= FS::$iMgr->selElmt("","none");
 				$groups=array();
 				$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
@@ -423,8 +423,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+					$radSQLMgr->Connect();
 
 				$output = "";
 
@@ -506,8 +506,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
                                 $radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
                                 $radSQLMgr = new FSMySQLMgr();
-                                $radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-                                $radSQLMgr->Connect();
+                                if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+	                                $radSQLMgr->Connect();
 
 				$output .= "<h3>".$this->loc->s("title-cleanusers")."</h3>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=9");
@@ -528,8 +528,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+					$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
@@ -557,8 +557,8 @@
 				$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-				$radSQLMgr->Connect();
+				if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+					$radSQLMgr->Connect();
 
 				$output .= "<div id=\"adduserlistres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11",array("id" => "adduserlist"));
@@ -654,8 +654,8 @@
 			$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 			$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 			$radSQLMgr = new FSMySQLMgr();
-			$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-			$radSQLMgr->Connect();
+			if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+				$radSQLMgr->Connect();
 
 			if($radentrytype == 1) {
 				$userexist = $radSQLMgr->GetOneData("radcheck","username","username = '".$radentry."'");
@@ -957,8 +957,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 
 					// For Edition Only, don't delete acct records
 					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
@@ -1067,8 +1067,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 
 					// For Edition Only, don't delete acct/user-group links
 					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
@@ -1141,8 +1141,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 					$radSQLMgr->Delete("radcheck","username = '".$username."'");
 					$radSQLMgr->Delete("radreply","username = '".$username."'");
 					$radSQLMgr->Delete("radusergroup","username = '".$username."'");
@@ -1166,8 +1166,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 					$radSQLMgr->Delete("radgroupcheck","groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radgroupreply","groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radusergroup","groupname = '".$groupname."'");
@@ -1194,8 +1194,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 
 					if(!$utype || $utype != 1 && $utype != 2 || !$userlist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some datas are missing or invalid for mass import");
@@ -1321,8 +1321,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 
 					$groupexist = $radSQLMgr->GetOneData("radgroupcheck","id","groupname='".$radgroup."'");
 					if(!$groupexist)
@@ -1380,8 +1380,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 
 					$cleanradenable = FS::$secMgr->checkAndSecurisePostData("cleanradsqlenable");
 					$cleanradtable = FS::$secMgr->checkAndSecurisePostData("cleanradsqltable");
@@ -1449,8 +1449,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 
 					$exist = $radSQLMgr->GetOneData("radcheck","id","username = '".$username."'");
 					if(!$exist) $exist = $radSQLMgr->GetOneData("radreply","id","username = '".$username."'");
@@ -1510,8 +1510,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 
 					$pdf = new PDFgen();
 					$pdf->SetTitle($this->loc->s("Account").": ".($valid == 1 ? $this->loc->s("Permanent") : $this->loc->s("Temporary")));
@@ -1542,8 +1542,8 @@
 					$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 					$radSQLMgr = new FSMySQLMgr();
-					$radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd);
-					$radSQLMgr->Connect();
+					if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd))
+						$radSQLMgr->Connect();
 					echo $this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport);
 					return;
 			}
