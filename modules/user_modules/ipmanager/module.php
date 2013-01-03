@@ -38,7 +38,7 @@
 
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h1>".$this->loc->s("title-ip-supervision")."</h1>";
+				$output .= "<h1>".$this->loc->s("title-ip-management")."</h1>";
 
 				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
@@ -88,7 +88,7 @@
         	                }
 
 				$netfound = false;
-				$tmpoutput = $this->loc->s("choose-net");
+				$tmpoutput = "<h2>".$this->loc->s("title-subnet-management")."</h2>".$this->loc->s("choose-net");
 				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$tmpoutput .= FS::$iMgr->select("f","submit()");
 				$formoutput = "";
@@ -415,9 +415,9 @@
                                         yAxis: { title: { text: 'Nombre d\'adresses' } },
                                         legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
                                         	x: -10, y: 100 },
-                                        series: [ { name: '".addslashes($this->loc->s("Usable")."s")."',
+                                        series: [ { name: '".addslashes($this->loc->s("Usable"))."',
 						data: [".$total."], color: 'green' },
-						{ name: '".addslashes($this->loc->s("not-usable")."s")."',
+						{ name: '".addslashes($this->loc->s("not-usable"))."',
                                                 data: [".$free."], color: 'black' },";
 					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
 						data: [".$baux."], color: 'red' },";
