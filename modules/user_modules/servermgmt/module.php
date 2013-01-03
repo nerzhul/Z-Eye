@@ -210,9 +210,6 @@
 		private function CreateOrEditServer($create) {
 			$saddr = "";
 			$slogin = "";
-			$dhcp = 0;
-			$dhcpdpath = "";
-			$dhcpleasepath = "";
 			$dns = 0;
 			$namedpath = "";
 			$chrootnamed = "";
@@ -226,13 +223,10 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
-				$query = FS::$pgdbMgr->Select("z_eye_server_list","login,dhcp,dns,dhcpdpath,dhcpleasepath,chrootnamed,namedpath","addr = '".$addr."'");
+				$query = FS::$pgdbMgr->Select("z_eye_server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
 				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
-					$dhcp = $data["dhcp"];
-					$dhcpdpath = $data["dhcpdpath"];
-					$dhcpleasepath = $data["dhcpleasepath"];
 					$dns = $data["dns"];
 					$namedpath = $data["namedpath"];
 					$chrootnamed = $data["chrootnamed"];
@@ -266,9 +260,6 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin);
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine("DHCP ?","dhcp",$dhcp > 0 ? true : false,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-conf-path"),"dhcpdpath",$dhcpdpath,array("tooltip" => $this->loc->s("tooltip-rights")));
-			$output .= FS::$iMgr->idxLine($this->loc->s("dhcpd-lease-path"),"dhcpleasepath",$dhcpleasepath,array("tooltip" => $this->loc->s("tooltip-rights")));
 			$output .= FS::$iMgr->idxLine("DNS ?","dns",$dns > 0 ? true : false,array("type" => "chk"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => $this->loc->s("tooltip-rights")));
 			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => $this->loc->s("tooltip-rights")));
@@ -282,14 +273,14 @@
 			$output = "<h2>".$this->loc->s("title-server-list")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-server")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
-				"</th><th>DHCP</th><th>DNS</th><th>".$this->loc->s("Remove")."</th></tr>";
+				"</th><th>DNS</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
-			$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,dhcp,dns");
+			$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,dns");
 			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
-				$tmpoutput .= "<center>".($data["dhcp"] > 0 ? "X" : "")."</center></td><td><center>".($data["dns"] > 0 ? "X" : "")."</center></td><td><center>";
+				$tmpoutput .= "<center>".($data["dns"] > 0 ? "X" : "")."</center></td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]."\">";
 				$tmpoutput .= FS::$iMgr->img("styles/images/cross.png",15,15);
 				$tmpoutput .= "</center></td></tr>";
@@ -353,16 +344,11 @@
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
-					$dhcp = FS::$secMgr->checkAndSecurisePostData("dhcp");
-					$dhcpdpath = FS::$secMgr->checkAndSecurisePostData("dhcpdpath");
-					$dhcpleasepath = FS::$secMgr->checkAndSecurisePostData("dhcpleasepath");
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
 					$namedpath = FS::$secMgr->checkAndSecurisePostData("namedpath");
 					$chrootnamed = FS::$secMgr->checkAndSecurisePostData("chrootnamed");
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
 						$spwd != $spwd2 ||
-						$dhcp == "on" && ($dhcpdpath == NULL || $dhcpdpath == "" || !FS::$secMgr->isPath($dhcpdpath) ||
-							$dhcpleasepath == NULL || $dhcpleasepath == "" || !FS::$secMgr->isPath($dhcpleasepath)) ||
 						$dns == "on" && ($namedpath == NULL || $namedpath == "" || !FS::$secMgr->isPath($namedpath) ||
 							(($chrootnamed == NULL || $chrootnamed == "") && !FS::$secMgr->isPath($chrootnamed)))
 						) {
@@ -384,9 +370,9 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=4");
 						return;
 					}
-					FS::$pgdbMgr->Insert("z_eye_server_list","addr,login,pwd,dhcp,dns,dhcpdpath,dhcpleasepath,namedpath,chrootnamed",
-					"'".$saddr."','".$slogin."','".$spwd."','".($dhcp == "on" ? 1 : 0)."','".($dns == "on" ? 1 : 0)."','".$dhcpdpath."','".$dhcpleasepath."','".$namedpath."','".$chrootnamed."'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: ".($dns == "on" ? "dns checking" : "").($dhcp == "on" ? "dhcp checking" : ""));
+					FS::$pgdbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
+					"'".$saddr."','".$slogin."','".$spwd."','".($dns == "on" ? 1 : 0)."','".$namedpath."','".$chrootnamed."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: ".($dns == "on" ? "dns checking" : ""));
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 2: // server edition
@@ -394,15 +380,10 @@
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
-					$dhcp = FS::$secMgr->checkAndSecurisePostData("dhcp");
 					$dns = FS::$secMgr->checkAndSecurisePostData("dns");
-					$dhcpdpath = FS::$secMgr->checkAndSecurisePostData("dhcpdpath");
-					$dhcpleasepath = FS::$secMgr->checkAndSecurisePostData("dhcpleasepath");
 					$namedpath = FS::$secMgr->checkAndSecurisePostData("namedpath");
 					$chrootnamed = FS::$secMgr->checkAndSecurisePostData("chrootnamed");
 					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2
-						|| $dhcp == "on" && ($dhcpdpath == NULL || $dhcpdpath == "" || !FS::$secMgr->isPath($dhcpdpath) ||
-						$dhcpleasepath == NULL || $dhcpleasepath == "" || !FS::$secMgr->isPath($dhcpleasepath))
                                                 || $dns == "on" && ($namedpath == NULL || $namedpath == "" || !FS::$secMgr->isPath($namedpath) ||
 							(($chrootnamed == NULL || $chrootnamed == "") && !FS::$secMgr->isPath($chrootnamed)))
 						) {
@@ -423,7 +404,7 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit server password for server '".$saddr."'");
 						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
 					}
-					FS::$pgdbMgr->Update("z_eye_server_list","login = '".$slogin."', dhcp = '".($dhcp == "on" ? 1 : 0)."', dns = '".($dns == "on" ? 1 : 0)."', chrootnamed = '".$chrootnamed."', namedpath='".$namedpath."', dhcpdpath='".$dhcpdpath."', dhcpleasepath='".$dhcpleasepath."'","addr = '".$saddr."'");
+					FS::$pgdbMgr->Update("z_eye_server_list","login = '".$slogin."', dns = '".($dns == "on" ? 1 : 0)."', chrootnamed = '".$chrootnamed."', namedpath='".$namedpath."', addr = '".$saddr."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit informations for server '".$server."'");
 					header("Location: m-".$this->mid.".html");
 					break;
