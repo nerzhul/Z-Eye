@@ -35,6 +35,7 @@
 				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-short")); break;
 				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-complex")); break;
 				case 8: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-unk")); break;
+				case 9: $output .= FS::$iMgr->printError($this->loc->s("err-mail")); break;
 			}
 
 			$user = FS::$secMgr->checkAndSecuriseGetData("user");
@@ -50,18 +51,19 @@
 
 		private function EditUser($user) {
 			$uid = FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$user."'");
-			$output = "<h3>".$this->loc->s("title-user-mod")."</h3>";
+			$output = "<h2>".$this->loc->s("title-user-mod")."</h2>";
 			if(!$uid) {
 				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
 				return $output;
 			}
 			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
-			if(FS::$pgdbMgr->GetOneData("z_eye_users","sha_pwd","username = '".$user."'"))
                         $output .= "<ul class=\"ulform\"><li><b>".$this->loc->s("User").":</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
-			if(FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$user."'")) {
+			if(FS::$pgdbMgr->GetOneData("z_eye_users","sha_pwd","username = '".$user."'")) {
+				$mail = FS::$pgdbMgr->GetOneData("z_eye_users","mail","username = '".$user."'");
 				$output .= "<li><i>".$this->loc->s("tip-password")."</i></li>
 					<li>".$this->loc->s("Password").": ".FS::$iMgr->password("pwd","")."</li>
-					<li>".$this->loc->s("Password-repeat").": ".FS::$iMgr->password("pwd2","")."</li>";
+					<li>".$this->loc->s("Password-repeat").": ".FS::$iMgr->password("pwd2","")."</li>
+					<li>".$this->loc->s("Mail").": ".FS::$iMgr->input("mail",$mail,24,64)."</li>";
 			}
 			$grpidx = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
@@ -70,7 +72,7 @@
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
-                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->submit("","Ajouter")."</li>";
+                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Modify"))."</li>";
                         $output .= "</ul></form>";
 
 			$output .= "<script type=\"text/javascript\">grpidx = ".$grpidx."; function addGrpForm() {
@@ -86,7 +88,7 @@
 		}
 
 		private function EditServer($addr) {
-			$output = "<h3>".$this->loc->s("title-directory")."</h3>";
+			$output = "<h2>".$this->loc->s("title-directory")."</h2>";
 			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
@@ -121,7 +123,7 @@
 		}
 
 		private function showMain() {
-			$output = "<h3>".$this->loc->s("title-usermgmt")."</h3>";
+			$output = "<h1>".$this->loc->s("title-usermgmt")."</h1>";
 
 			$tmpoutput = "";
 			$found = 0;
@@ -159,7 +161,7 @@
                                         dragend: function() { $('#trash').hide(); $('#editf').hide(); }
                                 });</script>";
 			}
-			$output .= "<h3>".$this->loc->s("title-directorymgmt")."</h3>";
+			$output .= "<h1>".$this->loc->s("title-directorymgmt")."</h1>";
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
 			$formoutput .= "<ul class=\"ulform\"><li>";
 			$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
@@ -276,6 +278,15 @@
 								header("Location: index.php?mod=".$this->mid."&user=".$username."&err=8");
                                                                 return;
 						}
+					}
+
+					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
+					if($mail) {
+						if(!FS::$secMgr->isMail($mail)) {
+							header("Location: index.php?mod=".$this->mid."&user=".$username."&err=9");
+							return;
+						}
+						FS::$pgdbMgr->Update("z_eye_users","mail = '".$mail."'","uid = '".$uid."'");
 					}
 
 					$groups = array();
