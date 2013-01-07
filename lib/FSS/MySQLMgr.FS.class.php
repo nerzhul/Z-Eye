@@ -41,7 +41,7 @@
 		public function Connect() {
 			$this->Close();
 
-			$result = mysql_pconnect($this->dbHost.":".$this->dbPort,$this->dbUser,$this->dbPass);
+			$result = mysql_connect($this->dbHost.":".$this->dbPort,$this->dbUser,$this->dbPass);
 			if(!$result) {
 				$iMgr = new FSInterfaceMgr($this);
 				$iMgr->printError("Unable to connect to MySQL database");
