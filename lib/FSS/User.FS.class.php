@@ -39,7 +39,7 @@
 
 		public function LoadFromDB($uid) {
 			$query = FS::$pgdbMgr->Select("z_eye_users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
-			if($data = mysql_fetch_array($query)) {
+			if($data = pg_fetch_array($query)) {
 				$this->id = $uid;
 				$this->username = $data["username"];
 				$this->subname = $data["mail"];
@@ -53,33 +53,46 @@
 		}
 
 		public function Create() {
-			$id = FS::$pgdbMgr->GetMax("chronos_http_links","id")+1;
+			$id = FS::$pgdbMgr->GetMax("z_eye_http_links","id")+1;
 			FS::$pgdbMgr->Insert("z_eye_users","uid, username, ulevel, subname, name, mail, join_date, last_ip","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0'");
 		}
-		
+
 		public function SaveToDB() {
 			FS::$pgdbMgr->Update("z_eye_users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
 			last_ip = '".$this->lastip."', last_conn = '".$this->lastconn."', ulevel = '".$this->ulevel."'","uid = '".$_SESSION["uid"]."'");
 		}
-		
+
+		public function changePassword($password) {
+			if(strlen($password) < Config::getPasswordMinLength())
+				return 1;
+
+			if(Config::getPasswordComplexity()) {
+				if(!preg_match("#[a-z]#",$password) || !preg_match("#[A-Z]#",$password) || !preg_match("#[0-9]#",$password))
+					return 2;
+			}
+
+			$hash = FS::$secMgr->EncryptPassword($password,$this->username,$this->id);
+			FS::$pgdbMgr->Update("z_eye_users","sha_pwd = '".$hash."'","uid = '".$this->id."'");
+			return 0;
+		}
+
 		public function getUserName() { return $this->username; }
 		public function setUsername($uname) { $this->username = $uname; }
-		
+
 		public function getSubName() { return $this->subname; }
 		public function setSubName($sname) { return $this->subname = $sname; }
-		
+
 		public function getUserLevel() { return $this->ulevel;	}
 		public function setUserLevel($ulevel) { $this->ulevel = $ulevel; }
-		
+
 		public function getMail() { return $this->mail; }
 		public function setMail($m) { $this->mail = $m; }
-		
+
 		public function getUid() {	return $this->id; }
 		public function getJoinDate() { return $this->joindate; }
 		public function getLastConnect() { return $this->lastconn; }
 		public function getLastIP() { return $this->lastip; }
-		
-		
+
 		private $username;
 		private $mail;
 		private $subname;

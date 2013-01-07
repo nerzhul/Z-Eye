@@ -31,6 +31,10 @@
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-bad-data")); break;
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-bad-data")); break;
 				case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-exist")); break;
+				case 5: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-match")); break;
+				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-short")); break;
+				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-complex")); break;
+				case 8: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-unk")); break;
 			}
 
 			$user = FS::$secMgr->checkAndSecuriseGetData("user");
@@ -52,7 +56,13 @@
 				return $output;
 			}
 			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
-                        $output .= "<ul class=\"ulform\"><li><b>Nom d'utilisateur:</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
+			if(FS::$pgdbMgr->GetOneData("z_eye_users","sha_pwd","username = '".$user."'"))
+                        $output .= "<ul class=\"ulform\"><li><b>".$this->loc->s("User").":</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
+			if(FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$user."'")) {
+				$output .= "<li><i>".$this->loc->s("tip-password")."</i></li>
+					<li>".$this->loc->s("Password").": ".FS::$iMgr->password("pwd","")."</li>
+					<li>".$this->loc->s("Password-repeat").": ".FS::$iMgr->password("pwd2","")."</li>";
+			}
 			$grpidx = 0;
 			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
 			while($data = pg_fetch_array($query)) {
@@ -64,7 +74,7 @@
                         $output .= "</ul></form>";
 
 			$output .= "<script type=\"text/javascript\">grpidx = ".$grpidx."; function addGrpForm() {
-                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->addList("ugroup'+grpidx+'","","Groupe").$this->addGroupList()."</select>";
+                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Groupe").$this->addGroupList()."</select>";
                         $output .= " <a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
                                         grpidx++;
                                 }
@@ -102,7 +112,7 @@
 			return $output;
 		}
 
-		private function addGrouplist($gid) {
+		private function addGrouplist($gid=-1) {
 			$output = "";
 			$query = FS::$pgdbMgr->Select("z_eye_groups","gid,gname");
 			while($data = pg_fetch_array($query))
@@ -237,13 +247,44 @@
 						return;
 					}
 
+					$username = FS::$pgdbMgr->GetOneData("z_eye_users","username","uid = '".$uid."'");
+					if(!$username) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User uid '".$uid."' doesn't exists");
+						header("Location: index.php?mod=".$this->mid."&err=2");
+						return;
+					}
+
+					$pwd = FS::$secMgr->checkAndSecurisePostData("pwd");
+					$pwd2 = FS::$secMgr->checkAndSecurisePostData("pwd2");
+					if($pwd || $pwd2) {
+						if($pwd != $pwd2) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Try to modify password for user ".$uid." but passwords didn't match");
+							header("Location: index.php?mod=".$this->mid."&user=".$username."&err=5");
+							return;
+						}
+						$user = new User();
+						$user->LoadFromDB($uid);
+						switch($user->changePassword($pwd)) {
+							case 0: break; // ok
+							case 1: // too short
+								header("Location: index.php?mod=".$this->mid."&user=".$username."&err=6");
+								return;
+							case 2: // complexity
+								header("Location: index.php?mod=".$this->mid."&user=".$username."&err=7");
+                                                                return;
+							default: // unk
+								header("Location: index.php?mod=".$this->mid."&user=".$username."&err=8");
+                                                                return;
+						}
+					}
+
 					$groups = array();
 					foreach($_POST as $key => $value) {
 						   if(preg_match("#^ugroup#",$key)) {
 								$exist = FS::$pgdbMgr->GetOneData("z_eye_groups","gname","gid = '".$value."'");
 								if(!$exist) {
 									FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Try to add user ".$uid." to inexistant group '".$value."'");
-									header("Location: index.php?mod=".$this->mid."&err=2");
+									header("Location: index.php?mod=".$this->mid."&user=".$username."&err=2");
 									return;
 								}
 								array_push($groups,$value);

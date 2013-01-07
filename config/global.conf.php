@@ -2,14 +2,14 @@
 	class Config {
 		private static $lang = "FR-fr";
 		private static $stylesheet = "fss1.css";
-		private static $websiteName = "Z-Eye (beta 3.2e)";
+		private static $websiteName = "Z-Eye (beta 3.3)";
 		private static $OS = "FreeBSD";
 		/* 0 (no crypt, not recommended
 		1: sha1
 		2: md5(sha1)
 		3: md5(sha1.username)
 		4: sha1(md5(sha1.username).uid)*/
-		private static $cryptlevel = 1;
+		private static $cryptlevel = 4;
 		private static $favicon = false;
 		private static $pgsqlen = true;
 		private static $snmpen = true;
