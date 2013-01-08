@@ -38,7 +38,7 @@ defaultSNMPRO = "public"
 max_threads = 30
 
 def zeye_log(text):
-        logfile = open("/usr/local/www/z-eye/datas/logs/z_eye_collector.log","a")
+        logfile = open("/var/www/datas/logs/z_eye_collector.log","a")
         logfile.writelines("%s\n"  % text)
         logfile.close()
 
@@ -52,8 +52,7 @@ def fetchSNMPInfos(ip,devname,devcom,vendor):
 		if vendor == "cisco":
 			cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
 		else:
-			cmd = "snmpwalk -v 2c -c %s %s ifName | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
-		print cmd
+			cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
 		pipe = os.popen('{ ' + cmd + '; }', 'r')
 		text = pipe.read()
 		pipe.close()
@@ -90,7 +89,6 @@ def fetchSNMPInfos(ip,devname,devcom,vendor):
 						elif len(piddata) >= 3 and piddata[2] == "No":
 							stopSwIDSearch = 1
 					""" must be there for no switch/switchport id """
-					print pname
 					pgcursor2.execute("INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid))
 		tc_mutex.acquire()
 		threadCounter = threadCounter - 1
