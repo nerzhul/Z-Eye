@@ -361,8 +361,8 @@
 			$output = "";
 			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
 			while($data = pg_fetch_array($query)) {
-				$radSQLMgr = new FSMySQLMgr();
-				$radSQLMgr->setConfig($data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
+				$radSQLMgr = new AbstractSQLMgr();
+				$radSQLMgr->setConfig("my",$data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
 				$radSQLMgr->Connect();
 				
 				$found = 0;

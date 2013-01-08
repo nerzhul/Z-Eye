@@ -200,7 +200,7 @@
 	function registerIPs($hosts_list,&$subnet_list,$server) {
 		global $execdate;
 		// Flush ip table for server
-		FS::$pgdbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
+		FS::$dbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
 
 			if(isset($value["state"])) $rstate = $value["state"];
@@ -246,18 +246,18 @@
 							$netfound = $subnet_list[$i][0];
 					}
 
-					FS::$pgdbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
+					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
 					if($rstate == 2 || $rstate == 3 || $rstate == 4)
-						FS::$pgdbMgr->Insert("z_eye_dhcp_ip_history","ip,mac,distributed,netid,server,collecteddate","'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
+						FS::$dbMgr->Insert("z_eye_dhcp_ip_history","ip,mac,distributed,netid,server,collecteddate","'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
 					if($rstate == 3) {
 						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
-						$query = FS::$pgdbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
+						$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
 						if($data = pg_fetch_array($query)) {
 							$radhost = $data["addr"];
 							$radport = $data["port"];
 							$raddb = $data["dbname"];
-							$radlogin = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-							$radpwd = FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+							$radlogin = FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+							$radpwd = FS::$dbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 							$radSQLMgr = new FSMySQLMgr();
 							if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd) == 0)
 								$radSQLMgr->Connect();
@@ -285,7 +285,7 @@
 	$dhcpdatas2 = "";
 	$DHCPfound = false;
 	$DHCPconnerr = false;
-	$query = FS::$pgdbMgr->Select("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath");
+	$query = FS::$dbMgr->Select("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath");
 	while($data = pg_fetch_array($query)) {
 		$dhcpdatas = "";
 		if($data["dhcpdpath"] == NULL || $data["dhcpdpath"] == "" || !FS::$secMgr->isPath($data["dhcpdpath"])) {
@@ -336,11 +336,11 @@
 		echo "Aucun serveur DHCP enregistré !\n";
 
 	// Flush subnet table
-	FS::$pgdbMgr->Delete("z_eye_dhcp_subnet_cache");
+	FS::$dbMgr->Delete("z_eye_dhcp_subnet_cache");
 
 	// Register subnets
 	for($i=0;$i<count($subnet_list);$i++)
-		FS::$pgdbMgr->Insert("z_eye_dhcp_subnet_cache","netid,netmask","'".$subnet_list[$i][0]."','".$subnet_list[$i][1]."'");
+		FS::$dbMgr->Insert("z_eye_dhcp_subnet_cache","netid,netmask","'".$subnet_list[$i][0]."','".$subnet_list[$i][1]."'");
 
 	$end_time = microtime(true);
 	$script_time = $end_time - $start_time;

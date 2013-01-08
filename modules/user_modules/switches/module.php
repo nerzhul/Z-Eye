@@ -1976,6 +1976,26 @@
 						return;
 					}
 					exec("netdisco -d ".$dip);
+
+					$devro = "";
+		                        $devrw = "";
+
+                			$foundro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
+			                $foundrw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
+                        		if($foundro && checkSnmp($data["ip"],$foundro) == 0)
+			                        $devro = $foundro;
+                        		if($foundrw && checkSnmp($data["ip"],$foundrw) == 0)
+			                	$devrw = $foundrw;
+
+                        		for($i=0;$i<count($snmpro) && $devro == "";$i++) {
+			                        if(checkSnmp($data["ip"],$snmpro[$i]) == 0)
+                        		 	       $devro = $snmpro[$i];
+			                }
+
+					for($i=0;$i<count($snmprw) && $devrw == "";$i++) {
+                        		        if(checkSnmp($data["ip"],$snmprw[$i]) == 0)
+			                		$devrw = $snmprw[$i];
+                        		}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Launch discovering for device '".$dip."'");
 					header("Location: index.php?mod=".$this->mid);
 					return;

@@ -24,13 +24,13 @@
 
 	function getPortId($device,$portname,&$portbuffer) {
 			$out = "";
-			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($dip == NULL)
 				return -1;
 
 			if(!isset($portbuffer[$dip])) $portbuffer[$dip] = array();
 			if(!isset($portbuffer[$dip][$portname])) {
-				$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
+				$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 				if($community == NULL) $community = SNMPConfig::$SNMPReadCommunity;
 				exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 				if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
@@ -58,7 +58,7 @@
 		else
 			$graphbuffer = "graph maingraph {\ngraph [bgcolor=white, nodesep=1];\n        node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
 		$nodelist = array();
-		$query = FS::$pgdbMgr->Select("device","model, name");
+		$query = FS::$dbMgr->Select("device","model, name");
 		while($data = pg_fetch_array($query)) {
 			if(in_array("NO-WIFI",$options) && preg_match("#AIRAP#",$data["model"]))
 				continue;
@@ -66,10 +66,10 @@
 				$nodelist[count($nodelist)] = $data["name"];
 		}
 		
-		/*$query = FS::$pgdbMgr->Select("device_port","remote_id","remote_id != ''","ip,remote_id");
+		/*$query = FS::$dbMgr->Select("device_port","remote_id","remote_id != ''","ip,remote_id");
 		while($data = pg_fetch_array($query)) {
 			if(in_array("NO-WIFI",$options)) {
-				$dmodel = FS::$pgdbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
+				$dmodel = FS::$dbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
 				if(preg_match("#AIRAP#",$dmodel)) continue;
 			}
 			if(!in_array($data["remote_id"],$nodelist))
@@ -81,19 +81,19 @@
 		}*/
 		
 		$outlink = array();
-		$query = FS::$pgdbMgr->Select("device_port","ip,port,speed,remote_id","remote_id != ''","ip,remote_id");
+		$query = FS::$dbMgr->Select("device_port","ip,port,speed,remote_id","remote_id != ''","ip,remote_id");
 		while($data = pg_fetch_array($query)) {
 			if(in_array("NO-WIFI",$options)) {
-				$dmodel = FS::$pgdbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
+				$dmodel = FS::$dbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
 				if(preg_match("#AIRAP#",$dmodel)) continue;
-				$dmodel = FS::$pgdbMgr->GetOneData("device","model","ip = '".$data["ip"]."'");
+				$dmodel = FS::$dbMgr->GetOneData("device","model","ip = '".$data["ip"]."'");
 				if(preg_match("#AIRAP#",$dmodel)) continue;
 			}
 			if(!in_array($data["remote_id"],$nodelist)) {
 				$nodelist[count($nodelist)] = $data["remote_id"];
 				$graphbuffer .= preg_replace("#[.-]#","_",$data["remote_id"])." [label=\"".$data["remote_id"]."\", URL=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$data["remote_id"]."\"];\n";
 			}
-			$dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+			$dname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 			$outcharge = 0;
 			$incharge = 0;
 			$pid = getPortId($dname,$data["port"],$portbuffer);

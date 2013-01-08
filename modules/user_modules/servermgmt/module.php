@@ -431,8 +431,8 @@
 						return;
 					}
 
-					$testDBMgr = new FSMySQLMgr();
-					$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
+					$testDBMgr = new AbstractSQLMgr();
+					$testDBMgr->setConfig("my",$sdbname,$sport,$saddr,$slogin,$spwd);
 
 					$conn = $testDBMgr->Connect();
 					if($conn != 0) {
@@ -463,8 +463,8 @@
 						return;
 					}
 					if($spwd != NULL || $spwd != "") {
-						$testDBMgr = new FSMySQLMgr();
-						$testDBMgr->setConfig($sdbname,$sport,$saddr,$slogin,$spwd);
+						$testDBMgr = new AbstractSQLMgr();
+						$testDBMgr->setConfig("my",$sdbname,$sport,$saddr,$slogin,$spwd);
 
 						$conn = $testDBMgr->Connect();
 						if(!$conn) {

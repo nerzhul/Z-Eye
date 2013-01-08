@@ -51,7 +51,7 @@
 			FS::$dbMgr->Connect();
 
 			// Load Security Manager
-			FS::$secMgr = new FSSecurityMgr(FS::$dbMgr);
+			FS::$secMgr = new FSSecurityMgr();
 
 			// Load Interface Manager
 			FS::$iMgr = new LocalInterface();

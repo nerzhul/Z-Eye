@@ -16,10 +16,10 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
-	
+
 	class iSecReport extends genModule{
 		function iSecReport() { parent::genModule(); $this->loc = new lSecReport(); }
 		public function Load() {
@@ -32,9 +32,9 @@
 			if($dbuser == "") $dbuser = "snort";
 			$dbpwd = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
 			if($dbpwd == "") $dbpwd = "snort";
-			
-			$this->snortDB = new FSPostgreSQLMgr();
-			$this->snortDB->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
+
+			$this->snortDB = new AbstractSQLMgr();
+			$this->snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd);
 			$this->snortDB->Connect();
 			$output = "";
 			if(!FS::isAjaxCall())

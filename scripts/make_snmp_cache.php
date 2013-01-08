@@ -61,13 +61,13 @@
 	}
 
 	function makeSNMPCache($snmpro,$snmprw) {
-		$query = FS::$pgdbMgr->Select("device","ip,name");
+		$query = FS::$dbMgr->Select("device","ip,name");
 		while($data = pg_fetch_array($query)) {
 			$devro = "";
 			$devrw = "";
 
-			$foundro = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
-			$foundrw = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
+			$foundro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
+			$foundrw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
 			if($foundro && checkSnmp($data["ip"],$foundro) == 0)
 				$devro = $foundro;
 			if($foundrw && checkSnmp($data["ip"],$foundrw) == 0)
@@ -86,9 +86,9 @@
 			if(strlen($devro) > 0 || strlen($devrw) > 0)
 				$snmpdbrecord[$data["name"]] = array("ro" => $devro, "rw" => $devrw);
 		}
-		FS::$pgdbMgr->Delete("z_eye_snmp_cache");
+		FS::$dbMgr->Delete("z_eye_snmp_cache");
 		foreach($snmpdbrecord as $key => $value)
-			FS::$pgdbMgr->Insert("z_eye_snmp_cache","device,snmpro,snmprw","'".$key."','".$value["ro"]."','".$value["rw"]."'");
+			FS::$dbMgr->Insert("z_eye_snmp_cache","device,snmpro,snmprw","'".$key."','".$value["ro"]."','".$value["rw"]."'");
 	}
 
 	echo "[".Config::getWebsiteName()."][SNMP-Caching] started at ".date('d-m-Y G:i:s')."\n";

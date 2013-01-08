@@ -568,12 +568,12 @@ preprocessor http_inspect_server: server default \\\n
 						return;
 					}
 					
-					$tmppgconn = new FSPostgreSQLMgr();
-					$tmppgconn->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd);
+					$tmppgconn = new AbstractSQLMgr();
+					$tmppgconn->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd);
 					$tmppgconn->Connect();
-					
+
 					FS::$dbMgr->Connect();
-					
+
 					FS::$dbMgr->Delete("z_eye_snortmgmt_keys","mkey IN ('dbhost','dbuser','dbpwd','dbname')");
 					FS::$dbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbhost','".$dbhost."'");
 					FS::$dbMgr->Insert("z_eye_snortmgmt_keys","mkey,val","'dbuser','".$dbuser."'");

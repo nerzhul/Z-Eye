@@ -29,9 +29,9 @@
         */
 
 	require_once(dirname(__FILE__)."/FS.main.php");
-	require_once(dirname(__FILE__)."/MySQLMgr".CLASS_EXT);
+	require_once(dirname(__FILE__)."/AbstractSQLMgr".CLASS_EXT);
 	class FSSecurityMgr {
-		function FSSecurityMgr($DBMgr) {
+		function FSSecurityMgr() {
 		}
 
 		public function isNumeric($str) {

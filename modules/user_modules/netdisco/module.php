@@ -44,7 +44,7 @@
 				$file = file("/usr/local/etc/netdisco/netdisco.conf");
 			else if(Config::getOS() == "Debian")
 				$file = file("/etc/netdisco/netdisco.conf");
-				
+
 			$dnssuffix = ".local";
 			if(Config::getOS() == "FreeBSD")
 				$netdiscodir = "/usr/local/share/netdisco/";

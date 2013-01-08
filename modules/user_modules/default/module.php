@@ -257,8 +257,8 @@
 			$dbpwd = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
 			if($dbpwd == "") $dbpwd = "snort";
 			
-			$snortDB = new FSPostgreSQLMgr();
-			if($snortDB->setConfig($dbname,5432,$dbhost,$dbuser,$dbpwd) == 0)
+			$snortDB = new AbstractSQLMgr();
+			if($snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd) == 0)
 				$snortDB->Connect();
 			$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0' GROUP BY ip_src,ip_dst,sig_name,timestamp","timestamp",1);
 			$tmpoutput .= "<table><tr><th>Source</th><th>Destination</th><th>Type</th></tr>";
