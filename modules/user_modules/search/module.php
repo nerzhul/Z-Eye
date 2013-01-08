@@ -62,14 +62,14 @@
 			$swmodid = FS::$iMgr->getModuleIdByPath("switches");
 
 			// Prise number
-			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
+			$query = FS::$dbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
 			$devprise = array();
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("Ref-plug")."</h2>";
 				}
-				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 				if(!isset($devprise[$swname]))
 					$devprise[$swname] = array();
 
@@ -90,9 +90,9 @@
 			$found = 0;
 
 			// VLAN on a device
-			$query = FS::$pgdbMgr->Select("device_vlan","ip,description","vlan = '".$search."'","ip");
+			$query = FS::$dbMgr->Select("device_vlan","ip,description","vlan = '".$search."'","ip");
 			while($data = pg_fetch_array($query)) {
-				if($dname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
+				if($dname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
 					if($found == 0) {
 						$found = 1;
 						$tmpoutput .= "<div><h2>".$this->loc->s("title-vlan-device")."</h2>";
@@ -120,7 +120,7 @@
 			$swmodid = FS::$iMgr->getModuleIdByPath("switches");
 
 			// Devices
-			$query = FS::$pgdbMgr->Select("device","mac,ip,description,model","name ILIKE '".$search."'");
+			$query = FS::$dbMgr->Select("device","mac,ip,description,model","name ILIKE '".$search."'");
 			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
 				$tmpoutput .= "<b>".$this->loc->s("Informations")."<i>: </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
@@ -133,14 +133,14 @@
 			}
 
 			// Prise number
-			$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
+			$query = FS::$dbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
 			$devprise = array();
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("Ref-plug")."</h2>";
 				}
-				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 				if(!isset($devprise[$swname]))
 					$devprise[$swname] = array();
 
@@ -163,12 +163,12 @@
 			$found = 0;
 			// Search device_ports
 			$devportname = array();
-			$query = FS::$pgdbMgr->Select("device_port","ip,port,name","name ILIKE '%".$search."%'","ip,port");
+			$query = FS::$dbMgr->Select("device_port","ip,port,name","name ILIKE '%".$search."%'","ip,port");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0)
 					$found = 1;
-				$swname = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-				$prise =  FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
+				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				$prise =  FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 				if(!isset($devportname[$swname]))
                                         $devportname[$swname] = array();
 
@@ -203,7 +203,7 @@
 					if($i != $count-1)
 						$dnszone .= ".";
 				}
-				$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");
+				$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");
 				while($data = pg_fetch_array($query)) {
 					if($found == 0) {
 						$found = 1;
@@ -226,7 +226,7 @@
 			}
 			
 			// Netbios INFOS
-			$query = FS::$pgdbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '".$search."' OR nbname ILIKE '".$search."'");
+			$query = FS::$dbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '".$search."' OR nbname ILIKE '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -257,7 +257,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			$lastmac = "";
-			$query = FS::$pgdbMgr->Select("z_eye_dns_zone_record_cache","zonename,record","recval ILIKE '".$search."'");
+			$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","zonename,record","recval ILIKE '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -269,7 +269,7 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			
-			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
+			$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -287,7 +287,7 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			
-			$query = FS::$pgdbMgr->Select("node_ip","mac,time_first,time_last","ip = '".$search."'","time_last",1);
+			$query = FS::$dbMgr->Select("node_ip","mac,time_first,time_last","ip = '".$search."'","time_last",1);
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -303,13 +303,13 @@
 			$found = 0;
 			
 			if($lastmac) {
-				$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac ILIKE '".$lastmac."' AND active = 't'","time_last",1,1);
+				$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last","mac ILIKE '".$lastmac."' AND active = 't'","time_last",1,1);
 				if($data = pg_fetch_array($query)) {
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-last-device")."</h2>";
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
-					$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-					$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+					$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
+					$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
 					$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 					$tmpoutput .= "[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
@@ -320,7 +320,7 @@
 				}
 			}
 			
-			$query = FS::$pgdbMgr->Select("node_nbt","domain,nbname,nbuser,time_first,time_last","ip = '".$search."'");
+			$query = FS::$dbMgr->Select("node_nbt","domain,nbname,nbuser,time_first,time_last","ip = '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -340,7 +340,7 @@
 			$found = 0;
 			
 			// Devices
-			$query = FS::$pgdbMgr->Select("device","mac,name,description,model","ip = '".$search."'");
+			$query = FS::$dbMgr->Select("device","mac,name,description,model","ip = '".$search."'");
 			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
 				$tmpoutput .= "<b><i>".$this->loc->s("Name").": </i></b><a href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
@@ -359,7 +359,7 @@
 		
 		private function showRadiusInfos($search) {
 			$output = "";
-			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
+			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
 			while($data = pg_fetch_array($query)) {
 				$radSQLMgr = new FSMySQLMgr();
 				$radSQLMgr->setConfig($data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
@@ -510,13 +510,13 @@
 					if(strlen($data2["calledstationid"]) > 0) {
 						$devportmac = preg_replace("[-]",":",$data2["calledstationid"]);
 						if(FS::$secMgr->isMacAddr($devportmac)) {
-							$macdevip = FS::$pgdbMgr->GetOneData("device_port","ip","mac = '".strtolower($devportmac)."'");
-							$macdev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$macdevip."'");
+							$macdevip = FS::$dbMgr->GetOneData("device_port","ip","mac = '".strtolower($devportmac)."'");
+							$macdev = FS::$dbMgr->GetOneData("device","name","ip = '".$macdevip."'");
 						}
 						else if(preg_match('#^([0-9A-Fa-f]{4}[.]){2}[0-9A-Fa-f]{4}$#',$devportmac)) {
 							$tmpmac = $devportmac[0].$devportmac[1].":".$devportmac[2].$devportmac[3].":".$devportmac[5].$devportmac[6].":".$devportmac[7].$devportmac[8].":".$devportmac[10].$devportmac[11].":".$devportmac[12].$devportmac[13];
-							$macdevip = FS::$pgdbMgr->GetOneData("device_port","ip","mac = '".strtolower($tmpmac)."'");
-							$macdev = FS::$pgdbMgr->GetOneData("device","name","ip = '".$macdevip."'");
+							$macdevip = FS::$dbMgr->GetOneData("device_port","ip","mac = '".strtolower($tmpmac)."'");
+							$macdev = FS::$dbMgr->GetOneData("device","name","ip = '".$macdevip."'");
 						}
 					}
 					$output .= "<tr><td>".(strlen($macdev) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev."\">".$macdev."</a>" : $this->loc->s("Unknown"))."</td>";
@@ -539,7 +539,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			$search = preg_replace("#[-]#",":",$search);
-			$query = FS::$pgdbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed,server","macaddr = '".$search."'");
+			$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed,server","macaddr = '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -556,7 +556,7 @@
 			
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
-			$query = FS::$pgdbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$search."'","time_last",2);
+			$query = FS::$dbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$search."'","time_last",2);
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -570,14 +570,14 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			
-			$query = FS::$pgdbMgr->Select("node","switch,port,time_first,time_last","mac = '".$search."'","time_last",2);
+			$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last","mac = '".$search."'","time_last",2);
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-network-places")."</h2>";
 				}
-				$switch = FS::$pgdbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-				$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+				$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
+				$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 				$convport = preg_replace("#\/#","-",$data["port"]);
 				$tmpoutput .=  "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 				$tmpoutput .= "[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
@@ -591,7 +591,7 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 
-			$query = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser,time_first,time_last","mac = '".$search."'");
+			$query = FS::$dbMgr->Select("node_nbt","nbname,domain,nbuser,time_first,time_last","mac = '".$search."'");
 			while($data = pg_fetch_array($query)) {
 				if($found == 0) {
 					$found = 1;
@@ -610,7 +610,7 @@
 			$tmpoutput .= $this->showRadiusInfos($search);
 			
 			// Devices
-			$query = FS::$pgdbMgr->Select("device","ip,name,description,model","mac = '".$search."'");
+			$query = FS::$dbMgr->Select("device","ip,name,description,model","mac = '".$search."'");
 			if($data = pg_fetch_array($query)) {
 				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
 				$tmpoutput .= "<b><i>".$this->loc->s("Name").": </i></b><a href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";

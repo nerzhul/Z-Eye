@@ -49,7 +49,7 @@
 			$ldapok = false;
 			$ldapname = "";
 			$ldapMgr = new LDAP();
-			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
+			$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
 			while($data = pg_fetch_array($query)) {
 				$tmpldapMgr = new LDAP();
 				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
@@ -82,7 +82,7 @@
 				$user->setUserLevel(4);
 				$user->setMail($mail);
 
-				$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+				$query = FS::$dbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 				if($data = pg_fetch_array($query))
 				{
 					$this->connectUser($data["uid"],$data["ulevel"]);
@@ -92,7 +92,7 @@
 				}
 				else {
 					$user->Create();
-					$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+					$query = FS::$dbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 					if($data = pg_fetch_array($query))
 					{
 							$this->connectUser($data["uid"],$data["ulevel"]);
@@ -102,7 +102,7 @@
 					}
 				}
 			} else {
-				$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+				$query = FS::$dbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 				if($data = pg_fetch_array($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if($data["sha_pwd"] != $encryptPwd) {
@@ -126,7 +126,7 @@
 				$_SESSION["lang"] = $langs[0];
 			$_SESSION["uid"] = $uid;
 			$_SESSION["ulevel"] = $ulevel;
-			FS::$pgdbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
+			FS::$dbMgr->Update("z_eye_users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
 		}
 
 		public function handlePostDatas($act) {

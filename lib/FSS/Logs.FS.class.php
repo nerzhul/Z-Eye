@@ -42,7 +42,7 @@
 		public static function i($user,$module,$level,$str) {
 			FS::$secMgr->SecuriseStringForDB($str);
 			FS::$secMgr->SecuriseStringForDB($module);
-			FS::$pgdbMgr->Insert("z_eye_logs","date,module,level,_user,txt","NOW(),'".$module."','".$level."','".$user."','".$str."'");
+			FS::$dbMgr->Insert("z_eye_logs","date,module,level,_user,txt","NOW(),'".$module."','".$level."','".$user."','".$str."'");
 		}
 	};	
 ?>

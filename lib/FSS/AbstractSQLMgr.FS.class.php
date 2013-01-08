@@ -28,126 +28,83 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
+	require_once(dirname(__FILE__)."/PgSQLMgr.FS.class.php");
+	require_once(dirname(__FILE__)."/MySQLMgr.FS.class.php");
 	require_once(dirname(__FILE__)."/../../config/pgdb.conf.php");
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
-	class FSPostgreSQLMgr {
-		function FSPostgreSQLMgr() {
+	class AbstractSQLMgr {
+		function AbstractSQLMgr() {
 			$this->dbName = "";
 			$this->dbPort = "";
 			$this->dbHost = "";
 			$this->dbPass = "";
 			$this->dbUser = "";
 			$this->dbLink = NULL;
+			$this->dbType = "";
+		}
+
+		public function initForZEye() {
+			$this->setConfig("pg",PGDbConfig::getDbName(),PGDbConfig::getDbPort(),PGDbConfig::getDbHost(),PGDbConfig::getDbUser(),
+                        	PGDbConfig::getDbPwd());
 		}
 
 		public function Connect() {
-			$this->dbLink = pg_connect("host=".$this->dbHost. " port=".$this->dbPort." dbname=".$this->dbName." user=".$this->dbUser." password=".$this->dbPass);
-			if(!$this->dbLink) {
-				$iMgr = new FSInterfaceMgr($this);
-				$iMgr->printError("Unable to connect to PG database");
-				exit(1);
-			}
+			return $this->dbMgr->Connect();
 		}
 
 		public function Select($table,$fields,$cond = "",$order = "",$ordersens = 0, $limit = 0, $startidx = 0) {
-			$sql = "SELECT ".$fields." FROM ".$table."";
-			if(strlen($cond) > 0)
-				$sql .= " WHERE ".$cond;
-			if(strlen($order) > 0) {
-				$sql .= " ORDER BY ".$order."";
-				if($ordersens == 1)
-					$sql .= " DESC";
-				else if($ordersens == 2)
-					$sql .= " ASC";
-			}
-			if($limit > 0) {
-				if($startidx > 0)
-					$sql .= " LIMIT ".$startidx.",".$limit;
-				else
-					$sql .= " LIMIT ".$limit;
-
-			}
-			return pg_query($this->dbLink,$sql);
+			return $this->dbMgr->Select($table,$fields,$cond,$order,$ordersens,$limit,$startidx);
 		}
 
 		public function GetOneData($table,$field,$cond = "",$order= "",$ordersens = 0, $limit = 0, $startidx = 0) {
-			$query = $this->Select($table,$field,$cond,$order,$ordersens,$limit,$startidx);
-			if($data = pg_fetch_array($query)) {
-				$splstr = preg_split("#[\.]#",$field);
-				$splstr = preg_replace("#`#","",$splstr);
-				return $data[$splstr[count($splstr)-1]];
-			}
-			return NULL;
+			return $this->dbMgr->GetOneData($table,$field,$cond,$order,$ordersens,$limit,$startidx);
 		}
-		
+
 		public function GetMax($table,$field,$cond = "") {
-			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
-			if($data = pg_fetch_array($query)) {
-					$splstr = preg_split("#[\.]#",$field);
-					$splstr = preg_replace("#`#","",$splstr);
-					return $data["mx"];
-			}
-			return -1;
+			return $this->dbMgr->GetMax($table,$field,$cond);
 		}
 
 		public function GetMin($table,$field,$cond = "") {
-                        $query = $this->Select($table,"MIN(".$field.") as mn",$cond);
-                        if($data = pg_fetch_array($query)) {
-                                        $splstr = preg_split("#[\.]#",$field);
-                                        $splstr = preg_replace("#`#","",$splstr);
-                                        return $data["mn"];
-                        }
-                        return -1;
+			return $this->dbMgr->GetMin($table,$field,$cond);
                 }
 
 		public function Sum($table,$field,$cond = "") {
-			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
-			if($data = pg_fetch_array($query)) {
-					$splstr = preg_split("#[\.]#",$field);
-					$splstr = preg_replace("#`#","",$splstr);
-					return $data["mx"];
-			}
-			return -1;
+			return $this->dbMgr->Sum($table,$field,$cond);
 		}
-		
+
 		public function Count($table,$field,$cond = "") {
-			$query = $this->Select($table,"COUNT(".$field.") as ct",$cond);
-			if($data = pg_fetch_array($query)) {
-				$splstr = preg_split("#[\.]#",$field);
-				$splstr = preg_replace("#`#","",$splstr);
-				return $data["ct"];
-			}
-			return NULL;
+			return $this->dbMgr->Count($table,$field,$cond);
 		}
-		
+
 		public function Insert($table,$keys,$values) {
-			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";
-			pg_query($sql);
+			return $this->dbMgr->Insert($table,$keys,$values);
 		}
 
 		public function Delete($table,$cond = "") {
-			$sql = "DELETE FROM ".$table."";
-			if(strlen($cond) > 0)
-				$sql .= " WHERE ".$cond;
-			pg_query($this->dbLink,$sql);
-		}
-		
-		public function Update($table,$mods,$cond = "") {
-			$sql = "UPDATE ".$table." SET ".$mods."";
-			if(strlen($cond) > 0)
-				$sql .= " WHERE ".$cond;
-			pg_query($this->dbLink,$sql);
+			return $this->dbMgr->Delete($table,$cond);
 		}
 
-		public function setConfig($dbn,$dbport,$dbh,$dbu,$dbp) {
+		public function Update($table,$mods,$cond = "") {
+			return $this->dbMgr->Update($table,$mods,$cond);
+		}
+
+		public function setConfig($dbtype,$dbn,$dbport,$dbh,$dbu,$dbp) {
 			if($dbn == $this->dbName && $dbport == $this->dbPort && $dbh == $this->dbHost && $dbu == $this->dbUser
-				&& $this->dbLink)
+				&& $this->dbLink && $this->dbType == $dbtype)
 				return 1;
+			if($dbtype != "pg" && $dbtype != "my")
+				return 2;
+			if($dbtype == "pg")
+				$this->dbMgr = new FSPostgreSQLMgr();
+			else if($dbtype == "my")
+				$this->dbMgr = new FSMySQLMgr();
+			$this->dbMgr->setConfig($dbn,$dbport,$dbh,$dbu,$dbp);
                         $this->dbName = $dbn;
                         $this->dbPort = $dbport;
                         $this->dbHost = $dbh;
                         $this->dbUser = $dbu;
                         $this->dbPass = $dbp;
+			$this->dbType = $dbtype;
 			return 0;
                 }
 
@@ -157,5 +114,7 @@
 		private $dbPass;
 		private $dbUser;
 		private $dbLink;
+		private $dbType;
+		private $dbMgr;
 	};
 ?>

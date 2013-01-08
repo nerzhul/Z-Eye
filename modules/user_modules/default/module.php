@@ -148,15 +148,15 @@
 			$total = 0;
 			$this->BWscore = 0;
 
-			$query = FS::$pgdbMgr->Select("z_eye_port_monitor","device,port,climit,wlimit,description");
+			$query = FS::$dbMgr->Select("z_eye_port_monitor","device,port,climit,wlimit,description");
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = 1;
 					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-net")."</h4><table><tr><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("inc-bw")."</th><th>".$this->loc->s("out-bw")."</th></tr>";
 				}
 				$total++;
-				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$data["device"]."'");
-				$pid = FS::$pgdbMgr->GetOneData("z_eye_port_id_cache","pid","device = '".$data["device"]."' AND portname = '".$data["port"]."'");
+				$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$data["device"]."'");
+				$pid = FS::$dbMgr->GetOneData("z_eye_port_id_cache","pid","device = '".$data["device"]."' AND portname = '".$data["port"]."'");
 				$tmpoutput .= "<tr style=\"font-size: 12px;\"><td>".$data["description"]."</td>";
 				$incharge = 0;
 				$outcharge = 0;
@@ -248,13 +248,13 @@
 			$atkfound = 0;
 			
 			// Load snort keys for db config
-			$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
+			$dbname = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
 			if($dbname == "") $dbname = "snort";
-			$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
+			$dbhost = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
 			if($dbhost == "") $dbhost = "localhost";
-			$dbuser = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
+			$dbuser = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
 			if($dbuser == "") $dbuser = "snort";
-			$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
+			$dbpwd = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
 			if($dbpwd == "") $dbpwd = "snort";
 			
 			$snortDB = new FSPostgreSQLMgr();

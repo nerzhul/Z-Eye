@@ -21,7 +21,7 @@
 	require_once(dirname(__FILE__)."/locales.php");
 	$device = FS::$secMgr->checkAndSecuriseGetData("d");
         if($device) {
-		$vendor = FS::$pgdbMgr->GetOneData("device","vendor","name = '".$device."'");
+		$vendor = FS::$dbMgr->GetOneData("device","vendor","name = '".$device."'");
 		switch($vendor) {
 			case "cisco": require_once(dirname(__FILE__)."/cisco.func.php"); break;
 			case "dell": require_once(dirname(__FILE__)."/dell.func.php"); break;
@@ -71,7 +71,7 @@
 				$output .= "</div>";
 			} else {
 				// Get Port ID
-				$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+				$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 				$portid = getPortId($device,$port);
 				// Port modification
 				if(!$sh || $sh == 1) {
@@ -102,7 +102,7 @@
 					$output .= "$('#pop').show();";
 					$output .= "};";*/
 					$output .= "</script>";
-					$query = FS::$pgdbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
+					$query = FS::$dbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if($data = pg_fetch_array($query)) {
 						if($portid != -1) {
 							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9",array("id" => "swpomod"));
@@ -112,7 +112,7 @@
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
 						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => $this->loc->s("tooltip-desc")));
-						$piece = FS::$pgdbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
+						$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
 						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => $this->loc->s("tooltip-plug")));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = getPortMtuWithPID($device,$portid);
@@ -214,7 +214,7 @@
 						$trunkall = true;
 						$vlannb = 0;
 
-						$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
+						$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 				                while($data = pg_fetch_array($query)) {
 							$output .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
 							$voicevlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
@@ -338,9 +338,9 @@
 				else if($sh == 3) {
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
 					$output .= FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port);
-					$climit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
-					$wlimit = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
-					$desc = FS::$pgdbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
+					$climit = FS::$dbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
+					$wlimit = FS::$dbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
+					$desc = FS::$dbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),"label" => $this->loc->s("enable-monitor")))."</li><li>";
 					$output .= FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>";
 					$output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
@@ -358,7 +358,7 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
 			$od = FS::$secMgr->checkAndSecuriseGetData("od");
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
-			$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($od == NULL) $od = "port";
 			else if($od == "desc" || $od == "name") $od = "name";
 			else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
@@ -371,7 +371,7 @@
 				$output .= $device." (";
 				$output .= $dip;
 	
-				$dloc = FS::$pgdbMgr->GetOneData("device","location","name = '".$device."'");
+				$dloc = FS::$dbMgr->GetOneData("device","location","name = '".$device."'");
 				if($dloc != NULL)
 				$output .= " - ".$dloc;
 				$output .= ")</h2>";
@@ -394,7 +394,7 @@
 				}
 	
 				if($showmodule == 1) {
-					$query = FS::$pgdbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
+					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
 					$found = 0;
 					$devmod = array();
 					while($data = pg_fetch_array($query)) {
@@ -420,7 +420,7 @@
 					return $output;
 				}
 				else if($showmodule == 2) {
-					$query = FS::$pgdbMgr->Select("device","*","name ='".$device."'");
+					$query = FS::$dbMgr->Select("device","*","name ='".$device."'");
 					if($data = pg_fetch_array($query)) {
 						$output .= "<h3>".$this->loc->s("Device-detail")."</h3>";
 						$output .= "<table class=\"standardTable\">";
@@ -433,10 +433,10 @@
 						$found = 0;
 						$tmpoutput = "<tr><td>".$this->loc->s("Energy")."</td><td>";
 	
-						$query2 = FS::$pgdbMgr->Select("device_power","module,power,status","ip = '".$dip."'");
+						$query2 = FS::$dbMgr->Select("device_power","module,power,status","ip = '".$dip."'");
 						while($data2 = pg_fetch_array($query2)) {
 							$found = 1;
-							$query3 = FS::$pgdbMgr->Select("device_port_power","module,class","module = '".$data2["module"]."' AND ip = '".$dip."'");
+							$query3 = FS::$dbMgr->Select("device_port_power","module,class","module = '".$data2["module"]."' AND ip = '".$dip."'");
 							$pwcount = 0;
 							while($data3 = pg_fetch_array($query3)) {
 								if($data3["class"] == "class2") $pwcount += 7;
@@ -460,7 +460,7 @@
 					}
 				}
 				else if($showmodule == 3) {
-					$query = FS::$pgdbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
+					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
 					$found = 0;
 					$devmod = array();
 					while($data = pg_fetch_array($query)) {
@@ -583,7 +583,7 @@
 								case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
 									$poearr = array();
 									// POE States
-									$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
+									$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
 									while($data = pg_fetch_array($query)) {
 										$pid = preg_split("#\/#",$data["port"]);
 										$pid = $pid[2];
@@ -595,7 +595,7 @@
 									}
 	
 									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'","port");
 									$arr_res = array();
 									while($data = pg_fetch_array($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -619,7 +619,7 @@
 										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
-									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
 									$arr_res = array();
 									while($data = pg_fetch_array($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -655,7 +655,7 @@
 								case "WS-C3750-24PS": case "WS-C3750-24P": // 100 Mbits switches
 									$poearr = array();
 									// POE States
-									$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
+									$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
 									while($data = pg_fetch_array($query)) {
 										$pid = preg_split("#\/#",$data["port"]);
 										$pid = $pid[2];
@@ -667,7 +667,7 @@
 									}
 	
 									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'","port");
 									$arr_res = array();
 									while($data = pg_fetch_array($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -691,7 +691,7 @@
 										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
-									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
 									$arr_res = array();
 									while($data = pg_fetch_array($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -731,7 +731,7 @@
 											$portlist .= ",";
 									}
 									// POE States
-									$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port IN (".$portlist.")");
+									$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port IN (".$portlist.")");
 									while($data = pg_fetch_array($query)) {
 										$pid = preg_split("#\/#",$data["port"]);
 										$pid = $pid[2];
@@ -743,7 +743,7 @@
 									}
 	
 									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN (".$portlist.")","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN (".$portlist.")","port");
 									$arr_res = array();
 									while($data = pg_fetch_array($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -767,7 +767,7 @@
 										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
-									$query = FS::$pgdbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN ('GigabitEthernet".($i+1)."/0/25', 'GigabitEthernet".($i+1)."/0/26',
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN ('GigabitEthernet".($i+1)."/0/25', 'GigabitEthernet".($i+1)."/0/26',
 											'GigabitEthernet".($i+1)."/0/27','GigabitEthernet".($i+1)."/0/28')","port");
 									$arr_res = array();
 									while($data = pg_fetch_array($query)) {
@@ -917,8 +917,8 @@
 				else if($showmodule == 5) {
 					$output .= "<h3>".$this->loc->s("VLANlist")."</h3>";
 					$found = 0;
-					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-					$query = FS::$pgdbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
+					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 					$tmpoutput = "<table><tr><th>ID</th><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("creation-date")."</th></tr>";
 					while($data = pg_fetch_array($query)) {
 						if(!$found) $found = 1;
@@ -933,18 +933,18 @@
 				}
 				else if($showmodule == 6) {
 	
-					$iswif = (preg_match("#AIR#",FS::$pgdbMgr->GetOneData("device","model","name = '".$device."'")) ? true : false);
+					$iswif = (preg_match("#AIR#",FS::$dbMgr->GetOneData("device","model","name = '".$device."'")) ? true : false);
 		
 					if($iswif == false) {
 						$poearr = array();
 						// POE States
-						$query = FS::$pgdbMgr->Select("device_port_power","port,class","ip = '".$dip."'");
+						$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'");
 						while($data = pg_fetch_array($query))
 							$poearr[$data["port"]] = $data["class"];
 					}
 		
 					$prisearr = array();
-					$query = FS::$pgdbMgr->Select("z_eye_switch_port_prises","port,prise","ip = '".$dip."'");
+					$query = FS::$dbMgr->Select("z_eye_switch_port_prises","port,prise","ip = '".$dip."'");
 					while($data = pg_fetch_array($query))
 						$prisearr[$data["port"]] = $data["prise"];
 		
@@ -971,7 +971,7 @@
 					$tmpoutput .= "<th>";
 					if($iswif == true) $tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
 					else $tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr>";
-					$query = FS::$pgdbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",$od);
+					$query = FS::$dbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",$od);
 					while($data = pg_fetch_array($query)) {
 						if(preg_match("#unrouted#",$data["port"]))
 							continue;
@@ -1033,7 +1033,7 @@
 							$tmpoutput2 .= "</td><td>";
 						}
 		
-						$query2 = FS::$pgdbMgr->Select("device_port_vlan","vlan,native,voice","ip = '".$dip."' AND port = '".$data["port"]."'","vlan");
+						$query2 = FS::$dbMgr->Select("device_port_vlan","vlan,native,voice","ip = '".$dip."' AND port = '".$data["port"]."'","vlan");
 		
 						$nvlan = $data["vlan"];
 						$vlanlist = "";
@@ -1058,13 +1058,13 @@
 						}
 						if($iswif == false) {
 							$tmpoutput2 .= "</td><td>";
-							$query2 = FS::$pgdbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'","mac");
+							$query2 = FS::$dbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'","mac");
 							while($data2 = pg_fetch_array($query2)) {
 								$tmpoutput2 .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
-								$query3 = FS::$pgdbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'","time_last",1,1);
+								$query3 = FS::$dbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'","time_last",1,1);
 								while($data3 = pg_fetch_array($query3)) {
 									$tmpoutput2 .= "&nbsp;&nbsp;<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
-									$query4 = FS::$pgdbMgr->Select("node_nbt","nbname,domain,nbuser","mac = '".$data2["mac"]."' AND ip = '".$data3["ip"]."'");
+									$query4 = FS::$dbMgr->Select("node_nbt","nbname,domain,nbuser","mac = '".$data2["mac"]."' AND ip = '".$data3["ip"]."'");
 									if($data4 = pg_fetch_array($query4)) {
 										if($data4["domain"] != "")
 											$tmpoutput2 .= "&nbsp;&nbsp;\\\\<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["domain"]."\">".$data4["domain"]."</a>\\<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
@@ -1076,9 +1076,9 @@
 							}
 						}
 						else {
-							$channel = FS::$pgdbMgr->GetOneData("device_port_wireless","channel","ip = '".$dip."' AND port = '".$data["port"]."'");
-							$power = FS::$pgdbMgr->GetOneData("device_port_wireless","power","ip = '".$dip."' AND port = '".$data["port"]."'");
-							$ssid = FS::$pgdbMgr->GetOneData("device_port_ssid","ssid","ip = '".$dip."' AND port = '".$data["port"]."'");
+							$channel = FS::$dbMgr->GetOneData("device_port_wireless","channel","ip = '".$dip."' AND port = '".$data["port"]."'");
+							$power = FS::$dbMgr->GetOneData("device_port_wireless","power","ip = '".$dip."' AND port = '".$data["port"]."'");
+							$ssid = FS::$dbMgr->GetOneData("device_port_ssid","ssid","ip = '".$dip."' AND port = '".$data["port"]."'");
 							$tmpoutput2 .= $channel."</td><td>".$power."</td><td>".$ssid;
 						}
 						$tmpoutput2 .= "</td></tr>";
@@ -1162,7 +1162,7 @@
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 			}
 
-			$query = FS::$pgdbMgr->Select("device","*","","name");
+			$query = FS::$dbMgr->Select("device","*","","name");
 
 			$foundsw = 0;
 			$foundwif = 0;
@@ -1264,8 +1264,8 @@
 
 					if($prise == NULL) $prise = "";
 					// Modify Plug for switch port
-					FS::$pgdbMgr->Delete("z_eye_switch_port_prises","ip = '".$sw."' AND port = '".$port."'");
-					FS::$pgdbMgr->Insert("z_eye_switch_port_prises","ip,port,prise","'".$sw."','".$port."','".$prise."'");
+					FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$sw."' AND port = '".$port."'");
+					FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise","'".$sw."','".$port."','".$prise."'");
 
 					// Return text for AJAX call
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Set plug for device '".$sw."' to '".$prise."' on port '".$port."'");
@@ -1282,12 +1282,12 @@
 						echo "ERROR";
 						return;
 					}
-					if(FS::$pgdbMgr->GetOneData("device_port","up","ip = '".$sw."' AND port = '".$port."'") != NULL) {
+					if(FS::$dbMgr->GetOneData("device_port","up","ip = '".$sw."' AND port = '".$port."'") != NULL) {
 						if(setPortDesc($sw,$port,$desc) == 0) {
 							echo $desc;
 							if($save == "true")
 								writeMemory($sw);
-							FS::$pgdbMgr->Update("device_port","name = '".$desc."'","ip = '".$sw."' AND port = '".$port."'");
+							FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$sw."' AND port = '".$port."'");
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Set description for '".$sw."' to '".$desc."' on port '".$port."'");
 						}
 						else {
@@ -1307,7 +1307,7 @@
 						return;
 					}
 		
-					if(FS::$pgdbMgr->GetOneData("device_port","type","ip = '".$sw."' AND port = '".$port."'") != NULL) {
+					if(FS::$dbMgr->GetOneData("device_port","type","ip = '".$sw."' AND port = '".$port."'") != NULL) {
 						if($this->setPortDuplex($sw,$port,$dup) == 0) {
 							if($save == "true")
 								writeMemory($sw);
@@ -1316,8 +1316,8 @@
 							if($dup == 1) $duplex = "half";
 							else if($dup == 2) $duplex = "full";
 			
-							FS::$pgdbMgr->Update("device_port","duplex_admin = '".$duplex."'","ip = '".$sw."' AND port = '".$port."'");
-							$ldup = FS::$pgdbMgr->GetOneData("device_port","duplex","ip = '".$sw."' AND port = '".$port."'");
+							FS::$dbMgr->Update("device_port","duplex_admin = '".$duplex."'","ip = '".$sw."' AND port = '".$port."'");
+							$ldup = FS::$dbMgr->GetOneData("device_port","duplex","ip = '".$sw."' AND port = '".$port."'");
 							$ldup = (strlen($ldup) > 0 ? $ldup : "[NA]");
 							if($ldup == "half" && $duplex != "half") $ldup = "<span style=\"color: red;\">".$ldup."</span>";
 							echo "<span style=\"color:black;\">".$ldup." / ".$duplex."</span>";
@@ -1330,13 +1330,13 @@
 					$device = FS::$secMgr->checkAndSecuriseGetData("dev");
 					$portname = FS::$secMgr->checkAndSecuriseGetData("port");
 					$out = "";
-					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					if($dip == NULL) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (plug fast edit)");
 						echo "-1";
 						return;
 					}
-					$community = FS::$pgdbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
+					$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 					if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 					exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 					if(strlen($out[0]) < 5) {
@@ -1714,17 +1714,17 @@
 					if($wr == "on")
 						writeMemory($sw);
 
-					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$sw."'");
+					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$sw."'");
 
 					if($prise == NULL) $prise = "";
 					pg_query("DELETE FROM z_eye_switch_port_prises where ip = '".$dip."' AND port = '".$port."'");
 					pg_query("INSERT INTO z_eye_switch_port_prises (ip,port,prise) VALUES ('".$dip."','".$port."','".$prise."')");
 
-					FS::$pgdbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
-					FS::$pgdbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$dip."' AND port = '".$port."'");
+					FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
+					FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$dip."' AND port = '".$port."'");
 					pg_query("UPDATE device_port SET vlan ='".$nvlan."' WHERE ip='".$dip."' and port='".$port."'");
 					pg_query("UPDATE device_port_vlan SET vlan ='".$nvlan."' WHERE ip='".$dip."' and port='".$port."' and native='t'");
-					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."' AND port='".$port."'");
+					FS::$dbMgr->Delete("device_port_vlan","ip = '".$dip."' AND port='".$port."'");
 					$vllist = FS::$secMgr->checkAndSecurisePostData("vllist");
 					if($trunk == 1) {
 						if($vllist) {
@@ -1732,12 +1732,12 @@
 							if(!in_array("all",$vllist)) {
 								$count = count($vllist);
 								for($i=0;$i<$count;$i++)
-									FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vllist[$i]."','f',NOW(),NOW()");
+									FS::$dbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$vllist[$i]."','f',NOW(),NOW()");
 							}
 						}
 					}
 					else if ($trunk == 2) {
-						FS::$pgdbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$nvlan."','t',NOW(),NOW()");
+						FS::$dbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$dip."','".$port."','".$nvlan."','t',NOW(),NOW()");
 					}
 
 					foreach($logvals as $keys => $values) {
@@ -1908,14 +1908,14 @@
 						return;
 					}
 
-					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
+					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					if(!$dip) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Bad device '".$device."' (port monitoring)");
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
-					$dport = FS::$pgdbMgr->GetOneData("device_port","name","ip = '".$dip."' AND port = '".$port."'");
+					$dport = FS::$dbMgr->GetOneData("device_port","name","ip = '".$dip."' AND port = '".$port."'");
 					if(!$dport) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Bad port '".$dport."' for device '".$dip."' (port monitoring)");
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
@@ -1927,11 +1927,11 @@
 							header("Location: index.php?mod=".$this->mid."&d=".$device."&p=".$port."&sh=3&err=2");
 							return;
 						}
-						FS::$pgdbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
-						FS::$pgdbMgr->Insert("z_eye_port_monitor","device,port,climit,wlimit,description","'".$device."','".$port."','".$climit."','".$wlimit."','".$desc."'");
+						FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
+						FS::$dbMgr->Insert("z_eye_port_monitor","device,port,climit,wlimit,description","'".$device."','".$port."','".$climit."','".$wlimit."','".$desc."'");
 					}
 					else
-						FS::$pgdbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
+						FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Port monitoring for device '".$device."' and port '".$dport."' edited. Enabled: ".($enmod == "on" ? "yes" : "no").
 						" wlimit: ".$wlimit." climit: ".$climit." desc: '".$desc."'");
 					header("Location: index.php?mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
@@ -1943,24 +1943,24 @@
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
-					$dip = FS::$pgdbMgr->GetOneData("device","ip","name = '".$device."'");
-					FS::$pgdbMgr->Delete("device_ip","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("device_module","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("device_port","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("device_port_power","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("device_port_wireless","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("device_port_ssid","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("device_port_vlan","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("device_power","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("node","switch = '".$dip."'");
-					FS::$pgdbMgr->Delete("node_ip","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("node_nbt","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("admin","device = '".$dip."'");
-					FS::$pgdbMgr->Delete("z_eye_port_id_cache","device = '".$device."'");
-					FS::$pgdbMgr->Delete("z_eye_port_monitor","device = '".$device."'");
-					FS::$pgdbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."'");
-					FS::$pgdbMgr->Delete("z_eye_snmp_cache","device = '".$device."'");
-					FS::$pgdbMgr->Delete("device","ip = '".$dip."'");
+					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+					FS::$dbMgr->Delete("device_ip","ip = '".$dip."'");
+					FS::$dbMgr->Delete("device_module","ip = '".$dip."'");
+					FS::$dbMgr->Delete("device_port","ip = '".$dip."'");
+					FS::$dbMgr->Delete("device_port_power","ip = '".$dip."'");
+					FS::$dbMgr->Delete("device_port_wireless","ip = '".$dip."'");
+					FS::$dbMgr->Delete("device_port_ssid","ip = '".$dip."'");
+					FS::$dbMgr->Delete("device_port_vlan","ip = '".$dip."'");
+					FS::$dbMgr->Delete("device_power","ip = '".$dip."'");
+					FS::$dbMgr->Delete("node","switch = '".$dip."'");
+					FS::$dbMgr->Delete("node_ip","ip = '".$dip."'");
+					FS::$dbMgr->Delete("node_nbt","ip = '".$dip."'");
+					FS::$dbMgr->Delete("admin","device = '".$dip."'");
+					FS::$dbMgr->Delete("z_eye_port_id_cache","device = '".$device."'");
+					FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."'");
+					FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."'");
+					FS::$dbMgr->Delete("z_eye_snmp_cache","device = '".$device."'");
+					FS::$dbMgr->Delete("device","ip = '".$dip."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Remove device '".$device."' from Z-Eye");
 					header("Location: index.php?mod=".$this->mid);
 				case 18: // Device discovery
@@ -2003,7 +2003,7 @@
 						header("Location: index.php?mod=".$this->mid."&err=3");
 						return;
 					}
-					$query = FS::$pgdbMgr->Select("device","name");
+					$query = FS::$dbMgr->Select("device","name");
 					while($data = pg_fetch_array($query)) {
 						writeMemory($data["name"]);
 					}
@@ -2021,12 +2021,12 @@
 						return;
 					}
 					$output = "";
-					$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","addr,type,path,login,pwd");
+					$query = FS::$dbMgr->Select("z_eye_save_device_servers","addr,type,path,login,pwd");
 					while($data = pg_fetch_array($query)) {
 						if(!FS::$secMgr->isIP($data["addr"]))
 							continue;
 							
-						$query2 = FS::$pgdbMgr->Select("device","ip,name");
+						$query2 = FS::$dbMgr->Select("device","ip,name");
 						while($data2 = pg_fetch_array($query2)) {
 							if($data["type"] == 1)
 								$copyId = exportConfigToTFTP($data2["name"],$data["addr"],$data["path"]."conf-".$data2["name"]);

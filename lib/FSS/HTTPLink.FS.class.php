@@ -35,7 +35,7 @@
 		}
 
 		public function getIt() {
-			$query = FS::$pgdbMgr->Select("z_eye_http_links","type,args","id = '".$this->id."'");
+			$query = FS::$dbMgr->Select("z_eye_http_links","type,args","id = '".$this->id."'");
 			if($data = pg_fetch_array($query)) {
 				switch($data["type"]) {
 					case 0: // external
@@ -59,7 +59,7 @@
 		}
 		
 		public function Load() {
-			$query = FS::$pgdbMgr->Select("z_eye_http_links","type,args","id = '".$this->id."'");
+			$query = FS::$dbMgr->Select("z_eye_http_links","type,args","id = '".$this->id."'");
 			if($data = pg_fetch_array($query)) {
 				$this->type = $data["type"];
 				$this->args = $data["args"];	
@@ -67,22 +67,22 @@
 		}
 		
 		public function Create() {
-			$id = FS::$pgdbMgr->GetMax("z_eye_http_links","id")+1;
-			FS::$pgdbMgr->Insert("z_eye_http_links","id,type,args","'".$id."','".$this->type."','".$this->args."'");
+			$id = FS::$dbMgr->GetMax("z_eye_http_links","id")+1;
+			FS::$dbMgr->Insert("z_eye_http_links","id,type,args","'".$id."','".$this->type."','".$this->args."'");
 		}
 		
 		public function SaveToDB() {
-			FS::$pgdbMgr->Update("z_eye_http_links","type = '".$this->type."', args = '".$this->args."'","id = '".$this->id."'");	
+			FS::$dbMgr->Update("z_eye_http_links","type = '".$this->type."', args = '".$this->args."'","id = '".$this->id."'");	
 		}
 		
 		public function Delete() {
-			FS::$pgdbMgr->Delete("z_eye_http_links","id = '".$this->id."'");
+			FS::$dbMgr->Delete("z_eye_http_links","id = '".$this->id."'");
 		}
 		
 		public function CreateSelect($idsel = 0) {
 			$output = "";
 			$output .= FS::$iMgr->select("link_id");
-			$query = FS::$pgdbMgr->Select("z_eye_http_links","id");
+			$query = FS::$dbMgr->Select("z_eye_http_links","id");
 			while($data = pg_fetch_array($query)) {
 				$this->id = $data["id"];
 				$this->Load();

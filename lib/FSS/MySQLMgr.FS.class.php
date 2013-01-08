@@ -32,7 +32,7 @@
 		function FSMySQLMgr() {
 			$this->dbName = "";
 			$this->dbPort = 3306;
-			$this->dbHost = "localhost";
+			$this->dbHost = "";
 			$this->dbPass = "";
 			$this->dbUser = "";
 			$this->dbConn = NULL;

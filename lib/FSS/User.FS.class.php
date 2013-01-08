@@ -33,12 +33,12 @@
 		function User() {}
 
 		public function LoadByName($username) {
-			$uid = FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$username."'");
+			$uid = FS::$dbMgr->GetOneData("z_eye_users","uid","username = '".$username."'");
 			$this->LoadFromDB($uid);
 		}
 
 		public function LoadFromDB($uid) {
-			$query = FS::$pgdbMgr->Select("z_eye_users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
+			$query = FS::$dbMgr->Select("z_eye_users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
 			if($data = pg_fetch_array($query)) {
 				$this->id = $uid;
 				$this->username = $data["username"];
@@ -53,12 +53,12 @@
 		}
 
 		public function Create() {
-			$id = FS::$pgdbMgr->GetMax("z_eye_http_links","id")+1;
-			FS::$pgdbMgr->Insert("z_eye_users","uid, username, ulevel, subname, name, mail, join_date, last_ip","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0'");
+			$id = FS::$dbMgr->GetMax("z_eye_http_links","id")+1;
+			FS::$dbMgr->Insert("z_eye_users","uid, username, ulevel, subname, name, mail, join_date, last_ip","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0'");
 		}
 
 		public function SaveToDB() {
-			FS::$pgdbMgr->Update("z_eye_users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
+			FS::$dbMgr->Update("z_eye_users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
 			last_ip = '".$this->lastip."', last_conn = '".$this->lastconn."', ulevel = '".$this->ulevel."'","uid = '".$_SESSION["uid"]."'");
 		}
 
@@ -72,7 +72,7 @@
 			}
 
 			$hash = FS::$secMgr->EncryptPassword($password,$this->username,$this->id);
-			FS::$pgdbMgr->Update("z_eye_users","sha_pwd = '".$hash."'","uid = '".$this->id."'");
+			FS::$dbMgr->Update("z_eye_users","sha_pwd = '".$hash."'","uid = '".$this->id."'");
 			return 0;
 		}
 

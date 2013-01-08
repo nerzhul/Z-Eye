@@ -50,7 +50,7 @@
 		}
 
 		private function EditUser($user) {
-			$uid = FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$user."'");
+			$uid = FS::$dbMgr->GetOneData("z_eye_users","uid","username = '".$user."'");
 			$output = "<h2>".$this->loc->s("title-user-mod")."</h2>";
 			if(!$uid) {
 				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
@@ -58,15 +58,15 @@
 			}
 			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
                         $output .= "<ul class=\"ulform\"><li><b>".$this->loc->s("User").":</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
-			if(FS::$pgdbMgr->GetOneData("z_eye_users","sha_pwd","username = '".$user."'")) {
-				$mail = FS::$pgdbMgr->GetOneData("z_eye_users","mail","username = '".$user."'");
+			if(FS::$dbMgr->GetOneData("z_eye_users","sha_pwd","username = '".$user."'")) {
+				$mail = FS::$dbMgr->GetOneData("z_eye_users","mail","username = '".$user."'");
 				$output .= "<li><i>".$this->loc->s("tip-password")."</i></li>
 					<li>".$this->loc->s("Password").": ".FS::$iMgr->password("pwd","")."</li>
 					<li>".$this->loc->s("Password-repeat").": ".FS::$iMgr->password("pwd2","")."</li>
 					<li>".$this->loc->s("Mail").": ".FS::$iMgr->input("mail",$mail,24,64)."</li>";
 			}
 			$grpidx = 0;
-			$query = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
+			$query = FS::$dbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
 			while($data = pg_fetch_array($query)) {
 				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
@@ -93,7 +93,7 @@
 			}
 
 			$output = "<h2>".$this->loc->s("title-directory")."</h2>";
-			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
+			$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = pg_fetch_array($query)) {
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
 				$output .= "<ul class=\"ulform\">".FS::$iMgr->hidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
@@ -120,7 +120,7 @@
 
 		private function addGrouplist($gid=-1) {
 			$output = "";
-			$query = FS::$pgdbMgr->Select("z_eye_groups","gid,gname");
+			$query = FS::$dbMgr->Select("z_eye_groups","gid,gname");
 			while($data = pg_fetch_array($query))
 				$output .= FS::$iMgr->selElmt($data["gname"],$data["gid"],$gid == $data["gid"] ? true : false);
 			return $output;
@@ -131,7 +131,7 @@
 
 			$tmpoutput = "";
 			$found = 0;
-			$query = FS::$pgdbMgr->Select("z_eye_users","uid,username,mail,last_ip,join_date,last_conn,name,subname,sha_pwd");
+			$query = FS::$dbMgr->Select("z_eye_users","uid,username,mail,last_ip,join_date,last_conn,name,subname,sha_pwd");
 			while($data = pg_fetch_array($query)) {
 				if(!$found) {
 					$found = 1;
@@ -141,9 +141,9 @@
 				}
 				$tmpoutput .= "<tr><td>".$data["uid"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["username"]."</td><td>".
 					($data["sha_pwd"] == "" ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
-				$query2 = FS::$pgdbMgr->Select("z_eye_user_group","gid","uid = '".$data["uid"]."'");
+				$query2 = FS::$dbMgr->Select("z_eye_user_group","gid","uid = '".$data["uid"]."'");
 				while($data2 = pg_fetch_array($query2)) {
-					$gname = FS::$pgdbMgr->GetOneData("z_eye_groups","gname","gid = '".$data2["gid"]."'");
+					$gname = FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$data2["gid"]."'");
 					$tmpoutput .= $gname."<br />";
 				}
 				$tmpoutput .= "</td><td>".$data["subname"]."</td><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".$data["last_ip"]."</td><td>".
@@ -187,7 +187,7 @@
 
 				$found = 0;
 				$tmpoutput = "";
-				$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,filter");
+				$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,filter");
 				while($data = pg_fetch_array($query)) {
 					if(!$found) {
 						$found = 1;
@@ -260,7 +260,7 @@
 						return;
 					}
 
-					$username = FS::$pgdbMgr->GetOneData("z_eye_users","username","uid = '".$uid."'");
+					$username = FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$uid."'");
 					if(!$username) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User uid '".$uid."' doesn't exists");
 						header("Location: index.php?mod=".$this->mid."&err=2");
@@ -297,13 +297,13 @@
 							header("Location: index.php?mod=".$this->mid."&user=".$username."&err=9");
 							return;
 						}
-						FS::$pgdbMgr->Update("z_eye_users","mail = '".$mail."'","uid = '".$uid."'");
+						FS::$dbMgr->Update("z_eye_users","mail = '".$mail."'","uid = '".$uid."'");
 					}
 
 					$groups = array();
 					foreach($_POST as $key => $value) {
 						   if(preg_match("#^ugroup#",$key)) {
-								$exist = FS::$pgdbMgr->GetOneData("z_eye_groups","gname","gid = '".$value."'");
+								$exist = FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$value."'");
 								if(!$exist) {
 									FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Try to add user ".$uid." to inexistant group '".$value."'");
 									header("Location: index.php?mod=".$this->mid."&user=".$username."&err=2");
@@ -312,11 +312,11 @@
 								array_push($groups,$value);
 						   }
 					}
-					FS::$pgdbMgr->Delete("z_eye_user_group","uid = '".$uid."'");
+					FS::$dbMgr->Delete("z_eye_user_group","uid = '".$uid."'");
 					$groups = array_unique($groups);
 					$count = count($groups);
 					for($i=0;$i<$count;$i++)
-						FS::$pgdbMgr->Insert("z_eye_user_group","uid,gid","'".$uid."','".$groups[$i]."'");
+						FS::$dbMgr->Insert("z_eye_user_group","uid,gid","'".$uid."','".$groups[$i]."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User ".$uid." edited");
 					header("Location: index.php?mod=".$this->mid);
 					return;
@@ -331,13 +331,13 @@
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
-					$exist = FS::$pgdbMgr->GetOneData("z_eye_users","uid","username = '".$username."'");
+					$exist = FS::$dbMgr->GetOneData("z_eye_users","uid","username = '".$username."'");
 					if(!$exist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove user '".$username."', doesn't exist");
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
-					FS::$pgdbMgr->Delete("z_eye_users","username = '".$username."'");
+					FS::$dbMgr->Delete("z_eye_users","username = '".$username."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User '".$username."' removed");
 					header("Location: index.php?mod=".$this->mid);
 					return;
@@ -364,7 +364,7 @@
 						return;
 					}
 
-					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
+					$serv = FS::$dbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
 					if($serv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", already exists");
 						header("Location: index.php?mod=".$this->mid."&err=4");
@@ -379,7 +379,7 @@
 						return;
 					}
 
-					FS::$pgdbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
+					FS::$dbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
 						"'".$addr."','".$port."','".($ssl == "on" ? 1 : 0)."','".$basedn."','".$rootdn."','".$rootpwd."','".$ldapfilter."','".$ldapuid."','".$ldapmail."','".$ldapname."','".$ldapsurname."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"New LDAP: ".$addr.":".$port." basedn: ".$basedn);
 					header("Location: index.php?mod=".$this->mid);
@@ -396,14 +396,14 @@
 						return;
 					}
 
-					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
+					$serv = FS::$dbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
 					if(!$serv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove LDAP ".$addr.":".$port.", not exists");
 						header("Location: index.php?mod=".$this->mid."&err=4");
 						return;
 					}
 
-					FS::$pgdbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
+					FS::$dbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"LDAP '".$addr."' removed");
 					header("Location: index.php?mod=".$this->mid);
 					return;
@@ -419,7 +419,7 @@
 						return;
 					}
 
-					$serv = FS::$pgdbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
+					$serv = FS::$dbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
 					if(!$serv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to edit LDAP ".$addr.":".$port.", not exists");
 						header("Location: index.php?mod=".$this->mid."&err=4");
@@ -442,7 +442,7 @@
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
-					FS::$pgdbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
+					FS::$dbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
 					$ldapMgr = new LDAP();
 					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
 					if(!$ldapMgr->RootConnect()) {
@@ -451,7 +451,7 @@
 						return;
 					}
 
-					FS::$pgdbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
+					FS::$dbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
 							"'".$addr."','".$port."','".($ssl == "on" ? 1 : 0)."','".$basedn."','".$rootdn."','".$rootpwd."','".$ldapfilter."','".$ldapuid."','".$ldapmail."','".$ldapname."','".$ldapsurname."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"LDAP edition: ".$addr.":".$port." basedn: ".$basedn);
 					header("Location: index.php?mod=".$this->mid);

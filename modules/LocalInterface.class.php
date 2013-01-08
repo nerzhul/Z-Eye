@@ -16,13 +16,13 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../lib/FSS/User.FS.class.php");
 	require_once(dirname(__FILE__)."/../lib/FSS/HTTPLink.FS.class.php");
-	
+
 	class LocalInterface extends FSInterfaceMgr {
-		function LocalInterface($DBMgr) {
-			parent::FSInterfaceMgr($DBMgr);
+		function LocalInterface() {
+			parent::FSInterfaceMgr();
 			$this->showRetMenu = false;
 		}
 
@@ -210,7 +210,7 @@
 					}
 				}
 			}
-			
+
 			return 0;
 		}
 

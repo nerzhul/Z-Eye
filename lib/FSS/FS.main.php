@@ -29,10 +29,9 @@
         */
 
 	define('CLASS_EXT','.FS.class.php');
-	
+
 	require_once(dirname(__FILE__)."/Logs".CLASS_EXT);
-	require_once(dirname(__FILE__)."/MySQLMgr".CLASS_EXT);
-	require_once(dirname(__FILE__)."/PgSQLMgr".CLASS_EXT);
+	require_once(dirname(__FILE__)."/AbstractSQLMgr".CLASS_EXT);
 	require_once(dirname(__FILE__)."/SecurityMgr".CLASS_EXT);
 	require_once(dirname(__FILE__)."/modules/MailMgr".CLASS_EXT);
 	require_once(dirname(__FILE__)."/InterfaceMgr".CLASS_EXT);
@@ -41,35 +40,28 @@
 	require_once(dirname(__FILE__)."/../../modules/Ajax.class.php");
 	require_once(dirname(__FILE__)."/SessionMgr".CLASS_EXT);
 	require_once(dirname(__FILE__)."/SNMP".CLASS_EXT);
-	
+
 	class FS {
 		function FS() {}
-		
+
 		public static function LoadFSModules() {
-			// Start MySQL connector
-			if(Config::enableMySQL()) {
-				FS::$dbMgr = new FSMySQLMgr();
-				FS::$dbMgr->Connect();
-			}
-			
-			// PostgreSQL connector
-			if(Config::enablePostgreSQL()) {
-				FS::$pgdbMgr = new FSPostgreSQLMgr();
-				FS::$pgdbMgr->Connect();
-			}
-			
+			// AbstractSQL connector
+			FS::$dbMgr = new AbstractSQLMgr();
+			FS::$dbMgr->initForZEye();
+			FS::$dbMgr->Connect();
+
 			// Load Security Manager
 			FS::$secMgr = new FSSecurityMgr(FS::$dbMgr);
-			
+
 			// Load Interface Manager
-			FS::$iMgr = new LocalInterface(FS::$dbMgr);
-			
+			FS::$iMgr = new LocalInterface();
+
 			// Load Session Manager
 			FS::$sessMgr = new FSSessionMgr();
-			
+
 			// Load Mail Manager
 			FS::$mailMgr = new FSMailMgr();
-			
+
 			// Load File Mgr
 			FS::$fileMgr = new FSFileMgr();
 
@@ -78,9 +70,9 @@
 
 			// Load SNMP Mgr
 			if(Config::enableSNMP()) {
-				FS::$snmpMgr = new SNMPMgr();	
+				FS::$snmpMgr = new SNMPMgr();
 			}
-			
+
 			// Load logger
 			FS::$log = new FSLogger();
 		}
@@ -102,14 +94,12 @@
 
 		public static $fileMgr;
 		public static $dbMgr;
-		public static $pgdbMgr;
 		public static $secMgr;
 		public static $iMgr;
 		public static $sessMgr;
 		public static $mailMgr;
 		public static $ajaxMgr;
 		public static $snmpMgr;
-		public static $pdfgen;
 		public static $log;
 	};
 ?>

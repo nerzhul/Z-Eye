@@ -61,7 +61,7 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
-				$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
+				$query = FS::$dbMgr->Select("z_eye_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
 				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
@@ -153,7 +153,7 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
 					return $output;
 				}
-				$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
+				$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
 				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
@@ -223,7 +223,7 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
-				$query = FS::$pgdbMgr->Select("z_eye_server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select("z_eye_server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
 				if($data = pg_fetch_array($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
@@ -275,7 +275,7 @@
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
 				"</th><th>DNS</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
-			$query = FS::$pgdbMgr->Select("z_eye_server_list","addr,login,dns");
+			$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,dns");
 			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
@@ -295,7 +295,7 @@
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
-			$query = FS::$pgdbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
+			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
 			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
@@ -314,7 +314,7 @@
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
-			$query = FS::$pgdbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
+			$query = FS::$dbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
 			while($data = pg_fetch_array($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=8&addr=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
@@ -365,12 +365,12 @@
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
-					if(FS::$pgdbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
+					if(FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=4");
 						return;
 					}
-					FS::$pgdbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
+					FS::$dbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','".($dns == "on" ? 1 : 0)."','".$namedpath."','".$chrootnamed."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: ".($dns == "on" ? "dns checking" : ""));
 					header("Location: m-".$this->mid.".html");
@@ -402,16 +402,16 @@
 							return;
 						}
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit server password for server '".$saddr."'");
-						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
+						if($spwd == $spwd2) FS::$dbMgr->Update("z_eye_server_list","pwd = '".$spwd."'","addr = '".$saddr."'");
 					}
-					FS::$pgdbMgr->Update("z_eye_server_list","login = '".$slogin."', dns = '".($dns == "on" ? 1 : 0)."', chrootnamed = '".$chrootnamed."', namedpath='".$namedpath."', addr = '".$saddr."'");
+					FS::$dbMgr->Update("z_eye_server_list","login = '".$slogin."', dns = '".($dns == "on" ? 1 : 0)."', chrootnamed = '".$chrootnamed."', namedpath='".$namedpath."', addr = '".$saddr."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit informations for server '".$server."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 3: { // server removal
 					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Removing server '".$srv."' from database");
-							FS::$pgdbMgr->Delete("z_eye_server_list","addr = '".$srv."'");
+							FS::$dbMgr->Delete("z_eye_server_list","addr = '".$srv."'");
 					}
 					header('Location: m-'.$this->mid.'.html');
 					return;
@@ -440,13 +440,13 @@
 						return;
 					}
 					FS::$dbMgr->Connect();
-					if(FS::$pgdbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+					if(FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
-					FS::$pgdbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
+					FS::$dbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 5: // radius db edition
@@ -474,10 +474,10 @@
 						}
 						FS::$dbMgr->Connect();
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit password for radius db ".$sdbname."@".$saddr.":".$sport);
-						if($spwd == $spwd2) FS::$pgdbMgr->Update("z_eye_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+						if($spwd == $spwd2) FS::$dbMgr->Update("z_eye_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit radius db ".$sdbname."@".$saddr.":".$sport);
-					FS::$pgdbMgr->Update("z_eye_radius_db_list","login = '".$slogin."', radalias = '".$salias."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					FS::$dbMgr->Update("z_eye_radius_db_list","login = '".$slogin."', radalias = '".$salias."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 6: { // removal of radius DB
@@ -486,7 +486,7 @@
 					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
 					if($saddr && $sport && $sdbname) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Remove Radius DB ".$sdbname."@".$saddr.":".$sport);
-						FS::$pgdbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+						FS::$dbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
 					header('Location: m-'.$this->mid.'.html');
 				}
@@ -503,13 +503,13 @@
 						return;
 					}
 
-					if(FS::$pgdbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+					if(FS::$dbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Server '".$saddr."' already exists for saving switch config");
 						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' (type ".$stype.") for saving switch config");
-					FS::$pgdbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
+					FS::$dbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 8: // Edit save server
@@ -525,7 +525,7 @@
 						return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Update server '".$saddr."' for saving switch config");
-					FS::$pgdbMgr->Update("z_eye_save_device_servers","path = '".$spath."', pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
+					FS::$dbMgr->Update("z_eye_save_device_servers","path = '".$spath."', pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				case 9: {
@@ -533,7 +533,7 @@
 					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
 					if($saddr && $stype) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Delete server '".$saddr."' for saving switch config");
-							FS::$pgdbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
+							FS::$dbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}	
 					header('Location: m-'.$this->mid.'.html');				
 				}

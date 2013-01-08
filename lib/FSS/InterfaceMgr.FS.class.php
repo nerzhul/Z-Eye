@@ -33,7 +33,7 @@
 	require_once(dirname(__FILE__)."/HTTPLink".CLASS_EXT);
 
 	class FSInterfaceMgr {
-		function FSInterfaceMgr($DBMgr) {
+		function FSInterfaceMgr() {
 		}
 
 		public function InitComponents() {
@@ -78,13 +78,13 @@
 				$haselemtoshow = 0;
 				$tmpoutput = "";
 				// Load menu
-				$query = FS::$pgdbMgr->Select("z_eye_menus","name,isconnected","id = '".$mlist[$i]."'");
+				$query = FS::$dbMgr->Select("z_eye_menus","name,isconnected","id = '".$mlist[$i]."'");
                                 if($data = pg_fetch_array($query)) {
 					$tmpoutput .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$data["name"]."</div><div class=\"menupopup\">";
 					// load menu elements
-					$query2 = FS::$pgdbMgr->Select("z_eye_menu_link","id_menu_item","id_menu = '".$mlist[$i]."'","\"order\"");
+					$query2 = FS::$dbMgr->Select("z_eye_menu_link","id_menu_item","id_menu = '".$mlist[$i]."'","\"order\"");
                                         while($data2 = pg_fetch_array($query2)) {
-						$query3 = FS::$pgdbMgr->Select("z_eye_menu_items","title,link,isconnected","id = '".$data2["id_menu_item"]."'");
+						$query3 = FS::$dbMgr->Select("z_eye_menu_items","title,link,isconnected","id = '".$data2["id_menu_item"]."'");
                                                 while($data3 = pg_fetch_array($query3)) {
 							$link = new HTTPLink($data3["link"]);
                                                         $link->Load();

@@ -24,13 +24,13 @@
 		function iSecReport() { parent::genModule(); $this->loc = new lSecReport(); }
 		public function Load() {
 			// Load snort keys for db config
-			$dbname = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
+			$dbname = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
 			if($dbname == "") $dbname = "snort";
-			$dbhost = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
+			$dbhost = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
 			if($dbhost == "") $dbhost = "localhost";
-			$dbuser = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
+			$dbuser = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
 			if($dbuser == "") $dbuser = "snort";
-			$dbpwd = FS::$pgdbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
+			$dbpwd = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
 			if($dbpwd == "") $dbpwd = "snort";
 			
 			$this->snortDB = new FSPostgreSQLMgr();
