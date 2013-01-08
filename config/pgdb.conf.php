@@ -17,6 +17,6 @@
 		private static $dbHost = 'localhost';
 		private static $dbPwd	= 'dbpassword';
 		private static $dbUser	= 'netdisco';
-		private static $dbPrefix = 'fss_';
+		private static $dbPrefix = 'z_eye_';
 	};
 ?>

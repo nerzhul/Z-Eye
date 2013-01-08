@@ -88,6 +88,10 @@
 		}
 
 		private function EditServer($addr) {
+			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
+				return FS::$iMgr->printError($this->loc->s("err-rights"));
+			}
+
 			$output = "<h2>".$this->loc->s("title-directory")."</h2>";
 			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = pg_fetch_array($query)) {
@@ -161,60 +165,60 @@
                                         dragend: function() { $('#trash').hide(); $('#editf').hide(); }
                                 });</script>";
 			}
-			$output .= "<h1>".$this->loc->s("title-directorymgmt")."</h1>";
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
-			$formoutput .= "<ul class=\"ulform\"><li>";
-			$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
-			$formoutput .= FS::$iMgr->numInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
-			$formoutput .= FS::$iMgr->check("ssl",array("label" => $this->loc->s("SSL")." ?"))."</li><li>";
-			$formoutput .= FS::$iMgr->input("dn","",20,200,$this->loc->s("base-dn"))."</li><li>";
-			$formoutput .= FS::$iMgr->input("rootdn","",20,200,$this->loc->s("root-dn"))."</li><li>";
-			$formoutput .= FS::$iMgr->password("rootpwd","",$this->loc->s("root-pwd"))."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapname","",20,40,$this->loc->s("attr-name"))."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapsurname","",20,40,$this->loc->s("attr-subname"))."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapmail","",20,40,$this->loc->s("attr-mail"))."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapuid","",20,40,$this->loc->s("attr-uid"))."</li><li>";
-			$formoutput .= FS::$iMgr->input("ldapfilter","",20,200,$this->loc->s("ldap-filter"))."</li><li>";
-			$formoutput .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-			$formoutput .= "</ul></form>";
+			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
+				$output .= "<h1>".$this->loc->s("title-directorymgmt")."</h1>";
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
+				$formoutput .= "<ul class=\"ulform\"><li>";
+				$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
+				$formoutput .= FS::$iMgr->numInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
+				$formoutput .= FS::$iMgr->check("ssl",array("label" => $this->loc->s("SSL")." ?"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("dn","",20,200,$this->loc->s("base-dn"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("rootdn","",20,200,$this->loc->s("root-dn"))."</li><li>";
+				$formoutput .= FS::$iMgr->password("rootpwd","",$this->loc->s("root-pwd"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("ldapname","",20,40,$this->loc->s("attr-name"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("ldapsurname","",20,40,$this->loc->s("attr-subname"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("ldapmail","",20,40,$this->loc->s("attr-mail"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("ldapuid","",20,40,$this->loc->s("attr-uid"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("ldapfilter","",20,200,$this->loc->s("ldap-filter"))."</li><li>";
+				$formoutput .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
+				$formoutput .= "</ul></form>";
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"));
 
-			$found = 0;
-			$tmpoutput = "";
-			$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,filter");
-			while($data = pg_fetch_array($query)) {
-				if(!$found) {
-					$found = 1;
-					$tmpoutput .= "<table id=\"ldaptb\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
-					"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th></tr>";
+				$found = 0;
+				$tmpoutput = "";
+				$query = FS::$pgdbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,filter");
+				while($data = pg_fetch_array($query)) {
+					if(!$found) {
+						$found = 1;
+						$tmpoutput .= "<table id=\"ldaptb\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
+						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th></tr>";
+					}
+					$tmpoutput .= "<tr><td id=\"dragtd\" draggable=\"true\">".$data["addr"]."</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td></tr>";
 				}
-				$tmpoutput .= "<tr><td id=\"dragtd\" draggable=\"true\">".$data["addr"]."</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td></tr>";
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";
 				$output .= "<script type=\"text/javascript\">var datatype = 0;
-                                $.event.props.push('dataTransfer');
-                                $('#ldaptb #dragtd').on({
-                                        mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
-                                        mouseleave: function(e) { $('#trash').hide(); $('#editf').hide();},
-                                        dragstart: function(e) { $('#trash').show(); $('#editf').show(); datatype=2; e.dataTransfer.setData('text/html', $(this).text()); },
-                                        dragenter: function(e) { e.preventDefault();},
-                                        dragover: function(e) { e.preventDefault(); },
-                                        dragleave: function(e) { },
-                                        drop: function(e) {},
-                                        dragend: function() { $('#trash').hide(); $('#editf').hide(); }
-                                });</script>";
+        	                       $.event.props.push('dataTransfer');
+                	               $('#ldaptb #dragtd').on({
+                                       mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
+                               	       mouseleave: function(e) { $('#trash').hide(); $('#editf').hide();},
+                                       dragstart: function(e) { $('#trash').show(); $('#editf').show(); datatype=2; e.dataTransfer.setData('text/html', $(this).text()); },
+                                       dragenter: function(e) { e.preventDefault();},
+    	                               dragover: function(e) { e.preventDefault(); },
+               	                       dragleave: function(e) { },
+                                       drop: function(e) {},
+                          	       dragend: function() { $('#trash').hide(); $('#editf').hide(); }
+	                        });</script>";
 			}
-
-			if($found) {
-				$output .= "<script type=\"text/javascript\">
+			$output .= "<script type=\"text/javascript\">
 				$('#editf').on({
                                         dragover: function(e) { e.preventDefault(); },
                                         drop: function(e) { if(datatype == 1) { $(location).attr('href','index.php?mod=".$this->mid."&user='+e.dataTransfer.getData('text/html')); }
-						else if(datatype == 2) { $(location).attr('href','index.php?mod=".$this->mid."&addr='+e.dataTransfer.getData('text/html')); } 
-					}
-                                });
+					else if(datatype == 2) { $(location).attr('href','index.php?mod=".$this->mid."&addr='+e.dataTransfer.getData('text/html')); } 
+				}
+        	                });
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
                                         drop: function(e) { if(datatype == 1) { $('#subpop').html('".$this->loc->s("sure-remove-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
@@ -233,15 +237,22 @@
 					}
 					datatype = 0;
                                 }
-                                });</script>";
-			}
+                        });</script>";
 			return $output;
 		}
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1: // add user
+					if(!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to add user but don't have rights");
+						return;
+					}
 					break;
 				case 2: // edit user
+					if(!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to edit user but don't have rights !");
+						return;
+					}
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					if(!$uid || !FS::$secMgr->isNumeric($uid)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (user edit)");
@@ -310,6 +321,10 @@
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 3: // del user
+					if(!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
+                                                FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to delete user but don't have rights");
+                                                return;
+                                        }
 					$username = FS::$secMgr->checkAndSecurisePostData("username");
 					if(!$username) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (User delete)");
@@ -327,6 +342,10 @@
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 4: // add ldap
+					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
+                                                FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to add ldap but don't have rights");
+                                                return;
+                                        }
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					$port = FS::$secMgr->checkAndSecurisePostData("port");
 					$ssl = FS::$secMgr->checkAndSecurisePostData("ssl");
@@ -366,6 +385,10 @@
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 5: // LDAP remove
+					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
+                                                FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to remove ldap but don't have rights");
+                                                return;
+                                        }
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP remove)");
@@ -385,6 +408,10 @@
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 6: // LDAP edition
+					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
+                                                FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to modify ldap but don't have rights");
+                                                return;
+                                        }
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP edition)");

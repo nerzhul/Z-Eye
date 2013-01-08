@@ -19,7 +19,15 @@
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
-	require_once(dirname(__FILE__)."/cisco.func.php");
+	$device = FS::$secMgr->checkAndSecuriseGetData("d");
+        if($device) {
+		$vendor = FS::$pgdbMgr->GetOneData("device","vendor","name = '".$device."'");
+		switch($vendor) {
+			case "cisco": require_once(dirname(__FILE__)."/cisco.func.php"); break;
+			case "dell": require_once(dirname(__FILE__)."/dell.func.php"); break;
+			default: break;
+		}
+        }
 	
 	class iSwitchMgmt extends genModule{
 		function iSwitchMgmt() { parent::genModule(); $this->loc = new lSwitchMgmt(); }
@@ -294,7 +302,7 @@
 						if($portid != -1) {
 							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
 							$output .= "</form>";
-							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
 						}
 						else
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
@@ -797,7 +805,7 @@
 					}
 					return $output;			
 				}
-				else if($showmodule == 4) {
+				else if($showmodule == 4) { // advanced tools
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
 					$output .= "<script type=\"text/javascript\">";
 					$output .= "function searchports() {";
@@ -823,7 +831,7 @@
 					$output .= "</script>";
 					$output .= "<h3>".$this->loc->s("title-retag")."</h3>";
 					if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
-					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=11");
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&d=".$device."&act=11");
 					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
 					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
 					$output .= "Confirmer ".FS::$iMgr->check("accept");
@@ -946,7 +954,7 @@
 						$output .= "<script type=\"text/javascript\">";
 						$output .= "function modifyPrise(src,sbmit,sw_,swport_,swpr_) { ";
 						$output .= "if(sbmit == true) { ";
-						$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) { ";
+						$output .= "$.post('index.php?at=3&mod=".$this->mid."&d=".$device."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) { ";
 						$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
 						$output .= "}); } ";
 						$output .= "else $(src).toggle(); }";

@@ -12,16 +12,22 @@
 		private static $cryptlevel = 4;
 		private static $favicon = false;
 		private static $pgsqlen = true;
+		private static $mysqlen = false;
 		private static $snmpen = true;
 		private static $defaultlang = "fr";
+		private static $passwordMinLength = 8;
+		private static $passwordComplexity = false;
 
 		public static function getSysLang() { return Config::$lang; }
 		public static function getSysStylesheet() { return Config::$stylesheet; }
 		public static function getWebsiteName() { return Config::$websiteName; }
 		public static function getOS() { return Config::$OS; }
 		public static function getCryptLevel() { return Config::$cryptlevel; }
+		public static function getPasswordMinLength() { return Config::$passwordMinLength; }
+		public static function getPasswordComplexity() { return Config::$passwordComplexity; }
 		public static function hasFavicon() { return Config::$favicon; }
 		public static function enablePostgreSQL() { return Config::$pgsqlen; }
+		public static function enableMySQL() { return Config::$mysqlen; }
 		public static function enableSNMP() { return Config::$snmpen; }
 		public static function getDefaultLang() { return Config::$defaultlang; }
 

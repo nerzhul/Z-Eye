@@ -42,14 +42,18 @@ def zeye_log(text):
         logfile.writelines("%s\n"  % text)
         logfile.close()
 
-def fetchSNMPInfos(ip,devname,devcom):
+def fetchSNMPInfos(ip,devname,devcom,vendor):
 	global threadCounter
 	global defaultSNMPRO
 	try:
 		tc_mutex.acquire()
 		threadCounter += 1
 		tc_mutex.release()
-		cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
+		if vendor == "cisco":
+			cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
+		else:
+			cmd = "snmpwalk -v 2c -c %s %s ifName | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
+		print cmd
 		pipe = os.popen('{ ' + cmd + '; }', 'r')
 		text = pipe.read()
 		pipe.close()
@@ -86,6 +90,7 @@ def fetchSNMPInfos(ip,devname,devcom):
 						elif len(piddata) >= 3 and piddata[2] == "No":
 							stopSwIDSearch = 1
 					""" must be there for no switch/switchport id """
+					print pname
 					pgcursor2.execute("INSERT INTO z_eye_port_id_cache (device,portname,pid,switchid,switchportid) VALUES ('%s','%s','%s','%s','%s')" % (devname,pname,pid,swid,swpid))
 		tc_mutex.acquire()
 		threadCounter = threadCounter - 1
@@ -108,7 +113,7 @@ try:
 	global threadCounter
 	pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 	pgcursor = pgsqlCon.cursor()
-	pgcursor.execute("SELECT ip,name FROM device ORDER BY ip")
+	pgcursor.execute("SELECT ip,name,vendor FROM device ORDER BY ip")
 	try:
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
@@ -121,11 +126,12 @@ try:
 	
 			devip = idx[0]
 			devname = idx[1]
+			vendor = idx[2]
 			if pgres2:
 				devcom = pgres2[0]
 			else:
 				devcom = defaultSNMPRO
-			thread.start_new_thread(fetchSNMPInfos,(devip,devname,devcom))
+			thread.start_new_thread(fetchSNMPInfos,(devip,devname,devcom,vendor))
 		""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 		time.sleep(1)
 	except StandardError, e:

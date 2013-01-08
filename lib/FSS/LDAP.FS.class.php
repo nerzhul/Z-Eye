@@ -100,30 +100,26 @@ class LDAP {
                 return null;
         }
 
-        private function & cleanEntries (array &$entries)
-        {
-                unset ($entries ['count']);
+        private function & cleanEntries (array &$entries) {
+	        unset ($entries ['count']);
 
-            // FOr each entry
-            foreach ($entries as $key => $attributes)
-            {
-              unset ($entries [$key]['count']);
+        	// For each entry
+	        foreach ($entries as $key => $attributes) {
+		        unset ($entries [$key]['count']);
 
-              for ($i = 0; array_key_exists ($i, $entries [$key]); $i++)
-                  unset ($entries [$key][$i]);
+			for ($i = 0; array_key_exists ($i, $entries [$key]); $i++)
+            			unset ($entries [$key][$i]);
 
-              // for earch attribute on the entry
-              foreach ($entries[$key] as $attName => $attValue)
-              {
-                if (is_array ($entries[$key][$attName]))
-                {
-                  if ($entries[$key][$attName]['count'] > 1)
-                    unset ($entries [$key][$attName]['count']);
-                  else
-                    $entries [$key][$attName] = $entries [$key][$attName][0];
-                }
-              }
-            }
+			// for each attribute on the entry
+	  		foreach ($entries[$key] as $attName => $attValue) {
+		                if (is_array ($entries[$key][$attName])) {
+			               if ($entries[$key][$attName]['count'] > 1)
+			 	              unset ($entries [$key][$attName]['count']);
+			               else
+		 	 	              $entries [$key][$attName] = $entries [$key][$attName][0];
+            			}
+			}
+        	}
 
             return $entries;
         }
@@ -135,8 +131,8 @@ class LDAP {
                         $result = ldap_search($this->connection, $this->baseDN, $query);
                         return ldap_count_entries($this->connection, $result);
                 }
-
         }
+
         public function IsConnected() { return $this->isConnected; }
 
 	public function setServerInfos($addr,$port,$ssl,$baseDN,$rootDN,$rootpwd,$uidAttr,$filter) {
