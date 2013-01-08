@@ -19,6 +19,7 @@
 	
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/snmpdiscovery.api.php");
 	$device = FS::$secMgr->checkAndSecuriseGetData("d");
         if($device) {
 		$vendor = FS::$dbMgr->GetOneData("device","vendor","name = '".$device."'");
@@ -1159,6 +1160,7 @@
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
 				$formoutput .= "</li><li>".FS::$iMgr->JSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
 				$formoutput .= "</ul></form>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=18","discoverdev",array("snotif" => $this->loc->s("Discovering-in-progress"), "lock" => true));
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 			}
 
@@ -1249,7 +1251,7 @@
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
 			return $output;
 		}
-		
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 2: // Plug fast edit
@@ -1979,25 +1981,35 @@
 
 					$devro = "";
 		                        $devrw = "";
+					$snmpro = array();
+					$snmprw = array();
 
-                			$foundro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
-			                $foundrw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
-                        		if($foundro && checkSnmp($data["ip"],$foundro) == 0)
+					loadNetdiscoCommunities($snmpro,$snmprw);
+					$devname = FS::$dbMgr->GetOneData("device","name","ip = '".$dip."'");
+
+                			$foundro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$devname."'");
+			                $foundrw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$devname."'");
+                        		if($foundro && checkSnmp($dip,$foundro) == 0)
 			                        $devro = $foundro;
-                        		if($foundrw && checkSnmp($data["ip"],$foundrw) == 0)
+                        		if($foundrw && checkSnmp($dip,$foundrw) == 0)
 			                	$devrw = $foundrw;
 
                         		for($i=0;$i<count($snmpro) && $devro == "";$i++) {
-			                        if(checkSnmp($data["ip"],$snmpro[$i]) == 0)
+			                        if(checkSnmp($dip,$snmpro[$i]) == 0)
                         		 	       $devro = $snmpro[$i];
 			                }
 
 					for($i=0;$i<count($snmprw) && $devrw == "";$i++) {
-                        		        if(checkSnmp($data["ip"],$snmprw[$i]) == 0)
+                        		        if(checkSnmp($dip,$snmprw[$i]) == 0)
 			                		$devrw = $snmprw[$i];
                         		}
+					if($foundro != $devro && strlen($devro) > 0 || $foundrw != $devrw && strlen($devrw) > 0)
+						FS::$dbMgr->Insert("z_eye_snmp_cache","device,snmpro,snmprw","'".$devname."','".$devro."','".$devrw."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Launch discovering for device '".$dip."'");
-					header("Location: index.php?mod=".$this->mid);
+					if(FS::isAjaxCall())
+                                                echo $this->loc->s("done-with-success");
+                                        else
+						header("Location: index.php?mod=".$this->mid);
 					return;
 				case 19: // device status
 					$dip = FS::$secMgr->getPost("dip","i4");
