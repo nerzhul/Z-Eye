@@ -64,7 +64,7 @@
 			// Prise number
 			$query = FS::$dbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
 			$devprise = array();
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("Ref-plug")."</h2>";
@@ -91,7 +91,7 @@
 
 			// VLAN on a device
 			$query = FS::$dbMgr->Select("device_vlan","ip,description","vlan = '".$search."'","ip");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($dname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
 					if($found == 0) {
 						$found = 1;
@@ -121,7 +121,7 @@
 
 			// Devices
 			$query = FS::$dbMgr->Select("device","mac,ip,description,model","name ILIKE '".$search."'");
-			if($data = pg_fetch_array($query)) {
+			if($data = FS::$dbMgr->Fetch($query)) {
 				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
 				$tmpoutput .= "<b>".$this->loc->s("Informations")."<i>: </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
 				if(strlen($data["mac"]) > 0)
@@ -135,7 +135,7 @@
 			// Prise number
 			$query = FS::$dbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
 			$devprise = array();
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("Ref-plug")."</h2>";
@@ -164,7 +164,7 @@
 			// Search device_ports
 			$devportname = array();
 			$query = FS::$dbMgr->Select("device_port","ip,port,name","name ILIKE '%".$search."%'","ip,port");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0)
 					$found = 1;
 				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
@@ -204,7 +204,7 @@
 						$dnszone .= ".";
 				}
 				$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
 						$found = 1;
 						$tmpoutput .= "<div><h2>".$this->loc->s("title-dns-records")."</h2>";
@@ -227,7 +227,7 @@
 			
 			// Netbios INFOS
 			$query = FS::$dbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '".$search."' OR nbname ILIKE '".$search."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-netbios")."</h2>";
@@ -258,7 +258,7 @@
 			$found = 0;
 			$lastmac = "";
 			$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","zonename,record","recval ILIKE '".$search."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-dns-assoc")."</h2>";
@@ -270,7 +270,7 @@
 			$found = 0;
 			
 			$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-dhcp-distrib")."</h2>";
@@ -288,7 +288,7 @@
 			$found = 0;
 			
 			$query = FS::$dbMgr->Select("node_ip","mac,time_first,time_last","ip = '".$search."'","time_last",1);
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-mac-addr")."</h2>";
@@ -304,7 +304,7 @@
 			
 			if($lastmac) {
 				$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last","mac ILIKE '".$lastmac."' AND active = 't'","time_last",1,1);
-				if($data = pg_fetch_array($query)) {
+				if($data = FS::$dbMgr->Fetch($query)) {
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-last-device")."</h2>";
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
@@ -321,7 +321,7 @@
 			}
 			
 			$query = FS::$dbMgr->Select("node_nbt","domain,nbname,nbuser,time_first,time_last","ip = '".$search."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-netbios")."</h2>";
@@ -341,7 +341,7 @@
 			
 			// Devices
 			$query = FS::$dbMgr->Select("device","mac,name,description,model","ip = '".$search."'");
-			if($data = pg_fetch_array($query)) {
+			if($data = FS::$dbMgr->Fetch($query)) {
 				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
 				$tmpoutput .= "<b><i>".$this->loc->s("Name").": </i></b><a href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
 				$tmpoutput .= "<b><i>".$this->loc->s("Informations").": </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
@@ -360,7 +360,7 @@
 		private function showRadiusInfos($search) {
 			$output = "";
 			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$radSQLMgr = new AbstractSQLMgr();
 				$radSQLMgr->setConfig("my",$data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
 				$radSQLMgr->Connect();
@@ -372,7 +372,7 @@
 				else
 					$tmpsearch = $search;
 				$query = $radSQLMgr->Select("radcheck","username","username = '".$tmpsearch."'","",0,1);
-				while($data2 = mysql_fetch_array($query)) {
+				while($data2 = $radSQLMgr->Fetch($query)) {
 					if(!$found) {
 						$found = 1;
 						$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
@@ -381,7 +381,7 @@
 				
 				if(!$found) {
 					$query = $radSQLMgr->Select("radreply","username","username = '".$tmpsearch."'","",0,1);
-					while($data2 = mysql_fetch_array($query)) {
+					while($data2 = $radSQLMgr->Fetch($query)) {
 						if(!$found) {
 							$found = 1;
 							$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
@@ -392,7 +392,7 @@
 				if($found) {
 					$found = 0;
 					$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$tmpsearch."'");
-					while($data2 = mysql_fetch_array($query)) {
+					while($data2 = $radSQLMgr->Fetch($query)) {
 						if(!$found) {
 							$found = 1;
 							$output .= "<h3>".$this->loc->s("Groups")."</h3><ul>";
@@ -408,7 +408,7 @@
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].".".$search[6].$search[7].$search[9].$search[10].".".$search[12].$search[13].$search[15].$search[16];
 					$found = 0;
 					$query2 = $radSQLMgr->Select("radacct","username,calledstationid,acctstarttime,acctstoptime","callingstationid = '".$tmpsearch."'");
-					if($data2 = mysql_fetch_array($query2)) {
+					if($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found == 0) {
 							$found = 1;
 							$output .= "<div><h2>".$this->loc->s("title-8021x-users")."</h2>";
@@ -425,7 +425,7 @@
 					$totinbw = 0;
 					$totoutbw = 0;
 					$query2 = $radSQLMgr->Select("radacct","calledstationid, SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$tmpsearch."' GROUP BY calledstationid");
-					if($data2 = mysql_fetch_array($query2)) {
+					if($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found == 0) {
 							$found = 1;
 							$output .= "<div><h2>".$this->loc->s("title-8021x-bw")."</h2>";
@@ -481,7 +481,7 @@
 				else
 					$tmpsearch = $search;
                 $query2 = $radSQLMgr->Select("radacct","calledstationid,acctterminatecause,acctstarttime,acctterminatecause,acctstoptime,acctinputoctets,acctoutputoctets","username = '".$tmpsearch."'","acctstarttime",1,10);
-				while($data2 = mysql_fetch_array($query2)) {
+				while($data2 = $radSQLMgr->Fetch($query2)) {
 					if($found == 0) {
 						$found = 1;
 						$output .= "<div><h2>".$this->loc->s("Accounting")."</h2>
@@ -540,7 +540,7 @@
 			$found = 0;
 			$search = preg_replace("#[-]#",":",$search);
 			$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed,server","macaddr = '".$search."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-dhcp-distrib")."</h2>";
@@ -557,7 +557,7 @@
 			if($found) $tmpoutput .= "</div>";
 			$found = 0;
 			$query = FS::$dbMgr->Select("node_ip","ip,time_first,time_last","mac = '".$search."'","time_last",2);
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-ip-addr")."</h2>";
@@ -571,7 +571,7 @@
 			$found = 0;
 			
 			$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last","mac = '".$search."'","time_last",2);
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-network-places")."</h2>";
@@ -592,7 +592,7 @@
 			$found = 0;
 
 			$query = FS::$dbMgr->Select("node_nbt","nbname,domain,nbuser,time_first,time_last","mac = '".$search."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
 					$tmpoutput .= "<div><h2>".$this->loc->s("title-netbios-name")."</h2>";
@@ -611,7 +611,7 @@
 			
 			// Devices
 			$query = FS::$dbMgr->Select("device","ip,name,description,model","mac = '".$search."'");
-			if($data = pg_fetch_array($query)) {
+			if($data = FS::$dbMgr->Fetch($query)) {
 				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
 				$tmpoutput .= "<b><i>".$this->loc->s("Name").": </i></b><a href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
 				$tmpoutput .= "<b><i>".$this->loc->s("Informations").": </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";

@@ -42,7 +42,7 @@
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
 					$query = FS::$dbMgr->Select("z_eye_menus","id,name,isconnected","","id",2);
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
 						if($data["isconnected"] == -1)
 							$output .= $this->loc->s("No");
@@ -63,7 +63,7 @@
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
 					$query = FS::$dbMgr->Select("z_eye_menu_items","id,title,link,isconnected","","id",2);
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 						$link2 = new HTTPLink($data["link"]);
 						$output .= $link2->getIt()."</td><td>";
@@ -155,9 +155,9 @@
 				<table class=\"standardTable\">
 				<tr><th>".$this->loc->s("elmt")."</th><th>".$this->loc->s("Order")."</th><th></th></tr>";
 				$query = FS::$dbMgr->Select("z_eye_menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					$query2 = FS::$dbMgr->Select("z_eye_menu_items","id,title","id = '".$data["id_menu_item"]."'");
-					if($data2 = pg_fetch_array($query2)) {
+					if($data2 = FS::$dbMgr->Fetch($query2)) {
 							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>
 							<a href=\"index.php?mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]."\">";
 							$output .= FS::$iMgr->img("styles/images/cross.png",15,15);

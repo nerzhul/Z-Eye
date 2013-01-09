@@ -80,6 +80,10 @@
 			return $this->dbMgr->Insert($table,$keys,$values);
 		}
 
+		public function Fetch(&$query) {
+			return $this->dbMgr->Fetch($query);
+		}
+
 		public function Delete($table,$cond = "") {
 			return $this->dbMgr->Delete($table,$cond);
 		}

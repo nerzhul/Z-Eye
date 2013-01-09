@@ -16,11 +16,11 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
-	
+
 	class iLogs extends genModule{
 		function iLogs() { parent::genModule(); $this->loc = new lLogs(); }
 		public function Load() {
@@ -48,7 +48,7 @@
 			$output = "";
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_logs","date,module,level,_user,txt",$filter,"date",1);
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
@@ -94,13 +94,13 @@
 				$output .= FS::$iMgr->select("uf","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
 				$query = FS::$dbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",2);
-				while($data = pg_fetch_array($query))
+				while($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["_user"],$data["_user"]);
 
 				$output .= "</select>".FS::$iMgr->select("af","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
 				$query = FS::$dbMgr->Select("z_eye_logs","module","module = module GROUP BY module","module",2);
-				while($data = pg_fetch_array($query))
+				while($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["module"],$data["module"]);
 				
 				$output .= "</select>".FS::$iMgr->select("lf","filterAppLogs()");

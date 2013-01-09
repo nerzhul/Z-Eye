@@ -79,7 +79,7 @@
 			}
 			return NULL;
 		}
-		
+
 		public function GetMax($table,$field,$cond = "") {
 			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
 			if($data = pg_fetch_array($query)) {
@@ -119,7 +119,11 @@
 			}
 			return NULL;
 		}
-		
+
+		public function Fetch(&$query) {
+			return pg_fetch_array($query);
+		}
+
 		public function Insert($table,$keys,$values) {
 			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";
 			pg_query($sql);

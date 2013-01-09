@@ -102,14 +102,14 @@
 			$formoutput .= FS::$iMgr->select("icon");
 			$formoutput .= FS::$iMgr->selElmt("Aucun","");
 			$query = FS::$dbMgr->Select("z_eye_icinga_icons","id,name","","name");
-			while($data = pg_fetch_array($query))
+			while($data = FS::$dbMgr->Fetch($query))
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["id"]);
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
 			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true);
 			$formoutput .= FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$formoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
 			$formoutput .= "</select></td></tr>";
@@ -154,7 +154,7 @@
 			 */
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,alias,addr,template","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Address")."</th><th>".$this->loc->s("Template")."</th><th>".$this->loc->s("Parent")."</th><th></th></tr>";
@@ -165,7 +165,7 @@
 				$output .= "</td><td>";
 				$found2 = false;
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found2) $output .= ", ";
 					else $found2 = true;
 					$output .= $data2["parent"];
@@ -198,7 +198,7 @@
 
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name,alias","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
@@ -206,7 +206,7 @@
 				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
 				$found2 = false;
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'","hosttype,name");
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found2) $output .= ", ";
 					else $found2 = true;
 					$output .= $data2["host"]." (";
@@ -282,7 +282,7 @@
 			
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_services","name,host,hosttype,template,ctg","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Host")."</th><th>".$this->loc->s("Hosttype")."</th><th>".$this->loc->s("Template")."</th><th></th></tr>";
@@ -331,7 +331,7 @@
 			 */
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
@@ -406,7 +406,7 @@
 			 */
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name,mail,template","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
@@ -431,7 +431,7 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true);
 			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"]);
 			}
 			$formoutput .= "</select></td></tr>";
@@ -445,7 +445,7 @@
 			 */
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
@@ -453,7 +453,7 @@
 				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
 				$found2 = false;
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found2) $output .= ", ";
 					else $found2 = true;
 					$output .= $data2["member"];
@@ -491,7 +491,7 @@
 			 */
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_commands","name,cmd","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr>";
@@ -507,7 +507,7 @@
 		private function getTimePeriodList($name) {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias","","alias");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"]);
 			}
 			$output .= "</select>";
@@ -517,7 +517,7 @@
 		private function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select("z_eye_icinga_commands","name","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
 			}
 			$output .= "</select>";
@@ -527,7 +527,7 @@
 		private function genContactGroupsList($name) {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"]);
 			}
 			$output .= "</select>";
@@ -537,7 +537,7 @@
 		private function genHostsList($name) {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
 			$output .= "</select>";
@@ -549,11 +549,11 @@
 			
 			$hostlist = array();
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
-			while($data = pg_fetch_array($query))
+			while($data = FS::$dbMgr->Fetch($query))
 				$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
 
 			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name");
-			while($data = pg_fetch_array($query))
+			while($data = FS::$dbMgr->Fetch($query))
 				$hostlist[$this->loc->s("Hostgroup").": ".$data["name"]] = array(2,$data["name"]);
 
 			ksort($hostlist);
@@ -576,7 +576,7 @@
 			if(!$file)
 				return false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_commands","name,cmd");
-			while($data = pg_fetch_array($query))
+			while($data = FS::$dbMgr->Fetch($query))
 				fwrite($file,"define command {\n\tcommand_name\t".$data["name"]."\n\tcommand_line\t".$data["cmd"]."\n}\n\n");
 			
 			fclose($file);
@@ -589,7 +589,7 @@
 			if(!$file)
 				return false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts","template = 'f'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\tservice_notification_period\t".$data["srvperiod"]."\n\thost_notification_period\t".$data["hostperiod"]."\n\t");
 				fwrite($file,"service_notification_commands\t".$data["srvcmd"]."\n\thost_notification_commands\t".$data["hostcmd"]."\n\temail\t".$data["mail"]."\n\t");
 				
@@ -667,11 +667,11 @@
 			}
 			
 			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define contactgroup {\n\tcontactgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tmembers\t");
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","member","name = '".$data["name"]."'");
 				$found = false;
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found) fwrite($file,",");
 					else $found = true;
 					fwrite($file,$data2["member"]);
@@ -689,7 +689,7 @@
 			if(!$file)
 				return false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define timeperiod {\n\ttimeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]);
 				if(strtotime($data["mhs"].":".$data["mms"]) < strtotime($data["mhe"].":".$data["mme"]))
 					fwrite($file,"\n\tmonday\t".$data["mhs"].":".$data["mms"]."-".$data["mhe"].":".$data["mme"]);
@@ -719,7 +719,7 @@
 				return false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
 			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,iconid","template = 'f'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define host {\n\thost_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
 				fwrite($file,$data["alivecommand"]."\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkinterval"]."\n\tretry_interval\t".$data["retrycheckinterval"]."\n\t");
 				fwrite($file,"max_check_attempts\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
@@ -761,7 +761,7 @@
 				
 				$found = false;
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = true;
 						fwrite($file,"\n\tparents\t");
@@ -788,11 +788,11 @@
 			if(!$file)
 				return false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name,alias");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define hostgroup {\n\thostgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]);
 				$found = false;
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '1'");
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = true;
 						fwrite($file,"\n\tmembers\t");
@@ -803,7 +803,7 @@
 				}
 				$found = false;
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '2'");
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = true;
 						fwrite($file,"\n\thostgroup_members\t");
@@ -826,7 +826,7 @@
 			$query = FS::$dbMgr->Select("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
 			retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptf,srvopts,notifintval,ctg,srvoptr",
 			"template = 'f'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define service {\n\tservice_description\t".$data["name"]."\n\tcheck_command\t".$data["checkcmd"]."\n\t");
 				if($data["hosttype"] == 1)
 					fwrite($file,"host_name\t".$data["host"]);

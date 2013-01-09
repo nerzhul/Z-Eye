@@ -62,7 +62,7 @@
 					return $output;
 				}
 				$query = FS::$dbMgr->Select("z_eye_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
-				if($data = pg_fetch_array($query)) {
+				if($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$spwd = $data["pwd"];
@@ -154,7 +154,7 @@
 					return $output;
 				}
 				$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
-				if($data = pg_fetch_array($query)) {
+				if($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$spwd = $data["pwd"];
@@ -224,7 +224,7 @@
 					return $output;
 				}
 				$query = FS::$dbMgr->Select("z_eye_server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
-				if($data = pg_fetch_array($query)) {
+				if($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$dns = $data["dns"];
@@ -276,7 +276,7 @@
 				"</th><th>DNS</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,dns");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
@@ -296,7 +296,7 @@
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
@@ -315,7 +315,7 @@
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=8&addr=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>";

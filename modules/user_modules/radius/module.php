@@ -49,7 +49,7 @@
 					$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
 					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 					$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 							if($found == 0) $found = 1;
 							$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
 							$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$radpath,$rad == $radpath);
@@ -61,7 +61,7 @@
 					$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
 					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 					$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname");
-	                	        while($data = pg_fetch_array($query)) {
+	                	        while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) $found = 1;
 						$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
 						$tmpoutput .= FS::$iMgr->selElmt($radpath,$radpath,$rad == $radpath);
@@ -264,7 +264,7 @@
 				$output .= FS::$iMgr->select("ug","filterRadiusDatas()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Group")."--","",true);
 				$query = $radSQLMgr->Select("radusergroup","distinct groupname");
-				while($data = mysql_fetch_array($query))
+				while($data = $radSQLMgr->Fetch($query))
 						$output .= FS::$iMgr->selElmt($data["groupname"],$data["groupname"]);
 
 				$output .= "</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterRadiusDatas()");
@@ -348,14 +348,14 @@
 
 				$groups=array();
 				$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 					$rcount = $radSQLMgr->Count("radusergroup","distinct username","groupname = '".$data["groupname"]."'");
 					if(!isset($groups[$data["groupname"]]))
 						$groups[$data["groupname"]] = $rcount;
 				}
 
 				$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 					$rcount = $radSQLMgr->Count("radusergroup","distinct username","groupname = '".$data["groupname"]."'");
 					if(!isset($groups[$data["groupname"]]))
 							$groups[$data["groupname"]] = $rcount;
@@ -378,11 +378,11 @@
 				$grouplist= FS::$iMgr->selElmt("","none");
 				$groups=array();
 				$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 						if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 				}
 				$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 						if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 				}
 				$count = count($groups);
@@ -434,7 +434,7 @@
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("subnet","","Subnet DHCP");
 				$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask");
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found) $found = 1;
 						$formoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"]);
 				}
@@ -444,13 +444,13 @@
 
 					$groups=array();
 					$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
-					while($data = mysql_fetch_array($query)) {
+					while($data = $radSQLMgr->Fetch($query)) {
 							if(!isset($groups[$data["groupname"]]))
 									$groups[$data["groupname"]] = 1;
 					}
 
 					$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
-					while($data = mysql_fetch_array($query)) {
+					while($data = $radSQLMgr->Fetch($query)) {
 							if(!isset($groups[$data["groupname"]]))
 									$groups[$data["groupname"]] = 1;
 					}
@@ -489,7 +489,7 @@
 						});
 					</script>";
 					$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dhcpsubnet,groupname","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) {
 							$found = 1;
 							$tmpoutput .= "<h3>".$this->loc->s("title-auto-import2")."</h3><table id=\"radsubnet\"><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
@@ -619,13 +619,13 @@
 				</script>";
 			$query = $radSQLMgr->Select("radcheck","id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')".($ug ? " AND username IN (SELECT username FROM radusergroup WHERE groupname = '".$ug."')" : ""));
 			$expirationbuffer = array();
-			while($data = mysql_fetch_array($query)) {
+			while($data = $radSQLMgr->Fetch($query)) {
 				if(!$found && (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]) 
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]))) {
 					$found = true;
 					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><tr><th>Id</th><th>Utilisateur</th><th>Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr>";
 					$query2 = $radSQLMgr->Select("z_eye_radusers","username,expiration","expiration > 0");
-					while($data2 = mysql_fetch_array($query2)) {
+					while($data2 = $radSQLMgr->Fetch($query2)) {
 						if(!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
 					}
 				}
@@ -634,7 +634,7 @@
 					$tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"]."\">".$data["username"]."</a></td><td>".$data["value"]."</td><td>";
 					$query2 = $radSQLMgr->Select("radusergroup","groupname","username = '".$data["username"]."'");
 					$found2 = 0;
-					while($data2 = mysql_fetch_array($query2)) {
+					while($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found2 == 0) $found2 = 1;
 						else $tmpoutput .= "<br />";
 						$tmpoutput .= $data2["groupname"];
@@ -732,14 +732,14 @@
 				}
 				$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$radentry."'");
 				$grpidx = 0;
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 					$formoutput .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Profil")).
 					$this->addGroupList($radSQLMgr,$data["groupname"])."</select> <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 					$grpidx++;
 				}
 				$attridx = 0;
 				$query = $radSQLMgr->Select("radcheck","attribute,op,value","username = '".$radentry."' AND attribute <> 'Cleartext-Password'");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 					if(!($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept")) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 						FS::$iMgr->select("attrop".$attridx).
@@ -763,7 +763,7 @@
 					}
 				}
 				$query = $radSQLMgr->Select("radreply","attribute,op,value","username = '".$radentry."'");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 						FS::$iMgr->select("attrop".$attridx).
 						FS::$iMgr->selElmt("=","=",($data["op"] == "=" ? true : false)).
@@ -836,7 +836,7 @@
                 $formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);
 				$attridx = 0;
 				$query = $radSQLMgr->Select("radgroupcheck","attribute,op,value","groupname = '".$radentry."'");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 					 $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 					 FS::$iMgr->select("attrop".$attridx).
 					 FS::$iMgr->selElmt("=","=",($data["op"] == "=" ? true : false)).
@@ -859,7 +859,7 @@
 				}
 
 				$query = $radSQLMgr->Select("radgroupreply","attribute,op,value","groupname = '".$radentry."'");
-				while($data = mysql_fetch_array($query)) {
+				while($data = $radSQLMgr->Fetch($query)) {
 					$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 					FS::$iMgr->select("attrop".$attridx).
 					FS::$iMgr->selElmt("=","=",($data["op"] == "=" ? true : false)).
@@ -892,11 +892,11 @@
 			$output = "";
 			$groups=array();
 			$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
-			while($data = mysql_fetch_array($query)) {
+			while($data = $radSQLMgr->Fetch($query)) {
 				if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 			}
 			$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
-			while($data = mysql_fetch_array($query)) {
+			while($data = $radSQLMgr->Fetch($query)) {
 				if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 			}
 			$count = count($groups);

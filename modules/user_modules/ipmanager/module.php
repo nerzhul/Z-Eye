@@ -77,7 +77,7 @@
 					$tmpoutput = "<h2>".$this->loc->s("title-remove-server")."</h2>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
 					$tmpoutput .= "<ul class=\"ulform\">".$this->loc->s("Server").": ".FS::$iMgr->select("daddr");
 					$query = FS::$dbMgr->Select("z_eye_dhcp_servers","addr,sshuser");
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) $found = true;
 						$tmpoutput .= "<li>".FS::$iMgr->selElmt($data["sshuser"]."@".$data["addr"],$data["addr"])."</li>";
 					}
@@ -93,7 +93,7 @@
 				$tmpoutput .= FS::$iMgr->select("f","submit()");
 				$formoutput = "";
 				$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$netfound) $netfound = true;
 					$formoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
 				}
@@ -121,7 +121,7 @@
 			} else {
 				if(!$showmodule || $showmodule == 1) {
 				$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					$iparray = array();
 					$netoutput .= "<h3>Réseau : ".$data["netid"]."/".$data["netmask"]."</h3>";
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
@@ -136,7 +136,7 @@
 					$switchlist = array();
 
 					$query2 = FS::$dbMgr->Select("device","ip,name");
-					while($data2 = pg_fetch_array($query2))
+					while($data2 = FS::$dbMgr->Fetch($query2))
 						$switchlist[$data2["ip"]] = $data2["name"];
 
 					// Initiate network IPs
@@ -154,7 +154,7 @@
 
 					// Fetch datas
 					$query2 = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
-					while($data2 = pg_fetch_array($query2)) {
+					while($data2 = FS::$dbMgr->Fetch($query2)) {
 						// If it's reserved on a host don't override status
 						if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
 							$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
@@ -218,7 +218,7 @@
 									$mac = FS::$dbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
 									if($mac) {
 										$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
-										if($data3 = pg_fetch_array($query3)) {
+										if($data3 = FS::$dbMgr->Fetch($query3)) {
 											$rstate = $this->loc->s("Stuck-IP");
 											$style = "background-color: orange;";
 											$fixedip++;
@@ -335,7 +335,7 @@
 			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
 			$query = FS::$dbMgr->Select("z_eye_dhcp_ip_history","count(ip) as ct,distributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and netid = '".$filter."' GROUP BY distributed,collecteddate ORDER BY collecteddate");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
 				switch($data["distributed"]) {
 					case 1: break;
@@ -434,7 +434,7 @@
 
 			$conns = array();
 			$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,pwd","dhcp = 1");
-		        while($data = pg_fetch_array($query)) {
+		        while($data = FS::$dbMgr->Fetch($query)) {
 		                $conn = ssh2_connect($data["addr"],22);
                 		if(!$conn) {
 		                        return $this->loc->s("error-fail-connect-ssh").$data["addr"];
@@ -472,7 +472,7 @@
 					$obsoletes = array();
 					$found = false;
 					$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname","netid = '".$filter."' AND distributed = 3");
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						$ltime = FS::$dbMgr->GetOneData("node","time_last","mac = '".$data["macaddr"]."'","time_last",1,1);
 						if($ltime) {
 							if(strtotime($ltime) < strtotime("-".$interval." day",strtotime(date("y-m-d H:i:s")))) {

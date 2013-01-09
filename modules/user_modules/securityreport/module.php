@@ -122,29 +122,29 @@
 					$labels = $scans = $tse = $ssh = "[";
 					$cursor = 0;
 					$temp1 = $temp2 = $temp3 = $temp4 = 0;
-					while($data = pg_fetch_array($query)) {
-							if($cursor != $ech || $ech == 1) {
-									$cursor++;
-									$temp1 = substr($data["atkdate"],8,2)."/".substr($data["atkdate"],5,2);
-									$temp2 += $data["scans"];
-									$temp3 += $data["tse"];
-									$temp4 += $data["ssh"];
-							}
-							
-							if($cursor == $ech) {
-									$labels .= "'".$temp1."',";
-									$scans .= $temp2.",";
-									$tse .= $temp3.",";
-									$ssh .= $temp4.",";
-									$cursor = $temp1 = $temp2 = $temp3 = $temp4 = 0;
-							}
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if($cursor != $ech || $ech == 1) {
+							$cursor++;
+							$temp1 = substr($data["atkdate"],8,2)."/".substr($data["atkdate"],5,2);
+							$temp2 += $data["scans"];
+							$temp3 += $data["tse"];
+							$temp4 += $data["ssh"];
+						}
+
+						if($cursor == $ech) {
+							$labels .= "'".$temp1."',";
+							$scans .= $temp2.",";
+							$tse .= $temp3.",";
+							$ssh .= $temp4.",";
+							$cursor = $temp1 = $temp2 = $temp3 = $temp4 = 0;
+						}
 					}
-		
+
 					$labels .= "]";
 					$scans .= "]";
 					$tse .= "]";
 					$ssh .= "]";
-					
+
 					$output .= "<script type=\"text/javascript\">(function($){ var hchart;
 							hchart = new Highcharts.Chart({
 							chart: { renderTo: 'atkst', type: 'line' },
@@ -171,7 +171,7 @@
 					$tmpoutput = "<h3>Top ".$topmax." (".$this->loc->s("Scans").")</h3><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					
 					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,scans","","scans",1,$topmax);
-					while($data = pg_fetch_array($query)) {
+					while($data = $this->snortDB->Fetch($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["scans"]."</td></tr>";
 					}
@@ -181,7 +181,7 @@
 					$found = 0;
 					$tmpoutput = "<h3>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h3><table><tr><th>Date</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,scans","","scans",1,$topmax);
-					while($data = pg_fetch_array($query)) {
+					while($data = $this->snortDB->Fetch($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["scans"]."</td></tr>";
@@ -200,7 +200,7 @@
 					$tmpoutput = "<h3>Top ".$topmax." (".$this->loc->s("TSE-atk").")</h3><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					
 					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,tse","","tse",1,$topmax);
-					while($data = pg_fetch_array($query)) {
+					while($data = $this->snortDB->Fetch($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["tse"]."</td></tr>";
 					}
@@ -210,7 +210,7 @@
 					$found = 0;
 					$tmpoutput = "<h3>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h3><table><tr><th>".$this->loc->s("Date")."<th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,tse","","tse",1,$topmax);
-					while($data = pg_fetch_array($query)) {
+					while($data = $this->snortDB->Fetch($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["tse"]."</td></tr>";
@@ -229,7 +229,7 @@
 					$tmpoutput = "<h3>Top ".$topmax." (".$this->loc->s("SSH-atk").")</h3><table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					
 					$query = $this->snortDB->Select("z_eye_collected_ips","ip,last_date,ssh","","ssh",1,$topmax);
-					while($data = pg_fetch_array($query)) {
+					while($data = $this->snortDB->Fetch($query)) {
 						if($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["ssh"]."</td></tr>";
 					}
@@ -239,7 +239,7 @@
 					$found = 0;
 					$tmpoutput = "<h3>".$this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days")."</h3><table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate,ssh","","ssh",1,$topmax);
-					while($data = pg_fetch_array($query)) {
+					while($data = $this->snortDB->Fetch($query)) {
 						if($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["ssh"]."</td></tr>";

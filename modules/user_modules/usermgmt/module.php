@@ -67,7 +67,7 @@
 			}
 			$grpidx = 0;
 			$query = FS::$dbMgr->Select("z_eye_user_group","gid","uid = '".$uid."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
@@ -94,7 +94,7 @@
 
 			$output = "<h2>".$this->loc->s("title-directory")."</h2>";
 			$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
-			if($data = pg_fetch_array($query)) {
+			if($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
 				$output .= "<ul class=\"ulform\">".FS::$iMgr->hidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
 				$output .= FS::$iMgr->numInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
@@ -121,7 +121,7 @@
 		private function addGrouplist($gid=-1) {
 			$output = "";
 			$query = FS::$dbMgr->Select("z_eye_groups","gid,gname");
-			while($data = pg_fetch_array($query))
+			while($data = FS::$dbMgr->Fetch($query))
 				$output .= FS::$iMgr->selElmt($data["gname"],$data["gid"],$gid == $data["gid"] ? true : false);
 			return $output;
 		}
@@ -132,7 +132,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select("z_eye_users","uid,username,mail,last_ip,join_date,last_conn,name,subname,sha_pwd");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
 					$tmpoutput .= "<table id=\"utb\"><tr><th>UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
@@ -142,7 +142,7 @@
 				$tmpoutput .= "<tr><td>".$data["uid"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["username"]."</td><td>".
 					($data["sha_pwd"] == "" ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 				$query2 = FS::$dbMgr->Select("z_eye_user_group","gid","uid = '".$data["uid"]."'");
-				while($data2 = pg_fetch_array($query2)) {
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					$gname = FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$data2["gid"]."'");
 					$tmpoutput .= $gname."<br />";
 				}
@@ -188,7 +188,7 @@
 				$found = 0;
 				$tmpoutput = "";
 				$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,filter");
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found) {
 						$found = 1;
 						$tmpoutput .= "<table id=\"ldaptb\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").

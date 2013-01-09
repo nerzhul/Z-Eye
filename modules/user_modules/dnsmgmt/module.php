@@ -16,11 +16,11 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/modules/Network.FS.class.php");
-	
+
 	class iDNSManager extends genModule{
 		function iDNSManager() { parent::genModule(); $this->loc = new lDNSManager(); }
 		public function Load() {
@@ -40,10 +40,10 @@
 				$output .= "<h1>".$this->loc->s("title-dns")."</h1>";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$formoutput .= FS::$iMgr->select("f");
-				
+
 				$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
 				if($shA == NULL) $shA = 1;
-				
+
 				$shAAAA = FS::$secMgr->checkAndSecuriseGetData("saaaa");
 				if($shAAAA == NULL) $shAAAA = 1;
 				
@@ -67,7 +67,7 @@
 
 				$found = false;
 				$query = FS::$dbMgr->Select("z_eye_dns_zone_cache","zonename","","zonename");
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found) $found = true;
 					$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
 				}
@@ -189,7 +189,7 @@
 					$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","zonename,record,rectype,recval,server",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
 					$curzone = "";
 					$dnsrecords = array();
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						if($curzone != $data["zonename"]) {
 							$curzone = $data["zonename"];
 							if($curzone != "") $dnsoutput .= "</table>";
@@ -312,9 +312,9 @@
 					$obsoletes = array();
 					// Search deprecated records
 					$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
-						while($data2 = pg_fetch_array($query2)) {
+						while($data2 = FS::$dbMgr->Fetch($query2)) {
 							$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 							if(!$foundrecent) {
 								if(!$found) $found = true;
@@ -324,7 +324,7 @@
 					}
 
 					$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'CNAME'");
-					while($data = pg_fetch_array($query)) {
+					while($data = FS::$dbMgr->Fetch($query)) {
 						$toquery = "";
 						if($data["recval"][strlen($data["recval"])-1] == ".") {
 							$toquery = $data["recval"];
@@ -341,7 +341,7 @@
 							$count = count($out);
 							for($i=0;$i<$count;$i++) {
 								$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$out[$i]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
-								while($data2 = pg_fetch_array($query2)) {
+								while($data2 = FS::$dbMgr->Fetch($query2)) {
 									$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 									if(!$foundrecent) {
 										if(!$found) $found = true;

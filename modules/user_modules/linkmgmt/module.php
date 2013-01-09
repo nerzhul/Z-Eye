@@ -37,7 +37,7 @@
 				<table class=\"standardTable\" width=\"55%\">
 				<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
 				$query = FS::$dbMgr->Select("z_eye_http_links","id,type,args","","id",1);
-				while($data = pg_fetch_array($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					$output .= "<tr><td><center><a href=\"index.php?mod=".$this->mid."&do=2&link=".$data["id"]."\">".$data["id"]."</a></center></td><td><center>";
 					if($data["type"] == 0)
 						$output .= $this->loc->s("Normal");

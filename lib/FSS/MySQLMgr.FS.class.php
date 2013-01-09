@@ -94,7 +94,7 @@
 				return 1;
 			return $max;
 		}
-		
+
 		public function Count($table,$field,$cond = "") {
 			$count = $this->GetOneData($table,"COUNT(".$field.")",$cond);
 			if($count == NULL)
@@ -102,37 +102,41 @@
 			return $count;
 		}
 
-		 public function Sum($table,$field,$cond = "") {
-				$count = $this->GetOneData($table,"SUM(".$field.")",$cond);
-				if($count == NULL)
-						return 0;
-				return $count;
+		public function Sum($table,$field,$cond = "") {
+			$count = $this->GetOneData($table,"SUM(".$field.")",$cond);
+			if($count == NULL)
+				return 0;
+			return $count;
 		}
-		
+
+		public function Fetch(&$query) {
+			return mysql_fetch_array($query);
+		}
+
 		public function Insert($table,$keys,$values) {
 			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";
 			mysql_query($sql);
 		}
-		
+
 		public function InsertIgnore($table,$keys,$values) {
 			$sql = "INSERT IGNORE INTO ".$table."(".$keys.") VALUES (".$values.");";
 			mysql_query($sql);
 		}
-		
+
 		public function Delete($table,$cond = "") {
 			$sql = "DELETE FROM ".$table."";
 			if(strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			mysql_query($sql);
 		}
-		
+
 		public function Update($table,$mods,$cond = "") {
 			$sql = "UPDATE ".$table." SET ".$mods."";
 			if(strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			mysql_query($sql);
 		}
-		
+
 		public function setConfig($dbn,$dbport,$dbh,$dbu,$dbp) {
 			if($dbn == $this->dbName && $dbport == $this->dbPort && $dbh == $this->dbHost &&
 				$dbu == $this->dbUser && $this->dbConn)
@@ -144,7 +148,7 @@
 			$this->dbPass = $dbp;
 			return 0;
 		}
-		
+
 		public function Close() {
 			if($this->dbConn)
 				mysql_close($this->dbConn);

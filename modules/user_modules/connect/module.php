@@ -50,7 +50,7 @@
 			$ldapname = "";
 			$ldapMgr = new LDAP();
 			$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$tmpldapMgr = new LDAP();
 				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
 				if($tmpldapMgr->Authenticate($username, $password)) {
@@ -83,7 +83,7 @@
 				$user->setMail($mail);
 
 				$query = FS::$dbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-				if($data = pg_fetch_array($query))
+				if($data = FS::$dbMgr->Fetch($query))
 				{
 					$this->connectUser($data["uid"],$data["ulevel"]);
 					FS::$log->i("None","connect",0,"Login success for user '".$username."'");
@@ -93,7 +93,7 @@
 				else {
 					$user->Create();
 					$query = FS::$dbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-					if($data = pg_fetch_array($query))
+					if($data = FS::$dbMgr->Fetch($query))
 					{
 							$this->connectUser($data["uid"],$data["ulevel"]);
 							FS::$log->i("None","connect",0,"Login success for user '".$username."'");
@@ -103,7 +103,7 @@
 				}
 			} else {
 				$query = FS::$dbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-				if($data = pg_fetch_array($query)) {
+				if($data = FS::$dbMgr->Fetch($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if($data["sha_pwd"] != $encryptPwd) {
 						FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Bad password)");

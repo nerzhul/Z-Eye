@@ -149,7 +149,7 @@
 			$this->BWscore = 0;
 
 			$query = FS::$dbMgr->Select("z_eye_port_monitor","device,port,climit,wlimit,description");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
 					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-net")."</h4><table><tr><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("inc-bw")."</th><th>".$this->loc->s("out-bw")."</th></tr>";
@@ -268,7 +268,7 @@
 			$attacklist=array();
 			$scannb = 0;
 			$atknb = 0;
-                        while($data = pg_fetch_array($query)) {
+                        while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$atkfound) $atkfound = 1;
                                 if(preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
 					if(!isset($attacklist[$data["ip_src"]])) $attacklist[$data["ip_src"]] = array();

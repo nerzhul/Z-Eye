@@ -52,7 +52,7 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
 			$rules = array();
 			$query = FS::$dbMgr->Select("z_eye_group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
-			while($data = pg_fetch_array($query))
+			while($data = FS::$dbMgr->Fetch($query))
 				array_push($rules,$data["rulename"]);
 			$output .= $this->loadModuleRuleSets($rules);
 			$output .= FS::$iMgr->hidden("gid",$gid);
@@ -72,7 +72,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select("z_eye_groups","gid,gname,description");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
 					$tmpoutput .= "<table id=\"grpt\"><tr><th>GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th></tr>";
