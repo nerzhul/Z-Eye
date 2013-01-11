@@ -601,6 +601,7 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").
 				FS::$iMgr->hidden("name",$cmdname).FS::$iMgr->hidden("edit",1).
 				"<ul class=\"ulform\"><li><b>".$this->loc->s("Name").":</b> ";
+			$cmd = htmlentities($cmd);
 			$output .= $cmdname."</li><li><b>".$this->loc->s("Command").":</b> ".FS::$iMgr->input("cmd",$cmd,30,200)."</li><li>".
 				FS::$iMgr->submit("",$this->loc->s("Save"))."</ul></form>";
 			return $output;
