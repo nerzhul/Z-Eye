@@ -34,11 +34,13 @@
 				$output = "<script type=\"text/javascript\">
 			        var refreshId = setInterval(function()
         			{
-	        		        $('#reports').fadeOut(1500);
-		                	$('#reports').load('index.php?mod=".$this->mid."&at=2', function() {
-			                       $('#reports').fadeIn(2500);
+					$.get('index.php?mod=".$this->mid."&at=2', function(data) {
+	        		        	$('#reports').fadeOut(1500,function() {
+							$('#reports').html(data);
+			                		$('#reports').fadeIn(1500);
+						});
         			        });
-		        	}, 30000);</script>";
+		        	}, 20000);</script>";
 				$output .= "<h1>Speed Reporting</h1>";
 			}
 			$output .= "<div id=\"reports\">";
