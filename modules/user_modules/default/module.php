@@ -59,7 +59,7 @@
 
 		private function showIcingaReporting() {
 			// report nagios
-		        $content = file_get_contents("http://127.0.0.1/cgi-bin/icinga/status.cgi");
+		        $content = file_get_contents("http://127.0.0.1/cgi-bin/icinga/status.cgi?limit=0&start=1");
         		preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
 			if(isset($body[0][0])) {
 			        $body = $body[0][0];
@@ -93,7 +93,7 @@
 				$this->totalicinga = count($totalservices[0])-1;
 
 				// report nagios
-                	        $content = file_get_contents("http://localhost/cgi-bin/icinga/status.cgi?servicestatustypes=28");
+                	        $content = file_get_contents("http://localhost/cgi-bin/icinga/status.cgi?limit=0&servicestatustypes=28");
                         	preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
 	                        $body = $body[0][0];
 

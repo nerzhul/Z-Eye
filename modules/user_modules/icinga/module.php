@@ -24,7 +24,14 @@
 	class iIcinga extends genModule{
 		function iIcinga() { parent::genModule(); $this->loc = new lIcinga(); }
 		public function Load() {
-			$output = $this->showTabPanel();
+			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
+			switch($edit) {
+				case 2: $output = $this->editHost(); break;
+				case 8: $output = $this->editCmd(); break;
+				default:
+					$output = $this->showTabPanel();
+					break;
+			}
 			return $output;
 		}
 		
@@ -141,7 +148,6 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",true,array("type" => "chk"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
 			$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
-			
 			// icon image
 			// statusmap image
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
@@ -159,7 +165,7 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Address")."</th><th>".$this->loc->s("Template")."</th><th>".$this->loc->s("Parent")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=2&host=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
 				if($data["template"] == "t") $output .= $this->loc->s("Yes");
 				else $output .= $this->loc->s("No");
 				$output .= "</td><td>";
@@ -173,6 +179,82 @@
 				$output .="</td><td><a href=\"index.php?mod=".$this->mid."&act=15&host=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."</a></td></tr>";
 			}
 			if($found) $output .= "</table>";
+			return $output;
+		}
+
+		private function editHost() {
+			$host = FS::$secMgr->checkAndSecuriseGetData("host");
+			// @TODO: log
+			if(!$host) {
+				return FS::$iMgr>printError($this->loc->s("err-no-host"));
+			}
+
+			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$host."'");
+			$hostdata = FS::$dbMgr->Fetch($query);
+			if(!$hostdata) {
+				return FS::$iMgr>printError($this->loc->s("err-no-host"));
+			}
+			$output = "<h1>".$this->loc->s("title-host-edit")."</h1>";	
+
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13").
+				FS::$iMgr->hidden("edit",1).FS::$iMgr->hidden("name",$host);
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$hostdata["template"] == "t" ? true : false,array("type" => "chk"));
+			//$formoutput .= template list
+			$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$host."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$hostdata["alias"]);
+			$output .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname",$hostdata["dname"]);
+			$output .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
+			$output .= FS::$iMgr->select("icon");
+			$output .= FS::$iMgr->selElmt("Aucun","",$hostdata["iconid"] == "" ? true : false);
+			$query = FS::$dbMgr->Select("z_eye_icinga_icons","id,name","","name");
+			while($data = FS::$dbMgr->Fetch($query))
+				$output .= FS::$iMgr->selElmt($data["name"],$data["id"],$hostdata["iconid"] == $data["id"] ? true : false);
+			$output .= "</select></td></tr>";
+
+			$parentlist = array();
+			$query = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$host."'");
+			while($data = FS::$dbMgr->Fetch($query))
+				array_push($parentlist,$data["parent"]);
+			
+			$output .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
+			$output .= FS::$iMgr->select("parent[]","",NULL,true);
+			$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",count($parentlist) > 0 ? false : true);
+			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"],in_array($data["name"],$parentlist));
+			}
+			$output .= "</select></td></tr>";
+			
+			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$hostdata["addr"]);
+			
+			// Checks
+			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand",$hostdata["alivecommand"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod",$hostdata["checkperiod"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => $hostdata["checkinterval"], "type" => "num"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => $hostdata["retrycheckinterval"], "type" => "num"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => $hostdata["maxcheck"], "type" => "num"));
+			
+			// Global
+			$output .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",$hostdata["eventhdlen"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",$hostdata["flapen"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",$hostdata["failpreden"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",$hostdata["perfdata"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",$hostdata["retstatus"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",$hostdata["retnonstatus"] == "t" ? true : false,array("type" => "chk"));
+			
+			// Notifications
+			$output .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",$hostdata["notifen"] == "t" ? true : false,array("type" => "chk"));
+			$output .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod",$hostdata["notifperiod"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval","",array("value" => $hostdata["notifintval"], "type" => "num"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",$hostdata["hostoptd"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",$hostdata["hostoptu"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",$hostdata["hostoptr"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",$hostdata["hostoptf"] == "t" ? true : false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$hostdata["hostopts"] == "t" ? true : false,array("type" => "chk"));
+			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$hostdata["contactgroup"])."</td></tr>";
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
 			return $output;
 		}
 		
@@ -496,19 +578,39 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=8&cmd=".$data["name"]."\">".$data["name"]."</a></td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>
 						<a href=\"index.php?mod=".$this->mid."&act=2&cmd=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
 						</a></td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
 		}
+
+		private function editCmd() {
+			$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
+			// TODO: log
+			if(!$cmdname) {
+				return FS::$iMgr->printError($this->loc->s("err-no-cmd"));
+			}
+
+			$cmd = FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'");
+			if(!$cmd) {
+				return FS::$iMgr->printError($this->loc->s("err-cmd-doesnt-exist"));
+			}
+			$output = "<h1>".$this->loc->s("title-cmd-edit")."</h1>";
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").
+				FS::$iMgr->hidden("name",$cmdname).FS::$iMgr->hidden("edit",1).
+				"<ul class=\"ulform\"><li><b>".$this->loc->s("Name").":</b> ";
+			$output .= $cmdname."</li><li><b>".$this->loc->s("Command").":</b> ".FS::$iMgr->input("cmd",$cmd,30,200)."</li><li>".
+				FS::$iMgr->submit("",$this->loc->s("Save"))."</ul></form>";
+			return $output;
+		}
 		
-		private function getTimePeriodList($name) {
+		private function getTimePeriodList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias","","alias");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"],$select == $data["name"]);
 			}
 			$output .= "</select>";
 			return $output;
@@ -524,11 +626,11 @@
 			return $output;
 		}
 		
-		private function genContactGroupsList($name) {
+		private function genContactGroupsList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"]);
+				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"],$select == $data["name"] ? true : false);
 			}
 			$output .= "</select>";
 			return $output;
@@ -893,23 +995,30 @@
 		}
 		public function handlePostDatas($act) {
 			switch($act) {
-				// Add command
+				// Add/Edit command
 				case 1:
 					$cmdname = FS::$secMgr->checkAndSecurisePostData("name");
 					$cmd = FS::$secMgr->checkAndSecurisePostData("cmd");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					
-					if(!$cmdname || !$cmd || preg_match("#[ ]#",$cmdname)) {
+					if(!$cmdname || !$cmd || preg_match("#[ ]#",$cmdname) || $edit && $edit != 1) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
 						return;
 					}
-					
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
+
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
+							return;
+						}
+					}
+					else if(FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=3");
 						return;
 					}
 					
 					// @TODO verify paths
-					
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_commands","name = '".$cmdname."'");	
 					FS::$dbMgr->Insert("z_eye_icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=5");
@@ -1268,10 +1377,10 @@
 					$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
 					$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
 					$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					$ctg = FS::$secMgr->getPost("ctg","w");
-					
 					if(!$name || preg_match("#[ ]#",$name) || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
-						 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon)) {
+						 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon) || $edit && $edit != 1) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
@@ -1296,16 +1405,24 @@
 					$retcheckintval = FS::$secMgr->getPost("retcheckintval","n+");
 					$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
 					$notifintval = FS::$secMgr->getPost("notifintval","n+=");
-					
+
 					if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 					
 					// Now verify datas
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=3");
-						return;
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
+                                                        header("Location: index.php?mod=".$this->mid."&sh=2&err=3");
+                                                        return;
+                                                }
+					}
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=2&err=3");
+							return;
+						}
 					}
 					
 					if($parent && !in_array("none",$parent)) {
@@ -1333,12 +1450,14 @@
 						return;
 					}
 
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
 					FS::$dbMgr->Insert("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
 						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid",
 						"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
 						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".$icon."'");
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
 					if($parent && !in_array("none",$parent)) {
 						$count = count($parent);
 						for($i=0;$i<$count;$i++) {
