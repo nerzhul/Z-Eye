@@ -2019,7 +2019,7 @@
 						return;
 					}
 					$out = "";
-					exec("ping -W 1 -c 1 ".$dip." | grep ttl | wc -l|awk '{print $1}'",$out);
+					exec("ping -W 100 -c 1 ".$dip." | grep ttl | wc -l|awk '{print $1}'",$out);
 					if(!is_array($out) || count($out) > 1)
 						echo "<span style=\"color:red;\">".$this->loc->s("err-output")." ".var_dump($out)."</span>";
 					else if($out[0] > 1)

@@ -19,10 +19,7 @@
 
 	function loadNetdiscoCommunities(&$snmpro,&$snmprw) {
 
-                if(Config::getOS() == "FreeBSD")
-                        $file = file("/usr/local/etc/netdisco/netdisco.conf");
-                else if(Config::getOS() == "Debian")
-                        $file = file("/etc/netdisco/netdisco.conf");
+                $file = file("/usr/local/etc/netdisco/netdisco.conf");
                 if(!$file) {
                         echo "[".Config::getWebsiteName()."][SNMP-Caching][FATAL] Cannot find/read netdisco.conf !";
                         exit(1);

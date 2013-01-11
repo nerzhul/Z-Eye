@@ -40,16 +40,10 @@
 			$output = "";
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>";
-			if(Config::getOS() == "FreeBSD")
-				$file = file("/usr/local/etc/netdisco/netdisco.conf");
-			else if(Config::getOS() == "Debian")
-				$file = file("/etc/netdisco/netdisco.conf");
+			$file = file("/usr/local/etc/netdisco/netdisco.conf");
 
 			$dnssuffix = ".local";
-			if(Config::getOS() == "FreeBSD")
-				$netdiscodir = "/usr/local/share/netdisco/";
-			else if(Config::getOS() == "Debian")
-				$netdiscodir = "/usr/lib/netdisco/";
+			$netdiscodir = "/usr/local/share/netdisco/";
 			$nodetimeout = 60;
 			$devicetimeout = 90;
 			$pghost = "127.0.0.1";
@@ -60,17 +54,11 @@
 			$snmprw = "private";
 			$snmptimeout = 1;
 			$snmptry = 3;
-			if(Config::getOS() == "FreeBSD")
-				$snmpmibs = "/usr/local/share/netdisco-mibs/";
-			else if(Config::getOS() == "Debian")
-				$snmpmibs = "/usr/share/netdisco/mibs/";
+			$snmpmibs = "/usr/local/share/netdisco-mibs/";
 			$snmpver = 2;
 
 			if(!$file) {
-				if(Config::getOS() == "FreeBSD")
-					$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
-				else if(Config::getOS() == "Debian")
-					$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /etc/netdisco/netdisco.conf");
+				$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
 			} else {
 				foreach ($file as $lineNumber => $buf) {
 					$buf = trim($buf);
@@ -113,14 +101,8 @@
 					fclose($file);
 				}
 			}
-			if(Config::getOS() == "FreeBSD")
-				$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","r");
-			else if(Config::getOS() == "Debian")
-				$file = fopen("/etc/netdisco/netdisco-topology.txt","r");
-			if(Config::getOS() == "FreeBSD")
-				$firstnode = fread($file,filesize("/usr/local/etc/netdisco/netdisco-topology.txt"));
-			else if(Config::getOS() == "Debian")
-				$firstnode = fread($file,filesize("/etc/netdisco/netdisco-topology.txt"));
+			$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","r");
+			$firstnode = fread($file,filesize("/usr/local/etc/netdisco/netdisco-topology.txt"));
 			fclose($file);
 			// @TODO: load configuration file
 			$output .= "<tr><td>".$this->loc->s("dns-suffix")."</td><td>".FS::$iMgr->input("suffix",$dnssuffix)."</td></tr>";
@@ -148,37 +130,26 @@
 			return $output;
 		}
 
-		public function checkNetdiscoConf($dns,$dir,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$firstnode) {
+		public function checkNetdiscoConf($dns,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$firstnode) {
 			if(!FS::$secMgr->isNumeric($nodetimeout) || !FS::$secMgr->isNumeric($devicetimeout) || !FS::$secMgr->isNumeric($snmptimeout) ||
 				!FS::$secMgr->isNumeric($snmptry) || !FS::$secMgr->isNumeric($snmpver))
 				return false;
-
-			if($dns == "" || $dir == "" || $pghost == "" || $dbname == "" || $dbuser == "" || $dbpwd == "" || $snmpro == "" || $snmprw == "" || $snmpmibs == "" || $firstnode == "")
+			if($dns == "" || $pghost == "" || $dbname == "" || $dbuser == "" || $dbpwd == "" || $snmpro == "" || $snmprw == "" || 
+				$firstnode == "")
 				return false;
-
 			if($nodetimeout > 3600 || $nodetimeout < 10 || $devicetimeout > 3600 || $devicetimeout < 10 || $snmptimeout > 30 || $snmptimeout < 1 || $snmptry > 10 ||
 				$snmptry < 1 || ($snmpver != 1 && $snmpver != 2))
 				return false;
-
 			return true;
 		}
 		public function writeNetdiscoConf($dns,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmpro,$snmprw,$snmptimeout,$snmptry,$snmpver,$firstnode) {
-			if(Config::getOS() == "FreeBSD")
-				$file = fopen("/usr/local/etc/netdisco/netdisco.conf","w+");
-			else if(Config::getOS() == "Debian")
-				$file = fopen("/etc/netdisco/netdisco.conf","w+");
+			$file = fopen("/usr/local/etc/netdisco/netdisco.conf","w+");
 			if(!$file)
 				return 1;
 			fwrite($file,"# ---- General Settings ----\n");
 			fwrite($file,"domain = ".$dns."\n");
-			if(Config::getOS() == "FreeBSD") {
-				fwrite($file,"home = /usr/local/share/netdisco\n");
-				fwrite($file,"topofile = /usr/local/etc/netdisco/netdisco-topology.txt\n");
-			}
-			else if(Config::getOS() == "Debian") {
-				fwrite($file,"home = /usr/lib/netdisco\n");
-				fwrite($file,"topofile = /etc/netdisco/netdisco-topology.txt\n");
-			}
+			fwrite($file,"home = /usr/local/share/netdisco\n");
+			fwrite($file,"topofile = /usr/local/etc/netdisco/netdisco-topology.txt\n");
 			
 			fwrite($file,"timeout = 90\nmacsuck_timeout = 90\nmacsuck_all_vlans = true\n");
 			fwrite($file,"arpnip          = true\n");
@@ -193,18 +164,12 @@
 			fwrite($file,"db_Pg_opts      = PrintError => 1, AutoCommit => 1\n");
 			fwrite($file,"\n# ---- SNMP Settings ----\ncommunity = ".$snmpro."\ncommunity_rw = ".$snmprw."\nsnmptimeout = ".($snmptimeout*1000000)."\n");
 			fwrite($file,"snmpretries = ".$snmptry."\nsnmpver = ".$snmpver."\n");
-			if(Config::getOS() == "FreeBSD")
-				fwrite($file,"mibhome = /usr/local/share/netdisco-mibs/\n");
-			else if(Config::getOS() == "Debian")
-				fwrite($file,"mibhome = /usr/share/netdisco/mibs/\n");
+			fwrite($file,"mibhome = /usr/local/share/netdisco-mibs/\n");
 			fwrite($file,"mibdirs = ".'$mibhome/allied,  $mibhome/asante, $mibhome/cisco, \\'."\n");
 			fwrite($file,'$mibhome/foundry, $mibhome/hp,     $mibhome/nortel, $mibhome/extreme, $mibhome/rfc,     $mibhome/net-snmp'."\n".'bulkwalk_off = true'."\n");
 			fclose($file);
 
-			if(Config::getOS() == "FreeBSD")
-				$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","w+");
-			else if(Config::getOS() == "Debian")
-				$file = fopen("/etc/netdisco/netdisco-topology.txt","w+");
+			$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","w+");
 			if(!$file)
 				return 1;
 			fwrite($file,$firstnode."\n");

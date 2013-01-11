@@ -32,7 +32,7 @@
 			if(!isset($portbuffer[$dip][$portname])) {
 				$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 				if($community == NULL) $community = SNMPConfig::$SNMPReadCommunity;
-				exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
+				exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 				if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
 					return -1;
 				$out = explode(" ",$out[0]);
@@ -182,8 +182,8 @@
 		fwrite($file,$graphbuffer);
 		fclose($file);
 		
-		exec("circo -Tsvg ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".svg");
-		exec("circo -Tpng ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".png");
+		exec("/usr/local/bin/circo -Tsvg ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".svg");
+		exec("/usr/local/bin/circo -Tpng ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".png");
 	}
 	
 	echo "[".Config::getWebsiteName()."][NetGraph-Generator] started at ".date('d-m-Y G:i:s')."\n";
