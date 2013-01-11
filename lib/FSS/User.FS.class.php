@@ -53,7 +53,7 @@
 		}
 
 		public function Create() {
-			$id = FS::$dbMgr->GetMax("z_eye_users","id")+1;
+			$id = FS::$dbMgr->GetMax("z_eye_users","uid")+1;
 			FS::$dbMgr->Insert("z_eye_users","uid, username, ulevel, subname, name, mail, join_date, last_ip, sha_pwd, last_conn","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW()");
 		}
 

@@ -330,7 +330,7 @@
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
-					$exist = FS::$dbMgr->GetOneData("z_eye_users","uid","username = '".$username."'");
+					$exist = FS::$dbMgr->GetOneData("z_eye_users","last_conn","username = '".$username."'");
 					if(!$exist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove user '".$username."', doesn't exist");
 						header("Location: index.php?mod=".$this->mid."&err=1");
