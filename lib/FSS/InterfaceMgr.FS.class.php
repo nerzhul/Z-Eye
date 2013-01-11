@@ -410,7 +410,7 @@
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-selected\"" : "")."><a href=\"".$link."&at=2&sh=".$shid."\">".$label."</a>";
+			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : "")."><a href=\"".$link."&at=2&sh=".$shid."\">".$label."</a>";
 			return $output;
 		}
 		

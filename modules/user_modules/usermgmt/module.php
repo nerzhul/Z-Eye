@@ -88,9 +88,8 @@
 		}
 
 		private function EditServer($addr) {
-			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
+			if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) 
 				return FS::$iMgr->printError($this->loc->s("err-rights"));
-			}
 
 			$output = "<h2>".$this->loc->s("title-directory")."</h2>";
 			$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
