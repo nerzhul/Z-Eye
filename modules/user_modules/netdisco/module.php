@@ -24,7 +24,6 @@
 		function iNetdisco() { parent::genModule(); $this->loc = new lNetdisco(); }
 		
 		public function Load() {
-			$output = "<h1>".$this->loc->s("title-netdisco")."</h1>";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err == 1)
 				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-data"));
@@ -32,14 +31,52 @@
 				$output .= FS::$iMgr->printError($this->loc->s("err-write-fail"));
 			else if ($err == -1)
 				$output .= FS::$iMgr->printDebug($this->loc->s("mod-ok"));
-			$output .= $this->showMainConf();
+			$output .= $this->showMain();
 			return $output;
 		}
 
-		private function showMainConf() {
+		private function showMain() {
+			$output = "";
+                        $sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+                        
+                        if(!FS::isAjaxCall()) {
+				$output .= "<h1>".$this->loc->s("title-netdisco")."</h1>";
+                                $output .= "<div id=\"contenttabs\"><ul>";
+                                $output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
+                                $output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("SNMP-communities"),$sh);
+                                $output .= "</ul></div>";
+                                $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+                                $output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+                                return $output;
+                        }
+
+                        if(!$sh) $sh = 1;
+
+                        switch($sh) {
+                                case 1: $output .= $this->showMainConfTab(); break;
+                                case 2: $output .= $this->showSNMPTab(); break;
+			}
+
+			return $output;	
+		}
+
+		private function showSNMPTab() {
+			$output = "";
+			$found = false;
+
+
+			$tmpoutput = "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Read-Only")."</th><th>".$this->loc->s("Read-Write")."</th></tr>";
+			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw","","name");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) $found = true;
+				$tmpoutput .= "<tr><td>".$data["name"]."</td><td>".($data["ro"] == 't' ? "X" : "")."</td><td>".($data["rw"] == 't' ? "X": "")."</td><td></td></tr>";
+			}
+			if($found) $output .= $tmpoutput."</table>";	
+		}
+
+		private function showMainConfTab() {
 			$output = "";
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>";
 			$file = file("/usr/local/etc/netdisco/netdisco.conf");
 
 			$dnssuffix = ".local";
@@ -57,6 +94,13 @@
 			$snmpmibs = "/usr/local/share/netdisco-mibs/";
 			$snmpver = 2;
 
+			$count = FS::$dbMgr->Count("z_eye_snmp_communities");
+			if($count < 1) {
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community"));
+				return $output;
+			} 
+
+			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>";
 			if(!$file) {
 				$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
 			} else {
@@ -104,7 +148,6 @@
 			$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","r");
 			$firstnode = fread($file,filesize("/usr/local/etc/netdisco/netdisco-topology.txt"));
 			fclose($file);
-			// @TODO: load configuration file
 			$output .= "<tr><td>".$this->loc->s("dns-suffix")."</td><td>".FS::$iMgr->input("suffix",$dnssuffix)."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("main-node")."</td><td>".FS::$iMgr->input("fnode",$firstnode)."</td></tr>";
 			$output .= "<tr><th colspan=\"2\">".$this->loc->s("timer-conf")."</th></tr>";

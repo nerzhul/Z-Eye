@@ -27,7 +27,8 @@
 						<tr><td></td><td>".FS::$iMgr->check("mrule_switches_write",array("check" => in_array("mrule_switches_write",$activerules),"label" => "Modifier les données"))."</td></tr>
 						<tr><td></td><td>".FS::$iMgr->check("mrule_switches_discover",array("check" => in_array("mrule_switches_discover",$activerules),"label" => "Découvrir un équipement"))."</td></tr>
 						<tr><td></td><td>".FS::$iMgr->check("mrule_switches_globalsave",array("check" => in_array("mrule_switches_globalsave",$activerules),"label" => "Sauvegarde globale des configurations"))."</td></tr>
-						<tr><td></td><td>".FS::$iMgr->check("mrule_switches_globalbackup",array("check" => in_array("mrule_switches_globalbackup",$activerules),"label" => "Export global des configurations"))."</td></tr>";
+						<tr><td></td><td>".FS::$iMgr->check("mrule_switches_globalbackup",array("check" => in_array("mrule_switches_globalbackup",$activerules),"label" => "Export global des configurations"))."</td></tr>
+						<tr><td></td><td>".FS::$iMgr->check("mrule_switches_managerights",array("check" => in_array("mrule_switches_managerights",$activerules),"label" => "Délégation et droits"))."</td></tr>";
                     return $output;
                 }
 

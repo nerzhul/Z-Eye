@@ -1152,6 +1152,7 @@
 				default: break;
 			}
 
+			$showtitle = true;
 			if(FS::$sessMgr->hasRight("mrule_switches_discover")) {
 				$formoutput = "<script type=\"text/javascript\">function showwait() {";
 				$formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
@@ -1161,6 +1162,8 @@
 				$formoutput .= "</li><li>".FS::$iMgr->JSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
 				$formoutput .= "</ul></form>";
 				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=18","discoverdev",array("snotif" => $this->loc->s("Discovering-in-progress"), "lock" => true));
+				$showtitle = false;
+				$output .= "<h2>".$this->loc->s("title-global-fct")."</h2>";
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 			}
 
@@ -1209,6 +1212,7 @@
 					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21","backupall",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true));
 				}
 				if($rightsok) {
+					if($titleshow) $output .= "<h2>".$this->loc->s("title-global-fct")."</h2>";
 					// Openable divs
 					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
 				}
