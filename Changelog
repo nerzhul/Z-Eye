@@ -198,3 +198,20 @@ Beta 3.1
 Beta 3.2
 - Implement DHCP history
 - improve for loops perfs
+
+Beta 3.3
+- Coding cleanup
+- SQL abstraction
+- DHCP search say which server
+- Security improvements
+- Move from Pg 9.0.11 to 9.2.2
+
+Beta 3.4
+- Move from FreeBSD 9.0-p3 to 9.1-p1
+- New password complexity config
+- Add rights to modify users
+- Preimplement Dell switch management 
+- Switch code cleanup for multi switch builders
+- Export netdisco SNMP communities from file reading to local DB
+- Added NRPE2 for NRPE sensors support
+
