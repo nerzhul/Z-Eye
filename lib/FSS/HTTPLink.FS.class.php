@@ -86,10 +86,10 @@
 			while($data = pg_fetch_array($query)) {
 				$this->id = $data["id"];
 				$this->Load();
-				$output .= FS::$iMgr->addElementTolist($this->getIt(),$data["id"], $idsel > 0 && $idsel == $data["id"] ? true : false);
+				$output .= FS::$iMgr->selElmt($this->getIt(),$data["id"], $idsel > 0 && $idsel == $data["id"] ? true : false);
 			}
 			$output .= "</select>";
-			return $output;		
+			return $output;	
 		}
 		
 		public function getType() { return $this->type; }

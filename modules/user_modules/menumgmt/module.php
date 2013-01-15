@@ -88,29 +88,28 @@
 			$output = "<h4>";
 			$output .= $edit ? $this->loc->s("elmt-edit") : $this->loc->s("elmt-create");
 			$output .= "</h4>";
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4));
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4))."<ul class=\"ulform\">";
 			$menuEl = NULL;
 			if($edit) {
-				$meid = FS::$secMgr->checkGetData("im");
-				FS::$secMgr->SecuriseStringForDB($meid);
+				$meid = FS::$secMgr->checkAndSecuriseGetData("im");
 				$output .= FS::$iMgr->hidden("menu_elmt",$meid);
 				$menuEl = new MenuElement();
 				$menuEl->setId($meid);
 				$menuEl->Load();
 			}
-			$output .= $this->loc->s("Name")." ";
-			$output .= FS::$iMgr->input("name",$menuEl ? $menuEl->getName() : "");
-			$output .= "<hr>".$this->loc->s("Link")." ";
+			$output .= "<li>".$this->loc->s("Name")." ";
+			$output .= FS::$iMgr->input("name",$menuEl ? $menuEl->getName() : "")."</li>";
+			$output .= "<li>".$this->loc->s("Link")." ";
 			$link = new HTTPLink(0);
-			$output .= $link->CreateSelect($menuEl ? $menuEl->getLink() : 0);
-			$output .= "<hr>".$this->loc->s("Connected")." ? ";
+			$output .= $link->CreateSelect($menuEl ? $menuEl->getLink() : 0)."</li>";
+			$output .= "<li>".$this->loc->s("Connected")." ? ";
 			$output .= FS::$iMgr->select("isconnected");
 			$output .= FS::$iMgr->selElmt($this->loc->s("No"),-1,$menuEl && $menuEl->getConnected() == -1 ? true : false);
 			$output .= FS::$iMgr->selElmt($this->loc->s("Yes"),1,$menuEl && $menuEl->getConnected() == 1 ? true : false);
 			$output .= FS::$iMgr->selElmt($this->loc->s("Both"),0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
-			$output .= "</select><hr>";
+			$output .= "</select></li><li>";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
-			$output .= "</form>";
+			$output .= "</li></ul></form>";
 			return $output;
 		}
 		

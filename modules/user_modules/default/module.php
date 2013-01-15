@@ -77,6 +77,7 @@
 		        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
 			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
 	        		$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
+				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)<\/TD>\n(.*?)<\/TR><TR>#i',"$1",$body);
 			        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
 			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
 	        		$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);

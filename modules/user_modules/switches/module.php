@@ -1253,6 +1253,10 @@
 
 			if($foundsw == 0 && $foundwif == 0)
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
+
+			if(FS::$seccMgr->hasRight("")) {
+				//$output .= "<h2>".$this->loc
+			}
 			return $output;
 		}
 
