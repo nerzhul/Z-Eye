@@ -215,3 +215,5 @@ Beta 3.4
 - Export netdisco SNMP communities from file reading to local DB
 - Added NRPE2 for NRPE sensors support
 
+Beta 3.5
+- Export netdisco SNMP community management to dedicated module
