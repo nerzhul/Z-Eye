@@ -61,7 +61,7 @@
 			while($data = pg_fetch_array($query)) {
 				$this->id = $data["id"];
 				$this->Load();
-				$output .= FS::$iMgr->addElementTolist($this->getName(),$data["id"], $idsel > 0 && $idsel == $data["id"] ? true : false);
+				$output .= FS::$iMgr->selElmt($this->getName(),$data["id"], $idsel > 0 && $idsel == $data["id"] ? true : false);
 			}
 			$output .= "</select>";
 			return $output;

@@ -18,17 +18,17 @@
         */
 
         require_once(dirname(__FILE__)."/../../../lib/FSS/objects/Rules.FS.class.php");
-        class rNetdisco extends zRules {
-                function rNetdisco() { $this->connectedstate = 1; }
+        class rSNMPmgmt extends zRules {
+                function rSNMPmgmt() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Moteur Netdisco</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_netdisco_read",array("check" => in_array("mrule_netdisco_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+			$output = "<tr><td>Gestion SNMP</td>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_snmpmgmt_read",array("check" => in_array("mrule_snmpmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>";
                         return $output;
                 }
 
                 public function canAccessToModule() {
-			if (FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_netdisco_read"))
+			if (FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_snmpmgmt_read"))
                                 return true;
                         return false;
                 }

@@ -37,7 +37,7 @@
 					$output .= $this->showMenuForm(true);
 			}
 			else {
-			$output .= "<h3>".$this->loc->s("title-menu-mgmt")."</h3>";
+			$output .= "<h1>".$this->loc->s("title-menu-mgmt")."</h1>";
 					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-Menu")."</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
@@ -49,7 +49,7 @@
 						else if($data["isconnected"] == 1)
 							$output .= $this->loc->s("Yes");
 						else
-							$output .= $this->loc->s("Both");						
+							$output .= $this->loc->s("Both");
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
 						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=3&menu=".$data["id"]."\">";
@@ -58,7 +58,7 @@
 					}
 					
 					$output .= "</table>
-					<h3>".$this->loc->s("title-menu-node-mgmt")."</h3>
+					<h1>".$this->loc->s("title-menu-node-mgmt")."</h1>
 					<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
@@ -85,9 +85,9 @@
 		}
 		
 		public function showMenuElmForm($edit = false) {
-			$output = "<h4>";
+			$output = "<h2>";
 			$output .= $edit ? $this->loc->s("elmt-edit") : $this->loc->s("elmt-create");
-			$output .= "</h4>";
+			$output .= "</h2>";
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4))."<ul class=\"ulform\">";
 			$menuEl = NULL;
 			if($edit) {
@@ -114,10 +114,10 @@
 		}
 		
 		public function showMenuForm($edit = false) {
-			$output = "<h3>";
+			$output = "<h1>";
 			$output .= $edit ? $this->loc->s("menu-edit") : $this->loc->s("menu-create");
-			$output .= "</h3>";
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
+			$output .= "</h1>";
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1))."<ul class=\"ulform\">";
 			$menu = NULL;
 			if($edit) {
 				$mid = FS::$secMgr->checkAndSecuriseGetData("menu");
@@ -126,21 +126,20 @@
 				$menu->setId($mid);
 				$menu->Load();
 			}
-			$output .= $this->loc->s("Name")." ";
-			$output .= FS::$iMgr->input("name",$menu ? $menu->getName() : "");
-			$output .= "<hr>".$this->loc->s("Connected")." ? ";
+			$output .= "<li>".$this->loc->s("Name")." ";
+			$output .= FS::$iMgr->input("name",$menu ? $menu->getName() : "")."</li>";
+			$output .= "<li>".$this->loc->s("Connected")." ? ";
 			$output .= FS::$iMgr->select("isconnected");
 			$output .= FS::$iMgr->selElmt($this->loc->s("No"),-1,$menu && $menu->getConnected() == -1 ? true : false);
 			$output .= FS::$iMgr->selElmt($this->loc->s("Yes"),1,$menu && $menu->getConnected() == 1 ? true : false);
 			$output .= FS::$iMgr->selElmt($this->loc->s("Both"),0,$menu && $menu->getConnected() == 0 ? true : false);
-			$output .= "</select>";
-			$output .= "<hr>";
-			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
-			$output .= "</form>";
+			$output .= "</select></li>";
+			$output .= "<li>".FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
+			$output .= "</ul></form>";
 			
 			if($edit) {
-				$output .= "<h3>".$this->loc->s("title-menu-node-mgmt")."</h3>
-				<h4>".$this->loc->s("add-elmt")."</h4>";
+				$output .= "<h1>".$this->loc->s("title-menu-node-mgmt")."</h1>
+					<h2>".$this->loc->s("add-elmt")."</h2>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
 				$output .= "<center>".$this->loc->s("elmt")." ";
 				$menuEl = new MenuElement();
@@ -148,9 +147,9 @@
 				$output .= " Place ";
 				$output .= FS::$iMgr->input("order","0",2,2);
 				$output .= FS::$iMgr->hidden("menu",$mid);
-				$output .= FS::$iMgr->submit("",$this->loc->s("Save"));				
+				$output .= FS::$iMgr->submit("",$this->loc->s("Save"));	
 				$output .= "</center></form>
-				<h4>".$this->loc->s("mod-elmt")."</h4>
+				<h2>".$this->loc->s("mod-elmt")."</h2>
 				<table class=\"standardTable\">
 				<tr><th>".$this->loc->s("elmt")."</th><th>".$this->loc->s("Order")."</th><th></th></tr>";
 				$query = FS::$dbMgr->Select("z_eye_menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
