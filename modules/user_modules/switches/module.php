@@ -393,7 +393,7 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-device"));
 					return $output;
 				}
-	
+
 				if($showmodule == 1) {
 					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
 					$found = 0;
@@ -1171,8 +1171,8 @@
 
 			$foundsw = 0;
 			$foundwif = 0;
-			$outputswitch = "<h2>".$this->loc->s("title-router-switch")."</h2>";
-			$outputswitch .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
+			$output .= "<h2>".$this->loc->s("title-router-switch")."</h2>";
+			$outputswitch = "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
 				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr>";
 
 			$outputwifi = "<h2>".$this->loc->s("title-WiFi-AP")."</h2>";
@@ -1254,9 +1254,6 @@
 			if($foundsw == 0 && $foundwif == 0)
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
 
-			if(FS::$seccMgr->hasRight("")) {
-				//$output .= "<h2>".$this->loc
-			}
 			return $output;
 		}
 
