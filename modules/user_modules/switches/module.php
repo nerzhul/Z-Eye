@@ -424,7 +424,7 @@
 						$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
 						$output .= $this->showDeviceModules($devmod,1);
 					}
-	
+
 					return $output;
 				}
 				else if($showmodule == 2) {
@@ -1284,6 +1284,13 @@
 						return;
 					}
 
+					$device = FS::$secMgr->GetOneData("device","name","ip = '".$sw."'");
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo "NORIGHTS";
+						return;	
+                        		}
+
 					if($prise == NULL) $prise = "";
 					// Modify Plug for switch port
 					FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$sw."' AND port = '".$port."'");
@@ -1303,6 +1310,12 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (desc fast edit)");
 						echo "ERROR";
 						return;
+					}
+					$device = FS::$secMgr->GetOneData("device","name","ip = '".$sw."'");
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo "NORIGHTS";
+						return;	
 					}
 					if(FS::$dbMgr->GetOneData("device_port","up","ip = '".$sw."' AND port = '".$port."'") != NULL) {
 						if(setPortDesc($sw,$port,$desc) == 0) {
@@ -1328,7 +1341,12 @@
 						echo "ERROR";
 						return;
 					}
-		
+					$device = FS::$secMgr->GetOneData("device","name","ip = '".$sw."'");
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo "NORIGHTS";
+						return;	
+					}
 					if(FS::$dbMgr->GetOneData("device_port","type","ip = '".$sw."' AND port = '".$port."'") != NULL) {
 						if($this->setPortDuplex($sw,$port,$dup) == 0) {
 							if($save == "true")
@@ -1337,7 +1355,7 @@
 							$duplex = "auto";
 							if($dup == 1) $duplex = "half";
 							else if($dup == 2) $duplex = "full";
-			
+
 							FS::$dbMgr->Update("device_port","duplex_admin = '".$duplex."'","ip = '".$sw."' AND port = '".$port."'");
 							$ldup = FS::$dbMgr->GetOneData("device_port","duplex","ip = '".$sw."' AND port = '".$port."'");
 							$ldup = (strlen($ldup) > 0 ? $ldup : "[NA]");
@@ -1348,77 +1366,6 @@
 								echo "ERROR";
 					}
 					return;
-				case 6:
-					$device = FS::$secMgr->checkAndSecuriseGetData("dev");
-					$portname = FS::$secMgr->checkAndSecuriseGetData("port");
-					$out = "";
-					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-					if($dip == NULL) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (plug fast edit)");
-						echo "-1";
-						return;
-					}
-					$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
-					if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-					exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
-					if(strlen($out[0]) < 5) {
-							echo "-1";
-						return;
-					}
-					$out = explode(" ",$out[0]);
-					$out = explode(".",$out[0]);
-					if(!FS::$secMgr->isNumeric($out[1])) {
-						echo "-1";
-						return;
-					}
-					$portid = $out[1];
-
-					$value = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.68.1.2.2.1.2.".$portid);
-					if($value == false)
-							echo "-1";
-					else
-						echo $value;
-					return;
-				case 7: // Access vlan fast mod
-					$port = FS::$secMgr->checkAndSecurisePostData("swport");
-					$sw = FS::$secMgr->checkAndSecurisePostData("sw");
-					$vlan = FS::$secMgr->checkAndSecurisePostData("vlan");
-					$save = FS::$secMgr->checkAndSecurisePostData("wr");
-					if($port == NULL || $sw == NULL || $vlan == NULL) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (switch access vlan fast mod)");
-						echo "ERROR";
-						return;
-					}
-					if(setSwitchAccessVLAN($sw,$port,$vlan) != 0) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Set access vma, for '".$sw."' to '".$vlan."' on port '".port."'");
-						echo "ERROR";
-						return;
-					}
-					if($save == "true")
-						 writeMemory($sw);
-					pg_query("UPDATE device_port SET vlan ='".$vlan."' WHERE ip='".$sw."' and port='".$port."'");
-					pg_query("UPDATE device_port_vlan SET vlan ='".$vlan."' WHERE ip='".$sw."' and port='".$port."' and native='t'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Set access vlan for '".$sw."' to '".$vlan."' on port '".$port."'");
-					return;
-				case 8: // Trunk vlan Fast
-					$port = FS::$secMgr->checkAndSecurisePostData("swport");
-					$sw = FS::$secMgr->checkAndSecurisePostData("sw");
-					$port = FS::$secMgr->checkAndSecurisePostData("swport");
-					$sw = FS::$secMgr->checkAndSecurisePostData("sw");
-					if($port == NULL || $sw == NULL || $vlan == NULL) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (trunk vlan fast edit)");
-						echo "ERROR";
-						return;
-					}
-					if(setSwitchTrunkVlan($sw,$port,$vlan) != 0) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switches",1,"Fail to set trunk vlan '".$vlan."' for device '".$sw."' port '".$port."'");
-						echo "ERROR";
-						return;
-					}
-					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Set trunk vlan for '".$sw."' to '".$vlan."' on port '".$port."'");
-					if($save == "true")
-						writeMemory($sw);
-					echo $vlan;
 				case 9: // Switch Plug edit
 					$sw = FS::$secMgr->checkAndSecurisePostData("sw");
 					$port = FS::$secMgr->checkAndSecurisePostData("port");
@@ -1441,6 +1388,12 @@
 						return;
 					}
 
+					$device = FS::$secMgr->GetOneData("device","name","ip = '".$sw."'");
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo $this->loc->s("err-no-credentials");
+						return;	
+					}
 					$pid = getPortId($sw,$port);
 					if($pid == -1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"PID is incorrect (plug edit)");
@@ -1789,8 +1742,14 @@
 					$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 					if(!$device) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (vlan replacement, portlist)");
-						echo FS::$iMgr->printError($this->loc->s("err-no-device"));	
+						echo FS::$iMgr->printError($this->loc->s("err-no-device"));
 						return;
+					}
+
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+						return;	
 					}
 
 					if(!$vlan || !FS::$secMgr->isNumeric($vlan)) {
@@ -1814,10 +1773,16 @@
 					$old = FS::$secMgr->checkAndSecurisePostData("oldvl");
 					$new = FS::$secMgr->checkAndSecurisePostData("newvl");
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
-					if(!$old || !$new || !FS::$secMgr->isNumeric($old) || !FS::$secMgr->isNumeric($new) || $old > 4096 || $new > 4096 || $old < 0 || $new < 0) {
+					if(!$device || !$old || !$new || !FS::$secMgr->isNumeric($old) || !FS::$secMgr->isNumeric($new) || $old > 4096 || $new > 4096 || $old < 0 || $new < 0) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing/wrong (vlan replacement)");
 						header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4&err=1");
 						return;
+					}
+
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						header("Location: index.php?mod=".$this->mid."&d=".$device."&err=XX");
+						return;	
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Replace VLAN '".$old."' by '".$new."' on device '".$device."'");
 					replaceVlan($device,$old,$new);
@@ -1837,6 +1802,11 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing/wrong (backup statup-config)");
 						echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
 						return;
+					}
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+						return;	
 					}
 					if($trmode == 2 || $trmode == 4 || $trmode == 5) {
 						$username = FS::$secMgr->checkAndSecurisePostData("srvuser");
@@ -1880,6 +1850,11 @@
 						echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
 						return;
 					}
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+						return;	
+					}
 					echo getCopyState($device,$saveid);
 					return;
 				case 14:
@@ -1889,6 +1864,11 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing/wrong (verify backup error)");
 						echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
 						return;
+					}
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+						return;	
 					}
 					$err = getCopyError($device,$saveid);
 					switch($err) {
@@ -1913,6 +1893,11 @@
 						echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
 						return;
 					}
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+						return;	
+					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Launch restore startup-config for device '".$device."'");
 					echo restoreStartupConfig($device);
 					return;
@@ -1928,6 +1913,11 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (port monitoring)");
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
 						return;
+					}
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						header("Location: index.php?mod=".$this->mid."&err=XX");
+						return;	
 					}
 
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -1964,6 +1954,11 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (Device cleanup)");
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
+					}
+					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+						header("Location: index.php?mod=".$this->mid."&err=XX");
+						return;	
 					}
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					FS::$dbMgr->Delete("device_ip","ip = '".$dip."'");
