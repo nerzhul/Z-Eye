@@ -365,18 +365,25 @@
 			else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
 
 			$output = "";
+
+			$snmpro = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
+			$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+			if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
+				return FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+			}
 			if(!FS::isAjaxCall()) {
 				FS::$iMgr->showReturnMenu(true);
 				$output = "<h2>".$this->loc->s("Device")." ";
-	
+
 				$output .= $device." (";
 				$output .= $dip;
-	
+
 				$dloc = FS::$dbMgr->GetOneData("device","location","name = '".$device."'");
 				if($dloc != NULL)
 				$output .= " - ".$dloc;
 				$output .= ")</h2>";
-				
+
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"),$showmodule);
@@ -1167,8 +1174,6 @@
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 			}
 
-			$query = FS::$dbMgr->Select("device","*","","name");
-
 			$foundsw = 0;
 			$foundwif = 0;
 			$output .= "<h2>".$this->loc->s("title-router-switch")."</h2>";
@@ -1178,7 +1183,17 @@
 			$outputwifi = "<h2>".$this->loc->s("title-WiFi-AP")."</h2>";
 			$outputwifi .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
 				$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr>";
+
+			$query = FS::$dbMgr->Select("device","*","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
+				// Rights: show only reading/writing switches
+				$snmpro = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
+				$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
+				if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
+					!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) 
+					continue;
+
+				// Split WiFi and Switches
 				if(preg_match("#AIR#",$data["model"])) {
 					if($foundwif == 0) $foundwif = 1;
 					$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>";
