@@ -92,7 +92,7 @@
 			$groups = $this->getUserGroups();
 			$found = false;
 			foreach($groups as $gid => $gname) {
-				if(!in_array($gname,$values)) {
+				if(!in_array($gid,$values)) {
 					if(!$found) $found = true;
 					$tmpoutput .= FS::$iMgr->selElmt($gname,$gid);
 				}

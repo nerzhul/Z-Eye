@@ -1161,7 +1161,7 @@
 				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-some-backup-fail")); break;
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-some-field-missing")); break;
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-no-rights")); break;
-				case 99: $output .= FS::$iMgr->printError($this->loc->s("err-no-credentials"); break;
+				case 99: $output .= FS::$iMgr->printError($this->loc->s("err-no-credentials")); break;
 				case -1: $output .= FS::$iMgr->printSuccess($this->loc->s("done-with-success")); break;
 				default: break;
 			}
@@ -1788,7 +1788,7 @@
 
 					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
-						header("Location: index.php?mod=".$this->mid."&d=".$device."&err=XX");
+						header("Location: index.php?mod=".$this->mid."&d=".$device."&err=99");
 						return;	
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Replace VLAN '".$old."' by '".$new."' on device '".$device."'");
@@ -1923,7 +1923,7 @@
 					}
 					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
-						header("Location: index.php?mod=".$this->mid."&err=XX");
+						header("Location: index.php?mod=".$this->mid."&err=99");
 						return;	
 					}
 
@@ -1964,7 +1964,7 @@
 					}
 					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write")) {
-						header("Location: index.php?mod=".$this->mid."&err=XX");
+						header("Location: index.php?mod=".$this->mid."&err=99");
 						return;	
 					}
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
