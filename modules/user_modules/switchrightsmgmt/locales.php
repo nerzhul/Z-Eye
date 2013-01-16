@@ -23,6 +23,11 @@
 		function lSwitchRightsMgmt() {
 			$this->locales = array(
 				"fr" => array(
+					"Add" => "Ajouter",
+					"err-already-exist" => "Cette règle existe déjà", 
+					"err-bad-datas" => "Erreur sur la requête",
+					"err-not-found" => "Cette règle n'existe pas ou plus",
+					"err-snmpgid-not-found" => "La communauté ou le groupe n'existe pas ou plus",
 					"Groups" => "Groupes",
 					"None" => "Aucun",
 					"Reading" => "Lecture",
@@ -35,6 +40,11 @@
 					"Writing" => "Ecriture",
 				),
 				"en" => array(
+					"Add" => "Add",
+					"err-already-exist" => "This rule already exists",
+					"err-bad-datas" => "Bad request",
+					"err-not-found" => "This rule doesn't exist (anymore)",
+					"err-snmpgid-not-found" => "This community/group doesn't exist (anymore)",
 					"Groups" => "Groups",
 					"None" => "Aucun",
 					"Reading" => "Lecture",
