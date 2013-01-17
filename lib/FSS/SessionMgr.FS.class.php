@@ -73,7 +73,7 @@
 		
 		public function getUserLevel() { return (isset($_SESSION["ulevel"]) ? $_SESSION["ulevel"] : 0); }
 		public function getUid() { return $_SESSION["uid"]; }
-		
+
 		public function Close() {
 			session_destroy();
 		}
@@ -94,6 +94,16 @@
 			return $groups;
 		}
 
+		public function getUsers() {
+			$users = array();
+			$query = FS::$dbMgr->Select("z_eye_users","uid");
+			while($data = pg_fetch_array($query)) {
+				array_push($users,$data["uid"]);
+			}
+			$users = array_unique($users);
+			return $users;
+		}
+
 		public function isInGroup($gname) {
 			$gid = FS::$dbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
 			if(in_array($gid,$this->getGroups()))
@@ -111,6 +121,8 @@
 				if(FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = '".$rulename."' AND gid = '".$groups[$i]."'") == "on")
 					return true;
 			}
+			if(FS::$dbMgr->GetOneData("z_eye_user_rules","ruleval","rulename = '".$rulename."' AND uid = '".$this->getUid()."'") == "on")
+				return true;
 			return false;
 		}
 	};
