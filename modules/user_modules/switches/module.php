@@ -73,8 +73,12 @@
 				$output .= "<h2>".$port." sur ".$device."</h2>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") ||
+					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") ||
+					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon"))
+					$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring"),$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
@@ -84,7 +88,6 @@
 				$portid = getPortId($device,$port);
 				// Port modification
 				if(!$sh || $sh == 1) {
-					// # todo, place JS before output
 					$output .= "<script type=\"text/javascript\">function arangeform() {";
 					$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
 					$output .= "$('#vltr').show('slow');
@@ -106,14 +109,11 @@
 						if($('#mabnoresp').is(':hidden')) $('#mabnoresp').show('slow');
 					}";
 					$output .= "};";
-					/*$output .= "function showwait() {";
-					$output .= "$('#subpop').html('".$this->loc->s("mod-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-					$output .= "$('#pop').show();";
-					$output .= "};";*/
 					$output .= "</script>";
 					$query = FS::$dbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if($data = FS::$dbMgr->Fetch($query)) {
-						if($portid != -1) {
+						if($portid != -1 && (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write"))) {
 							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9",array("id" => "swpomod"));
 							$output .= FS::$iMgr->hidden("portid",$portid);
 							$output .= FS::$iMgr->hidden("sw",$device);
@@ -174,9 +174,6 @@
 						$output .= "<tr><td>".$this->loc->s("switchport-mode")."</td><td>";
 						$trmode = getSwitchportModeWithPID($device,$portid);
 
-						/*$trmode = FS::$snmpMgr->get($dip,"1.3.6.1.4.1.9.9.46.1.6.1.1.13.".$portid);
-						$trmode = preg_split("# #",$trmode);
-						$trmode = $trmode[1];*/
 						$mabstate = getSwitchportMABState($device,$portid);
 						if($mabstate == 1)
 							$trmode = 3;
@@ -308,7 +305,8 @@
 
 						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => $this->loc->s("tooltip-saveone")));
 						$output .= "</table>";
-						if($portid != -1) {
+						if($portid != -1 && (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write"))) {
 							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
 							$output .= "</form>";
 							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
@@ -321,6 +319,11 @@
 				}
 				// Port Stats
 				else if($sh == 2) {
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats")) {
+						$output .= FS::$iMgr->printError("err-no-rights");
+						return $output;
+					}
 					$file = file(dirname(__FILE__)."/../../../datas/rrd/".$dip."_".$portid.".html");
 					if($file) {
 						$filebuffer = "";
@@ -345,6 +348,11 @@
 				}
 				// Monitoring
 				else if($sh == 3) {
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") && 
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						return $output;
+					}
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
 					$output .= FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port);
 					$climit = FS::$dbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");

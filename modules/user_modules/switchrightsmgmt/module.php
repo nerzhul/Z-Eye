@@ -42,35 +42,95 @@
 			
 			$found = false;
 			$query = FS::$dbMgr->Select("device","ip,name");
-			$tmpoutput = "<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+			$grpoutput = "<h3>".$this->loc->s("group-rights")."</h3>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Groups")."</th></tr>";
+			$usroutput = "<h3>".$this->loc->s("usr-rights")."</h3>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+				$this->loc->s("Users")."</th></tr>";
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
-				$rules = array();
-				if($data["ro"] == 't')
-					$rules["read"] = array();
-				if($data["rw"] == 't')
-					$rules["write"] = array();
+				$grprules = array("read" => array(), "write" => array(), "readportstats" => array(), "writeportmon" => array());
+				$usrrules = array("read" => array(), "write" => array(), "readportstats" => array(), "writeportmon" => array());
+				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["ip"]."_read" && $data["ro"] == 't')
-						array_push($rules["read"],$data2["gid"]);
-					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["ip"]."_write" && $data["rw"] == 't')
-						array_push($rules["write"],$data2["gid"]);
+					if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_read")
+						array_push($grprules["read"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readportstats")
+						array_push($grprules["readportstats"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_write")
+						array_push($grprules["write"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_writeportmon")
+						array_push($grprules["writeportmon"],$data2["gid"]);
 				}
 				$first = true;
-				foreach($rules as $key => $values) {
-					$tmpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
+				foreach($grprules as $key => $values) {
+					$grpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if($first) $first = false;
 					switch($key) {
-						case "read": $tmpoutput .= $this->loc->s("Reading"); break;
-						case "write": $tmpoutput .= $this->loc->s("Writing"); break;
+						case "read": $grpoutput .= $this->loc->s("Reading"); break;
+						case "write": $grpoutput .= $this->loc->s("Writing"); break;
+						case "readportstats": $grpoutput .= $this->loc->s("Read-port-stats"); break;
+						case "writeportmon": $grpoutput .= $this->loc->s("Write-port-mon"); break;
 					}
-					$tmpoutput .= "</td><td>";
-					$tmpoutput .= $this->showIPGroups($data["ip"],$key,$values);
-				}			
+					$grpoutput .= "</td><td>";
+					$grpoutput .= $this->showIPGroups($data["ip"],$key,$values);
+				}
+				// Users			
+				$query2 = FS::$dbMgr->Select("z_eye_user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
+					if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_read")
+						array_push($usrrules["read"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readportstats")
+						array_push($usrrules["readportstats"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_write")
+						array_push($usrrules["write"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_writeportmon")
+						array_push($usrrules["writeportmon"],$data2["uid"]);
+				}
+				foreach($usrrules as $key => $values) {
+					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
+					if($first) $first = false;
+					switch($key) {
+						case "read": $usroutput .= $this->loc->s("Reading"); break;
+						case "readportstats": $usroutput .= $this->loc->s("Read-port-stats"); break;
+						case "write": $usroutput .= $this->loc->s("Writing"); break;
+						case "writeportmon": $usroutput .= $this->loc->s("Write-port-mon"); break;
+					}
+					$usroutput .= "</td><td>";
+					$usroutput .= $this->showIPGroups($data["ip"],$key,$values);
+				}
 			}
-			if($found) $output .= $tmpoutput."</table>";
+			if($found) {
+				$output .= $grpoutput."</table>";
+				$output .= $usroutput."</table>";
+			}
+			return $output;
+		}
+
+		private function showIPUsers($ip,$right,$values) { 
+			$output = "";
+
+			$count = count($values);
+			if($count) {
+				for($i=0;$i<count($values);$i++) {
+					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ";
+					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right."\">".
+						FS::$iMgr->img("styles/images/cross.png",15,15)."</a><br />";
+				}
+			}
+			else
+				$output .= $this->loc->s("None")."<br />";
+			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("gid");
+			$users = $this->getUsers();
+			$found = false;
+			foreach($users as $uid => $username) {
+				if(!in_array($uid,$values)) {
+					if(!$found) $found = true;
+					$tmpoutput .= FS::$iMgr->selElmt($username,$uid);
+				}
+			}
+			if($found) $output .= $tmpoutput."</select>".FS::$iMgr->submit("",$this->loc->s("Add"))."</form>";
 			return $output;
 		}
 
@@ -101,7 +161,6 @@
 			return $output;
 		}
 
-
 		private function showBySNMPCommunity() {
 			$output = "<h2>".$this->loc->s("title-rightsbysnmp")."</h4>";
 			
@@ -118,17 +177,25 @@
 				if($data["ro"] == 't') {
 					$grprules["read"] = array();
 					$usrrules["read"] = array();
+					$grprules["readportstats"] = array();
+					$usrrules["readportstats"] = array();
 				}
 				if($data["rw"] == 't') {
 					$grprules["write"] = array();
 					$usrrules["write"] = array();
+					$grprules["writeportmon"] = array();
+					$usrrules["writeportmon"] = array();
 				}
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_read" && $data["ro"] == 't')
 						array_push($grprules["read"],$data2["gid"]);
-					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readportstats" && $data["ro"] == 't')
+						array_push($grprules["readportstats"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
 						array_push($grprules["write"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
+						array_push($grprules["writeportmon"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -136,7 +203,9 @@
 					if($first) $first = false;
 					switch($key) {
 						case "read": $grpoutput .= $this->loc->s("Reading"); break;
+						case "readportstats": $grpoutput .= $this->loc->s("Read-port-stats"); break;
 						case "write": $grpoutput .= $this->loc->s("Writing"); break;
+						case "writeportmon": $grpoutput .= $this->loc->s("Write-port-mon"); break;
 					}
 					$grpoutput .= "</td><td>";
 					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values);
@@ -146,8 +215,12 @@
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_read" && $data["ro"] == 't')
 						array_push($usrrules["read"],$data2["uid"]);
-					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readportstats" && $data["ro"] == 't')
+						array_push($usrrules["readportstats"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
 						array_push($usrrules["write"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
+						array_push($usrrules["writeportmon"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -155,7 +228,9 @@
 					if($first) $first = false;
 					switch($key) {
 						case "read": $usroutput .= $this->loc->s("Reading"); break;
+						case "readportstats": $usroutput .= $this->loc->s("Read-port-stats"); break;
 						case "write": $usroutput .= $this->loc->s("Writing"); break;
+						case "writeportmon": $usroutput .= $this->loc->s("Write-port-mon"); break;
 					}
 					$usroutput .= "</td><td>";
 					$usroutput .= $this->showSNMPUsers($data["name"],$key,$values);
@@ -210,9 +285,9 @@
 				$output .= $this->loc->s("None")."<br />";
 			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("uid");
-			$groups = $this->getUsers();
+			$users = $this->getUsers();
 			$found = false;
-			foreach($groups as $uid => $username) {
+			foreach($users as $uid => $username) {
 				if(!in_array($uid,$values)) {
 					if(!$found) $found = true;
 					$tmpoutput .= FS::$iMgr->selElmt($username,$uid);

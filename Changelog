@@ -217,3 +217,10 @@ Beta 3.4
 
 Beta 3.5
 - Export netdisco SNMP community management to dedicated module
+- Implement Group/User rights by SNMP community, global
+
+Beta 3.6
+- Implement per switch rights 
+- Create right for port stats reading
+- Create right for write monitoring
+

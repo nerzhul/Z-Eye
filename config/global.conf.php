@@ -2,7 +2,7 @@
 	class Config {
 		private static $lang = "FR-fr";
 		private static $stylesheet = "fss1.css";
-		private static $websiteName = "Z-Eye (beta 3.5)";
+		private static $websiteName = "Z-Eye (beta 3.6)";
 		private static $OS = "FreeBSD";
 		/* 0 (no crypt, not recommended
 		1: sha1
