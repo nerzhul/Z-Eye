@@ -48,8 +48,10 @@
 				$this->loc->s("Users")."</th></tr>";
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
-				$grprules = array("read" => array(), "write" => array(), "readportstats" => array(), "writeportmon" => array());
-				$usrrules = array("read" => array(), "write" => array(), "readportstats" => array(), "writeportmon" => array());
+				$grprules = array("read" => array(), "readswvlans" => array(), "readportstats" => array(), 
+					"write" => array(), "writeportmon" => array());
+				$usrrules = array("read" => array(), "readswvlans" => array(), "readportstats" => array(), 
+					"write" => array(), "writeportmon" => array());
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -57,6 +59,8 @@
 						array_push($grprules["read"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readportstats")
 						array_push($grprules["readportstats"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswvlans")
+						array_push($grprules["readswvlans"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_write")
 						array_push($grprules["write"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_writeportmon")
@@ -68,8 +72,9 @@
 					if($first) $first = false;
 					switch($key) {
 						case "read": $grpoutput .= $this->loc->s("Reading"); break;
-						case "write": $grpoutput .= $this->loc->s("Writing"); break;
 						case "readportstats": $grpoutput .= $this->loc->s("Read-port-stats"); break;
+						case "readswvlans": $grpoutput .= $this->loc->s("Read-switch-vlan"); break;
+						case "write": $grpoutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $grpoutput .= $this->loc->s("Write-port-mon"); break;
 					}
 					$grpoutput .= "</td><td>";
@@ -82,6 +87,8 @@
 						array_push($usrrules["read"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readportstats")
 						array_push($usrrules["readportstats"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswvlans")
+						array_push($usrrules["readswvlans"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_write")
 						array_push($usrrules["write"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_writeportmon")
@@ -93,6 +100,7 @@
 					switch($key) {
 						case "read": $usroutput .= $this->loc->s("Reading"); break;
 						case "readportstats": $usroutput .= $this->loc->s("Read-port-stats"); break;
+						case "readswvlans": $usroutput .= $this->loc->s("Read-switch-vlan"); break;
 						case "write": $usroutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $usroutput .= $this->loc->s("Write-port-mon"); break;
 					}
@@ -179,6 +187,8 @@
 					$usrrules["read"] = array();
 					$grprules["readportstats"] = array();
 					$usrrules["readportstats"] = array();
+					$grprules["readswvlans"] = array();
+					$usrrules["readswvlans"] = array();
 				}
 				if($data["rw"] == 't') {
 					$grprules["write"] = array();
@@ -192,6 +202,8 @@
 						array_push($grprules["read"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readportstats" && $data["ro"] == 't')
 						array_push($grprules["readportstats"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswvlans" && $data["ro"] == 't')
+						array_push($grprules["readswvlans"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
 						array_push($grprules["write"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
@@ -204,6 +216,7 @@
 					switch($key) {
 						case "read": $grpoutput .= $this->loc->s("Reading"); break;
 						case "readportstats": $grpoutput .= $this->loc->s("Read-port-stats"); break;
+						case "readswvlans": $grpoutput .= $this->loc->s("Read-switch-vlan"); break;
 						case "write": $grpoutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $grpoutput .= $this->loc->s("Write-port-mon"); break;
 					}
@@ -217,6 +230,8 @@
 						array_push($usrrules["read"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readportstats" && $data["ro"] == 't')
 						array_push($usrrules["readportstats"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswvlans" && $data["ro"] == 't')
+						array_push($usrrules["readswvlans"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
 						array_push($usrrules["write"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
@@ -229,6 +244,7 @@
 					switch($key) {
 						case "read": $usroutput .= $this->loc->s("Reading"); break;
 						case "readportstats": $usroutput .= $this->loc->s("Read-port-stats"); break;
+						case "readswvlans": $usroutput .= $this->loc->s("Read-switch-vlan"); break;
 						case "write": $usroutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $usroutput .= $this->loc->s("Write-port-mon"); break;
 					}

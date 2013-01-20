@@ -319,8 +319,7 @@
 				}
 				// Port Stats
 				else if($sh == 2) {
-					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
-						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats")) {
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats")) {
 						$output .= FS::$iMgr->printError("err-no-rights");
 						return $output;
 					}
@@ -404,7 +403,9 @@
 
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"),$showmodule);
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswvlans") || 
+					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswvlans"))
+					$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Details"),$showmodule);
@@ -944,6 +945,11 @@
 					$output .= "<h3>".$this->loc->s("VLANlist")."</h3>";
 					$found = 0;
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswvlans") && 
+                                        	!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswvlans")) {
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						return $output;
+					}
 					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
 					$tmpoutput = "<table><tr><th>ID</th><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("creation-date")."</th></tr>";
 					while($data = FS::$dbMgr->Fetch($query)) {
@@ -958,9 +964,9 @@
 					return $output;	
 				}
 				else if($showmodule == 6) {
-	
+
 					$iswif = (preg_match("#AIR#",FS::$dbMgr->GetOneData("device","model","name = '".$device."'")) ? true : false);
-		
+
 					if($iswif == false) {
 						$poearr = array();
 						// POE States
