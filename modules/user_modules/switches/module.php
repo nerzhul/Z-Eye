@@ -1953,8 +1953,8 @@
 					}
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					$snmprw = FS::$secMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
-					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") && 
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
 						header("Location: index.php?mod=".$this->mid."&err=99");
 						return;	
 					}
