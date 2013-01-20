@@ -407,8 +407,12 @@
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswvlans"))
 					$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Details"),$showmodule);
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") || 
+					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules"))
+					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$showmodule);
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") || 
+					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails"))
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Details"),$showmodule);
 				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools"),$showmodule);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
@@ -421,6 +425,11 @@
 				}
 
 				if($showmodule == 1) {
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") && 
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules")) {
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						return $output;
+					}
 					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
 					$found = 0;
 					$devmod = array();
@@ -447,6 +456,11 @@
 					return $output;
 				}
 				else if($showmodule == 2) {
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") && 
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails")) {
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						return $output;
+					}
 					$query = FS::$dbMgr->Select("device","*","name ='".$device."'");
 					if($data = FS::$dbMgr->Fetch($query)) {
 						$output .= "<h3>".$this->loc->s("Device-detail")."</h3>";
