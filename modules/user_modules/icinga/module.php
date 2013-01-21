@@ -28,6 +28,7 @@
 			switch($edit) {
 				case 2: $output = $this->editHost(); break;
 				case 3: $output = $this->editHostgroup(); break;
+				case 7: $output = $this->editContactgroup(); break;
 				case 8: $output = $this->editCmd(); break;
 				default:
 					$output = $this->showTabPanel();
@@ -39,18 +40,19 @@
 		private function showTabPanel() {
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
-			
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+
 			if(!FS::isAjaxCall()) {
 				$output .= "<h1>".$this->loc->s("title-icinga")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				//$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Hosts"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Hostgroups"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid,$this->loc->s("Services"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid,$this->loc->s("Timeperiods"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid,$this->loc->s("Contacts"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid,$this->loc->s("Contactgroups"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid,$this->loc->s("Commands"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands"),$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
@@ -539,9 +541,15 @@
 			if($found) $output .= "</table>";
 			return $output;
 		}
-		
+
 		private function showContactgroupsTab() {
 			$output = "";
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
+			}
 			
 			/*
 			 * Ajax new contactgroup
@@ -558,9 +566,9 @@
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
-			
+
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"));
-			
+
 			/*
 			 * Contactgroup table
 			 */
@@ -571,7 +579,7 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=7&cg=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
 				$found2 = false;
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -585,7 +593,40 @@
 			if($found) $output .= "</table>";
 			return $output;
 		}
-		
+
+		private function editContactgroup() {
+			$cg = FS::$secMgr->checkAndSecuriseGetData("cg");
+			if(!$cg)
+				return FS::$iMgr->printError($this->loc->s("err-no-contactgroup"));
+
+			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias","name = '".$cg."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$alias = $data["alias"];
+			}
+			else {
+                                return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
+                        }
+			$output = "<h1>".$this->loc->s("title-edit-contactgroup")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=10");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
+				<tr><td>".$this->loc->s("Name")."</td><td>".$cg."</td></tr>";
+			$output .= FS::$iMgr->hidden("name",$cg).FS::$iMgr->hidden("edit",1);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
+			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true);
+
+			$contacts = array();
+			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","member","name = '".$cg."'");
+			while($data = FS::$dbMgr->Fetch($query))
+				array_push($contacts,$data["member"]);
+			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
+			}
+			$output .= "</select></td></tr>";
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
+			return $output;
+		}
+
 		private function showCommandTab() {
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
@@ -1333,23 +1374,32 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=6");
 					return;
-				// Add contact group
+				// Add/Edit contact group
 				case 10:
 					$name = FS::$secMgr->getPost("name","w");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$cts = FS::$secMgr->checkAndSecurisePostData("cts");
-					
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
 					if(!$name || !$alias || !$cts || $cts == "") {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 						return;
 					}
 					
 					// ctg exists
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=3");
-						return;
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
+							return;
+						}
 					}
-					
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=7&err=3");
+							return;
+						}
+					}
+
 					// some members don't exist
 					$count = count($cts);
 					for($i=0;$i<$count;$i++) {
@@ -1358,23 +1408,17 @@
 							return;
 						}
 					}
-					
+
+					if($edit) {
+						FS::$dbMgr->Delete("z_eye_icinga_contactgroups","name = '".$name."'");
+						FS::$dbMgr->Delete("z_eye_icinga_contactgroup_members","name = '".$name."'");
+					}
 					// Add it
 					FS::$dbMgr->Insert("z_eye_icinga_contactgroups","name,alias","'".$name."','".$alias."'");
 					for($i=0;$i<$count;$i++) {
 						FS::$dbMgr->Insert("z_eye_icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
 					}
-					
-					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
-						return;
-					}
-					header("Location: index.php?mod=".$this->mid."&sh=7");
-					return;
-				// Edit contact group
-				case 11:
-					// @TODO
-					
+
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
 						return;
@@ -1384,25 +1428,25 @@
 				// Delete contact group
 				case 12:
 					// @TODO forbid remove when used (service, service_group)
-					$ctgname = FS::$secMgr->getPost("ctg","w");
+					$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
 					if(!$ctgname) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
 						return;
 					}
-					
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$ctgname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
 						return;
 					}
-					
+
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","contactgroup = '".$ctgname."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=4");
 						return;
 					}
-					
+
 					FS::$dbMgr->Delete("z_eye_icinga_contactgroup_members","name = '".$ctgname."'");
 					FS::$dbMgr->Delete("z_eye_icinga_contactgroups","name = '".$ctgname."'");
-					
+
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
 						return;
