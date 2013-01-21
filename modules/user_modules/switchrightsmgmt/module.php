@@ -49,7 +49,7 @@
 				$this->loc->s("Users")."</th></tr>";
 			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
 
-			$query = FS::$dbMgr->Select("device","ip,name",$ip && $ip != "NULL0" ? "ip = '".$ip."'" : "");
+			$query = FS::$dbMgr->Select("device","ip,name",$ip && $ip != "NULL0" ? "ip = '".$ip."'" : "","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				// Init array for device
@@ -211,11 +211,11 @@
 			$output = "";
 			
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw",$community && $community != "NULL0" ? "name = '".$community."'" : "");
 			$grpoutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Groups")."</th></tr>";
 			$usroutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
+			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw",$community && $community != "NULL0" ? "name = '".$community."'" : "","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],$community == $data["name"]);
