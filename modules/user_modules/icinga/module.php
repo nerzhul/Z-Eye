@@ -27,6 +27,7 @@
 			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
 			switch($edit) {
 				case 2: $output = $this->editHost(); break;
+				case 3: $output = $this->editHostgroup(); break;
 				case 8: $output = $this->editCmd(); break;
 				default:
 					$output = $this->showTabPanel();
@@ -42,7 +43,7 @@
 			if(!FS::isAjaxCall()) {
 				$output .= "<h1>".$this->loc->s("title-icinga")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
+				//$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("Hosts"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("Hostgroups"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid,$this->loc->s("Services"),$sh);
@@ -186,7 +187,7 @@
 			$host = FS::$secMgr->checkAndSecuriseGetData("host");
 			// @TODO: log
 			if(!$host) {
-				return FS::$iMgr>printError($this->loc->s("err-no-host"));
+				return FS::$iMgr->printError($this->loc->s("err-no-host"));
 			}
 
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$host."'");
@@ -276,6 +277,12 @@
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
 			}
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
+			}	
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
 
 			$found = false;
@@ -285,7 +292,7 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=3&hg=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				$found2 = false;
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'","hosttype,name");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -305,6 +312,38 @@
 			return $output;
 		}
 		
+		private function editHostgroup() {
+			$hostgroup = FS::$secMgr->checkAndSecuriseGetData("hg");
+                        // @TODO: log
+                        if(!$hostgroup) {
+                                return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
+                        }
+
+			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name,alias","name = '".$hostgroup."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$alias = $data["alias"];
+			}
+			else {
+                                return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
+                        }
+			$output = "<h1>".$this->loc->s("title-hostgroup-edit")."</h1>";
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
+				<tr><td>".$this->loc->s("Name")."</td><td>".$hostgroup."</td></tr>";
+			$output .= FS::$iMgr->hidden("name",$hostgroup).FS::$iMgr->hidden("edit",1);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
+
+			$hostlist = array();
+			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","name,host,hosttype","name = '".$hostgroup."'");
+			while($data = FS::$dbMgr->Fetch($query))
+				array_push($hostlist,$data["hosttype"]."$".$data["host"]);
+
+			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true,$hostlist,$hostgroup)."</td></tr>";
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
+			return $output;
+		}
+
 		private function showServicesTab() {
 			$output = "";
 			
@@ -647,22 +686,25 @@
 			return $output;
 		}
 		
-		private function getHostOrGroupList($name,$multi) {
+		private function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "") {
 			$output = FS::$iMgr->select($name,"",NULL,$multi);
-			
+
 			$hostlist = array();
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query))
 				$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
+		
 
 			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name");
-			while($data = FS::$dbMgr->Fetch($query))
-				$hostlist[$this->loc->s("Hostgroup").": ".$data["name"]] = array(2,$data["name"]);
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if($data["name"] != $ignore)
+					$hostlist[$this->loc->s("Hostgroup").": ".$data["name"]] = array(2,$data["name"]);
+			}
 
 			ksort($hostlist);
 
 			foreach($hostlist as $host => $value)
-				$output .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1]);
+				$output .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1],in_array($value[0]."$".$value[1],$selected));
 
 			$output .= "</select>";
 			return $output;
@@ -1641,14 +1683,23 @@
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$members = FS::$secMgr->checkAndSecurisePostData("members");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 					
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
-						return;
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
+                                                        header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+                                                        return;
+                                                }
+					}
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=3&err=3");
+							return;
+						}
 					}
 					
 					if($members) {
@@ -1660,6 +1711,7 @@
 								return;
 							}
 						}
+						if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","name = '".$name."'");
 						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) == 2 && ($mt[0] == 1 || $mt[0] == 2))
@@ -1670,18 +1722,9 @@
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
-					
+
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
 					FS::$dbMgr->Insert("z_eye_icinga_hostgroups","name,alias","'".$name."','".$alias."'");
-					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
-						return;
-					}
-					header("Location: index.php?mod=".$this->mid."&sh=3");
-					return;
-				// Edit hostgroup
-				case 20:
-					// @TODO
-					
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
 						return;
