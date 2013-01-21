@@ -304,11 +304,13 @@
 
 						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => $this->loc->s("tooltip-saveone")));
 						$output .= "</table>";
-						if($portid != -1 && (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write"))) {
-							$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
-							$output .= "</form>";
-							$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+						if($portid != -1) {
+							if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
+								FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+								$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
+								$output .= "</form>";
+								$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+							}
 						}
 						else
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
@@ -1214,7 +1216,6 @@
 
 			$foundsw = 0;
 			$foundwif = 0;
-			$output .= "<h2>".$this->loc->s("title-router-switch")."</h2>";
 			$outputswitch = "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
 				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr>";
 
@@ -1229,8 +1230,8 @@
 				$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
 				if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
 					!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-					!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
-					!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) 
+					!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$data["ip"]."_read") && 
+					!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$data["ip"]."_write")) 
 					continue;
 
 				// Split WiFi and Switches
@@ -1272,6 +1273,9 @@
 					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
 				}
 			}
+			if($foundsw != 0 || $foundwif != 0)
+				$output .= "<h2>".$this->loc->s("title-router-switch")."</h2>";
+
 			if($foundsw != 0) {
 				$output .= $outputswitch;
 				$output .= "</table>";

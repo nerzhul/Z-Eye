@@ -55,6 +55,7 @@ h3:hover {
 	min-height: 400px;
 }
 
+
 #main h1 {
         color: white;
         background-color: #7e0000;
@@ -65,6 +66,18 @@ h3:hover {
         margin-right: -45px;
         padding: 3px;
         font-size: 18px;
+        padding-left: 55px;
+        text-align: left;
+}
+
+#contenttabs h1 {
+        color: white;
+        border-radius: 2px 0px 0px 2px;
+        margin-bottom: 30px;
+        margin-top: 30px;
+        margin-left: 2%;
+	margin-right: -18px;
+        padding: 3px;
         padding-left: 55px;
         text-align: left;
 }

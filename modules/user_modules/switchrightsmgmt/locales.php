@@ -24,6 +24,7 @@
 			$this->locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",
+					"device" => "Equipement",
 					"err-already-exist" => "Cette règle existe déjà", 
 					"err-bad-datas" => "Erreur sur la requête",
 					"err-not-found" => "Cette règle n'existe pas ou plus",
@@ -40,6 +41,7 @@
 					"Save" => "Enregistrer",
 					"snmp-community" => "Communauté SNMP",
 					"title-rightsbysnmp" => "Par communauté SNMP", 
+					"title-rightsbyswitch" => "Par équipement",
 					"title-switchrightsmgmt" => "Gestion des droits sur les équipements réseau",
 					"user-rights" => "Droits des utilisateurs",
 					"Users" => "Utilisateurs",
@@ -48,6 +50,7 @@
 				),
 				"en" => array(
 					"Add" => "Add",
+					"device" => "Device",
 					"err-already-exist" => "This rule already exists",
 					"err-bad-datas" => "Bad request",
 					"err-not-found" => "This rule doesn't exist (anymore)",
@@ -64,6 +67,7 @@
 					"Save" => "Save",
 					"snmp-community" => "SNMP community",
 					"title-rightsbysnmp" => "By SNMP community",
+					"title-rightsbyswitch" => "By device",
 					"title-switchrightsmgmt" => "Network devices rights management",
 					"user-rights" => "User rights",
 					"Users" => "Users",

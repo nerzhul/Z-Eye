@@ -38,13 +38,12 @@
 		}
 
 		private function showBySwitch() {
-			$output = "<h2>".$this->loc->s("title-rightsbyswitch")."</h4>";
-			
+			$output = "";	
 			$found = false;
 			$query = FS::$dbMgr->Select("device","ip,name");
-			$grpoutput = "<h3>".$this->loc->s("group-rights")."</h3>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+			$grpoutput = "<h2>".$this->loc->s("group-rights")."</h2>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Groups")."</th></tr>";
-			$usroutput = "<h3>".$this->loc->s("usr-rights")."</h3>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+			$usroutput = "<h2>".$this->loc->s("user-rights")."</h2>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
@@ -104,6 +103,7 @@
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_writeportmon")
 						array_push($usrrules["writeportmon"],$data2["uid"]);
 				}
+				$first = true;
 				foreach($usrrules as $key => $values) {
 					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if($first) $first = false;
@@ -117,7 +117,7 @@
 						case "writeportmon": $usroutput .= $this->loc->s("Write-port-mon"); break;
 					}
 					$usroutput .= "</td><td>";
-					$usroutput .= $this->showIPGroups($data["ip"],$key,$values);
+					$usroutput .= $this->showIPUsers($data["ip"],$key,$values);
 				}
 			}
 			if($found) {
@@ -182,7 +182,7 @@
 		}
 
 		private function showBySNMPCommunity() {
-			$output = "<h2>".$this->loc->s("title-rightsbysnmp")."</h4>";
+			$output = "";
 			
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw");
@@ -281,8 +281,8 @@
 				}			
 			}
 			if($found) {
-				$output .= "<h3>".$this->loc->s("group-rights")."</h3>".$grpoutput."</table>";
-				$output .= "<h3>".$this->loc->s("user-rights")."</h3>".$usroutput."</table>";
+				$output .= "<h1>".$this->loc->s("group-rights")."</h1>".$grpoutput."</table>";
+				$output .= "<h1>".$this->loc->s("user-rights")."</h1>".$usroutput."</table>";
 			}
 			return $output;
 		}
@@ -360,8 +360,22 @@
 		}
 
 		private function showMain() {
-			$output = "<h1>".$this->loc->s("title-switchrightsmgmt")."</h1>";
-			$output .= $this->showBySNMPCommunity();	
+			$output = "";
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+			if(!FS::isAjaxCall()) {
+				$output = "<h1>".$this->loc->s("title-switchrightsmgmt")."</h1>";
+				$output .= "<div id=\"contenttabs\"><ul>";
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("title-rightsbysnmp"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("title-rightsbyswitch"),$sh);
+				$output .= "</ul></div>";
+        	                $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+                	        $output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
+                        	$output .= "</div>";
+			}
+			else if($sh == 1)
+				$output .= $this->showBySNMPCommunity();	
+			else if($sh == 2)
+				$output .= $this->showbySwitch();
 			return $output;
 		}
 
