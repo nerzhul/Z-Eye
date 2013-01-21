@@ -43,9 +43,9 @@
 			$output = "";	
 			$found = false;
 
-			$grpoutput = "<h2>".$this->loc->s("group-rights")."</h2>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+			$grpoutput = "<h1>".$this->loc->s("group-rights")."</h1>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Groups")."</th></tr>";
-			$usroutput = "<h2>".$this->loc->s("user-rights")."</h2>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+			$usroutput = "<h1>".$this->loc->s("user-rights")."</h1>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
 			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
 
@@ -133,7 +133,7 @@
 					$output .= FS::$iMgr->select("ip","filterSw()");
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSw()")."</form>";
-					$output = "<script type=\"text/javascript\">function filterSw() {
+					$output .= "<script type=\"text/javascript\">function filterSw() {
                                    		     	$('#swfdiv').fadeOut('slow',function() {
                                         			$.post('index.php?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
                                                         		$('#swfdiv').html(data);

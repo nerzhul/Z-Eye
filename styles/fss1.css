@@ -94,7 +94,20 @@ h3:hover {
         font-size: 17px;
         padding-left: 55px;
         text-align: left;
+}
 
+#contenttabs h2 {
+        color: white;
+        background-color: #5e0000;
+        border-radius: 2px 0px 0px 2px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        margin-left: 7%;
+        margin-right: -18px;
+        padding: 3px;
+        font-size: 17px;
+        padding-left: 55px;
+        text-align: left;
 }
 
 #loghello {
