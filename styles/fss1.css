@@ -1,6 +1,28 @@
-/* CSS Document */
+/*
+* Copyright (C) 2010-2013 Lo\xc3\xafc BLOT, CNRS <http://www.unix-experience.fr/>
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 
-body { 
+/* 
+* Copyright (C) 2013 Jennifer Aouizerat <http://pixnart.fr/>
+* Z-Eye Logos are under CC BY-ND 3.0 licence
+* You can found copy of this licence at: http://creativecommons.org/licenses/by-nd/3.0/legalcode
+*/
+
+body {
 	background-color: #5e0000;
 	font-family: Arial, Helvetica, sans-serif;
 	background-attachment: fixed;
@@ -17,6 +39,9 @@ h3:hover {
 
 #main {
 	background-color: rgba(245, 245, 245, 0.94);
+	background-image: url('/styles/images/z_eye_logo_HD.png');
+	background-repeat: no-repeat;
+	background-position: center center;
 	height: auto;
 	margin: auto;
 	margin-top: -10px;
@@ -27,7 +52,7 @@ h3:hover {
 	box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.7);
 	font-size: 12px;
 	text-align: center;
-	min-height: 200px;
+	min-height: 400px;
 }
 
 #main h1 {
@@ -335,13 +360,15 @@ th a:hover {
 	color: #333;
 }
 
-tr:hover {
-	background-color: #EEE;
+tr:hover td {
+	background-color: #CCE;
 }
 
 td {
+	background-color: #EEE;
 	border: 1px solid #CCC;
 	padding: 8px;
+	opacity: 0.7;
 }
 
 td:hover {

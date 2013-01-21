@@ -46,7 +46,7 @@ ta/*!
 .ui-widget { font-family: Verdana,Arial,sans-serif; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
 .ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff 50% 50% repeat-x; color: #222222; }
-.ui-widget-header { background-image: -moz-linear-gradient(center top , #CC3232, #A05252); background-color: #CC5252; color: #222222; font-weight: bold; }
+.ui-widget-header { background-image: -moz-linear-gradient(center top , #8A0000, #7A0000); background-color: #7A0000; color: #222222; font-weight: bold; }
 .ui-widget-header a { color: #222222; }
 
 /* Interaction states
@@ -102,7 +102,10 @@ ta/*!
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; border-bottom: white; }
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
 .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
-.ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: #FFF; }
+.ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: #FFF; background-image: url('/styles/images/z_eye_logo_HD.png');
+        background-repeat: no-repeat;
+        background-position: center center;
+}
 .ui-tabs .ui-tabs-hide { display: none !important; }
 
 

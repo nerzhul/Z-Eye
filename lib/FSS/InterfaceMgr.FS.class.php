@@ -53,7 +53,7 @@
 				for($i=0;$i<$count;$i++)
 					$output .= "<link rel=\"stylesheet\" href=\"".$this->arr_css[$i]."\" type=\"text/css\" />";
 				if(Config::hasFavicon())
-					$output .= "<link rel=\"shortcut icon\" href=\"/favicon.ico\" />";
+					$output .= "<link rel=\"shortcut icon\" href=\"/styles/images/favicon.png\" />";
 				$count = count($this->arr_js);
 				for($i=0;$i<$count;$i++)
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";

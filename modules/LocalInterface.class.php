@@ -102,7 +102,7 @@
 			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
 			$output .= "<h1>Bienvenue sur Z-Eye</h1>";
 
-			$output .= "<p class=\"grey\">Cette interface permet de monitorer et d'administrer les services</p>";
+			$output .= "<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>";
 
 			$output .= "</div><div class=\"left\">";
 			
