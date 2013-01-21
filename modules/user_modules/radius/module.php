@@ -246,7 +246,7 @@
 				FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-User"));
 				$found = 0;
-			
+
 				// Filtering
 				$output = "<script type=\"text/javascript\">function filterRadiusDatas() {
 					$('#radd').fadeOut();

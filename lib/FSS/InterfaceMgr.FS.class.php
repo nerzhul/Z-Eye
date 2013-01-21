@@ -413,7 +413,7 @@
 			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : "")."><a href=\"".$link."&at=2&sh=".$shid."\">".$label."</a>";
 			return $output;
 		}
-		
+
 		public function opendiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
 			if($divname == NULL) $divname = uniqid();
 			if($liname == NULL) $liname = uniqid();

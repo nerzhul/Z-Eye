@@ -38,19 +38,26 @@
 		}
 
 		private function showBySwitch() {
+			// IP for ajax filtering
+			$ip = (FS::isAjaxCall() ? FS::$secMgr->checkAndSecurisePostData("ip") : "");
 			$output = "";	
 			$found = false;
-			$query = FS::$dbMgr->Select("device","ip,name");
+
 			$grpoutput = "<h2>".$this->loc->s("group-rights")."</h2>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Groups")."</th></tr>";
 			$usroutput = "<h2>".$this->loc->s("user-rights")."</h2>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
+			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
+
+			$query = FS::$dbMgr->Select("device","ip,name",$ip && $ip != "NULL0" ? "ip = '".$ip."'" : "");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
+				// Init array for device
 				$grprules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array());
 				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array());
+				$formoutput .=  FS::$iMgr->selElmt($data["name"],$data["ip"]);
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -121,8 +128,24 @@
 				}
 			}
 			if($found) {
+				if($ip == "") {
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=2",array("id" => "swfform"));
+					$output .= FS::$iMgr->select("ip","filterSw()");
+					$output .= $formoutput;
+					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSw()")."</form>";
+					$output = "<script type=\"text/javascript\">function filterSw() {
+                                   		     	$('#swfdiv').fadeOut('slow',function() {
+                                        			$.post('index.php?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
+                                                        		$('#swfdiv').html(data);
+                                    	        	    	});
+							});
+              	                          		$('#swfdiv').fadeIn();
+						}</script><div id=\"swfdiv\">";
+				}
 				$output .= $grpoutput."</table>";
 				$output .= $usroutput."</table>";
+				if($ip == "")
+					$output .= "</div>";
 			}
 			return $output;
 		}
@@ -182,16 +205,21 @@
 		}
 
 		private function showBySNMPCommunity() {
+			$community = (FS::isAjaxCall() ? FS::$secMgr->checkAndSecurisePostData("snmp") : "");
+
+			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
 			$output = "";
 			
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw");
+			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw",$community && $community != "NULL0" ? "name = '".$community."'" : "");
 			$grpoutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Groups")."</th></tr>";
 			$usroutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
+				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],$community == $data["name"]);
+				// Init SNMP rights
 				$grprules = array();
 				$usrrules = array();
 				if($data["ro"] == 't') {
@@ -281,8 +309,29 @@
 				}			
 			}
 			if($found) {
+				if($community == "") {
+					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=1",array("id" => "snmpfform"));
+					$output .= FS::$iMgr->select("snmp","filterSNMP()");
+					$output .= $formoutput;
+					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSNMP()")."</form>";
+					$output .= "<script type=\"text/javascript\">function filterSNMP() {
+        	                                $('#snmpfdiv').fadeOut('fast',function() {
+	                                       		$.post('index.php?mod=".$this->mid."&at=2&sh=1', $('#snmpfform').serialize(), function(data) {
+                                        	                $('#snmpfdiv').html(data);
+                        	                        });
+						});
+						$('#snmpfdiv').fadeIn('fast');
+                	                        }</script>";
+					$output .= "<div id=\"snmpfdiv\">";
+				}
 				$output .= "<h1>".$this->loc->s("group-rights")."</h1>".$grpoutput."</table>";
 				$output .= "<h1>".$this->loc->s("user-rights")."</h1>".$usroutput."</table>";
+				if($community == "")
+					$output .= "</div>";
+			}
+			else {
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
+                                        "<br /><br /><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2\">".$this->loc->s("Go")."</a>");
 			}
 			return $output;
 		}
@@ -366,7 +415,9 @@
 				$output = "<h1>".$this->loc->s("title-switchrightsmgmt")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("title-rightsbysnmp"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("title-rightsbyswitch"),$sh);
+				// Show only if there is devices
+				if(FS::$dbMgr->Count("device","ip") > 0)
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("title-rightsbyswitch"),$sh);
 				$output .= "</ul></div>";
         	                $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
                 	        $output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
@@ -375,7 +426,7 @@
 			else if($sh == 1)
 				$output .= $this->showBySNMPCommunity();	
 			else if($sh == 2)
-				$output .= $this->showbySwitch();
+				$output .= $this->showBySwitch();
 			return $output;
 		}
 
