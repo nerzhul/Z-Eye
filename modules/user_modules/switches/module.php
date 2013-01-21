@@ -73,8 +73,7 @@
 				$output .= "<h2>".$port." sur ".$device."</h2>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
-				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") ||
-					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
 					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") ||
 					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon"))
@@ -320,7 +319,7 @@
 				// Port Stats
 				else if($sh == 2) {
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats")) {
-						$output .= FS::$iMgr->printError("err-no-rights");
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						return $output;
 					}
 					$file = file(dirname(__FILE__)."/../../../datas/rrd/".$dip."_".$portid.".html");
