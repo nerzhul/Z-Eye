@@ -28,6 +28,7 @@
 			switch($edit) {
 				case 2: $output = $this->editHost(); break;
 				case 3: $output = $this->editHostgroup(); break;
+				case 4: $output = $this->editService(); break;
 				case 7: $output = $this->editContactgroup(); break;
 				case 8: $output = $this->editCmd(); break;
 				default:
@@ -358,12 +359,12 @@
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 				//$formoutput .= template list
-				
+
 				// Global
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc","",array("length" => 120, "size" => 30));
 				// @ TODO support hostlist
 				$formoutput .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false)."</td></tr>";
-				
+
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("active-check-en"),"actcheck",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("passive-check-en"),"pascheck",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("parallel-check"),"parcheck",true,array("type" => "chk"));
@@ -376,14 +377,14 @@
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",true,array("type" => "chk"));
-				
+
 				// Checks
 				$formoutput .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd")."</td></tr>";
 				$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => 3, "type" => "num"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => 1, "type" => "num"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => 10, "type" => "num"));
-				
+
 				// Notifications
 				$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",true,array("type" => "chk"));
@@ -400,9 +401,9 @@
 			}
 			else
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
-			
+
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"));
-			
+
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_icinga_services","name,host,hosttype,template,ctg","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -410,7 +411,7 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Host")."</th><th>".$this->loc->s("Hosttype")."</th><th>".$this->loc->s("Template")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".$data["host"]."</td><td>";
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=4&srv=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["host"]."</td><td>";
 				switch($data["hosttype"]) {
 					case 1: $output .= "Simple"; break;
 					case 2: $output .= "Groupe"; break;
@@ -424,7 +425,71 @@
 			if($found) $output .= "</table>";
 			return $output;
 		}
-		
+
+		private function editService() {
+			$srv = FS::$secMgr->checkAndSecuriseGetData("srv");
+                        // @TODO: log
+                        if(!$srv) {
+                                return FS::$iMgr->printError($this->loc->s("err-no-service"));
+                        }
+
+			$query = FS::$dbMgr->Select("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
+				retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
+				"name = '".$srv."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$host = $data["host"];
+			}
+			else {
+                                return FS::$iMgr->printError($this->loc->s("err-no-service"));
+                        }
+
+			$output = "<h1>".$this->loc->s("title-edit-service")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$data["template"] == 't',array("type" => "chk"));
+			//$formoutput .= template list
+
+			// Global
+			$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".$data["name"]."</td></tr>";
+			$output .= FS::$iMgr->hidden("desc",$data["name"]).FS::$iMgr->hidden("edit",1);
+			// @ TODO support hostlist
+			$output .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false,array($data["hosttype"]."$".$data["host"]))."</td></tr>";
+
+			$output .= FS::$iMgr->idxLine($this->loc->s("active-check-en"),"actcheck",$data["actcheck"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("passive-check-en"),"pascheck",$data["pascheck"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("parallel-check"),"parcheck",$data["parcheck"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("obs-over-srv"),"obsess",$data["obsess"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("check-freshness"),"freshness",$data["freshness"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",$data["notifen"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",$data["eventhdlen"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",$data["flapen"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",$data["failpreden"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",$data["perfdata"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",$data["retstatus"] == "t",array("type" => "chk"));
+			$ioutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",$data["retnonstatus"] == "t",array("type" => "chk"));
+
+			// Checks
+			$output .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd",$data["checkcmd"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod",$data["checkperiod"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval",$data["checkintval"],array("value" => 3, "type" => "num"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval",$data["retcheckintval"],array("value" => 1, "type" => "num"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck",$data["maxcheck"],array("value" => 10, "type" => "num"));
+
+			// Notifications
+			$output .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod",$data["notifperiod"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",$data["srvoptc"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",$data["srvoptw"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",$data["srvoptu"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",$data["srvoptr"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",$data["srvoptf"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",$data["srvopts"],array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval",$data["notifintval"],array("value" => 0, "type" => "num"));
+			// @ TODO support for contact not only contactlist
+			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$data["ctg"])."</td></tr>";
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
+			$output .= "</table></form>";
+			return $output;
+		}
+
 		private function showTimeperiodsTab() {
 			$output = "";
 			
@@ -696,7 +761,7 @@
 			$output .= "</select>";
 			return $output;
 		}
-		
+
 		private function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select("z_eye_icinga_commands","name","","name");
@@ -1543,7 +1608,7 @@
 						"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
-						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".$icon."'");
+						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".($icon ? $icon : 0)."'");
 					if($edit) FS::$dbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
 					if($parent && !in_array("none",$parent)) {
 						$count = count($parent);
@@ -1588,17 +1653,18 @@
 					FS::$dbMgr->Delete("z_eye_icinga_host_parents","parent = '".$name."'");
 					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = 1");
 					FS::$dbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
-					
+
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;
-				// add service
+				// Add/Edit service
 				case 16:
 					$name = trim(FS::$secMgr->checkAndSecurisePostData("desc"));
 					$host = FS::$secMgr->checkAndSecurisePostData("host");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					$checkcmd = FS::$secMgr->getPost("checkcmd","w");
 					$checkperiod = FS::$secMgr->getPost("checkperiod","w");
 					$notifperiod = FS::$secMgr->getPost("notifperiod","w");
@@ -1608,14 +1674,27 @@
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
-					
+
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=4&err=2");
+							return;
+						}
+					}
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=4&err=3");
+							return;
+						}
+					}
+
 					$srvoptw = FS::$secMgr->checkAndSecurisePostData("srvoptw");
 					$srvoptc = FS::$secMgr->checkAndSecurisePostData("srvoptc");
 					$srvoptu = FS::$secMgr->checkAndSecurisePostData("srvoptu");
 					$srvoptr = FS::$secMgr->checkAndSecurisePostData("srvoptr");
 					$srvoptf = FS::$secMgr->checkAndSecurisePostData("srvoptf");
 					$srvopts = FS::$secMgr->checkAndSecurisePostData("srvopts");
-					
+
 					$actcheck = FS::$secMgr->checkAndSecurisePostData("actcheck");
 					$pascheck = FS::$secMgr->checkAndSecurisePostData("pascheck");
 					$parcheck = FS::$secMgr->checkAndSecurisePostData("parcheck");
@@ -1635,7 +1714,7 @@
 					$retcheckintval = FS::$secMgr->getPost("retcheckintval","n+");
 					$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
 					$notifintval = FS::$secMgr->getPost("notifintval","n+=");
-					
+
 					if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
@@ -1651,28 +1730,27 @@
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
-					
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
-					
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
-					
+
 					if($mt[0] == 1 && !FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
-					
 					if($mt[0] == 2 && !FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$mt[1]."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
-					
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_services","name = '".$name."'");
 					FS::$dbMgr->Insert("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
 						retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
 						"'".$name."','".$mt[1]."','".$mt[0]."','".($actcheck == "on" ? 1 : 0)."','".($pascheck == "on" ? 1 : 0)."','".($parcheck == "on" ? 1 : 0)."','".($obsess == "on" ? 1 : 0).
@@ -1681,17 +1759,7 @@
 						$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".$notifperiod."','".($srvoptc == "on" ? 1 : 0)."','".($srvoptw == "on" ? 1 : 0)."','".
 						($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".$notifintval."','".$ctg."','".
 						($tpl == "on" ? 1 : 0)."'");
-					
-					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=5");
-						return;
-					}
-					header("Location: index.php?mod=".$this->mid."&sh=4");
-					return;
-				// edit service
-				case 17:
-					// @TODO
-					
+
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=5");
 						return;
@@ -1782,24 +1850,24 @@
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
 						return;
 					}
-					
+
 					// Not exists
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
-					
+
 					// Used
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_services","name","host = '".$name."' AND hosttype = '2'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
-				
+
 					// Delete hostgroup and members
 					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","name = '".$name."'");
 					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = 2");
 					FS::$dbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
-					
+
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
 						return;
