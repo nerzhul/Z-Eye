@@ -16,11 +16,10 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
-	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
-	
+
 	class iIcinga extends genModule{
 		function iIcinga() { parent::genModule(); $this->loc = new lIcinga(); }
 		public function Load() {
@@ -29,6 +28,7 @@
 				case 2: $output = $this->editHost(); break;
 				case 3: $output = $this->editHostgroup(); break;
 				case 4: $output = $this->editService(); break;
+				case 6: $output = $this->editContact(); break;
 				case 7: $output = $this->editContactgroup(); break;
 				case 8: $output = $this->editCmd(); break;
 				default:
@@ -485,7 +485,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval",$data["notifintval"],array("value" => 0, "type" => "num"));
 			// @ TODO support for contact not only contactlist
 			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$data["ctg"])."</td></tr>";
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
 			return $output;
 		}
@@ -552,7 +552,7 @@
 			if($found) $output .= "</table>";
 			return $output;
 		}
-		
+
 		private function showContactsTab() {
 			$output = "";
 			$tpexist = FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
@@ -586,9 +586,9 @@
 			}
 			else
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
-			
+
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"));
-			
+
 			/*
 			 * Command table
 			 */
@@ -599,14 +599,54 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>
-						<a href=\"index.php?mod=".$this->mid."&act=9&ct=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
-						</a></td></tr>";
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=6&ct=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["mail"]."</td>
+					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>
+					<a href=\"index.php?mod=".$this->mid."&act=9&ct=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."
+					</a></td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
 		}
 
+		private function editContact() {
+			$contact = FS::$secMgr->checkAndSecuriseGetData("ct");
+			if(!$contact) {
+                                return FS::$iMgr->printError($this->loc->s("err-no-contact"));
+			}
+			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
+				"name = '".$contact."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$test = $data["name"];
+			}
+			else
+                                return FS::$iMgr->printError($this->loc->s("err-no-contact"));
+
+			$output = "<h1>".$this->loc->s("title-edit-contact")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$data["template"] == "t",array("type" => "chk"));
+			//$output .= template list
+			$output .= FS::$iMgr->hidden("name",$data["name"]).FS::$iMgr->hidden("edit",1);
+			$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("Email"),"mail",$data["mail"]);
+			$output .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod",$data["srvperiod"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",$data["soptc"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",$data["soptw"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",$data["soptu"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",$data["soptr"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",$data["soptf"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",$data["sopts"] == "t",array("type" => "chk"));
+			$output .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd",$data["srvcmd"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod",$data["hostperiod"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",$data["hoptd"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",$data["hoptu"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",$data["hoptr"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",$data["hoptf"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$data["hopts"] == "t",array("type" => "chk"));
+			$output .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd",$data["hostcmd"])."</td></tr>";
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
+			return $output;
+		}
 		private function showContactgroupsTab() {
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
@@ -1340,7 +1380,7 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=5");
 					return;
-				// Add contact
+				// Add/Edit contact
 				case 7:
 					$name = FS::$secMgr->getPost("name","w");
 					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
@@ -1348,11 +1388,12 @@
 					$srvnotifcmd = FS::$secMgr->checkAndSecurisePostData("srvnotifcmd");
 					$hostnotifperiod = FS::$secMgr->getPost("hostnotifperiod","w");
 					$hostnotifcmd = FS::$secMgr->checkAndSecurisePostData("hostnotifcmd");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$name || !$mail || preg_match("#[ ]#",$name) || !$srvnotifperiod || !$srvnotifcmd || !$hostnotifperiod || !$hostnotifcmd) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
 						return;
-					}
-					
+					}	
+
 					$istpl = FS::$secMgr->checkAndSecurisePostData("istemplate");
 					$srvoptc = FS::$secMgr->checkAndSecurisePostData("srvoptc");
 					$srvoptw = FS::$secMgr->checkAndSecurisePostData("srvoptw");
@@ -1365,38 +1406,49 @@
 					$hostoptr = FS::$secMgr->checkAndSecurisePostData("hostoptr");
 					$hostoptf = FS::$secMgr->checkAndSecurisePostData("hostoptf");
 					$hostopts = FS::$secMgr->checkAndSecurisePostData("hostopts");
-				
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=3");
-						return;
+
+					if($edit) {
+						// If contact doesn't exist
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=6&err=2");
+							return;
+						}
 					}
-					
+					else {
+						// If contact exist
+						if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=6&err=3");
+							return;
+						}
+					}
+
 					// Timeperiods don't exist
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
-					
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
-					
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$srvnotifcmd."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
-					
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$hostnotifcmd."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
-					
+
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_contacts","name = '".$name."'");
 					FS::$dbMgr->Insert("z_eye_icinga_contacts","name,mail,template,srvperiod,srvcmd,hostperiod,hostcmd,soptc,soptw,soptu,soptr,soptf,sopts,hoptd,hoptu,hoptr,hoptf,hopts",
 						"'".$name."','".$mail."','".($istpl == "on" ? 1 : 0)."','".$srvnotifperiod."','".$srvnotifcmd."','".$hostnotifperiod."','".$hostnotifcmd."','".($srvoptc == "on" ? 1 : 0)."','".
 						($srvoptw == "on" ? 1 : 0)."','".($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".
 						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
-					
+
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=5");
 						return;
