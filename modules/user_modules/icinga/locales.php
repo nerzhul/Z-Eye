@@ -109,7 +109,7 @@
 					"srvoptsched" => "Notification sur évènement (Service Up/Down planifié)",
 					"srvoptunreach" => "Notification sur évènement (service non joignable)",
 					"srvoptwarn" => "Notification sur évènement (Service en alerte)",
-					"Sunday" => "Sunday",
+					"Sunday" => "Dimanche",
 					"Template" => "Modèle",
 					"Thursday" => "Jeudi",
 					"Timeperiods" => "Périodes temporelles",

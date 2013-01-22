@@ -28,6 +28,7 @@
 				case 2: $output = $this->editHost(); break;
 				case 3: $output = $this->editHostgroup(); break;
 				case 4: $output = $this->editService(); break;
+				case 5: $output = $this->editTimeperiod(); break;
 				case 6: $output = $this->editContact(); break;
 				case 7: $output = $this->editContactgroup(); break;
 				case 8: $output = $this->editCmd(); break;
@@ -511,9 +512,9 @@
 			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
-			
+
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"));
-			
+
 			/*
 			 * Timeperiod table
 			 */
@@ -524,7 +525,7 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td>".$data["name"]."</td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=5&tp=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				if($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0)
 					$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].	
 					" ".$this->loc->s("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
@@ -550,6 +551,43 @@
 					</a></tr>";
 			}
 			if($found) $output .= "</table>";
+			return $output;
+		}
+
+		private function editTimeperiod() {
+			$tp = FS::$secMgr->checkAndSecuriseGetData("tp");
+			if(!$tp) {
+                                return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
+			}
+
+			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","name = '".$tp."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$name = $data["name"];
+			}
+			else
+                                return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
+
+			$output = "<h1>".$this->loc->s("title-edit-timeperiod")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$output .= FS::$iMgr->hidden("name",$data["name"]).FS::$iMgr->hidden("edit",1);
+			$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$data["alias"],array("length" => 120, "size" => 30));
+			$output .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".
+				FS::$iMgr->hourlist("mhs","mms",$data["mhs"],$data["mms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme",$data["mhe"],$data["mme"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".	
+				FS::$iMgr->hourlist("tuhs","tums",$data["tuhs"],$data["tums"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume",$data["tuhe"],$data["tume"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".
+				FS::$iMgr->hourlist("whs","wms",$data["whs"],$data["wms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme",$data["whe"],$data["wme"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".
+				FS::$iMgr->hourlist("thhs","thms",$data["thhs"],$data["thms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme",$data["thhe"],$data["thme"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".
+				FS::$iMgr->hourlist("fhs","fms",$data["fhs"],$data["fms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme",$data["fhe"],$data["fme"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".
+				FS::$iMgr->hourlist("sahs","sams",$data["sahs"],$data["sams"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same",$data["sahe"],$data["same"])."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".
+				FS::$iMgr->hourlist("suhs","sums",$data["suhs"],$data["sums"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$data["suhe"],$data["sume"])."</td></tr>";
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -1260,12 +1298,13 @@
 				case 4:
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
-					
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
 					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
-					
+
 					$mhs = FS::$secMgr->getPost("mhs","n+=");
 					$mms = FS::$secMgr->getPost("mms","n+=");
 					$tuhs = FS::$secMgr->getPost("tuhs","n+=");
@@ -1280,7 +1319,7 @@
 					$sams = FS::$secMgr->getPost("sams","n+=");
 					$suhs = FS::$secMgr->getPost("suhs","n+=");
 					$sums = FS::$secMgr->getPost("sums","n+=");
-					
+
 					if($mhs == NULL || $mms == NULL || $tuhs == NULL || $tums == NULL || $whs == NULL || $wms == NULL || 
 						$thhs == NULL || $thms == NULL || $fhs == NULL || $fms == NULL || $sahs == NULL || $sams == NULL || 
 						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 || 
@@ -1289,7 +1328,7 @@
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
-					
+
 					$mhe = FS::$secMgr->getPost("mhe","n+=");
 					$mme = FS::$secMgr->getPost("mme","n+=");
 					$tuhe = FS::$secMgr->getPost("tuhe","n+=");
@@ -1304,7 +1343,7 @@
 					$same = FS::$secMgr->getPost("same","n+=");
 					$suhe = FS::$secMgr->getPost("suhe","n+=");
 					$sume = FS::$secMgr->getPost("sume","n+=");
-					
+
 					if($mhe == NULL || $mme == NULL || $tuhe == NULL || $tume == NULL || $whe == NULL || $wme == NULL || 
 						$thhe == NULL || $thme == NULL || $fhe == NULL || $fme == NULL || $sahe == NULL || $same == NULL || 
 						$suhe == NULL || $sume == NULL || $mhe > 23 || $mme > 59 || $tuhe > 23 || $tume > 59 || 
@@ -1313,12 +1352,21 @@
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
-					
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=3");
-						return;
+
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=5&err=2");
+							return;
+						}
 					}
-					
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
+							header("Location: index.php?mod=".$this->mid."&sh=5&err=3");
+							return;
+						}
+					}
+
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_timeperiods","name = '".$name."'");
 					FS::$dbMgr->Insert("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume",
 						"'".$name."','".$alias."','".$mhs."','".$mms."','".$tuhs."','".$tums."','".$whs."','".$wms."','".$thhs."','".$thms."','".$fhs."','".$fms."','".$sahs."','".$sams."','".$suhs."','".$sums.
 						"','".$mhe."','".$mme."','".$tuhe."','".$tume."','".$whe."','".$wme."','".$thhe."','".$thme."','".$fhe."','".$fme."','".$sahe."','".$same."','".$suhe."','".$sume."'");
