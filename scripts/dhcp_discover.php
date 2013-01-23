@@ -199,10 +199,10 @@
 	
 	function registerIPs($hosts_list,&$subnet_list,$server) {
 		global $execdate;
+		$subnet_hist = array();
 		// Flush ip table for server
 		FS::$dbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
-
 			if(isset($value["state"])) $rstate = $value["state"];
 			else $rstate = 0;
 
@@ -214,12 +214,24 @@
 				case "expired":
 				case "abandoned":
 					$rstate = 2;
+					if(!isset($subnet_hist[$netfound])) $subnet_hist[$netfound] = array();
+					if(!isset($subnet_hist[$netfound][$value["server"]])) $subnet_hist[$netfound][$value["server"]] = array();
+					if(!isset($subnet_hist[$netfound][$value["server"]]["active"])) $subnet_hist[$netfound][$value["server"]]["active"] = 0;
+					$subnet_hist[$netfound][$value["server"]]["active"]++;
 					break;
 				case "reserved":
 					$rstate = 3;
+					if(!isset($subnet_hist[$netfound])) $subnet_hist[$netfound] = array();
+					if(!isset($subnet_hist[$netfound][$value["server"]])) $subnet_hist[$netfound][$value["server"]] = array();
+					if(!isset($subnet_hist[$netfound][$value["server"]]["reserved"])) $subnet_hist[$netfound][$value["server"]]["reserved"] = 0;
+					$subnet_hist[$netfound][$value["server"]]["reserved"]++;
 					break;
 				case "distributed":
 					$rstate = 4;
+					if(!isset($subnet_hist[$netfound])) $subnet_hist[$netfound] = array();
+					if(!isset($subnet_hist[$netfound][$value["server"]])) $subnet_hist[$netfound][$value["server"]] = array();
+					if(!isset($subnet_hist[$netfound][$value["server"]]["distributed"])) $subnet_hist[$netfound][$value["server"]]["distributed"] = 0;
+					$subnet_hist[$netfound][$value["server"]]["distributed"]++;
 					break;
 				default:
 					$rstate = 0;
@@ -246,9 +258,13 @@
 							$netfound = $subnet_list[$i][0];
 					}
 
-					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server","'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
+					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server",
+						"'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
+
 					if($rstate == 2 || $rstate == 3 || $rstate == 4)
-						FS::$dbMgr->Insert("z_eye_dhcp_ip_history","ip,mac,distributed,netid,server,collecteddate","'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
+						FS::$dbMgr->Insert("z_eye_dhcp_ip_history","ip,mac,distributed,netid,server,collecteddate",
+							"'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
+						
 					if($rstate == 3) {
 						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 						$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
@@ -269,6 +285,21 @@
 						}
 					}
 				}
+			}
+		}
+
+		$keydsubnets = array();
+		for($i=0;$i<count($subnet_list);$i++)
+			$keydsubnets[$subnet_list[$i][0]] = $subnet_list[$i][1];
+
+		foreach($subnet_hist as $subnet => $subnetvals) {
+			foreach($subnetvals as $server => $values) {
+				$netclass = new FSNetwork();
+				$netclass->setNetAddr($subnet);
+				$netclass->setNetMask($keydsubnets[$subnet]);
+				FS::$dbMgr->Insert("z_eye_dhcp_subnet_history","subnet,server,ipfree,ipactive,ipreserved,ipdistributed,collecteddate",
+					"'".$subnet."','".$server."','".($netclass->GetMaxHosts()-$values["active"]-$values["reserved"]-$values["distributed"])."','".
+					$values["active"]."','".$values["reserved"]."','".$values["distributed"]."','".$execdate."'::timestamp");		
 			}
 		}
 	}
