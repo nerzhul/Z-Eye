@@ -216,7 +216,7 @@
 					$rstate = 2;
 					if(!isset($subnet_hist[$netfound])) $subnet_hist[$netfound] = array();
 					if(!isset($subnet_hist[$netfound][$server])) {
-						$subnet_hist[$netfound][$server]] = array();
+						$subnet_hist[$netfound][$server] = array();
 						$subnet_hist[$netfound][$server]["active"] = 0;
 						$subnet_hist[$netfound][$server]["reserved"] = 0;
 						$subnet_hist[$netfound][$server]["distributed"] = 0;

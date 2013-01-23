@@ -334,15 +334,12 @@
 			$output = "<h3>".$this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days")."</h3>";
 			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
-			$query = FS::$dbMgr->Select("z_eye_dhcp_ip_history","count(ip) as ct,distributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and netid = '".$filter."' GROUP BY distributed,collecteddate ORDER BY collecteddate");
+			$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'","collecteddate");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
-				switch($data["distributed"]) {
-					case 1: break;
-					case 2: $results[$data["collecteddate"]]["baux"] = $data["ct"]; break;
-					case 3: $results[$data["collecteddate"]]["reserv"] = $data["ct"]; break;
-					case 4: $results[$data["collecteddate"]]["avail"] = $data["ct"]; break;
-				}
+				$results[$data["collecteddate"]]["baux"] = $data["ipactive"]; break;
+				$results[$data["collecteddate"]]["reserv"] = $data["ipreserved"]; break;
+				$results[$data["collecteddate"]]["avail"] = $data["ipdistributed"]; break;
 			}
 			$netobj = new FSNetwork();
                         $netobj->setNetAddr($filter);
@@ -430,7 +427,6 @@
 		}
 
 		private function writeConfigToServer($server = NULL) {
-
 
 			$conns = array();
 			$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,pwd","dhcp = 1");
