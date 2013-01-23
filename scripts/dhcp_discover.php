@@ -206,6 +206,15 @@
 			if(isset($value["state"])) $rstate = $value["state"];
 			else $rstate = 0;
 
+			for($i=0;$i<count($subnet_list)&&$netfound==false;$i++) {
+				$netclass = new FSNetwork();
+				$netclass->setNetAddr($subnet_list[$i][0]);
+				$netclass->setNetMask($subnet_list[$i][1]);
+				if($netclass->isUsableIP($host))
+					$netfound = $subnet_list[$i][0];
+			}
+
+
 			switch($rstate) {
 				case "free":
 					$rstate = 1;
@@ -262,14 +271,6 @@
 
 				$netfound = "";
 				if($host) {
-					for($i=0;$i<count($subnet_list)&&$netfound==false;$i++) {
-						$netclass = new FSNetwork();
-						$netclass->setNetAddr($subnet_list[$i][0]);
-						$netclass->setNetMask($subnet_list[$i][1]);
-						if($netclass->isUsableIP($host))
-							$netfound = $subnet_list[$i][0];
-					}
-
 					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server",
 						"'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
 
