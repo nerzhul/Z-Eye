@@ -261,7 +261,7 @@
 		}
 
 		public function button($name, $value, $js) {
-				return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
+			return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
 		}
 
 		public function radio($name, $value, $checked = false, $label=NULL) {
@@ -280,18 +280,18 @@
 				$output .= $this->radio($name,$values[$i],$checkid == $values[$i] ? true : false, $labels[$i])."<br />";
 			return $output;
 		}
-		
+
 		public function form($link,$options=array()) {
 			$output = "<form action=\"".$link."\" ";
 			if(isset($options["id"]) && strlen($options["id"]) > 0)
 				$output .= "id=\"".$options["id"]."\" ";
 			$output .= "method=\"".((isset($options["get"]) && $options["get"]) ? "GET" : "POST")."\"";
 			if(isset($options["js"]))
-				$output .= " onsubmit=\"return ".$options["js"].";\ ";
+				$output .= " onsubmit=\"return ".$options["js"].";\" ";
 			$output .= ">";
 			return $output;
 		}
-		
+
 		public function idxLine($label,$name,$def_value = "", $options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
 			if(isset($options["type"])) {

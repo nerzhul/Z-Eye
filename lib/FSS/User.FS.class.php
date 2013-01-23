@@ -52,8 +52,10 @@
 			}
 		}
 
-		public function Create() {
-			$id = FS::$dbMgr->GetMax("z_eye_users","uid")+1;
+		public function Create($uid = 0) {
+			if($uid) $id = $uid;
+			else $id = FS::$dbMgr->GetMax("z_eye_users","uid")+1;
+			$this->id = $uid;
 			FS::$dbMgr->Insert("z_eye_users","uid, username, ulevel, subname, name, mail, join_date, last_ip, sha_pwd, last_conn","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW()");
 		}
 
@@ -67,7 +69,7 @@
 				return 1;
 
 			if(Config::getPasswordComplexity()) {
-				if(!preg_match("#[a-z]#",$password) || !preg_match("#[A-Z]#",$password) || !preg_match("#[0-9]#",$password))
+				if(!FS::$secMgr->isStrongPwd($password))
 					return 2;
 			}
 

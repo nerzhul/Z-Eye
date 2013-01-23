@@ -41,19 +41,19 @@
 		}
 
 		public function isAlphaNumeric($str) {
-			if(preg_match("#\W#",$str))
-				return false;
-			else
+			if(preg_match("#^[\w]+$#i",$str))
 				return true;
+			else
+				return false;
 		}
 
 		public function isAlphabetic($str) {
-			if(preg_match("#[^a-zA-Z]#",$str))
-				return false;
-			else
+			if(preg_match("#^[a-zA-Z]+$#",$str))
 				return true;
+			else
+				return false;
 		}
-		
+
 		public function isMail($str) {
 			if(preg_match('#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#',$str))
 				return true;
@@ -284,6 +284,14 @@
 			$str = pg_escape_string($str);
 			if($this->hasJS($str))
 				$str = "";
+		}
+
+		public function isStrongPwd($pwd) {
+			if(strlen($pwd) < Config::getPasswordMinLength())
+				return false;
+			if(Config::getPasswordComplexity() && $this->isAlphaNumeric($pwd))
+				return false;
+			return true;
 		}
 
 		public function EncryptPassword($pwd, $name = "", $uid = "") {

@@ -27,31 +27,40 @@
 		}
 
 		public function content() {
+			$lockinstall = file_get_contents(dirname(__FILE__)."/../config/LOCK");
+
 			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
-			$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
-			$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
+			if($lockinstall) {
+				$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
+				$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
+			}
 			$output .= "<div id=\"tooltip\"></div>";
 			
+
 			$tmpoutput = "<div id=\"main\">";
 			$tmpoutput .= $this->showModule();
 			$tmpoutput .= "</div>";
 			// must be after because of return button
-			$output .= $this->showConnForm().$tmpoutput;
-			$output .= "<div id=\"notification\"><div id=\"subnotification\"></div></div>";
-			$output .= "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS";
-			$output .= " - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
+			if($lockinstall)
+				$output .= $this->showConnForm();
+			$output .= $tmpoutput.
+				"<div id=\"notification\"><div id=\"subnotification\"></div></div>
+				<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
 			return $output;
 		}
 
-		public function showNotification($text,$timeout = 5000) {
-			return "<script type=\"text/javascript\">
-				$('#subnotification').html('".addslashes($text)."');
+		public function showNotification($text,$timeout = 5000, $jsbraces = true) {
+			$output = "";
+			if($jsbraces) $output .= "<script type=\"text/javascript\">";
+			$output .= "$('#subnotification').html('".addslashes($text)."');
 				$('#notification').slideDown();
 				setTimeout(function() {
 					$('#notification').slideUp();
-				},".$timeout.");
-			</script>";
+				},".$timeout.");";
+			if($jsbraces) $output .= "</script>";
+			return $output;
 		}
+
 		public function callbackNotification($link,$id,$options = array()) {
 			$output = "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {";
 			// Locking screen if needed
@@ -138,27 +147,28 @@
                         $output .= $this->hidden("mod",$this->getModuleIdByPath("search"));
 			$output .= $this->input("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
 			$output .= "</div></div></div>";
-		
+
 			return $output;
 		}
 
 		public function showModule() {
 			$output = "";
+			$lockinstall = file_get_contents(dirname(__FILE__)."/../config/LOCK");
+			if(!$lockinstall)
+				return $this->loadModule($this->getModuleIdByPath("install"));
+				
 			$module = FS::$secMgr->checkAndSecuriseGetData("mod");
 			if(!$module) $module = 0;
 
 			if($module && !FS::$secMgr->isNumeric($module))
-				$output .= $this->printError("Module inconnu !");
-			else {
-				FS::$secMgr->SecuriseStringForDB($module);
-				if($module > 0)
-					$output .= $this->loadModule($module);
-				else if($module == 0)
-					$output .= $this->loadModule($this->getModuleIdByPath("default"));
-				else
-					$output .= $this->printError("Module inconnu !");
-			}
-			return $output;
+				return $this->printError("Module inconnu !");
+
+			if($module > 0)
+				return $this->loadModule($module);
+			else if($module == 0)
+				return $this->loadModule($this->getModuleIdByPath("default"));
+			else
+				return $this->printError("Module inconnu !");
 		}
 
 		public function loadModule($id) {
