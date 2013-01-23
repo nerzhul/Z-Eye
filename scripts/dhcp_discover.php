@@ -206,6 +206,7 @@
 			if(isset($value["state"])) $rstate = $value["state"];
 			else $rstate = 0;
 
+			$netfound = "";
 			for($i=0;$i<count($subnet_list)&&$netfound==false;$i++) {
 				$netclass = new FSNetwork();
 				$netclass->setNetAddr($subnet_list[$i][0]);
@@ -269,7 +270,6 @@
 				if(isset($value["end"])) $iend = $value["end"];
 				else $iend = "";
 
-				$netfound = "";
 				if($host) {
 					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server",
 						"'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");

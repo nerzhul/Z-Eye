@@ -318,7 +318,7 @@
 					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
 					$output .= FS::$iMgr->hidden("filter",$filter);
-					$date = FS::$dbMgr->GetMin("z_eye_dhcp_ip_history","collecteddate");
+					$date = FS::$dbMgr->GetMin("z_eye_dhcp_subnet_history","collecteddate");
 					if(!$date) $date = "now";
 					$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
 					$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
@@ -334,12 +334,12 @@
 			$output = "<h3>".$this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days")."</h3>";
 			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
-			$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'","collecteddate");
+			$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'","collecteddate",2);
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
-				$results[$data["collecteddate"]]["baux"] = $data["ipactive"]; break;
-				$results[$data["collecteddate"]]["reserv"] = $data["ipreserved"]; break;
-				$results[$data["collecteddate"]]["avail"] = $data["ipdistributed"]; break;
+				$results[$data["collecteddate"]]["baux"] = $data["ipactive"];
+				$results[$data["collecteddate"]]["reserv"] = $data["ipreserved"];
+				$results[$data["collecteddate"]]["avail"] = $data["ipdistributed"];
 			}
 			$netobj = new FSNetwork();
                         $netobj->setNetAddr($filter);
