@@ -215,35 +215,35 @@
 				case "abandoned":
 					$rstate = 2;
 					if(!isset($subnet_hist[$netfound])) $subnet_hist[$netfound] = array();
-					if(!isset($subnet_hist[$netfound][$value["server"]])) {
-						$subnet_hist[$netfound][$value["server"]] = array();
-						$subnet_hist[$netfound][$value["server"]]["active"] = 0;
-						$subnet_hist[$netfound][$value["server"]]["reserved"] = 0;
-						$subnet_hist[$netfound][$value["server"]]["distributed"] = 0;
+					if(!isset($subnet_hist[$netfound][$server])) {
+						$subnet_hist[$netfound][$server]] = array();
+						$subnet_hist[$netfound][$server]["active"] = 0;
+						$subnet_hist[$netfound][$server]["reserved"] = 0;
+						$subnet_hist[$netfound][$server]["distributed"] = 0;
 					}
-					$subnet_hist[$netfound][$value["server"]]["active"]++;
+					$subnet_hist[$netfound][$server]["active"]++;
 					break;
 				case "reserved":
 					$rstate = 3;
 					if(!isset($subnet_hist[$netfound])) $subnet_hist[$netfound] = array();
-					if(!isset($subnet_hist[$netfound][$value["server"]])) {
-						$subnet_hist[$netfound][$value["server"]] = array();
-						$subnet_hist[$netfound][$value["server"]]["active"] = 0;
-						$subnet_hist[$netfound][$value["server"]]["reserved"] = 0;
-						$subnet_hist[$netfound][$value["server"]]["distributed"] = 0;
+					if(!isset($subnet_hist[$netfound][$server])) {
+						$subnet_hist[$netfound][$server] = array();
+						$subnet_hist[$netfound][$server]["active"] = 0;
+						$subnet_hist[$netfound][$server]["reserved"] = 0;
+						$subnet_hist[$netfound][$server]["distributed"] = 0;
 					}
-					$subnet_hist[$netfound][$value["server"]]["reserved"]++;
+					$subnet_hist[$netfound][$server]["reserved"]++;
 					break;
 				case "distributed":
 					$rstate = 4;
 					if(!isset($subnet_hist[$netfound])) $subnet_hist[$netfound] = array();
-					if(!isset($subnet_hist[$netfound][$value["server"]])) {
-						$subnet_hist[$netfound][$value["server"]] = array();
-						$subnet_hist[$netfound][$value["server"]]["active"] = 0;
-						$subnet_hist[$netfound][$value["server"]]["reserved"] = 0;
-						$subnet_hist[$netfound][$value["server"]]["distributed"] = 0;
+					if(!isset($subnet_hist[$netfound][$server])) {
+						$subnet_hist[$netfound][$server] = array();
+						$subnet_hist[$netfound][$server]["active"] = 0;
+						$subnet_hist[$netfound][$server]["reserved"] = 0;
+						$subnet_hist[$netfound][$server]["distributed"] = 0;
 					}
-					$subnet_hist[$netfound][$value["server"]]["distributed"]++;
+					$subnet_hist[$netfound][$server]["distributed"]++;
 					break;
 				default:
 					$rstate = 0;
