@@ -296,7 +296,7 @@
 					$contact = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","contact","subnet = '".$filter."'");
 					$output .= "<div id=\"monsubnetres\"></div>";
 	                                $output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
-					$output .= "<ul class=\"ulform\"><li>.FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
+					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
 						<li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>";
                                         $output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
 					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
