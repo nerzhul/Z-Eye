@@ -1435,8 +1435,9 @@
 						return;
 					}
 
-					$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
-					$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$sw."'");
+
+					$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$sw."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
 						echo $this->loc->s("err-no-credentials");
@@ -1737,7 +1738,6 @@
 					if($wr == "on")
 						writeMemory($sw);
 
-					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$sw."'");
 
 					if($prise == NULL) $prise = "";
 					pg_query("DELETE FROM z_eye_switch_port_prises where ip = '".$dip."' AND port = '".$port."'");

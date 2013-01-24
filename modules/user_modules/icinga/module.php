@@ -118,14 +118,18 @@
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["id"]);
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
-			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true);
-			$formoutput .= FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
+			$formoutput2 = FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
+			$countElmt = 0;
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$formoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
+				$countElmt++;
+				$formoutput2 .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
+			if($countElmt/4 < 4) $countElmt = 16;
+			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true,array("size" => round($countElmt/4)));
+			$formoutput .= $formoutput2;
 			$formoutput .= "</select></td></tr>";
-			
+
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr","");
 			
 			// Checks
@@ -223,12 +227,16 @@
 				array_push($parentlist,$data["parent"]);
 			
 			$output .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
-			$output .= FS::$iMgr->select("parent[]","",NULL,true);
-			$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",count($parentlist) > 0 ? false : true);
+			$tmpoutput = FS::$iMgr->selElmt($this->loc->s("None"),"none",count($parentlist) > 0 ? false : true);
+			$countElmt = 0;
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"],in_array($data["name"],$parentlist));
+				$countElmt++;
+				$tmpoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"],in_array($data["name"],$parentlist));
 			}
+			if($countElmt/4 < 4) $countElmt = 16;
+			$output .= FS::$iMgr->select("parent[]","",NULL,true,array("size" => round($countElmt/4)));
+			$output .= $tmpoutput;
 			$output .= "</select></td></tr>";
 			
 			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$hostdata["addr"]);
@@ -701,11 +709,16 @@
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true);
+			$countElmt = 0;
+			$formoutput2 = "";
 			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"]);
+				$countElmt++;
+				$formoutput2 .= FS::$iMgr->selElmt($data["name"],$data["name"]);
 			}
+			if($countElmt/4 < 4) $countElmt = 16;
+			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true,array("size" => round($countElmt/4)));
+			$formoutput .= $formoutput2;
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
@@ -754,7 +767,7 @@
 				<tr><td>".$this->loc->s("Name")."</td><td>".$cg."</td></tr>";
 			$output .= FS::$iMgr->hidden("name",$cg).FS::$iMgr->hidden("edit",1);
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
-			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true);
+			$tmpoutput = "";
 
 			$contacts = array();
 			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","member","name = '".$cg."'");
@@ -762,8 +775,11 @@
 				array_push($contacts,$data["member"]);
 			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
+				$tmpoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
 			}
+			if($countElmt/4 < 4) $countElmt = 16;
+			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true,array("size" => round($countElmt/4)));
+			$output .= $tmpoutput;
 			$output .= "</select></td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
@@ -871,8 +887,6 @@
 		}
 		
 		private function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "") {
-			$output = FS::$iMgr->select($name,"",NULL,$multi);
-
 			$hostlist = array();
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query))
@@ -887,9 +901,14 @@
 
 			ksort($hostlist);
 
-			foreach($hostlist as $host => $value)
-				$output .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1],in_array($value[0]."$".$value[1],$selected));
-
+			$tmpoutput = "";
+			foreach($hostlist as $host => $value) {
+				$countElmt++;
+				$tmpoutput .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1],in_array($value[0]."$".$value[1],$selected));
+			}
+			if($countElmt/4 < 4) $countElmt = 16;
+			$output = FS::$iMgr->select($name,"",NULL,$multi,array("size" => round($countElmt/4)));
+			$output .= $tmpoutput;
 			$output .= "</select>";
 			return $output;
 		}
