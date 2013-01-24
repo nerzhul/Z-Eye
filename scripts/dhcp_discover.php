@@ -200,6 +200,12 @@
 	function registerIPs($hosts_list,&$subnet_list,$server) {
 		global $execdate;
 		$subnet_hist = array();
+		$en_hist = array();
+
+		// Enable history 
+		$query = FS::$dbMgr->Select("z_eye_dhcp_monitoring","subnet,eniphistory");
+		while($data = FS::$dbMgr->Fetch($query))
+			$en_hist[$data["subnet"]] = $data["eniphistory"];
 		// Flush ip table for server
 		FS::$dbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
@@ -274,7 +280,7 @@
 					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server",
 						"'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
 
-					if($rstate == 2 || $rstate == 3 || $rstate == 4)
+					if(isset($en_hist[$netfound]) && $en_hist[$netfound] == "t" && ($rstate == 2 || $rstate == 3 || $rstate == 4))
 						FS::$dbMgr->Insert("z_eye_dhcp_ip_history","ip,mac,distributed,netid,server,collecteddate",
 							"'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
 						

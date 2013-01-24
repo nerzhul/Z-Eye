@@ -292,10 +292,12 @@
 					$climit = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","crituse","subnet = '".$filter."'");
 					$maxage = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","maxage","subnet = '".$filter."'");
 					$enmon = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","enmon","subnet = '".$filter."'");
+					$eniphistory = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","eniphistory","subnet = '".$filter."'");
 					$contact = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","contact","subnet = '".$filter."'");
 					$output .= "<div id=\"monsubnetres\"></div>";
 	                                $output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
-					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1 ? true : false,"label" => $this->loc->s("En-monitor")))."</li><li>";
+					$output .= "<ul class=\"ulform\"><li>.FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
+						<li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>";
                                         $output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
 					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
 					$output .= FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => $this->loc->s("tooltip-max-age")))."</li><li>";
@@ -499,6 +501,7 @@
 					$maxage = FS::$secMgr->checkAndSecurisePostData("maxage");
 					$contact = FS::$secMgr->checkAndSecurisePostData("contact");
 					$enmon = FS::$secMgr->checkAndSecurisePostData("enmon");
+					$eniphistory = FS::$secMgr->checkAndSecurisePostData("eniphistory");
 					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || $warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
 						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to monitor subnet");
@@ -513,8 +516,8 @@
 					}
 
 					FS::$dbMgr->Delete("z_eye_dhcp_monitoring","subnet = '".$filtr."'");
-					if($enmon == "on")
-						FS::$dbMgr->Insert("z_eye_dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage","'".$filtr."','".$warn."','".$crit."','".$contact."','1','".$maxage."'");
+					FS::$dbMgr->Insert("z_eye_dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage,eniphistory","'".$filtr."','".$warn."','".$crit."','".$contact."','".($enmon == "on" ? "1" : "0").
+						"','".$maxage."','".($eniphistory == "on" ? "t" : "f")."'");
 					echo FS::$iMgr->printDebug($this->loc->s("modif-record"));
 
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
