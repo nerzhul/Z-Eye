@@ -1439,7 +1439,7 @@
 
 					$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$sw."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 						echo $this->loc->s("err-no-credentials");
 						return;	
 					}
