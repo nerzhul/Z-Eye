@@ -158,7 +158,7 @@
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ";
 					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right."\">".
-						FS::$iMgr->img("styles/images/cross.png",15,15)."</a><br />";
+						FS::$iMgr->removeIcon()."</a><br />";
 				}
 			}
 			else
@@ -185,7 +185,7 @@
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ";
 					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right."\">".
-						FS::$iMgr->img("styles/images/cross.png",15,15)."</a><br />";
+						FS::$iMgr->removeIcon()."</a><br />";
 				}
 			}
 			else
@@ -344,7 +344,7 @@
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ";
 					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right."\">".
-						FS::$iMgr->img("styles/images/cross.png",15,15)."</a><br />";
+						FS::$iMgr->removeIcon()."</a><br />";
 				}
 			}
 			else
@@ -371,7 +371,7 @@
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ";
 					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right."\">".
-						FS::$iMgr->img("styles/images/cross.png",15,15)."</a><br />";
+						FS::$iMgr->removeIcon()."</a><br />";
 				}
 			}
 			else

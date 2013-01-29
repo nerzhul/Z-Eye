@@ -225,6 +225,10 @@
 			return 0;
 		}
 
+		public function removeIcon() {
+			return FS::$iMgr->img("styles/images/cross.png",15,15);
+		}
+
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;
 	};

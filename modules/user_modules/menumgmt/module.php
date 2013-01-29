@@ -53,7 +53,7 @@
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
 						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=3&menu=".$data["id"]."\">";
-						$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
+						$output .= FS::$iMgr->removeIcon();
 						$output .= "</a></td></tr>";
 					}
 					
@@ -76,7 +76,7 @@
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
 						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=6&im=".$data["id"]."\">";
-						$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
+						$output .= FS::$iMgr->removeIcon();
 						$output .= "</a></td></tr>";
 					}
 					$output .= "</table>";				
@@ -158,7 +158,7 @@
 					if($data2 = FS::$dbMgr->Fetch($query2)) {
 							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>
 							<a href=\"index.php?mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]."\">";
-							$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
+							$output .= FS::$iMgr->removeIcon();
 							$output .= "</a></td></tr>";
 					}
 				}

@@ -53,7 +53,7 @@
 						$output .= $this->loc->s("rewr-other");
 					$output .= "</center></td><td><center>".$data["args"]."</center></td>";
 					$output .= "<td><a href=\"index.php?mod=".$this->mid."&act=3&link=".$data["id"]."\">";
-					$output .= FS::$iMgr->img("styles/images/cross.png",15,15);
+					$output .= FS::$iMgr->removeIcon();
 					$output .= "</a></td></tr>";
 				}
 				$output .= "</table></div>";				

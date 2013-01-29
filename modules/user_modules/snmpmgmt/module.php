@@ -58,7 +58,7 @@
 			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
-				$tmpoutput .= "<tr><td>".$data["name"]."</td><td>".($data["ro"] == 't' ? "X" : "")."</td><td>".($data["rw"] == 't' ? "X": "")."</td><td><a href=\"index.php?mod=".$this->mid."&act=2&snmp=".$data["name"]."\">".FS::$iMgr->img("styles/images/cross.png",15,15)."</a></td></tr>";
+				$tmpoutput .= "<tr><td>".$data["name"]."</td><td>".($data["ro"] == 't' ? "X" : "")."</td><td>".($data["rw"] == 't' ? "X": "")."</td><td><a href=\"index.php?mod=".$this->mid."&act=2&snmp=".$data["name"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
 			}
 			if($found) $output .= $tmpoutput."</table>";	
 			return $output;

@@ -282,7 +282,7 @@
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
 				$tmpoutput .= "<center>".($data["dns"] > 0 ? "X" : "")."</center></td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]."\">";
-				$tmpoutput .= FS::$iMgr->img("styles/images/cross.png",15,15);
+				$tmpoutput .= FS::$iMgr->removeIcon();
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
@@ -301,7 +301,7 @@
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">";
-				$tmpoutput .= FS::$iMgr->img("styles/images/cross.png",15,15);
+				$tmpoutput .= FS::$iMgr->removeIcon();
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
@@ -327,7 +327,7 @@
 				}
 				$tmpoutput .= "</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=9&addr=".$data["addr"]."&type=".$data["type"]."\">";
-				$tmpoutput .= FS::$iMgr->img("styles/images/cross.png",15,15);
+				$tmpoutput .= FS::$iMgr->removeIcon();
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
