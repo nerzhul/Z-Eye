@@ -178,48 +178,15 @@
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found) {
 						$found = 1;
-						$tmpoutput .= "<table id=\"ldaptb\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
-						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th></tr>";
+						$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
+						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr>";
 					}
-					$tmpoutput .= "<tr><td id=\"dragtd\" draggable=\"true\">".$data["addr"]."</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td></tr>";
+					$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"]."</a></td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td><a href=\"index.php?mod=".$this->mid."&act=5&addr=".$data["addr"]."\">".FS::$iMgr->removeIcon()."</a></tr>";
 				}
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";
-				$output .= "<script type=\"text/javascript\">var datatype = 0;
-        	                       $.event.props.push('dataTransfer');
-                	               $('#ldaptb #dragtd').on({
-                                       mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
-                               	       mouseleave: function(e) { $('#trash').hide(); $('#editf').hide();},
-                                       dragstart: function(e) { $('#trash').show(); $('#editf').show(); datatype=2; e.dataTransfer.setData('text/html', $(this).text()); },
-                                       dragenter: function(e) { e.preventDefault();},
-    	                               dragover: function(e) { e.preventDefault(); },
-               	                       dragleave: function(e) { },
-                                       drop: function(e) {},
-                          	       dragend: function() { $('#trash').hide(); $('#editf').hide(); }
-	                        });</script>";
 			}
-			$output .= "<script type=\"text/javascript\">
-				$('#editf').on({
-                                        dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) {
-					if(datatype == 2) { $(location).attr('href','index.php?mod=".$this->mid."&addr='+e.dataTransfer.getData('text/html')); } 
-				}
-        	                });
-                                $('#trash').on({
-                                        dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { 
-					if(datatype == 2) {
-						$('#subpop').html('".$this->loc->s("sure-remove-directory")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                              FS::$iMgr->form("index.php?mod=".$this->mid."&act=5").
-                                              FS::$iMgr->hidden("addr","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->submit("",$this->loc->s("Remove")).
-                                              FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-                                              $('#pop').show();
-					}
-					datatype = 0;
-                                }
-                        });</script>";
 			return $output;
 		}
 		public function handlePostDatas($act) {
@@ -372,7 +339,7 @@
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to remove ldap but don't have rights");
                                                 return;
                                         }
-					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
+					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP remove)");
 						header("Location: index.php?mod=".$this->mid."&err=2");
