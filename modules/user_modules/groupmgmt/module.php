@@ -76,38 +76,13 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"grpt\"><tr><th>GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th></tr>";
+					$tmpoutput .= "<table><tr><th>GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr>";
 				}
-				$tmpoutput .= "<tr><td>".$data["gid"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["gname"]."</td><td>".FS::$dbMgr->Count("z_eye_user_group","gid","gid = '".$data["gid"]."'")."</td></tr>";
+				$tmpoutput .= "<tr><td>".$data["gid"]."</td><td><a href=\"index.php?mod=".$this->mid."&g=".$data["gname"]."\">".$data["gname"]."</a></td><td>".
+					FS::$dbMgr->Count("z_eye_user_group","gid","gid = '".$data["gid"]."'")."</td><td><a href=\"index.php?mod=".$this->mid."&act=2&gname=".$data["gname"]."\">".FS::$iMgr->removeIcon()."</a></tr>";
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";
-				$output .= "<script type=\"text/javascript\">
-                                $.event.props.push('dataTransfer');
-                                $('#grpt #dragtd').on({
-                                        mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
-                                        mouseleave: function(e) { $('#trash').hide(); $('#editf').hide(); },
-                                        dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
-                                        dragenter: function(e) { e.preventDefault();},
-                                        dragover: function(e) { e.preventDefault(); },
-                                        dragleave: function(e) { },
-                                        drop: function(e) {},
-                                        dragend: function() { $('#trash').hide(); $('#editf').hide(); }
-                                });
-                                $('#trash').on({
-                                        dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $('#subpop').html('".$this->loc->s("sure-delete")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                              FS::$iMgr->form("index.php?mod=".$this->mid."&act=2").
-  	                                      FS::$iMgr->hidden("gname","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->submit("",$this->loc->s("Delete")).
-                                              FS::$iMgr->button("popcancel","Annuler","$(\'#pop\').hide()")."</form>');
-                                              $('#pop').show();
-                                	}
-                                });
-				$('#editf').on({
-                                        dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&g='+e.dataTransfer.getData('text/html')); }
-                                });</script>";
 			}
 			return $output;
 		}
@@ -171,17 +146,17 @@
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 2:
-					$gname = FS::$secMgr->checkAndSecurisePostData("gname");
+					$gname = FS::$secMgr->checkAndSecuriseGetData("gname");
 					if(!$gname) {
-							header("Location: index.php?mod=".$this->mid."&err=2");
-							FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to remove group");
-							return;
+						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to remove group");
+						return;
 					}
 					$gid = FS::$dbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
 					if(!$gid) {
-							header("Location: index.php?mod=".$this->mid."&err=1");
-							FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"Unable to remove group '".$gname."', group doesn't exists");
-							return;
+						header("Location: index.php?mod=".$this->mid."&err=1");
+						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"Unable to remove group '".$gname."', group doesn't exists");
+						return;
 					}
 					FS::$dbMgr->Delete("z_eye_groups","gname = '".$gname."'");
 					FS::$dbMgr->Delete("z_eye_group_rules","gid = '".$gid."'");
@@ -192,19 +167,19 @@
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
 					if(!$gid) {
-							header("Location: index.php?mod=".$this->mid."&err=3");
-							FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to edit group");
-							return;
+						header("Location: index.php?mod=".$this->mid."&err=3");
+						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to edit group");
+						return;
 					}
 					$rules = array();
 					foreach($_POST as $key => $value) {
 						   if(preg_match("#^mrule_#",$key)) {
-									$rules[$key] = $value;
+							$rules[$key] = $value;
 						   }
 					}
 					FS::$dbMgr->Delete("z_eye_group_rules","gid = '".$gid."'");
 					foreach($rules as $key => $value) {
-							FS::$dbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
+						FS::$dbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"Group Id '".$gid."' edited");
 					header("Location: index.php?mod=".$this->mid);
