@@ -134,11 +134,11 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"utb\"><tr><th>UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
+					$tmpoutput .= "<table><tr><th>UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
 					$this->loc->s("Groups")."</th><th>".$this->loc->s("Subname")."</th><th>".$this->loc->s("Name")."</th><th>".
-					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th></tr>";
+					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th><th></th></tr>";
 				}
-				$tmpoutput .= "<tr><td>".$data["uid"]."</td><td id=\"dragtd\" draggable=\"true\">".$data["username"]."</td><td>".
+				$tmpoutput .= "<tr><td>".$data["uid"]."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$data["username"]."\">".$data["username"]."</a></td><td>".
 					($data["sha_pwd"] == "" ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 				$query2 = FS::$dbMgr->Select("z_eye_user_group","gid","uid = '".$data["uid"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -146,23 +146,11 @@
 					$tmpoutput .= $gname."<br />";
 				}
 				$tmpoutput .= "</td><td>".$data["subname"]."</td><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".$data["last_ip"]."</td><td>".
-					$data["last_conn"]."</td><td>".$data["join_date"]."</td></tr>";
+					$data["last_conn"]."</td><td>".$data["join_date"]."</td><td><a href=\"index.php?mod=".$this->mid."&act=3&uid=".$data["uid"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
 			}
 
 			if($found) {
 				$output .= $tmpoutput."</table>";
-				$output .= "<script type=\"text/javascript\">var datatype = 0;
-                                $.event.props.push('dataTransfer');
-                                $('#utb #dragtd').on({
-                                        mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
-                                        mouseleave: function(e) { $('#trash').hide(); $('#editf').hide();},
-                                        dragstart: function(e) { $('#trash').show(); $('#editf').show(); datatype = 1; e.dataTransfer.setData('text/html', $(this).text()); },
-                                        dragenter: function(e) { e.preventDefault();},
-                                        dragover: function(e) { e.preventDefault(); },
-                                        dragleave: function(e) { },
-                                        drop: function(e) {},
-                                        dragend: function() { $('#trash').hide(); $('#editf').hide(); }
-                                });</script>";
 			}
 			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
 				$output .= "<h1>".$this->loc->s("title-directorymgmt")."</h1>";
@@ -214,19 +202,14 @@
 			$output .= "<script type=\"text/javascript\">
 				$('#editf').on({
                                         dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { if(datatype == 1) { $(location).attr('href','index.php?mod=".$this->mid."&user='+e.dataTransfer.getData('text/html')); }
-					else if(datatype == 2) { $(location).attr('href','index.php?mod=".$this->mid."&addr='+e.dataTransfer.getData('text/html')); } 
+                                        drop: function(e) {
+					if(datatype == 2) { $(location).attr('href','index.php?mod=".$this->mid."&addr='+e.dataTransfer.getData('text/html')); } 
 				}
         	                });
                                 $('#trash').on({
                                         dragover: function(e) { e.preventDefault(); },
-                                        drop: function(e) { if(datatype == 1) { $('#subpop').html('".$this->loc->s("sure-remove-user")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-                                              FS::$iMgr->form("index.php?mod=".$this->mid."&act=3").
-                                              FS::$iMgr->hidden("username","'+e.dataTransfer.getData('text/html')+'").
-                                              FS::$iMgr->submit("",$this->loc->s("Remove")).
-                                              FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-                                              $('#pop').show();
-					} else if(datatype == 2) {
+                                        drop: function(e) { 
+					if(datatype == 2) {
 						$('#subpop').html('".$this->loc->s("sure-remove-directory")." \''+e.dataTransfer.getData('text/html')+'\' ?".
                                               FS::$iMgr->form("index.php?mod=".$this->mid."&act=5").
                                               FS::$iMgr->hidden("addr","'+e.dataTransfer.getData('text/html')+'").
@@ -324,20 +307,21 @@
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to delete user but don't have rights");
                                                 return;
                                         }
-					$username = FS::$secMgr->checkAndSecurisePostData("username");
-					if(!$username) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (User delete)");
+					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
+					if(!$uid || !FS::$secMgr->isNumeric($uid)) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are wrong or missing for user management (User delete)");
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
-					$exist = FS::$dbMgr->GetOneData("z_eye_users","last_conn","username = '".$username."'");
+					$exist = FS::$dbMgr->GetOneData("z_eye_users","last_conn","uid = '".$uid."'");
 					if(!$exist) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove user '".$username."', doesn't exist");
+						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove user '".$uid."', doesn't exist");
 						header("Location: index.php?mod=".$this->mid."&err=1");
 						return;
 					}
-					FS::$dbMgr->Delete("z_eye_users","username = '".$username."'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User '".$username."' removed");
+					FS::$dbMgr->Delete("z_eye_users","uid = '".$uid."'");
+					FS::$dbMgr->Delete("z_eye_user_group","uid = '".$uid."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User '".$uid."' removed");
 					header("Location: index.php?mod=".$this->mid);
 					return;
 				case 4: // add ldap

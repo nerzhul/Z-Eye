@@ -902,6 +902,7 @@
 			ksort($hostlist);
 
 			$tmpoutput = "";
+			$countElmt = 0;
 			foreach($hostlist as $host => $value) {
 				$countElmt++;
 				$tmpoutput .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1],in_array($value[0]."$".$value[1],$selected));
