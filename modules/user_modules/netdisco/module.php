@@ -71,19 +71,19 @@
 			}
 
 			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>";
-			$output .= "<tr><td>".$this->loc->s("dns-suffix")."</td><td>".FS::$iMgr->input("suffix",$netdiscoCfg["dnssuffix"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("main-node")."</td><td>".FS::$iMgr->input("fnode",$netdiscoCfg["firstnode"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("dns-suffix"),"suffix",$netdiscoCfg["dnssuffix"],array("tooltip" => $this->loc->s("tooltip-dnssuffix")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("main-node"),"fnode",$netdiscoCfg["firstnode"],array("tooltip" => $this->loc->s("tooltip-firstnode")));
 			$output .= "<tr><th colspan=\"2\">".$this->loc->s("timer-conf")."</th></tr>";
-			$output .= "<tr><td>".$this->loc->s("node-expiration")."</td><td>".FS::$iMgr->input("nodetimeout",$netdiscoCfg["nodetimeout"],4,4)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("device-expiration")."</td><td>".FS::$iMgr->input("devicetimeout",$netdiscoCfg["devicetimeout"],4,4)."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("node-expiration"),"nodetimeout",$netdiscoCfg["nodetimeout"],array("size" => 4, "length" => 4, "tooltip" => $this->loc->s("tooltip-nodetimeout")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("device-expiration"),"devicetimeout",$netdiscoCfg["devicetimeout"],array("size" => 4, "length" => 4, "tooltip" => $this->loc->s("tooltip-devicetimeout")));
 			$output .= "<tr><th colspan=\"2\">".$this->loc->s("database")."</th></tr>";
-			$output .= "<tr><td>".$this->loc->s("pg-host")."</td><td>".FS::$iMgr->input("pghost",$netdiscoCfg["pghost"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("pg-db")."</td><td>".FS::$iMgr->input("dbname",$netdiscoCfg["dbname"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("pg-user")."</td><td>".FS::$iMgr->input("dbuser",$netdiscoCfg["dbuser"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("pg-pwd")."</td><td>".FS::$iMgr->password("dbpwd",$netdiscoCfg["dbpwd"])."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("pg-host"),"pghost",$netdiscoCfg["pghost"]);
+			$output .= FS::$iMgr->idxLine($this->loc->s("pg-db"),"dbname",$netdiscoCfg["dbname"]);
+			$output .= FS::$iMgr->idxLine($this->loc->s("pg-user"),"dbuser",$netdiscoCfg["dbuser"]);
+			$output .= FS::$iMgr->idxLine($this->loc->s("pg-pwd"),"dbpwd",$netdiscoCfg["dbpwd"],array("type" => "pwd"));
 			$output .= "<tr><th colspan=\"2\">".$this->loc->s("snmp-conf")."</th></tr>";
-			$output .= "<tr><td>".$this->loc->s("snmp-timeout")."</td><td>".FS::$iMgr->input("snmptimeout",$netdiscoCfg["snmptimeout"],2,2)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("snmp-try")."</td><td>".FS::$iMgr->input("snmptry",$netdiscoCfg["snmptry"],2,2)."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("snmp-timeout"),"snmptimeout",$netdiscoCfg["snmptimeout"],array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-snmptimeout")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("snmp-try"),"snmptry",$netdiscoCfg["snmptry"],array("size" => 2, "length" => 2, "tooltip" => $this->loc->s("tooltip-snmptry")));
 			$output .= "<tr><td>".$this->loc->s("snmp-version")."</td><td>";
 			$output .= FS::$iMgr->select("snmpver");
 			$output .= FS::$iMgr->selElmt("1","1",$netdiscoCfg["snmpver"] == 1 ? true : false);
