@@ -16,11 +16,11 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
-	
+
 	class iGroupMgmt extends genModule{
 		function iGroupMgmt() { parent::genModule(); $this->loc = new lGroupMgmt(); }
 		public function Load() {
@@ -33,6 +33,7 @@
 			}
 			if(!FS::isAjaxCall()) {
 				$gname = FS::$secMgr->checkAndSecuriseGetData("g");
+				$output = "<h1>".$this->loc->s("title-mgmt")."</h1>";
 				if($gname)
 					$output .= $this->editGroup($gname);
 				else
@@ -48,7 +49,7 @@
 			}
 
 			FS::$iMgr->showReturnMenu(true);
-			$output = "<h3>".$this->loc->s("title-edit")." '".$gname."'</h3>";
+			$output = "<h2>".$this->loc->s("title-edit")." '".$gname."'</h2>";
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
 			$rules = array();
 			$query = FS::$dbMgr->Select("z_eye_group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
@@ -61,10 +62,10 @@
 		}
 
 		private function showMain() {
-			$output = "<h3>".$this->loc->s("title-mgmt")."</h3>";
+			$output = "";
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
-			$formoutput .= "<h3>".$this->loc->s("title-opts")."</h3>";
+			$formoutput .= "<h2>".$this->loc->s("title-opts")."</h2>";
 			$formoutput .= $this->loadModuleRuleSets();
                         $formoutput .= "</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>";
 			$formoutput .= "</ul></form>";
