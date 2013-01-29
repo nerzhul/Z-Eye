@@ -88,6 +88,9 @@
 			if($nodetimeout > 3600 || $nodetimeout < 10 || $devicetimeout > 3600 || $devicetimeout < 10 || $snmptimeout > 30 || $snmptimeout < 1 || $snmptry > 10 ||
 				$snmptry < 1 || ($snmpver != 1 && $snmpver != 2))
 				return false;
+
+			if($nodetimeout > $devicetimeout)	
+				return false;
 			return true;
 		}
 		
