@@ -686,7 +686,7 @@
 					$utype = 1;
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= FS::$iMgr->hidden("uedit",1);
-				$formoutput .= "<h3>".$this->loc->s("title-usermod")." '".$radentry."'</h3>";
+				$formoutput .= "<h2>".$this->loc->s("title-usermod")." '".$radentry."'</h2>";
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->hidden("utype",$utype)."<b>".$this->loc->s("User-type").": </b>".
 				($utype == 1 ? "Normal" : $this->loc->s("Mac-addr"));
 				$formoutput .= "</li><li>".
@@ -808,7 +808,7 @@
 				function delAttrElmt(attridx) {
 						$('.attrli'+attridx).remove();
 				}</script>";
-				$formoutput .= "<h3>Modification du groupe '".$radentry."'</h3>";
+				$formoutput .= "<h2>".$this->loc->s("title-groupmod").": '".$radentry."'</h2>";
 				$formoutput .= "<ul class=\"ulform\">";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
                 $formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);
