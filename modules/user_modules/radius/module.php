@@ -248,7 +248,7 @@
 				$found = 0;
 
 				// Filtering
-				$output = "<script type=\"text/javascript\">function filterRadiusDatas() {
+				$output .= "<script type=\"text/javascript\">function filterRadiusDatas() {
 					$('#radd').fadeOut();
 					$.post('index.php?mod=".$this->mid."&act=12&r=".$raddb."&h=".$radhost."&p=".$radport."', $('#radf').serialize(), function(data) {
 							$('#radd').html(data);
