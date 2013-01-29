@@ -104,17 +104,17 @@
 					$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
 			$output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
 			</li></ul></div></div>";
-			
+
 			if(FS::$sessMgr->isConnected())
 				$output .= $this->showSearchForm();
-				
+
 			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
 			$output .= "<h1>Bienvenue sur Z-Eye</h1>";
 
 			$output .= "<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>";
 
 			$output .= "</div><div class=\"left\">";
-			
+
 			if(!FS::$sessMgr->isConnected()) {
 				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
 					$output .= "<h1>Identification</h1>";
@@ -122,6 +122,7 @@
 					$output .= $this->input("uname","");
 					$output .= $this->label("upwd","Mot de passe");
 					$output .= $this->password("upwd","");
+					$output .= $this->hidden("redir",$_SERVER["REQUEST_URI"]);
 					$output .= "<div class=\"clearlogform\"></div>";
 					$output .= $this->submit("conn","Connexion");
 					$output .= "</form>";

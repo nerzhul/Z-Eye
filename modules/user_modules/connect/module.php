@@ -16,11 +16,11 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
-	
+
 	class iConnect extends genModule{
 		function iConnect() { parent::genModule(); $this->loc = new lConnect(); }
 		public function Load() {
@@ -60,7 +60,7 @@
 				}
 			}
 
-			$url = FS::$secMgr->checkAndSecurisePostData("rdr");
+			$url = FS::$secMgr->checkAndSecurisePostData("redir");
 			if($url == NULL || $url == "index.php") $url = "m-0.html";
 
 			if($ldapok) {
