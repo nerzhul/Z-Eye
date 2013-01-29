@@ -445,14 +445,14 @@
 					$groups=array();
 					$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
 					while($data = $radSQLMgr->Fetch($query)) {
-							if(!isset($groups[$data["groupname"]]))
-									$groups[$data["groupname"]] = 1;
+						if(!isset($groups[$data["groupname"]]))
+							$groups[$data["groupname"]] = 1;
 					}
 
 					$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
 					while($data = $radSQLMgr->Fetch($query)) {
-							if(!isset($groups[$data["groupname"]]))
-									$groups[$data["groupname"]] = 1;
+						if(!isset($groups[$data["groupname"]]))
+							$groups[$data["groupname"]] = 1;
 					}
 					if(count($groups) > 0) {
 						$found = 1;
@@ -465,37 +465,15 @@
 					$output .= $formoutput;
 					$found = 0;
 					$tmpoutput = "";
-					$tmpoutput .= "<script type=\"text/javascript\">
-						$.event.props.push('dataTransfer');
-						$('#radsubnet #dragtd').on({
-								mouseover: function(e) { $('#trash').show(); },
-								mouseleave: function(e) { $('#trash').hide(); },
-								dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
-								dragenter: function(e) { e.preventDefault();},
-								dragover: function(e) { e.preventDefault(); },
-								dragleave: function(e) { },
-							drop: function(e) {},
-							dragend: function() { $('#trash').hide(); $('#editf').hide();}
-						});
-						$('#trash').on({
-								dragover: function(e) { e.preventDefault(); },
-								drop: function(e) { $('#subpop').html('".$this->loc->s("Delete-subnet-import")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-										FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8").
-										FS::$iMgr->hidden("subnet","'+e.dataTransfer.getData('text/html')+'").
-										FS::$iMgr->submit("","Supprimer").
-										FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-										$('#pop').show();
-								}
-						});
-					</script>";
 					$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dhcpsubnet,groupname","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) {
 							$found = 1;
-							$tmpoutput .= "<h3>".$this->loc->s("title-auto-import2")."</h3><table id=\"radsubnet\"><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
-							$this->loc->s("Radius-profile")."</th></tr>";
+							$tmpoutput .= "<h3>".$this->loc->s("title-auto-import2")."</h3><table><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
+							$this->loc->s("Radius-profile")."</th><th></th></tr>";
 						}
-						$tmpoutput .= "<tr><td draggable=\"true\" id=\"dragtd\">".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td></tr>";
+						$tmpoutput .= "<tr><td>".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td><td>
+							<a href=\"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8&subnet=".$data["dhcpsubnet"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
 					}
 					if($found) $output .= $tmpoutput."</table>";
 				}
@@ -1338,7 +1316,7 @@
 					if(!$subnetexist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Subnet '".$subnet."' doesn't exist can't bind DHCP to radius");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
-                        return;
+                        			return;
 					}
 					if(!FS::$dbMgr->GetOneData("z_eye_radius_dhcp_import","dhcpsubnet","addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."' AND dhcpsubnet = '".$subnet."'"))
 						FS::$dbMgr->Insert("z_eye_radius_dhcp_import","addr,port,dbname,dhcpsubnet,groupname","'".$radhost."','".$radport."','".$raddb."','".$subnet."','".$radgroup."'");
@@ -1349,7 +1327,7 @@
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
-					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
 
 					if(!$raddb || !$radhost || !$radport) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some required fields are missing for DHCP sync removal");
