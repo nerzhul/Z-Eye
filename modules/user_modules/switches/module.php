@@ -33,9 +33,21 @@
 	class iSwitchMgmt extends genModule{
 		function iSwitchMgmt() { parent::genModule(); $this->loc = new lSwitchMgmt(); }
 		public function Load() {
+			return $this->showMain();
+		}
+
+		private function showMain() {
 			$output = "";
 			if(!FS::isAjaxCall())
 				$output .= "<h1>".$this->loc->s("title-network-device-mgmt")."</h1>";
+
+			$count = FS::$dbMgr->Count("z_eye_snmp_communities","name");
+                        if($count < 1) {
+                                $output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
+                                        "<br /><br /><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2\">".$this->loc->s("Go")."</a>");
+                                return $output;
+                        }
+
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
