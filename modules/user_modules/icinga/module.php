@@ -38,11 +38,14 @@
 			}
 			return $output;
 		}
-		
+
 		private function showTabPanel() {
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+
+			if($err == 99)
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-right"));
 
 			if(!FS::isAjaxCall()) {
 				$output .= "<h1>".$this->loc->s("title-icinga")."</h1>";
@@ -1281,6 +1284,11 @@
 			switch($act) {
 				// Add/Edit command
 				case 1:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$cmdname = FS::$secMgr->checkAndSecurisePostData("name");
 					$cmd = FS::$secMgr->checkAndSecurisePostData("cmd");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
@@ -1312,6 +1320,11 @@
 					return;
 				// Remove command
 				case 2:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					// @TODO forbid remove when use (host + service)
 					$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
 					if(!$cmdname) {
@@ -1342,17 +1355,13 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=8");
 					return;
-				// Edit command
-				case 3:
-					// @TODO
-					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=5");
-						return;
-					}
-					header("Location: index.php?mod=".$this->mid."&sh=8");
-					return;
-				// Add timeperiod
+				// Add/Edit timeperiod
 				case 4:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+			
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
@@ -1433,17 +1442,13 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=5");
 					return;
-				// Edit timeperiod
-				case 5:
-					//@TODO
-					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=5");
-						return;
-					}
-					header("Location: index.php?mod=".$this->mid."&sh=5");
-					return;
 				// Delete timeperiod
 				case 6:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$tpname = FS::$secMgr->checkAndSecuriseGetData("tp");
 					if(!$tpname) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
@@ -1477,7 +1482,7 @@
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
-					
+
 					FS::$dbMgr->Delete("z_eye_icinga_timeperiods","name = '".$tpname."'");
 					if(!$this->writeConfiguration()) {
 						header("Location: index.php?mod=".$this->mid."&sh=5&err=5");
@@ -1487,6 +1492,11 @@
 					return;
 				// Add/Edit contact
 				case 7:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = FS::$secMgr->getPost("name","w");
 					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
 					$srvnotifperiod = FS::$secMgr->getPost("srvnotifperiod","w");
@@ -1560,17 +1570,13 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=6");
 					return;
-				// Edit contact
-				case 8:
-					// @TODO
-					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=5");
-						return;
-					}
-					header("Location: index.php?mod=".$this->mid."&sh=6");
-					return;
 				// Delete contact
 				case 9:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
 					if(!$ctname) {
 						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
@@ -1598,6 +1604,11 @@
 					return;
 				// Add/Edit contact group
 				case 10:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = FS::$secMgr->getPost("name","w");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$cts = FS::$secMgr->checkAndSecurisePostData("cts");
@@ -1649,6 +1660,11 @@
 					return;
 				// Delete contact group
 				case 12:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					// @TODO forbid remove when used (service, service_group)
 					$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
 					if(!$ctgname) {
@@ -1675,8 +1691,13 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=7");
 					return;
-				// Add host
+				// Add/Edit host
 				case 13:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$dname = FS::$secMgr->checkAndSecurisePostData("dname");
@@ -1780,18 +1801,13 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;	
-				// Edit host
-				case 14:
-					// @TODO
-					
-					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
-						return;
-					}
-					header("Location: index.php?mod=".$this->mid."&sh=2");
-					return;	
 				// Remove host
 				case 15:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = FS::$secMgr->checkAndSecuriseGetData("host");
 					if(!$name) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
@@ -1819,6 +1835,11 @@
 					return;
 				// Add/Edit service
 				case 16:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = trim(FS::$secMgr->checkAndSecurisePostData("desc"));
 					$host = FS::$secMgr->checkAndSecurisePostData("host");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
@@ -1925,6 +1946,11 @@
 					return;
 				// remove service
 				case 18:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if(!$name) {
 						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
@@ -1947,8 +1973,13 @@
 					}
 					header("Location: index.php?mod=".$this->mid."&sh=4");
 					return;
-				// Add hostgroup
+				// Add/Edit hostgroup
 				case 19:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$members = FS::$secMgr->checkAndSecurisePostData("members");
@@ -2002,6 +2033,11 @@
 					return;
 				// remove hostgroup
 				case 21:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+						header("Location:index.php?mod=".$this->mid."&err=99");
+						return;
+					} 
+
 					$name = FS::$secMgr->checkAndSecuriseGetData("hg");
 					if(!$name) {
 						header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
