@@ -2,7 +2,7 @@
 	class Config {
 		private static $lang = "FR-fr";
 		private static $stylesheet = "fss1.css";
-		private static $websiteName = "Z-Eye (RC1.1)";
+		private static $websiteName = "Z-Eye (RC1.1b)";
 		private static $OS = "FreeBSD";
 		/* 0 (no crypt, not recommended
 		1: sha1
@@ -10,13 +10,13 @@
 		3: md5(sha1.username)
 		4: sha1(md5(sha1.username).uid)*/
 		private static $cryptlevel = 4;
-		private static $favicon = false;
+		private static $favicon = true;
 		private static $pgsqlen = true;
 		private static $mysqlen = false;
 		private static $snmpen = true;
 		private static $defaultlang = "fr";
 		private static $passwordMinLength = 8;
-		private static $passwordComplexity = false;
+		private static $passwordComplexity = true;
 
 		public static function getSysLang() { return Config::$lang; }
 		public static function getSysStylesheet() { return Config::$stylesheet; }

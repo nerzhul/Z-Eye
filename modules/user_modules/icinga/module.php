@@ -48,13 +48,20 @@
 				$output .= "<h1>".$this->loc->s("title-icinga")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				//$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_icinga_host_write"))
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+					$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
+					$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+					$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+					$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+					$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups"),$sh);
+				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
+					$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands"),$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
@@ -76,14 +83,17 @@
 			}
 			return $output;
 		}
-		
+
 		private function showGeneralTab() {
 			$output = FS::$iMgr->printError($this->loc->s("not-implemented"));
 			
 			return $output;
 		}
-		
+
 		private function showHostsTab() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			
 			$output = "";
 			
 			$tpexist = FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","");
@@ -192,6 +202,8 @@
 		}
 
 		private function editHost() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$host = FS::$secMgr->checkAndSecuriseGetData("host");
 			// @TODO: log
 			if(!$host) {
@@ -272,6 +284,8 @@
 		}
 		
 		private function showHostgroupsTab() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
 			$hostexist = FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","");
 			if(!$hostexist)
@@ -325,6 +339,8 @@
 		}
 		
 		private function editHostgroup() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$hostgroup = FS::$secMgr->checkAndSecuriseGetData("hg");
                         // @TODO: log
                         if(!$hostgroup) {
@@ -357,8 +373,11 @@
 		}
 
 		private function showServicesTab() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+
 			$output = "";
-			
+
 			$tpexist = FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","");
 			if($tpexist) {
 				/*
@@ -436,6 +455,8 @@
 		}
 
 		private function editService() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$srv = FS::$secMgr->checkAndSecuriseGetData("srv");
                         // @TODO: log
                         if(!$srv) {
@@ -500,6 +521,8 @@
 		}
 
 		private function showTimeperiodsTab() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
 			
 			/*
@@ -563,6 +586,8 @@
 		}
 
 		private function editTimeperiod() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$tp = FS::$secMgr->checkAndSecuriseGetData("tp");
 			if(!$tp) {
                                 return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
@@ -600,6 +625,8 @@
 		}
 
 		private function showContactsTab() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
 			$tpexist = FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
 			if($tpexist) {
@@ -655,6 +682,8 @@
 		}
 
 		private function editContact() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$contact = FS::$secMgr->checkAndSecuriseGetData("ct");
 			if(!$contact) {
                                 return FS::$iMgr->printError($this->loc->s("err-no-contact"));
@@ -694,6 +723,8 @@
 			return $output;
 		}
 		private function showContactgroupsTab() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -751,6 +782,8 @@
 		}
 
 		private function editContactgroup() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$cg = FS::$secMgr->checkAndSecuriseGetData("cg");
 			if(!$cg)
 				return FS::$iMgr->printError($this->loc->s("err-no-contactgroup"));
@@ -787,6 +820,8 @@
 		}
 
 		private function showCommandTab() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -826,6 +861,8 @@
 		}
 
 		private function editCmd() {
+			if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) 
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
 			// TODO: log
 			if(!$cmdname) {
