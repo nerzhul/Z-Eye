@@ -156,9 +156,8 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ";
-					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right."\">".
-						FS::$iMgr->removeIcon()."</a><br />";
+					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ".
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right)."<br />";
 				}
 			}
 			else
@@ -183,9 +182,8 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ";
-					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right."\">".
-						FS::$iMgr->removeIcon()."</a><br />";
+					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ".
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right)."<br />";
 				}
 			}
 			else
@@ -342,9 +340,8 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ";
-					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right."\">".
-						FS::$iMgr->removeIcon()."</a><br />";
+					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ".
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right)."<br />";
 				}
 			}
 			else
@@ -369,9 +366,8 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ";
-					$output .= "<a href=\"index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right."\">".
-						FS::$iMgr->removeIcon()."</a><br />";
+					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ".
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right)."<br />";
 				}
 			}
 			else

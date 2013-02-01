@@ -472,8 +472,8 @@
 							$tmpoutput .= "<h3>".$this->loc->s("title-auto-import2")."</h3><table><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
 							$this->loc->s("Radius-profile")."</th><th></th></tr>";
 						}
-						$tmpoutput .= "<tr><td>".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td><td>
-							<a href=\"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8&subnet=".$data["dhcpsubnet"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
+						$tmpoutput .= "<tr><td>".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td><td>".
+							FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8&subnet=".$data["dhcpsubnet"])."</td></tr>";
 					}
 					if($found) $output .= $tmpoutput."</table>";
 				}

@@ -225,8 +225,10 @@
 			return 0;
 		}
 
-		public function removeIcon() {
-			return FS::$iMgr->img("styles/images/cross.png",15,15);
+		public function removeIcon($link = "") {
+			$output = FS::$iMgr->img("styles/images/cross.png",15,15);
+			if($link) $output = "<a href=\"".$link."\">".$output."</a>";
+			return $output;
 		}
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}

@@ -281,8 +281,7 @@
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=2&addr=".$data["addr"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
 				$tmpoutput .= "<center>".($data["dns"] > 0 ? "X" : "")."</center></td><td><center>";
-				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]."\">";
-				$tmpoutput .= FS::$iMgr->removeIcon();
+				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=3&srv=".$data["addr"]);
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
@@ -300,15 +299,14 @@
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
 				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">";
-				$tmpoutput .= FS::$iMgr->removeIcon();
+				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]);
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
 				$output .= $tmpoutput."</table>";
 			else
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-db-given")." !");
-				
+
 			$output .= "<h2>".$this->loc->s("title-backup-switch")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=7\">".$this->loc->s("New-server")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
@@ -326,8 +324,7 @@
 					case 5: $tmpoutput .= "SFTP"; break;
 				}
 				$tmpoutput .= "</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&act=9&addr=".$data["addr"]."&type=".$data["type"]."\">";
-				$tmpoutput .= FS::$iMgr->removeIcon();
+				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=9&addr=".$data["addr"]."&type=".$data["type"]);
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)

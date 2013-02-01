@@ -51,12 +51,11 @@
 						$output .= $this->loc->s("rewr-mod");
 					else
 						$output .= $this->loc->s("rewr-other");
-					$output .= "</center></td><td><center>".$data["args"]."</center></td>";
-					$output .= "<td><a href=\"index.php?mod=".$this->mid."&act=3&link=".$data["id"]."\">";
-					$output .= FS::$iMgr->removeIcon();
-					$output .= "</a></td></tr>";
+					$output .= "</center></td><td><center>".$data["args"]."</center></td><td>";
+					$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=3&link=".$data["id"]);
+					$output .= "</td></tr>";
 				}
-				$output .= "</table></div>";				
+				$output .= "</table></div>";
 			}
 			return $output;
 		}

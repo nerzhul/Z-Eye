@@ -52,8 +52,8 @@
 							$output .= $this->loc->s("Both");
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
 						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
-						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=3&menu=".$data["id"]."\">";
-						$output .= FS::$iMgr->removeIcon();
+						$output .= "</a></td><td>";
+						$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=3&menu=".$data["id"]);
 						$output .= "</a></td></tr>";
 					}
 					
@@ -72,14 +72,14 @@
 						else if($data["isconnected"] == 1)
 							$output .= $this->loc->s("Yes");
 						else
-							$output .= $this->loc->s("Both");						
+							$output .= $this->loc->s("Both");
 						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
 						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
-						$output .= "</a></td><td><a href=\"index.php?mod=".$this->mid."&act=6&im=".$data["id"]."\">";
-						$output .= FS::$iMgr->removeIcon();
+						$output .= "</a></td><td>";
+						$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=6&im=".$data["id"]);
 						$output .= "</a></td></tr>";
 					}
-					$output .= "</table>";				
+					$output .= "</table>";
 			}
 			return $output;
 		}
@@ -156,9 +156,8 @@
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$query2 = FS::$dbMgr->Select("z_eye_menu_items","id,title","id = '".$data["id_menu_item"]."'");
 					if($data2 = FS::$dbMgr->Fetch($query2)) {
-							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>
-							<a href=\"index.php?mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]."\">";
-							$output .= FS::$iMgr->removeIcon();
+							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>";
+							$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]);
 							$output .= "</a></td></tr>";
 					}
 				}

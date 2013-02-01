@@ -198,7 +198,7 @@
 					else $found2 = true;
 					$output .= $data2["parent"];
 				}
-				$output .="</td><td><a href=\"index.php?mod=".$this->mid."&act=15&host=".$data["name"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
+				$output .="</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=15&host=".$data["name"])."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -335,7 +335,7 @@
 					}
 					$output .= ")";
 				}
-				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=21&hg=".$data["name"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=21&hg=".$data["name"])."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -451,7 +451,7 @@
 				$output .= "</td><td>";
 				if($data["template"] == "t") $output .= $this->loc->s("Yes");
 				else $output .= $this->loc->s("No");
-				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=18&srv=".$data["name"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=18&srv=".$data["name"])."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -581,8 +581,7 @@
 				if($data["suhs"] != 0 || $data["sums"] != 0 || $data["suhe"] != 0 || $data["sume"] != 0)
 					$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
 					" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
-				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=6&tp=".$data["name"]."\">".FS::$iMgr->removeIcon()."
-					</a></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=6&tp=".$data["name"])."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -676,9 +675,8 @@
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
 				}
 				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=6&ct=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["mail"]."</td>
-					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>
-					<a href=\"index.php?mod=".$this->mid."&act=9&ct=".$data["name"]."\">".FS::$iMgr->removeIcon()."
-					</a></td></tr>";
+					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
+					FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=9&ct=".$data["name"])."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -777,8 +775,7 @@
 					else $found2 = true;
 					$output .= $data2["member"];
 				}
-				$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&act=12&ctg=".$data["name"]."\">".FS::$iMgr->removeIcon()."
-						</a></td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=12&ctg=".$data["name"])."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -842,9 +839,9 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
-			
+
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"));
-			
+
 			/*
 			 * Command table
 			 */
@@ -855,9 +852,8 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=8&cmd=".$data["name"]."\">".$data["name"]."</a></td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>
-						<a href=\"index.php?mod=".$this->mid."&act=2&cmd=".$data["name"]."\">".FS::$iMgr->removeIcon()."
-						</a></td></tr>";
+				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=8&cmd=".$data["name"]."\">".$data["name"]."</a></td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>".
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&cmd=".$data["name"])."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;

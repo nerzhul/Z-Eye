@@ -146,7 +146,7 @@
 					$tmpoutput .= $gname."<br />";
 				}
 				$tmpoutput .= "</td><td>".$data["subname"]."</td><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".$data["last_ip"]."</td><td>".
-					$data["last_conn"]."</td><td>".$data["join_date"]."</td><td><a href=\"index.php?mod=".$this->mid."&act=3&uid=".$data["uid"]."\">".FS::$iMgr->removeIcon()."</a></td></tr>";
+					$data["last_conn"]."</td><td>".$data["join_date"]."</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=3&uid=".$data["uid"])."</td></tr>";
 			}
 
 			if($found) {
@@ -181,7 +181,7 @@
 						$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
 						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr>";
 					}
-					$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"]."</a></td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td><a href=\"index.php?mod=".$this->mid."&act=5&addr=".$data["addr"]."\">".FS::$iMgr->removeIcon()."</a></tr>";
+					$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"]."</a></td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=5&addr=".$data["addr"])."</tr>";
 				}
 			}
 			if($found) {
