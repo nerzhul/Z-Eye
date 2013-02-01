@@ -60,7 +60,7 @@
 					"hostnotifcmd" => "Commande de notification (hôtes)",
 					"hostnotifperiod" => "Période de notification (hôtes)",
 					"hostoptdown" => "Notification sur évènement (Hôte Down)",
-					"hostoptflap" => "Notification sur évènement (Hôte Instabile)",
+					"hostoptflap" => "Notification sur évènement (Hôte Instable)",
 					"hostoptrec" => "Notification sur évènement (Hôte de retour)",
 					"hostoptsched" => "Notification sur évènement (Hôte Up/Down planifié)",
 					"hostoptunreach" => "Notification sur évènement (Hôte non joignable)",
