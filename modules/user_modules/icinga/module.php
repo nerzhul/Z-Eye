@@ -648,14 +648,14 @@
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",true,array("type" => "chk"));
-				$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd")."</td></tr>";
+				$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd","notify-service-by-email")."</td></tr>";
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod")."</td></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",true,array("type" => "chk"));
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
-				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd")."</td></tr>";
+				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd","notify-host-by-email")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
 			}
