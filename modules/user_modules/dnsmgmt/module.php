@@ -25,8 +25,44 @@
 		function iDNSManager() { parent::genModule(); $this->loc = new lDNSManager(); }
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
+			return $this->showMain();
+		}
+
+		private function showMain() {
+			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+	
 			$output = "";
-			$output .= $this->showStats();
+			if(!FS::isAjaxCall())
+				$output .= "<h1>".$this->loc->s("title-dns")."</h1>";
+
+			if($addr && FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+				$output .= $this->CreateOrEditServer(true);
+			}
+			else {
+				 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+					$output .= $this->showCreateEditErr();
+					$output .= FS::$iMgr->opendiv($this->CreateOrEditServer(true),$this->loc->s("add-server"));
+
+					$found = false;
+					$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,dns","dns = '1'");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if(!$found) {
+							$found = true;
+							$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
+							"</th><th></th></tr>";
+						}
+
+						$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
+						$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
+						$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=4&srv=".$data["addr"]);
+						$tmpoutput .= "</td></tr>";
+					}
+					if($found)
+						$output .= "<h2>".$this->loc->s("serverlist")."</h2>".$tmpoutput."</table>";
+				}
+
+				$output .= $this->showStats();
+			}
 			return $output;
 		}
 
@@ -38,7 +74,6 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h1>".$this->loc->s("title-dns")."</h1>";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$formoutput .= FS::$iMgr->select("f");
 
@@ -47,13 +82,13 @@
 
 				$shAAAA = FS::$secMgr->checkAndSecuriseGetData("saaaa");
 				if($shAAAA == NULL) $shAAAA = 1;
-				
+
 				$shNS = FS::$secMgr->checkAndSecuriseGetData("sns");
 				if($shNS == NULL) $shNS = 1;
-				
+
 				$shCNAME = FS::$secMgr->checkAndSecuriseGetData("scname");
 				if($shCNAME == NULL) $shCNAME = 1;
-				
+
 				$shSRV = FS::$secMgr->checkAndSecuriseGetData("ssrv");
 				if($shSRV == NULL) $shSRV = 1;
 				
@@ -250,7 +285,71 @@
 			}
 			return $output;
 		}
-		
+
+		private function CreateOrEditServer($create) {
+			$saddr = "";
+			$slogin = "";
+			$dns = 0;
+			$namedpath = "";
+			$chrootnamed = "";
+			if($create)
+				$output = "<h2>".$this->loc->s("add-server")."</h2>";
+			else {
+				$output = "<h2>".$this->loc->s("edit-server")."</h2>";
+				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+				if(!$addr || $addr == "") {
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
+					return $output;
+				}
+				$query = FS::$dbMgr->Select("z_eye_server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$saddr = $addr;
+					$slogin = $data["login"];
+					$dns = $data["dns"];
+					$namedpath = $data["namedpath"];
+					$chrootnamed = $data["chrootnamed"];
+				}
+				else {
+					$output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !");
+					return $output;
+				}
+			}
+			
+			if(!$create) {
+				$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
+				$output .= $this->showCreateEditErr();	
+			}
+			
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
+			
+			$output .= "<table class=\"standardTable\">";
+			if($create)
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
+			else {
+				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";
+				$output .= FS::$iMgr->hidden("saddr",$saddr).FS::$iMgr->hidden("edit","1");
+			}
+			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-rights"));
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table>";
+			
+			return $output;
+		}
+
+		private function showCreateEditErr() {
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 1: return FS::$iMgr->printError($this->loc->s("err-miss-bad-fields"));
+				case 2: return FS::$iMgr->printError($this->loc->s("err-unable-conn"));
+				case 3: return FS::$iMgr->printError($this->loc->s("err-bad-login")); 
+				case 4: return FS::$iMgr->printError($this->loc->s("err-server-exist")); 
+				case 99: return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+			}
+		}
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
@@ -263,23 +362,21 @@
 					$shPTR = FS::$secMgr->checkAndSecurisePostData("sptr");
 					$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
 					$shother = FS::$secMgr->checkAndSecurisePostData("sother");
-					
+
 					if($filtr == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Some filtering values are wrong");
-						header("Location: index.php?mod".$this->mid."");
+						header("Location: index.php?mod=".$this->mid."");
 					}
 					else {
 						if($shA == "on") $shA = 1;
 						else $shA = 0;
-			
+
 						if($shAAAA == "on") $shAAAA = 1;
 						else $shAAAA = 0;
-						
-			
+
 						if($shNS == "on") $shNS = 1;
 						else $shNS = 0;
-						
-			
+
 						if($shCNAME == "on") $shCNAME = 1;
 						else $shCNAME = 0;
 
@@ -360,6 +457,66 @@
 					else echo FS::$iMgr->printDebug($this->loc->s("no-found-records"));
 					FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",3,"User read ".$filter." DNS zone");
 					return;
+				// Add/Edit DNS server
+				case 3:
+					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+					$namedpath = FS::$secMgr->checkAndSecurisePostData("namedpath");
+					$chrootnamed = FS::$secMgr->checkAndSecurisePostData("chrootnamed");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
+					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to add/edit server");
+						header("Location: index.php?mod=".$this->mid."&err=99");
+						return;
+					}
+
+					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
+						$spwd != $spwd2 ||
+						$namedpath == NULL || $namedpath == "" || !FS::$secMgr->isPath($namedpath) ||
+							(($chrootnamed == NULL || $chrootnamed == "") && !FS::$secMgr->isPath($chrootnamed))
+						) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some datas are invalid or wrong for add server");
+						header("Location: index.php?mod=".$this->mid."&err=1");
+						return;
+					}
+					$conn = ssh2_connect($saddr,22);
+					if(!$conn) {
+						header("Location: index.php?mod=".$this->mid."&err=2");
+						return;
+					}
+					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
+						header("Location: index.php?mod=".$this->mid."&&err=3");
+						return;
+					}
+					if(FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
+						header("Location: index.php?mod=".$this->mid."&err=4");
+						return;
+					}
+					if($edit) FS::$dbMgr->Delete("z_eye_server_list","addr = '".$saddr."'");
+					FS::$dbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
+					"'".$saddr."','".$slogin."','".$spwd."','1','".$namedpath."','".$chrootnamed."'");
+					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: dns checking");
+					header("Location: m-".$this->mid.".html");
+					return;
+				// Delete DNS server
+				case 4: { 
+					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
+						header("Location: index.php?mod=".$this->mid."&err=99");
+						return;
+					}
+
+					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Removing server '".$srv."' from database");
+						FS::$dbMgr->Delete("z_eye_server_list","addr = '".$srv."'");
+					}
+					header('Location: m-'.$this->mid.'.html');
+					return;
+				}
 			}
 		}
 	};
