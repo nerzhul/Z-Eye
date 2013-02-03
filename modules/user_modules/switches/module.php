@@ -893,9 +893,13 @@
 					$output .= "Confirmer ".FS::$iMgr->check("accept");
 					$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
 					$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
-					
-					// Common JS
-					$output .= "<script type=\"text/javascript\">function checkCopyState(copyId) {
+
+					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_exportcfg") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_exportcfg") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_restorestartupcfg") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_restorestartupcfg")) {
+						// Common JS WARN: it's only for CISCO
+						$output .= "<script type=\"text/javascript\">function checkCopyState(copyId) {
 							setTimeout(function() {
 								$.post('index.php?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
 									if(data == 2) {
@@ -916,43 +920,48 @@
 										$('#subpop').html('".$this->loc->s("unk-answer").": '+data);
 								}); }, 1000);
 						}</script>";
-					
-					// Copy startup-config -> TFTP/FTP server
-					$output .= "<script type=\"text/javascript\">function arangeform() {";
-					$output .= "if(document.getElementsByName('exportm')[0].value == 2 || document.getElementsByName('exportm')[0].value == 4 || document.getElementsByName('exportm')[0].value == 5) {";
-					$output .= "$('#slogin').show();";
-					$output .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
-					$output .= "$('#slogin').hide(); }};";
-					$output .= "function sendbackupreq() {";
-					$output .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-					$output .= "$('#pop').show();";
-					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
-					srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
-					io: document.getElementsByName('io')[0].value },
-					function(data) { 
-						var copyId = data;
-						$('#subpop').html('".$this->loc->s("Copy-in-progress")."...');
-						checkCopyState(copyId);
-					});";
-					$output .= "return false;";
-					$output .= "};";
-					$output .= "</script>";
-					$output .= "<h3>".$this->loc->s("title-transfer-conf")."</h3>";
-					$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
-					$output .= FS::$iMgr->selElmt("TFTP",1);
-					$output .= FS::$iMgr->selElmt("FTP",2);
-					$output .= FS::$iMgr->selElmt("SCP",4);
-					$output .= FS::$iMgr->selElmt("SFTP",5);
-					$output .= "</select><br />";
-					$output .= $this->loc->s("transfer-way")." ".FS::$iMgr->select("io");
-					$output .= FS::$iMgr->selElmt($this->loc->s("Export"),1);
-					$output .= FS::$iMgr->selElmt($this->loc->s("Import"),2);
-					$output .= "</select><br />";
-					$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />";
-					$output .= $this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />";
-					$output .= "<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser");
-					$output .= " ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>";
-					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
+					}
+
+					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_exportcfg") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_exportcfg")) {
+
+						// Copy startup-config -> TFTP/FTP server
+						$output .= "<script type=\"text/javascript\">function arangeform() {";
+						$output .= "if(document.getElementsByName('exportm')[0].value == 2 || document.getElementsByName('exportm')[0].value == 4 || document.getElementsByName('exportm')[0].value == 5) {";
+						$output .= "$('#slogin').show();";
+						$output .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
+						$output .= "$('#slogin').hide(); }};";
+						$output .= "function sendbackupreq() {";
+						$output .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
+						$output .= "$('#pop').show();";
+						$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
+						srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
+						io: document.getElementsByName('io')[0].value },
+						function(data) { 
+							var copyId = data;
+							$('#subpop').html('".$this->loc->s("Copy-in-progress")."...');
+							checkCopyState(copyId);
+						});";
+						$output .= "return false;";
+						$output .= "};";
+						$output .= "</script>";
+						$output .= "<h3>".$this->loc->s("title-transfer-conf")."</h3>";
+						$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
+						$output .= FS::$iMgr->selElmt("TFTP",1);
+						$output .= FS::$iMgr->selElmt("FTP",2);
+						$output .= FS::$iMgr->selElmt("SCP",4);
+						$output .= FS::$iMgr->selElmt("SFTP",5);
+						$output .= "</select><br />";
+						$output .= $this->loc->s("transfer-way")." ".FS::$iMgr->select("io");
+						$output .= FS::$iMgr->selElmt($this->loc->s("Export"),1);
+						$output .= FS::$iMgr->selElmt($this->loc->s("Import"),2);
+						$output .= "</select><br />";
+						$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />";
+						$output .= $this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />";
+						$output .= "<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser");
+						$output .= " ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>";
+						$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
+					}
 
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_restorestartupcfg") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_restorestartupcfg")) {

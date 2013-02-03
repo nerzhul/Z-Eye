@@ -56,9 +56,9 @@
 				if(!$found) $found = true;
 				// Init array for device
 				$grprules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
-					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array());
+					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array());
 				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
-					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array());
+					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array());
 				$formoutput .=  FS::$iMgr->selElmt($data["name"],$data["ip"]);
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
@@ -79,6 +79,8 @@
 						array_push($grprules["writeportmon"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_restorestartupcfg")
 						array_push($grprules["restorestartupcfg"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_exportcfg")
+						array_push($grprules["exportcfg"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -93,6 +95,7 @@
 						case "write": $grpoutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $grpoutput .= $this->loc->s("Write-port-mon"); break;
 						case "restorestartupcfg": $grpoutput .= $this->loc->s("Restore-startup-cfg"); break;
+						case "exportcfg": $grpoutput .= $this->loc->s("Export-cfg"); break;
 					}
 					$grpoutput .= "</td><td>";
 					$grpoutput .= $this->showIPGroups($data["ip"],$key,$values);
@@ -116,6 +119,8 @@
 						array_push($usrrules["writeportmon"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_restorestartupcfg")
 						array_push($usrrules["restorestartupcfg"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_exportcfg")
+						array_push($usrrules["exportcfg"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -130,6 +135,7 @@
 						case "write": $usroutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $usroutput .= $this->loc->s("Write-port-mon"); break;
 						case "restorestartupcfg": $usroutput .= $this->loc->s("Restore-startup-cfg"); break;
+						case "exportcfg": $usroutput .= $this->loc->s("Export-cfg"); break;
 					}
 					$usroutput .= "</td><td>";
 					$usroutput .= $this->showIPUsers($data["ip"],$key,$values);
@@ -247,6 +253,8 @@
 					$usrrules["writeportmon"] = array();
 					$grprules["restorestartupcfg"] = array();
 					$usrrules["restorestartupcfg"] = array();
+					$grprules["exportcfg"] = array();
+					$usrrules["exportcfg"] = array();
 				}
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -266,6 +274,8 @@
 						array_push($grprules["writeportmon"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_restorestartupcfg" && $data["rw"] == 't')
 						array_push($grprules["restorestartupcfg"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_exportcfg" && $data["rw"] == 't')
+						array_push($grprules["exportcfg"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -280,6 +290,7 @@
 						case "write": $grpoutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $grpoutput .= $this->loc->s("Write-port-mon"); break;
 						case "restorestartupcfg": $grpoutput .= $this->loc->s("Restore-startup-cfg"); break;
+						case "exportcfg": $grpoutput .= $this->loc->s("Export-Cfg"); break;
 					}
 					$grpoutput .= "</td><td>";
 					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values);
@@ -303,6 +314,8 @@
 						array_push($usrrules["writeportmon"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_restorestartupcfg" && $data["rw"] == 't')
 						array_push($usrrules["restorestartupcfg"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_exportcfg" && $data["rw"] == 't')
+						array_push($usrrules["exportcfg"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -317,6 +330,7 @@
 						case "write": $usroutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $usroutput .= $this->loc->s("Write-port-mon"); break;
 						case "restorestartupcfg": $usroutput .= $this->loc->s("Restore-startup-cfg"); break;
+						case "exportcfg": $usroutput .= $this->loc->s("Export-cfg"); break;
 					}
 					$usroutput .= "</td><td>";
 					$usroutput .= $this->showSNMPUsers($data["name"],$key,$values);
