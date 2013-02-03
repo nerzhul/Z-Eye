@@ -290,7 +290,7 @@
 						case "write": $grpoutput .= $this->loc->s("Writing"); break;
 						case "writeportmon": $grpoutput .= $this->loc->s("Write-port-mon"); break;
 						case "restorestartupcfg": $grpoutput .= $this->loc->s("Restore-startup-cfg"); break;
-						case "exportcfg": $grpoutput .= $this->loc->s("Export-Cfg"); break;
+						case "exportcfg": $grpoutput .= $this->loc->s("Export-cfg"); break;
 					}
 					$grpoutput .= "</td><td>";
 					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values);
