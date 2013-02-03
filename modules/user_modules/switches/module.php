@@ -863,36 +863,40 @@
 				}
 				else if($showmodule == 4) { // advanced tools
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
-					$output .= "<script type=\"text/javascript\">";
-					$output .= "function searchports() {";
-					$output .= "$('#subpop').html('".$this->loc->s("search-ports")."...<br /><br /><br />');";
-					$output .= "$('#pop').show();
-					var ovlid = document.getElementsByName('oldvl')[0].value;";
-					$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
-						$('#pop').hide();
-						$('#vlplist').html(data); });";
-					$output .= "return false;";
-					$output .= "};";
-					$output .= "function checkTagForm() {
-						if($('#vlplist') == null || $('#vlplist').html().length < 1) {
-							alert('".$this->loc->s("must-verify-ports")." !');
-							return false;
-						}
-						if(document.getElementsByName('accept')[0].checked == false) {
-							alert('".$this->loc->s("must-confirm")." !');
-							return false;
-						}
-						return true;
-					};";
-					$output .= "</script>";
-					$output .= "<h3>".$this->loc->s("title-retag")."</h3>";
-					if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
-					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&d=".$device."&act=11");
-					$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
-					$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
-					$output .= "Confirmer ".FS::$iMgr->check("accept");
-					$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
-					$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
+					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_retagvlan") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_retagvlan")) { 
+						$output .= "<script type=\"text/javascript\">";
+						$output .= "function searchports() {";
+						$output .= "$('#subpop').html('".$this->loc->s("search-ports")."...<br /><br /><br />');";
+						$output .= "$('#pop').show();
+						var ovlid = document.getElementsByName('oldvl')[0].value;";
+						$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
+							$('#pop').hide();
+							$('#vlplist').html(data); });";
+						$output .= "return false;";
+						$output .= "};";
+						$output .= "function checkTagForm() {
+							if($('#vlplist') == null || $('#vlplist').html().length < 1) {
+								alert('".$this->loc->s("must-verify-ports")." !');
+								return false;
+							}
+							if(document.getElementsByName('accept')[0].checked == false) {
+								alert('".$this->loc->s("must-confirm")." !');
+								return false;
+							}
+							return true;
+						};";
+						$output .= "</script>";
+						$output .= "<h3>".$this->loc->s("title-retag")."</h3>";
+						if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
+						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&d=".$device."&act=11");
+						$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
+						$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
+						$output .= "Confirmer ".FS::$iMgr->check("accept");
+						$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
+						$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
+
+					}
 
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_exportcfg") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_exportcfg") ||
