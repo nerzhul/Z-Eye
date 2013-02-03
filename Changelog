@@ -224,3 +224,24 @@ Beta 3.6
 - Create right for port stats reading
 - Create right for write monitoring
 
+RC1.0
+- IP dhcp history is now in option and must be enable on dhcp history monitoring tab
+- Subnet DHCP history replaces this history for stats
+- Stability fixes
+
+RC1.1
+- many D&D remove
+- connection redirect fix
+- style fix for hX
+- some tooltips added
+- bugfix on radius user adding
+
+RC1.2
+- internationalize menu items
+- icinga rights per tab
+- fix on snmp community removal
+- coding style
+- check if icinga cmd exist and is allowed
+- cleanup on radius module
+- Some new tooltips
+- search style fix

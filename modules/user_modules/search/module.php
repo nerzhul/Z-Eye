@@ -69,7 +69,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("Ref-plug")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("Ref-plug")."</h2><div>";
 				}
 				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 				if(!isset($devprise[$swname]))
@@ -97,7 +97,7 @@
 				if($dname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'")) {
 					if($found == 0) {
 						$found = 1;
-						$tmpoutput .= "<div><h2>".$this->loc->s("title-vlan-device")."</h2>";
+						$tmpoutput .= "<h2>".$this->loc->s("title-vlan-device")."</h2><div>";
 					}
 					$tmpoutput .= "<li> <a href=\"index.php?mod=".$swmodid."&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
 				}
@@ -124,7 +124,7 @@
 			// Devices
 			$query = FS::$dbMgr->Select("device","mac,ip,description,model","name ILIKE '".$search."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
-				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
+				$tmpoutput .= "<h2>".$this->loc->s("Network-device")."</h2><div>";
 				$tmpoutput .= "<b>".$this->loc->s("Informations")."<i>: </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
 				if(strlen($data["mac"]) > 0)
 					$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a> - ";
@@ -140,7 +140,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("Ref-plug")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("Ref-plug")."</h2><div>";
 				}
 				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 				if(!isset($devprise[$swname]))
@@ -179,7 +179,7 @@
 				$nbresults++;
 			}
 			if($found) {
-				$tmpoutput .= "<div><h2>".$this->loc->s("Ref-desc")."</h2>";
+				$tmpoutput .= "<h2>".$this->loc->s("Ref-desc")."</h2><div>";
 				foreach($devportname as $device => $devport) {
                                         $tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
 					foreach($devport as $port => $portdata) {
@@ -209,7 +209,7 @@
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
 						$found = 1;
-						$tmpoutput .= "<div><h2>".$this->loc->s("title-dns-records")."</h2>";
+						$tmpoutput .= "<h2>".$this->loc->s("title-dns-records")."</h2><div>";
 					}
 					switch($data["rectype"]) {
 						case "A": $tmpoutput .= $this->loc->s("ipv4-addr").": "; break;
@@ -232,7 +232,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-netbios")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-netbios")."</h2><div>";
 					$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Node")."</th><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("First-view")."</th><th>".$this->loc->s("Last-view")."</th></tr>";
 				}
 				$fst = preg_split("#\.#",$data["time_first"]);
@@ -263,7 +263,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-dns-assoc")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-dns-assoc")."</h2><div>";
 				}
 				$tmpoutput .= $data["record"].".".$data["zonename"]."<br />";
 			}
@@ -275,7 +275,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-dhcp-distrib")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-dhcp-distrib")."</h2><div>";
 				}
 				if(strlen($data["hostname"]) > 0)
 					$tmpoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
@@ -293,7 +293,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-mac-addr")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-mac-addr")."</h2><div>";
 					$lastmac = $data["mac"];
 				}
 				$fst = preg_split("#\.#",$data["time_first"]);
@@ -307,7 +307,7 @@
 			if($lastmac) {
 				$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last","mac ILIKE '".$lastmac."' AND active = 't'","time_last",1,1);
 				if($data = FS::$dbMgr->Fetch($query)) {
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-last-device")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-last-device")."</h2><div>";
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 					$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
@@ -326,7 +326,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-netbios")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-netbios")."</h2><div>";
 				}
 				
 				$fst = preg_split("#\.#",$data["time_first"]);
@@ -344,7 +344,7 @@
 			// Devices
 			$query = FS::$dbMgr->Select("device","mac,name,description,model","ip = '".$search."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
-				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
+				$tmpoutput .= "<h2>".$this->loc->s("Network-device")."</h2><div>";
 				$tmpoutput .= "<b><i>".$this->loc->s("Name").": </i></b><a href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
 				$tmpoutput .= "<b><i>".$this->loc->s("Informations").": </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a>)<br />";
@@ -413,7 +413,7 @@
 					if($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found == 0) {
 							$found = 1;
-							$output .= "<div><h2>".$this->loc->s("title-8021x-users")."</h2>";
+							$output .= "<h2>".$this->loc->s("title-8021x-users")."</h2><div>";
 						}
 						$fst = preg_split("#\.#",$data2["acctstarttime"]);
 						$lst = preg_split("#\.#",$data2["acctstoptime"]);
@@ -430,7 +430,7 @@
 					if($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found == 0) {
 							$found = 1;
-							$output .= "<div><h2>".$this->loc->s("title-8021x-bw")."</h2>";
+							$output .= "<h2>".$this->loc->s("title-8021x-bw")."</h2><div>";
 						}
 						if($data2["input"] > 1024*1024*1024)
 							$inputbw = round($data2["input"]/1024/1024/1024,2)."Go";
@@ -486,7 +486,7 @@
 				while($data2 = $radSQLMgr->Fetch($query2)) {
 					if($found == 0) {
 						$found = 1;
-						$output .= "<div><h2>".$this->loc->s("Accounting")."</h2>
+						$output .= "<h2>".$this->loc->s("Accounting")."</h2><div>
 						<table><tr><th>".$this->loc->s("Device")."</th><th>".$this->loc->s("start-session")."</th><th>".$this->loc->s("end-session")."</th><th>".$this->loc->s("Upload")."</th>
 						<th>".$this->loc->s("Download")."</th><th>".$this->loc->s("end-session-cause")."</th></tr>";
 					}
@@ -545,7 +545,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-dhcp-distrib")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-dhcp-distrib")."</h2><div>";
 				}
 				if(strlen($data["hostname"]) > 0)
 					$tmpoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
@@ -562,7 +562,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-ip-addr")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-ip-addr")."</h2>";
 				}
 				$fst = preg_split("#\.#",$data["time_first"]);
 				$lst = preg_split("#\.#",$data["time_last"]);
@@ -576,7 +576,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-network-places")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-network-places")."</h2><div>";
 				}
 				$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
 				$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
@@ -597,7 +597,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == 0) {
 					$found = 1;
-					$tmpoutput .= "<div><h2>".$this->loc->s("title-netbios-name")."</h2>";
+					$tmpoutput .= "<h2>".$this->loc->s("title-netbios-name")."</h2><div>";
 				}
 				$fst = preg_split("#\.#",$data["time_first"]);
 				$lst = preg_split("#\.#",$data["time_last"]);
@@ -614,7 +614,7 @@
 			// Devices
 			$query = FS::$dbMgr->Select("device","ip,name,description,model","mac = '".$search."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
-				$tmpoutput .= "<div><h2>".$this->loc->s("Network-device")."</h2>";
+				$tmpoutput .= "<h2>".$this->loc->s("Network-device")."</h2><div>";
 				$tmpoutput .= "<b><i>".$this->loc->s("Name").": </i></b><a href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
 				$tmpoutput .= "<b><i>".$this->loc->s("Informations").": </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
 				$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
