@@ -953,21 +953,24 @@
 					$output .= "<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser");
 					$output .= " ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>";
 					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
-					
-					// Copy startup-config -> running-config
-					$output .= "<script type=\"text/javascript\">function restorestartupconfig() {";
-					$output .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-					$output .= "$('#pop').show();";
-					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
-						var copyId = data;
-						$('#subpop').html('".$this->loc->s("restore-in-progress")."...');
-						checkCopyState(copyId);
-					});";
-					$output .= "return false;";
-					$output .= "};";
-					$output .= "</script>";
-					$output .= "<h3>".$this->loc->s("title-restore-startup")."</h3>";
-					$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
+
+					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_restorestartupcfg") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_restorestartupcfg")) {
+						// Copy startup-config -> running-config
+						$output .= "<script type=\"text/javascript\">function restorestartupconfig() {";
+						$output .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
+						$output .= "$('#pop').show();";
+						$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
+							var copyId = data;
+							$('#subpop').html('".$this->loc->s("restore-in-progress")."...');
+							checkCopyState(copyId);
+						});";
+						$output .= "return false;";
+						$output .= "};";
+						$output .= "</script>";
+						$output .= "<h3>".$this->loc->s("title-restore-startup")."</h3>";
+						$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
+					}
 					return $output;
 				}
 				else if($showmodule == 5) {
@@ -1143,11 +1146,11 @@
 							$tmpoutput2 .= $channel."</td><td>".$power."</td><td>".$ssid;
 						}
 						$tmpoutput2 .= "</td></tr>";
-		
+
 						if($filter_ok == 1)
 							$tmpoutput .= $tmpoutput2;
 					}
-		
+
 					if($found != 0) {
 						$output .= $tmpoutput;
 						$output .= "</table>";
