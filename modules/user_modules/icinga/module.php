@@ -828,6 +828,7 @@
 				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
+				case 4: $output .= Fs::$iMgr->printError($this->loc->s("err-binary-not-found")); break;
 			}
 			
 			/*
@@ -1276,6 +1277,14 @@
 			
 			return true;
 		}
+
+		private function isForbidCmd($cmd) {
+			if($cmd == "rm" || $cmd == "/bin/rm" || $cmd == "ls" || $cmd == "/bin/ls" || $cmd == "cp" || $cmd == "/bin/cp" || $cmd == "mv" || $cmd == "/bin/mv") 
+				return true;
+
+			return false;
+		}
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				// Add/Edit command
@@ -1305,7 +1314,15 @@
 						return;
 					}
 					
-					// @TODO verify paths
+					$tmpcmd = preg_replace("#\\\$USER1\\\$#","/usr/local/libexec/nagios/",$cmd);
+					$tmpcmd = preg_split("#[ ]#",$tmpcmd);
+					$out = "";
+					exec("if [ -f ".$tmpcmd[0]." ] && [ -x ".$tmpcmd[0]." ]; then echo 0; else echo 1; fi;",$out);
+					if(!is_array($out) || count($out) != 1 || $out[0] != 0 || $this->isForbidCmd($tmpcmd[0])) {
+						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
+						return;
+					} 
+
 					if($edit) FS::$dbMgr->Delete("z_eye_icinga_commands","name = '".$cmdname."'");	
 					FS::$dbMgr->Insert("z_eye_icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
 					if(!$this->writeConfiguration()) {
