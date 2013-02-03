@@ -21,7 +21,7 @@
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/PDFgen.FS.class.php");
-	
+
 	class iRadius extends genModule{
 		function iRadius() { parent::genModule(); $this->loc = new lRadius(); }
 		public function Load() {
@@ -43,6 +43,7 @@
 			}
 			else
 				$output = "";
+
 			if(!FS::isAjaxCall()) {
 				$found = 0;
 				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
@@ -50,9 +51,9 @@
 					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 					$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
 					while($data = FS::$dbMgr->Fetch($query)) {
-							if($found == 0) $found = 1;
-							$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
-							$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$radpath,$rad == $radpath);
+						if($found == 0) $found = 1;
+						$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
+						$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$radpath,$rad == $radpath);
 					}
 					if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Manage"))."</form>";
 					else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
@@ -495,11 +496,11 @@
 				$radexptable = FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_table' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 				$radexpuser = FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_user_field' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 				$radexpdate = FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_date_field' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-				
+
 				$output .= FS::$iMgr->idxLine($this->loc->s("enable-autoclean"),"cleanradsqlenable", ($radexpenable == 1 ? true : false), array("type" => "chk"));
-				$output .= FS::$iMgr->idxLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable);
-				$output .= FS::$iMgr->idxLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser);
-				$output .= FS::$iMgr->idxLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate);
+				$output .= FS::$iMgr->idxLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable,array("tooltip" => $this->loc->s("tooltip-ac-sqltable")));
+				$output .= FS::$iMgr->idxLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser,array("tooltip" => $this->loc->s("tooltip-ac-sqluserfield")));
+				$output .= FS::$iMgr->idxLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate,array("tooltip" => $this->loc->s("tooltip-ac-sqlexpirationfield")));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</form>";
 			}
 			else if($sh == 6) {
@@ -602,11 +603,13 @@
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]))) {
 					$found = true;
 					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><tr><th>Id</th><th>Utilisateur</th><th>Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr>";
-					$query2 = $radSQLMgr->Select("z_eye_radusers","username,expiration","expiration > 0");
-					while($data2 = $radSQLMgr->Fetch($query2)) {
-						if(!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
+					if($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
+						$query2 = $radSQLMgr->Select("z_eye_radusers","username,expiration","expiration > 0");
+						while($data2 = $radSQLMgr->Fetch($query2)) {
+							if(!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
+						}
 					}
-				}
+				}	
 				if(!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-F]{12})$#i', $data["username"])
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"])) {
 					$tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"]."\">".$data["username"]."</a></td><td>".$data["value"]."</td><td>";
@@ -653,7 +656,7 @@
 					grpidx++;
 				}
 				function delGrpElmt(grpidx) {
-						$('.ugroupli'+grpidx).remove();
+					$('.ugroupli'+grpidx).remove();
 				}
 				attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Valeur".
@@ -691,7 +694,7 @@
 				($utype == 1 ? "Normal" : $this->loc->s("Mac-addr"));
 				$formoutput .= "</li><li>".
 				FS::$iMgr->hidden("username",$radentry)."</li>";
-				if(FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1) {
+				if($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
 					$creadate = $radSQLMgr->GetOneData("z_eye_radusers","creadate","username='".$radentry."'");
 					$formoutput .= "<li><b>".$this->loc->s("Creation-date").": </b>".$creadate."</li>";
 				}
@@ -764,7 +767,7 @@
 				}
 
 				// if expiration module is activated, show the options
-				if(FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1) {
+				if($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
 					$expdate = $radSQLMgr->GetOneData("z_eye_radusers","expiration","username='".$radentry."'");
 					$startdate = $radSQLMgr->GetOneData("z_eye_radusers","startdate","username='".$radentry."'");
 					$formoutput .= "<li>".FS::$iMgr->calendar("starttime",$startdate ? date("d-m-y",strtotime($startdate)) : "",$this->loc->s("Acct-start-date"))."</li>";
@@ -882,6 +885,12 @@
 				$output .= FS::$iMgr->selElmt($groups[$i],$groups[$i],($groups[$i] == $selectEntry ? true : false));
 			}
 			return $output;
+		}
+
+		private function hasExpirationEnabled($radhost,$radport,$raddb) {
+			if(FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1)
+				return true;
+			return false;
 		}
 
 		public function handlePostDatas($act) {
@@ -1025,7 +1034,7 @@
 					else {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Try to add user ".$username." but user already exists");
 						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
-                        return;
+                        			return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"User '".$username."' edited/created");
 					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb);
