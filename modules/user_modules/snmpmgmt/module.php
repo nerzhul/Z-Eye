@@ -123,6 +123,8 @@
 						return;
 					}
 					FS::$dbMgr->Delete("z_eye_snmp_communities","name = '".$name."'");
+					FS::$dbMgr->Delete("z_eye_user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
+					FS::$dbMgr->Delete("z_eye_group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
 					header("Location: index.php?mod=".$this->mid."&sh=2");
 					return;
