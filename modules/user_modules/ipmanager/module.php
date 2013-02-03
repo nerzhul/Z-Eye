@@ -66,10 +66,10 @@
 						<li>".FS::$iMgr->input("sshuser","",20,128,$this->loc->s("ssh-user"))." (*)</li>
 						<li>".FS::$iMgr->password("sshpwd","",$this->loc->s("ssh-pwd"))." (*)</li>
 						<li>".FS::$iMgr->password("sshpwd2","",$this->loc->s("ssh-pwd-repeat"))." (*)</li>
-						<li>".FS::$iMgr->input("dhcpdpath","",30,980,$this->loc->s("dhcpd-path"))." (*)</li>
-						<li>".FS::$iMgr->input("leasepath","",30,980,$this->loc->s("lease-path"))." (*)</li>
-						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"))."</li>
-						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"))."</li>
+						<li>".FS::$iMgr->input("dhcpdpath","",30,980,$this->loc->s("dhcpd-path"),$this->loc->s("tooltip-dhcpdpath"))." (*)</li>
+						<li>".FS::$iMgr->input("leasepath","",30,980,$this->loc->s("lease-path"),$this->loc->s("tooltip-leasepath"))." (*)</li>
+						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"),$this->loc->s("tooltip-reservconfpath"))."</li>
+						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"),$this->loc->s("tooltip-subnetconfpath"))."</li>
                         	        	<li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li>
                                 		</ul></form>";
 					// To delete servers
