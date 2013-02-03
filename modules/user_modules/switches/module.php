@@ -32,7 +32,9 @@
 	
 	class iSwitchMgmt extends genModule{
 		function iSwitchMgmt() { parent::genModule(); $this->loc = new lSwitchMgmt(); }
+
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			return $this->showMain();
 		}
 
@@ -131,9 +133,9 @@
 							$output .= FS::$iMgr->hidden("port",$port);
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
-						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => $this->loc->s("tooltip-desc")));
+						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => "tooltip-desc"));
 						$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => $this->loc->s("tooltip-plug")));
+						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => "tooltip-plug"));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = getPortMtuWithPID($device,$portid);
 						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
@@ -146,11 +148,11 @@
 						else
 							$output .= "unk";
 						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false, "tooltip" => $this->loc->s("tooltip-shut")))."</td></tr>";
+						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false, "tooltip" => "tooltip-shut"))."</td></tr>";
 						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
                                                 $sp = getPortSpeedWithPID($device,$portid);
 						if($sp > 0) {
-							$output .= FS::$iMgr->select("speed","",null,false,array("tooltip" => $this->loc->s("tooltip-speed")));
+							$output .= FS::$iMgr->select("speed","",null,false,array("tooltip" => "tooltip-speed"));
 							$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
 							if(preg_match("#Ethernet#",$port)) {
 								$output .= FS::$iMgr->selElmt("10 Mbits",10000000,$sp == 10000000 ? true : false);
@@ -254,13 +256,13 @@
 
 						// NoResp Vlan
                                                 $output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-noresp")."</td><td>";
-                                                $output .= FS::$iMgr->select("norespvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-noresp-tooltip")));
+                                                $output .= FS::$iMgr->select("norespvlan","",NULL,false,array("tooltip" => "MAB-noresp-tooltip"));
                                                 $output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
                                                 $output .= $norespvlanoutput;
                                                 $output .= "</select></td></tr>";
 						// Dead Vlan
 						$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-dead")."</td><td>";
-						$output .= FS::$iMgr->select("deadvlan","",NULL,false,array("tooltip" => $this->loc->s("MAB-dead-tooltip")));
+						$output .= FS::$iMgr->select("deadvlan","",NULL,false,array("tooltip" => "MAB-dead-tooltip"));
 						$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
 						$output .= $deadvlanoutput;
 						$output .= "</select></td></tr>";
@@ -279,7 +281,7 @@
 						* Voice vlan
 						*/
 						$output .= "</td></tr><tr><td>".$this->loc->s("voice-vlan")."</td><td>";
-						$output .= FS::$iMgr->select("voicevlan","",null,false,array("tooltip" => $this->loc->s("tooltip-voicevlan")));
+						$output .= FS::$iMgr->select("voicevlan","",null,false,array("tooltip" => "tooltip-voicevlan"));
 						$output .= $voicevlanoutput;
 						$output .= "</select></td></tr>";
 						$portsecen = getPortSecEnableWithPID($device,$portid);
@@ -299,22 +301,22 @@
                                                         $output .= "</td></tr>";
 							// Action when violation is performed
 							$psviolact = getPortSecViolActWithPID($device,$portid);
-							$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact","",NULL,false,array("tooltip" => $this->loc->s("portsec-viol-tooltip")));
+							$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact","",NULL,false,array("tooltip" => "portsec-viol-tooltip"));
 							$output .= FS::$iMgr->selElmt($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
 							$output .= FS::$iMgr->selElmt($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
 							$output .= FS::$iMgr->selElmt($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
 							$output .= "</select>";
 							// Maximum MAC addresses before violation mode
 							$psmaxmac = getPortSecMaxMACWithPID($device,$portid);
-							$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => $this->loc->s("portsec-maxmac-tooltip")))."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => "portsec-maxmac-tooltip"))."</td></tr>";
 						}
 						$cdp = getPortCDPEnableWithPID($device,$portid);
 						if($cdp != -1) {
 							$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
-							$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => $this->loc->s("cdp-tooltip")))."</td></tr>";
+							$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
 						}
 
-						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => $this->loc->s("tooltip-saveone")));
+						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
 						$output .= "</table>";
 						if($portid != -1) {
 							if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
@@ -1267,7 +1269,7 @@
 					$rightsok = true;
 					// Write all devices button
 					$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
-					$formoutput .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => $this->loc->s("tooltip-save")));
+					$formoutput .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"));
 					$formoutput .= "</form>";
 					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20","saveall",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true));
 				}
@@ -1275,7 +1277,7 @@
 					$rightsok = true;
 					// Backup all devices button
 					$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=21",array("id" => "backupall"));
-					$formoutput .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => $this->loc->s("tooltip-backup")));
+					$formoutput .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"));
 					$formoutput .= "</form>";
 					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21","backupall",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true));
 				}

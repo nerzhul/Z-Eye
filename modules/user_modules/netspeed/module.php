@@ -16,13 +16,14 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
-	
+
 	class iNetSpeed extends genModule{
 		function iNetSpeed() { parent::genModule(); $this->loc = new lNetSpeed(); }
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			if(!FS::isAJAXCall()) {
 				$output .= "<h1>".$this->loc->s("title-bw")."</h1>";

@@ -22,7 +22,10 @@
 
 	class iSecReport extends genModule{
 		function iSecReport() { parent::genModule(); $this->loc = new lSecReport(); }
+
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
+
 			// Load snort keys for db config
 			$dbname = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
 			if($dbname == "") $dbname = "snort";

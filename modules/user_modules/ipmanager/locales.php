@@ -100,10 +100,10 @@
 					"tooltip-max-age" => "Délai maximum (en jours) avant d'avertir de l'obsolescence d'une réservation.<br />0 = pas de vérification",
 					"tooltip-reservconfpath" => "Pour un usage futur, chemin vers un fichier accessible en écriture afin de réserver des hôtes. Non obligatoire",
 					"tooltip-subnetconfpath" => "Pour un usage futur, chemin vers un fichier accessible en écriture afin de créer des subnets. Non obligatoire",
+					"tooltip-%use" => "% d'utilisation",
 					"Usable" => "Utilisables",
 					"Used" => "Utilisée",
 					"warn-line" => "Seuil d'avertissement",
-					"%use" => "% d'utilisation",
 				),
 				"en" => array(
 					"Add" => "Ajouter",
@@ -182,10 +182,10 @@
 					"tooltip-max-age" => "Max delay (in days) before advertise for old datas.<br />0 = No verification",
 					"tooltip-reservconfpath" => "For future usage. Path to a writeable file for dhcp reservations.",
 					"tooltip-subnetconfpath" => "For future usage. Path to a writeable file for dhcp subnet configuration",
+					"tooltip-%use" => "% of use",
 					"Usable" => "Usable",
 					"Used" => "Used",
 					"warn-line" => "Warning step",
-					"%use" => "% of use",
 				)
 			);
 		}

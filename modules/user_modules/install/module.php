@@ -23,6 +23,7 @@
 		function iInstall() { parent::genModule(); $this->loc = new lInstall(); }
 
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			if(!FS::isAjaxCall())
 				$output .= $this->showMain();

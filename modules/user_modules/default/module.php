@@ -23,6 +23,7 @@
 		function iDefault() { parent::genModule(); $this->loc = new lDefault(); }
 
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			$output .= $this->showMain();
 			return $output;

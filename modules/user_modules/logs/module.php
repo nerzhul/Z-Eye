@@ -24,10 +24,11 @@
 	class iLogs extends genModule{
 		function iLogs() { parent::genModule(); $this->loc = new lLogs(); }
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = $this->showLogs();
 			return $output;
 		}
-		
+
 		private function getApplicationLogs() {
 			$ufilter = FS::$secMgr->checkAndSecurisePostData("uf");
 			$appfilter = FS::$secMgr->checkAndSecurisePostData("af");

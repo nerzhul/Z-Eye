@@ -16,14 +16,15 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
-	
+
 	class iLinkMgmt extends genModule{
 		function iLinkMgmt() { parent::genModule(); $this->loc = new lLinkMgmt(); }
-		
+
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			if($do = FS::$secMgr->checkGetData("do")) {
 				if($do == 1)

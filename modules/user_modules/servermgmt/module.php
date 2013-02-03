@@ -16,14 +16,16 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
-	
+
 	class iServerMgmt extends genModule{
 		function iServerMgmt() { parent::genModule(); $this->loc = new lServerMgmt(); }
+
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "<h1>".$this->loc->s("title-analysismgmt")."</h1>";
 			$do = FS::$secMgr->checkAndSecuriseGetData("do");
 			switch($do) {
@@ -251,18 +253,18 @@
 			
 			if($create == false)
 				$output .= FS::$iMgr->hidden("saddr",$saddr);
-	
+
 			$output .= "<table class=\"standardTable\">";
 			if($create)
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 			else
-				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";		
+				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin);
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine("DNS ?","dns",$dns > 0 ? true : false,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => $this->loc->s("tooltip-rights")));
-			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => $this->loc->s("tooltip-rights")));
+			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 			

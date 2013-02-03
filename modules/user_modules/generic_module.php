@@ -31,9 +31,11 @@
 	class genModule {
 		function genModule() {
 		}
-		
+
 		public function Load() { $this->iMgr->printError("Unknown module !"); }
 		public function setModuleId($id) { $this->mid = $id; }
+		public function getLoc() { return $this->loc; }
+
 		protected $mid;
 		protected $loc;
 	}

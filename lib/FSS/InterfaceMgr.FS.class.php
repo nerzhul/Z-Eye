@@ -130,7 +130,7 @@
 		}
 
 		private function tooltip($obj,$text) {
-			$output = '<script type="text/javascript">$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($text).'");
+			$output = '<script type="text/javascript">$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($this->cur_module->getLoc()->s($text)).'");
 			$("#tooltip").fadeIn("fast");}).mouseleave(function(){$("#tooltip").fadeOut("fast",function(){
 			});});</script>';
 			return $output;
@@ -432,18 +432,24 @@
 		public function stylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;
 		}
-		
+
 		public function jsinc($path) {
 			$this->arr_js[count($this->arr_js)] = $path;
 		}
-		
+
 		public function printError($msg) {
 			return "<div id=\"errorContent\">Erreur: ".$msg."</div>";
 		}
-		
+
 		public function printDebug($msg) {
 			return "<div id=\"debugContent\">Notification: ".$msg."</div>";
 		}
+
+		public function setCurrentModule($module) {
+			$this->cur_module = $module;
+		}
+
+		private $cur_module;
 		private $arr_css;
 		private $arr_js;
 	};

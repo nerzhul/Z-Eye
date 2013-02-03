@@ -20,10 +20,12 @@
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
-	
+
 	class iSearch extends genModule{
 		function iSearch() { parent::genModule(); $this->loc = new lSearch(); }
+
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			if($search && strlen($search) > 0)

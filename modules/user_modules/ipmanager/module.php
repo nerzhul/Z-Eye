@@ -20,10 +20,11 @@
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/modules/Network.FS.class.php");
-	
+
 	class iIPManager extends genModule{
 		function iIPManager() { parent::genModule(); $this->loc = new lIPManager(); }
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			$output .= $this->showStats();
 			return $output;
@@ -66,10 +67,10 @@
 						<li>".FS::$iMgr->input("sshuser","",20,128,$this->loc->s("ssh-user"))." (*)</li>
 						<li>".FS::$iMgr->password("sshpwd","",$this->loc->s("ssh-pwd"))." (*)</li>
 						<li>".FS::$iMgr->password("sshpwd2","",$this->loc->s("ssh-pwd-repeat"))." (*)</li>
-						<li>".FS::$iMgr->input("dhcpdpath","",30,980,$this->loc->s("dhcpd-path"),$this->loc->s("tooltip-dhcpdpath"))." (*)</li>
-						<li>".FS::$iMgr->input("leasepath","",30,980,$this->loc->s("lease-path"),$this->loc->s("tooltip-leasepath"))." (*)</li>
-						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"),$this->loc->s("tooltip-reservconfpath"))."</li>
-						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"),$this->loc->s("tooltip-subnetconfpath"))."</li>
+						<li>".FS::$iMgr->input("dhcpdpath","",30,980,$this->loc->s("dhcpd-path"),"tooltip-dhcpdpath")." (*)</li>
+						<li>".FS::$iMgr->input("leasepath","",30,980,$this->loc->s("lease-path"),"tooltip-leasepath")." (*)</li>
+						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"),"tooltip-reservconfpath")."</li>
+						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"),"tooltip-subnetconfpath")."</li>
                         	        	<li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li>
                                 		</ul></form>";
 					// To delete servers
@@ -298,10 +299,10 @@
 	                                $output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
 						<li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>";
-                                        $output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
-					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => $this->loc->s("%use")))."</li><li>";
-					$output .= FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => $this->loc->s("tooltip-max-age")))."</li><li>";
-					$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),$this->loc->s("tooltip-contact"))."</li><li>";
+                                        $output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => "tooltip-%use"))."</li><li>";
+					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => "tooltip-%use"))."</li><li>";
+					$output .= FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => "tooltip-max-age"))."</li><li>";
+					$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),"tooltip-contact")."</li><li>";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
 					$output .= "<script type=\"text/javascript\">$('#monsubnet').submit(function(event) {
         	                                event.preventDefault();

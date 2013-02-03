@@ -25,6 +25,7 @@
 		function iSNMPMgmt() { parent::genModule(); $this->loc = new lSNMPMgmt(); }
 		
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -47,8 +48,8 @@
 
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1")."<ul class=\"ulform\">";
 			$formoutput .= "<li>".FS::$iMgr->input("name","",20,64,$this->loc->s("snmp-community"))."</li>";
-			$formoutput .= "<li>".FS::$iMgr->check("ro",array("label" => $this->loc->s("Read"), "tooltip" => $this->loc->s("tooltip-read")))."</li>";
-			$formoutput .= "<li>".FS::$iMgr->check("rw",array("label" => $this->loc->s("Write"), "tooltip" => $this->loc->s("tooltip-write")))."</li>";
+			$formoutput .= "<li>".FS::$iMgr->check("ro",array("label" => $this->loc->s("Read"), "tooltip" => "tooltip-read"))."</li>";
+			$formoutput .= "<li>".FS::$iMgr->check("rw",array("label" => $this->loc->s("Write"), "tooltip" => "tooltip-write"))."</li>";
 			$formoutput .= "<li>".FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
 			$formoutput .= "</ul></form>";
 

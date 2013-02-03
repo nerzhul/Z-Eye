@@ -24,6 +24,7 @@
 	class iConnect extends genModule{
 		function iConnect() { parent::genModule(); $this->loc = new lConnect(); }
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			$err = FS::$secMgr->checkGetData("err");
 			if($err) {

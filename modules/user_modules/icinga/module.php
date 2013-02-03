@@ -23,6 +23,7 @@
 	class iIcinga extends genModule{
 		function iIcinga() { parent::genModule(); $this->loc = new lIcinga(); }
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
 			switch($edit) {
 				case 2: $output = $this->editHost(); break;
@@ -836,8 +837,8 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30, "tooltip" => $this->loc->s("tooltip-cmdname")));
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30, "tooltip" => $this->loc->s("tooltip-cmd")));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 

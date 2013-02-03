@@ -24,7 +24,9 @@
 
 	class iRadius extends genModule{
 		function iRadius() { parent::genModule(); $this->loc = new lRadius(); }
+
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
@@ -473,9 +475,9 @@
 				$radexpdate = FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_date_field' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 
 				$output .= FS::$iMgr->idxLine($this->loc->s("enable-autoclean"),"cleanradsqlenable", ($radexpenable == 1 ? true : false), array("type" => "chk"));
-				$output .= FS::$iMgr->idxLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable,array("tooltip" => $this->loc->s("tooltip-ac-sqltable")));
-				$output .= FS::$iMgr->idxLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser,array("tooltip" => $this->loc->s("tooltip-ac-sqluserfield")));
-				$output .= FS::$iMgr->idxLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate,array("tooltip" => $this->loc->s("tooltip-ac-sqlexpirationfield")));
+				$output .= FS::$iMgr->idxLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable,array("tooltip" => "tooltip-ac-sqltable"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser,array("tooltip" => "tooltip-ac-sqluserfield"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate,array("tooltip" => "tooltip-ac-sqlexpirationfield"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</form>";
 			}
 			else if($sh == 6) {

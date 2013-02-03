@@ -24,6 +24,7 @@
 	class iDNSManager extends genModule{
 		function iDNSManager() { parent::genModule(); $this->loc = new lDNSManager(); }
 		public function Load() {
+			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			$output .= $this->showStats();
 			return $output;
