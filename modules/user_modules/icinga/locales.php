@@ -123,6 +123,8 @@
 					"title-hostgroup-edit" => "Edition d'un groupe d'hôtes",
 					"title-icinga" => "Gestion du moniteur de services Icinga",
 					"To" => "à",
+					"tooltip-cmd" => "Commande systeme.<br />Nécessite le chemin absolu du binaire.<br />\\\$USER1\\\$ correspond au chemin /usr/local/libexec/nagios/.<br />\\\$ARG1\\\$ au premier argument<br />\\\$HOSTNAME\\\$ au nom d'hôte, ou à l'adresse IP",
+					"tooltip-cmdname" => "Un nom de commande (chiffres, lettres, [-_]",
 					"Tuesday" => "Mardi",
 					"Value" => "Valeur",
 					"Wednesday" => "Mercreci",

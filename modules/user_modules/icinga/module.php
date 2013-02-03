@@ -836,8 +836,8 @@
 			 */
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30, "tooltip" => $this->loc->s("tooltip-cmdname")));
+			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30, "tooltip" => $this->loc->s("tooltip-cmd")));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
 
@@ -1298,7 +1298,7 @@
 					$cmd = FS::$secMgr->checkAndSecurisePostData("cmd");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					
-					if(!$cmdname || !$cmd || preg_match("#[ ]#",$cmdname) || $edit && $edit != 1) {
+					if(!$cmdname || !$cmd || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$cmdname) || $edit && $edit != 1) {
 						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
 						return;
 					}
