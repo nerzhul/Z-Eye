@@ -26,11 +26,13 @@
 					"Confirm" => "Confirmer",
 					"confirm-disconnect" => "Êtes vous sûr de vouloir vous déconnecter ?",
 					"Disconnect" => "Déconnexion",
+					"menu-title" => "Déconnexion",
 				),
 				"en" => array(
 					"Confirm" => "Confirm",
 					"confirm-disconnect" => "Are you sure about disconnecting ?",
 					"Disconnect" => "Disconnect",
+					"menu-title" => "Disconnect",
 				)
 			);
 		}

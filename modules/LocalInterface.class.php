@@ -116,7 +116,7 @@
 			$output .= "</div><div class=\"left\">";
 
 			if(!FS::$sessMgr->isConnected()) {
-				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
+				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
 					$output .= "<h1>Identification</h1>";
 					$output .= $this->label("uname","Utilisateur");
 					$output .= $this->input("uname","");
@@ -127,7 +127,7 @@
 					$output .= $this->submit("conn","Connexion");
 					$output .= "</form>";
 			} else {
-				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
+				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
 				$output .= FS::$iMgr->submit("disconnect","Confirmer");
 				$output .= "</form>";
 			}
@@ -204,25 +204,6 @@
 				$output .= $this->printError("Module inconnu !");
 
 			return $output."<script type=\"text/javascript\">$('textarea, input:checkbox, input:radio, input:file').uniform();</script>";
-		}
-
-		public function getModuleIdByPath($path) {
-			$dir = opendir(dirname(__FILE__)."/user_modules");
-			$moduleid = 0;
-			$found = false;
-			while(($elem = readdir($dir)) && $found == false) {
-				$dirpath = dirname(__FILE__)."/user_modules/".$elem;
-				if(is_dir($dirpath)) $moduleid++;
-				if(is_dir($dirpath) && $elem == $path) {
-					$dir2 = opendir($dirpath);
-					while(($elem2 = readdir($dir2)) && $found == false) {
-						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
-							return $moduleid;
-					}
-				}
-			}
-
-			return 0;
 		}
 
 		public function removeIcon($link = "") {

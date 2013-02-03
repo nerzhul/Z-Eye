@@ -26,6 +26,7 @@
 					"Connect" => "Connexion",
 					"err-bad-user" => "Nom d'utilisateur et/ou mot de passe inconnu",
 					"err-unk" => "Erreur inconnue",
+					"menu-title" => "Connexion",
 					"Login" => "Utilisateur",
 					"Password" => "Mot de passe",
 					"title-conn" => "Connexion à l'espace d'administration",
@@ -35,6 +36,7 @@
 					"err-bad-user" => "Invalid user/password",
 					"err-unk" => "Unknown error",
 					"Login" => "User",
+					"menu-title" => "Connexion",
 					"Password" => "Password",
 					"title-conn" => "Connect to the admin panel",
 				)

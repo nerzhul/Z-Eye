@@ -42,7 +42,7 @@
 		}
 
 		// header/footer/content
-		
+
 		public function header() {
 			$output = "<!DOCTYPE html>
 				<html lang=\"".Config::getSysLang()."\">
@@ -92,8 +92,8 @@
 							if(FS::$sessMgr->getUid() == 1 || (is_dir($dirpath))) {
 								require($dirpath."/main.php");
 								if($module->getRulesClass()->canAccessToModule()) {
-	                                                                $tmpoutput .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$data3["title"]."</a></div>";
-								$haselemtoshow = 1;
+	                                                                $tmpoutput .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$module->getModuleClass()->getMenuTitle()."</a></div>";
+									$haselemtoshow = 1;
 								}
 							}
 						}
@@ -443,6 +443,24 @@
 
 		public function printDebug($msg) {
 			return "<div id=\"debugContent\">Notification: ".$msg."</div>";
+		}
+
+		public function getModuleIdByPath($path) {
+			$dir = opendir(dirname(__FILE__)."/../../modules/user_modules");
+			$moduleid = 0;
+			$found = false;
+			while(($elem = readdir($dir)) && $found == false) {
+				$dirpath = dirname(__FILE__)."/../../modules/user_modules/".$elem;
+				if(is_dir($dirpath)) $moduleid++;
+				if(is_dir($dirpath) && $elem == $path) {
+					$dir2 = opendir($dirpath);
+					while(($elem2 = readdir($dir2)) && $found == false) {
+						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+							return $moduleid;
+					}
+				}
+			}
+			return 0;
 		}
 
 		public function setCurrentModule($module) {
