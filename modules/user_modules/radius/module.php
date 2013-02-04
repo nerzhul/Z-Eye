@@ -160,8 +160,8 @@
 			$output .= "<table class=\"standardTable\">";
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
-				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num"));
-				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname,array("tooltip" => "tooltip-dbname"));
 			}
 			else {
 				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
@@ -171,7 +171,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",$slogin);
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias,array("tooltip" => "tooltip-alias"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table>";
 
