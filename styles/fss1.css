@@ -447,6 +447,10 @@ a:hover {
 	padding: 10px;
 	font-size: 12px;
 	background-color: #0CF;
+	border-radius: 3px;
+	margin-left: 10%;
+	margin-right: 10%;
+	border: 1px solid blue;
 }
 
 .required_text {

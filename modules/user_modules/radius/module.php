@@ -33,24 +33,27 @@
 			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 			$rad = $raddb."@".$radhost.":".$radport;
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			if($err && FS::$secMgr->isNumeric($err)) {
-				switch($err) {
-					case 1: $output = FS::$iMgr->printError($this->loc->s("err-not-exist")); break;
-					case 2: $output = FS::$iMgr->printError($this->loc->s("err-miss-data")); break;
-					case 3: $output = FS::$iMgr->printError($this->loc->s("err-exist")); break;
-					case 4: $output = FS::$iMgr->printError($this->loc->s("err-delete")); break;
-					case 5: $output = FS::$iMgr->printError($this->loc->s("err-exist2")); break;
-					case 6: $output = FS::$iMgr->printError($this->loc->s("err-invalid-table")); break;
-					case 7: $output = FS::$iMgr->printError($this->loc->s("err-bad-server")); break;
-				}
-			}
+			$output = "";
+
+			if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1)
+				$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
 			else
-				$output = "";
+				$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
+
+			switch($err) {
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-not-exist")); break;
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-data")); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-exist")); break;
+				case 4: $output .= FS::$iMgr->printError($this->loc->s("err-delete")); break;
+				case 5: $output .= FS::$iMgr->printError($this->loc->s("err-exist2")); break;
+				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-table")); break;
+				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")); break;
+			}
 
 			if(!FS::isAjaxCall()) {
-				$output .= $this->showRadiusList();
 				if(FS::$sessMgr->hasRight("mrule_radius_manage"))
 					$output .= FS::$iMgr->opendiv($this->showRadiusServerMgmt(),$this->loc->s("Manage-radius-db"));
+				$output .= $this->showRadiusList();
 			}
 			if($raddb && $radhost && $radport) {
 				$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
@@ -145,7 +148,7 @@
 				}
 			}
 
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=XX");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
 
 			if(!$create) {
 				$output .= FS::$iMgr->hidden("saddr",$saddr);
@@ -179,7 +182,6 @@
 			$output = "";
 			$found = 0;
 			if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-				$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
 				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 				$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
 				while($data = FS::$dbMgr->Fetch($query)) {
@@ -188,10 +190,9 @@
 					$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$radpath,$rad == $radpath);
 				}
 				if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Manage"))."</form>";
-				else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
+				else $output .= FS::$iMgr->printDebug($this->loc->s("err-no-server"));
 			}
 			else {
-				$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
 				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 				$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname");
 	               	        while($data = FS::$dbMgr->Fetch($query)) {
@@ -200,7 +201,7 @@
 					$tmpoutput .= FS::$iMgr->selElmt($radpath,$radpath,$rad == $radpath);
 				}
 				if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Administrate"))."</form>";
-				else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
+				else $output .= FS::$iMgr->printDebug($this->loc->s("err-no-server"));
 			}
 			return $output;
 		}
