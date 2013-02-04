@@ -44,9 +44,10 @@
 			$this->dbLink = pg_connect("host=".$this->dbHost. " port=".$this->dbPort." dbname=".$this->dbName." user=".$this->dbUser." password=".$this->dbPass);
 			if(!$this->dbLink) {
 				$iMgr = new FSInterfaceMgr($this);
-				$iMgr->printError("Unable to connect to PG database");
-				exit(1);
+				echo $iMgr->printError("Unable to connect to PG database");
+				return 1;
 			}
+			return 0;
 		}
 
 		public function Select($table,$fields,$cond = "",$order = "",$ordersens = 0, $limit = 0, $startidx = 0) {

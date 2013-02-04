@@ -29,9 +29,6 @@
 			$output = "<h1>".$this->loc->s("title-analysismgmt")."</h1>";
 			$do = FS::$secMgr->checkAndSecuriseGetData("do");
 			switch($do) {
-				case 4: case 5:
-					$output .= $this->CreateOrEditRadiusDB($do == 4 ? true : false);
-					break;
 				case 7: case 8:
 					$output .= $this->CreateOrEditDeviceSaveServer($do == 7 ? true : false);
 					break;
@@ -207,25 +204,7 @@
 		}
 
 		private function showServerList() {
-			$output .= "<h2>".$this->loc->s("title-radius-db")."</h2>";
-			$output .= "<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-base")."</a><br />";
-			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
-				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
-			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
-			while($data = FS::$dbMgr->Fetch($query)) {
-				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&do=5&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
-				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=6&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]);
-				$tmpoutput .= "</center></td></tr>";
-			}
-			if($found)
-				$output .= $tmpoutput."</table>";
-			else
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-db-given")." !");
-
-			$output .= "<h2>".$this->loc->s("title-backup-switch")."</h2>";
+			$output = "<h2>".$this->loc->s("title-backup-switch")."</h2>";
 			$output .= "<a href=\"index.php?mod=".$this->mid."&do=7\">".$this->loc->s("New-server")."</a><br />";
 			$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
@@ -254,80 +233,6 @@
 		
 		public function handlePostDatas($act) {
 			switch($act) {
-				case 4: // add radius db
-					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
-					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
-					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
-					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
-					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
-					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
-					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
-					if($saddr == NULL || $saddr == "" || $salias == NULL || $salias == "" || $sport == NULL || !FS::$secMgr->isNumeric($sport) || $sdbname == NULL || $sdbname == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
-						$spwd != $spwd2) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing or wrong for radius db adding");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
-						return;
-					}
-
-					$testDBMgr = new AbstractSQLMgr();
-					$testDBMgr->setConfig("my",$sdbname,$sport,$saddr,$slogin,$spwd);
-
-					$conn = $testDBMgr->Connect();
-					if($conn != 0) {
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=2");
-						return;
-					}
-					FS::$dbMgr->Connect();
-					if(FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
-						return;
-					}
-					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
-					FS::$dbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 5: // radius db edition
-					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
-					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
-					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
-					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
-					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
-					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
-					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
-					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd != $spwd2 || $salias == NULL || $salias == "") {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing or wrong for radius db edit");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=1");
-						return;
-					}
-					if($spwd != NULL || $spwd != "") {
-						$testDBMgr = new AbstractSQLMgr();
-						$testDBMgr->setConfig("my",$sdbname,$sport,$saddr,$slogin,$spwd);
-
-						$conn = $testDBMgr->Connect();
-						if(!$conn) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Unable to connect to database ".$sdbname."@".$saddr);
-							header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&pr=".$sport."&db=".$sdbname."&err=2");
-							return;
-						}
-						FS::$dbMgr->Connect();
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit password for radius db ".$sdbname."@".$saddr.":".$sport);
-						if($spwd == $spwd2) FS::$dbMgr->Update("z_eye_radius_db_list","pwd = '".$spwd."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
-					}
-					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Edit radius db ".$sdbname."@".$saddr.":".$sport);
-					FS::$dbMgr->Update("z_eye_radius_db_list","login = '".$slogin."', radalias = '".$salias."'","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
-					header("Location: m-".$this->mid.".html");
-					break;
-				case 6: { // removal of radius DB
-					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
-					$sport = FS::$secMgr->checkAndSecuriseGetData("pr");
-					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
-					if($saddr && $sport && $sdbname) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Remove Radius DB ".$sdbname."@".$saddr.":".$sport);
-						FS::$dbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
-					}
-					header('Location: m-'.$this->mid.'.html');
-				}
 				case 7: // Save server for switch config
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");

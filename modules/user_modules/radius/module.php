@@ -41,49 +41,34 @@
 					case 4: $output = FS::$iMgr->printError($this->loc->s("err-delete")); break;
 					case 5: $output = FS::$iMgr->printError($this->loc->s("err-exist2")); break;
 					case 6: $output = FS::$iMgr->printError($this->loc->s("err-invalid-table")); break;
+					case 7: $output = FS::$iMgr->printError($this->loc->s("err-bad-server")); break;
 				}
 			}
 			else
 				$output = "";
 
 			if(!FS::isAjaxCall()) {
-				$found = 0;
-				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-					$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
-					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
-					$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if($found == 0) $found = 1;
-						$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
-						$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$radpath,$rad == $radpath);
-					}
-					if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Manage"))."</form>";
-					else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
-				}
-				else {
-					$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
-					$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
-					$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname");
-	                	        while($data = FS::$dbMgr->Fetch($query)) {
-						if($found == 0) $found = 1;
-						$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
-						$tmpoutput .= FS::$iMgr->selElmt($radpath,$radpath,$rad == $radpath);
-					}
-					if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Administrate"))."</form>";
-					else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
-				}
+				$output .= $this->showRadiusList();
+				if(FS::$sessMgr->hasRight("mrule_radius_manage"))
+					$output .= FS::$iMgr->opendiv($this->showRadiusServerMgmt(),$this->loc->s("Manage-radius-db"));
 			}
 			if($raddb && $radhost && $radport) {
-				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-					$output .= $this->showDelegTool($radalias,$raddb,$radhost,$radport);
+				$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
+				if($edit && FS::$sessMgr->hasRight("mrule_radius_manage")) {
+					$output .= $this->showCreateOrEditRadiusDB(true);
 				}
 				else {
-					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
-					$radentrytype = FS::$secMgr->checkAndSecuriseGetData("radentrytype");
-					if($radentry && $radentrytype && ($radentrytype == 1 || $radentrytype == 2))
-						$output .= $this->editRadiusEntry($raddb,$radhost,$radport,$radentry,$radentrytype);
-					else
-						$output .= $this->showRadiusAdmin($raddb,$radhost,$radport);
+					if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
+						$output .= $this->showDelegTool($radalias,$raddb,$radhost,$radport);
+					}
+					else {
+							$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
+						$radentrytype = FS::$secMgr->checkAndSecuriseGetData("radentrytype");
+						if($radentry && $radentrytype && ($radentrytype == 1 || $radentrytype == 2))
+							$output .= $this->editRadiusEntry($raddb,$radhost,$radport,$radentry,$radentrytype);
+						else
+			 				$output .= $this->showRadiusAdmin($raddb,$radhost,$radport);
+		 			}
 				}
 			}
 			else if(isset($sh))
@@ -92,6 +77,133 @@
 			return $output;
 		}
 
+		private function showRadiusServerMgmt() {
+			$output = "";
+
+			$tmpoutput = "<h2>".$this->loc->s("title-radius-db")."</h2>";
+			$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
+				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
+
+			$found = false;
+			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if($found == false) $found = true;
+				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
+				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
+				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]);
+				$tmpoutput .= "</center></td></tr>";
+			}
+			if($found)
+				$output .= $tmpoutput."</table>";
+
+			$output .= $this->showCreateOrEditRadiusDB(true);
+
+			return $output;
+		}
+
+		private function showCreateOrEditRadiusDB($create) {
+			$saddr = "";
+			$slogin = "";
+			$sdbname = "";
+			$sport = 3306;
+			$spwd = "";
+			$salias = "";
+			if($create)
+				$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
+			else {
+				$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
+				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
+				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
+				if(!$addr || $addr == "" || !$port || !FS::$secMgr->isNumeric($port) || !$dbname || $dbname == "") {
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
+					return $output;
+				}
+				$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$saddr = $addr;
+					$slogin = $data["login"];
+					$spwd = $data["pwd"];
+					$salias = $data["radalias"];
+					$sport = $port;
+					$sdbname = $dbname;
+				}
+				else {
+					$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
+					return $output;
+				}
+			}
+
+
+			if(!$create) {
+				$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
+				$err = FS::$secMgr->checkAndSecuriseGetData("err");
+				switch($err) {
+					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
+					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
+					case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !"); break;
+				}
+			}
+
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=XX");
+
+			if(!$create) {
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("sport",$sport);
+				$output .= FS::$iMgr->hidden("sdbname",$sdbname);
+				$output .= FS::$iMgr->hidden("edit",1);
+			}
+
+			$output .= "<table class=\"standardTable\">";
+			if($create) {
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
+				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname);
+			}
+			else {
+				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
+				$output .= "<tr><td>".$this->loc->s("Port")."</td><td>".$sport."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
+			}
+			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",$slogin);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias);
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table>";
+
+			return $output;
+		}
+
+		private function showRadiusList() {
+			$output = "";
+			$found = 0;
+			if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
+				$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
+				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
+				$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,radalias");
+				while($data = FS::$dbMgr->Fetch($query)) {
+					if($found == 0) $found = 1;
+					$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
+					$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$radpath,$rad == $radpath);
+				}
+				if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Manage"))."</form>";
+				else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
+			}
+			else {
+				$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
+				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
+				$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname");
+	               	        while($data = FS::$dbMgr->Fetch($query)) {
+					if($found == 0) $found = 1;
+					$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
+					$tmpoutput .= FS::$iMgr->selElmt($radpath,$radpath,$rad == $radpath);
+				}
+				if($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Administrate"))."</form>";
+				else $output .= FS::$iMgr->printError($this->loc->s("err-no-server"));
+			}
+			return $output;
+		}
 		private function showDelegTool($radalias,$raddb,$radhost,$radport) {
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
@@ -1392,7 +1504,7 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"User '".$username."' already exists (Deleg)");
 						echo FS::$iMgr->printError($this->loc->s("err-no-user"));
 						//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
-                        return;
+                        			return;
 					}
 
 					$password = FS::$secMgr->genRandStr(8);
@@ -1424,10 +1536,11 @@
 						echo FS::$iMgr->printError($this->loc->s("err-invalid-auth-server"));
 						//header("Location: index.php?mod=".$this->mid."&sh=1&h=".$radhost."&p=".$radport."&r=".$raddb."&err=1");
 						return;
-					}
+					}					
 
 					if(!$typegen || $typegen == 2 && !$prefix || !$nbacct || !$valid || !$profil || ($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0 
-						|| !FS::$secMgr->isNumeric($nbacct) || $nbacct <= 0 || !FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate) 
+						|| !FS::$secMgr->isNumeric($nbacct) || $nbacct <= 0 || !FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) 
+						|| !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate)
 					))) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing or invalid for massive creation (Deleg) (datas)");
 						echo FS::$iMgr->printError($this->loc->s("err-field-missing"));
@@ -1435,7 +1548,7 @@
 							return;
 					}
 					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
-                    $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
+			                $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
 					if(strtotime($sdate) > strtotime($edate)) {
 						echo FS::$iMgr->printError($this->loc->s("err-end-before-start"));
 						return;
@@ -1473,6 +1586,74 @@
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
 
 					echo $this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport);
+					return;
+				// Add/Edit radius db
+				case 13:
+					if(!FS::$sessMgr->hasRight("mrule_radius_manage")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"This user don't have rights to manage radius !");
+						header("Location: index.php?mod=".$this->mid."&err=99");
+						return;
+					}
+					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
+					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
+					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname  || !$slogin  || !$spwd || !$spwd2 ||
+						$spwd != $spwd2) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing or wrong for radius db adding");
+						header("Location: index.php?mod=".$this->mid."&err=2");
+						return;
+					}
+
+					$testDBMgr = new AbstractSQLMgr();
+					$testDBMgr->setConfig("my",$sdbname,$sport,$saddr,$slogin,$spwd);
+
+					$conn = $testDBMgr->Connect();
+					if($conn != 0) {
+						header("Location: index.php?mod=".$this->mid."&err=7");
+						return;
+					}
+					FS::$dbMgr->Connect();
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
+							header("Location: index.php?mod=".$this->mid."&err=7");
+							return;
+						}
+
+						FS::$dbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND sdbname = '".$sdbname."'");
+					}
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
+							header("Location: index.php?mod=".$this->mid."&err=3");
+							return;
+						}
+					}
+					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
+					FS::$dbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
+					header("Location: m-".$this->mid.".html");
+					break;
+				// Remove radius db
+				case 14:
+					if(!FS::$sessMgr->hasRight("mrule_radius_manage")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"This user don't have rights to manage radius !");
+						header("Location: index.php?mod=".$this->mid."&err=99");
+						return;
+					}
+
+					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
+					$sport = FS::$secMgr->checkAndSecuriseGetData("pr");
+					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
+					if($saddr && $sport && $sdbname) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Remove Radius DB ".$sdbname."@".$saddr.":".$sport);
+						FS::$dbMgr->Delete("z_eye_radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					}
+					header('Location: m-'.$this->mid.'.html');
 					return;
 			}
 

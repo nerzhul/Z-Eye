@@ -362,7 +362,7 @@ p#banner {
 	margin: 0 0 10px;
 	font-family: arial,helvetica,sans-serif;
 }
-#menu li:hover { 
+#menu li:hover {
 	color: red;
 	font-weight: bold;
 }
@@ -371,6 +371,8 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 	margin: auto;
+	margin-top: 15px;
+	margin-bottom: 15px;
 	border: 1px solid #CCC;
 }
 

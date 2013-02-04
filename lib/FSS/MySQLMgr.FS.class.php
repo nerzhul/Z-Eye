@@ -45,18 +45,18 @@
 			if(!$result) {
 				$iMgr = new FSInterfaceMgr($this);
 				$iMgr->printError("Unable to connect to MySQL database");
-				exit(1);
+				return 1; 
 			}
 			$this->dbConn = $result;
 			$result = mysql_select_db($this->dbName,$this->dbConn);
 			if(!$result) {
 				$iMgr = new FSInterfaceMgr($this);
 				echo $iMgr->printError("Unable to use database '".$this->dbName."' for host '".$this->dbHost."'");
-				exit(1);
+				return 1;
 			}
 			return 0;
 		}
-		
+
 		public function Select($table,$fields,$cond = "",$order = "",$ordersens = 0, $limit = 0, $startidx = 0) {
 			$sql = "SELECT ".$fields." FROM ".$table."";
 			if(strlen($cond) > 0)
