@@ -100,7 +100,7 @@
 					if($first) $first = false;
 					$grpoutput .= $this->getRightForKey($key);
 					$grpoutput .= "</td><td>";
-					$grpoutput .= $this->showIPGroups($data["ip"],$key,$values);
+					$grpoutput .= $this->showIPGroups($data["ip"],$key,$values,$filteri);
 				}
 				// Users			
 				$query2 = FS::$dbMgr->Select("z_eye_user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
@@ -132,7 +132,7 @@
 					if($first) $first = false;
 					$usroutput .= $this->getRightForKey($key);
 					$usroutput .= "</td><td>";
-					$usroutput .= $this->showIPUsers($data["ip"],$key,$values);
+					$usroutput .= $this->showIPUsers($data["ip"],$key,$values,$filteri);
 				}
 			}
 			if($found) {
@@ -158,10 +158,9 @@
 			return $output;
 		}
 
-		private function showIPUsers($ip,$right,$values) { 
+		private function showIPUsers($ip,$right,$values,$filterIP) { 
 			$output = "";
 
-			$filterIP = FS::$secMgr->checkAndSecurisePostData("ip");
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
@@ -185,10 +184,9 @@
 			return $output;
 		}
 
-		private function showIPGroups($ip,$right,$values) { 
+		private function showIPGroups($ip,$right,$values,$filterIP) { 
 			$output = "";
 
-			$filterIP = FS::$secMgr->checkAndSecurisePostData("ip");
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
@@ -294,7 +292,7 @@
 					if($first) $first = false;
 					$grpoutput .= $this->getRightForKey($key);
 					$grpoutput .= "</td><td>";
-					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values);
+					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values,$filterc);
 				}			
 				// Users
 				$query2 = FS::$dbMgr->Select("z_eye_user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
@@ -326,7 +324,7 @@
 					if($first) $first = false;
 					$usroutput .= $this->getRightForKey($key);
 					$usroutput .= "</td><td>";
-					$usroutput .= $this->showSNMPUsers($data["name"],$key,$values);
+					$usroutput .= $this->showSNMPUsers($data["name"],$key,$values,$filterc);
 				}			
 			}
 			if($found) {
@@ -357,10 +355,8 @@
 			return $output;
 		}
 
-		private function showSNMPGroups($snmp,$right,$values) { 
+		private function showSNMPGroups($snmp,$right,$values,$filterSNMP) { 
 			$output = "";
-
-			$filterSNMP = FS::$secMgr->checkAndSecurisePostData("snmp");
 
 			$count = count($values);
 			if($count) {
@@ -385,10 +381,8 @@
 			return $output;
 		}
 
-		private function showSNMPUsers($snmp,$right,$values) { 
+		private function showSNMPUsers($snmp,$right,$values,$filterSNMP) { 
 			$output = "";
-
-			$filterSNMP = FS::$secMgr->checkAndSecurisePostData("snmp");
 
 			$count = count($values);
 			if($count) {
