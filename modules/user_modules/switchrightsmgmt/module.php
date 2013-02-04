@@ -51,7 +51,18 @@
 				$this->loc->s("Users")."</th></tr>";
 			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
 
-			$query = FS::$dbMgr->Select("device","ip,name",$ip && $ip != "NULL0" ? "ip = '".$ip."'" : "","name");
+			$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
+			if($ip && $ip != "NULL0")
+				$filteri = $ip;
+			else if($filter) $filteri = $filter;
+			else $filteri = ""; 
+
+			$query = FS::$dbMgr->Select("device","ip,name","","name");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$formoutput .=  FS::$iMgr->selElmt($data["name"],$data["ip"],$filter == $data["ip"]);
+			}
+
+			$query = FS::$dbMgr->Select("device","ip,name",$filteri ? "ip = '".$filteri."'" : "","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				// Init array for device
@@ -59,7 +70,6 @@
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array());
 				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array());
-				$formoutput .=  FS::$iMgr->selElmt($data["name"],$data["ip"]);
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -151,16 +161,17 @@
 		private function showIPUsers($ip,$right,$values) { 
 			$output = "";
 
+			$filterIP = FS::$secMgr->checkAndSecurisePostData("ip");
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right)."<br />";
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
-			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("gid");
 			$users = $this->getUsers();
 			$found = false;
@@ -177,16 +188,17 @@
 		private function showIPGroups($ip,$right,$values) { 
 			$output = "";
 
+			$filterIP = FS::$secMgr->checkAndSecurisePostData("ip");
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right)."<br />";
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
-			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("gid");
 			$groups = $this->getUserGroups();
 			$found = false;
@@ -211,10 +223,21 @@
 				$this->loc->s("Groups")."</th></tr>";
 			$usroutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
-			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw",$community && $community != "NULL0" ? "name = '".$community."'" : "","name");
+
+			$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
+			if($community && $community != "NULL0")
+				$filterc = $community;
+			else if($filter) $filterc = $filter;
+			else $filterc = ""; 
+
+			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw","","name");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],$filter == $data["name"]);
+			}
+
+			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw",($filterc ? "name = '".$filterc."'" : ""),"name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
-				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],$community == $data["name"]);
 				// Init SNMP rights
 				$grprules = array();
 				$usrrules = array();
@@ -337,16 +360,18 @@
 		private function showSNMPGroups($snmp,$right,$values) { 
 			$output = "";
 
+			$filterSNMP = FS::$secMgr->checkAndSecurisePostData("snmp");
+
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right)."<br />";
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
-			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("gid");
 			$groups = $this->getUserGroups();
 			$found = false;
@@ -363,16 +388,18 @@
 		private function showSNMPUsers($snmp,$right,$values) { 
 			$output = "";
 
+			$filterSNMP = FS::$secMgr->checkAndSecurisePostData("snmp");
+
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right)."<br />";
+						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
-			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("uid");
 			$users = $this->getUsers();
 			$found = false;
@@ -408,12 +435,13 @@
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
+				$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 				$output = "<h1>".$this->loc->s("title-switchrightsmgmt")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("title-rightsbysnmp"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp"),$sh);
 				// Show only if there is devices
 				if(FS::$dbMgr->Count("device","ip") > 0)
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("title-rightsbyswitch"),$sh);
+					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch"),$sh);
 				$output .= "</ul></div>";
         	                $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
                 	        $output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
@@ -450,9 +478,10 @@
 					$snmp = FS::$secMgr->checkAndSecurisePostData("snmp");
 					$ip = FS::$secMgr->checkAndSecurisePostData("ip");
 					$right = FS::$secMgr->checkAndSecurisePostData("right");
+					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 
 					if((!$gid && !$uid) || (!$snmp && !$ip) || !$right) {
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						header("Location: index.php?mod=".$this->mid."&err=1".($filter ? "&filter=".$filter : ""));
 						return;
 					}
 
@@ -463,12 +492,12 @@
 									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
 								$right == "write" && 
 									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and rw = 't'")) {
-								header("Location: index.php?mod=".$this->mid."&err=2");
+								header("Location: index.php?mod=".$this->mid."&err=2".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							if(FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
-								header("Location: index.php?mod=".$this->mid."&err=3");
+								header("Location: index.php?mod=".$this->mid."&err=3".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
@@ -480,12 +509,12 @@
 									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
 								$right == "write" && 
 									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and rw = 't'")) {
-								header("Location: index.php?mod=".$this->mid."&err=2");
+								header("Location: index.php?mod=".$this->mid."&err=2".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							if(FS::$dbMgr->GetOneData("z_eye_user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."' AND ruleval = 'on'")) {
-								header("Location: index.php?mod=".$this->mid."&err=3");
+								header("Location: index.php?mod=".$this->mid."&err=3".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							FS::$dbMgr->Delete("z_eye_user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
@@ -495,19 +524,19 @@
 					else if($ip) {
 						if(!FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$gid."'") ||
 							!FS::$dbMgr->GetOneData("device","name","ip = '".$ip."'")) {
-							header("Location: index.php?mod=".$this->mid."&err=2");
+							header("Location: index.php?mod=".$this->mid."&err=2".($filter ? "&filter=".$filter : ""));
 							return;
 						}
 						if(FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 							$ip."_".$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
-							header("Location: index.php?mod=".$this->mid."&err=3");
+							header("Location: index.php?mod=".$this->mid."&err=3".($filter ? "&filter=".$filter : ""));
 							return;
 						}
 						FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
 						FS::$dbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','mrule_switchmgmt_ip_".$ip."_".$right."','on'");
 					}
 
-					header("Location: index.php?mod=".$this->mid);
+					header("Location: index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""));
 					return;
 				case 2: // Remove group from SNMP community
 					$gid = FS::$secMgr->checkAndSecuriseGetData("gid");
@@ -515,9 +544,10 @@
 					$snmp = FS::$secMgr->checkAndSecuriseGetData("snmp");
 					$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
 					$right = FS::$secMgr->checkAndSecuriseGetData("right");
+					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 
 					if((!$uid && !$gid) || (!$ip && !$snmp) || !$right) {
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						header("Location: index.php?mod=".$this->mid."&err=1".($filter ? "&filter=".$filter : ""));
 						return;
 					}
 
@@ -525,7 +555,7 @@
 						if($gid) {
 							if(!FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."'")) {
-								header("Location: index.php?mod=".$this->mid."&err=4");
+								header("Location: index.php?mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
@@ -533,7 +563,7 @@
 						else if($uid) {
 							if(!FS::$dbMgr->GetOneData("z_eye_user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."'")) {
-								header("Location: index.php?mod=".$this->mid."&err=4");
+								header("Location: index.php?mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							FS::$dbMgr->Delete("z_eye_user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
@@ -542,12 +572,12 @@
 					else if($ip) {
 						if(!FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 							$ip."_".$right."' AND gid = '".$gid."'")) {
-							header("Location: index.php?mod=".$this->mid."&err=4");
+							header("Location: index.php?mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 							return;
 						}
 						FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
 					}
-					header("Location: index.php?mod=".$this->mid);
+					header("Location: index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""));
 					return;
 				default: break;
 			}
