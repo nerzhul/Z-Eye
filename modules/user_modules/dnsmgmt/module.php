@@ -36,19 +36,21 @@
 				$output .= "<h1>".$this->loc->s("title-dns")."</h1>";
 
 			if($addr && FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-				$output .= $this->CreateOrEditServer(true);
+				$output .= $this->CreateOrEditServer(false);
 			}
 			else {
 				 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 					$output .= $this->showCreateEditErr();
-					$output .= FS::$iMgr->opendiv($this->CreateOrEditServer(true),$this->loc->s("add-server"));
+
+					$tmpoutput = $this->CreateOrEditServer(true);
 
 					$found = false;
 					$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,dns","dns = '1'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) {
 							$found = true;
-							$tmpoutput = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
+							$tmpoutput .= "<h2>".$this->loc->s("serverlist")."</h2>".
+								"<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
 							"</th><th></th></tr>";
 						}
 
@@ -58,7 +60,8 @@
 						$tmpoutput .= "</td></tr>";
 					}
 					if($found)
-						$output .= "<h2>".$this->loc->s("serverlist")."</h2>".$tmpoutput."</table>";
+						$tmpoutput .= "</table>";
+					$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"));
 				}
 
 				$output .= $this->showStats();
@@ -347,6 +350,7 @@
 				case 2: return FS::$iMgr->printError($this->loc->s("err-unable-conn"));
 				case 3: return FS::$iMgr->printError($this->loc->s("err-bad-login")); 
 				case 4: return FS::$iMgr->printError($this->loc->s("err-server-exist")); 
+				case 5: return FS::$iMgr->printError($this->loc->s("err-bad-server")); 
 				case 99: return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 		}
@@ -473,10 +477,9 @@
 						return;
 					}
 
-					if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
-						$spwd != $spwd2 ||
-						$namedpath == NULL || $namedpath == "" || !FS::$secMgr->isPath($namedpath) ||
-							(($chrootnamed == NULL || $chrootnamed == "") && !FS::$secMgr->isPath($chrootnamed))
+					if(!$saddr || !$slogin || !$spwd || !$spwd2 || $spwd != $spwd2 ||
+						!$namedpath || !FS::$secMgr->isPath($namedpath) ||
+							(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
 						) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some datas are invalid or wrong for add server");
 						header("Location: index.php?mod=".$this->mid."&err=1");
@@ -491,12 +494,23 @@
 						header("Location: index.php?mod=".$this->mid."&&err=3");
 						return;
 					}
-					if(FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
-						header("Location: index.php?mod=".$this->mid."&err=4");
-						return;
+				
+					if($edit) {	
+						if(!FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
+							header("Location: index.php?mod=".$this->mid."&err=5");
+							return;
+						}
+
+						FS::$dbMgr->Delete("z_eye_server_list","addr = '".$saddr."'");
 					}
-					if($edit) FS::$dbMgr->Delete("z_eye_server_list","addr = '".$saddr."'");
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
+							header("Location: index.php?mod=".$this->mid."&err=4");
+							return;
+						}
+					}
 					FS::$dbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','1','".$namedpath."','".$chrootnamed."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: dns checking");

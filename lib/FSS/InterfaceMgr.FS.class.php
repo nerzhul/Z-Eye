@@ -420,7 +420,7 @@
 			if($aname == NULL) $aname = uniqid();
                         $output = "<ul style=\"list-style-type:none;padding:0;\"><li id=\"".$liname."\"><a id=\"".$aname."\" href=\"#\">".$text1."</a>
                        		<a id=\"".$aname."2\" style=\"display:none;\" href=\"#\">".$text2."</a></li></ul>";
-                        $output .= "<div id=\"".$divname."\" style=\"display:none;\">".$content."</div>";
+                        $output .= "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content."</div>";
 			$output .= "<script type=\"text/javascript\">
 				$(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
 				$(\"#".$aname."2\").click(function(){ $(\"div#".$divname."\").slideUp(\"slow\");});
