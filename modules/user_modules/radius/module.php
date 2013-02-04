@@ -85,68 +85,70 @@
 
 			$tmpoutput = "<h2>".$this->loc->s("title-radius-db")."</h2>";
 			$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
-				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th></tr>";
+				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th>".$this->loc->s("Remove")."</th><th></th></tr>";
 
 			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
-				$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]);
-				$tmpoutput .= "</center></td></tr>";
+			$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
+			$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td><td><center>";
+			$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]);
+			$tmpoutput .= "</center></td><td><div id=\"radstatus".$data["addr"].$data["port"].$data["dbname"]."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div><script type=\"text/javascript\">
+                                        $.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["sdbname"]."' }, function(data) {
+                                        $('#radstatus".$data["addr"].$data["port"].$data["dbname"]."').html(data); });</script></td></tr>";
+		}
+		if($found)
+			$output .= $tmpoutput."</table>";
+
+		$output .= $this->showCreateOrEditRadiusDB(true);
+
+		return $output;
+	}
+
+	private function showCreateOrEditRadiusDB($create) {
+		$saddr = "";
+		$slogin = "";
+		$sdbname = "";
+		$sport = 3306;
+		$spwd = "";
+		$salias = "";
+		if($create)
+			$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
+		else {
+			$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
+			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+			$port = FS::$secMgr->checkAndSecuriseGetData("pr");
+			$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
+			if(!$addr || $addr == "" || !$port || !FS::$secMgr->isNumeric($port) || !$dbname || $dbname == "") {
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
+				return $output;
 			}
-			if($found)
-				$output .= $tmpoutput."</table>";
-
-			$output .= $this->showCreateOrEditRadiusDB(true);
-
-			return $output;
+			$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$saddr = $addr;
+				$slogin = $data["login"];
+				$spwd = $data["pwd"];
+				$salias = $data["radalias"];
+				$sport = $port;
+				$sdbname = $dbname;
+			}
+			else {
+				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
+				return $output;
+			}
 		}
 
-		private function showCreateOrEditRadiusDB($create) {
-			$saddr = "";
-			$slogin = "";
-			$sdbname = "";
-			$sport = 3306;
-			$spwd = "";
-			$salias = "";
-			if($create)
-				$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
-			else {
-				$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
-				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
-				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
-				if(!$addr || $addr == "" || !$port || !FS::$secMgr->isNumeric($port) || !$dbname || $dbname == "") {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
-					return $output;
-				}
-				$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
-					$saddr = $addr;
-					$slogin = $data["login"];
-					$spwd = $data["pwd"];
-					$salias = $data["radalias"];
-					$sport = $port;
-					$sdbname = $dbname;
-				}
-				else {
-					$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
-					return $output;
-				}
-			}
 
-
-			if(!$create) {
-				$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
-				$err = FS::$secMgr->checkAndSecuriseGetData("err");
-				switch($err) {
-					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
-					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
-					case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !"); break;
-				}
+		if(!$create) {
+			$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
+				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
+				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !"); break;
 			}
+		}
 
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
 
@@ -168,7 +170,7 @@
 				$output .= "<tr><td>".$this->loc->s("Port")."</td><td>".$sport."</td></tr>";
 				$output .= "<tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
 			}
-			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",$slogin);
+			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",$slogin,array("tooltip" => "tooltip-user"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias,array("tooltip" => "tooltip-alias"));
@@ -969,8 +971,10 @@
 			$radlogin = FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 			$radpwd = FS::$dbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 			$radSQLMgr = new AbstractSQLMgr();
-			if($radSQLMgr->setConfig("my",$raddb,$radport,$radhost,$radlogin,$radpwd) == 0)
-				$radSQLMgr->Connect();
+			if($radSQLMgr->setConfig("my",$raddb,$radport,$radhost,$radlogin,$radpwd) == 0) {
+				if($radSQLMgr->Connect() != 0)
+					return NULL; 
+			}
 			return $radSQLMgr;
 		}
 
@@ -1656,6 +1660,19 @@
 					}
 					header('Location: m-'.$this->mid.'.html');
 					return;
+				// Ping radius db
+				case 15:
+					$saddr = FS::$secMgr->checkAndSecuriseGetData("saddr");
+					$sport = FS::$secMgr->checkAndSecuriseGetData("sport");
+					$sdbname = FS::$secMgr->checkAndSecuriseGetData("sdbname");
+					if(!$saddr || !$sport || !$sdbname) {
+						echo "<span style=\"color:red;\">".$this->loc->s("Error")."</span>";
+						return;
+					}
+					if($radSQLMgr = $this->connectToRaddb($saddr,$sport,$sdbname))
+						echo "<span style=\"color:green;\">".$this->loc->s("OK")."</span>";
+					else	
+						echo "<span style=\"color:red;\">".$this->loc->s("Error")."</span>";
 			}
 
 		}
