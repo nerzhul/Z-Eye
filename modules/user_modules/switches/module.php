@@ -465,7 +465,8 @@
 					}
 					if($found == 1) {
 						$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
-						$output .= $this->showDeviceModules($devmod,1);
+						$output .= "<table><tr><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("Name")."</th>
+							<th></th><th></th><th></th><th></th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
 					}
 
 					return $output;
@@ -1182,27 +1183,41 @@
 			if($level == 0)
 				return "";
 			if(!isset($devmod[$idx])) return "";
-			$output = "<ul>";
+			$output = "";
 			$count = count($devmod[$idx]);
 			for($i=0;$i<$count;$i++) {
-				$output .= "<li>" .$devmod[$idx][$i]["desc"]." (".$devmod[$idx][$i]["name"].") ";
+				$output .= "<tr><td>" .$devmod[$idx][$i]["desc"]."</td><td>".$devmod[$idx][$i]["name"]."</td><td>";
 				if(strlen($devmod[$idx][$i]["hwver"]) > 0)
-					$output .= "[hw: ".$devmod[$idx][$i]["hwver"]."] ";
+					$output .= "hw: ".$devmod[$idx][$i]["hwver"];
+
+				$output .= "</td><td>";
+
 				if(strlen($devmod[$idx][$i]["fwver"]) > 0)
-                                        $output .= "[fw: ".$devmod[$idx][$i]["fwver"]."] ";
+                                        $output .= "fw: ".$devmod[$idx][$i]["fwver"];
+
+				$output .= "</td><td>";
+
 				if(strlen($devmod[$idx][$i]["swver"]) > 0)
-                                        $output .= "[sw: ".$devmod[$idx][$i]["swver"]."] ";
+                                        $output .= "sw: ".$devmod[$idx][$i]["swver"];
+
+				$output .= "</td><td>";
+
 				if(strlen($devmod[$idx][$i]["serial"]) > 0)
-                                        $output .= "[serial: ".$devmod[$idx][$i]["serial"]."] ";
-				$output .= "/ Type: ".$devmod[$idx][$i]["type"];
+                                        $output .= "serial: ".$devmod[$idx][$i]["serial"];
+
+				$output .= "</td><td>";
+
+				$output .= "Type: ".$devmod[$idx][$i]["type"];
+
+				$output .= "</td><td>";
 				if(strlen($devmod[$idx][$i]["model"]) > 0)
-                                        $output .= " Modèle: ".$devmod[$idx][$i]["model"];
+                                        $output .= "Modèle: ".$devmod[$idx][$i]["model"];
+
+				$output .= "</td></tr>";
+
 				if($idx != 0)
 					$output .= $this->showDeviceModules($devmod,$devmod[$idx][$i]["idx"],$level-1);
-				$output .= "</li>";
-
 			}
-			$output .= "</ul>";
 			return $output;
 		}
 
