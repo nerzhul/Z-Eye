@@ -101,7 +101,7 @@
 		/*
 		* VLAN management
 		*/
-		
+
 		function setSwitchAccessVLANWithPID($device,$pid,$value) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
 				return -1;
@@ -335,7 +335,7 @@
 			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str2);
 			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4","x",$str);
 		}
-		
+
 		function setSwitchNoTrunkVlanWithPID($device,$pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 				return -1;
@@ -399,7 +399,7 @@
 			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
@@ -418,7 +418,7 @@
 			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
@@ -437,7 +437,7 @@
 			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 				$trunkNoVlan = false;
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
@@ -456,7 +456,7 @@
 			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE")
 				$trunkNoVlan = false;
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
@@ -559,7 +559,16 @@
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			return snmpget($dip,$community,$field.".".$pid);
+			$out = "";
+			exec("/usr/local/bin/snmpget -v 2c -c ".$community." ".$dip." ".$field.".".$pid,$out);
+			$outoid = "";
+			for($i=0;$i<count($out);$i++) {
+				$outoid .= $out[$i];
+				if($i<count($out)-1) $outoid .= "";
+			}
+			$outoid = preg_split("# = #",$outoid);
+			$outoid = $outoid[1];
+			return $outoid;
 		}
 
 		function getPortId($device,$portname) {
@@ -586,7 +595,7 @@
 				return -1;
 			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {
