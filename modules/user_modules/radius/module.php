@@ -85,7 +85,7 @@
 			$output = "";
 
 			$tmpoutput = "<h2>".$this->loc->s("title-radius-db")."</h2>";
-			$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>"
+			$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>".$this->loc->s("db-type")."</th><th>"
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th></th><th></th></tr>";
 
 			$found = false;
@@ -937,7 +937,8 @@
 			if($this->raddbinfos["dbtype"] != "my" && $this->raddbinfos["dbtype"] != "pg")
 				return NULL;
 
-			if($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$raddb,$radport,$radhost,$radlogin,$radpwd) == 0) {
+			$radSQLMgr = new AbstractSQLMgr();
+			if($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$raddb,$radport,$radhost,$this->raddbinfos["login"],$this->raddbinfos["pwd"]) == 0) {
 				if($radSQLMgr->Connect() != 0)
 					return NULL; 
 			}
