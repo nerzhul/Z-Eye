@@ -466,7 +466,7 @@
 					if($found == 1) {
 						$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
 						$output .= "<table><tr><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("Name")."</th>
-							<th></th><th></th><th></th><th></th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
+							<th></th><th></th><th></th><th></th><th>".$this->loc->s("Type")."</th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
 					}
 
 					return $output;
@@ -1207,11 +1207,11 @@
 
 				$output .= "</td><td>";
 
-				$output .= "Type: ".$devmod[$idx][$i]["type"];
+				$output .= $devmod[$idx][$i]["type"];
 
 				$output .= "</td><td>";
 				if(strlen($devmod[$idx][$i]["model"]) > 0)
-                                        $output .= "Modèle: ".$devmod[$idx][$i]["model"];
+                                        $output .= $devmod[$idx][$i]["model"];
 
 				$output .= "</td></tr>";
 
