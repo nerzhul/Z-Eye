@@ -383,10 +383,10 @@
 
 		private function showRadiusInfos($search) {
 			$output = "";
-			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd");
+			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd,dbtype,tradcheck,tradreply,tradusrgrp,tradacct");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$radSQLMgr = new AbstractSQLMgr();
-				$radSQLMgr->setConfig("my",$data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
+				$radSQLMgr->setConfig($data["dbtype"],$data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
 				$radSQLMgr->Connect();
 
 				$found = 0;
@@ -395,7 +395,7 @@
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
 				else
 					$tmpsearch = $search;
-				$query2 = $radSQLMgr->Select("radcheck","username","username = '".$tmpsearch."'","",0,1);
+				$query2 = $radSQLMgr->Select($data["tradcheck"],"username","username = '".$tmpsearch."'","",0,1);
 				while($data2 = $radSQLMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = 1;
@@ -403,7 +403,7 @@
 					}
 				}
 				if(!$found) {
-					$query2 = $radSQLMgr->Select("radreply","username","username = '".$tmpsearch."'","",0,1);
+					$query2 = $radSQLMgr->Select($data["tradreply"],"username","username = '".$tmpsearch."'","",0,1);
 					while($data2 = $radSQLMgr->Fetch($query2)) {
 						if(!$found) {
 							$found = 1;
@@ -414,7 +414,7 @@
 				
 				if($found) {
 					$found = 0;
-					$query2 = $radSQLMgr->Select("radusergroup","groupname","username = '".$tmpsearch."'");
+					$query2 = $radSQLMgr->Select($data["tradusrgrp"],"groupname","username = '".$tmpsearch."'");
 					while($data2 = $radSQLMgr->Fetch($query2)) {
 						if(!$found) {
 							$found = 1;
@@ -424,13 +424,12 @@
 					}
 					if($found) $output .= "</ul>";
 				}
-					
-				
+
 				if(FS::$secMgr->isMacAddr($search)) {
 					// Format mac addr for some accounting
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].".".$search[6].$search[7].$search[9].$search[10].".".$search[12].$search[13].$search[15].$search[16];
 					$found = 0;
-					$query2 = $radSQLMgr->Select("radacct","username,calledstationid,acctstarttime,acctstoptime","callingstationid = '".$tmpsearch."'");
+					$query2 = $radSQLMgr->Select($data["tradacct"],"username,calledstationid,acctstarttime,acctstoptime","callingstationid = '".$tmpsearch."'");
 					if($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found == 0) {
 							$found = 1;
@@ -442,12 +441,12 @@
 						$this->mid."&s=".$data2["calledstationid"]."\">".$data2["calledstationid"]."</a>";
 						$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")<br />";
 					}
-					
+
 					if($found) $output .= "</div>";
 					$found = 0;
 					$totinbw = 0;
 					$totoutbw = 0;
-					$query2 = $radSQLMgr->Select("radacct","calledstationid, SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$tmpsearch."' GROUP BY calledstationid");
+					$query2 = $radSQLMgr->Select($data["tradacct"],"calledstationid, SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$tmpsearch."' GROUP BY calledstationid");
 					if($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found == 0) {
 							$found = 1;
@@ -503,7 +502,7 @@
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
 				else
 					$tmpsearch = $search;
-                		$query2 = $radSQLMgr->Select("radacct","calledstationid,acctterminatecause,acctstarttime,acctterminatecause,acctstoptime,acctinputoctets,acctoutputoctets",
+                		$query2 = $radSQLMgr->Select($data["tradacct"],"calledstationid,acctterminatecause,acctstarttime,acctterminatecause,acctstoptime,acctinputoctets,acctoutputoctets",
 					"username = '".$tmpsearch."'","acctstarttime",1,10);
 				while($data2 = $radSQLMgr->Fetch($query2)) {
 					if($found == 0) {

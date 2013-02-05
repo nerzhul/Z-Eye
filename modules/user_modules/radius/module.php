@@ -23,7 +23,7 @@
 	require_once(dirname(__FILE__)."/../../../lib/FSS/PDFgen.FS.class.php");
 
 	class iRadius extends genModule{
-		function iRadius() { parent::genModule(); $this->loc = new lRadius(); }
+		function iRadius() { parent::genModule(); $this->loc = new lRadius(); $raddbinfos = array(); }
 
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
@@ -48,6 +48,7 @@
 				case 5: $output .= FS::$iMgr->printError($this->loc->s("err-exist2")); break;
 				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-table")); break;
 				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")); break;
+				case 90: $output .= FS::$iMgr->printError($this->loc->s("err-db-conn-fail")); break;
 			}
 
 			if(!FS::isAjaxCall()) {
@@ -88,11 +89,18 @@
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th></th><th></th></tr>";
 
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login");
+			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,dbtype");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == false) $found = true;
 			$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
-			$tmpoutput .= "</td><td>".$data["port"]."</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>";
+			$tmpoutput .= "</td><td>".$data["port"]."</td><td>";
+
+			switch($data["dbtype"]) {
+				case "my": $tmpoutput .= "MySQL"; break;
+				case "pg": $tmpoutput .= "PgSQL"; break;
+			}
+
+			$tmpoutput .= "</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>";
 			$tmpoutput .= "<td><div id=\"radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."\">".
 				FS::$iMgr->img("styles/images/loader.gif",24,24)."</div><script type=\"text/javascript\">
                                 $.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
@@ -114,6 +122,13 @@
 			$sport = 3306;
 			$spwd = "";
 			$salias = "";
+			$sdbtype = "";
+			$tradcheck = "radcheck";
+			$tradreply = "radreply";
+			$tradgrpchk = "radgroupcheck";
+			$tradgrprep = "radgroupreply";
+			$tradusrgrp = "radusergroup";
+			$tradacct = "radacct";
 			if($create)
 				$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
 			else {
@@ -125,7 +140,8 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
 					return $output;
 				}
-				$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
+				$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
+					"addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
@@ -133,6 +149,13 @@
 					$salias = $data["radalias"];
 					$sport = $port;
 					$sdbname = $dbname;
+					$sdbtype = $data["dbtype"];
+					$tradcheck = $data["tradcheck"];
+					$tradreply = $data["tradreply"];
+					$tradgrpchk = $data["tradgrpchk"];
+					$tradgrprep = $data["tradgrprep"];
+					$tradusrgrp = $data["tradusrgrp"];
+					$tradacct = $data["tradacct"];
 				}
 				else {
 					$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
@@ -163,17 +186,30 @@
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
+				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td>".FS::$iMgr->select("sdbtype").FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname,array("tooltip" => "tooltip-dbname"));
 			}
 			else {
 				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Port")."</td><td>".$sport."</td></tr>";
-				$output .= "<tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
+				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td>";
+				switch($sdbtype) {
+					case "my": $output .= "MySQL"; break;
+					case "pg": $output .= "PgSQL"; break;
+				}
+				$output .= "</td></tr><tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
 			}
 			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",$slogin,array("tooltip" => "tooltip-user"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias,array("tooltip" => "tooltip-alias"));
+			$output .= "<th colspan=2>".$this->loc->s("Tables")."</th>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("table-radcheck"),"tradcheck",$tradcheck,array("tooltip" => "tooltip-radcheck"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("table-radreply"),"tradreply",$tradreply,array("tooltip" => "tooltip-radreply"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("table-radgrpchk"),"tradgrpchk",$tradgrpchk,array("tooltip" => "tooltip-radgrpchk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("table-radgrprep"),"tradgrprep",$tradgrprep,array("tooltip" => "tooltip-radgrprep"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("table-radusrgrp"),"tradusrgrp",$tradusrgrp,array("tooltip" => "tooltip-radusrgrp"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("table-radacct"),"tradacct",$tradacct,array("tooltip" => "tooltip-radacct"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
 
@@ -220,6 +256,8 @@
 			}
 			else if(!$sh || $sh == 1) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
@@ -246,6 +284,8 @@
 			}
 			else if($sh == 2) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$output .= "<div id=\"adduserlistres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11",array("id" => "adduserlist"));
@@ -288,6 +328,8 @@
 			}
 			else if(!$sh || $sh == 1) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$formoutput = "<script type=\"text/javascript\"> function changeUForm() {
 					if(document.getElementsByName('utype')[0].value == 1) {
@@ -309,19 +351,7 @@
 				}
 				attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-				FS::$iMgr->selElmt("=","=").
-				FS::$iMgr->selElmt("==","==").
-				FS::$iMgr->selElmt(":=",":=").
-				FS::$iMgr->selElmt("+=","+=").
-				FS::$iMgr->selElmt("!=","!=").
-				FS::$iMgr->selElmt(">",">").
-				FS::$iMgr->selElmt(">=",">=").
-				FS::$iMgr->selElmt("<","<").
-				FS::$iMgr->selElmt("<=","<=").
-				FS::$iMgr->selElmt("=~","=~").
-				FS::$iMgr->selElmt("!~","!~").
-				FS::$iMgr->selElmt("=*","=*").
-				FS::$iMgr->selElmt("!*","!*").
+				$this->raddbCondSelector().
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
 				FS::$iMgr->selElmt("check",1).
 				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertBefore('#formactions');
@@ -370,7 +400,7 @@
 				$output .= "</select>";
 				$output .= FS::$iMgr->select("ug","filterRadiusDatas()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Group")."--","",true);
-				$query = $radSQLMgr->Select("radusergroup","distinct groupname");
+				$query = $radSQLMgr->Select($this->raddbinfos["radusrgrp"],"distinct groupname");
 				while($data = $radSQLMgr->Fetch($query))
 						$output .= FS::$iMgr->selElmt($data["groupname"],$data["groupname"]);
 
@@ -380,19 +410,7 @@
 			else if($sh == 2) {
 				$formoutput = "<script type=\"text/javascript\">attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-				FS::$iMgr->selElmt("=","=").
-				FS::$iMgr->selElmt("==","==").
-				FS::$iMgr->selElmt(":=",":=").
-				FS::$iMgr->selElmt("+=","+=").
-				FS::$iMgr->selElmt("!=","!=").
-				FS::$iMgr->selElmt(">",">").
-				FS::$iMgr->selElmt(">=",">=").
-				FS::$iMgr->selElmt("<","<").
-				FS::$iMgr->selElmt("<=","<=").
-				FS::$iMgr->selElmt("=~","=~").
-				FS::$iMgr->selElmt("!~","!~").
-				FS::$iMgr->selElmt("=*","=*").
-				FS::$iMgr->selElmt("!*","!*").
+				$this->raddbCondSelector().
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
 				FS::$iMgr->selElmt("check",1).
 				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
@@ -449,18 +467,20 @@
 				$found = 0;
 
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$groups=array();
-				$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
+				$query = $radSQLMgr->Select($this->raddbinfos["radgrprep"],"distinct groupname");
 				while($data = $radSQLMgr->Fetch($query)) {
-					$rcount = $radSQLMgr->Count("radusergroup","distinct username","groupname = '".$data["groupname"]."'");
+					$rcount = $radSQLMgr->Count($this->raddbinfos["radusrgrp"],"distinct username","groupname = '".$data["groupname"]."'");
 					if(!isset($groups[$data["groupname"]]))
 						$groups[$data["groupname"]] = $rcount;
 				}
 
-				$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
+				$query = $radSQLMgr->Select($this->raddbinfos["radgrpchk"],"distinct groupname");
 				while($data = $radSQLMgr->Fetch($query)) {
-					$rcount = $radSQLMgr->Count("radusergroup","distinct username","groupname = '".$data["groupname"]."'");
+					$rcount = $radSQLMgr->Count($this->raddbinfos["radusrgrp"],"distinct username","groupname = '".$data["groupname"]."'");
 					if(!isset($groups[$data["groupname"]]))
 							$groups[$data["groupname"]] = $rcount;
 					else
@@ -475,14 +495,16 @@
 			}
 			else if($sh == 3) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$grouplist= FS::$iMgr->selElmt("","none");
 				$groups=array();
-				$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
+				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
 				while($data = $radSQLMgr->Fetch($query)) {
 						if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 				}
-				$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
+				$query = $radSQLMgr->Select($this->raddbinfos["radgrprep"],"distinct groupname");
 				while($data = $radSQLMgr->Fetch($query)) {
 						if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 				}
@@ -522,6 +544,8 @@
 			}
 			else if($sh == 4) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$output = "";
 
@@ -540,13 +564,13 @@
 					$formoutput .= "</select></li><li>".FS::$iMgr->select("radgroup","",$this->loc->s("Radius-profile"));
 
 					$groups=array();
-					$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
+					$query = $radSQLMgr->Select($this->raddbinfos["radgrprep"],"distinct groupname");
 					while($data = $radSQLMgr->Fetch($query)) {
 						if(!isset($groups[$data["groupname"]]))
 							$groups[$data["groupname"]] = 1;
 					}
 
-					$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
+					$query = $radSQLMgr->Select($this->raddbinfos["radgrpchk"],"distinct groupname");
 					while($data = $radSQLMgr->Fetch($query)) {
 						if(!isset($groups[$data["groupname"]]))
 							$groups[$data["groupname"]] = 1;
@@ -579,6 +603,8 @@
 			}
 			else if($sh == 5) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$output .= "<h3>".$this->loc->s("title-cleanusers")."</h3>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=9");
@@ -597,6 +623,8 @@
 			}
 			else if($sh == 6) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
@@ -622,6 +650,8 @@
 			}
 			else if($sh == 7) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				if(!$radSQLMgr)
+					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 				$output .= "<div id=\"adduserlistres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=11",array("id" => "adduserlist"));
@@ -680,7 +710,7 @@
 					drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry='+e.dataTransfer.getData('text/html')); }
 				});
 				</script>";
-			$query = $radSQLMgr->Select("radcheck","id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')".($ug ? " AND username IN (SELECT username FROM radusergroup WHERE groupname = '".$ug."')" : ""));
+			$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')".($ug ? " AND username IN (SELECT username FROM radusergroup WHERE groupname = '".$ug."')" : ""));
 			$expirationbuffer = array();
 			while($data = $radSQLMgr->Fetch($query)) {
 				if(!$found && (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]) 
@@ -697,7 +727,7 @@
 				if(!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-F]{12})$#i', $data["username"])
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"])) {
 					$tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"]."\">".$data["username"]."</a></td><td>".$data["value"]."</td><td>";
-					$query2 = $radSQLMgr->Select("radusergroup","groupname","username = '".$data["username"]."'");
+					$query2 = $radSQLMgr->Select($this->raddbinfos["radusrgrp"],"groupname","username = '".$data["username"]."'");
 					$found2 = 0;
 					while($data2 = $radSQLMgr->Fetch($query2)) {
 						if($found2 == 0) $found2 = 1;
@@ -717,19 +747,21 @@
 			$output = "";
 			FS::$iMgr->showReturnMenu(true);
 			$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+			if(!$radSQLMgr)
+				return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
 			if($radentrytype == 1) {
-				$userexist = $radSQLMgr->GetOneData("radcheck","username","username = '".$radentry."'");
+				$userexist = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$radentry."'");
 				if(!$userexist) {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-user"));
 					return $output;
 				}
-				$userpwd = $radSQLMgr->GetOneData("radcheck","value","username = '".$radentry."' AND op = ':=' AND attribute IN('Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')");
+				$userpwd = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"value","username = '".$radentry."' AND op = ':=' AND attribute IN('Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')");
 				if($userpwd)
-					$upwdtype = $radSQLMgr->GetOneData("radcheck","attribute","username = '".$radentry."' AND op = ':=' AND value = '".$userpwd."'");
-				$grpcount = $radSQLMgr->Count("radusergroup","groupname","username = '".$radentry."'");
-				$attrcount = $radSQLMgr->Count("radcheck","username","username = '".$radentry."'");
-				$attrcount += $radSQLMgr->Count("radreply","username","username = '".$radentry."'");
+					$upwdtype = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"attribute","username = '".$radentry."' AND op = ':=' AND value = '".$userpwd."'");
+				$grpcount = $radSQLMgr->Count($this->raddbinfos["radusrgrp"],"groupname","username = '".$radentry."'");
+				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradcheck"],"username","username = '".$radentry."'");
+				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradreply"],"username","username = '".$radentry."'");
 				$formoutput = "<script type=\"text/javascript\">grpidx = ".$grpcount."; 
 				function addGrpForm() {
 					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select> <a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
@@ -741,19 +773,7 @@
 				attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Valeur".
 				FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-				FS::$iMgr->selElmt("=","=").
-				FS::$iMgr->selElmt("==","==").
-				FS::$iMgr->selElmt(":=",":=").
-				FS::$iMgr->selElmt("+=","+=").
-				FS::$iMgr->selElmt("!=","!=").
-				FS::$iMgr->selElmt(">",">").
-				FS::$iMgr->selElmt(">=",">=").
-				FS::$iMgr->selElmt("<","<").
-				FS::$iMgr->selElmt("<=","<=").
-				FS::$iMgr->selElmt("=~","=~").
-				FS::$iMgr->selElmt("!~","!~").
-				FS::$iMgr->selElmt("=*","=*").
-				FS::$iMgr->selElmt("!*","!*").
+				$this->raddbCondSelector().
 				"</select> Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
 				FS::$iMgr->selElmt("check",1).
 				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertBefore('#formactions');
@@ -780,7 +800,7 @@
 				}
 				if($utype == 1) {
 					$formoutput .= "<li><fieldset id=\"userdf\" style=\"border:0;\">";
-					$pwd = $radSQLMgr->GetOneData("radcheck","value","username = '".$radentry."' AND attribute = 'Cleartext-Password' AND op = ':='");
+					$pwd = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"value","username = '".$radentry."' AND attribute = 'Cleartext-Password' AND op = ':='");
 					$formoutput .= FS::$iMgr->password("pwd",$pwd,$this->loc->s("Password"))."<br />".
 					FS::$iMgr->select("upwdtype","",$this->loc->s("Pwd-Type")).
 					FS::$iMgr->selElmt("Cleartext-Password",1,($upwdtype && $upwdtype == "Cleartext-Password" ? true : false)).
@@ -791,7 +811,7 @@
 					FS::$iMgr->selElmt("CHAP-Password",6,($upwdtype && $upwdtype == "CHAP-Password" ? true : false)).
 					"</select></fieldset></li>";
 				}
-				$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$radentry."'");
+				$query = $radSQLMgr->Select($this->raddbinfos["radusrgrp"],"groupname","username = '".$radentry."'");
 				$grpidx = 0;
 				while($data = $radSQLMgr->Fetch($query)) {
 					$formoutput .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Profil")).
@@ -799,47 +819,23 @@
 					$grpidx++;
 				}
 				$attridx = 0;
-				$query = $radSQLMgr->Select("radcheck","attribute,op,value","username = '".$radentry."' AND attribute <> 'Cleartext-Password'");
+				$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"attribute,op,value","username = '".$radentry."' AND attribute <> 'Cleartext-Password'");
 				while($data = $radSQLMgr->Fetch($query)) {
 					if(!($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept")) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 						FS::$iMgr->select("attrop".$attridx).
-						FS::$iMgr->selElmt("=","=",($data["op"] == "=" ? true : false)).
-						FS::$iMgr->selElmt("==","==",($data["op"] == "==" ? true : false)).
-						FS::$iMgr->selElmt(":=",":=",($data["op"] == ":=" ? true : false)).
-						FS::$iMgr->selElmt("+=","+=",($data["op"] == "+=" ? true : false)).
-						FS::$iMgr->selElmt("!=","!=",($data["op"] == "!=" ? true : false)).
-						FS::$iMgr->selElmt(">",">",($data["op"] == ">" ? true : false)).
-						FS::$iMgr->selElmt(">=",">=",($data["op"] == ">=" ? true : false)).
-						FS::$iMgr->selElmt("<","<",($data["op"] == "<" ? true : false)).
-						FS::$iMgr->selElmt("<=","<=",($data["op"] == "<=" ? true : false)).
-						FS::$iMgr->selElmt("=~","=~",($data["op"] == "=~" ? true : false)).
-						FS::$iMgr->selElmt("!~","!~",($data["op"] == "!~" ? true : false)).
-						FS::$iMgr->selElmt("=*","=*",($data["op"] == "=*" ? true : false)).
-						FS::$iMgr->selElmt("!*","!*",($data["op"] == "!*" ? true : false)).
+						$this->raddbCondSelector($data["op"]).
 						"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
 						FS::$iMgr->selElmt("check",1,true).
 						FS::$iMgr->selElmt("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
 						$attridx++;
 					}
 				}
-				$query = $radSQLMgr->Select("radreply","attribute,op,value","username = '".$radentry."'");
+				$query = $radSQLMgr->Select($this->raddbinfos["tradreply"],"attribute,op,value","username = '".$radentry."'");
 				while($data = $radSQLMgr->Fetch($query)) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 						FS::$iMgr->select("attrop".$attridx).
-						FS::$iMgr->selElmt("=","=",($data["op"] == "=" ? true : false)).
-						FS::$iMgr->selElmt("==","==",($data["op"] == "==" ? true : false)).
-						FS::$iMgr->selElmt(":=",":=",($data["op"] == ":=" ? true : false)).
-						FS::$iMgr->selElmt("+=","+=",($data["op"] == "+=" ? true : false)).
-						FS::$iMgr->selElmt("!=","!=",($data["op"] == "!=" ? true : false)).
-						FS::$iMgr->selElmt(">",">",($data["op"] == ">" ? true : false)).
-						FS::$iMgr->selElmt(">=",">=",($data["op"] == ">=" ? true : false)).
-						FS::$iMgr->selElmt("<","<",($data["op"] == "<" ? true : false)).
-						FS::$iMgr->selElmt("<=","<=",($data["op"] == "<=" ? true : false)).
-						FS::$iMgr->selElmt("=~","=~",($data["op"] == "=~" ? true : false)).
-						FS::$iMgr->selElmt("!~","!~",($data["op"] == "!~" ? true : false)).
-						FS::$iMgr->selElmt("=*","=*",($data["op"] == "=*" ? true : false)).
-						FS::$iMgr->selElmt("!*","!*",($data["op"] == "!*" ? true : false)).
+						$raddbCondSelect($data["op"]).
 						"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
 						FS::$iMgr->selElmt("check",1).
 						FS::$iMgr->selElmt("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
@@ -859,30 +855,18 @@
 				$output .= $formoutput;
 			}
 			else if($radentrytype == 2) {
-				$groupexist = $radSQLMgr->GetOneData("radgroupcheck","groupname","groupname = '".$radentry."'");
+				$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["radgrpchk"],"groupname","groupname = '".$radentry."'");
 				if(!$groupexist)
-					$groupexist = $radSQLMgr->GetOneData("radgroupreply","groupname","groupname = '".$radentry."'");
+					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["radgrprep"],"groupname","groupname = '".$radentry."'");
 				if(!$groupexist) {
 					$output .= FS::$iMgr->printError("Groupe inexistant !");
 					return $output;
 				}
-				$attrcount = $radSQLMgr->Count("radgroupcheck","groupname","groupname = '".$radentry."'");
-				$attrcount += $radSQLMgr->Count("radgroupreply","groupname","groupname = '".$radentry."'");
+				$attrcount = $radSQLMgr->Count($this->raddbinfos["radgrpchk"],"groupname","groupname = '".$radentry."'");
+				$attrcount += $radSQLMgr->Count($this->raddbinfos["radgrprep"],"groupname","groupname = '".$radentry."'");
 				$formoutput = "<script type=\"text/javascript\">attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-				FS::$iMgr->selElmt("=","=").
-				FS::$iMgr->selElmt("==","==").
-				FS::$iMgr->selElmt(":=",":=").
-				FS::$iMgr->selElmt("+=","+=").
-				FS::$iMgr->selElmt("!=","!=").
-				FS::$iMgr->selElmt(">",">").
-				FS::$iMgr->selElmt(">=",">=").
-				FS::$iMgr->selElmt("<","<").
-				FS::$iMgr->selElmt("<=","<=").
-				FS::$iMgr->selElmt("=~","=~").
-				FS::$iMgr->selElmt("!~","!~").
-				FS::$iMgr->selElmt("=*","=*").
-				FS::$iMgr->selElmt("!*","!*").
+				$this->raddbCondSelector().
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
 				FS::$iMgr->selElmt("check",1).
 				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
@@ -896,46 +880,22 @@
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
                 $formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);
 				$attridx = 0;
-				$query = $radSQLMgr->Select("radgroupcheck","attribute,op,value","groupname = '".$radentry."'");
+				$query = $radSQLMgr->Select($this->raddbinfos["radgrpchk"],"attribute,op,value","groupname = '".$radentry."'");
 				while($data = $radSQLMgr->Fetch($query)) {
 					 $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 					 FS::$iMgr->select("attrop".$attridx).
-					 FS::$iMgr->selElmt("=","=",($data["op"] == "=" ? true : false)).
-					 FS::$iMgr->selElmt("==","==",($data["op"] == "==" ? true : false)).
-					 FS::$iMgr->selElmt(":=",":=",($data["op"] == ":=" ? true : false)).
-					 FS::$iMgr->selElmt("+=","+=",($data["op"] == "+=" ? true : false)).
-					 FS::$iMgr->selElmt("!=","!=",($data["op"] == "!=" ? true : false)).
-					 FS::$iMgr->selElmt(">",">",($data["op"] == ">" ? true : false)).
-					 FS::$iMgr->selElmt(">=",">=",($data["op"] == ">=" ? true : false)).
-					 FS::$iMgr->selElmt("<","<",($data["op"] == "<" ? true : false)).
-					 FS::$iMgr->selElmt("<=","<=",($data["op"] == "<=" ? true : false)).
-					 FS::$iMgr->selElmt("=~","=~",($data["op"] == "=~" ? true : false)).
-					 FS::$iMgr->selElmt("!~","!~",($data["op"] == "!~" ? true : false)).
-					 FS::$iMgr->selElmt("=*","=*",($data["op"] == "=*" ? true : false)).
-					 FS::$iMgr->selElmt("!*","!*",($data["op"] == "!*" ? true : false)).
+					$this->raddbCondSelector($data["op"]).
 					 "</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
 					 FS::$iMgr->selElmt("check",1,true).
 					 FS::$iMgr->selElmt("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
 					 $attridx++;
 				}
 
-				$query = $radSQLMgr->Select("radgroupreply","attribute,op,value","groupname = '".$radentry."'");
+				$query = $radSQLMgr->Select($this->raddbinfos["radgrprep"],"attribute,op,value","groupname = '".$radentry."'");
 				while($data = $radSQLMgr->Fetch($query)) {
 					$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 					FS::$iMgr->select("attrop".$attridx).
-					FS::$iMgr->selElmt("=","=",($data["op"] == "=" ? true : false)).
-					FS::$iMgr->selElmt("==","==",($data["op"] == "==" ? true : false)).
-					FS::$iMgr->selElmt(":=",":=",($data["op"] == ":=" ? true : false)).
-					FS::$iMgr->selElmt("+=","+=",($data["op"] == "+=" ? true : false)).
-					FS::$iMgr->selElmt("!=","!=",($data["op"] == "!=" ? true : false)).
-					FS::$iMgr->selElmt(">",">",($data["op"] == ">" ? true : false)).
-					FS::$iMgr->selElmt(">=",">=",($data["op"] == ">=" ? true : false)).
-					FS::$iMgr->selElmt("<","<",($data["op"] == "<" ? true : false)).
-					FS::$iMgr->selElmt("<=","<=",($data["op"] == "<=" ? true : false)).
-					FS::$iMgr->selElmt("=~","=~",($data["op"] == "=~" ? true : false)).
-					FS::$iMgr->selElmt("!~","!~",($data["op"] == "!~" ? true : false)).
-					FS::$iMgr->selElmt("=*","=*",($data["op"] == "=*" ? true : false)).
-					FS::$iMgr->selElmt("!*","!*",($data["op"] == "!*" ? true : false)).
+					$this->raddbCondSelector($data["op"]).
 					"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
 					FS::$iMgr->selElmt("check",1).
 					FS::$iMgr->selElmt("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">X</a></li>";
@@ -952,11 +912,11 @@
 		private function addGroupList($radSQLMgr,$selectEntry="") {
 			$output = "";
 			$groups=array();
-			$query = $radSQLMgr->Select("radgroupcheck","distinct groupname");
+			$query = $radSQLMgr->Select($this->raddbinfos["radgroupchk"],"distinct groupname");
 			while($data = $radSQLMgr->Fetch($query)) {
 				if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 			}
-			$query = $radSQLMgr->Select("radgroupreply","distinct groupname");
+			$query = $radSQLMgr->Select($this->raddbinfos["radgrprep"],"distinct groupname");
 			while($data = $radSQLMgr->Fetch($query)) {
 				if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
 			}
@@ -968,10 +928,16 @@
 		}
 
 		private function connectToRaddb($radhost,$radport,$raddb) {
-			$radlogin = FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
-			$radpwd = FS::$dbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+			// Load some other useful datas from DB
+			$query = FS::$dbMgr->Select("z_eye_radius_db_list","login,pwd,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$this->raddbinfos = $data;
+			}
 			$radSQLMgr = new AbstractSQLMgr();
-			if($radSQLMgr->setConfig("my",$raddb,$radport,$radhost,$radlogin,$radpwd) == 0) {
+			if($this->raddbinfos["dbtype"] != "my" && $this->raddbinfos["dbtype"] != "pg")
+				return NULL;
+
+			if($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$raddb,$radport,$radhost,$radlogin,$radpwd) == 0) {
 				if($radSQLMgr->Connect() != 0)
 					return NULL; 
 			}
@@ -982,6 +948,22 @@
 			if(FS::$dbMgr->GetOneData("z_eye_radius_options","optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1)
 				return true;
 			return false;
+		}
+
+		private function raddbCondSelector($select = "") {
+			return	FS::$iMgr->selElmt("=","=",$select == "=").
+				FS::$iMgr->selElmt("==","==",$select == "==").
+				FS::$iMgr->selElmt(":=",":=",$select == ":=").
+				FS::$iMgr->selElmt("+=","+=",$select == "+=").
+				FS::$iMgr->selElmt("!=","!=",$select == "!=").
+				FS::$iMgr->selElmt(">",">",$select == ">").
+				FS::$iMgr->selElmt(">=",">=",$select == ">=").
+				FS::$iMgr->selElmt("<","<",$select == "<").
+				FS::$iMgr->selElmt("<=","<=",$select == "<=").
+				FS::$iMgr->selElmt("=~","=~",$select == "=~").
+				FS::$iMgr->selElmt("!~","!~",$select == "!~").
+				FS::$iMgr->selElmt("=*","=*",$select == "=*").
+				FS::$iMgr->selElmt("!*","!*",$select == "!*");
 		}
 
 		public function handlePostDatas($act) {
@@ -1033,16 +1015,21 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
 					// For Edition Only, don't delete acct records
 					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
 					if($edit == 1) {
-						$radSQLMgr->Delete("radcheck","username = '".$username."'");
-						$radSQLMgr->Delete("radreply","username = '".$username."'");
-						$radSQLMgr->Delete("radusergroup","username = '".$username."'");
+						$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
+						$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
+						$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
 						$radSQLMgr->Delete("z_eye_radusers","username = '".$username."'");
 					}
-					$userexist = $radSQLMgr->GetOneData("radcheck","username","username = '".$username."'");
+					$userexist = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$username."'");
 					if(!$userexist || $edit == 1) {
 						if($utype == 1) {
 							switch($upwdtype) {
@@ -1066,16 +1053,16 @@
 							$attr = "Auth-Type";
 							$value = "Accept";
 						}
-						$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','".$attr."',':=','".$value."'");
+						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username."','".$attr."',':=','".$value."'");
 						foreach($_POST as $key => $value) {
 						if(preg_match("#^ugroup#",$key)) {
-								$groupfound = $radSQLMgr->GetOneData("radgroupreply","groupname","groupname = '".$value."'");
+								$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["radgrprep"],"groupname","groupname = '".$value."'");
 								if(!$groupfound)
-									$groupfound = $radSQLMgr->GetOneData("radgroupcheck","groupname","groupname = '".$value."'");
+									$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["radgrpchk"],"groupname","groupname = '".$value."'");
 								if($groupfound) {
-									$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$username."' AND groupname = '".$value."'");
+									$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["radusrgrp"],"groupname","username = '".$username."' AND groupname = '".$value."'");
 									if(!$usergroup)
-										$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$value."','1'");
+										$radSQLMgr->Insert($this->raddbinfos["radusrgrp"],"username,groupname,priority","'".$username."','".$value."','1'");
 								}
 							}
 						}
@@ -1104,11 +1091,11 @@
 						}
 						foreach($attrTab as $attrKey => $attrEntry) {
 								if($attrEntry["target"] == "2") {
-										$radSQLMgr->Insert("radreply","id,username,attribute,op,value","'','".$username.
+									$radSQLMgr->Insert($this->raddbinfos["tradreply"],"id,username,attribute,op,value","'','".$username.
 										"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
 								}
 								else if($attrEntry["target"] == "1") {
-										$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username.
+									$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username.
 										"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
 								}
 						}
@@ -1139,21 +1126,26 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
 					// For Edition Only, don't delete acct/user-group links
 					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
 					if($edit == 1) {
-						$radSQLMgr->Delete("radgroupcheck","groupname = '".$groupname."'");
-						$radSQLMgr->Delete("radgroupreply","groupname = '".$groupname."'");
+						$radSQLMgr->Delete($this->raddbinfos["radgrpchk"],"groupname = '".$groupname."'");
+						$radSQLMgr->Delete($this->raddbinfos["radgrprep"],"groupname = '".$groupname."'");
 					}
 
-					$groupexist = $radSQLMgr->GetOneData("radgroupcheck","id","groupname='".$groupname."'");
+					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["radgrpchk"],"id","groupname='".$groupname."'");
 					if($groupexist && $edit != 1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Trying to add existing group '".$groupname."'");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
 						return;
 					}
-					$groupexist = $radSQLMgr->GetOneData("radgroupreply","id","groupname='".$groupname."'");
+					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["radgrprep"],"id","groupname='".$groupname."'");
 					if($groupexist && $edit != 1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Trying to add existing group '".$groupname."'");
 						header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."&err=3");
@@ -1184,11 +1176,11 @@
 					}
 					foreach($attrTab as $attrKey => $attrValue) {
 						if($attrValue["target"] == "2") {
-							$radSQLMgr->Insert("radgroupreply","id,groupname,attribute,op,value","'','".$groupname.
+							$radSQLMgr->Insert($this->raddbinfos["radgrprep"],"id,groupname,attribute,op,value","'','".$groupname.
 							"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
 						}
 						else if($attrValue["target"] == "1") {
-							$radSQLMgr->Insert("radgroupcheck","id,groupname,attribute,op,value","'','".$groupname.
+							$radSQLMgr->Insert($this->raddbinfos["radgrpchk"],"id,groupname,attribute,op,value","'','".$groupname.
                                                         "','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
 						}
 					}
@@ -1210,13 +1202,18 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
-					$radSQLMgr->Delete("radcheck","username = '".$username."'");
-					$radSQLMgr->Delete("radreply","username = '".$username."'");
-					$radSQLMgr->Delete("radusergroup","username = '".$username."'");
+					$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
+					$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
+					$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
 					$radSQLMgr->Delete("z_eye_radusers","username ='".$username."'");
 					if($logdel == "on") $radSQLMgr->Delete("radpostauth","username = '".$username."'");
-					if($acctdel == "on") $radSQLMgr->Delete("radacct","username = '".$username."'");
+					if($acctdel == "on") $radSQLMgr->Delete($this->raddbinfos["radacct"],"username = '".$username."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"User '".$username."' removed".($logdel == "on" ? " Also remove logs" : "").($acctdel == "on" ? " Also remove acct": ""));
 					header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."");
 					return;
@@ -1233,10 +1230,15 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
-					$radSQLMgr->Delete("radgroupcheck","groupname = '".$groupname."'");
-					$radSQLMgr->Delete("radgroupreply","groupname = '".$groupname."'");
-					$radSQLMgr->Delete("radusergroup","groupname = '".$groupname."'");
+					$radSQLMgr->Delete($this->raddbinfos["radgrpchk"],"groupname = '".$groupname."'");
+					$radSQLMgr->Delete($this->raddbinfos["radgrprep"],"groupname = '".$groupname."'");
+					$radSQLMgr->Delete($this->raddbinfos["radusrgrp"],"groupname = '".$groupname."'");
 					$radSQLMgr->Delete("radhuntgroup","groupname = '".$groupname."'");
 					FS::$dbMgr->Delete("z_eye_radius_dhcp_import","groupname = '".$groupname."'");
 					header("Location: index.php?mod=".$this->mid."&sh=2&h=".$radhost."&p=".$radport."&r=".$raddb."");
@@ -1259,6 +1261,11 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
 					if(!$utype || $utype != 1 && $utype != 2 || !$userlist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some datas are missing or invalid for mass import");
@@ -1268,9 +1275,9 @@
 
 					$groupfound = NULL;
 					if($group != "none") {
-						$groupfound = $radSQLMgr->GetOneData("radgroupreply","groupname","groupname = '".$group."'");
+						$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["radgrprep"],"groupname","groupname = '".$group."'");
 						if(!$groupfound)
-							$groupfound = $radSQLMgr->GetOneData("radgroupcheck","groupname","groupname = '".$group."'");
+							$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["radgrpchk"],"groupname","groupname = '".$group."'");
 					}
 					if($utype == 1) {
 						$userlist = str_replace('\r','\n',$userlist);
@@ -1303,12 +1310,12 @@
 										header("Location: index.php?mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
 										return;
 							}
-							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$user."'"))
-								$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$user."','".$attr."',':=','".$value."'");
+							if(!$radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$user."'"))
+								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$user."','".$attr."',':=','".$value."'");
 							if($groupfound) {
-								$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$user."' AND groupname = '".$group."'");
+								$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["radusrgrp"],"groupname","username = '".$user."' AND groupname = '".$group."'");
 								if(!$usergroup)
-									$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$user."','".$group."','1'");
+									$radSQLMgr->Insert($this->raddbinfos["radusrgrp"],"username,groupname,priority","'".$user."','".$group."','1'");
 							}
 						}
 						if($userfound) {
@@ -1344,13 +1351,13 @@
 						$userfound = 0;
 						$count = count($userlist);
 						for($i=0;$i<$count;$i++) {
-							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$userlist[$i]."'"))
-								$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$userlist[$i]."','Auth-Type',':=','Accept'");
+							if(!$radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$userlist[$i]."'"))
+								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$userlist[$i]."','Auth-Type',':=','Accept'");
 							else $userfound = 1;
 							if($groupfound) {
-								$usergroup = $radSQLMgr->GetOneData("radusergroup","groupname","username = '".$userlist[$i]."' AND groupname = '".$group."'");
+								$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["radusrgrp"],"groupname","username = '".$userlist[$i]."' AND groupname = '".$group."'");
 								if(!$usergroup)
-									$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$userlist[$i]."','".$group."','1'");
+									$radSQLMgr->Insert($this->raddbinfos["radusrgrp"],"username,groupname,priority","'".$userlist[$i]."','".$group."','1'");
 							}
 						}
 						if($userfound) {
@@ -1382,10 +1389,15 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
-					$groupexist = $radSQLMgr->GetOneData("radgroupcheck","id","groupname='".$radgroup."'");
+					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["radgrpchk"],"id","groupname='".$radgroup."'");
 					if(!$groupexist)
-						$groupexist = $radSQLMgr->GetOneData("radgroupreply","id","groupname='".$radgroup."'");
+						$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["radgrprep"],"id","groupname='".$radgroup."'");
 
 					if(!$groupexist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Group '".$radgroup."' doesn't exist, can't bind DHCP to radius");
@@ -1437,6 +1449,11 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
 					$cleanradenable = FS::$secMgr->checkAndSecurisePostData("cleanradsqlenable");
 					$cleanradtable = FS::$secMgr->checkAndSecurisePostData("cleanradsqltable");
@@ -1502,9 +1519,14 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
-					$exist = $radSQLMgr->GetOneData("radcheck","id","username = '".$username."'");
-					if(!$exist) $exist = $radSQLMgr->GetOneData("radreply","id","username = '".$username."'");
+					$exist = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"id","username = '".$username."'");
+					if(!$exist) $exist = $radSQLMgr->GetOneData($this->raddbinfos["tradreply"],"id","username = '".$username."'");
 					if($exist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"User '".$username."' already exists (Deleg)");
 						echo FS::$iMgr->printError($this->loc->s("err-no-user"));
@@ -1513,9 +1535,9 @@
 					}
 
 					$password = FS::$secMgr->genRandStr(8);
-					$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
+					$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
 					$radSQLMgr->Insert("z_eye_radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
-					$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$profil."',0");
+					$radSQLMgr->Insert($this->raddbinfos["radusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
 
 					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Creating delegated user '".$username."' with password '".$password."'. Account expiration: ".($valid == 2 ? $edate: "none"));
 					echo FS::$iMgr->printDebug($this->loc->s("ok-user"))."<br /><hr><b>".$this->loc->s("User").": </b>".$username."<br /><b>".$this->loc->s("Password").": </b>".$password."<br /><b>".$this->loc->s("Validity").": </b>".
@@ -1560,6 +1582,11 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
 					$pdf = new PDFgen();
 					$pdf->SetTitle($this->loc->s("Account").": ".($valid == 1 ? $this->loc->s("Permanent") : $this->loc->s("Temporary")));
@@ -1567,9 +1594,9 @@
 						$password = FS::$secMgr->genRandStr(8);
 						if($typegen == 2) $username = $prefix.($i+1);
 						else $username = FS::$secMgr->genRandStr(12);
-						$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
+						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
 						$radSQLMgr->Insert("z_eye_radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
-						$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$username."','".$profil."',0");
+						$radSQLMgr->Insert($this->raddbinfos["radusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Create user '".$username."' with password '".$password."' for massive creation (Deleg)");
 						$pdf->AddPage();
 						$pdf->WriteHTML(utf8_decode("<b>".$this->loc->s("User").": </b>".$username."<br /><br /><b>".$this->loc->s("Password").": </b>".$password."<br /><br /><b>".
@@ -1589,6 +1616,11 @@
 					}
 
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+					if(!$radSQLMgr) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						header("Location: index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&err=90");
+						return;
+					}
 
 					echo $this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport);
 					return;
@@ -1599,6 +1631,7 @@
 						header("Location: index.php?mod=".$this->mid."&err=99");
 						return;
 					}
+
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
 					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
@@ -1607,15 +1640,30 @@
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
 					$salias = FS::$secMgr->checkAndSecurisePostData("salias");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname  || !$slogin  || !$spwd || !$spwd2 ||
-						$spwd != $spwd2) {
+
+					$tradcheck = FS::$secMgr->checkAndSecurisePostData("tradcheck");
+					$tradreply = FS::$secMgr->checkAndSecurisePostData("tradreply");
+					$tradgrpchk = FS::$secMgr->checkAndSecurisePostData("tradgrpchk");
+					$tradgrprep = FS::$secMgr->checkAndSecurisePostData("tradgrprep");
+					$tradusrgrp = FS::$secMgr->checkAndSecurisePostData("tradusrgrp");
+					$tradacct = FS::$secMgr->checkAndSecurisePostData("tradacct");
+
+					$sdbtype = "";
+					if($edit) $sdbtype = FS::$dbMgr->GetOneData("z_eye_radius_db_list","data","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					else $sdbtype = FS::$secMgr->checkAndSecurisePostData("sdbtype");
+
+					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname || !$sdbtype || !$slogin  || !$spwd || !$spwd2 ||
+						$spwd != $spwd2 || !$tradcheck || !$tradreply || !$tradgrpchk || !$tradgrprep || !$tradusrgrp || $tradacct ||
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradcheck) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradacct) ||
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradreply) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) || 
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing or wrong for radius db adding");
 						header("Location: index.php?mod=".$this->mid."&err=2");
 						return;
 					}
 
 					$testDBMgr = new AbstractSQLMgr();
-					$testDBMgr->setConfig("my",$sdbname,$sport,$saddr,$slogin,$spwd);
+					$testDBMgr->setConfig($sdbtype,$sdbname,$sport,$saddr,$slogin,$spwd);
 
 					$conn = $testDBMgr->Connect();
 					if($conn != 0) {
@@ -1623,6 +1671,9 @@
 						return;
 					}
 					FS::$dbMgr->Connect();
+	
+					// @TODO: test table exist on db
+
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
@@ -1640,7 +1691,9 @@
 						}
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
-					FS::$dbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,login,pwd,radalias","'".$saddr."','".$sport."','".$sdbname."','".$slogin."','".$spwd."','".$salias."'");
+					FS::$dbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,type,login,pwd,radalias,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
+					"'".$saddr."','".$sport."','".$sdbname."','".$sdbtype."','".$slogin."','".$spwd."','".$salias."','".$tradcheck."','".$tradreply."','".$tradgrpchk."','".$tradgrprep."','".
+					$tradusrgrp."','".$tradacct."'");
 					header("Location: m-".$this->mid.".html");
 					break;
 				// Remove radius db
@@ -1676,5 +1729,7 @@
 			}
 
 		}
+	
+		private $raddbinfos;
 	};
 ?>
