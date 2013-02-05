@@ -85,7 +85,7 @@
 						foreach($devport as $port => $prise) {
 							$convport = preg_replace("#\/#","-",$port);
         		        	                $tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-	                		                $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (".$this->loc->s("Plug");" ".$prise.")</li>";
+	                		                $tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (".$this->loc->s("Plug")." ".$prise.")</li>";
 						}
 						$tmpoutput .= "</ul>";
 					}
