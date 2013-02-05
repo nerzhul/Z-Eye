@@ -176,7 +176,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",$salias,array("tooltip" => "tooltip-alias"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table>";
+			$output .= "</table></form>";
 
 			return $output;
 		}
@@ -998,13 +998,13 @@
 					if(count($radcut1) != 2) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Wrong datas for radius selection");
 						header("Location: index.php?mod=".$this->mid."&err=1");
-                        return;
+                        			return;
 					}
 					$radcut2 = preg_split("[:]",$radcut1[1]);
 					if(count($radcut2) != 2) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Wrong datas for radius selection");
-							header("Location: index.php?mod=".$this->mid."&err=1");
-							return;
+						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Wrong datas for radius selection");
+						header("Location: index.php?mod=".$this->mid."&err=1");
+						return;
 					}
 					header("Location: index.php?mod=".$this->mid."&h=".$radcut2[0]."&p=".$radcut2[1]."&r=".$radcut1[0]);
 					return;
