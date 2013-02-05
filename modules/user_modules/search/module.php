@@ -388,24 +388,23 @@
 				$radSQLMgr = new AbstractSQLMgr();
 				$radSQLMgr->setConfig("my",$data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
 				$radSQLMgr->Connect();
-				
+
 				$found = 0;
 				// Format MAC addr for radius users
 				if(FS::$secMgr->isMacAddr($search))
 					$tmpsearch = $search[0].$search[1].$search[3].$search[4].$search[6].$search[7].$search[9].$search[10].$search[12].$search[13].$search[15].$search[16];
 				else
 					$tmpsearch = $search;
-				$query = $radSQLMgr->Select("radcheck","username","username = '".$tmpsearch."'","",0,1);
-				while($data2 = $radSQLMgr->Fetch($query)) {
+				$query2 = $radSQLMgr->Select("radcheck","username","username = '".$tmpsearch."'","",0,1);
+				while($data2 = $radSQLMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = 1;
 						$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
 					}
 				}
-				
 				if(!$found) {
-					$query = $radSQLMgr->Select("radreply","username","username = '".$tmpsearch."'","",0,1);
-					while($data2 = $radSQLMgr->Fetch($query)) {
+					$query2 = $radSQLMgr->Select("radreply","username","username = '".$tmpsearch."'","",0,1);
+					while($data2 = $radSQLMgr->Fetch($query2)) {
 						if(!$found) {
 							$found = 1;
 							$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
@@ -415,8 +414,8 @@
 				
 				if($found) {
 					$found = 0;
-					$query = $radSQLMgr->Select("radusergroup","groupname","username = '".$tmpsearch."'");
-					while($data2 = $radSQLMgr->Fetch($query)) {
+					$query2 = $radSQLMgr->Select("radusergroup","groupname","username = '".$tmpsearch."'");
+					while($data2 = $radSQLMgr->Fetch($query2)) {
 						if(!$found) {
 							$found = 1;
 							$output .= "<h3>".$this->loc->s("Groups")."</h3><ul>";
@@ -558,7 +557,7 @@
 			}
 			return $output;
 		}
-		
+
 		private function showMacAddrResults($search) {
 			$output = "";
 			$tmpoutput = "";
