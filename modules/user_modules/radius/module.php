@@ -98,58 +98,57 @@
                                 $.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
                                 $('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });</script></td><td>".
 				FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"])."</td></tr>";
+			}
+			if($found)
+				$output .= $tmpoutput."</table>";
+
+			$output .= $this->showCreateOrEditRadiusDB(true);
+
+			return $output;
 		}
-		if($found)
-			$output .= $tmpoutput."</table>";
 
-		$output .= $this->showCreateOrEditRadiusDB(true);
-
-		return $output;
-	}
-
-	private function showCreateOrEditRadiusDB($create) {
-		$saddr = "";
-		$slogin = "";
-		$sdbname = "";
-		$sport = 3306;
-		$spwd = "";
-		$salias = "";
-		if($create)
-			$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
-		else {
-			$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
-			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-			$port = FS::$secMgr->checkAndSecuriseGetData("pr");
-			$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
-			if(!$addr || $addr == "" || !$port || !FS::$secMgr->isNumeric($port) || !$dbname || $dbname == "") {
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
-				return $output;
-			}
-			$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
-			if($data = FS::$dbMgr->Fetch($query)) {
-				$saddr = $addr;
-				$slogin = $data["login"];
-				$spwd = $data["pwd"];
-				$salias = $data["radalias"];
-				$sport = $port;
-				$sdbname = $dbname;
-			}
+		private function showCreateOrEditRadiusDB($create) {
+			$saddr = "";
+			$slogin = "";
+			$sdbname = "";
+			$sport = 3306;
+			$spwd = "";
+			$salias = "";
+			if($create)
+				$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
 			else {
-				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
-				return $output;
+				$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
+				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
+				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
+				if(!$addr || $addr == "" || !$port || !FS::$secMgr->isNumeric($port) || !$dbname || $dbname == "") {
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
+					return $output;
+				}
+				$query = FS::$dbMgr->Select("z_eye_radius_db_list","radalias,login,pwd","addr = '".$addr."' AND port = '".$port."' AND dbname = '".$dbname."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$saddr = $addr;
+					$slogin = $data["login"];
+					$spwd = $data["pwd"];
+					$salias = $data["radalias"];
+					$sport = $port;
+					$sdbname = $dbname;
+				}
+				else {
+					$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
+					return $output;
+				}
 			}
-		}
 
-
-		if(!$create) {
-			$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
-				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !"); break;
+			if(!$create) {
+				$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
+				$err = FS::$secMgr->checkAndSecuriseGetData("err");
+				switch($err) {
+					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
+					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
+					case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !"); break;
+				}
 			}
-		}
 
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
 
