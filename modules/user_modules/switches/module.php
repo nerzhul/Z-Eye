@@ -466,7 +466,7 @@
 					if($found == 1) {
 						$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
 						$output .= "<table><tr><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("Name")."</th>
-							<th></th><th></th><th></th><th></th><th>".$this->loc->s("Type")."</th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
+							<th>".$this->loc->s("Type")."</th><th></th><th></th><th></th><th></th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
 					}
 
 					return $output;
@@ -1187,6 +1187,10 @@
 			$count = count($devmod[$idx]);
 			for($i=0;$i<$count;$i++) {
 				$output .= "<tr><td>" .$devmod[$idx][$i]["desc"]."</td><td>".$devmod[$idx][$i]["name"]."</td><td>";
+
+				$output .= $devmod[$idx][$i]["type"];
+
+				$output .= "</td><td>";
 				if(strlen($devmod[$idx][$i]["hwver"]) > 0)
 					$output .= "hw: ".$devmod[$idx][$i]["hwver"];
 
@@ -1204,10 +1208,6 @@
 
 				if(strlen($devmod[$idx][$i]["serial"]) > 0)
                                         $output .= "serial: ".$devmod[$idx][$i]["serial"];
-
-				$output .= "</td><td>";
-
-				$output .= $devmod[$idx][$i]["type"];
 
 				$output .= "</td><td>";
 				if(strlen($devmod[$idx][$i]["model"]) > 0)
