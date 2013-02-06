@@ -1827,18 +1827,17 @@
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
-					
+
 					// Not exists
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","addr","name = '".$name."'")) {
 						header("Location: index.php?mod=".$this->mid."&sh=2&err=2");
 						return;
 					}
-					// @ TODO forbid remove when used
-					
+
 					// Remove host and links with parents and hostgroups
 					FS::$dbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
 					FS::$dbMgr->Delete("z_eye_icinga_host_parents","parent = '".$name."'");
-					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = 1");
+					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
 					FS::$dbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
 
 					if(!$this->writeConfiguration()) {

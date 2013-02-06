@@ -136,7 +136,7 @@
 				$sql .= " WHERE ".$cond;
 			pg_query($this->dbLink,$sql);
 		}
-		
+
 		public function Update($table,$mods,$cond = "") {
 			$sql = "UPDATE ".$table." SET ".$mods."";
 			if(strlen($cond) > 0)
