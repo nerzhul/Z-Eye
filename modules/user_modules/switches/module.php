@@ -538,33 +538,21 @@
 					if($found == 1) {
 						$output .= "<h3>".$this->loc->s("frontview")."</h3>";
 						$output .= "<script>
-							// 3750 48 ports	
-							var c3750p48x = [59,71,87,98,115,126,143,154,171,182,199,210,227,238,254,266,299,310,326,338,355,366,382,394,
-							411,422,438,450,466,478,494,506,539,550,567,578,595,606,623,635,651,663,679,690,707,718,735,746];
-							var c3750p48y = 38;
-							var c3750g48 = [[815,58],[866,58],[815,90],[866,90]];
+							/*
+							* 48 ports + 4 uplinks
+							*/
+							var sw48p4x = [34,33,63,62,93,92,123,121,153,151,183,181,222,222,251,251,281,281,311,311,341,341,371,371,
+								410,411,439,440,469,470,499,499,529,529,558,559,599,600,628,629,658,659,688,689,718,718,747,748];
+							var sw48p4y = [12,102,12,102,12,102,12,102,12,102,12,102,13,101,13,101,13,101,13,101,13,102,13,102,
+								13,101,13,101,13,101,13,101,13,101,13,101,14,101,14,101,14,101,14,101,14,101,14,101];
+							var sw2448p4 = [[816,15],[817,101],[846,15],[847,101]];
+							var sw2448p4b = [[783,101],[813,101],[844,101],[874,101]];
 							// poe
-							var c3750poe48x = [61,61,89,89,117,117,144,144,172,172,200,200,229,229,254,254,300,300,327,327,356,356,383,383,
-													412,412,439,439,467,467,495,495,540,540,568,568,596,596,624,624,652,652,680,680,708,708,736,736];
-													var c3750impp48y = 66;
-													var c3750pp48y = 94;
-							// 3750 24 ports
-							var c3750p24x = [355,366,383,394,411,422,439,450,467,478,495,506,596,607,624,635,652,663,680,691,708,719,736,747];
-							var c3750p24y = 36;
-							var c3750g24 = [[816,89],[867,89]];
-							// poe
-							var c3750poe24x = [357,357,385,385,413,413,441,441,470,470,498,498,597,597,625,625,652,652,681,681,710,710,738,738];
-													var c3750impp24y = 65;
-													var c3750pp24y = 94;
-							// 2960 - 24 ports
-							var c2960p24x = [411,424,440,451,467,478,495,507,523,536,552,564,593,605,621,633,649,660,676,687,704,717,732,744];
-							var c2960p24y = 14;
-							var c2960g24 = [[778,85],[808,85],[834,85],[865,85]];
-							// poe
-													var c2960poe24x = [357,357,385,385,413,413,441,441,470,470,498,498,597,597,625,625,652,652,681,681,710,710,738,738];
-													var c2960impp24y = 65;
-													var c2960pp24y = 94;
-		
+							var sw48poe4x = [29,29,59,59,89,89,118,118,148,148,178,178,217,217,247,247,277,277,307,307,336,336,366,366,
+							406,406,436,436,466,466,495,495,525,525,555,555,595,595,625,625,655,655,685,685,714,714,743,743];
+							var sw48poe4py = 81;
+							var sw48poe4iy = 47;
+
 							function drawContext(obj,type,ptab,gptab,poetab) {
 								var canvas = document.getElementById(obj);
 								var context = canvas.getContext(\"2d\");
@@ -577,58 +565,74 @@
 								context.lineTo(892,-2);
 								context.lineTo(892,119);
 								context.lineTo(-2,119);
-								context.lineTo(-2,-2);	
+								context.lineTo(-2,-2);
 								context.closePath(); // complete custom shape
-		
+
 								context.moveTo(0,0);
 								var img = new Image();
 								img.onload = function() {
 									context.drawImage(img, 0,0,892,119);
-									var normportX = null; var normportY = null;
-									var trunkport = null; var icsize = null;
-									var poeX = null; var poePY = null; var poeIMPY = null;
-									switch(type) {
-										case 1: normportX = c3750p48x; normportY = c3750p48y; trunkport = c3750g48; icsize = 7; 
-											poeX = c3750poe48x; poePY = c3750pp48y; poeIMPY = c3750impp48y; break;
-										case 2: normportX = c3750p24x; normportY = c3750p24y; trunkport = c3750g24; icsize = 7; 
-											poeX = c3750poe24x; poePY = c3750pp24y; poeIMPY = c3750impp24y; break;
-										case 3: normportX = c2960p24x; normportY = c2960p24y; trunkport = c2960g24; icsize = 6; 
-											poeX = c2960poe24x; poePY = c2960pp24y; poeIMPY = c2960impp24y; break;
-										case 4: break;
+									var startIdx = 0; var stopULIdx = sw2448p4.length; 
+									var normportX = sw48p4x; var normportY = sw48p4y;
+									var trunkport = sw2448p4;
+									var poeX = sw48poe4x; var poePY = sw48poe4py; var poeIMPY = sw48poe4iy;
+									switch(type) { 
+										case 2:	startIdx = 24; stopULIdx = 2; break;
+										case 3: startIdx = 24; trunkport = sw2448p4b; break; 
 									}
-									for(i=0;i<normportX.length;i++) {
-										if(ptab[i] == 0)
-											context.fillStyle = \"rgba(200, 0, 0, 0.5)\";
-										else if(ptab[i] == 1)
+									for(i=startIdx;i<normportX.length;i++) {
+										curptab = ptab[i];
+										if(startIdx > 0) curptab = ptab[i-startIdx]; 
+										if(curptab == 0)
+											context.fillStyle = \"rgba(200, 0, 0, 0.6)\";
+										else if(curptab == 1)
 											context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-										else if(ptab[i] == 2)
-											context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+										else if(curptab == 2)
+											context.fillStyle = \"rgba(0, 255, 50, 0.9)\";
 										else
 											context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-										context.fillRect(normportX[i], normportY, icsize, icsize);
-										context.fillStyle = \"rgba(200, 200, 0, 0.6)\";
-																			if(poetab[i] == 1)
-																					context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
-																			else if(poetab[i] == 2)
-																					context.fillText(\"15.0\",poeX[i]-4, (i%2 == 0 ? poeIMPY : poePY));
+										context.fillRect(normportX[i], normportY[i], 7, 7);
+										context.fillStyle = \"rgba(200, 200, 0, 1)\";
+										if(startIdx > 0) {
+											if(poetab[i-startIdx] == 1)
+												context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
+											else if(poetab[i-startIdx] == 2)
+												context.fillText(\"15.0\",poeX[i]-2, (i%2 == 0 ? poeIMPY : poePY));
+											/*else
+												context.fillText(\"0.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));*/
+										}
+										else {
+											if(poetab[i] == 1)
+												context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
+											else if(poetab[i] == 2)
+												context.fillText(\"15.0\",poeX[i]-2, (i%2 == 0 ? poeIMPY : poePY));
+											/*else
+												context.fillText(\"0.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));*/
+										}
 									}
-									for(i=0;i<trunkport.length;i++) {
-											if(gptab[i] == 0)
-													context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
-											else if(gptab[i] == 1)
-													context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-											else if(gptab[i] == 2)
-													context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+									for(i=0;i<stopULIdx;i++) {
+										if(gptab[i] == 0)
+												context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+										else if(gptab[i] == 1)
+												context.fillStyle = \"rgba(255, 150, 0, 1.0)\";
+										else if(gptab[i] == 2)
+												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+										else
+												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+										if(stopULIdx == 2) {
+											if(i == 0)
+												context.fillRect(trunkport[i+1][0], trunkport[i+1][1], 7, 7);
 											else
-													context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-											context.fillRect(trunkport[i][0], trunkport[i][1], icsize, icsize);
+												context.fillRect(trunkport[i+2][0], trunkport[i+2][1], 7, 7);
+										}
+										else
+											context.fillRect(trunkport[i][0], trunkport[i][1], 7, 7);
 									}
 								}
 								switch(type) {
-									case 1:	img.src = '/uploads/WS-C3750-48PS-S_front.jpg'; break;
-									case 2:	img.src = '/uploads/WS-C3750-24PS-S_front.jpg'; break;
-									case 3: img.src = '/uploads/2960-24.jpg'; break;
-									case 4: img.src = '/uploads/2960-48.jpg'; break;
+									case 1:	img.src = '/styles/images/Switch48-4.png'; break;
+									case 2:	img.src = '/styles/images/Switch24-2-r.png'; break;
+									case 3: img.src = '/styles/images/Switch24-2-r2.png'; break;
 								}
 							}
 						</script>";
@@ -650,7 +654,7 @@
 											case "class3": $poearr[$pid] = 2; break;
 										}
 									}
-	
+
 									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
 									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'","port");
 									$arr_res = array();
@@ -740,7 +744,7 @@
 										else
 											$arr_res[$pid] = 3;
 									}
-	
+
 									uksort($arr_res,"strnatcasecmp");
 									$count = count($arr_res);
 									for($j=1;$j<=$count;$j++) {
