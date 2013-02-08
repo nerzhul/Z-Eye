@@ -46,12 +46,13 @@
 			$output = "<h1>".$this->loc->s("snmp-communities")."</h1>";
 			$found = false;
 
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1")."<ul class=\"ulform\">";
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "snmpfrm"))."<ul class=\"ulform\">";
 			$formoutput .= "<li>".FS::$iMgr->input("name","",20,64,$this->loc->s("snmp-community"))."</li>";
 			$formoutput .= "<li>".FS::$iMgr->check("ro",array("label" => $this->loc->s("Read"), "tooltip" => "tooltip-read"))."</li>";
 			$formoutput .= "<li>".FS::$iMgr->check("rw",array("label" => $this->loc->s("Write"), "tooltip" => "tooltip-write"))."</li>";
 			$formoutput .= "<li>".FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
 			$formoutput .= "</ul></form>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1","snmpfrm",array("snotif" => $this->loc->s("Add"), "lock" => true));
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"));
 
@@ -75,26 +76,38 @@
 
 					if(!$name || $ro && $ro != "on" || $rw && $rw != "on") {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Adding data");
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-invalid-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 
-					if(FS::$dbMgr->GetOneData("z_eye_snmp_communities","name = '".$name."'")) {
+					if(FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-already-exist");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
 						return;
 					}
 
 					// User must choose read and/or write
 					if($ro != "on" && $rw != "on") {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=6");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-readorwrite");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=6");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if(!is_array($netdiscoCfg)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
 					
@@ -102,7 +115,7 @@
 						($rw == "on" ? 't' : 'f')."'");
 
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
-					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=2",true);
 					return;
 				case 2: // Remove SNMP community
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
