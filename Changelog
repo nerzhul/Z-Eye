@@ -245,3 +245,11 @@ RC1.2
 - cleanup on radius module
 - Some new tooltips
 - search style fix
+
+RC1.3
+- remove CISCO proprietary images and use open images (need some improvements)
+- Many radius improvements
+- Radius support PgSQL db
+- ntp is now configurable by installer
+- Icinga improvements (path verification)
+

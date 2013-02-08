@@ -39,6 +39,7 @@
 				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-complex")); break;
 				case 8: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-unk")); break;
 				case 9: $output .= FS::$iMgr->printError($this->loc->s("err-mail")); break;
+				case 10: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist")); break;
 			}
 
 			$user = FS::$secMgr->checkAndSecuriseGetData("user");
@@ -97,8 +98,8 @@
 			$output = "<h2>".$this->loc->s("title-directory")."</h2>";
 			$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
-				$output .= "<ul class=\"ulform\">".FS::$iMgr->hidden("addr",$addr)."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "ldapfrm"));
+				$output .= "<ul class=\"ulform\">".FS::$iMgr->hidden("addr",$addr).FS::$iMgr->hidden("edit","1")."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
 				$output .= FS::$iMgr->numInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
 				$output .= FS::$iMgr->check("ssl",array("check" => ($data["ssl"] == 1 ? true : false),"label" => "SSL ?"))."</li><li>";
 				$output .= FS::$iMgr->input("dn",$data["dn"],20,200,$this->loc->s("base-dn"))."</li><li>";
@@ -111,6 +112,7 @@
 				$output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,$this->loc->s("ldap-filter"))."</li><li>";
 				$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
 				$output .= "</ul></form>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","ldapfrm",array("snotif" => $this->loc->s("Editing"), "lock" => true));
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist"));
@@ -157,7 +159,7 @@
 			}
 			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
 				$output .= "<h1>".$this->loc->s("title-directorymgmt")."</h1>";
-				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "ldapfrm"));
 				$formoutput .= "<ul class=\"ulform\"><li>";
 				$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
 				$formoutput .= FS::$iMgr->numInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
@@ -169,9 +171,10 @@
 				$formoutput .= FS::$iMgr->input("ldapsurname","",20,40,$this->loc->s("attr-subname"))."</li><li>";
 				$formoutput .= FS::$iMgr->input("ldapmail","",20,40,$this->loc->s("attr-mail"))."</li><li>";
 				$formoutput .= FS::$iMgr->input("ldapuid","",20,40,$this->loc->s("attr-uid"))."</li><li>";
-				$formoutput .= FS::$iMgr->input("ldapfilter","",20,200,$this->loc->s("ldap-filter"))."</li><li>";
+				$formoutput .= FS::$iMgr->input("ldapfilter","(objectclass=*)",20,200,$this->loc->s("ldap-filter"))."</li><li>";
 				$formoutput .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
 				$formoutput .= "</ul></form>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","ldapfrm",array("snotif" => $this->loc->s("Adding"), "lock" => true));
 
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"));
 
@@ -208,14 +211,14 @@
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					if(!$uid || !FS::$secMgr->isNumeric($uid)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (user edit)");
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 
 					$username = FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$uid."'");
 					if(!$username) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User uid '".$uid."' doesn't exists");
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 
@@ -224,7 +227,7 @@
 					if($pwd || $pwd2) {
 						if($pwd != $pwd2) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Try to modify password for user ".$uid." but passwords didn't match");
-							header("Location: index.php?mod=".$this->mid."&user=".$username."&err=5");
+							FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=5");
 							return;
 						}
 						$user = new User();
@@ -232,13 +235,13 @@
 						switch($user->changePassword($pwd)) {
 							case 0: break; // ok
 							case 1: // too short
-								header("Location: index.php?mod=".$this->mid."&user=".$username."&err=6");
+								FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=6");
 								return;
 							case 2: // complexity
-								header("Location: index.php?mod=".$this->mid."&user=".$username."&err=7");
+								FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=7");
                                                                 return;
 							default: // unk
-								header("Location: index.php?mod=".$this->mid."&user=".$username."&err=8");
+								FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=8");
                                                                 return;
 						}
 					}
@@ -246,7 +249,7 @@
 					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
 					if($mail) {
 						if(!FS::$secMgr->isMail($mail)) {
-							header("Location: index.php?mod=".$this->mid."&user=".$username."&err=9");
+							FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=9");
 							return;
 						}
 						FS::$dbMgr->Update("z_eye_users","mail = '".$mail."'","uid = '".$uid."'");
@@ -258,7 +261,7 @@
 								$exist = FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$value."'");
 								if(!$exist) {
 									FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Try to add user ".$uid." to inexistant group '".$value."'");
-									header("Location: index.php?mod=".$this->mid."&user=".$username."&err=2");
+									FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=2");
 									return;
 								}
 								array_push($groups,$value);
@@ -270,7 +273,7 @@
 					for($i=0;$i<$count;$i++)
 						FS::$dbMgr->Insert("z_eye_user_group","uid,gid","'".$uid."','".$groups[$i]."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User ".$uid." edited");
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				case 3: // del user
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
@@ -280,19 +283,19 @@
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					if(!$uid || !FS::$secMgr->isNumeric($uid)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are wrong or missing for user management (User delete)");
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData("z_eye_users","last_conn","uid = '".$uid."'");
 					if(!$exist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove user '".$uid."', doesn't exist");
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						return;
 					}
 					FS::$dbMgr->Delete("z_eye_users","uid = '".$uid."'");
 					FS::$dbMgr->Delete("z_eye_user_group","uid = '".$uid."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User '".$uid."' removed");
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				case 4: // add ldap
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
@@ -310,32 +313,55 @@
 					$ldapmail = FS::$secMgr->checkAndSecurisePostData("ldapmail");
 					$ldapuid = FS::$secMgr->checkAndSecurisePostData("ldapuid");
 					$ldapfilter = FS::$secMgr->checkAndSecurisePostData("ldapfilter");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$addr || !$port || !FS::$secMgr->isNumeric($port) || !$basedn || !$rootdn || !$rootpwd || !$ldapname || !$ldapsurname || !$ldapmail || !$ldapuid || !$ldapfilter) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing/wrong for user management (LDAP add)");
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-invalid-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 
 					$serv = FS::$dbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
-					if($serv) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", already exists");
-						header("Location: index.php?mod=".$this->mid."&err=4");
-						return;
+					if($edit) {
+						if(!$serv) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to edit LDAP ".$addr.":".$port.", not exists");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-ldap-not-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&err=10");
+							return;
+						}
+					}
+					else {
+						if($serv) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", already exists");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-ldap-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&err=4");
+							return;
+						}
 					}
 
 					$ldapMgr = new LDAP();
 					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
 					if(!$ldapMgr->RootConnect()) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", connection fail");
-						header("Location: index.php?mod=".$this->mid."&err=3");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-ldap-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						return;
 					}
 
+					if($edit) FS::$dbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
 					FS::$dbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
 						"'".$addr."','".$port."','".($ssl == "on" ? 1 : 0)."','".$basedn."','".$rootdn."','".$rootpwd."','".$ldapfilter."','".$ldapuid."','".$ldapmail."','".$ldapname."','".$ldapsurname."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"New LDAP: ".$addr.":".$port." basedn: ".$basedn);
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				case 5: // LDAP remove
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
@@ -345,69 +371,20 @@
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP remove)");
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 
 					$serv = FS::$dbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
 					if(!$serv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove LDAP ".$addr.":".$port.", not exists");
-						header("Location: index.php?mod=".$this->mid."&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&err=4");
 						return;
 					}
 
 					FS::$dbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"LDAP '".$addr."' removed");
-					header("Location: index.php?mod=".$this->mid);
-					return;
-				case 6: // LDAP edition
-					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
-                                                FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to modify ldap but don't have rights");
-                                                return;
-                                        }
-					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
-					if(!$addr) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP edition)");
-						header("Location: index.php?mod=".$this->mid."&err=2");
-						return;
-					}
-
-					$serv = FS::$dbMgr->GetOneData("z_eye_ldap_auth_servers","addr","addr = '".$addr."'");
-					if(!$serv) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to edit LDAP ".$addr.":".$port.", not exists");
-						header("Location: index.php?mod=".$this->mid."&err=4");
-						return;
-					}
-
-					$port = FS::$secMgr->checkAndSecurisePostData("port");
-					$ssl = FS::$secMgr->checkAndSecurisePostData("ssl");
-					$basedn = FS::$secMgr->checkAndSecurisePostData("dn");
-					$rootdn = FS::$secMgr->checkAndSecurisePostData("rootdn");
-					$rootpwd = FS::$secMgr->checkAndSecurisePostData("rootpwd");
-					$ldapname = FS::$secMgr->checkAndSecurisePostData("ldapname");
-					$ldapsurname = FS::$secMgr->checkAndSecurisePostData("ldapsurname");
-					$ldapmail = FS::$secMgr->checkAndSecurisePostData("ldapmail");
-					$ldapuid = FS::$secMgr->checkAndSecurisePostData("ldapuid");
-					$ldapfilter = FS::$secMgr->checkAndSecurisePostData("ldapfilter");
-
-					if(!$port || !FS::$secMgr->isNumeric($port) || !$basedn || !$rootdn || !$rootpwd || !$ldapname || !$ldapsurname || !$ldapmail || !$ldapuid || !$ldapfilter) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP edition)");
-						header("Location: index.php?mod=".$this->mid."&err=2");
-						return;
-					}
-					FS::$dbMgr->Delete("z_eye_ldap_auth_servers","addr ='".$addr."'");
-					$ldapMgr = new LDAP();
-					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
-					if(!$ldapMgr->RootConnect()) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to connect to LDAP ".$addr.":".$port.", login failed");
-						header("Location: index.php?mod=".$this->mid."&err=3");
-						return;
-					}
-
-					FS::$dbMgr->Insert("z_eye_ldap_auth_servers","addr,port,ssl,dn,rootdn,dnpwd,filter,ldapuid,ldapmail,ldapname,ldapsurname",
-							"'".$addr."','".$port."','".($ssl == "on" ? 1 : 0)."','".$basedn."','".$rootdn."','".$rootpwd."','".$ldapfilter."','".$ldapuid."','".$ldapmail."','".$ldapname."','".$ldapsurname."'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"LDAP edition: ".$addr.":".$port." basedn: ".$basedn);
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				default: break;
 			}

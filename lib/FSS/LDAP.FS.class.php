@@ -62,7 +62,7 @@ class LDAP {
         public function Authenticate($user,$pwd) {
                 if(!$this->RootConnect())
                         return false;
-                $result = $this->GetOneEntry($this->uidAttr."=".$user);
+                $result = $this->getOneEntry($this->uidAttr."=".$user);
                 $this->Disconnect();
                 if(!$result)
                         return false;

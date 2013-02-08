@@ -475,7 +475,7 @@
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 
 					if((!$gid && !$uid) || (!$snmp && !$ip) || !$right) {
-						header("Location: index.php?mod=".$this->mid."&err=1".($filter ? "&filter=".$filter : ""));
+						FS::$iMgr->redir("mod=".$this->mid."&err=1".($filter ? "&filter=".$filter : ""));
 						return;
 					}
 

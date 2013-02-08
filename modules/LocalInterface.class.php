@@ -212,6 +212,13 @@
 			return $output;
 		}
 
+		public function redir($link,$js=false) {
+			if($js && FS::isAjaxCall())
+				echo "<script type=\"text/javascript\">window.location.href=\"index.php?".$link."\";</script>";
+			else
+				header("Location: index.php?".$link);
+		}
+
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;
 	};

@@ -23,6 +23,7 @@
 		function lUserMgmt() {
 			$this->locales = array(
 				"fr" => array(
+					"Adding" => "Ajout...",
 					"attr-mail" => "Attribut Mail",
 					"attr-name" => "Attribut Nom",
 					"attr-subname" => "Attribut Prénom",
@@ -30,6 +31,7 @@
 					"base-dn" => "Base DN",
 					"Cancel" => "Annuler",
 					"Directory" => "Annuaire",
+					"Editing" => "Edition...",
 					"err-invalid-bad-data" => "Informations invalides ou manquantes",
 					"err-invalid-user" => "Utilisateur invalide",
 					"err-ldap-bad-data" => "Données LDAP invalides, impossible de se connecter au serveur",
@@ -78,6 +80,7 @@
 					"User-type" => "Type d'utilisateur",
 				),
 				"en" => array(
+					"Adding" => "Adding...",
 					"attr-mail" => "Mail attribute",
 					"attr-name" => "Name Attribute",
 					"attr-subname" => "Subname Attribute",
@@ -85,6 +88,7 @@
 					"base-dn" => "Base DN",
 					"Cancel" => "Annuler",
 					"Directory" => "Cancel",
+					"Editing" => "Editing...",
 					"err-invalid-bad-data" => "Some informations are missing or invalid",
 					"err-invalid-user" => "Invalid user",
 					"err-ldap-bad-data" => "Invalid LDAP datas, unable to connect to server",

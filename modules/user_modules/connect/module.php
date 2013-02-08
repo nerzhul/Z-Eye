@@ -50,14 +50,22 @@
 			$ldapok = false;
 			$ldapident = "";
 			$ldapMgr = new LDAP();
+			$ldapsurname = "";
+			$ldapname = "";
+			$ldapmail = "";
+			$found = false;
 			$query = FS::$dbMgr->Select("z_eye_ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while(!$found && ($data = FS::$dbMgr->Fetch($query))) {
 				$tmpldapMgr = new LDAP();
 				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
 				if($tmpldapMgr->Authenticate($username, $password)) {
 					$ldapok = true;
 					$ldapident = $data["ldapuid"];
+					$ldapsurname = $data["ldapsurname"];
+					$ldapname = $data["ldapname"];
+					$ldapmail = $data["ldapmail"];
 					$ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
+					$found = true;
 				}
 			}
 
@@ -73,9 +81,9 @@
 					return;
 				}
 
-				$mail = is_array($result["supannautremail"]) ? $result["supannautremail"][0] : $result["supannautremail"];
-				$prenom = $result["givenname"];
-				$nom = $result["sn"];
+				$mail = is_array($result[$ldapmail]) ? $result[$ldapmail][0] : $result[$ldapmail];
+				$prenom = $result[$ldapsurname];
+				$nom = $result[$ldapname];
 				$user = new User();
 				$user->setUsername($username);
 				$user->setSubName($prenom);
@@ -92,7 +100,7 @@
 				else {
 					$user->Create();
 					$query = FS::$dbMgr->Select("z_eye_users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-					if($data = FS::$dbMgr->Fetch($query)) {
+					if($data = FS::$dbMgr->Fetch($query)) { 
 							$this->connectUser($data["uid"],$data["ulevel"]);
 							FS::$log->i("None","connect",0,"Login success for user '".$username."'");
 							header("Location: ".$url);
