@@ -1480,7 +1480,7 @@
 						if(FS::isAjaxCall())
 							echo "Some fields are missing (port, switch, trunk or native vlan)";
 						else
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 						return;
 					}
 
@@ -1498,7 +1498,7 @@
 						if(FS::isAjaxCall())
 							echo "PID is incorrect (".$pid.")";
 						else
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
 
@@ -1512,7 +1512,7 @@
 							if(FS::isAjaxCall())
 								echo "Duplex field is wrong (".$duplex.")";
 							else
-								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
+								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
 							return;
 						}
 
@@ -1591,30 +1591,30 @@
 
 			                        // set settings
 						if(setSwitchTrunkEncapWithPID($sw,$pid,4) != 0) {
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 						}
 						$logvals["trunkencap"]["dst"] = 4;
 						if(setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 						}
 						$logvals["mode"]["dst"] = $trunk;
 						if(in_array("all",$vlanlist)) {
 							if(setSwitchNoTrunkVlanWithPID($sw,$pid) != 0) {
-                                                                header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+                                                                FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
                                                                 return;
                                                         }
 						}
 						else {
 							if(setSwitchTrunkVlanWithPID($sw,$pid,$vlanlist) != 0) {
-								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 							}
 						}
 						$logvals["trunkvlan"]["dst"] = $vlanlist;
 						if(setSwitchTrunkNativeVlanWithPID($sw,$pid,$nvlan) != 0) {
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 						}
 						$logvals["nativevlan"]["dst"] = $nvlan;
@@ -1654,7 +1654,7 @@
 								if(FS::isAjaxCall())
 									echo "Fail to set Switchport mode";
 								else
-									header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+									FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 						}
 						$logvals["mode"]["dst"] = $trunk;
@@ -1662,7 +1662,7 @@
 							if(FS::isAjaxCall())
 								echo "Fail to set Switchport Trunk encapsulated VLANs";
 							else
-								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 						}
 						$logvals["trunkencap"]["dst"] = 5;
@@ -1670,7 +1670,7 @@
 							if(FS::isAjaxCall())
 								echo "Fail to set Switchport Access Vlan";
 							else
-								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 						}
 						$logvals["accessvlan"]["dst"] = $nvlan;
@@ -1684,7 +1684,7 @@
 							if(FS::isAjaxCall())
 								echo "Dot1x hostmode is wrong (".$dot1xhostmode.")";
 							else
-								header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 						}
 						// switchport mode access & no vlan assigned
@@ -1740,7 +1740,7 @@
 						if(FS::isAjaxCall())
 							echo "Fail to set switchport shut/no shut state";
 						else
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
 					$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
@@ -1749,7 +1749,7 @@
 						if(FS::isAjaxCall())
 							echo "Fail to set switchport voice vlan";
 						else
-							header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 						return;
 					}
 					$logvals["voicevlan"]["dst"] = $voicevlan;
@@ -1831,7 +1831,7 @@
 					if(FS::isAjaxCall())
 						echo $this->loc->s("done-with-success");
 					else
-						header("Location: index.php?mod=".$this->mid."&d=".$sw."&p=".$port);
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
 				case 10: // replace vlan portlist
 					echo "<h3>".$this->loc->s("title-port-modiflist")."</h3>";
@@ -1874,7 +1874,7 @@
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					if(!$device || !$old || !$new || !FS::$secMgr->isNumeric($old) || !FS::$secMgr->isNumeric($new) || $old > 4096 || $new > 4096 || $old < 0 || $new < 0) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing/wrong (vlan replacement)");
-						header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4&err=1");
 						return;
 					}
 
@@ -1882,12 +1882,12 @@
 					$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
-						header("Location: index.php?mod=".$this->mid."&d=".$device."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&err=99");
 						return;	
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Replace VLAN '".$old."' by '".$new."' on device '".$device."'");
 					replaceVlan($device,$old,$new);
-					header("Location: index.php?mod=".$this->mid."&d=".$device."&sh=4");
+					FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4");
 					return;
 				/*
 				* Backup startup-config
@@ -2020,34 +2020,34 @@
 					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 					if(!$device || !$port) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (port monitoring)");
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") && 
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
-						header("Location: index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;	
 					}
 
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					if(!$dip) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Bad device '".$device."' (port monitoring)");
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
 					$dport = FS::$dbMgr->GetOneData("device_port","name","ip = '".$dip."' AND port = '".$port."'");
 					if(!$dport) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Bad port '".$dport."' for device '".$dip."' (port monitoring)");
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 					if($enmon == "on") {
 						if(!$climit || !$wlimit || !FS::$secMgr->isNumeric($wlimit) || !FS::$secMgr->isNumeric($climit) || $climit <= 0 || $wlimit <= 0) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing/wrong (port monitoring)");
-							header("Location: index.php?mod=".$this->mid."&d=".$device."&p=".$port."&sh=3&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3&err=2");
 							return;
 						}
 						FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
@@ -2057,20 +2057,20 @@
 						FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Port monitoring for device '".$device."' and port '".$dport."' edited. Enabled: ".($enmod == "on" ? "yes" : "no").
 						" wlimit: ".$wlimit." climit: ".$climit." desc: '".$desc."'");
-					header("Location: index.php?mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
+					FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
 					return;
 				case 17: // device cleanup
 					$device = FS::$secMgr->checkAndSecurisePostData("device");
 					if(!$device) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (Device cleanup)");
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						return;
 					}
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
-						header("Location: index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;	
 					}
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -2092,17 +2092,17 @@
 					FS::$dbMgr->Delete("z_eye_snmp_cache","device = '".$device."'");
 					FS::$dbMgr->Delete("device","ip = '".$dip."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Remove device '".$device."' from Z-Eye");
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid);
 				case 18: // Device discovery
 					if(!FS::$sessMgr->hasRight("mrule_switches_discover")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");
-						header("Location: index.php?mod=".$this->mid."&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						return;
 					}
 					$dip = FS::$secMgr->getPost("dip","i4");
 					if(!$dip) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (device discovery)");
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					exec("netdisco -d ".$dip);
@@ -2137,7 +2137,7 @@
 					if(FS::isAjaxCall())
                                                 echo $this->loc->s("done-with-success");
                                         else
-						header("Location: index.php?mod=".$this->mid);
+						FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				case 19: // device status
 					$dip = FS::$secMgr->getPost("dip","i4");
@@ -2160,7 +2160,7 @@
 				case 20: // Save all devices
 					if(!FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to save all devices !");
-						header("Location: index.php?mod=".$this->mid."&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						return;
 					}
 					$query = FS::$dbMgr->Select("device","name");
@@ -2172,12 +2172,12 @@
 					if(FS::isAjaxCall())
 						echo $this->loc->s("saveorder-terminated");
 					else
-						header("Location: index.php?mod=".$this->mid."&err=-1");
+						FS::$iMgr->redir("mod=".$this->mid."&err=-1");
 					return;
 				case 21: // Backup all devices
 					if(!FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to backup all devices !");
-						header("Location: index.php?mod=".$this->mid."&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						return;
 					}
 					$output = "";
@@ -2229,11 +2229,11 @@
 					else {
 						if(strlen($output) > 0) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",1,"Some devices cannot be backup: ".$output);
-							header("Location: index.php?mod=".$this->mid."&err=1");
+							FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						}
 						else {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"User ".FS::$sessMgr->getUserName()." backup all devices");
-							header("Location: index.php?mod=".$this->mid);
+							FS::$iMgr->redir("mod=".$this->mid);
 						}
 					}
 					return;

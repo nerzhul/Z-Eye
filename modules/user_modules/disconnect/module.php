@@ -41,7 +41,7 @@
 					break;
 				default: break;
 			}
-			header("Location: index.php");
+			FS::$iMgr->redir("mod=0");	
 		}
 		
 		public function handlePostDatas($act) {

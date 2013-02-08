@@ -75,26 +75,26 @@
 
 					if(!$name || $ro && $ro != "on" || $rw && $rw != "on") {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Adding data");
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 
 					if(FS::$dbMgr->GetOneData("z_eye_snmp_communities","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
 						return;
 					}
 
 					// User must choose read and/or write
 					if($ro != "on" && $rw != "on") {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=6");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=6");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if(!is_array($netdiscoCfg)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
 					
@@ -102,32 +102,32 @@
 						($rw == "on" ? 't' : 'f')."'");
 
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
-					header("Location: index.php?mod=".$this->mid."&sh=2");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
 					return;
 				case 2: // Remove SNMP community
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
 					if(!$name) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Deleting data");
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 					if(!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Community '".$name."' not in DB");
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=4");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if(!is_array($netdiscoCfg)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
 					FS::$dbMgr->Delete("z_eye_snmp_communities","name = '".$name."'");
 					FS::$dbMgr->Delete("z_eye_user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					FS::$dbMgr->Delete("z_eye_group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
-					header("Location: index.php?mod=".$this->mid."&sh=2");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
 					return;
 				default: break;
 			}

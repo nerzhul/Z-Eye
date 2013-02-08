@@ -130,20 +130,20 @@
 			$link->Delete();
 			FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Link removed '".$link."'");
 		}
-		
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1: // new
 					$this->RegisterLink();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 2: // edit
 					$this->EditLink();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
-				case 3: // del	
+				case 3: // del
 					$this->RemoveLink();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				default: break;
 			}

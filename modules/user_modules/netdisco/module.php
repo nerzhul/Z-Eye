@@ -112,15 +112,15 @@
 					if(checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
 						if(writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) != 0) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",2,"Fail to write netdisco configuration");
-							header("Location: index.php?mod=".$this->mid."&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 							return;
 						}
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",0,"Netdisco configuration changed");
-						header("Location: index.php?mod=".$this->mid."&err=-1");
+						FS::$iMgr->redir("mod=".$this->mid."&err=-1");
 						return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Bad netdisco configuration");
-					header("Location: index.php?mod=".$this->mid."&err=1");
+					FS::$iMgr->redir("mod=".$this->mid."&err=1");
 					return;
 				default: break;
 			}

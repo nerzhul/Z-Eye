@@ -450,11 +450,11 @@
 					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
 					if($filtr == NULL) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to filter values");
-						header("Location: index.php?mod".$this->mid."");
+						FS::$iMgr->redir("mod=".$this->mid."");
 					}
 					else {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User filter by ".$filtr);
-						header("Location: index.php?mod=".$this->mid."&f=".$filtr);
+						FS::$iMgr->redir("mod=".$this->mid."&f=".$filtr);
 					}
 					return;
 				case 2:
@@ -549,28 +549,28 @@
 						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath))
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
-                                                header("Location: index.php?mod=".$this->mid."&err=1");
+                                                FS::$iMgr->redir("mod=".$this->mid."&err=1");
                                                 return;
                                         }
 					if($spwd != $spwd2) {
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
                                                 return;
                                         }
 
                                         $conn = ssh2_connect($saddr,22);
                                         if(!$conn) {
-                                                header("Location: index.php?mod=".$this->mid."&err=3");
+                                                FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"SSH Connection failed for '".$saddr."'");
                                                 return;
                                         }
 					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
-                                                header("Location: index.php?mod=".$this->mid."&err=4");
+                                                FS::$iMgr->redir("mod=".$this->mid."&err=4");
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
                                                 return;
                                         }
                                         if(FS::$dbMgr->GetOneData("z_eye_dhcp_servers","sshuser","addr ='".$saddr."'")) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
-                                                header("Location: index.php?mod=".$this->mid."&err=5");
+                                                FS::$iMgr->redir("mod=".$this->mid."&err=5");
                                                 return;
                                         }
 					/*
@@ -585,7 +585,7 @@
 
 					if($cmdret != 0) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
-						header("Location: index.php?mod=".$this->mid."&err=6&file=".$dhcpdpath);
+						FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$dhcpdpath);
                                                 return;
 					}
 
@@ -598,7 +598,7 @@
 
                                         if($cmdret != 0) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$leasepath."' on '".$saddr."'");
-                                                header("Location: index.php?mod=".$this->mid."&err=6&file=".$leasepath);
+                                                FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$leasepath);
                                                 return;
                                         }
 
@@ -611,7 +611,7 @@
 
                                         	if($cmdret != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
-	                                                header("Location: index.php?mod=".$this->mid."&err=6&file=".$reservconfpath);
+	                                                FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$reservconfpath);
         	                                        return;
                 	                        }
 					}
@@ -625,7 +625,7 @@
 
                                         	if($cmdret != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
-	                                                header("Location: index.php?mod=".$this->mid."&err=6&file=".$subnetconfpath);
+	                                                FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$subnetconfpath);
         	                                        return;
                 	                        }
 					}
@@ -633,7 +633,7 @@
 					FS::$dbMgr->Insert("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
 						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				// Delete DHCP Server
 				case 6:
@@ -641,13 +641,13 @@
 					$histrm = FS::$secMgr->checkAndSecurisePostData("histrm");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"No DHCP server specified to remove");
-						header("Location: index.php?mod=".$this->mid."&err=7");
+						FS::$iMgr->redir("mod=".$this->mid."&err=7");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_dhcp_servers","sshuser","addr = '".$addr."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Unknown DHCP server specified to remove");
-						header("Location: index.php?mod=".$this->mid."&err=8");
+						FS::$iMgr->redir("mod=".$this->mid."&err=8");
 						return;
 					}
 
@@ -658,7 +658,7 @@
 					// Later
 					// FS::$dbMgr->Delete("z_eye_dhcp_subnet_cache","server = '".$addr."'");
 					FS::$dbMgr->Delete("z_eye_dhcp_servers","addr = '".$addr."'");
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
                                         return;
 			}
 		}

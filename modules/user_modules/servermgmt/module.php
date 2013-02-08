@@ -242,18 +242,18 @@
 					$spath = FS::$secMgr->checkAndSecurisePostData("spath");
 					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing/wrong for saving switch config");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&do=".$act."&err=1");
 						return;
 					}
 
 					if(FS::$dbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Server '".$saddr."' already exists for saving switch config");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&do=".$act."&err=3");
 						return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' (type ".$stype.") for saving switch config");
 					FS::$dbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 8: // Edit save server
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
@@ -264,12 +264,12 @@
 					$spath = FS::$secMgr->checkAndSecurisePostData("spath");
 					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd != $spwd2))) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some fields are missing/wrong for saving switch config");
-						header("Location: index.php?mod=".$this->mid."&do=".$act."&addr=".$saddr."&type=".$stype."&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&do=".$act."&addr=".$saddr."&type=".$stype."&err=1");
 						return;
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Update server '".$saddr."' for saving switch config");
 					FS::$dbMgr->Update("z_eye_save_device_servers","path = '".$spath."', pwd = '".$spwd."', login = '".$slogin."'","addr = '".$saddr."' AND type = '".$stype."'");
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 9: {
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
@@ -278,7 +278,7 @@
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Delete server '".$saddr."' for saving switch config");
 							FS::$dbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}	
-					header('Location: m-'.$this->mid.'.html');				
+					FS::$iMgr->redir("mod=".$this->mid);
 				}
 				break;
 				default: break;

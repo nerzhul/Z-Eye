@@ -253,35 +253,35 @@
 			switch($act) {
 				case 1: // new
 					$this->RegisterMenu();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 2: // edit
 					$this->EditMenu();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 3: // del	
 					$this->RemoveMenu();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 4: // add elm
 					$this->addMenuElement();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 5: // edit elem
 					$this->EditMenuElement();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 6: // del elem
 					$this->RemoveMenuElement();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 7: // add elmtomenu
 					$this->addElementToMenu();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;								
 				case 8: // del elmtomenu
 					$this->RemoveElementFromMenu();
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				default: break;
 			}

@@ -369,7 +369,7 @@
 
 					if($filtr == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Some filtering values are wrong");
-						header("Location: index.php?mod=".$this->mid."");
+						FS::$iMgr->redir("mod=".$this->mid);
 					}
 					else {
 						if($shA == "on") $shA = 1;
@@ -395,7 +395,7 @@
 
 						if($shother == "on") $shother = 1;
 						else $shother = 0;
-						header("Location: index.php?mod=".$this->mid.($filtr != NULL ? "&f=".$filtr : "")."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother);
+						FS::$iMgr->redir("mod=".$this->mid.($filtr != NULL ? "&f=".$filtr : "")."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother);
 					}
 					return;
 				case 2:
@@ -473,7 +473,7 @@
 
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to add/edit server");
-						header("Location: index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					}
 
@@ -482,23 +482,23 @@
 							(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
 						) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some datas are invalid or wrong for add server");
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						return;
 					}
 					$conn = ssh2_connect($saddr,22);
 					if(!$conn) {
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
-						header("Location: index.php?mod=".$this->mid."&&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&&err=3");
 						return;
 					}
 				
 					if($edit) {	
 						if(!FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
-							header("Location: index.php?mod=".$this->mid."&err=5");
+							FS::$iMgr->redir("mod=".$this->mid."&err=5");
 							return;
 						}
 
@@ -507,20 +507,20 @@
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
-							header("Location: index.php?mod=".$this->mid."&err=4");
+							FS::$iMgr->redir("mod=".$this->mid."&err=4");
 							return;
 						}
 					}
 					FS::$dbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','1','".$namedpath."','".$chrootnamed."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: dns checking");
-					header("Location: m-".$this->mid.".html");
+					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				// Delete DNS server
 				case 4: { 
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
-						header("Location: index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					}
 
@@ -528,7 +528,7 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Removing server '".$srv."' from database");
 						FS::$dbMgr->Delete("z_eye_server_list","addr = '".$srv."'");
 					}
-					header('Location: m-'.$this->mid.'.html');
+					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				}
 			}

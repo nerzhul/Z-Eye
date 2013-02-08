@@ -123,12 +123,12 @@
 					$gname = FS::$secMgr->checkAndSecurisePostData("gname");
 					if(!$gname) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to create group");
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
 					if($exist) {
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"The group ".$gname." already exists");
 						return;
 					}
@@ -144,18 +144,18 @@
 						FS::$dbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"New group '".$gname."' added");
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				case 2:
 					$gname = FS::$secMgr->checkAndSecuriseGetData("gname");
 					if(!$gname) {
-						header("Location: index.php?mod=".$this->mid."&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to remove group");
 						return;
 					}
 					$gid = FS::$dbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
 					if(!$gid) {
-						header("Location: index.php?mod=".$this->mid."&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"Unable to remove group '".$gname."', group doesn't exists");
 						return;
 					}
@@ -163,12 +163,12 @@
 					FS::$dbMgr->Delete("z_eye_group_rules","gid = '".$gid."'");
 					FS::$dbMgr->Delete("z_eye_user_group","gid = '".$gid."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"Group '".$gname."' removed");
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid);
                                         return;
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
 					if(!$gid) {
-						header("Location: index.php?mod=".$this->mid."&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to edit group");
 						return;
 					}
@@ -183,7 +183,7 @@
 						FS::$dbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"Group Id '".$gid."' edited");
-					header("Location: index.php?mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid);
 
 				default: break;
 			}

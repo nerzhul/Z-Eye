@@ -259,11 +259,11 @@
 				case 1:
 					$ech = FS::$secMgr->checkAndSecurisePostData("ech");
 					$ec = FS::$secMgr->checkAndSecurisePostData("ec");
-					header("Location: index.php?mod=".$this->mid."&sh=1&ech=".$ech."&ec=".$ec);
+					FS::$iMgr->redir("mod=".$this->mid."&sh=1&ech=".$ech."&ec=".$ec);
 					break;
 				case 2: case 3: case 4:
 					$topmax = FS::$secMgr->checkAndSecurisePostData("max");
-					header("Location: index.php?mod=".$this->mid."&sh=".$act."&max=".$topmax."");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=".$act."&max=".$topmax."");
 					break;
 				default: break;
 			}

@@ -1291,7 +1291,7 @@
 				// Add/Edit command
 				case 1:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1300,18 +1300,18 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					
 					if(!$cmdname || !$cmd || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$cmdname) || $edit && $edit != 1) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=1");
 						return;
 					}
 
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
 							return;
 						}
 					}
 					else if(FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=3");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=3");
 						return;
 					}
 					
@@ -1320,59 +1320,59 @@
 					$out = "";
 					exec("if [ -f ".$tmpcmd[0]." ] && [ -x ".$tmpcmd[0]." ]; then echo 0; else echo 1; fi;",$out);
 					if(!is_array($out) || count($out) != 1 || $out[0] != 0 || $this->isForbidCmd($tmpcmd[0])) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
 						return;
 					} 
 
 					if($edit) FS::$dbMgr->Delete("z_eye_icinga_commands","name = '".$cmdname."'");	
 					FS::$dbMgr->Insert("z_eye_icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=8");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=8");
 					return;
 				// Remove command
 				case 2:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					// @TODO forbid remove when use (host + service)
 					$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
 					if(!$cmdname) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=2");
 						return;
 					}
 					
 					// Forbid remove if command is used
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","srvcmd = '".$cmdname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","hostcmd = '".$cmdname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
 						return;
 					}
 					
 					FS::$dbMgr->Delete("z_eye_icinga_commands","name = '".$cmdname."'");
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=8&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=8");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=8");
 					return;
 				// Add/Edit timeperiod
 				case 4:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 			
@@ -1381,7 +1381,7 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
@@ -1405,7 +1405,7 @@
 						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 || 
 						$whs > 23 || $wms > 59 || $thhs > 23 || $thms > 59 || $fhs > 23 || $fms > 59 || $sahs > 23 || $sams > 59 ||
 						$suhs > 23 || $sums > 59) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
@@ -1429,19 +1429,19 @@
 						$suhe == NULL || $sume == NULL || $mhe > 23 || $mme > 59 || $tuhe > 23 || $tume > 59 || 
 						$whe > 23 || $wme > 59 || $thhe > 23 || $thme > 59 || $fhe > 23 || $fme > 59 || $sahe > 23 || $same > 59 ||
 						$suhe > 23 || $sume > 59) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=5&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=2");
 							return;
 						}
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=5&err=3");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=3");
 							return;
 						}
 					}
@@ -1451,26 +1451,26 @@
 						"'".$name."','".$alias."','".$mhs."','".$mms."','".$tuhs."','".$tums."','".$whs."','".$wms."','".$thhs."','".$thms."','".$fhs."','".$fms."','".$sahs."','".$sams."','".$suhs."','".$sums.
 						"','".$mhe."','".$mme."','".$tuhe."','".$tume."','".$whe."','".$wme."','".$thhe."','".$thme."','".$fhe."','".$fme."','".$sahe."','".$same."','".$suhe."','".$sume."'");
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=5");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=5");
 					return;
 				// Delete timeperiod
 				case 6:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$tpname = FS::$secMgr->checkAndSecuriseGetData("tp");
 					if(!$tpname) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$tpname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=2");
 						return;
 					}
 					
@@ -1478,36 +1478,36 @@
 					
 					// Forbid remove if timeperiod is used
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","srvperiod = '".$tpname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","hostperiod = '".$tpname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","checkperiod = '".$tpname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","notifperiod = '".$tpname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 
 					FS::$dbMgr->Delete("z_eye_icinga_timeperiods","name = '".$tpname."'");
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=5");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=5");
 					return;
 				// Add/Edit contact
 				case 7:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1519,7 +1519,7 @@
 					$hostnotifcmd = FS::$secMgr->checkAndSecurisePostData("hostnotifcmd");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$name || !$mail || preg_match("#[ ]#",$name) || !$srvnotifperiod || !$srvnotifcmd || !$hostnotifperiod || !$hostnotifcmd) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=1");
 						return;
 					}	
 
@@ -1539,36 +1539,36 @@
 					if($edit) {
 						// If contact doesn't exist
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=6&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=2");
 							return;
 						}
 					}
 					else {
 						// If contact exist
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=6&err=3");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=3");
 							return;
 						}
 					}
 
 					// Timeperiods don't exist
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$srvnotifcmd."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$hostnotifcmd."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
@@ -1579,47 +1579,47 @@
 						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
 
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=6");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=6");
 					return;
 				// Delete contact
 				case 9:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
 					if(!$ctname) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$ctname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=2");
 						return;
 					}
 					
 					// Forbid remove if in existing contact group
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_contactgroup_members","name","member = '".$ctname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 					
 					FS::$dbMgr->Delete("z_eye_icinga_contacts","name = '".$ctname."'");
 					
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=6&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=6");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=6");
 					return;
 				// Add/Edit contact group
 				case 10:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1629,20 +1629,20 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$name || !$alias || !$cts || $cts == "") {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
 						return;
 					}
 					
 					// ctg exists
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=2");
 							return;
 						}
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=7&err=3");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=3");
 							return;
 						}
 					}
@@ -1651,7 +1651,7 @@
 					$count = count($cts);
 					for($i=0;$i<$count;$i++) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$cts[$i]."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
 							return;
 						}
 					}
@@ -1667,32 +1667,32 @@
 					}
 
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=7");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=7");
 					return;
 				// Delete contact group
 				case 12:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					// @TODO forbid remove when used (service, service_group)
 					$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
 					if(!$ctgname) {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$ctgname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=2");
 						return;
 					}
 
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","contactgroup = '".$ctgname."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=4");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=4");
 						return;
 					}
 
@@ -1700,15 +1700,15 @@
 					FS::$dbMgr->Delete("z_eye_icinga_contactgroups","name = '".$ctgname."'");
 
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=7&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=7");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=7");
 					return;
 				// Add/Edit host
 				case 13:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1725,7 +1725,7 @@
 					$ctg = FS::$secMgr->getPost("ctg","w");
 					if(!$name || preg_match("#[ ]#",$name) || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
 						 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon) || $edit && $edit != 1) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 				
@@ -1751,20 +1751,20 @@
 					$notifintval = FS::$secMgr->getPost("notifintval","n+=");
 
 					if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 					
 					// Now verify datas
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
-                                                        header("Location: index.php?mod=".$this->mid."&sh=2&err=3");
+                                                        FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
                                                         return;
                                                 }
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=2&err=3");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
 							return;
 						}
 					}
@@ -1773,24 +1773,24 @@
 						$count = count($parent);
 						for($i=0;$i<$count;$i++) {
 							if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent[$i]."'")) {
-								header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+								FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 								return;
 							}
 						}
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcommand."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 
@@ -1810,27 +1810,27 @@
 					}
 					
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=2");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
 					return;	
 				// Remove host
 				case 15:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("host");
 					if(!$name) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 
 					// Not exists
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","addr","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=2");
 						return;
 					}
 
@@ -1841,15 +1841,15 @@
 					FS::$dbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
 
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=2&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=2");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
 					return;
 				// Add/Edit service
 				case 16:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1862,19 +1862,19 @@
 					$ctg = FS::$secMgr->getPost("ctg","w");
 
 					if(!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$notifperiod || !$ctg) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=4&err=2");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=2");
 							return;
 						}
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=4&err=3");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=3");
 							return;
 						}
 					}
@@ -1907,37 +1907,37 @@
 					$notifintval = FS::$secMgr->getPost("notifintval","n+=");
 
 					if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 					
 					$mt = preg_split("#[$]#",$host);
 					if(count($mt) != 2 || ($mt[0] != 1 && $mt[0] != 2)) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcmd."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if($mt[0] == 1 && !FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 					if($mt[0] == 2 && !FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$mt[1]."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
@@ -1952,27 +1952,27 @@
 						($tpl == "on" ? 1 : 0)."'");
 
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=4");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=4");
 					return;
 				// remove service
 				case 18:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if(!$name) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 					
 					// Not exists
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_services","name","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=2");
 						return;
 					}
 					
@@ -1981,15 +1981,15 @@
 					FS::$dbMgr->Delete("z_eye_icinga_services","name = '".$name."'");
 					
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=4&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=4");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=4");
 					return;
 				// Add/Edit hostgroup
 				case 19:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1998,19 +1998,19 @@
 					$members = FS::$secMgr->checkAndSecurisePostData("members");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 					
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
-                                                        header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+                                                        FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
                                                         return;
                                                 }
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
-							header("Location: index.php?mod=".$this->mid."&sh=3&err=3");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=3");
 							return;
 						}
 					}
@@ -2020,7 +2020,7 @@
 						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) != 2 && !FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
-								header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
+								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
@@ -2032,40 +2032,40 @@
 						}
 					}
 					else {
-						header("Location: index.php?mod=".$this->mid."&sh=5&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
 					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
 					FS::$dbMgr->Insert("z_eye_icinga_hostgroups","name,alias","'".$name."','".$alias."'");
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=3");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=3");
 					return;
 				// remove hostgroup
 				case 21:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-						header("Location:index.php?mod=".$this->mid."&err=99");
+						FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("hg");
 					if(!$name) {
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=1");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 						return;
 					}
 
 					// Not exists
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
 					// Used
 					if(FS::$dbMgr->GetOneData("z_eye_icinga_services","name","host = '".$name."' AND hosttype = '2'")) {
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=2");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
@@ -2075,10 +2075,10 @@
 					FS::$dbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
 
 					if(!$this->writeConfiguration()) {
-						header("Location: index.php?mod=".$this->mid."&sh=3&err=5");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=5");
 						return;
 					}
-					header("Location: index.php?mod=".$this->mid."&sh=3");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=3");
 					return;
 			}
 		}
