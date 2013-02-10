@@ -23,7 +23,8 @@
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Gestion des droits sur les équipements réseau</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_snmpmgmt_read",array("check" => in_array("mrule_switchrightsmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+                        $output .= "<td>".FS::$iMgr->check("mrule_switchrightsmgmt_read",array("check" => in_array("mrule_switchrightsmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_switchmgmt_backup",array("check" => in_array("mrule_switchmgmt_backup",$activerules),"label" => "Gérer les serveurs de backup"))."</td></tr>";
                         return $output;
                 }
 

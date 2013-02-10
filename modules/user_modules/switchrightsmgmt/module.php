@@ -33,10 +33,129 @@
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-snmpgid-not-found")); break;
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-already-exist")); break;
 				case 4: $output .= FS::$iMgr->printError($this->loc->s("err-not-found")); break;
+				case 99: $output .= FS::$iMgr->printError($this->loc->s("err-no-rights")); break;
 				default: break;
 			}
 			$output .= $this->showMain();
 			return $output;
+		}
+
+
+		private function addOrEditBackupServer($create = false) {
+			$saddr = "";
+			$slogin = "";
+			$stype = 1;
+			$spwd = "";
+			$spath = "";
+			if(!$create) {
+				FS::$iMgr->showReturnMenu(true);
+				$output = "<h2>".$this->loc->s("title-edit-backup-switch-server")."</h2>";
+				$addr = FS::$secMgr->checkAndSecuriseGetData("bck");
+				$type = FS::$secMgr->checkAndSecuriseGetData("type");
+				if(!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
+					return $output;
+				}
+				$query = FS::$dbMgr->Select("z_eye_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$saddr = $addr;
+					$slogin = $data["login"];
+					$spwd = $data["pwd"];
+					$stype = $type;
+					$spath = $data["path"];
+				}
+				else {
+					$output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !");
+					return $output;
+				}
+				$output .= "<a href=\"index.php?mod=".$this->mid."\">".$this->loc->s("Return")."</a><br />";
+			}
+
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
+			switch($err) {
+				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
+				case 3: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
+			}
+
+			$output .= "<script type=\"text/javascript\">function arangeform() {";
+			$output .= "if(document.getElementsByName('stype')[0].value == 1) {";
+			$output .= "$('#tohide1').hide();";
+			$output .= "$('#tohide2').hide();";
+			$output .= "$('#tohide3').hide();";
+			$output .= "} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {";
+			$output .= "$('#tohide1').show();";
+			$output .= "$('#tohide2').show();";
+			$output .= "$('#tohide3').show();";
+			$output .= "}";
+			$output .= "};</script>";
+
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3",array("id" => "swbckfrm"));
+
+			$output .= "<table>";
+			if($create) {
+				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
+				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
+				$output .= FS::$iMgr->select("stype","arangeform();");
+				$output .= FS::$iMgr->selElmt("TFTP",1);
+				$output .= FS::$iMgr->selElmt("FTP",2);
+				$output .= FS::$iMgr->selElmt("SCP",4);
+				$output .= FS::$iMgr->selElmt("SFTP",5);
+				$output .= "</select>";
+				$output .= "</td></tr>";
+			}
+			else {
+				$output .= FS::$iMgr->hidden("saddr",$saddr);
+				$output .= FS::$iMgr->hidden("stype",$stype);
+				$output .= FS::$iMgr->hidden("edit",1);
+
+				$output .= "<tr><th>".$this->loc->s("ip-addr")."</th><th>".$saddr."</th></tr>";
+				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
+				switch($stype) {
+					case 1: $output .= "TFTP"; break;
+					case 2: $output .= "FTP"; break;
+					case 4: $output .= "SCP"; break;
+					case 5: $output .= "SFTP"; break;
+				}
+			}
+			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("User")."</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
+			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
+			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("server-path"),"spath",$spath);
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3","swbckfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			return $output;
+		}
+
+		private function showBackupTab() {
+			$formoutput = $this->addOrEditBackupServer(true);
+
+			$output = FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Server"));
+
+			$tmpoutput = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
+				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th></th></tr>";
+			$found = false;
+			$query = FS::$dbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if($found == false) $found = true;
+				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&bck=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
+				$tmpoutput .= "</td><td>";
+				switch($data["type"]) {
+					case 1: $tmpoutput .= "TFTP"; break;
+					case 2: $tmpoutput .= "FTP"; break;
+					case 4: $tmpoutput .= "SCP"; break;
+					case 5: $tmpoutput .= "SFTP"; break;
+				}
+				$tmpoutput .= "</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
+				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=4&addr=".$data["addr"]."&type=".$data["type"]);
+				$tmpoutput .= "</center></td></tr>";
+			}
+			if($found)
+				$output .= $tmpoutput."</table>";
+			else
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-backup-found")." !");
+			return $output;
+
 		}
 
 		private function showBySwitch() {
@@ -429,22 +548,31 @@
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
-				$output = "<h1>".$this->loc->s("title-switchrightsmgmt")."</h1>";
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp"),$sh);
-				// Show only if there is devices
-				if(FS::$dbMgr->Count("device","ip") > 0)
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch"),$sh);
-				$output .= "</ul></div>";
-        	                $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-                	        $output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
-                        	$output .= "</div>";
+				$backupfound = FS::$secMgr->checkAndSecuriseGetData("bck");
+				$typefound = FS::$secMgr->checkAndSecuriseGetData("type");
+				if($backupfound && $typefound)
+					$output .= $this->addOrEditBackupServer();
+				else {
+					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
+					$output = "<h1>".$this->loc->s("title-switchrightsmgmt")."</h1>";
+					$output .= "<div id=\"contenttabs\"><ul>";
+					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp"),$sh);
+					// Show only if there is devices
+					if(FS::$dbMgr->Count("device","ip") > 0)
+						$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch"),$sh);
+					$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-device-backup"),$sh);
+					$output .= "</ul></div>";
+        	        	        $output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+                		        $output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
+                        		$output .= "</div>";
+				}
 			}
 			else if($sh == 1)
 				$output .= $this->showBySNMPCommunity();	
 			else if($sh == 2)
 				$output .= $this->showBySwitch();
+			else if($sh == 3)
+				$output .= $this->showBackupTab();
 			return $output;
 		}
 
@@ -572,6 +700,82 @@
 						FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
 					}
 					FS::$iMgr->redir("mod=".$this->mid.($filter ? "&filter=".$filter : ""));
+					return;
+				case 3: // add or edit backup server
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"User don't have rights to add/edit server '".$saddr."' from switches backup");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
+						return;
+					}
+					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
+					$spath = FS::$secMgr->checkAndSecurisePostData("spath");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"Some fields are missing/wrong for saving switch config");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-datas");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
+						return;
+					}
+					if($edit) {
+						if(!FS::$dbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-not-found");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=4");
+							return;
+						}
+					}
+					else {
+						if(FS::$dbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-already-exists");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=3");
+							return;
+						}
+					}
+
+					if($edit) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Edit server '".$saddr."' (type ".$stype.") for saving switch config");
+						FS::$dbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
+					}
+					else
+						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Added server '".$saddr."' (type ".$stype.") for saving switch config");
+					FS::$dbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
+
+					return;
+				case 4: // remove backup server
+					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"User don't have rights to remove server '".$saddr."' from switches backup");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-rights");
+						else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
+						return;
+					}
+					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
+					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
+					if($saddr && $stype) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Delete server '".$saddr."' for saving switch config");
+						FS::$dbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
+					}
+					else {
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-datas");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
+					}
+					
 					return;
 				default: break;
 			}
