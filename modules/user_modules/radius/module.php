@@ -173,7 +173,7 @@
 				}
 			}
 
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13",array("id" => "radaefrm"));
 
 			if(!$create) {
 				$output .= FS::$iMgr->hidden("saddr",$saddr);
@@ -212,6 +212,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radacct"),"tradacct",$tradacct,array("tooltip" => "tooltip-radacct"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","radaefrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 
 			return $output;
 		}
@@ -1629,7 +1630,10 @@
 				case 13:
 					if(!FS::$sessMgr->hasRight("mrule_radius_manage")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"This user don't have rights to manage radius !");
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					}
 
@@ -1659,7 +1663,10 @@
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradreply) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) || 
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some fields are missing or wrong for radius db adding");
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-miss-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 
@@ -1668,7 +1675,10 @@
 
 					$conn = $testDBMgr->Connect();
 					if($conn != 0) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=7");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-server");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=7");
 						return;
 					}
 					FS::$dbMgr->Connect();
@@ -1678,7 +1688,10 @@
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-							FS::$iMgr->redir("mod=".$this->mid."&err=7");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-not-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&err=1");
 							return;
 						}
 
@@ -1687,7 +1700,10 @@
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"radius",1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-							FS::$iMgr->redir("mod=".$this->mid."&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&err=3");
 							return;
 						}
 					}
@@ -1695,7 +1711,7 @@
 					FS::$dbMgr->Insert("z_eye_radius_db_list","addr,port,dbname,type,login,pwd,radalias,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
 					"'".$saddr."','".$sport."','".$sdbname."','".$sdbtype."','".$slogin."','".$spwd."','".$salias."','".$tradcheck."','".$tradreply."','".$tradgrpchk."','".$tradgrprep."','".
 					$tradusrgrp."','".$tradacct."'");
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 					break;
 				// Remove radius db
 				case 14:
