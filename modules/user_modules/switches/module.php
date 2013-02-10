@@ -2096,13 +2096,19 @@
 				case 18: // Device discovery
 					if(!FS::$sessMgr->hasRight("mrule_switches_discover")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");
-						FS::$iMgr->redir("mod=".$this->mid."&err=3");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-rights");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						return;
 					}
 					$dip = FS::$secMgr->getPost("dip","i4");
 					if(!$dip) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (device discovery)");
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-datas");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					exec("netdisco -d ".$dip);
