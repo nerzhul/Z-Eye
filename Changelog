@@ -253,3 +253,15 @@ RC1.3
 - ntp is now configurable by installer
 - Icinga improvements (path verification)
 
+RC2.0
+- Icinga cleanups
+- Icinga AJAX calls
+- Ipmanager AJAX calls
+- dnsmgmt AJAX calls
+- merge some duplicate code
+- Add some new iMgr functions
+- Remove some hardcoded LDAP attributes
+- Switch backup is now on switch rights module
+- Rename switch rights module to switch rights & save module
+- Remove useless servermgmt module
+- Speed reporting now uses HTTPS for icinga AJAX call
