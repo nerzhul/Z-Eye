@@ -323,7 +323,7 @@
 				$output .= $this->showCreateEditErr();	
 			}
 			
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3",array("id" => "dnsfrm"));
 			
 			$output .= "<table class=\"standardTable\">";
 			if($create)
@@ -338,7 +338,8 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table>";
+			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3","dnsfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			
 			return $output;
 		}
@@ -473,7 +474,10 @@
 
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to add/edit server");
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-rights");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					}
 
@@ -482,23 +486,35 @@
 							(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
 						) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some datas are invalid or wrong for add server");
-						FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-miss-bad-fields");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						return;
 					}
 					$conn = ssh2_connect($saddr,22);
 					if(!$conn) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-unable-conn");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
-						FS::$iMgr->redir("mod=".$this->mid."&&err=3");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-login");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&&err=3");
 						return;
 					}
 				
 					if($edit) {	
 						if(!FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
-							FS::$iMgr->redir("mod=".$this->mid."&err=5");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-bad-server");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&err=5");
 							return;
 						}
 
@@ -507,14 +523,17 @@
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
-							FS::$iMgr->redir("mod=".$this->mid."&err=4");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-server-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&err=4");
 							return;
 						}
 					}
 					FS::$dbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','1','".$namedpath."','".$chrootnamed."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: dns checking");
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				// Delete DNS server
 				case 4: { 
