@@ -113,11 +113,11 @@
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 				return $output;
 			}
-			
+
 			/*
 			 * Ajax new host
 			 */
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=13");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=13",array("id" => "hostfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 			//$formoutput .= template list
@@ -127,32 +127,36 @@
 			$formoutput .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
 			$formoutput .= FS::$iMgr->select("icon");
 			$formoutput .= FS::$iMgr->selElmt("Aucun","");
+
 			$query = FS::$dbMgr->Select("z_eye_icinga_icons","id,name","","name");
 			while($data = FS::$dbMgr->Fetch($query))
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["id"]);
+
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
 			$formoutput2 = FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
 			$countElmt = 0;
+
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				$formoutput2 .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
+
 			if($countElmt/4 < 4) $countElmt = 16;
 			$formoutput .= FS::$iMgr->select("parent[]","",NULL,true,array("size" => round($countElmt/4)));
 			$formoutput .= $formoutput2;
 			$formoutput .= "</select></td></tr>";
 
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr","");
-			
+
 			// Checks
 			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand","check-host-alive")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => 3, "type" => "num"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => 1, "type" => "num"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => 10, "type" => "num"));
-			
+
 			// Global
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",true,array("type" => "chk"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",true,array("type" => "chk"));
@@ -160,7 +164,7 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",true,array("type" => "chk"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",true,array("type" => "chk"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",true,array("type" => "chk"));
-			
+
 			// Notifications
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",true,array("type" => "chk"));
 			$formoutput .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod")."</td></tr>";
@@ -174,10 +178,11 @@
 			// icon image
 			// statusmap image
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";				
-				
+			$formoutput .= "</table></form>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","hostfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
-			
+
 			/*
 			 * Host table
 			 */
@@ -221,7 +226,7 @@
 			}
 			$output = "<h1>".$this->loc->s("title-host-edit")."</h1>";	
 
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13").
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13",array("id" => "hostfrm")).
 				FS::$iMgr->hidden("edit",1).FS::$iMgr->hidden("name",$host);
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$hostdata["template"] == "t" ? true : false,array("type" => "chk"));
@@ -284,6 +289,7 @@
 			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$hostdata["contactgroup"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","hostfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			return $output;
 		}
 		
@@ -298,7 +304,7 @@
 				/*
 				 * Ajax new hostgroup
 				 */
-				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=19",array("id" => "hgfrm"));
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				// Global
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
@@ -306,6 +312,7 @@
 				$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19","hgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			}
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -359,7 +366,7 @@
                                 return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
                         }
 			$output = "<h1>".$this->loc->s("title-hostgroup-edit")."</h1>";
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=19");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=19",array("id" => "hgfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
 				<tr><td>".$this->loc->s("Name")."</td><td>".$hostgroup."</td></tr>";
 			$output .= FS::$iMgr->hidden("name",$hostgroup).FS::$iMgr->hidden("edit",1);
@@ -373,6 +380,7 @@
 			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true,$hostlist,$hostgroup)."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19","hgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			return $output;
 		}
 
@@ -387,7 +395,7 @@
 				/*
 				 * Ajax new service
 				 */
-				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=16",array("id" => "srvfrm"));
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 				//$formoutput .= template list
@@ -430,6 +438,7 @@
 				$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16","srvfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			}
 			else
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
@@ -477,7 +486,7 @@
                                 return FS::$iMgr->printError($this->loc->s("err-no-service"));
                         }
 
-			$output = "<h1>".$this->loc->s("title-edit-service")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
+			$output = "<h1>".$this->loc->s("title-edit-service")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=16",array("id" => "srvfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$data["template"] == 't',array("type" => "chk"));
 			//$formoutput .= template list
@@ -521,6 +530,7 @@
 			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$data["ctg"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16","srvfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			return $output;
 		}
 
@@ -534,7 +544,7 @@
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
 			
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "tpfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
@@ -547,6 +557,7 @@
 			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","tpfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"));
 
@@ -603,7 +614,7 @@
 			else
                                 return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 
-			$output = "<h1>".$this->loc->s("title-edit-timeperiod")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
+			$output = "<h1>".$this->loc->s("title-edit-timeperiod")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "tpfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->hidden("name",$data["name"]).FS::$iMgr->hidden("edit",1);
 			$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
@@ -624,6 +635,7 @@
 				FS::$iMgr->hourlist("suhs","sums",$data["suhs"],$data["sums"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$data["suhe"],$data["sume"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","tpfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			return $output;
 		}
 
@@ -636,7 +648,7 @@
 				/*
 				 * Ajax new contact
 				 */
-				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
+				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=7",array("id" => "ctfrm"));
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",true,array("type" => "chk"));
 				//$formoutput .= template list
@@ -659,6 +671,7 @@
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd","notify-host-by-email")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7","ctfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			}
 			else
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
@@ -698,7 +711,7 @@
 			else
                                 return FS::$iMgr->printError($this->loc->s("err-no-contact"));
 
-			$output = "<h1>".$this->loc->s("title-edit-contact")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
+			$output = "<h1>".$this->loc->s("title-edit-contact")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=7",array("id" => "ctfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$data["template"] == "t",array("type" => "chk"));
 			//$output .= template list
@@ -722,6 +735,7 @@
 			$output .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd",$data["hostcmd"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7","ctfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			return $output;
 		}
 		private function showContactgroupsTab() {
@@ -738,7 +752,7 @@
 			/*
 			 * Ajax new contactgroup
 			 */
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=10");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=10",array("id" => "ctgfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
@@ -755,6 +769,7 @@
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10","ctgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"));
 
@@ -796,7 +811,7 @@
 			else {
                                 return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
                         }
-			$output = "<h1>".$this->loc->s("title-edit-contactgroup")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=10");
+			$output = "<h1>".$this->loc->s("title-edit-contactgroup")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=10",array("id" => "ctgfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
 				<tr><td>".$this->loc->s("Name")."</td><td>".$cg."</td></tr>";
 			$output .= FS::$iMgr->hidden("name",$cg).FS::$iMgr->hidden("edit",1);
@@ -817,6 +832,7 @@
 			$output .= "</select></td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10","ctgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			return $output;
 		}
 
@@ -835,12 +851,13 @@
 			/*
 			 * Ajax new command
 			 */
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "cmdfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1","cmdfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"));
 
@@ -875,12 +892,13 @@
 				return FS::$iMgr->printError($this->loc->s("err-cmd-doesnt-exist"));
 			}
 			$output = "<h1>".$this->loc->s("title-cmd-edit")."</h1>";
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "cmdfrm")).
 				FS::$iMgr->hidden("name",$cmdname).FS::$iMgr->hidden("edit",1).
 				"<ul class=\"ulform\"><li><b>".$this->loc->s("Name").":</b> ";
 			$cmd = htmlentities($cmd);
 			$output .= $cmdname."</li><li><b>".$this->loc->s("Command").":</b> ".FS::$iMgr->input("cmd",$cmd,30,200)."</li><li>".
 				FS::$iMgr->submit("",$this->loc->s("Save"))."</ul></form>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1","cmdfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			return $output;
 		}
 		
@@ -1291,7 +1309,10 @@
 				// Add/Edit command
 				case 1:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1300,18 +1321,27 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					
 					if(!$cmdname || !$cmd || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$cmdname) || $edit && $edit != 1) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=1");
 						return;
 					}
 
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
+						if(!FS::$dbMgr->GetOneData("z_eye_icinga_sommands","cmd","name = '".$cmdname."'")) {
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-not-found");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=2");
 							return;
 						}
 					}
 					else if(FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=3");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-data-exist");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=3");
 						return;
 					}
 					
@@ -1320,7 +1350,10 @@
 					$out = "";
 					exec("if [ -f ".$tmpcmd[0]." ] && [ -x ".$tmpcmd[0]." ]; then echo 0; else echo 1; fi;",$out);
 					if(!is_array($out) || count($out) != 1 || $out[0] != 0 || $this->isForbidCmd($tmpcmd[0])) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-binary-not-found");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
 						return;
 					} 
 
@@ -1330,7 +1363,7 @@
 						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=8");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=8",true);
 					return;
 				// Remove command
 				case 2:
@@ -1372,7 +1405,10 @@
 				// Add/Edit timeperiod
 				case 4:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 			
@@ -1381,7 +1417,10 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
@@ -1405,7 +1444,10 @@
 						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 || 
 						$whs > 23 || $wms > 59 || $thhs > 23 || $thms > 59 || $fhs > 23 || $fms > 59 || $sahs > 23 || $sams > 59 ||
 						$suhs > 23 || $sums > 59) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
@@ -1429,19 +1471,38 @@
 						$suhe == NULL || $sume == NULL || $mhe > 23 || $mme > 59 || $tuhe > 23 || $tume > 59 || 
 						$whe > 23 || $wme > 59 || $thhe > 23 || $thme > 59 || $fhe > 23 || $fme > 59 || $sahe > 23 || $same > 59 ||
 						$suhe > 23 || $sume > 59) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
+					if(!$mhs && !$mms && !$tuhs && !$tums && !$whs && !$wms && !$thhs && !$thms && !$fhs && !$fms && !$sahs && !$sams && !$suhs && !$sums &&
+						!$mhe && !$mme && !$tuhe && !$tume && !$whe && !$wme && !$thhe && !$thme && !$fhe && !$fme && !$sahe && !$same && !$suhe && !$sume) {
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
+						return;
+					}
+							 
+
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=2");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-not-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=2");
 							return;
 						}
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=3");
 							return;
 						}
 					}
@@ -1454,7 +1515,7 @@
 						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=5");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=5",true);
 					return;
 				// Delete timeperiod
 				case 6:
@@ -1507,7 +1568,10 @@
 				// Add/Edit contact
 				case 7:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1519,7 +1583,10 @@
 					$hostnotifcmd = FS::$secMgr->checkAndSecurisePostData("hostnotifcmd");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$name || !$mail || preg_match("#[ ]#",$name) || !$srvnotifperiod || !$srvnotifcmd || !$hostnotifperiod || !$hostnotifcmd) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=1");
 						return;
 					}	
 
@@ -1539,36 +1606,54 @@
 					if($edit) {
 						// If contact doesn't exist
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=2");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-not-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=2");
 							return;
 						}
 					}
 					else {
 						// If contact exist
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=3");
 							return;
 						}
 					}
 
 					// Timeperiods don't exist
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$srvnotifcmd."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$hostnotifcmd."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 
@@ -1579,10 +1664,13 @@
 						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
 
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=5");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-fail-writecfg");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=6");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=6",true);
 					return;
 				// Delete contact
 				case 9:
@@ -1619,7 +1707,10 @@
 				// Add/Edit contact group
 				case 10:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1629,20 +1720,29 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$name || !$alias || !$cts || $cts == "") {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
 						return;
 					}
 					
 					// ctg exists
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=2");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-not-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=2");
 							return;
 						}
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=3");
 							return;
 						}
 					}
@@ -1651,7 +1751,10 @@
 					$count = count($cts);
 					for($i=0;$i<$count;$i++) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$cts[$i]."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-bad-data");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
 							return;
 						}
 					}
@@ -1667,10 +1770,13 @@
 					}
 
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=5");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-fail-writecfg");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=7");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=7",true);
 					return;
 				// Delete contact group
 				case 12:
@@ -1708,7 +1814,10 @@
 				// Add/Edit host
 				case 13:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1725,7 +1834,10 @@
 					$ctg = FS::$secMgr->getPost("ctg","w");
 					if(!$name || preg_match("#[ ]#",$name) || !$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
 						 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon) || $edit && $edit != 1) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 				
@@ -1751,20 +1863,29 @@
 					$notifintval = FS::$secMgr->getPost("notifintval","n+=");
 
 					if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 					
 					// Now verify datas
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
-                                                        FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-not-exist");
+							else
+                                                        	FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
                                                         return;
                                                 }
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
 							return;
 						}
 					}
@@ -1773,24 +1894,36 @@
 						$count = count($parent);
 						for($i=0;$i<$count;$i++) {
 							if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent[$i]."'")) {
-								FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+								if(FS::isAjaxCall())
+									echo $this->loc->s("err-bad-data");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 								return;
 							}
 						}
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcommand."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
-					
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 
@@ -1801,6 +1934,7 @@
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
 						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".($icon ? $icon : 0)."'");
+
 					if($edit) FS::$dbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
 					if($parent && !in_array("none",$parent)) {
 						$count = count($parent);
@@ -1810,11 +1944,14 @@
 					}
 					
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-fail-writecfg");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
-					return;	
+					FS::$iMgr->redir("mod=".$this->mid."&sh=2",true);
+					return;
 				// Remove host
 				case 15:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
@@ -1849,7 +1986,10 @@
 				// Add/Edit service
 				case 16:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1862,19 +2002,28 @@
 					$ctg = FS::$secMgr->getPost("ctg","w");
 
 					if(!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$notifperiod || !$ctg) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=2");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-not-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=2");
 							return;
 						}
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=3");
 							return;
 						}
 					}
@@ -1907,37 +2056,58 @@
 					$notifintval = FS::$secMgr->getPost("notifintval","n+=");
 
 					if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 					
 					$mt = preg_split("#[$]#",$host);
 					if(count($mt) != 2 || ($mt[0] != 1 && $mt[0] != 2)) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcmd."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
 					if($mt[0] == 1 && !FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 					if($mt[0] == 2 && !FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$mt[1]."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 
@@ -1952,10 +2122,13 @@
 						($tpl == "on" ? 1 : 0)."'");
 
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=5");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-fail-writecfg");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=4");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
 				// remove service
 				case 18:
@@ -1989,7 +2162,10 @@
 				// Add/Edit hostgroup
 				case 19:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-right");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
@@ -1998,19 +2174,28 @@
 					$members = FS::$secMgr->checkAndSecurisePostData("members");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$name || !$alias || preg_match("#[ ]#",$name)) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 					
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
-                                                        FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-not-exist");
+							else
+                                                        	FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
                                                         return;
                                                 }
 					}
 					else {
 						if(FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=3");
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-data-exist");
+							else
+								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=3");
 							return;
 						}
 					}
@@ -2020,7 +2205,10 @@
 						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) != 2 && !FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
-								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
+								if(FS::isAjaxCall())
+									echo $this->loc->s("err-bad-data");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 								return;
 							}
 						}
@@ -2032,17 +2220,23 @@
 						}
 					}
 					else {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 
 					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
 					FS::$dbMgr->Insert("z_eye_icinga_hostgroups","name,alias","'".$name."','".$alias."'");
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=5");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-fail-writecfg");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=3");
+					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					return;
 				// remove hostgroup
 				case 21:
