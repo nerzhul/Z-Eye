@@ -25,7 +25,6 @@
 				"fr" => array(
 					"Add" => "Ajouter",
 					"Available-s" => "Distribuables",
-					"bad-datas" => "Requête invalide !",
 					"bad-filter" => "Filtre invalide !",
 					"Baux" => "Baux",
 					"change-interval" => "Changer l'intervalle",
@@ -38,6 +37,7 @@
 					"En-IP-history" => "Activer l'historique IP",
 					"En-monitor" => "Activer le monitoring de capacité",
 					"err-already-exists" => "Le serveur SSH mentionné existe déjà",
+					"err-bad-datas" => "Requête invalide !",
 					"err-bad-subnet" => "Le subnet entré est invalide !",
 					"err-miss-data" => "Certaines données sont manquantes ou invalides !",
 					"err-invalid-req" => "Requête invalide !",
@@ -109,7 +109,6 @@
 				"en" => array(
 					"Add" => "Ajouter",
 					"Available-s" => "Distributable",
-					"bad-datas" => "Invalid request",
 					"bad-filter" => "Bad filter",
 					"Baux" => "Leases",
 					"change-interval" => "Change interval",
@@ -121,6 +120,7 @@
 					"Distributed" => "Available",
 					"En-IP-history" => "Enable IP history",
 					"En-monitor" => "Enable capacity monitoring",
+					"err-bad-datas" => "Invalid request",
 					"err-bad-subnet" => "This subnet is invalid !",
 					"err-miss-data" => "Some datas are missing or invalid !",
 					"err-invalid-req" => "Invalid request !",

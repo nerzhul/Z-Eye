@@ -44,7 +44,7 @@
 				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
 					switch($err) {
-						case 1: case 7: case 8: $output .= FS::$iMgr->printError($this->loc->s("bad-datas")); break;
+						case 1: case 7: case 8: $output .= FS::$iMgr->printError($this->loc->s("err-bad-datas")); break;
 						case 2: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-not-match")); break;
 						case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-conn-failed")); break;
 						case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-auth-failed")); break;
@@ -61,7 +61,7 @@
 					}
 					// To add servers
         	                        $formoutput = "<h2>".$this->loc->s("title-add-server")."</h2>".
-						FS::$iMgr->form("index.php?mod=".$this->mid."&act=5").
+						FS::$iMgr->form("index.php?mod=".$this->mid."&act=5",array("id" => "dhcpmgmtfrm")).
                 	                	"<ul class=\"ulform\"><li>".$this->loc->s("note-needed")."<li>
 						<li>".FS::$iMgr->input("addr","",20,128,$this->loc->s("server-addr"))." (*)</li>
 						<li>".FS::$iMgr->input("sshuser","",20,128,$this->loc->s("ssh-user"))." (*)</li>
@@ -73,6 +73,7 @@
 						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"),"tooltip-subnetconfpath")."</li>
                         	        	<li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li>
                                 		</ul></form>";
+					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=5","dhcpmgmtfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 					// To delete servers
 					$found = false;
 					$tmpoutput = "<h2>".$this->loc->s("title-remove-server")."</h2>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
@@ -549,28 +550,43 @@
 						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath))
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
-                                                FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-datas");
+						else
+                                                	FS::$iMgr->redir("mod=".$this->mid."&err=1");
                                                 return;
                                         }
 					if($spwd != $spwd2) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-pwd-not-match");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
                                                 return;
                                         }
 
                                         $conn = ssh2_connect($saddr,22);
                                         if(!$conn) {
-                                                FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"SSH Connection failed for '".$saddr."'");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-ssh-conn-failed");
+						else
+                                                	FS::$iMgr->redir("mod=".$this->mid."&err=3");
                                                 return;
                                         }
 					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
-                                                FS::$iMgr->redir("mod=".$this->mid."&err=4");
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-ssh-auth-failed");
+						else
+                                                	FS::$iMgr->redir("mod=".$this->mid."&err=4");
                                                 return;
                                         }
                                         if(FS::$dbMgr->GetOneData("z_eye_dhcp_servers","sshuser","addr ='".$saddr."'")) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
-                                                FS::$iMgr->redir("mod=".$this->mid."&err=5");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-already-exists");
+						else
+                                                	FS::$iMgr->redir("mod=".$this->mid."&err=5");
                                                 return;
                                         }
 					/*
@@ -585,7 +601,10 @@
 
 					if($cmdret != 0) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
-						FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$dhcpdpath);
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-unable-read")." '".$dhcpdpath."'";
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$dhcpdpath);
                                                 return;
 					}
 
@@ -598,7 +617,10 @@
 
                                         if($cmdret != 0) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$leasepath."' on '".$saddr."'");
-                                                FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$leasepath);
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-unable-read")." '".$leasepath."'";
+						else
+                                                	FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$leasepath);
                                                 return;
                                         }
 
@@ -611,7 +633,10 @@
 
                                         	if($cmdret != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
-	                                                FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$reservconfpath);
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-unable-read")." '".$reservconfpath."'";
+							else
+	                                        	        FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$reservconfpath);
         	                                        return;
                 	                        }
 					}
@@ -625,7 +650,10 @@
 
                                         	if($cmdret != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
-	                                                FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$subnetconfpath);
+							if(FS::isAjaxCall())
+								echo $this->loc->s("err-unable-read")." '".$subnetconfpath."'";
+							else
+	                                                	FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$subnetconfpath);
         	                                        return;
                 	                        }
 					}
@@ -633,7 +661,7 @@
 					FS::$dbMgr->Insert("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
 						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				// Delete DHCP Server
 				case 6:
