@@ -744,7 +744,7 @@ label {
 
 /* Tooltip */
 .tooltip {
-	background-color: rgba(25, 25, 25, 0.90);
+	background-color: rgba(15, 15, 15, 0.90);
 	border-radius: 3px 3px 3px 3px;
 	font-size: 10px;
 	padding: 7px;
