@@ -186,9 +186,11 @@
 				if(!$found) $found = true;
 				// Init array for device
 				$grprules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
-					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array());
+					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
+					"sshpwd" => array());
 				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
-					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array());
+					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
+					"sshpwd" => array());
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -212,6 +214,8 @@
 						array_push($grprules["exportcfg"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_retagvlan")
 						array_push($grprules["retagvlan"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshpwd")
+						array_push($grprules["sshpwd"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -244,6 +248,8 @@
 						array_push($usrrules["exportcfg"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_retagvlan")
 						array_push($usrrules["retagvlan"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshpwd")
+						array_push($usrrules["sshpwd"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -381,6 +387,8 @@
 					$usrrules["exportcfg"] = array();
 					$grprules["retagvlan"] = array();
 					$usrrules["retagvlan"] = array();
+					$grprules["sshpwd"] = array();
+					$usrrules["sshpwd"] = array();
 				}
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -404,6 +412,8 @@
 						array_push($grprules["exportcfg"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_retagvlan" && $data["rw"] == 't')
 						array_push($grprules["retagvlan"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshpwd" && $data["rw"] == 't')
+						array_push($grprules["sshpwd"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -436,6 +446,8 @@
 						array_push($usrrules["exportcfg"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_retagvlan" && $data["rw"] == 't')
 						array_push($usrrules["retagvlan"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshpwd" && $data["rw"] == 't')
+						array_push($usrrules["sshpwd"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -588,6 +600,7 @@
 				case "restorestartupcfg": return $this->loc->s("Restore-startup-cfg");
 				case "exportcfg": return $this->loc->s("Export-cfg");
 				case "retagvlan": return $this->loc->s("Retag-vlan");
+				case "sshpwd": return $this->loc->s("Set-switch-sshpwd");
 				default: return FS::$iMgr->printError($this->loc->s("err-not-found"));
 			}
 		}

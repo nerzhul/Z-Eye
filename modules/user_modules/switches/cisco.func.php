@@ -16,7 +16,7 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 		/*
 		* Generic port management
 		*/
@@ -59,7 +59,6 @@
                         $dup = $dup[1];
                         return $dup;
                 }
-
 
 		function setPortDuplexWithPID($device,$pid,$value) {
 			if($value < 1 || $value > 4)
@@ -988,15 +987,38 @@
 
 			return setFieldForPortWithPID($device,$pid,$field,$vtype,$value);
 		}
-		
+
 		function getFieldForPort($device, $portname, $field) {
 			if($device == "" || $portname == "" || $field == "")
 				return NULL;
-			
+
 			$pid = getPortId($device,$portname);
 			if($pid == -1)
 				return NULL;
 
 			return getFieldForPortWithPid($device,$pid,$field);
+		}
+
+
+		function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
+			$conn = ssh2_connect($device,22);
+			if(!$conn)
+				return 1;
+
+			if(!ssh2_auth_password($conn, $sshuser, $sshpwd))
+				return 2;
+
+			$stdio = @ssh2_shell($conn,"xterm");
+			fwrite($stdio,"enable\n");
+			usleep(500000);
+			while($line = fgets($stdio)) {}
+
+			fwrite($stdio,$enablepwd."\n");
+			usleep(500000);
+			while($line = fgets($stdio)) {
+				if($line == "% Access denied\r\n")
+        	                	return 3;
+        		}
+			return 0;
 		}
 ?>
