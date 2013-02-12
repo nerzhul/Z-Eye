@@ -1019,6 +1019,28 @@
 				if($line == "% Access denied\r\n")
         	                	return 3;
         		}
-			return 0;
+			return $stdio;
 		}
+
+		function sendSSHCmd($stdio, $cmd) {
+			$output = "";
+			$output_arr = array();
+			$firstline = true;
+
+			fwrite($stdio,$cmd."\n");
+			usleep(500000);
+
+			while($line = fgets($stdio)) {
+				if($firstline) $firstline = false;
+				else if(preg_match("# --More-- #",$line)) {
+					fwrite($stdio,"\n");
+					usleep(500000);
+				}
+				else array_push($output_arr,$line);
+        		}
+
+			for($i=0;$i<count($output_arr)-2;$i++)
+				$output .= $output_arr[$i];
+			return $output;
+		}		
 ?>

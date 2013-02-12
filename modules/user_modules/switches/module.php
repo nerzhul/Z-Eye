@@ -87,6 +87,7 @@
 				$output .= "<h2>".$port." sur ".$device."</h2>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view"),$sh);
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
 					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") ||
@@ -379,6 +380,32 @@
 					$output .= FS::$iMgr->submit("","Enregister")."</li>";
 					$output .= "</ul>";
 					$output .= "</form>";
+				}
+				else if($sh == 4) {
+					$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
+					if(!$sshuser) {
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
+							<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
+						return $output;
+					}
+					
+					$sshpwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshpwd","device = '".$device."'");
+					$enablepwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","enablepwd","device = '".$device."'");
+					$stdio = connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
+					if(FS::$secMgr->isNumeric($stdio) && $err > 0) {
+						switch($stdio) {
+							case 1: $output .= FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
+							case 2: $output .= FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
+							case 3: $output .= FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
+							case 4: $output .= FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+						}	
+						return $output;
+					}
+					$output .= "<h2>".$this->loc->s("iface-dev-cfg")."</h2>".
+						"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",sendSSHCmd($stdio,"show running-config interface ".$port))."</pre>";
+					$output .= "<h2>".$this->loc->s("iface-dev-status")."</h2>".
+						"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",sendSSHCmd($stdio,"show interface ".$port))."</pre>";
+					
 				}
 			}
 			return $output;
@@ -2278,6 +2305,7 @@
 					case 22: // SSH pwd set
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						$dip = "";	
+						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 						if(!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-bad-datas");
@@ -2359,6 +2387,7 @@
 					case 23:
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						$dip = "";	
+						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
 						if(!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 							return;
