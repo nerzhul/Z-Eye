@@ -1191,8 +1191,10 @@
 						}
 						$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
 						$output .= $this->loc->s("ssh-link-state").": ";
-						if($sshuser)
-							$output .= "<span style=\"color: green;\">".$this->loc->s("Enabled")."</span>";
+						if($sshuser) {
+							$output .= "<span style=\"color: green;\">".$this->loc->s("Enabled")."</span> ";
+							$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=23&d=".$device);
+						}
 						else
 							$output .= "<span style=\"color: red;\">".$this->loc->s("Disabled")."</span>";
 						$output .= FS::$iMgr->form("index.php?act=22&d=".$device,array("id" => "sshpwdset"));
@@ -2346,10 +2348,24 @@
 						FS::$dbMgr->Delete("z_eye_switch_pwd","device = '".$device."'");
 						FS::$dbMgr->Insert("z_eye_switch_pwd","device,sshuser,sshpwd,enablepwd","'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".
 							base64_encode($enablepwd)."'");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("OK");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7");
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7",true);
+						return;
+					case 23:
+						$device = FS::$secMgr->checkAndSecuriseGetData("d");
+						$dip = "";	
+						if(!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							return;
+						}
+
+						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_sshpwd") && 
+							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd")) {
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=1");
+							return;
+						}
+							
+						FS::$dbMgr->Delete("z_eye_switch_pwd","device = '".$device."'");
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7");
 						return;
 				default: break;
 			}
