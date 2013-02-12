@@ -2344,6 +2344,12 @@
 								else
 									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=7");
 								return;
+							case 4:
+								if(FS::isAjaxCall())
+									echo $this->loc->s("err-not-implemented");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=8");
+								return;
 						}
 						FS::$dbMgr->Delete("z_eye_switch_pwd","device = '".$device."'");
 						FS::$dbMgr->Insert("z_eye_switch_pwd","device,sshuser,sshpwd,enablepwd","'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".

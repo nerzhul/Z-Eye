@@ -1035,4 +1035,9 @@
 
 			return getFieldForPortWithPid($device,$pid,$field);
 		}
+		
+		function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
+			// 4: not implemented		// 4: not implemented		// 4: not implemented		// 4: not implemented	
+			return 4;
+		}
 ?>
