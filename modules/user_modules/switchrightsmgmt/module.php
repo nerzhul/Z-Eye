@@ -187,10 +187,10 @@
 				// Init array for device
 				$grprules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
-					"sshpwd" => array());
+					"sshpwd" => array(), "sshportinfos" => array());
 				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
-					"sshpwd" => array());
+					"sshpwd" => array(), "sshportinfos" => array());
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -216,6 +216,8 @@
 						array_push($grprules["retagvlan"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshpwd")
 						array_push($grprules["sshpwd"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshportinfos")
+						array_push($grprules["sshportinfos"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -250,6 +252,8 @@
 						array_push($usrrules["retagvlan"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshpwd")
 						array_push($usrrules["sshpwd"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshportinfos")
+						array_push($usrrules["sshportinfos"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -375,6 +379,8 @@
 					$usrrules["readswmodules"] = array();
 					$grprules["readswvlans"] = array();
 					$usrrules["readswvlans"] = array();
+					$grprules["sshportinfos"] = array();
+					$usrrules["sshportinfos"] = array();
 				}
 				if($data["rw"] == 't') {
 					$grprules["write"] = array();
@@ -402,6 +408,8 @@
 						array_push($grprules["readswmodules"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswvlans" && $data["ro"] == 't')
 						array_push($grprules["readswvlans"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshportinfos" && $data["ro"] == 't')
+						array_push($grprules["sshportinfos"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
 						array_push($grprules["write"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
@@ -436,6 +444,8 @@
 						array_push($usrrules["readswmodules"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswvlans" && $data["ro"] == 't')
 						array_push($usrrules["readswvlans"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshportinfos" && $data["ro"] == 't')
+						array_push($usrrules["sshportinfos"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
 						array_push($usrrules["write"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
@@ -595,6 +605,7 @@
 				case "readswdetails": return $this->loc->s("Read-switch-details");
 				case "readswmodules": return $this->loc->s("Read-switch-modules");
 				case "readswvlans": return $this->loc->s("Read-switch-vlan");
+				case "sshportinfos": return $this->loc->s("Read-ssh-portinfos");
 				case "write": return $this->loc->s("Writing");
 				case "writeportmon": return $this->loc->s("Write-port-mon"); 
 				case "restorestartupcfg": return $this->loc->s("Restore-startup-cfg");
