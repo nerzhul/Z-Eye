@@ -19,7 +19,7 @@
 	require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 	
 	FS::LoadFSModules();
-	
+
 	$portbuffer = array();
 
 	function getPortId($device,$portname,&$portbuffer) {
@@ -31,10 +31,13 @@
 			if(!isset($portbuffer[$dip])) $portbuffer[$dip] = array();
 			if(!isset($portbuffer[$dip][$portname])) {
 				$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
-				if($community == NULL) $community = SNMPConfig::$SNMPReadCommunity;
+				if(!$community)
+					return -1;
+
 				exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep ".$portname,$out);
 				if(!is_array($out) || count($out) == 0 || strlen($out[0]) < 5)
 					return -1;
+
 				$out = explode(" ",$out[0]);
 				$out = explode(".",$out[0]);
 				if(!FS::$secMgr->isNumeric($out[1]))
@@ -45,7 +48,7 @@
 			else
 				return $portbuffer[$dip][$portname];
 	}
-		
+
 	function generateGraph($filename, &$portbuffer, $options=array()) {
 		$file = fopen(dirname(__FILE__)."/../datas/weathermap/".$filename.".dot","w+");
 		if(!$file) {
