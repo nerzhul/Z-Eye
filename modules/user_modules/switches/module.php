@@ -84,10 +84,11 @@
 				default: break;
 			}
 			if(!FS::isAjaxCall()) {
-				$output .= "<h2>".$port." sur ".$device."</h2>";
+				$output .= "<h2>".$port." ".$this->loc->s("on")." ".$device."</h2>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view"),$sh);
+				if(FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'"))
+					$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view"),$sh);
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
 					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") ||
