@@ -1383,7 +1383,7 @@
 						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21","backupall",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true));
 					}
 					if($rightsok) {
-						if($titleshow) $output .= "<h2>".$this->loc->s("title-global-fct")."</h2>";
+						if($showtitle) $output .= "<h2>".$this->loc->s("title-global-fct")."</h2>";
 						// Openable divs
 						$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
 					}
