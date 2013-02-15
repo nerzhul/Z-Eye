@@ -42,7 +42,7 @@ def restartSnort():
 				pipe = os.popen('{ ' + cmd + '; }', 'r')
 				text = pipe.read()
 				pipe.close()
-				os.remove("/tmp/icinga_restart")
+				os.remove("/tmp/snort_restart")
 			snortFile.close()
 		
 restartIcinga()
