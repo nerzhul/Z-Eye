@@ -1008,7 +1008,7 @@
 		*/
 
 		public function showSSHRunCfg($stdio) {
-			return $this->sendSSHCmd($stdio,"show running-config");
+			return $this->sendSSHCmd($stdio,"show running-config",5000000);
 		}
 
 		public function showSSHStartCfg($stdio) {
@@ -1025,11 +1025,11 @@
 
 			$stdio = @ssh2_shell($conn,"xterm");
 			fwrite($stdio,"enable\n");
-			usleep(500000);
+			usleep(250000);
 			while($line = fgets($stdio)) {}
 
 			fwrite($stdio,$enablepwd."\n");
-			usleep(500000);
+			usleep(250000);
 			while($line = fgets($stdio)) {
 				if($line == "% Access denied\r\n")
         	                	return 3;
@@ -1037,19 +1037,19 @@
 			return $stdio;
 		}
 
-		public function sendSSHCmd($stdio, $cmd) {
+		public function sendSSHCmd($stdio, $cmd, $fusleep = 500000, $iusleep = 200000) {
 			$output = "";
 			$output_arr = array();
 			$firstline = true;
 
 			fwrite($stdio,$cmd."\n");
-			usleep(500000);
+			usleep($fusleep);
 
 			while($line = fgets($stdio)) {
 				if($firstline) $firstline = false;
 				else if(preg_match("# --More-- #",$line)) {
 					fwrite($stdio," ");
-					usleep(50000);
+					usleep($iusleep);
 				}
 				else array_push($output_arr,$line);
         		}
