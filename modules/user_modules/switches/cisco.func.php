@@ -30,18 +30,18 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 				return -1;
 
-			return setFieldForPortWithPID($device,$pid,"ifAlias","s",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"ifAlias","s",$value);
 		}
 
 		public function setPortStateWithPID($device,$pid,$value) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || ($value != 1 && $value != 2))
 				return NULL;
 
-			return setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
 		}
 
 		public function getPortStateWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"ifAdminStatus");
+			$dup = $this->getFieldForPortWithPID($device,$pid,"ifAdminStatus");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -56,7 +56,7 @@
 		*/
 
 		public function getPortMtuWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"ifMtu");
+                        $dup = $this->getFieldForPortWithPID($device,$pid,"ifMtu");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                         	return -1;
@@ -69,11 +69,11 @@
 			if($value < 1 || $value > 4)
 				return NULL;
 
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
 		}
 
 		public function getPortDuplexWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.522.3.15.5");
+			$dup = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.522.3.15.5");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -86,18 +86,18 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value < 1)
 					return NULL;
 			
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
 		}
 		
 		public function getPortSpeedWithPID($device,$pid) {
-			$idx = getPortIndexes($device,$pid);
+			$idx = $this->getPortIndexes($device,$pid);
 			if($idx == NULL)
-					return -2;
+				return -2;
 
-			$dup = getFieldForPortWithPID($device,$idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
+			$dup = $this->getFieldForPortWithPID($device,$idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
-					return -1;
+				return -1;
 			
 			$dup = $dup[1];
 			return $dup;
@@ -110,14 +110,14 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
 				return -1;
 
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2","i",$value);
 		}
 
 		public function getSwitchAccessVLANWithPID($device,$pid) {
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");
+                        $ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");
                         $vlan = explode(" ",$ret);
                         if(count($vlan) != 2)
                                 return -1;
@@ -130,17 +130,17 @@
 			// 1: enable / 2: disable
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2)
 				return 1;
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1","i",$value);
 		}
 
 		public function getSwitchportMABState($device,$pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
+			$ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
 			$state = explode(" ",$ret);
 			if(count($state) != 2)
-					return -1;
+				return -1;
 
 			$state = $state[1];
 			return $state;
@@ -150,34 +150,34 @@
 			// 1: normal / 2: EAP
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2)
                                 return 1;
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
 		}
 
 		public function getSwitchportMABType($device,$pid) {
-				if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-						return -1;
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+				return -1;
 
-				$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
-				$type = explode(" ",$ret);
-				if(count($type) != 2)
-						return -1;
+			$ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
+			$type = explode(" ",$ret);
+			if(count($type) != 2)
+				return -1;
 
-				$type = $type[1];
-				return $type;
+			$type = $type[1];
+			return $type;
 		}
 
 		public function setSwitchportAuthFailVLAN($device,$pid,$value) {
 			// #todo disable feature
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
                                 return 1;
-                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.1.1.2" : "1.3.6.1.4.1.9.9.656.1.3.1.1.3"),"i",($value == 0 ? 1 : $value));
+                        return $this->setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.1.1.2" : "1.3.6.1.4.1.9.9.656.1.3.1.1.3"),"i",($value == 0 ? 1 : $value));
                 }
 
                 public function getSwitchportAuthFailVLAN($device,$pid) {
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.1.1.3");
+                        $ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.1.1.3");
                         $vlan = explode(" ",$ret);
                         if(count($vlan) != 2)
                                 return -1;
@@ -190,14 +190,14 @@
 			// @todo disable feature
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
                                 return 1;
-                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.2.1.1" : "1.3.6.1.4.1.9.9.656.1.3.2.1.2"),"i",($value == 0 ? 1 : $value));
+                        return $this->setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.2.1.1" : "1.3.6.1.4.1.9.9.656.1.3.2.1.2"),"i",($value == 0 ? 1 : $value));
                 }
 
                 public function getSwitchportAuthNoRespVLAN($device,$pid) {
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.2.1.2");
+                        $ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.2.1.2");
                         $vlan = explode(" ",$ret);
                         if(count($vlan) != 2)
                                 return -1;
@@ -210,14 +210,14 @@
                         // @todo disable feature
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
                                 return 1;
-                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
+                        return $this->setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
                 }
 
                 public function getSwitchportAuthDeadVLAN($device,$pid) {
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.3.1.3");
+                        $ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.3.1.3");
                         $vlan = explode(" ",$ret);
                         if(count($vlan) != 2)
                                 return -1;
@@ -231,7 +231,7 @@
 			// 1: unauthorized / 2: auto / 3: authorized / 3: disable feature
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2 && $value != 3)
                                 return 1;
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
                 }
 
                 public function getSwitchportControlMode($device,$pid) {
@@ -252,14 +252,14 @@
 			// 1: single-host (default) / 2: multi-host / 3: multi-auth / 4: multi-domain
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4)
 					return 1;
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
 		}
 				
 		public function getSwitchportAuthHostMode($device,$pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 					return -1;   
 					
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3");
+			$ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3");
 			$val = explode(" ",$ret);
 			if(count($val) != 2)
 					return -1;
@@ -272,14 +272,14 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 1005)
 				return -1;
 
-            		return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
+            		return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
 		}
 		
 		public function getSwitchTrunkNativeVlanWithPID($device,$pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 				return -1;
 
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
+			$ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
 			$vlan = explode(" ",$ret);
             		if(count($vlan) != 2)
 				return -1;
@@ -334,10 +334,10 @@
 			* There is 4 mibs, each contains 1024 vlan id
 			* For now, we don't use vlanid > 1024, only 1-1024
 			*/
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17","x",$str2);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18","x",$str2);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str2);
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4","x",$str);
+			$this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17","x",$str2);
+			$this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18","x",$str2);
+			$this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str2);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4","x",$str);
 		}
 
 		public function setSwitchNoTrunkVlanWithPID($device,$pid) {
@@ -377,30 +377,30 @@
 			$str23 = "";
 			$count=0;
 			for($i=0;$i<1024;$i++) {
-					$tmpstr .= "1";
-					$count++;
-					if($count == 8) {
-							$tmpchar = base_convert($tmpstr,2,16);
-							if(strlen($tmpchar) == 1)
-							$tmpchar = "0".$tmpchar;
-							$str23 .= $tmpchar;
+				$tmpstr .= "1";
+				$count++;
+				if($count == 8) {
+					$tmpchar = base_convert($tmpstr,2,16);
+					if(strlen($tmpchar) == 1)
+					$tmpchar = "0".$tmpchar;
+					$str23 .= $tmpchar;
 
-							$tmpstr = "";
-							$count = 0;
-					}
+					$tmpstr = "";
+					$count = 0;
+				}
 			}
 
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17","x",$str23);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18","x",$str23);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str4);
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4","x",$str1);
+			$this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17","x",$str23);
+			$this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18","x",$str23);
+			$this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str4);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4","x",$str1);
 		}
 
 		public function getSwitchportTrunkVlansWithPid($device,$pid) {
 			$vlanlist = array();
 			$trunkNoVlan = true;
 			$vlid = 0;
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4");
+			$hstr = $this->getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -419,7 +419,7 @@
 					$vlid++;
 				}
 			}
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17");
+			$hstr = $this->getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -438,7 +438,7 @@
 					$vlid++;
 				}
 			}
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18");
+			$hstr = $this->getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -457,7 +457,7 @@
 					$vlid++;
 				}
 			}
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19");
+			$hstr = $this->getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19");
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE")
@@ -487,14 +487,14 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
 					return -1;
 
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3","i",$value);
 		}
 		
 		public function getSwitchTrunkEncapWithPID($device, $pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 		                  return -1;
 
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3");
+			$ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3");
 			$state = explode(" ",$ret);
 			if(count($state) != 2)
 					return -1;
@@ -507,14 +507,14 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
 				return -1;
 
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
 		}
 
 		public function getSwitchportModeWithPID($device, $pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 		                  return -1;
 
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
+			$ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
 			$state = explode(" ",$ret);
 			if(count($state) != 2)
 					return -1;
@@ -524,30 +524,30 @@
 		}
 
 		public function setSwitchportVoiceVlanWithPID($device, $pid, $value) {
-				if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4096)
-				   return -1;
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4096)
+			   return -1;
 
-				return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
 		}
 
 		public function getSwitchportVoiceVlanWithPID($device, $pid) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 				return -1;
 
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1");
+			$ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1");
 			$value = explode(" ",$ret);
-				if(count($value) != 2)
-						return -1;
+			if(count($value) != 2)
+				return -1;
 
-				$value = $value[1];
-				return $value;
+			$value = $value[1];
+			return $value;
 		}
 
 		/*
 		* Generic public functions
 		*/
 
-		public function setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
+		public function $this->setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
 			if($device == "" || $field == "" || $pid == "" || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -612,18 +612,18 @@
 				if($vlanFltr == NULL || !FS::$secMgr->isNumeric($vlanFltr) || $vlanFltr < 1 || $vlanFltr > 4096)
 					array_push($plist,$pname);
 				else {
-					$portmode = getSwitchportModeWithPID($device,$pid);
+					$portmode = $this->getSwitchportModeWithPID($device,$pid);
 					if($portmode == 1) {
-						$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
+						$nvlan = $this->getSwitchTrunkNativeVlanWithPID($device,$pid);
 						if(!in_array($pname,$plist) && $vlanFltr == $nvlan)
 							array_push($plist,$pname);
 
-						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
+						$vllist = $this->getSwitchportTrunkVlansWithPid($device,$pid);
 						if(!in_array($pname,$plist) && in_array($vlanFltr,$vllist))
 							array_push($plist,$pname);
 					}
 					else if($portmode == 2) {
-						$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+						$pvlan = $this->getSwitchAccessVLANWithPID($device,$pid);
 						if(!in_array($pname,$plist) && $vlanFltr == $pvlan)
 							array_push($plist,$pname);
 					}
@@ -648,13 +648,13 @@
 				if(!FS::$secMgr->isNumeric($pid[1]))
 					continue;
 				$pid = $pid[1];
-				$portmode = getSwitchportModeWithPID($device,$pid);
+				$portmode = $this->getSwitchportModeWithPID($device,$pid);
 				if($portmode == 1) {
-					$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
+					$nvlan = $this->getSwitchTrunkNativeVlanWithPID($device,$pid);
 					if($oldvlan == $nvlan)
-						setSwitchTrunkNativeVlanWithPID($device,$pid,$newvlan);
+						$this->setSwitchTrunkNativeVlanWithPID($device,$pid,$newvlan);
 
-					$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
+					$vllist = $this->getSwitchportTrunkVlansWithPid($device,$pid);
 					if(in_array($oldvlan,$vllist)) {
 						$vllist2 = array();
 						$countvl = count($vllist);
@@ -663,13 +663,13 @@
 								array_push($vllist2,$vllist[$j]);
 						}
 						array_push($vllist2,$newvlan);
-						setSwitchTrunkVlanWithPID($device,$pid,$vllist2);
+						$this->setSwitchTrunkVlanWithPID($device,$pid,$vllist2);
 					}
 				}
 				else if($portmode == 2) {
-					$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+					$pvlan = $this->getSwitchAccessVLANWithPID($device,$pid);
 					if($oldvlan == $pvlan)
-						setSwitchAccessVLANWithPID($device,$pid,$newvlan);
+						$this->setSwitchAccessVLANWithPID($device,$pid,$newvlan);
 				}
 			}
 		}
@@ -793,106 +793,106 @@
 		*/
 		
 		public function setPortState($device,$portname,$value) {
-			$pid = getPortId($device,$portname);
+			$pid = i$this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setPortStateWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
+			return $this->setPortStateWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
 		}
 		
 		public function setPortDesc($device,$portname,$value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setPortDescWithPID($device,$pid,$value);
+			return $this->setPortDescWithPID($device,$pid,$value);
 		}
 		
 		public function getPortDesc($device,$portname) {
-			return getFieldForPort($device, $portname, "ifAlias");
+			return $this->getFieldForPort($device, $portname, "ifAlias");
 		}
 		
 		public function setSwitchportMode($device, $portname, $value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 			return -1;
 
-	        	return setSwitchportModeWithPID($device,$pid,$value);
+	        	return $this->setSwitchportModeWithPID($device,$pid,$value);
 		}
 		
 		public function getSwitchportMode($device, $portname, $value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-	            return getSwitchportModeWithPID($device,$pid,$value);
+	            return $this->getSwitchportModeWithPID($device,$pid,$value);
 		}
 		
 		public function setSwitchNoTrunkVlan($device,$portname) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchNoTrunkVlanWithPID($device,$pid);
+			return $this->setSwitchNoTrunkVlanWithPID($device,$pid);
 		}
 		
 		public function setSwitchTrunkNativeVlan($device,$portname,$value) {
 			if(!FS::$secMgr->isNumeric($value) || $value > 1005)
 				return -1;
 			
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
+			return $this->setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
 		}
 		
 		public function setSwitchTrunkVlan($device,$portname,$values) {
 			if(!preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values))
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchTrunkVlanWithPID($device,$pid,$values);
+			return $this->setSwitchTrunkVlanWithPID($device,$pid,$values);
 		}
 		
 		public function setSwitchAccessVLAN($device,$portname,$value) {
 			if(!FS::$secMgr->isNumeric($value))
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchAccessVLANWithPID($device,$pid,$value);
+			return $this->setSwitchAccessVLANWithPID($device,$pid,$value);
 		}
 		
 		public function getSwitchAccessVLAN($device,$portname,$value) {
 			if(!FS::$secMgr->isNumeric($value))
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return getSwitchAccessVLANWithPID($device,$pid);
+			return $this->getSwitchAccessVLANWithPID($device,$pid);
 		}
 		
 		public function getSwitchportTrunkVlans($device,$portname) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
-			return getSwitchportTrunkVlansWithPid($device,$pid);
+			return $this->getSwitchportTrunkVlansWithPid($device,$pid);
 		}
 		
 		public function setSwitchTrunkEncap($device,$portname,$value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchTrunkEncapWithPID($device,$pid,$value);
+			return $this->setSwitchTrunkEncapWithPID($device,$pid,$value);
 		}
 
 		/*
@@ -900,7 +900,7 @@
 		*/
 
 		public function getPortSecStatusWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.2");
+                        $dup = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.2");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                                 return -1;
@@ -910,7 +910,7 @@
                 }
 
 		public function getPortSecEnableWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1");
+                        $dup = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                                 return -1;
@@ -923,11 +923,11 @@
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
                                 return -1;
 
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
                 }
 
 		public function getPortSecViolActWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8");
+                        $dup = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                                 return -1;
@@ -940,11 +940,11 @@
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
                                 return -1;
 
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
                 }
 
 		public function getPortSecMaxMACWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3");
+                        $dup = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                                 return -1;
@@ -957,16 +957,15 @@
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 6144)
                                 return -1;
 
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
                 }
-
 
 		/*
 		* special
 		*/
 
 		public function getPortCDPEnableWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2");
+                        $dup = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                                 return -1;
@@ -979,31 +978,42 @@
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
                         	return -1;
 
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
                 }
 
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setFieldForPortWithPID($device,$pid,$field,$vtype,$value);
+			return $this->setFieldForPortWithPID($device,$pid,$field,$vtype,$value);
 		}
 
 		public function getFieldForPort($device, $portname, $field) {
 			if($device == "" || $portname == "" || $field == "")
 				return NULL;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return NULL;
 
-			return getFieldForPortWithPid($device,$pid,$field);
+			return $this->getFieldForPortWithPid($device,$pid,$field);
 		}
 
+		/*
+		* SSH commands
+		*/
+
+		public function showSSHRunCfg($stdio) {
+			return $this->sendSSHCmd($stdio,"show running-config");
+		}
+
+		public function showSSHStartCfg($stdio) {
+			return $this->sendSSHCmd($stdio,"show startup-config");
+		}
 
 		public function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
 			$conn = ssh2_connect($device,22);

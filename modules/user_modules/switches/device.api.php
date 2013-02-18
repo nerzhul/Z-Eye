@@ -349,13 +349,16 @@
 
 
 		public function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
-			return 1;
+			return NULL;
 		}
 
 		public function sendSSHCmd($stdio, $cmd) {
 			return "";
 		}		
 
+		public function showSSHRunCfg($stdio) {
+			return "";
+		}
 		public $vendor;
 	}
 ?>

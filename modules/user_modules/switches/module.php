@@ -402,12 +402,12 @@
 					$sshpwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshpwd","device = '".$device."'");
 					$enablepwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","enablepwd","device = '".$device."'");
 					$stdio = $devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
-					if(FS::$secMgr->isNumeric($stdio) && $err > 0) {
+					if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
 						switch($stdio) {
 							case 1: $output .= FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
 							case 2: $output .= FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
 							case 3: $output .= FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
-							case 4: $output .= FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+							case NULL: $output .= FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
 						}	
 						return $output;
 					}
@@ -468,6 +468,13 @@
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails"))
 					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Details"),$showmodule);
+
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") || 
+					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowstart")) 
+					$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Startup-Cfg"),$showmodule);
+				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowrun") || 
+					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowrun"))
+					$output .= FS::$iMgr->tabPanElmt(9,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Running-Cfg"),$showmodule);
 
 				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools"),$showmodule);
 
@@ -1224,7 +1231,7 @@
 					else if($showmodule == 7) {
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_sshpwd") && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd")) {
-							return $this->loc->s("err-no-rights");
+							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						}
 						$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
 						$output .= $this->loc->s("ssh-link-state").": ";
@@ -1244,6 +1251,56 @@
 						$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 						$output .= "</table></form>";
 						$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=22","sshpwdset",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+					}
+					else if($showmodule == 8) {
+						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") && 
+							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowstart")) {
+							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						}
+						$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
+						if(!$sshuser) {
+							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
+								<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
+							return $output;
+						}
+					
+						$sshpwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshpwd","device = '".$device."'");
+						$enablepwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","enablepwd","device = '".$device."'");
+						$stdio = $devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
+						if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
+							switch($stdio) {
+								case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
+								case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
+								case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
+								case NULL: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+							}	
+						}
+						$output .= "<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$devapi->showSSHStartCfg($stdio))."</pre>";
+					}
+					else if($showmodule == 9) {
+						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowrun") && 
+							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowrun")) {
+							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						}
+						$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
+						if(!$sshuser) {
+							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
+								<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
+							return $output;
+						}
+					
+						$sshpwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshpwd","device = '".$device."'");
+						$enablepwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","enablepwd","device = '".$device."'");
+						$stdio = $devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
+						if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
+							switch($stdio) {
+								case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
+								case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
+								case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
+								case NULL: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+							}	
+						}
+						$output .= "<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$devapi->showSSHRunCfg($stdio))."</pre>";
 					}
 					else {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
@@ -2382,7 +2439,7 @@
 								else
 									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=7");
 								return;
-							case 4:
+							case NULL:
 								if(FS::isAjaxCall())
 									echo $this->loc->s("err-not-implemented");
 								else

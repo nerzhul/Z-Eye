@@ -30,18 +30,18 @@
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
 				return -1;
 
-			return setFieldForPortWithPID($device,$pid,"ifAlias","s",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"ifAlias","s",$value);
 		}
 
 		public function setPortStateWithPID($device,$pid,$value) {
 			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || ($value != 1 && $value != 2))
 				return NULL;
 
-			return setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
+			return $this->setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
 		}
 
 		public function getPortStateWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"ifAdminStatus");
+			$dup = $this->getFieldForPortWithPID($device,$pid,"ifAdminStatus");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -56,7 +56,7 @@
 		*/
 
 		public function getPortMtuWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"ifMtu");
+                        $dup = $this->getFieldForPortWithPID($device,$pid,"ifMtu");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                         	return -1;
@@ -64,513 +64,6 @@
                         $dup = $dup[1];
                         return $dup;
                 }
-
-		// TODO: find mib
-		public function setPortDuplexWithPID($device,$pid,$value) {
-			if($value < 1 || $value > 4)
-				return NULL;
-
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
-		}
-
-		// TODO: find mib
-		public function getPortDuplexWithPID($device,$pid) {
-			$dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.522.3.15.5");
-			$dup = explode(" ",$dup);
-			if(count($dup) != 2)
-					return -1;
-
-			$dup = $dup[1];
-			return $dup;
-		}
-
-		// TODO: find mib
-		public function setPortSpeedWithPID($device,$pid,$value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value < 1)
-					return NULL;
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
-		}
-
-		// TODO: find mib
-		public function getPortSpeedWithPID($device,$pid) {
-			$idx = getPortIndexes($device,$pid);
-			if($idx == NULL)
-					return -2;
-
-			$dup = getFieldForPortWithPID($device,$idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
-			$dup = explode(" ",$dup);
-			if(count($dup) != 2)
-					return -1;
-			$dup = $dup[1];
-			return $dup;
-		}
-		/*
-		* VLAN management
-		*/
-
-		// TODO: find mib
-		public function setSwitchAccessVLANWithPID($device,$pid,$value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value))
-				return -1;
-
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchAccessVLANWithPID($device,$pid) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                                return -1;
-
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");
-                        $vlan = explode(" ",$ret);
-                        if(count($vlan) != 2)
-                                return -1;
-
-                        $vlan = $vlan[1];
-                        return $vlan;
-                }
-
-		// TODO: find mib
-		public function setSwitchportMABEnableWithPID($device,$pid,$value) {
-			// 1: enable / 2: disable
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2)
-				return 1;
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchportMABState($device,$pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                                return -1;
-
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
-			$state = explode(" ",$ret);
-			if(count($state) != 2)
-					return -1;
-
-			$state = $state[1];
-			return $state;
-		}
-
-		// TODO: find mib
-		public function setSwitchMABTypeWithPID($device,$pid,$value) {
-			// 1: normal / 2: EAP
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2)
-                                return 1;
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchportMABType($device,$pid) {
-				if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-						return -1;
-
-				$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
-				$type = explode(" ",$ret);
-				if(count($type) != 2)
-						return -1;
-
-				$type = $type[1];
-				return $type;
-		}
-
-		// TODO: find mib
-		public function setSwitchportAuthFailVLAN($device,$pid,$value) {
-			// #todo disable feature
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
-                                return 1;
-                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.1.1.2" : "1.3.6.1.4.1.9.9.656.1.3.1.1.3"),"i",($value == 0 ? 1 : $value));
-                }
-
-		// TODO: find mib
-                public function getSwitchportAuthFailVLAN($device,$pid) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                                return -1;
-
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.1.1.3");
-                        $vlan = explode(" ",$ret);
-                        if(count($vlan) != 2)
-                                return -1;
-
-                        $vlan = $vlan[1];
-                        return $vlan;
-                }
-
-		// TODO: find mib
-		public function setSwitchportAuthNoRespVLAN($device,$pid,$value) {
-			// @todo disable feature
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
-                                return 1;
-                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.2.1.1" : "1.3.6.1.4.1.9.9.656.1.3.2.1.2"),"i",($value == 0 ? 1 : $value));
-                }
-
-		// TODO: find mib
-                public function getSwitchportAuthNoRespVLAN($device,$pid) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                                return -1;
-
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.2.1.2");
-                        $vlan = explode(" ",$ret);
-                        if(count($vlan) != 2)
-                                return -1;
-
-                        $vlan = $vlan[1];
-                        return $vlan;
-                }
-
-		// TODO: find mib
-		public function setSwitchportAuthDeadVLAN($device,$pid,$value) {
-                        // @todo disable feature
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 4096)
-                                return 1;
-                        return setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
-                }
-
-		// TODO: find mib
-                public function getSwitchportAuthDeadVLAN($device,$pid) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                                return -1;
-
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.3.3.1.3");
-                        $vlan = explode(" ",$ret);
-                        if(count($vlan) != 2)
-                                return -1;
-
-                        $vlan = $vlan[1];
-                        return $vlan;
-                }
-
-		// TODO: find mib
-		// authentication port-control 1,2,3
-		public function setSwitchportControlMode($device,$pid,$value) {
-			// 1: unauthorized / 2: auto / 3: authorized / 3: disable feature
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || $value != 1 && $value != 2 && $value != 3)
-                                return 1;
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
-                }
-
-		// TODO: find mib
-                public function getSwitchportControlMode($device,$pid) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-                                return -1;
-
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5");
-                        $val = explode(" ",$ret);
-                        if(count($val) != 2)
-                                return -1;
-
-                        $val = $val[1];
-                        return $val;
-                }
-
-		// TODO: find mib
-		// authentication host-mode
-		public function setSwitchportAuthHostMode($device,$pid,$value) {
-			// 1: single-host (default) / 2: multi-host / 3: multi-auth / 4: multi-domain
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4)
-					return 1;
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchportAuthHostMode($device,$pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-					return -1;
-
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3");
-			$val = explode(" ",$ret);
-			if(count($val) != 2)
-					return -1;
-
-			$val = $val[1];
-			return $val;
-		}
-
-		// TODO: find mib
-		public function setSwitchTrunkNativeVlanWithPID($device,$pid,$value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value > 1005)
-				return -1;
-
-            		return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchTrunkNativeVlanWithPID($device,$pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-				return -1;
-
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
-			$vlan = explode(" ",$ret);
-            		if(count($vlan) != 2)
-				return -1;
-
-			$vlan = $vlan[1];
-			return $vlan;
-		}
-
-		// TODO: find mib
-		public function setSwitchTrunkVlanWithPID($device,$pid,$values) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || (!is_array($values) && !preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values)))
-				return -1;
-			/* 
-			* For each VLAN from 1 to 4096, set bit value to 1 if vlan is allowed, else set to 0
-			* Each byte is converted to a hex string, and chained
-			*/
-			$str = "";
-			$tmpstr="";
-			$count=0;
-			for($i=0;$i<1024;$i++) {
-				if(in_array($i,$values))
-						$tmpstr .= "1";
-				else
-						$tmpstr .= "0";
-				$count++;
-				if($count == 8) {
-					$tmpchar = base_convert($tmpstr,2,16);
-					if(strlen($tmpchar) == 1)
-						$tmpchar = "0".$tmpchar;
-					$str .= $tmpchar;
-					$tmpstr = "";
-					$count = 0;
-			        }
-			}
-
-			$tmpstr = "";
-			$str2 = "";
-			$count=0;
-			for($i=0;$i<1024;$i++) {
-				$tmpstr .= "0";
-				$count++;
-				if($count == 8) {
-					$tmpchar = base_convert($tmpstr,2,16);
-					if(strlen($tmpchar) == 1)
-						$tmpchar = "0".$tmpchar;
-					$str2 .= $tmpchar;
-					$tmpstr = "";
-					$count = 0;
-				}
-			}
-
-			/*
-			* There is 4 mibs, each contains 1024 vlan id
-			* For now, we don't use vlanid > 1024, only 1-1024
-			*/
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17","x",$str2);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18","x",$str2);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str2);
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4","x",$str);
-		}
-
-		// TODO: find mib
-		public function setSwitchNoTrunkVlanWithPID($device,$pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-				return -1;
-
-			$tmpstr1 = "0";
-			$tmpstr4 = "1";
-		        $str1 = "";
-			$str23 = "";
-			$str4 = "";
-			$count=1;
-			/*
-			* To unset allowed vlans, set all bits to 1 for vlan 2-4095. Vlan 1 and 4096 must be set to 0
-			*/
-			for($i=1;$i<1023;$i++) {
-				$tmpstr1 .= "1";
-				$tmpstr4 .= "1";
-  			        $count++;
-				if($i == 1022) {
-					$tmpstr1 .= "1";
-					$tmpstr4 .= "0";
-					$count++;
-				}
-                		if($count == 8) {
-			                $tmpchar1 = base_convert($tmpstr1,2,16);
-					$tmpchar4 = base_convert($tmpstr4,2,16);
-			                $str1 .= $tmpchar1;
-					$str4 .= $tmpchar4;
-			                $tmpstr1 = "";
-					$tmpstr4 = "";
-			                $count = 0;
-		               }
-		        }
-
-			$tmpstr = "";
-			$str23 = "";
-			$count=0;
-			for($i=0;$i<1024;$i++) {
-					$tmpstr .= "1";
-					$count++;
-					if($count == 8) {
-							$tmpchar = base_convert($tmpstr,2,16);
-							if(strlen($tmpchar) == 1)
-							$tmpchar = "0".$tmpchar;
-							$str23 .= $tmpchar;
-
-							$tmpstr = "";
-							$count = 0;
-					}
-			}
-
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17","x",$str23);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18","x",$str23);
-			setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19","x",$str4);
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4","x",$str1);
-		}
-
-		// TODO: find mib
-		public function getSwitchportTrunkVlansWithPid($device,$pid) {
-			$vlanlist = array();
-			$trunkNoVlan = true;
-			$vlid = 0;
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.4");
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-				$trunkNoVlan = false;
-			$strlen = strlen($hstr);
-			for($i=0;$i<$strlen;$i++) {
-				$vlanbytes = base_convert($hstr[$i],16,2);
-				$vlanbyteslen = strlen($vlanbytes);
-				// add initial zero to get 4 chars
-				for($j=$vlanbyteslen;$j<4;$j++)
-					$vlanbytes = "0".$vlanbytes;
-				$vlanbyteslen = strlen($vlanbytes);
-				for($j=0;$j<$vlanbyteslen;$j++) {
-					if($vlanbytes[$j] == "1")
-						array_push($vlanlist,$vlid);
-					$vlid++;
-				}
-			}
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.17");
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-				$trunkNoVlan = false;
-			$strlen = strlen($hstr);
-			for($i=0;$i<$strlen;$i++) {
-				$vlanbytes = base_convert($hstr[$i],16,2);
-				$vlanbyteslen = strlen($vlanbytes);
-				// add initial zero to get 4 chars
-				for($j=$vlanbyteslen;$j<4;$j++)
-					$vlanbytes = "0".$vlanbytes;
-				$vlanbyteslen = strlen($vlanbytes);
-				for($j=0;$j<$vlanbyteslen;$j++) {
-					if($vlanbytes[$j] == "1")
-						array_push($vlanlist,$vlid);
-					$vlid++;
-				}
-			}
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.18");
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-				$trunkNoVlan = false;
-			$strlen = strlen($hstr);
-			for($i=0;$i<$strlen;$i++) {
-				$vlanbytes = base_convert($hstr[$i],16,2);
-				$vlanbyteslen = strlen($vlanbytes);
-				// add initial zero to get 4 chars
-				for($j=$vlanbyteslen;$j<4;$j++)
-					$vlanbytes = "0".$vlanbytes;
-				$vlanbyteslen = strlen($vlanbytes);
-				for($j=0;$j<$vlanbyteslen;$j++) {
-					if($vlanbytes[$j] == "1")
-						array_push($vlanlist,$vlid);
-					$vlid++;
-				}
-			}
-			$hstr = getFieldForPortWithPid($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.19");
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE")
-				$trunkNoVlan = false;
-			$strlen = strlen($hstr);
-			for($i=0;$i<$strlen;$i++) {
-				$vlanbytes = base_convert($hstr[$i],16,2);
-				$vlanbyteslen = strlen($vlanbytes);
-				// add initial zero to get 4 chars
-				for($j=$vlanbyteslen;$j<4;$j++)
-					$vlanbytes = "0".$vlanbytes;
-				$vlanbyteslen = strlen($vlanbytes);
-				for($j=0;$j<$vlanbyteslen;$j++) {
-					if($vlanbytes[$j] == "1")
-						array_push($vlanlist,$vlid);
-					$vlid++;
-				}
-			}
-
-			if($trunkNoVlan == true)
-				return array();
-
-			return $vlanlist;
-		}
-
-		// TODO: find mib
-		public function setSwitchTrunkEncapWithPID($device,$pid,$value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
-					return -1;
-
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchTrunkEncapWithPID($device, $pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-		                  return -1;
-
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3");
-			$state = explode(" ",$ret);
-			if(count($state) != 2)
-					return -1;
-
-			$state = $state[1];
-			return $state;
-		}
-
-		// TODO: find mib
-		public function setSwitchportModeWithPID($device, $pid, $value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
-				return -1;
-
-			return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchportModeWithPID($device, $pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-		                  return -1;
-
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
-			$state = explode(" ",$ret);
-			if(count($state) != 2)
-					return -1;
-
-			$state = $state[1];
-			return $state;
-		}
-
-		// TODO: find mib
-		public function setSwitchportVoiceVlanWithPID($device, $pid, $value) {
-				if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4096)
-				   return -1;
-
-				return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
-		}
-
-		// TODO: find mib
-		public function getSwitchportVoiceVlanWithPID($device, $pid) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
-				return -1;
-
-			$ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1");
-			$value = explode(" ",$ret);
-				if(count($value) != 2)
-						return -1;
-
-				$value = $value[1];
-				return $value;
-		}
 
 		/*
 		* Generic public functions
@@ -632,18 +125,18 @@
 				if($vlanFltr == NULL || !FS::$secMgr->isNumeric($vlanFltr) || $vlanFltr < 1 || $vlanFltr > 4096)
 					array_push($plist,$pname);
 				else {
-					$portmode = getSwitchportModeWithPID($device,$pid);
+					$portmode = $this->getSwitchportModeWithPID($device,$pid);
 					if($portmode == 1) {
-						$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
+						$nvlan = $this->getSwitchTrunkNativeVlanWithPID($device,$pid);
 						if(!in_array($pname,$plist) && $vlanFltr == $nvlan)
 							array_push($plist,$pname);
 
-						$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
+						$vllist = $this->getSwitchportTrunkVlansWithPid($device,$pid);
 						if(!in_array($pname,$plist) && in_array($vlanFltr,$vllist))
 							array_push($plist,$pname);
 					}
 					else if($portmode == 2) {
-						$pvlan = getSwitchAccessVLANWithPID($device,$pid);
+						$pvlan = $this->getSwitchAccessVLANWithPID($device,$pid);
 						if(!in_array($pname,$plist) && $vlanFltr == $pvlan)
 							array_push($plist,$pname);
 					}
@@ -652,398 +145,137 @@
 			return $plist;
 		}
 
-		public function replaceVlan($device,$oldvlan,$newvlan) {
-			$out = "";
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			if($dip == NULL)
-				return -1;
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
-			$count = count($out);
-			for($i=0;$i<$count;$i++) {
-				$pdata = explode(" ",$out[$i]);
-				$pname = $pdata[3];
-				$pid = explode(".",$pdata[0]);
-				if(!FS::$secMgr->isNumeric($pid[1]))
-					continue;
-				$pid = $pid[1];
-				$portmode = getSwitchportModeWithPID($device,$pid);
-				if($portmode == 1) {
-					$nvlan = getSwitchTrunkNativeVlanWithPID($device,$pid);
-					if($oldvlan == $nvlan)
-						setSwitchTrunkNativeVlanWithPID($device,$pid,$newvlan);
-
-					$vllist = getSwitchportTrunkVlansWithPid($device,$pid);
-					if(in_array($oldvlan,$vllist)) {
-						$vllist2 = array();
-						$countvl = count($vllist);
-						for($j=0;$j<$countvl;$j++) {
-							if($vllist[$j] != $oldvlan)
-								array_push($vllist2,$vllist[$j]);
-						}
-						array_push($vllist2,$newvlan);
-						setSwitchTrunkVlanWithPID($device,$pid,$vllist2);
-					}
-				}
-				else if($portmode == 2) {
-					$pvlan = getSwitchAccessVLANWithPID($device,$pid);
-					if($oldvlan == $pvlan)
-						setSwitchAccessVLANWithPID($device,$pid,$newvlan);
-				}
-			}
-		}
-
-		// TODO: find mib
-		// Saving running-config => startup-config
-		public function writeMemory($device) {
-			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
-			return $rand;
-		}
-
-		// TODO: find mib
-		public function restoreStartupConfig($device) {
-			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","4");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
-			return $rand;
-		}
-
-		// TODO: find mib
-		// Save startup-config to TFTP Server
-		public function exportConfigToTFTP($device,$server,$path) {
-			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			return $rand;
-		}
-
-		// TODO: find mib
-		// Restore startup-config to TFTP Server
-		public function importConfigFromTFTP($device,$server,$path) {
-			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			return $rand;
-		}
-
-		// TODO: find mib
-		// Save startup-config to FTP/SCP/SFTP Server
-		public function exportConfigToAuthServer($device,$server,$type,$path,$user,$pwd) {
-			if($type != 2 && $type != 4 && $type != 5)
-				return -1;
-			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			return $rand;	
-		}
-
-		// TODO: find mib
-		// Restore startup-config to FTP/SCP/SFTP Server
-		public function importConfigFromAuthServer($device,$server,$type,$path,$user,$pwd) {
-			if($type != 2 && $type != 4 && $type != 5)
-				return -1;
-			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			return $rand;
-		}
-
-		// TODO: find mib
-		// Get Copy state from switch, using previous randomized id
-		public function getCopyState($device,$copyId) {
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			$res = snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
-			$res = preg_split("# #",$res);
-			return $res[1];
-		}
-
-		// TODO: find mib
-		public function getCopyError($device,$copyId) {
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			$res = snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.13.".$copyId);
-			$res = preg_split("# #",$res);
-			return $res[1];
-		}
-
 		/*
 		* helpers
 		*/
 
 		public function setPortState($device,$portname,$value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setPortStateWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
+			return $this->setPortStateWithPID($device,$pid,"1.3.6.1.2.1.2.2.1.7","i",$value);
 		}
 
 		public function setPortDesc($device,$portname,$value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setPortDescWithPID($device,$pid,$value);
+			return $this->setPortDescWithPID($device,$pid,$value);
 		}
 
 		public function getPortDesc($device,$portname) {
-			return getFieldForPort($device, $portname, "ifAlias");
+			return $this->getFieldForPort($device, $portname, "ifAlias");
 		}
 
 		public function setSwitchportMode($device, $portname, $value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 			return -1;
 
-	        	return setSwitchportModeWithPID($device,$pid,$value);
+	        	return $this->setSwitchportModeWithPID($device,$pid,$value);
 		}
 
 		public function getSwitchportMode($device, $portname, $value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-	            return getSwitchportModeWithPID($device,$pid,$value);
+	            return $this->getSwitchportModeWithPID($device,$pid,$value);
 		}
 
 		public function setSwitchNoTrunkVlan($device,$portname) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchNoTrunkVlanWithPID($device,$pid);
+			return $this->setSwitchNoTrunkVlanWithPID($device,$pid);
 		}
 
 		public function setSwitchTrunkNativeVlan($device,$portname,$value) {
 			if(!FS::$secMgr->isNumeric($value) || $value > 1005)
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
+			return $this->setSwitchTrunkNativeVlanWithPID($device,$pid,$value);
 		}
 
 		public function setSwitchTrunkVlan($device,$portname,$values) {
 			if(!preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values))
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchTrunkVlanWithPID($device,$pid,$values);
+			return $this->setSwitchTrunkVlanWithPID($device,$pid,$values);
 		}
 
 		public function setSwitchAccessVLAN($device,$portname,$value) {
 			if(!FS::$secMgr->isNumeric($value))
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchAccessVLANWithPID($device,$pid,$value);
+			return $this->setSwitchAccessVLANWithPID($device,$pid,$value);
 		}
 
 		public function getSwitchAccessVLAN($device,$portname,$value) {
 			if(!FS::$secMgr->isNumeric($value))
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return getSwitchAccessVLANWithPID($device,$pid);
+			return $this->getSwitchAccessVLANWithPID($device,$pid);
 		}
 
 		public function getSwitchportTrunkVlans($device,$portname) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
-			return getSwitchportTrunkVlansWithPid($device,$pid);
+			return $this->getSwitchportTrunkVlansWithPid($device,$pid);
 		}
 
 		public function setSwitchTrunkEncap($device,$portname,$value) {
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setSwitchTrunkEncapWithPID($device,$pid,$value);
+			return $this->setSwitchTrunkEncapWithPID($device,$pid,$value);
 		}
-
-		/*
-		* Port Security
-		*/
-
-		// TODO: find mib
-		public function getPortSecStatusWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.2");
-                        $dup = explode(" ",$dup);
-                        if(count($dup) != 2)
-                                return -1;
-
-                        $dup = $dup[1];
-                        return $dup;
-                }
-
-		// TODO: find mib
-		public function getPortSecEnableWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1");
-                        $dup = explode(" ",$dup);
-                        if(count($dup) != 2)
-                                return -1;
-
-                        $dup = $dup[1];
-                        return $dup;
-                }
-
-		// TODO: find mib
-		public function setPortSecEnableWithPID($device,$pid,$value) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                                return -1;
-
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
-                }
-
-		// TODO: find mib
-		public function getPortSecViolActWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8");
-                        $dup = explode(" ",$dup);
-                        if(count($dup) != 2)
-                                return -1;
-
-                        $dup = $dup[1];
-                        return $dup;
-                }
-
-		// TODO: find mib
-		public function setPortSecViolActWithPID($device,$pid,$value) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
-                                return -1;
-
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
-                }
-
-		// TODO: find mib
-		public function getPortSecMaxMACWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3");
-                        $dup = explode(" ",$dup);
-                        if(count($dup) != 2)
-                                return -1;
-
-                        $dup = $dup[1];
-                        return $dup;
-                }
-
-		// TODO: find mib
-		public function setPortSecMaxMACWithPID($device,$pid,$value) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 6144)
-                                return -1;
-
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
-                }
-
 
 		/*
 		* special
 		*/
 
-		// TODO: find mib
-		public function getPortCDPEnableWithPID($device,$pid) {
-                        $dup = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2");
-                        $dup = explode(" ",$dup);
-                        if(count($dup) != 2)
-                                return -1;
-
-                        $dup = $dup[1];
-                        return $dup;
-                }
-
-		// TODO: find mib
-		public function setPortCDPEnableWithPID($device,$pid,$value) {
-                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                        	return -1;
-
-                        return setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
-                }
-
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
 				return -1;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
-			return setFieldForPortWithPID($device,$pid,$field,$vtype,$value);
+			return $this->setFieldForPortWithPID($device,$pid,$field,$vtype,$value);
 		}
 
 		public function getFieldForPort($device, $portname, $field) {
 			if($device == "" || $portname == "" || $field == "")
 				return NULL;
 
-			$pid = getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return NULL;
 
-			return getFieldForPortWithPid($device,$pid,$field);
-		}
-		
-		public function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
-			// 4: not implemented		// 4: not implemented		// 4: not implemented		// 4: not implemented	
-			return 4;
+			return $this->getFieldForPortWithPid($device,$pid,$field);
 		}
 	}
 ?>
