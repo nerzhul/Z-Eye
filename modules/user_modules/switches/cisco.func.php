@@ -20,7 +20,7 @@
 	require_once(dirname(__FILE__)."/device.api.php");
 	
 	class CiscoAPI extends DeviceAPI {
-		function CiscoAPI() { $this->vendor = $vendor; }
+		function CiscoAPI() { $this->vendor = "cisco"; }
 
 		/*
 		* Generic port management
@@ -547,7 +547,7 @@
 		* Generic public functions
 		*/
 
-		public function $this->setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
+		public function setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
 			if($device == "" || $field == "" || $pid == "" || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -793,7 +793,7 @@
 		*/
 		
 		public function setPortState($device,$portname,$value) {
-			$pid = i$this->getPortId($device,$portname);
+			$pid = $this->getPortId($device,$portname);
 			if($pid == -1)
 				return -1;
 
