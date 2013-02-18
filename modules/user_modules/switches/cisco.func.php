@@ -1048,8 +1048,8 @@
 			while($line = fgets($stdio)) {
 				if($firstline) $firstline = false;
 				else if(preg_match("# --More-- #",$line)) {
-					fwrite($stdio,"\n");
-					usleep(500000);
+					fwrite($stdio," ");
+					usleep(50000);
 				}
 				else array_push($output_arr,$line);
         		}
