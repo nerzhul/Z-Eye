@@ -1655,7 +1655,7 @@
 	
 							if($idx != NULL) {
 								$logvals["duplex"]["src"] = $this->devapi->getPortDuplexWithPID($sw,$pid);
-								setPortDuplexWithPid($sw,$idx[0].".".$idx[1],$duplex);
+								$this->devapi->setPortDuplexWithPid($sw,$idx[0].".".$idx[1],$duplex);
 								$logvals["duplex"]["dst"] = $duplex;
 							}
 						}
@@ -1663,7 +1663,7 @@
 						if($speed && FS::$secMgr->isNumeric($speed)) {
 							if($idx != NULL) {
 								$logvals["speed"]["src"] = $this->devapi->getPortSpeedWithPID($sw,$pid);
-								setPortSpeedWithPid($sw,$idx[0].".".$idx[1],$speed);
+								$this->devapi->setPortSpeedWithPid($sw,$idx[0].".".$idx[1],$speed);
 								$logvals["speed"]["dst"] = $speed;
 							}
 						}

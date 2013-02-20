@@ -238,7 +238,7 @@
                         if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
                                 return -1;
 
-                        $ret = getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5");
+                        $ret = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5");
                         $val = explode(" ",$ret);
                         if(count($val) != 2)
                                 return -1;
