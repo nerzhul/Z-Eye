@@ -344,7 +344,7 @@
 						$dhcpsnrate = $this->devapi->getPortDHCPSnoopingRate($device,$portid);
 						if($dhcpsntrust != NULL) {
 							$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-rate"),"dhcpsnrate",$dhcpsnrate,
-								array("type" => "num", "tooltip" => "dhcp-snooping-rate-tooltip"))."</td></tr>";
+								array("type" => "num", "size" => 4, "length" => 4, "tooltip" => "dhcp-snooping-rate-tooltip"))."</td></tr>";
 						}
 
 						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
