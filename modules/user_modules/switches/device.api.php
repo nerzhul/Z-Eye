@@ -339,6 +339,14 @@
 			return NULL;
                 }
 
+		public function getPortDHCPSnoopingTrust($device,$pid) {
+			return NULL;
+		}
+
+		public function setPortDHCPSnoopingTrust($device,$pid,$value) {
+			return NULL;
+		}
+
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			return NULL;
 		}

@@ -981,6 +981,25 @@
                         return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
                 }
 
+		public function getPortDHCPSnoopingTrust($device,$pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+				return -1; 
+                        $trust = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.380.1.3.1.1.1");
+                        $trust = explode(" ",$trust);
+                        if(count($trust) != 2)
+                                return -1;
+
+                        $trust = $trust[1];
+                        return $trust;
+		}
+
+		public function setPortDHCPSnoopingTrust($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                        	return -1;
+
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.380.1.3.1.1.1","i",$value);
+		}
+
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
 				return -1;

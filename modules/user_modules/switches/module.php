@@ -327,10 +327,18 @@
 							$psmaxmac = $this->devapi->getPortSecMaxMACWithPID($device,$portid);
 							$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => "portsec-maxmac-tooltip"))."</td></tr>";
 						}
+						$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
+
 						$cdp = $this->devapi->getPortCDPEnableWithPID($device,$portid);
-						if($cdp != -1) {
-							$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
+						if($cdp != NULL) {
 							$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
+						}
+
+						// DHCP snooping options
+						$dhcpsntrust = $this->devapi->getPortDHCPSnoopingTrust($device,$portid);
+						if($dhcpsntrust != NULL) {
+							$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-trust-enable"),"dhcpsntrusten",$dhcpsntrust == 1 ? true : false,
+								array("type" => "chk", "tooltip" => "dhcp-snooping-trust-tooltip"))."</td></tr>";
 						}
 
 						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
@@ -1606,6 +1614,7 @@
 						$prise = FS::$secMgr->checkAndSecurisePostData("prise");
 						$shut = FS::$secMgr->checkAndSecurisePostData("shut");
 						$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
+						$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
 						$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 						$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
 						$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
@@ -1895,12 +1904,20 @@
 						$logvals["desc"]["dst"] = $desc;
 	
 						$cdpstate = $this->devapi->getPortCDPEnableWithPID($sw,$pid);
-						if($cdpstate != -1) {
+						if($cdpstate != NULL) {
 							$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
 							$this->devapi->setPortCDPEnableWithPID($sw,$pid,$cdpen == "on" ? 1 : 2);
 							$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
 						}
 	
+						$dhcpsntruststate = $this->devapi->getPortDHCPSnoopingTrust($sw,$pid);
+						if($dhcpsntruststate != NULL) {
+							$logvals["dhcpsntrusten"]["src"] = ($dhcpsntruststate == 1 ? true : false);
+							$this->devapi->setPortDHCPSnoopingTrust($sw,$pid,$dhcpsntrusten == "on" ? 1 : 2);
+							$logvals["dhcpsntrusten"]["dst"] = ($dhcpsntrusten == "on" ? true : false);
+						}
+	
+						$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
 						$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
 						if($portsecen != -1) {
 							$psen = FS::$secMgr->checkAndSecurisePostData("psen");
