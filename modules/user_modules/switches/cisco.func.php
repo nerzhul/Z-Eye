@@ -1000,6 +1000,25 @@
                         return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.380.1.3.1.1.1","i",$value);
 		}
 
+		public function getPortDHCPSnoopingRate($device,$pid) {
+			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+				return -1; 
+                        $rate = $this->getFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.380.1.3.2.1.1");
+                        $rate = explode(" ",$rate);
+                        if(count($rate) != 2)
+                                return -1;
+
+                        $rate = $rate[1];
+                        return $rate;
+		}
+
+		public function setPortDHCPSnoopingRate($device,$pid,$value) {
+                        if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || !FS::$secMgr->isNumeric($value) || $value < 0 || $value > 2048)
+                        	return -1;
+
+                        return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.380.1.3.2.1.1","u",$value);
+		}
+
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
 				return -1;

@@ -341,6 +341,12 @@
 								array("type" => "chk", "tooltip" => "dhcp-snooping-trust-tooltip"))."</td></tr>";
 						}
 
+						$dhcpsnrate = $this->devapi->getPortDHCPSnoopingRate($device,$portid);
+						if($dhcpsntrust != NULL) {
+							$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-rate"),"dhcpsnrate",$dhcpsnrate,
+								array("type" => "num", "tooltip" => "dhcp-snooping-rate-tooltip"))."</td></tr>";
+						}
+
 						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
 						$output .= "</table>";
 						if($portid != -1) {
@@ -1615,6 +1621,7 @@
 						$shut = FS::$secMgr->checkAndSecurisePostData("shut");
 						$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 						$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
+						$dhcpsnrate = FS::$secMgr->checkAndSecurisePostData("dhcpsnrate");
 						$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 						$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
 						$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
@@ -1917,6 +1924,14 @@
 							$logvals["dhcpsntrusten"]["dst"] = ($dhcpsntrusten == "on" ? true : false);
 						}
 	
+						$dhcpsnrateorig = $this->devapi->getPortDHCPSnoopingRate($sw,$pid);
+						if($dhcpsnrateorig != NULL) {
+							$logvals["dhcpsnrate"]["src"] = $dhcpsnrateorig;
+							$this->devapi->setPortDHCPSnoopingRate($sw,$pid,$dhcpsnrate);
+							$logvals["dhcpsnrate"]["dst"] = $dhcpsnrate;
+						}
+	
+						$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
 						$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
 						$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
 						if($portsecen != -1) {

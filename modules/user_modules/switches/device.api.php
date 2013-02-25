@@ -347,6 +347,14 @@
 			return NULL;
 		}
 
+		public function getPortDHCPSnoopingRate($device,$pid) {
+			return NULL;
+		}
+
+		public function setPortDHCPSnoopingRate($device,$pid,$value) {
+			return NULL;
+		}
+
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			return NULL;
 		}
