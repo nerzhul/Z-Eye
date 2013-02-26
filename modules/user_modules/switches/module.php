@@ -487,12 +487,10 @@
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview"),$showmodule);
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") || 
-					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules"))
-					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$showmodule);
-
-				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") || 
+					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules") ||
+					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails"))
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Details"),$showmodule);
+					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$showmodule);
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowstart")) 
@@ -518,80 +516,81 @@
 
 				if($showmodule == 1) {
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") && 
-						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules")) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
-						return $output;
-					}
-					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
-					$found = 0;
-					$devmod = array();
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if($found == 0) $found = 1;
-						if(!isset($devmod[$data["parent"]])) $devmod[$data["parent"]] = array();
-						$idx = count($devmod[$data["parent"]]);
-						$devmod[$data["parent"]][$idx] = array();
-						$devmod[$data["parent"]][$idx]["idx"] = $data["index"];
-						$devmod[$data["parent"]][$idx]["desc"] = $data["description"];
-						$devmod[$data["parent"]][$idx]["name"] = $data["name"];
-						$devmod[$data["parent"]][$idx]["hwver"] = $data["hw_ver"];
-						$devmod[$data["parent"]][$idx]["type"] = $data["type"];
-						$devmod[$data["parent"]][$idx]["serial"] = $data["serial"];
-						$devmod[$data["parent"]][$idx]["model"] = $data["model"];
-						$devmod[$data["parent"]][$idx]["fwver"] = $data["fw_ver"];
-						$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
-					}
-					if($found == 1) {
-						$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
-						$output .= "<table><tr><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("Name")."</th>
-							<th>".$this->loc->s("Type")."</th><th></th><th></th><th></th><th></th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
-					}
-
-					return $output;
-				}
-				else if($showmodule == 2) {
-					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") && 
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules") &&
+						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") && 
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails")) {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						return $output;
 					}
-					$query = FS::$dbMgr->Select("device","*","name ='".$device."'");
-					if($data = FS::$dbMgr->Fetch($query)) {
-						$output .= "<h3>".$this->loc->s("Device-detail")."</h3>";
-						$output .= "<table class=\"standardTable\">";
-						$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Model")." / ".$this->loc->s("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("OS")." / ".$this->loc->s("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".$data["description"]."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Uptime")."</td><td>".$data["uptime"]."</td></tr>";
-						$found = 0;
-						$tmpoutput = "<tr><td>".$this->loc->s("Energy")."</td><td>";
+
+					if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails")) { 
+						$query = FS::$dbMgr->Select("device","*","name ='".$device."'");
+						if($data = FS::$dbMgr->Fetch($query)) {
+							$output .= "<h3>".$this->loc->s("Device-detail")."</h3>";
+							$output .= "<table class=\"standardTable\">";
+							$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("Model")." / ".$this->loc->s("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("OS")." / ".$this->loc->s("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".$data["description"]."</td></tr>";
+							$output .= "<tr><td>".$this->loc->s("Uptime")."</td><td>".$data["uptime"]."</td></tr>";
+							$found = 0;
+							$tmpoutput = "<tr><td>".$this->loc->s("Energy")."</td><td>";
 	
-						$query2 = FS::$dbMgr->Select("device_power","module,power,status","ip = '".$dip."'");
-						while($data2 = FS::$dbMgr->Fetch($query2)) {
-							$found = 1;
-							$query3 = FS::$dbMgr->Select("device_port_power","module,class","module = '".$data2["module"]."' AND ip = '".$dip."'");
-							$pwcount = 0;
-							while($data3 = FS::$dbMgr->Fetch($query3)) {
-								if($data3["class"] == "class2") $pwcount += 7;
-								else if($data3["class"] == "class3") $pwcount += 15;
+							$query2 = FS::$dbMgr->Select("device_power","module,power,status","ip = '".$dip."'");
+							while($data2 = FS::$dbMgr->Fetch($query2)) {
+								$found = 1;
+								$query3 = FS::$dbMgr->Select("device_port_power","module,class","module = '".$data2["module"]."' AND ip = '".$dip."'");
+								$pwcount = 0;
+								while($data3 = FS::$dbMgr->Fetch($query3)) {
+									if($data3["class"] == "class2") $pwcount += 7;
+									else if($data3["class"] == "class3") $pwcount += 15;
+								}
+								$tmpoutput .= "Module ".$data2["module"]." : ".$pwcount." / ".$data2["power"]." Watts (statut: ";
+								$tmpoutput .= ($data2["status"] == "on" ? "<span style=\"color: green;\">".$data2["status"]."</span>" : $data2["status"]);
+								$tmpoutput .= ")<br />";
 							}
-							$tmpoutput .= "Module ".$data2["module"]." : ".$pwcount." / ".$data2["power"]." Watts (statut: ";
-							$tmpoutput .= ($data2["status"] == "on" ? "<span style=\"color: green;\">".$data2["status"]."</span>" : $data2["status"]);
-							$tmpoutput .= ")<br />";
-						}
 	
-						$tmpoutput .= "</td></tr>";
-						if($found == 1) $output .= $tmpoutput;
-						$output .= "<tr><td>".$this->loc->s("IP-addr")."</td><td>".$data["ip"]."</td></tr>";
-						$iswif = (preg_match("#AIR#",$data["model"]) ? true : false);
-						if($iswif == false) {
-							$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
-							$output .= "<tr><td>".$this->loc->s("VTP-domain")."</td><td>".$data["vtp_domain"]."</td></tr>";
+							$tmpoutput .= "</td></tr>";
+							if($found == 1) $output .= $tmpoutput;
+							$output .= "<tr><td>".$this->loc->s("IP-addr")."</td><td>".$data["ip"]."</td></tr>";
+							$iswif = (preg_match("#AIR#",$data["model"]) ? true : false);
+							if($iswif == false) {
+								$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
+								$output .= "<tr><td>".$this->loc->s("VTP-domain")."</td><td>".$data["vtp_domain"]."</td></tr>";
+							}
+							$output .= "</table>";
 						}
-						$output .= "</table>";
-						return $output;
 					}
+
+					if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules")) { 
+						$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
+						$found = 0;
+						$devmod = array();
+						while($data = FS::$dbMgr->Fetch($query)) {
+							if($found == 0) $found = 1;
+							if(!isset($devmod[$data["parent"]])) $devmod[$data["parent"]] = array();
+							$idx = count($devmod[$data["parent"]]);
+							$devmod[$data["parent"]][$idx] = array();
+							$devmod[$data["parent"]][$idx]["idx"] = $data["index"];
+							$devmod[$data["parent"]][$idx]["desc"] = $data["description"];
+							$devmod[$data["parent"]][$idx]["name"] = $data["name"];
+							$devmod[$data["parent"]][$idx]["hwver"] = $data["hw_ver"];
+							$devmod[$data["parent"]][$idx]["type"] = $data["type"];
+							$devmod[$data["parent"]][$idx]["serial"] = $data["serial"];
+							$devmod[$data["parent"]][$idx]["model"] = $data["model"];
+							$devmod[$data["parent"]][$idx]["fwver"] = $data["fw_ver"];
+							$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
+						}
+						if($found == 1) {
+							$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
+							$output .= "<table><tr><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("Name")."</th>
+								<th>".$this->loc->s("Type")."</th><th></th><th></th><th></th><th></th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
+						}
+					}
+					return $output;
 				}
 				else if($showmodule == 3) {
 					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
