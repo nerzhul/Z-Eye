@@ -187,10 +187,12 @@
 				// Init array for device
 				$grprules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
-					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array());
+					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array(), "portmod_portsec" => array(),
+					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "portmod_dhcpsnooping" => array());
 				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
-					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array());
+					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array(), "portmod_portsec" => array(),
+					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "Portmod_dhcpsnooping" => array());
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -222,6 +224,14 @@
 						array_push($grprules["sshshowstart"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshshowrun")
 						array_push($grprules["sshshowrun"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_portsec")
+						array_push($grprules["portmod_portsec"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_cdp")
+						array_push($grprules["portmod_cdp"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_voicevlan")
+						array_push($grprules["portmod_voicevlan"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_dhcpsnooping")
+						array_push($grprules["portmod_dhcpsnooping"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -262,6 +272,14 @@
 						array_push($usrrules["sshshowstart"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshshowrun")
 						array_push($usrrules["sshshowrun"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_portsec")
+						array_push($usrrules["portmod_portsec"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_cdp")
+						array_push($usrrules["portmod_cdp"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_voicevlan")
+						array_push($usrrules["portmod_voicevlan"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_dhcpsnooping")
+						array_push($usrrules["portmod_dhcpsnooping"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -407,6 +425,14 @@
 					$usrrules["retagvlan"] = array();
 					$grprules["sshpwd"] = array();
 					$usrrules["sshpwd"] = array();
+					$grprules["portmod_portsec"] = array();
+					$usrrules["portmod_portsec"] = array();
+					$grprules["portmod_cdp"] = array();
+					$usrrules["portmod_cdp"] = array();
+					$grprules["portmod_voicevlan"] = array();
+					$usrrules["portmod_voicevlan"] = array();
+					$grprules["portmod_dhcpsnooping"] = array();
+					$usrrules["portmod_dhcpsnooping"] = array();
 				}
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -440,6 +466,14 @@
 						array_push($grprules["retagvlan"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshpwd" && $data["rw"] == 't')
 						array_push($grprules["sshpwd"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_portsec" && $data["rw"] == 't')
+						array_push($grprules["portmod_portsec"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_cdp" && $data["rw"] == 't')
+						array_push($grprules["portmod_cdp"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_voicevlan" && $data["rw"] == 't')
+						array_push($grprules["portmod_voicevlan"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_dhcpsnooping" && $data["rw"] == 't')
+						array_push($grprules["portmod_dhcpsnooping"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -482,6 +516,14 @@
 						array_push($usrrules["retagvlan"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshpwd" && $data["rw"] == 't')
 						array_push($usrrules["sshpwd"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_portsec" && $data["rw"] == 't')
+						array_push($usrrules["portmod_portsec"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_cdp" && $data["rw"] == 't')
+						array_push($usrrules["portmod_cdp"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_voicevlan" && $data["rw"] == 't')
+						array_push($usrrules["portmod_voicevlan"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_dhcpsnooping" && $data["rw"] == 't')
+						array_push($usrrules["portmod_dhcpsnooping"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -638,6 +680,10 @@
 				case "exportcfg": return $this->loc->s("Export-cfg");
 				case "retagvlan": return $this->loc->s("Retag-vlan");
 				case "sshpwd": return $this->loc->s("Set-switch-sshpwd");
+				case "portmod_portsec": return $this->loc->s("Portmod-portsec");
+				case "portmod_cdp": return $this->loc->s("Portmod-cdp");
+				case "portmod_voicevlan": return $this->loc->s("Portmod-voicevlan");
+				case "portmod_dhcpsnooping": return $this->loc->s("Portmod-dhcpsnooping");
 				default: return FS::$iMgr->printError($this->loc->s("err-not-found"));
 			}
 		}
