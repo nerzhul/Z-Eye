@@ -973,9 +973,9 @@
 						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&d=".$device."&act=11");
 						$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
 						$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
+						$output .= FS::$iMgr->JSSubmit("searchvlan",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
 						$output .= "Confirmer ".FS::$iMgr->check("accept");
 						$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
-						$output .= FS::$iMgr->JSSubmit("search",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
 
 					}
 
