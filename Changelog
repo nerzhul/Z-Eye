@@ -265,3 +265,10 @@ RC2.0
 - Rename switch rights module to switch rights & save module
 - Remove useless servermgmt module
 - Speed reporting now uses HTTPS for icinga AJAX call
+
+RC2.1
+- Many fixes
+- Improve design for switches show
+
+RC2.2
+- Implement DHCP Snooping management

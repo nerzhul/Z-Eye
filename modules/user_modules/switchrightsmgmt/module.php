@@ -188,11 +188,11 @@
 				$grprules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
 					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array(), "portmod_portsec" => array(),
-					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "portmod_dhcpsnooping" => array());
+					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "portmod_dhcpsnooping" => array(), "dhcpsnmgmt" => array());
 				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
 					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
 					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array(), "portmod_portsec" => array(),
-					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "Portmod_dhcpsnooping" => array());
+					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "portmod_dhcpsnooping" => array(), "dhcpsnmgmt" => array());
 				// Groups
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -232,6 +232,8 @@
 						array_push($grprules["portmod_voicevlan"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_dhcpsnooping")
 						array_push($grprules["portmod_dhcpsnooping"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_dhcpsnmgmt")
+						array_push($grprules["dhcpsnmgmt"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -280,6 +282,8 @@
 						array_push($usrrules["portmod_voicevlan"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_dhcpsnooping")
 						array_push($usrrules["portmod_dhcpsnooping"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_dhcpsnmgmt")
+						array_push($usrrules["dhcpsnmgmt"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -433,6 +437,8 @@
 					$usrrules["portmod_voicevlan"] = array();
 					$grprules["portmod_dhcpsnooping"] = array();
 					$usrrules["portmod_dhcpsnooping"] = array();
+					$grprules["dhcpsnmgmt"] = array();
+					$usrrules["dhcpsnmgmt"] = array();
 				}
 				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -474,6 +480,8 @@
 						array_push($grprules["portmod_voicevlan"],$data2["gid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_dhcpsnooping" && $data["rw"] == 't')
 						array_push($grprules["portmod_dhcpsnooping"],$data2["gid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_dhcpsnmgmt" && $data["rw"] == 't')
+						array_push($grprules["dhcpsnmgmt"],$data2["gid"]);
 				}
 				$first = true;
 				foreach($grprules as $key => $values) {
@@ -524,6 +532,8 @@
 						array_push($usrrules["portmod_voicevlan"],$data2["uid"]);
 					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_dhcpsnooping" && $data["rw"] == 't')
 						array_push($usrrules["portmod_dhcpsnooping"],$data2["uid"]);
+					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_dhcpsnmgmt" && $data["rw"] == 't')
+						array_push($usrrules["dhcpsnmgmt"],$data2["uid"]);
 				}
 				$first = true;
 				foreach($usrrules as $key => $values) {
@@ -684,6 +694,7 @@
 				case "portmod_cdp": return $this->loc->s("Portmod-cdp");
 				case "portmod_voicevlan": return $this->loc->s("Portmod-voicevlan");
 				case "portmod_dhcpsnooping": return $this->loc->s("Portmod-dhcpsnooping");
+				case "dhcpsnmgmt": return $this->loc->s("DHCP-Snooping-mgmt");
 				default: return FS::$iMgr->printError($this->loc->s("err-not-found"));
 			}
 		}

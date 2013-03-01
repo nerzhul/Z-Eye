@@ -336,7 +336,8 @@
 		public function select($name,$js = "",$label=NULL, $multival=false, $options=array()) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<select name=\"".$name."\" id=\"".$name."\"";
+			$selId = preg_replace("#\[|\]#","",$name);
+			$output .= "<select name=\"".$name."\" id=\"".$selId."\"";
 			if(strlen($js) > 0)
 				$output .= " onchange=\"javascript:".$js.";\" ";
 			if($multival)
@@ -349,7 +350,7 @@
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
-		
+
 		public function selElmt($name,$value,$selected = false) {
 			$output = "<option value=\"".$value."\"";
 			if($selected)
@@ -357,7 +358,7 @@
 			$output .= ">".$name."</option>";
 			return $output;
 		}
-		
+
 		public function check($name,$options = array()) {
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
@@ -368,7 +369,7 @@
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
-		
+
 		public function img($path,$sizeX = 0,$sizeY = 0, $id = "") {
 			$output = "<img src=\"".$path."\" ";
 			if(FS::$secMgr->isNumeric($sizeX) && $sizeX > 0)

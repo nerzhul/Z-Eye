@@ -355,6 +355,42 @@
 			return NULL;
 		}
 
+		public function getDHCPSnoopingStatus($device) {
+			return NULL;
+		}
+
+		public function setDHCPSnoopingStatus($device,$value) {
+			return NULL;
+		}
+
+		public function getDHCPSnoopingOpt82($device) {
+			return NULL;
+		}
+
+		public function setDHCPSnoopingOpt82($device,$value) {
+			return NULL;
+		}
+
+		public function getDHCPSnoopingMatchMAC($device) {
+			return NULL;
+		}
+
+		public function setDHCPSnoopingMatchMAC($device) {
+			return NULL;
+		}
+
+		public function getDHCPSnoopingVlans($dip,$community) {
+			return NULL;
+		}
+
+		public function setDHCPSnoopingVlans($device,$vlans) {
+			return NULL;
+		}
+
+		public function setDHCPSnoopingOnVlan($device,$vlan,$value) {
+			return NULL;
+		}
+
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			return NULL;
 		}

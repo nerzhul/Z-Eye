@@ -957,6 +957,35 @@
 				}
 				else if($showmodule == 4) { // advanced tools
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
+					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_dhcpsnmgmt") ||
+						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_dhcpsnmgmt")) { 
+						$output .= "<h3>".$this->loc->s("title-dhcpsnooping")."</h3>";
+						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=24",array("id" => "dhcpsnfrm"));
+						$enable = $this->devapi->getDHCPSnoopingStatus($device);
+						$opt82 = $this->devapi->getDHCPSnoopingOpt82($device);
+						$match = $this->devapi->getDHCPSnoopingMatchMAC($device);
+						$output .= $this->loc->s("Enable")." ".FS::$iMgr->check("enable",array("tooltip" => "tooltip-dhcpsnoopingen", "check" => $enable == 1))."<br />";
+						$output .= $this->loc->s("Use-DHCP-opt-82")." ".FS::$iMgr->check("opt82",array("tooltip" => "tooltip-dhcpsnoopingopt", "check" => $opt82 == 1))."<br />";
+						$output .= $this->loc->s("Match-MAC-addr")." ".FS::$iMgr->check("matchmac",array("tooltip" => "tooltip-dhcpsnoopingmatch", "check" => $match == 1))."<br />";
+
+						$vlanlist = array();
+						$query = FS::$dbMgr->Select("device_vlan","vlan,description","ip = '".$dip."'");
+						while($data = FS::$dbMgr->Fetch($query))
+							$vlanlist[$data["vlan"]] = $data["description"];
+
+						$dhcpsnvlanlist = $this->devapi->getDHCPSnoopingVlans($device);
+						if($dhcpsnvlanlist && is_array($dhcpsnvlanlist)) {
+							$output .= $this->loc->s("Apply-VLAN").": <br />";
+							$output .= FS::$iMgr->select("vlansnooping[]","",NULL,true,array("tooltip" => "tooltip-dhcpsnoopingvlan", "size" => count($dhcpsnvlanlist)/4));
+
+							foreach($dhcpsnvlanlist as $vlan => $value)
+								$output .= FS::$iMgr->selElmt($vlan." - ".$vlanlist[$vlan],$vlan,$value == 1);
+
+							$output .= "</select><br />";
+						}
+						$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";
+					}
+
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_retagvlan") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_retagvlan")) { 
 						$output .= "<script type=\"text/javascript\">";
@@ -987,7 +1016,7 @@
 						$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
 						$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
 						$output .= FS::$iMgr->JSSubmit("searchvlan",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
-						$output .= "Confirmer ".FS::$iMgr->check("accept");
+						$output .= $this->loc->s("Confirm")." ".FS::$iMgr->check("accept");
 						$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
 
 					}
@@ -2518,6 +2547,7 @@
 							base64_encode($enablepwd)."'");
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7",true);
 						return;
+					// Remove SSH link
 					case 23:
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						$dip = "";	
@@ -2535,6 +2565,51 @@
 							
 						FS::$dbMgr->Delete("z_eye_switch_pwd","device = '".$device."'");
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7");
+						return;
+					// Modify DHCP Snooping (switch)
+					case 24:
+						$device = FS::$secMgr->checkAndSecuriseGetData("d");
+						$dip = "";	
+						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						if(!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							return;
+						}
+
+						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_dhcpsnmgmt") &&
+							!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_dhcpsnmgmt")) { 
+							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&err=2");
+							return;
+						}
+
+						$enable = FS::$secMgr->checkAndSecurisePostData("enable");
+						$opt82 = FS::$secMgr->checkAndSecurisePostData("opt82");
+						$matchmac = FS::$secMgr->checkAndSecurisePostData("matchmac");
+						$vlans = FS::$secMgr->checkAndSecurisePostData("vlansnooping");
+
+						if($vlans && !is_array($vlans)) {
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							return;
+						}
+
+						$vlanlist = $this->devapi->getDHCPSnoopingVlans($device);
+						foreach($vlanlist as $vlan => $value)
+							$vlanlist[$vlan] = 2;
+						$count = count($vlans);
+						for($i=0;$i<$count;$i++) {
+							if(!FS::$secMgr->isNumeric($vlans[$i])) {
+								FS::$iMgr->redir("mod=".$this->mid."&err=2");
+								return;
+							}
+							$vlanlist[$vlans[$i]] = 1;
+						}
+								
+						$this->devapi->setDHCPSnoopingStatus($device,$enable == "on" ? 1 : 2);
+						$this->devapi->setDHCPSnoopingOpt82($device,$opt82 == "on" ? 1 : 2);
+						$this->devapi->setDHCPSnoopingMatchMAC($device,$matchmac == "on" ? 1 : 2);
+						$this->devapi->setDHCPSnoopingVlans($device,$vlanlist);
+
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4");
 						return;
 				default: break;
 			}

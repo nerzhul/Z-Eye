@@ -575,6 +575,34 @@
 			return $outoid;
 		}
 
+		public function setField($device, $field, $vtype, $value) {
+			if($device == "" || $field == "" || $vtype == "")
+				return NULL;
+			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+                        if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
+			snmpset($dip,$community,$field,$vtype,$value);
+			return 0;
+		}
+
+		public function getField($device, $field) {
+			if($device == "" || $field == "")
+				return NULL;
+			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
+			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+			$out = "";
+			exec("/usr/local/bin/snmpget -v 2c -c ".$community." ".$dip." ".$field,$out);
+			$outoid = "";
+			for($i=0;$i<count($out);$i++) {
+				$outoid .= $out[$i];
+				if($i<count($out)-1) $outoid .= "";
+			}
+			$outoid = preg_split("# = #",$outoid);
+			$outoid = $outoid[1];
+			return $outoid;
+		}
+
 		public function getPortId($device,$portname) {
 			$pid = FS::$dbMgr->GetOneData("z_eye_port_id_cache","pid","device = '".$device."' AND portname = '".$portname."'");
 			if($pid == NULL) $pid = -1;
@@ -1018,6 +1046,97 @@
 
                         return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.380.1.3.2.1.1","u",$value);
 		}
+
+		public function getDHCPSnoopingStatus($device) {
+                        $state = $this->getField($device,"1.3.6.1.4.1.9.9.380.1.1.1.0");
+                        $state = explode(" ",$state);
+                        if(count($state) != 2)
+                                return NULL;
+
+                        $state = $state[1];
+                        return $state;
+                }
+
+                public function setDHCPSnoopingStatus($device,$value) {
+                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                        	return -1;
+
+                        return $this->setField($device,"1.3.6.1.4.1.9.9.380.1.1.1.0","i",$value);
+                }
+
+                public function getDHCPSnoopingOpt82($device) {
+                        $state = $this->getField($device,"1.3.6.1.4.1.9.9.380.1.1.4.0");
+                        $state = explode(" ",$state);
+                        if(count($state) != 2)
+                                return NULL;
+
+                        $state = $state[1];
+                        return $state;
+                }
+
+                public function setDHCPSnoopingOpt82($device,$value) {
+                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                        	return -1;
+			// TO TEST
+                        return $this->setField($device,"1.3.6.1.4.1.9.9.380.1.1.4.0","i",$value);
+                }
+
+                public function getDHCPSnoopingMatchMAC($device) {
+                        $state = $this->getField($device,"1.3.6.1.4.1.9.9.380.1.1.6.0");
+                        $state = explode(" ",$state);
+                        if(count($state) != 2)
+                                return NULL;
+
+                        $state = $state[1];
+                        return $state;
+                }
+
+                public function setDHCPSnoopingMatchMAC($device,$value) {
+                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                        	return -1;
+
+                        return $this->setField($device,"1.3.6.1.4.1.9.9.380.1.1.6.0","i",$value);
+                }
+
+		public function getDHCPSnoopingVlans($device) {
+			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+                        $community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
+                        if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
+			$vlanlist = array();
+			exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$dip." 1.3.6.1.4.1.9.9.380.1.2.1.1.2",$out);
+			$count = count($out);
+			for($i=0;$i<count($out);$i++) {
+				$tmpout = preg_split("# #",$out[$i]);
+				$enable = $tmpout[3];
+
+				$vlanid = preg_split("#[\.]#",$tmpout[0]);
+				$vlanid = $vlanid[count($vlanid)-1];
+
+				$vlanlist[$vlanid] = $enable;
+			}
+			return $vlanlist;
+		}
+
+		public function setDHCPSnoopingVlans($device,$vlans) {
+			if($vlans == NULL || !is_array($vlans))
+				return NULL;
+
+			foreach($vlans as $vlan => $value)
+				$this->setDHCPSnoopingOnVlan($device,$vlan,$value);	
+
+			return 0;
+		}
+
+		public function setDHCPSnoopingOnVlan($device,$vlan,$value) {
+                        if(!FS::$secMgr->isNumeric($vlan) || $vlan == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+                        	return -1;
+
+                        return $this->setFieldForPortWithPID($device,$vlan,"1.3.6.1.4.1.9.9.380.1.2.1.1.2","i",$value);
+		}
+
+		/*
+		* Generic
+		*/
 
 		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
 			if($device == "" || $portname == "" || $field == "" || $vtype == "")
