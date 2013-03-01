@@ -639,8 +639,8 @@
 							// poe
 							var sw48poe4x = [29,29,59,59,89,89,118,118,148,148,178,178,217,217,247,247,277,277,307,307,336,336,366,366,
 							406,406,436,436,466,466,495,495,525,525,555,555,595,595,625,625,655,655,685,685,714,714,743,743];
-							var sw48poe4py = 81;
-							var sw48poe4iy = 47;
+							var sw48poe4py = 85;
+							var sw48poe4iy = 51;
 
 							function drawContext(obj,type,ptab,gptab,poetab) {
 								var canvas = document.getElementById(obj);
