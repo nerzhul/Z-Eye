@@ -384,7 +384,7 @@
 		
 		public function imgWithZoom($path,$sizeX,$sizeY,$maxsizeX ,$maxsizeY,$id) {
 			$output = 
-            $output = "<div id=\"".$id."\" style=\"width: ".$sizeX."px; height: ".$sizeY."px; overflow: hidden;\"><div style=\"background: url(".$path."); no-repeat; width: ".$sizeX."px; height: ".$sizeY."px;\">";
+            $output = "<div id=\"".$id."\" style=\"width: ".$sizeX.(!preg_match("#%#",$sizeX) ? "px" : "")."; height: ".$sizeY."px; overflow: hidden;\"><div style=\"background: url(".$path."); no-repeat; width: ".$sizeX."px; height: ".$sizeY."px;\">";
 			$output .= FS::$iMgr->img($path,$sizeX,$sizeY)."</div>";
 			$output .= "<div style=\"width:".$maxsizeX."px; height:".$maxsizeY."px;\">";
         	$output .= FS::$iMgr->img($path);

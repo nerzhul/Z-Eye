@@ -55,7 +55,7 @@
 			$output = "<h3>".$this->loc->s("net-map")."</h3>";
 			$imgsize = getimagesize("datas/weathermap/main-nowifi.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main-nowifi.svg","1000","700",$sizes[1],$sizes[3],"netmapL");
+			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main-nowifi.svg","100%","700",$sizes[1],$sizes[3],"netmapL");
 			return $output;	
 		}
 		
@@ -63,7 +63,7 @@
 			$output = "<h2>".$this->loc->s("net-map-full")."</h2><div id=\"netmapdF\">";
 			$imgsize = getimagesize("datas/weathermap/main.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main.svg","1000","700",$sizes[1],$sizes[3],"netmapF");
+			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main.svg","100%","700",$sizes[1],$sizes[3],"netmapF");
 			return $output;	
 		}
 		
