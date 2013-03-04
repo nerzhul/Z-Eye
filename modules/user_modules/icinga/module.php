@@ -1996,9 +1996,9 @@
 					$name = trim(FS::$secMgr->checkAndSecurisePostData("desc"));
 					$host = FS::$secMgr->checkAndSecurisePostData("host");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-					$checkcmd = FS::$secMgr->getPost("checkcmd","w");
-					$checkperiod = FS::$secMgr->getPost("checkperiod","w");
-					$notifperiod = FS::$secMgr->getPost("notifperiod","w");
+					$checkcmd = FS::$secMgr->checkAndSecurisePostData("checkcmd");
+					$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
+					$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
 					$ctg = FS::$secMgr->getPost("ctg","w");
 
 					if(!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$notifperiod || !$ctg) {
