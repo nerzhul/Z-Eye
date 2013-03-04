@@ -328,11 +328,11 @@
 			$output .= "<script type=\"text/javascript\">
 				eltBar = document.getElementById(\"".$name."\");
 				eltPct = document.getElementById(\"".$name."val\");
-				eltPct.innerHTML = ' ' + Math.round(eltBar.position * 100) + \"%\";
+				eltPct.innerHTML = ' ' + Math.floor(eltBar.position * 100) + \"%\";
 				</script>";
 			return $output;
 		}
-		
+
 		public function select($name,$js = "",$label=NULL, $multival=false, $options=array()) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
