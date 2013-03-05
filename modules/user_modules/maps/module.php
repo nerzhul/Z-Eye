@@ -20,28 +20,35 @@
 	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 
-	class iNetSpeed extends genModule{
-		function iNetSpeed() { parent::genModule(); $this->loc = new lNetSpeed(); }
+	class iMaps extends genModule{
+		function iMaps() { parent::genModule(); $this->loc = new lMaps(); }
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
+
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
+
 			if(!FS::isAJAXCall()) {
-				$output .= "<h1>".$this->loc->s("title-bw")."</h1>";
+				$output .= "<h1>".$this->loc->s("title-maps")."</h1>";
 				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2\">".$this->loc->s("main-map")."</a>";
-				$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&sh=1\">".$this->loc->s("precise-map")."</a>";
+				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("icinga-map"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("net-map"),$sh);
+				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("net-map-full"),$sh);
 				$output .= "</ul></div>";
 				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
 				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
 			} else {
 				$device = FS::$secMgr->checkAndSecuriseGetData("d");
-				$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 				if($device != NULL)
 					$output .= $this->showDeviceWeatherMap($device);
 				else if($sh == 1)
 					$output .= $this->showGeneralFullWeatherMap();
-				else
+				else if($sh == 2)
 					$output .= $this->showGeneralLightWeatherMap();
+				else if($sh == 3)
+					$output .= $this->showIcingaMap();
+				else
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
 			}
 			return $output;
 		}
@@ -52,19 +59,23 @@
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
-			$output = "<h3>".$this->loc->s("net-map")."</h3>";
 			$imgsize = getimagesize("datas/weathermap/main-nowifi.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main-nowifi.svg","100%","700",$sizes[1],$sizes[3],"netmapL");
+			$output = FS::$iMgr->imgWithZoom("datas/weathermap/main-nowifi.svg","100%","700",$sizes[1],$sizes[3],"netmapL");
 			return $output;	
 		}
 		
 		private function showGeneralFullWeatherMap() {
-			$output = "<h2>".$this->loc->s("net-map-full")."</h2><div id=\"netmapdF\">";
 			$imgsize = getimagesize("datas/weathermap/main.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output .= FS::$iMgr->imgWithZoom("datas/weathermap/main.svg","100%","700",$sizes[1],$sizes[3],"netmapF");
+			$output = FS::$iMgr->imgWithZoom("datas/weathermap/main.svg","100%","800",$sizes[1],$sizes[3],"netmapF");
 			return $output;	
+		}
+
+		private function showIcingaMap() {
+			$imgsize = getimagesize("http://localhost/cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5");
+			$sizes = preg_split("#\"#",$imgsize[3]);
+			return "<center>".FS::$iMgr->imgWithZoom("cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5","100%",$sizes[3],$sizes[1],$sizes[3],"netmapI")."</center>";
 		}
 		
 		public function handlePostDatas($act) {

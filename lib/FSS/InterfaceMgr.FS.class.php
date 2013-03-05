@@ -382,13 +382,12 @@
 			return $output;
 		}
 		
-		public function imgWithZoom($path,$sizeX,$sizeY,$maxsizeX ,$maxsizeY,$id) {
-			$output = 
-            $output = "<div id=\"".$id."\" style=\"width: ".$sizeX.(!preg_match("#%#",$sizeX) ? "px" : "")."; height: ".$sizeY."px; overflow: hidden;\"><div style=\"background: url(".$path."); no-repeat; width: ".$sizeX."px; height: ".$sizeY."px;\">";
+		public function imgWithZoom($path,$sizeX,$sizeY,$maxsizeX,$maxsizeY,$id) {
+            		$output =  "<div id=\"".$id."\" style=\"width: ".$sizeX.(!preg_match("#%#",$sizeX) ? "px" : "")."; height: ".$sizeY.(!preg_match("#%#",$sizeY) ? "px" : "")."; overflow: hidden;\"><div>";
 			$output .= FS::$iMgr->img($path,$sizeX,$sizeY)."</div>";
-			$output .= "<div style=\"width:".$maxsizeX."px; height:".$maxsizeY."px;\">";
-        	$output .= FS::$iMgr->img($path);
-        	$output .= "<div class=\"mapcontent\">";
+			$output .= "<div>";
+     		   	$output .= FS::$iMgr->img($path);
+        		$output .= "<div class=\"mapcontent\">";
 			$output .= "</div></div></div><script type=\"text/javascript\">$('#".$id."').mapbox({mousewheel: true});</script>";
 			return $output;
 		}

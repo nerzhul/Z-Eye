@@ -35,10 +35,12 @@
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			$output = "";
 
-			if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1)
-				$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
-			else
-				$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
+			if(!FS::isAjaxCall()) {
+				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1)
+					$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
+				else
+					$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
+			}
 
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-not-exist")); break;

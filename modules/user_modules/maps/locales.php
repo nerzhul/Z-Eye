@@ -19,28 +19,28 @@
 
     require_once(dirname(__FILE__)."/../../../lib/FSS/objects/Locales.FS.class.php");
     
-	class lNetSpeed extends zLocales {
-		function lNetSpeed() {
+	class lMaps extends zLocales {
+		function lMaps() {
 			$this->locales = array(
 				"fr" => array(
+					"err-no-tab" => "Onglet invalide",
 					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux, ou la page indisponible",
+					"icinga-map" => "Etat des systèmes",
 					"link-state" => "Etat des liens de",
-					"main-map" => "Carte principale",
-					"menu-title" => "Cartographie réseau",
-					"net-map" => "Carte du réseau",
-					"net-map-full" => "Carte complète du réseau",
-					"precise-map" => "Carte détaillée",
-					"title-bw" => "Analyse des Débits",
+					"menu-title" => "Cartes",
+					"net-map" => "Réseau",
+					"net-map-full" => "Réseau (complet)",
+					"title-maps" => "Cartes",
 				),
 				"en" => array(
+					"err-no-tab" => "Bad tab",
 					"fail-tab" => "Unable to load tab, link may be wrong or page unavailable",
+					"icinga-map" => "System states",
 					"link-state" => "Links state of",
-					"main-map" => "Main map",
-					"menu-title" => "Network maps",
-					"net-map" => "CNetwork map",
-					"net-map-full" => "Full network map",
-					"precise-map" => "Precise map",
-					"title-bw" => "Bandwidth analysis",
+					"menu-title" => "Maps",
+					"net-map" => "Network",
+					"net-map-full" => "Network (full)",
+					"title-maps" => "Maps",
 				)
 			);
 		}

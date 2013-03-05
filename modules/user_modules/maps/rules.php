@@ -18,8 +18,8 @@
         */
 
         require_once(dirname(__FILE__)."/../../../lib/FSS/objects/Rules.FS.class.php");
-        class rNetspeed extends zRules {
-                function rNetspeed() { $this->connectedstate = 1; }
+        class rMaps extends zRules {
+                function rMaps() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = "<tr><td>Cartographie Réseau</td>";

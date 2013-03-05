@@ -21,18 +21,18 @@
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
-	if(!class_exists("MNetSpeed")) {
-		class MNetSpeed extends InterfaceModule {
-			function MNetSpeed() {
+	if(!class_exists("MMaps")) {
+		class MMaps extends InterfaceModule {
+			function MMaps() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iNetSpeed";
+				$this->conf->modulename = "iMaps";
 				$this->conf->seclevel = 4;
-				$this->moduleclass = new iNetSpeed();
-				$this->rulesclass = new rNetspeed();
+				$this->moduleclass = new iMaps();
+				$this->rulesclass = new rMaps();
 				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}
 
-	$module = new MNetSpeed();
+	$module = new MMaps();
 ?>
