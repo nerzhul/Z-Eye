@@ -277,6 +277,4 @@ RC2.3
 - Rename netspeed module into maps (update z_eye_http_links set args='maps' where args='netspeed'; required)
 - Fix bugs in icinga admin module
 - Speed reporting also show host states
-D
-- Speed reporting show hoxxs state
 
