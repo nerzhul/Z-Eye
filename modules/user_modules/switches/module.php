@@ -1946,16 +1946,16 @@
 								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 							return;
 						}
-						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_voicevlan") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_voicevlan")) {
+						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_voicevlan") ||
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_voicevlan")) {
 							$logvals["voicevlan"]["dst"] = $voicevlan;
 							$logvals["desc"]["src"] = $this->devapi->getPortDesc($sw,$pid);
 							$this->devapi->setPortDescWithPID($sw,$pid,$desc);
 							$logvals["desc"]["dst"] = $desc;
 						}
 
-						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
+						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") ||
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
 							$cdpstate = $this->devapi->getPortCDPEnableWithPID($sw,$pid);
 							if($cdpstate != NULL) {
 								$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
@@ -1964,8 +1964,8 @@
 							}
 						}
 
-						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_dhcpsnooping") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_dhcpsnooping")) {
+						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_dhcpsnooping") ||
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_dhcpsnooping")) {
 							$dhcpsntruststate = $this->devapi->getPortDHCPSnoopingTrust($sw,$pid);
 							if($dhcpsntruststate != NULL) {
 								$logvals["dhcpsntrusten"]["src"] = ($dhcpsntruststate == 1 ? true : false);
@@ -1981,8 +1981,8 @@
 							}
 						}
 	
-						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_portsec") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
+						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_portsec") ||
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
 							$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
 							$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
 							$portsecen = $this->devapi->getPortSecEnableWithPID($sw,$pid);
@@ -2035,7 +2035,7 @@
 						}
 	
 						foreach($logvals as $keys => $values) {
-							if(is_array($values["src"]) || is_array($values["dst"])) {
+							if(is_array($values["src"]) || isset($values["dst"]) && is_array($values["dst"])) {
 								if(count(array_diff($values["src"],$values["dst"])) != 0) {
 									$logoutput .= "\n".$keys.": ";
 									$count = count($values["src"]);
@@ -2045,7 +2045,7 @@
 									for($i=0;$i<$count;$i++) $logoutput .= $values["dst"][$i].",";
 								}
 							}
-							else if($values["src"] != $values["dst"]) {
+							else if(isset($values["dst"]) && $values["src"] != $values["dst"]) {
 								$logoutput .= "\n".$keys.": ".$values["src"]." => ".$values["dst"];
 							}
 						}
