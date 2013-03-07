@@ -111,10 +111,11 @@
 }
 
 .zoomWrapperImage{
-  display:block;
-  position:relative;
-  overflow:hidden;
-  z-index:110;
+	display:block;
+	position:relative;
+	overflow:hidden;
+	z-index:110;
+	background-color: white;
 }
 
 .zoomWrapperImage img{

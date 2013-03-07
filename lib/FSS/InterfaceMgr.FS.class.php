@@ -395,7 +395,7 @@
 		public function imgWithZoom2($path,$title,$id,$bigpath="") {
 			$output = "<a href=\"".(strlen($bigpath) > 0 ? $bigpath : $path)."\" id=\"".$id."\" title=\"".$title."\">"; 
 			$output .= FS::$iMgr->img($path,0,0,"jqzoom-img");
-			$output .= "</a><script type=\"text/javascript\">$('#".$id."').jqzoom({ xOffset: 50, yOffset: 50, zoomWidth: 400, zoomHeight: 320, zoomType: 'drag', alwaysOn: true});</script>";
+			$output .= "</a><script type=\"text/javascript\">$('#".$id."').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});</script>";
 			return $output;
 		}	
 

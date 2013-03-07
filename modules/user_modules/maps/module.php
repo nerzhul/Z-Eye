@@ -69,7 +69,7 @@
 			/*$imgsize = getimagesize("datas/weathermap/main.png");
 			$sizes = preg_split("#\"#",$imgsize[3]);
 			$output = FS::$iMgr->imgWithZoom("datas/weathermap/main.svg","100%","800",$sizes[1],$sizes[3],"netmapF");
-			*/$output = FS::$iMgr->imgWithZoom2("datas/weathermap/main-tiny.svg",$this->loc->s("net-map-full"),"netmapF","datas/weathermap/main.svg");
+			*/$output = FS::$iMgr->imgWithZoom2("datas/weathermap/main-tiny.svg",$this->loc->s("net-map-full"),"netmapF","datas/weathermap/main.png");
 			return $output;	
 		}
 

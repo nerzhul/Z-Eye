@@ -93,9 +93,9 @@
 				$dmodel = FS::$dbMgr->GetOneData("device","model","ip = '".$data["ip"]."'");
 				if(preg_match("#AIRAP#",$dmodel)) continue;
 			}
-			if(!in_array($data["remote_id"],$nodelist)) {
+			if(in_array($data["remote_id"],$nodelist)) {
 				$nodelist[count($nodelist)] = $data["remote_id"];
-				$graphbuffer .= preg_replace("#[.-]#","_",$data["remote_id"])." [label=\"".$data["remote_id"]."\", URL=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$data["remote_id"]."\"];\n";
+				$graphbuffer .= preg_replace("#[.-]#","_",$data["remote_id"])." [label=\"".$data["remote_id"]."\", href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$data["remote_id"]."\"];\n";
 			}
 			$dname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 			$outcharge = 0;
@@ -187,7 +187,7 @@
 		fclose($file);
 		
 		exec("/usr/local/bin/circo -Tsvg ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".svg");
-		//exec("/usr/local/bin/circo -Tpng ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".png");
+		exec("/usr/local/bin/circo -Tpng ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".png");
 	}
 	
 	echo "[".Config::getWebsiteName()."][NetGraph-Generator] started at ".date('d-m-Y G:i:s')."\n";
