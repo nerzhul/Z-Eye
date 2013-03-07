@@ -49,17 +49,22 @@
 				return $portbuffer[$dip][$portname];
 	}
 
-	function generateGraph($filename, &$portbuffer, $options=array()) {
+	function generateGraph($filename, &$portbuffer, $options=array(), $size="") {
 		$file = fopen(dirname(__FILE__)."/../datas/weathermap/".$filename.".dot","w+");
 		if(!$file) {
 			echo  "[".Config::getWebsiteName()."][NetGraph-Generator][FATAL] Can't write ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot !";
 			exit(1);
 		}
 		// penwidth for epaisseur
+		$graphopts = "bgcolor=white, nodesep=1";
+		if(strlen($size) > 0)
+			$graphopts .= ", size=\"".$size."\"";
+
+		echo $graphopts;
 		if(!in_array("NO-DIRECTION",$options))
-			$graphbuffer = "digraph maingraph {\ngraph [bgcolor=white, nodesep=1];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
+			$graphbuffer = "digraph maingraph {\ngraph [".$graphopts."];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
 		else
-			$graphbuffer = "graph maingraph {\ngraph [bgcolor=white, nodesep=1];\n        node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
+			$graphbuffer = "graph maingraph {\ngraph [".$graphopts."];\n        node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
 		$nodelist = array();
 		$query = FS::$dbMgr->Select("device","model, name");
 		while($data = pg_fetch_array($query)) {
@@ -77,10 +82,6 @@
 			}
 			if(!in_array($data["remote_id"],$nodelist))
 				$nodelist[count($nodelist)] = $data["remote_id"];
-		}*/
-		
-		/*for($i=0;$i<count($nodelist);$i++) {
-			 $graphbuffer .= preg_replace("#[.-]#","_",$nodelist[$i])." [label=\"".$nodelist[$i]."\", URL=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$nodelist[$i]."\", size=20];\n";
 		}*/
 		
 		$outlink = array();
@@ -186,17 +187,17 @@
 		fclose($file);
 		
 		exec("/usr/local/bin/circo -Tsvg ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".svg");
-		exec("/usr/local/bin/circo -Tpng ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".png");
+		//exec("/usr/local/bin/circo -Tpng ".dirname(__FILE__)."/../datas/weathermap/".$filename.".dot -o ".dirname(__FILE__)."/../datas/weathermap/".$filename.".png");
 	}
 	
 	echo "[".Config::getWebsiteName()."][NetGraph-Generator] started at ".date('d-m-Y G:i:s')."\n";
 	$start_time = microtime(true);
 	
 	generateGraph("main", $portbuffer);
-	generateGraph("main-nodir", $portbuffer, array("NO-DIRECTION"));
+	generateGraph("main-tiny", $portbuffer,array(),"22,14");
 	// Without WiFi APs
 	generateGraph("main-nowifi", $portbuffer, array("NO-WIFI"));
-	generateGraph("main-nodir-nowifi", $portbuffer, array("NO-DIRECTION","NO-WIFI"));
+	generateGraph("main-nowifi-tiny", $portbuffer, array("NO-WIFI"),"22,14");
 
 	$end_time = microtime(true);
 	$script_time = $end_time - $start_time;

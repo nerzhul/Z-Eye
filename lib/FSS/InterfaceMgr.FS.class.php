@@ -372,9 +372,9 @@
 
 		public function img($path,$sizeX = 0,$sizeY = 0, $id = "") {
 			$output = "<img src=\"".$path."\" ";
-			if(FS::$secMgr->isNumeric($sizeX) && $sizeX > 0)
+			if($sizeX != 0)
 				$output .= "width=\"".$sizeX."\" ";
-			if(FS::$secMgr->isNumeric($sizeY) && $sizeY > 0)
+			if($sizeY != 0)
 				$output .= "height=\"".$sizeY."\" ";
 			if(strlen($id) > 0)
 				$output .= "id=\"".$id."\" ";
@@ -392,6 +392,13 @@
 			return $output;
 		}
 
+		public function imgWithZoom2($path,$title,$id,$bigpath="") {
+			$output = "<a href=\"".(strlen($bigpath) > 0 ? $bigpath : $path)."\" id=\"".$id."\" title=\"".$title."\">"; 
+			$output .= FS::$iMgr->img($path,0,0,"jqzoom-img");
+			$output .= "</a><script type=\"text/javascript\">$('#".$id."').jqzoom({ xOffset: 50, yOffset: 50, zoomWidth: 400, zoomHeight: 320, zoomType: 'drag', alwaysOn: true});</script>";
+			return $output;
+		}	
+
 		public function imgWithLens($path,$sizeX = 0,$sizeY = 0, $id = "", $lsize=200) {
 			$output = FS::$iMgr->img($path,$sizeX,$sizeY,$id);
 		        $output .= "<script type=\"text/javascript\">$('#".$id."').imageLens(";
@@ -400,7 +407,7 @@
 			$output .=");</script>";
 			return $output;
 		}
-		
+
 		public function upload($name) {
 			return "<input type=\"file\" name=\"".$name."\" />";
 		}
