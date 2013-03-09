@@ -59,33 +59,17 @@
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
-			$imgsize = getimagesize("datas/weathermap/main-nowifi.png");
-			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output = FS::$iMgr->imgWithZoom("datas/weathermap/main-nowifi.svg","100%","700",$sizes[1],$sizes[3],"netmapL");
-			return $output;	
+			return FS::$iMgr->imgWithZoom2("datas/weathermap/main-nowifi-tiny.svg",$this->loc->s("net-map-full"),"netmapF","datas/weathermap/main-nowifi.png");
 		}
 		
 		private function showGeneralFullWeatherMap() {
-			/*$imgsize = getimagesize("datas/weathermap/main.png");
-			$sizes = preg_split("#\"#",$imgsize[3]);
-			$output = FS::$iMgr->imgWithZoom("datas/weathermap/main.svg","100%","800",$sizes[1],$sizes[3],"netmapF");
-			*/$output = FS::$iMgr->imgWithZoom2("datas/weathermap/main-tiny.svg",$this->loc->s("net-map-full"),"netmapF","datas/weathermap/main.png");
-			return $output;	
+			return FS::$iMgr->imgWithZoom2("datas/weathermap/main-tiny.svg",$this->loc->s("net-map-full"),"netmapF","datas/weathermap/main.png");
 		}
 
 		private function showIcingaMap() {
-			/*$imgsize = getimagesize("http://localhost/cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5");
-			$sizes = preg_split("#\"#",$imgsize[3]);
-			return "<center>".FS::$iMgr->imgWithZoom("cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5","100%",$sizes[3],$sizes[1],$sizes[3],"netmapI")."</center>";
-			*/return FS::$iMgr->imgWithZoom2("cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5",$this->loc->s("icinga-map"),"netmapI");
+			return FS::$iMgr->imgWithZoom2("cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5",$this->loc->s("icinga-map"),"netmapI");
 		}
 		
-		public function handlePostDatas($act) {
-			switch($act) {
-				case 1:
-					break;
-				default: break;
-			}
-		}
+		public function handlePostDatas($act) {}
 	};
 ?>

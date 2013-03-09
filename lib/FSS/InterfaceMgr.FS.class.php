@@ -382,31 +382,12 @@
 			return $output;
 		}
 		
-		public function imgWithZoom($path,$sizeX,$sizeY,$maxsizeX,$maxsizeY,$id) {
-            		$output =  "<div id=\"".$id."\" style=\"width: ".$sizeX.(!preg_match("#%#",$sizeX) ? "px" : "")."; height: ".$sizeY.(!preg_match("#%#",$sizeY) ? "px" : "")."; overflow: hidden;\"><div>";
-			$output .= FS::$iMgr->img($path,$sizeX,$sizeY)."</div>";
-			$output .= "<div>";
-     		   	$output .= FS::$iMgr->img($path);
-        		$output .= "<div class=\"mapcontent\">";
-			$output .= "</div></div></div><script type=\"text/javascript\">$('#".$id."').mapbox({mousewheel: true});</script>";
-			return $output;
-		}
-
 		public function imgWithZoom2($path,$title,$id,$bigpath="") {
 			$output = "<a href=\"".(strlen($bigpath) > 0 ? $bigpath : $path)."\" id=\"".$id."\" title=\"".$title."\">"; 
 			$output .= FS::$iMgr->img($path,0,0,"jqzoom-img");
 			$output .= "</a><script type=\"text/javascript\">$('#".$id."').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});</script>";
 			return $output;
 		}	
-
-		public function imgWithLens($path,$sizeX = 0,$sizeY = 0, $id = "", $lsize=200) {
-			$output = FS::$iMgr->img($path,$sizeX,$sizeY,$id);
-		        $output .= "<script type=\"text/javascript\">$('#".$id."').imageLens(";
-			if(FS::$secMgr->isNumeric($lsize))
-				$output .= "{ lensSize: ".$lsize." }";
-			$output .=");</script>";
-			return $output;
-		}
 
 		public function upload($name) {
 			return "<input type=\"file\" name=\"".$name."\" />";
