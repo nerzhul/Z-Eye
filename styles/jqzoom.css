@@ -1,9 +1,4 @@
-.zoomPad{
-	position:relative;
-	z-index:99;
-	cursor:crosshair;
-	text-align: left;
-}
+.zoomPad { position:relative; z-index:99; cursor:crosshair; text-align:left; }
 
 .zoomPreload{
 	opacity: 0.8;
@@ -15,7 +10,7 @@
 	background-color: white;
 	padding: 8px;
 	text-align:center;
-	background-image: url(../images/zoomloader.gif);
+	background-image: url('/styles/images/loader.gif');
 	background-repeat: no-repeat;
 	background-position: 43px 30px;
 	z-index:110;
