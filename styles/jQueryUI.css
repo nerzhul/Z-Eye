@@ -46,7 +46,7 @@ ta/*!
 .ui-widget { font-family: Verdana,Arial,sans-serif; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
 .ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff 50% 50% repeat-x; color: #222222; }
-.ui-widget-header { background-image: -moz-linear-gradient(center top , #8A0000, #7A0000); background-color: #7A0000; color: #222222; font-weight: bold; }
+.ui-widget-header { background-image: linear-gradient(center top , #8A0000, #7A0000); background-color: #7A0000; color: #222222; font-weight: bold; }
 .ui-widget-header a { color: #222222; }
 
 /* Interaction states
@@ -98,8 +98,8 @@ ta/*!
 .ui-tabs { position: relative; padding: .2em; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
 .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
 .ui-tabs .ui-widget-header { background: none; }
-.ui-tabs .ui-tabs-nav .ui-state-default { background-image: linear-gradient(#7A0000, #8A0000); color: white;}
-.ui-tabs .ui-tabs-nav .ui-state-active { background-image: linear-gradient(#4A0000, #8A0000); color: white; font-weight: bold;}
+.ui-tabs .ui-tabs-nav .ui-state-default { background-image: linear-gradient(#7A0000, #8A0000); background-image: -webkit-linear-gradient(#7A0000, #8A0000); background-color: #7A0000; color: white;}
+.ui-tabs .ui-tabs-nav .ui-state-active { background-image: linear-gradient(#4A0000, #8A0000); background-image: -webkit-linear-gradient(#4A0000, #8A0000); background-color: #4A0000; color: white; font-weight: bold;}
 .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; padding: 0; white-space: nowrap; box-shadow: 1px; border-bottom: 0; }
 .ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; border-bottom: white; font-weight: bold; }
