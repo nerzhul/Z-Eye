@@ -255,7 +255,8 @@
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
-				$tmpoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"],in_array($data["name"],$parentlist));
+				if($data["name"] != $host)
+					$tmpoutput .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"],in_array($data["name"],$parentlist));
 			}
 			if($countElmt/4 < 4) $countElmt = 16;
 			$output .= FS::$iMgr->select("parent[]","",NULL,true,array("size" => round($countElmt/4)));
@@ -264,7 +265,12 @@
 			
 			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$hostdata["addr"]);
 
-			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups[]",false,array(),"",true)."</td></tr>";
+			$hglist = array();
+			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","name","host = '".$host."' AND hosttype = '1'");
+			while($data = FS::$dbMgr->Fetch($query))
+				array_push($hglist,$data["name"]);
+			
+			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups[]",false,$hglist,"",true)."</td></tr>";
 
 			// Checks
 			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand",$hostdata["alivecommand"])."</td></tr>";
@@ -966,7 +972,7 @@
 			$countElmt = 0;
 			foreach($hostlist as $host => $value) {
 				$countElmt++;
-				$tmpoutput .= FS::$iMgr->selElmt($host,(!$grouponly ? $value[0]."$" : "").$value[1],in_array($value[0]."$".$value[1],$selected));
+				$tmpoutput .= FS::$iMgr->selElmt($host,(!$grouponly ? $value[0]."$" : "").$value[1],in_array((!$grouponly ? $value[0]."$" : "").$value[1],$selected));
 			}
 			if($countElmt/4 < 4) $countElmt = 16;
 			$output = FS::$iMgr->select($name,"",NULL,$multi,array("size" => round($countElmt/4)));
