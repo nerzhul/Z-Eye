@@ -95,6 +95,8 @@ h3:hover {
         text-align: left;
 }
 
+#contenttabs { background: none; border: 0px; }
+
 #contenttabs h2 {
         color: white;
         background-color: #5e0000;
