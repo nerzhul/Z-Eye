@@ -150,6 +150,8 @@
 
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr","");
 
+			$formoutput .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups[]",false,array(),"",true)."</td></tr>";
+
 			// Checks
 			$formoutput .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand","check-host-alive")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod")."</td></tr>";
@@ -261,7 +263,9 @@
 			$output .= "</select></td></tr>";
 			
 			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$hostdata["addr"]);
-			
+
+			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups[]",false,array(),"",true)."</td></tr>";
+
 			// Checks
 			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand",$hostdata["alivecommand"])."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod",$hostdata["checkperiod"])."</td></tr>";
@@ -942,17 +946,18 @@
 			return $output;
 		}
 		
-		private function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "") {
+		private function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "",$grouponly = false) {
 			$hostlist = array();
-			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
-			while($data = FS::$dbMgr->Fetch($query))
-				$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
-		
+			if(!$grouponly) {
+				$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
+				while($data = FS::$dbMgr->Fetch($query))
+					$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
+			}
 
 			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($data["name"] != $ignore)
-					$hostlist[$this->loc->s("Hostgroup").": ".$data["name"]] = array(2,$data["name"]);
+					$hostlist[($grouponly ? "" : $this->loc->s("Hostgroup").": ").$data["name"]] = array(2,$data["name"]);
 			}
 
 			ksort($hostlist);
@@ -961,7 +966,7 @@
 			$countElmt = 0;
 			foreach($hostlist as $host => $value) {
 				$countElmt++;
-				$tmpoutput .= FS::$iMgr->selElmt($host,$value[0]."$".$value[1],in_array($value[0]."$".$value[1],$selected));
+				$tmpoutput .= FS::$iMgr->selElmt($host,(!$grouponly ? $value[0]."$" : "").$value[1],in_array($value[0]."$".$value[1],$selected));
 			}
 			if($countElmt/4 < 4) $countElmt = 16;
 			$output = FS::$iMgr->select($name,"",NULL,$multi,array("size" => round($countElmt/4)));
@@ -1825,6 +1830,7 @@
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$dname = FS::$secMgr->checkAndSecurisePostData("dname");
 					$parent = FS::$secMgr->checkAndSecurisePostData("parent");
+					$hg = FS::$secMgr->checkAndSecurisePostData("hostgroups");
 					$icon = FS::$secMgr->checkAndSecurisePostData("icon");
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
@@ -1903,6 +1909,19 @@
 						}
 					}
 					
+					if($hg && is_array($hg)) {
+						$count = count($hg);
+						for($i=0;$i<$count;$i++) {
+							if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$hg[$i]."'")) {
+								if(FS::isAjaxCall())
+									echo $this->loc->s("err-bad-data");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+								return;
+							}
+						}
+					}
+
 					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcommand."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
@@ -1938,9 +1957,15 @@
 					if($edit) FS::$dbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
 					if($parent && !in_array("none",$parent)) {
 						$count = count($parent);
-						for($i=0;$i<$count;$i++) {
+						for($i=0;$i<$count;$i++)
 							FS::$dbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
-						}
+					}
+
+					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
+					if($hg && is_array($hg)) {
+						$count = count($hg);
+						for($i=0;$i<$count;$i++)
+							FS::$dbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$hg[$i]."','".$name."','1'");
 					}
 					
 					if(!$this->writeConfiguration()) {
