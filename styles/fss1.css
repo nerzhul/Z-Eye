@@ -772,3 +772,8 @@ label {
 #searchres li:hover {
 	background-color: rgba(245, 235, 235, 0.94);
 }
+
+/* JQZoom */
+#jqzoom-img {
+	max-width: 75%;
+}
