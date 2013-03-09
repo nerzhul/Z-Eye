@@ -71,7 +71,6 @@
 					}
 				}
 			}
-			fclose($file);
 			$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","r");
 			$netdiscoCfg["firstnode"] = fread($file,filesize("/usr/local/etc/netdisco/netdisco-topology.txt"));
 			fclose($file);

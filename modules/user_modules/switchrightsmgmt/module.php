@@ -47,6 +47,7 @@
 			$stype = 1;
 			$spwd = "";
 			$spath = "";
+			$output = "";
 			if(!$create) {
 				FS::$iMgr->showReturnMenu(true);
 				$output = "<h2>".$this->loc->s("title-edit-backup-switch-server")."</h2>";
