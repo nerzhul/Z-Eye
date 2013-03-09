@@ -59,7 +59,7 @@
 			return $output;	
 		}
 		private function showGeneralLightWeatherMap() {
-			return FS::$iMgr->imgWithZoom2("datas/weathermap/main-nowifi-tiny.svg",$this->loc->s("net-map-full"),"netmapF","datas/weathermap/main-nowifi.png");
+			return FS::$iMgr->imgWithZoom2("datas/weathermap/main-nowifi-tiny.svg",$this->loc->s("net-map-full"),"netmapL","datas/weathermap/main-nowifi.png");
 		}
 		
 		private function showGeneralFullWeatherMap() {
