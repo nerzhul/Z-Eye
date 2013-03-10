@@ -68,7 +68,8 @@ def load_portbuffer():
 	try:
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
-			portbuffer[idx[0]] = {}
+			if not portbuffer.has_key(idx[0]):
+				portbuffer[idx[0]] = {}
 			portbuffer[idx[0]][idx[1]] = (idx[2],idx[3])
 		
 	except PgSQL.Error, e:
@@ -77,7 +78,7 @@ def load_portbuffer():
         	sys.exit(1);
 	
 def generate_graph(filename,options=[],size=""):
-	global pgsqlCon,devlist
+	global pgsqlCon,devlist,devlistbyip,portbuffer
 	graphopts = "bgcolor=white, nodesep=1"
 	if(len(size) > 0):
 		graphopts += ", size=\"%s\"" % size
@@ -89,9 +90,9 @@ def generate_graph(filename,options=[],size=""):
 
 	""" Search each port in and out bw """
 	outlink = {}
-	for devkey,dev in portbuffer.items():
+	for (devkey,dev) in portbuffer.items():
 		devname = devlistbyip[devkey][1]
-		for pkey,devport in dev.items():
+		for (pkey,devport) in dev.items():
 			if "NO-WIFI" in options:
 				if re.match("AIRAP",devlist[devname][0]):
 					continue
@@ -104,48 +105,53 @@ def generate_graph(filename,options=[],size=""):
 				try:
 					pid = pgcursor.fetchone()
 					if pid != None:
+						pid = pid[0]
 						""" if PID there is a MRTG file to read, maybe """
-						mrtgfile = open("/usr/local/www/z-eye/datas/rrd/%s_%s.log" % (devkey,pid))
-						mrtgfilecontent = mrtgfile.readlines()
-						for i in range(1,2):
-							outputbw = 0
-							res = re.split(" ",mrtgfilecontent[i])
-							if len(res) == 5:
-								if devport[0] == 0:
-									inputbw = 0
-									outputbw = 0
-								else:
-									inputbw = res[1]
-									outputbw = res[2]
-									maxbw = re.split(" ",devport[0])
-									if len(maxbw) == 2:
-										if maxbw[1] == "Gbit" or maxbw[1] == "Gbps":
-											maxbw = maxbw[0] * 1000000000
-										elif maxbw[1] == "Mbit" or maxbw[1] == "Mbps":
-											maxbw = maxbw[0] * 1000000
-
+						try:
+							mrtgfile = open("/usr/local/www/z-eye/datas/rrd/%s_%s.log" % (devkey,pid))
+							mrtgfilecontent = mrtgfile.readlines()
+							for i in range(1,2):
+								outputbw = 0
+								res = re.split(" ",mrtgfilecontent[i])
+								if len(res) == 5:
+									if devport[0] == 0:
+										inputbw = 0
+										outputbw = 0
 									else:
-										maxbw = maxbw[0]
-									outcharge = outputbw / maxbw
-									incharge = inputbw / maxbw
-									if not outlink.has_key(devname):
-										outlink[devname] = {}
-									if not ("NO-DIRECTION" in options) or "NO-DIRECTION" in options and not outlink[devname].has_key(devport[1]):
-										outlink[devname][devport[1]] = {"lock": 1, "chrg": outcharge}
-									if not ("NO-DIRECTION" in options):
-										if not outlink.has_key(devport[1]):
-											outlink[devport[1]] = {}
-										if not outlink[devport[1]].has_key(devname) or outlink[devport[1]][devname]["lock"] == 0:
-											outlink[devport[1]][devname] = {"lock": 0, "chrg": incharge}
-									
+										inputbw = res[1]
+										outputbw = res[2]
+										maxbw = re.split(" ",devport[0])
+										if len(maxbw) == 2:
+											if maxbw[1] == "Gbit" or maxbw[1] == "Gbps":
+												maxbw = float(maxbw[0]) * 1000000000
+											elif maxbw[1] == "Mbit" or maxbw[1] == "Mbps":
+												maxbw = float(maxbw[0]) * 1000000
+											else:
+												maxbw = float(maxbw[0])
+										else:
+											maxbw = maxbw[0]
+										outcharge = float(outputbw) / float(maxbw)
+										incharge = float(inputbw) / float(maxbw)
+										if not outlink.has_key(devname):
+											outlink[devname] = {}
+										if not ("NO-DIRECTION" in options) or "NO-DIRECTION" in options and not outlink[devname].has_key(devport[1]):
+											outlink[devname][devport[1]] = {"lock": 1, "chrg": outcharge}
+										if not ("NO-DIRECTION" in options):
+											if not outlink.has_key(devport[1]):
+												outlink[devport[1]] = {}
+											if not outlink[devport[1]].has_key(devname) or outlink[devport[1]][devname]["lock"] == 0:
+												outlink[devport[1]][devname] = {"lock": 0, "chrg": incharge}
+					 	except IOError, e:				
+        						print "%s IOError: %s" % (log_header,e)
+							zeye_log("%s IOError: %s" % (log_header,e))
 				except PgSQL.Error, e:
         				print "%s Pgsql Error %s" % (log_header,e)
 					zeye_log("%s Pgsql Error %s" % (log_header,e))
         				sys.exit(1);
-
+	print outlink
 	""" Generate .dot file """
-	for devsrc,devsrcdata in outlink:
-		for devdst,devdstdata in devsrcdata:
+	for (devsrc,devsrcdata) in outlink:
+		for (devdst,devdstdata) in devsrcdata:
 			outcharge = outlink[devsrc][devdst]["chrg"]
 			penwidth = "1.0"
 			pencolor = "black"
@@ -199,7 +205,7 @@ try:
 	tinysize = "22,14"
 
 	load_devlist()
-	load_portbuffer
+	load_portbuffer()
 
 	generate_graph("main")
 	generate_graph("main-tiny",[],tinysize)
