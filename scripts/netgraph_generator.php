@@ -60,7 +60,6 @@
 		if(strlen($size) > 0)
 			$graphopts .= ", size=\"".$size."\"";
 
-		echo $graphopts;
 		if(!in_array("NO-DIRECTION",$options))
 			$graphbuffer = "digraph maingraph {\ngraph [".$graphopts."];\n	node [label=\"\N\", color=white, fontcolor=black, fontname=lucon, shape=plaintext];\n edge [color=black];\n";
 		else
