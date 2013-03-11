@@ -78,7 +78,7 @@
 					$found = false;
 					$tmpoutput = "<h2>".$this->loc->s("title-remove-server")."</h2>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
 					$tmpoutput .= "<ul class=\"ulform\">".$this->loc->s("Server").": ".FS::$iMgr->select("daddr");
-					$query = FS::$dbMgr->Select("z_eye_dhcp_servers","addr,sshuser");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) $found = true;
 						$tmpoutput .= "<li>".FS::$iMgr->selElmt($data["sshuser"]."@".$data["addr"],$data["addr"])."</li>";
@@ -94,7 +94,7 @@
 				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$tmpoutput .= FS::$iMgr->select("f","submit()");
 				$formoutput = "";
-				$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","","netid");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","","netid");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$netfound) $netfound = true;
 					$formoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
@@ -122,7 +122,7 @@
 				}
 			} else {
 				if(!$showmodule || $showmodule == 1) {
-				$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$iparray = array();
 					$netoutput .= "<h3>Réseau : ".$data["netid"]."/".$data["netmask"]."</h3>";
@@ -155,7 +155,7 @@
 					}
 
 					// Fetch datas
-					$query2 = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
+					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
 					while($data2 = FS::$dbMgr->Fetch($query2)) {
 						// If it's reserved on a host don't override status
 						if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
@@ -290,12 +290,12 @@
 				}
 				else if($showmodule == 3) {
 					$output .= "<h4>Monitoring</h4>";
-					$wlimit = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","warnuse","subnet = '".$filter."'");
-					$climit = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","crituse","subnet = '".$filter."'");
-					$maxage = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","maxage","subnet = '".$filter."'");
-					$enmon = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","enmon","subnet = '".$filter."'");
-					$eniphistory = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","eniphistory","subnet = '".$filter."'");
-					$contact = FS::$dbMgr->GetOneData("z_eye_dhcp_monitoring","contact","subnet = '".$filter."'");
+					$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","warnuse","subnet = '".$filter."'");
+					$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","crituse","subnet = '".$filter."'");
+					$maxage = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","maxage","subnet = '".$filter."'");
+					$enmon = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","enmon","subnet = '".$filter."'");
+					$eniphistory = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","eniphistory","subnet = '".$filter."'");
+					$contact = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","contact","subnet = '".$filter."'");
 					$output .= "<div id=\"monsubnetres\"></div>";
 	                                $output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
@@ -322,7 +322,7 @@
 					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
 					$output .= FS::$iMgr->hidden("filter",$filter);
-					$date = FS::$dbMgr->GetMin("z_eye_dhcp_subnet_history","collecteddate");
+					$date = FS::$dbMgr->GetMin(PGDbConfig::getDbPrefix()."dhcp_subnet_history","collecteddate");
 					if(!$date) $date = "now";
 					$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
 					$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
@@ -338,7 +338,7 @@
 			$output = "<h3>".$this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days")."</h3>";
 			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
-			$query = FS::$dbMgr->Select("z_eye_dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'","collecteddate",2);
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'","collecteddate",2);
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
 				$results[$data["collecteddate"]]["baux"] = $data["ipactive"];
@@ -347,7 +347,7 @@
 			}
 			$netobj = new FSNetwork();
                         $netobj->setNetAddr($filter);
-                        $netobj->setNetMask(FS::$dbMgr->GetOneData("z_eye_dhcp_subnet_cache","netmask","netid ='".$filter."'"));
+                        $netobj->setNetMask(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netmask","netid ='".$filter."'"));
 
 			// JS Table
 			$labels = $baux = $reserv = $avail = $free = $total = "";
@@ -433,7 +433,7 @@
 		private function writeConfigToServer($server = NULL) {
 
 			$conns = array();
-			$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,pwd","dhcp = 1");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,pwd","dhcp = 1");
 		        while($data = FS::$dbMgr->Fetch($query)) {
 		                $conn = ssh2_connect($data["addr"],22);
                 		if(!$conn) {
@@ -471,7 +471,7 @@
 					$output = "";
 					$obsoletes = array();
 					$found = false;
-					$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","ip,macaddr,hostname","netid = '".$filter."' AND distributed = 3");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname","netid = '".$filter."' AND distributed = 3");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						$ltime = FS::$dbMgr->GetOneData("node","time_last","mac = '".$data["macaddr"]."'","time_last",1,1);
 						if($ltime) {
@@ -510,15 +510,15 @@
 						echo FS::$iMgr->printError($this->loc->s("err-miss-data"));
 						return;
 					}
-					$exist = FS::$dbMgr->GetOneData("z_eye_dhcp_subnet_cache","netid","netid = '".$filtr."'");
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid","netid = '".$filtr."'");
 					if(!$exist) {
 						echo FS::$iMgr->printError($this->loc->s("err-bad-subnet"));
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"User try to monitor inexistant subnet '".$filtr."'");
 						return;
 					}
 
-					FS::$dbMgr->Delete("z_eye_dhcp_monitoring","subnet = '".$filtr."'");
-					FS::$dbMgr->Insert("z_eye_dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage,eniphistory","'".$filtr."','".$warn."','".$crit."','".$contact."','".($enmon == "on" ? "1" : "0").
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_monitoring","subnet = '".$filtr."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage,eniphistory","'".$filtr."','".$warn."','".$crit."','".$contact."','".($enmon == "on" ? "1" : "0").
 						"','".$maxage."','".($eniphistory == "on" ? "t" : "f")."'");
 					echo FS::$iMgr->printDebug($this->loc->s("modif-record"));
 
@@ -581,7 +581,7 @@
                                                 	FS::$iMgr->redir("mod=".$this->mid."&err=4");
                                                 return;
                                         }
-                                        if(FS::$dbMgr->GetOneData("z_eye_dhcp_servers","sshuser","addr ='".$saddr."'")) {
+                                        if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr ='".$saddr."'")) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-already-exists");
@@ -658,7 +658,7 @@
                 	                        }
 					}
 
-					FS::$dbMgr->Insert("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
 						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
 					FS::$iMgr->redir("mod=".$this->mid,true);
@@ -673,19 +673,19 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_dhcp_servers","sshuser","addr = '".$addr."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr = '".$addr."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Unknown DHCP server specified to remove");
 						FS::$iMgr->redir("mod=".$this->mid."&err=8");
 						return;
 					}
 
 					if($histrm == "on")
-						FS::$dbMgr->Delete("z_eye_dhcp_ip_history","server = '".$addr."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_history","server = '".$addr."'");
 
-					FS::$dbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$addr."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_cache","server = '".$addr."'");
 					// Later
-					// FS::$dbMgr->Delete("z_eye_dhcp_subnet_cache","server = '".$addr."'");
-					FS::$dbMgr->Delete("z_eye_dhcp_servers","addr = '".$addr."'");
+					// FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","server = '".$addr."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
 					FS::$iMgr->redir("mod=".$this->mid);
                                         return;
 			}

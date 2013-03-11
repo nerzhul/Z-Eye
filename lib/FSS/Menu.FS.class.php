@@ -33,7 +33,7 @@
 		function Menu() {}
 
 		public function Load() {
-			$query = FS::$dbMgr->Select("z_eye_menus","name,isconnected","id = '".$this->id."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","name,isconnected","id = '".$this->id."'");
 			if($data = pg_fetch_array($query)) {
 				$this->name = $data["name"];
 				$this->isconnected = $data["isconnected"];
@@ -41,16 +41,16 @@
 		}
 
 		public function Create() {
-			$id = FS::$dbMgr->GetMax("z_eye_menus","id")+1;
-			FS::$dbMgr->Insert("z_eye_menus","id,name,isconnected","'".$id."','".$this->name."','".$this->isconnected."'");
+			$id = FS::$dbMgr->GetMax(PGDbConfig::getDbPrefix()."menus","id")+1;
+			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","'".$id."','".$this->name."','".$this->isconnected."'");
 		}
 
 		public function SaveToDB() {
-			FS::$dbMgr->Update("z_eye_menus","name = '".$this->name."', isconnected = '".$this->isconnected."'","id = '".$this->id."'");
+			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."menus","name = '".$this->name."', isconnected = '".$this->isconnected."'","id = '".$this->id."'");
 		}
 
 		public function Delete() {
-			FS::$dbMgr->Delete("z_eye_menus","id = '".$this->id."'");
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."menus","id = '".$this->id."'");
 		}
 
 		public function getConnected() { return $this->isconnected; }

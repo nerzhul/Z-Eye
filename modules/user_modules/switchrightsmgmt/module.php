@@ -57,7 +57,7 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
-				$query = FS::$dbMgr->Select("z_eye_save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
@@ -136,7 +136,7 @@
 			$tmpoutput = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th></th></tr>";
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_save_device_servers","addr,type,path,login");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == false) $found = true;
 				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&bck=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
@@ -195,7 +195,7 @@
 					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array(), "portmod_portsec" => array(),
 					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "portmod_dhcpsnooping" => array(), "dhcpsnmgmt" => array());
 				// Groups
-				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_read")
 						array_push($grprules["read"],$data2["gid"]);
@@ -245,7 +245,7 @@
 					$grpoutput .= $this->showIPGroups($data["ip"],$key,$values,$filteri);
 				}
 				// Users			
-				$query2 = FS::$dbMgr->Select("z_eye_user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_read")
 						array_push($usrrules["read"],$data2["uid"]);
@@ -324,7 +324,7 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ".
+					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'")." ".
 						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
 				}
 			}
@@ -350,7 +350,7 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ".
+					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'")." ".
 						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
 				}
 			}
@@ -388,12 +388,12 @@
 			else if($filter) $filterc = $filter;
 			else $filterc = ""; 
 
-			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],$filter == $data["name"]);
 			}
 
-			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw",($filterc ? "name = '".$filterc."'" : ""),"name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw",($filterc ? "name = '".$filterc."'" : ""),"name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				// Init SNMP rights
@@ -441,7 +441,7 @@
 					$grprules["dhcpsnmgmt"] = array();
 					$usrrules["dhcpsnmgmt"] = array();
 				}
-				$query2 = FS::$dbMgr->Select("z_eye_group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					// Read rules
 					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_read" && $data["ro"] == 't')
@@ -493,7 +493,7 @@
 					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values,$filterc);
 				}			
 				// Users
-				$query2 = FS::$dbMgr->Select("z_eye_user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					// Read rules
 					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_read" && $data["ro"] == 't')
@@ -579,7 +579,7 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$values[$i]."'")." ".
+					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'")." ".
 						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
 				}
 			}
@@ -605,7 +605,7 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$values[$i]."'")." ".
+					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'")." ".
 						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
 				}
 			}
@@ -627,7 +627,7 @@
 
 		private function getUserGroups() {
 			$groups = array();
-			$query = FS::$dbMgr->Select("z_eye_groups","gid,gname");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$groups[$data["gid"]] = $data["gname"];
 			}
@@ -636,7 +636,7 @@
 
 		private function getUsers() {
 			$groups = array();
-			$query = FS::$dbMgr->Select("z_eye_users","uid,username");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$users[$data["uid"]] = $data["username"];
 			}
@@ -717,53 +717,53 @@
 
 					if($snmp) {
 						if($gid) {
-							if(!FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$gid."'") ||
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'") ||
 								$right == "read" && 
-									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
+									!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
 								$right == "write" && 
-									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and rw = 't'")) {
+									!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$snmp."' and rw = 't'")) {
 								FS::$iMgr->redir("mod=".$this->mid."&err=2".($filter ? "&filter=".$filter : ""));
 								return;
 							}
-							if(FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
 								FS::$iMgr->redir("mod=".$this->mid."&err=3".($filter ? "&filter=".$filter : ""));
 								return;
 							}
-							FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
-							FS::$dbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','mrule_switchmgmt_snmp_".$snmp."_".$right."','on'");
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','mrule_switchmgmt_snmp_".$snmp."_".$right."','on'");
 						}
 						else if($uid) {
-							if(!FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$uid."'") ||
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'") ||
 								$right == "read" && 
-									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
+									!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
 								$right == "write" && 
-									!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$snmp."' and rw = 't'")) {
+									!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$snmp."' and rw = 't'")) {
 								FS::$iMgr->redir("mod=".$this->mid."&err=2".($filter ? "&filter=".$filter : ""));
 								return;
 							}
-							if(FS::$dbMgr->GetOneData("z_eye_user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."' AND ruleval = 'on'")) {
 								FS::$iMgr->redir("mod=".$this->mid."&err=3".($filter ? "&filter=".$filter : ""));
 								return;
 							}
-							FS::$dbMgr->Delete("z_eye_user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
-							FS::$dbMgr->Insert("z_eye_user_rules","uid,rulename,ruleval","'".$uid."','mrule_switchmgmt_snmp_".$snmp."_".$right."','on'");
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","'".$uid."','mrule_switchmgmt_snmp_".$snmp."_".$right."','on'");
 						}
 					}
 					else if($ip) {
-						if(!FS::$dbMgr->GetOneData("z_eye_groups","gname","gid = '".$gid."'") ||
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'") ||
 							!FS::$dbMgr->GetOneData("device","name","ip = '".$ip."'")) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=2".($filter ? "&filter=".$filter : ""));
 							return;
 						}
-						if(FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 							$ip."_".$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=3".($filter ? "&filter=".$filter : ""));
 							return;
 						}
-						FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
-						FS::$dbMgr->Insert("z_eye_group_rules","gid,rulename,ruleval","'".$gid."','mrule_switchmgmt_ip_".$ip."_".$right."','on'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','mrule_switchmgmt_ip_".$ip."_".$right."','on'");
 					}
 
 					FS::$iMgr->redir("mod=".$this->mid.($filter ? "&filter=".$filter : ""));
@@ -783,29 +783,29 @@
 
 					if($snmp) {
 						if($gid) {
-							if(!FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."'")) {
 								FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
 							}
-							FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
 						}
 						else if($uid) {
-							if(!FS::$dbMgr->GetOneData("z_eye_user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."'")) {
 								FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
 							}
-							FS::$dbMgr->Delete("z_eye_user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
 						}
 					}
 					else if($ip) {
-						if(!FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 							$ip."_".$right."' AND gid = '".$gid."'")) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 							return;
 						}
-						FS::$dbMgr->Delete("z_eye_group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
 					}
 					FS::$iMgr->redir("mod=".$this->mid.($filter ? "&filter=".$filter : ""));
 					return;
@@ -831,7 +831,7 @@
 						return;
 					}
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-not-found");
@@ -841,7 +841,7 @@
 						}
 					}
 					else {
-						if(FS::$dbMgr->GetOneData("z_eye_save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-already-exists");
@@ -853,11 +853,11 @@
 
 					if($edit) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Edit server '".$saddr."' (type ".$stype.") for saving switch config");
-						FS::$dbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}
 					else
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Added server '".$saddr."' (type ".$stype.") for saving switch config");
-					FS::$dbMgr->Insert("z_eye_save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
 					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 
 					return;
@@ -874,7 +874,7 @@
 					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
 					if($saddr && $stype) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Delete server '".$saddr."' for saving switch config");
-						FS::$dbMgr->Delete("z_eye_save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					}
 					else {

@@ -100,14 +100,14 @@
 			
 			$output = "";
 			
-			$tpexist = FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","");
+			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 			if(!$tpexist) {
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 				return $output;
 			}
 			
-			$ctexist = FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","name","");
+			$ctexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","name","");
 			if(!$ctexist) {
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
@@ -128,7 +128,7 @@
 			$formoutput .= FS::$iMgr->select("icon");
 			$formoutput .= FS::$iMgr->selElmt("Aucun","");
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_icons","id,name","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_icons","id,name","","name");
 			while($data = FS::$dbMgr->Fetch($query))
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["id"]);
 
@@ -137,7 +137,7 @@
 			$formoutput2 = FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
 			$countElmt = 0;
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				$formoutput2 .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
@@ -189,7 +189,7 @@
 			 * Host table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,alias,addr,template","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,addr,template","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -200,7 +200,7 @@
 				else $output .= $this->loc->s("No");
 				$output .= "</td><td>";
 				$found2 = false;
-				$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_host_parents","parent","name = '".$data["name"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found2) $output .= ", ";
 					else $found2 = true;
@@ -221,7 +221,7 @@
 				return FS::$iMgr->printError($this->loc->s("err-no-host"));
 			}
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$host."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$host."'");
 			$hostdata = FS::$dbMgr->Fetch($query);
 			if(!$hostdata) {
 				return FS::$iMgr>printError($this->loc->s("err-no-host"));
@@ -239,20 +239,20 @@
 			$output .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
 			$output .= FS::$iMgr->select("icon");
 			$output .= FS::$iMgr->selElmt("Aucun","",$hostdata["iconid"] == "" ? true : false);
-			$query = FS::$dbMgr->Select("z_eye_icinga_icons","id,name","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_icons","id,name","","name");
 			while($data = FS::$dbMgr->Fetch($query))
 				$output .= FS::$iMgr->selElmt($data["name"],$data["id"],$hostdata["iconid"] == $data["id"] ? true : false);
 			$output .= "</select></td></tr>";
 
 			$parentlist = array();
-			$query = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$host."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_host_parents","parent","name = '".$host."'");
 			while($data = FS::$dbMgr->Fetch($query))
 				array_push($parentlist,$data["parent"]);
 			
 			$output .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
 			$tmpoutput = FS::$iMgr->selElmt($this->loc->s("None"),"none",count($parentlist) > 0 ? false : true);
 			$countElmt = 0;
-			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				if($data["name"] != $host)
@@ -266,7 +266,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$hostdata["addr"]);
 
 			$hglist = array();
-			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","name","host = '".$host."' AND hosttype = '1'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name","host = '".$host."' AND hosttype = '1'");
 			while($data = FS::$dbMgr->Fetch($query))
 				array_push($hglist,$data["name"]);
 			
@@ -307,7 +307,7 @@
 			if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
-			$hostexist = FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","");
+			$hostexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","");
 			if(!$hostexist)
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-hosts"));
 			else {
@@ -333,7 +333,7 @@
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
 
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name,alias","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -341,7 +341,7 @@
 				}
 				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=3&hg=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				$found2 = false;
-				$query2 = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'","hosttype,name");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'","hosttype,name");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found2) $output .= ", ";
 					else $found2 = true;
@@ -368,7 +368,7 @@
                                 return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
                         }
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name,alias","name = '".$hostgroup."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","name = '".$hostgroup."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
 				$alias = $data["alias"];
 			}
@@ -383,7 +383,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
 
 			$hostlist = array();
-			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","name,host,hosttype","name = '".$hostgroup."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","name = '".$hostgroup."'");
 			while($data = FS::$dbMgr->Fetch($query))
 				array_push($hostlist,$data["hosttype"]."$".$data["host"]);
 
@@ -400,7 +400,7 @@
 
 			$output = "";
 
-			$tpexist = FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","");
+			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 			if($tpexist) {
 				/*
 				 * Ajax new service
@@ -456,7 +456,7 @@
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"));
 
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_services","name,host,hosttype,template,ctg","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template,ctg","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -486,7 +486,7 @@
                                 return FS::$iMgr->printError($this->loc->s("err-no-service"));
                         }
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
 				retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
 				"name = '".$srv."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
@@ -575,7 +575,7 @@
 			 * Timeperiod table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -617,7 +617,7 @@
                                 return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 			}
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","name = '".$tp."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","name = '".$tp."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
 				$name = $data["name"];
 			}
@@ -653,7 +653,7 @@
 			if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
-			$tpexist = FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","","alias");
+			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");
 			if($tpexist) {
 				/*
 				 * Ajax new contact
@@ -692,7 +692,7 @@
 			 * Command table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name,mail,template","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,template","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -713,7 +713,7 @@
 			if(!$contact) {
                                 return FS::$iMgr->printError($this->loc->s("err-no-contact"));
 			}
-			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
 				"name = '".$contact."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
 				$test = $data["name"];
@@ -768,7 +768,7 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$countElmt = 0;
 			$formoutput2 = "";
-			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				$formoutput2 .= FS::$iMgr->selElmt($data["name"],$data["name"]);
@@ -787,14 +787,14 @@
 			 * Contactgroup table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
 				}
 				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=7&cg=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
-				$query2 = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
 				$found2 = false;
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found2) $output .= ", ";
@@ -814,7 +814,7 @@
 			if(!$cg)
 				return FS::$iMgr->printError($this->loc->s("err-no-contactgroup"));
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias","name = '".$cg."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","name = '".$cg."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
 				$alias = $data["alias"];
 			}
@@ -829,10 +829,10 @@
 			$tmpoutput = "";
 
 			$contacts = array();
-			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","member","name = '".$cg."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","member","name = '".$cg."'");
 			while($data = FS::$dbMgr->Fetch($query))
 				array_push($contacts,$data["member"]);
-			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$tmpoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
 			}
@@ -875,7 +875,7 @@
 			 * Command table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_commands","name,cmd","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -897,7 +897,7 @@
 				return FS::$iMgr->printError($this->loc->s("err-no-cmd"));
 			}
 
-			$cmd = FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'");
+			$cmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'");
 			if(!$cmd) {
 				return FS::$iMgr->printError($this->loc->s("err-cmd-doesnt-exist"));
 			}
@@ -914,7 +914,7 @@
 		
 		private function getTimePeriodList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias","","alias");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias","","alias");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"],$select == $data["name"]);
 			}
@@ -924,7 +924,7 @@
 
 		private function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select("z_eye_icinga_commands","name","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
 			}
@@ -934,7 +934,7 @@
 		
 		private function genContactGroupsList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"],$select == $data["name"] ? true : false);
 			}
@@ -944,7 +944,7 @@
 		
 		private function genHostsList($name) {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
@@ -955,12 +955,12 @@
 		private function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "",$grouponly = false) {
 			$hostlist = array();
 			if(!$grouponly) {
-				$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr","template = 'f'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'");
 				while($data = FS::$dbMgr->Fetch($query))
 					$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
 			}
 
-			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($data["name"] != $ignore)
 					$hostlist[($grouponly ? "" : $this->loc->s("Hostgroup").": ").$data["name"]] = array(2,$data["name"]);
@@ -991,7 +991,7 @@
 			$file = fopen($path."commands.cfg","w+");
 			if(!$file)
 				return false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_commands","name,cmd");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd");
 			while($data = FS::$dbMgr->Fetch($query))
 				fwrite($file,"define command {\n\tcommand_name\t".$data["name"]."\n\tcommand_line\t".$data["cmd"]."\n}\n\n");
 			
@@ -1004,7 +1004,7 @@
 			$file = fopen($path."contacts.cfg","w+");
 			if(!$file)
 				return false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts","template = 'f'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\tservice_notification_period\t".$data["srvperiod"]."\n\thost_notification_period\t".$data["hostperiod"]."\n\t");
 				fwrite($file,"service_notification_commands\t".$data["srvcmd"]."\n\thost_notification_commands\t".$data["hostcmd"]."\n\temail\t".$data["mail"]."\n\t");
@@ -1082,10 +1082,10 @@
 				fwrite($file,"\n}\n\n");
 			}
 			
-			$query = FS::$dbMgr->Select("z_eye_icinga_contactgroups","name,alias");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define contactgroup {\n\tcontactgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tmembers\t");
-				$query2 = FS::$dbMgr->Select("z_eye_icinga_contactgroup_members","member","name = '".$data["name"]."'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","member","name = '".$data["name"]."'");
 				$found = false;
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found) fwrite($file,",");
@@ -1104,7 +1104,7 @@
 			$file = fopen($path."timeperiods.cfg","w+");
 			if(!$file)
 				return false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define timeperiod {\n\ttimeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]);
 				if(strtotime($data["mhs"].":".$data["mms"]) < strtotime($data["mhe"].":".$data["mme"]))
@@ -1133,7 +1133,7 @@
 			$file = fopen($path."hosts.cfg","w+");
 			if(!$file)
 				return false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
 			perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,iconid","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define host {\n\thost_name\t".$data["name"]."\n\talias\t".$data["alias"]."\n\tdisplay_name\t".$data["dname"]."\n\taddress\t".$data["addr"]."\n\tcheck_command\t");
@@ -1176,7 +1176,7 @@
 				fwrite($file,"\n\tcontact_groups\t".$data["contactgroup"]);
 				
 				$found = false;
-				$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_host_parents","parent","name = '".$data["name"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = true;
@@ -1186,7 +1186,7 @@
 					fwrite($file,$data2["parent"]);
 				}
 				if($data["iconid"] && FS::$secMgr->isNumeric($data["iconid"])) {
-					$iconpath = FS::$dbMgr->GetOneData("z_eye_icinga_icons","path","id = '".$data["iconid"]."'");
+					$iconpath = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_icons","path","id = '".$data["iconid"]."'");
 					if($iconpath) {
 						fwrite($file,"\n\ticon_image\t".$iconpath);
 						fwrite($file,"\n\tstatusmap_image\t".$iconpath);
@@ -1203,11 +1203,11 @@
 			$file = fopen($path."hostgroups.cfg","w+");
 			if(!$file)
 				return false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_hostgroups","name,alias");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define hostgroup {\n\thostgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]);
 				$found = false;
-				$query2 = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '1'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '1'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = true;
@@ -1218,7 +1218,7 @@
 					
 				}
 				$found = false;
-				$query2 = FS::$dbMgr->Select("z_eye_icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '2'");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."' AND hosttype = '2'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if(!$found) {
 						$found = true;
@@ -1239,7 +1239,7 @@
 			$file = fopen($path."services.cfg","w+");
 			if(!$file)
 				return false;
-			$query = FS::$dbMgr->Select("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
 			retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptf,srvopts,notifintval,ctg,srvoptr",
 			"template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -1340,7 +1340,7 @@
 					}
 
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_sommands","cmd","name = '".$cmdname."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_sommands","cmd","name = '".$cmdname."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-not-found");
 							else
@@ -1348,7 +1348,7 @@
 							return;
 						}
 					}
-					else if(FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
+					else if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-data-exist");
 						else
@@ -1368,8 +1368,8 @@
 						return;
 					} 
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_commands","name = '".$cmdname."'");	
-					FS::$dbMgr->Insert("z_eye_icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");	
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
@@ -1390,23 +1390,23 @@
 						return;
 					}
 					
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","cmd","name = '".$cmdname."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=2");
 						return;
 					}
 					
 					// Forbid remove if command is used
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","srvcmd = '".$cmdname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","srvcmd = '".$cmdname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
 						return;
 					}
 					
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","hostcmd = '".$cmdname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","hostcmd = '".$cmdname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
 						return;
 					}
 					
-					FS::$dbMgr->Delete("z_eye_icinga_commands","name = '".$cmdname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
@@ -1500,7 +1500,7 @@
 							 
 
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-not-exist");
 							else
@@ -1509,7 +1509,7 @@
 						}
 					}
 					else {
-						if(FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$name."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-exist");
 							else
@@ -1518,8 +1518,8 @@
 						}
 					}
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_timeperiods","name = '".$name."'");
-					FS::$dbMgr->Insert("z_eye_icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume",
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_timeperiods","name = '".$name."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume",
 						"'".$name."','".$alias."','".$mhs."','".$mms."','".$tuhs."','".$tums."','".$whs."','".$wms."','".$thhs."','".$thms."','".$fhs."','".$fms."','".$sahs."','".$sams."','".$suhs."','".$sums.
 						"','".$mhe."','".$mme."','".$tuhe."','".$tume."','".$whe."','".$wme."','".$thhe."','".$thme."','".$fhe."','".$fme."','".$sahe."','".$same."','".$suhe."','".$sume."'");
 					if(!$this->writeConfiguration()) {
@@ -1541,7 +1541,7 @@
 						return;
 					}
 					
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","alias","name = '".$tpname."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$tpname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=2");
 						return;
 					}
@@ -1549,27 +1549,27 @@
 					// @ TODO forbid remove when used (service + host / groups ??)
 					
 					// Forbid remove if timeperiod is used
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","srvperiod = '".$tpname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","srvperiod = '".$tpname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","hostperiod = '".$tpname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","hostperiod = '".$tpname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","checkperiod = '".$tpname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","checkperiod = '".$tpname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","notifperiod = '".$tpname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","notifperiod = '".$tpname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 
-					FS::$dbMgr->Delete("z_eye_icinga_timeperiods","name = '".$tpname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_timeperiods","name = '".$tpname."'");
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=5");
 						return;
@@ -1616,7 +1616,7 @@
 
 					if($edit) {
 						// If contact doesn't exist
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-not-exist");
 							else
@@ -1626,7 +1626,7 @@
 					}
 					else {
 						// If contact exist
-						if(FS::$dbMgr->GetOneData("z_eye_icinga_contacts","name","name = '".$name."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-exist");
 							else
@@ -1636,7 +1636,7 @@
 					}
 
 					// Timeperiods don't exist
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -1644,7 +1644,7 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -1652,7 +1652,7 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$srvnotifcmd."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$srvnotifcmd."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -1660,7 +1660,7 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$hostnotifcmd."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$hostnotifcmd."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -1668,8 +1668,8 @@
 						return;
 					}
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_contacts","name = '".$name."'");
-					FS::$dbMgr->Insert("z_eye_icinga_contacts","name,mail,template,srvperiod,srvcmd,hostperiod,hostcmd,soptc,soptw,soptu,soptr,soptf,sopts,hoptd,hoptu,hoptr,hoptf,hopts",
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contacts","name = '".$name."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,template,srvperiod,srvcmd,hostperiod,hostcmd,soptc,soptw,soptu,soptr,soptf,sopts,hoptd,hoptu,hoptr,hoptf,hopts",
 						"'".$name."','".$mail."','".($istpl == "on" ? 1 : 0)."','".$srvnotifperiod."','".$srvnotifcmd."','".$hostnotifperiod."','".$hostnotifcmd."','".($srvoptc == "on" ? 1 : 0)."','".
 						($srvoptw == "on" ? 1 : 0)."','".($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".
 						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
@@ -1696,18 +1696,18 @@
 						return;
 					}
 					
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$ctname."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$ctname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=2");
 						return;
 					}
 					
 					// Forbid remove if in existing contact group
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_contactgroup_members","name","member = '".$ctname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name","member = '".$ctname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 					
-					FS::$dbMgr->Delete("z_eye_icinga_contacts","name = '".$ctname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contacts","name = '".$ctname."'");
 					
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=5");
@@ -1740,7 +1740,7 @@
 					
 					// ctg exists
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-not-exist");
 							else
@@ -1749,7 +1749,7 @@
 						}
 					}
 					else {
-						if(FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$name."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-exist");
 							else
@@ -1761,7 +1761,7 @@
 					// some members don't exist
 					$count = count($cts);
 					for($i=0;$i<$count;$i++) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_contacts","mail","name = '".$cts[$i]."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$cts[$i]."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-bad-data");
 							else
@@ -1771,13 +1771,13 @@
 					}
 
 					if($edit) {
-						FS::$dbMgr->Delete("z_eye_icinga_contactgroups","name = '".$name."'");
-						FS::$dbMgr->Delete("z_eye_icinga_contactgroup_members","name = '".$name."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroups","name = '".$name."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$name."'");
 					}
 					// Add it
-					FS::$dbMgr->Insert("z_eye_icinga_contactgroups","name,alias","'".$name."','".$alias."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","'".$name."','".$alias."'");
 					for($i=0;$i<$count;$i++) {
-						FS::$dbMgr->Insert("z_eye_icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
 					}
 
 					if(!$this->writeConfiguration()) {
@@ -1803,18 +1803,18 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_contactgroups","alias","name = '".$ctgname."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$ctgname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=2");
 						return;
 					}
 
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","contactgroup = '".$ctgname."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","contactgroup = '".$ctgname."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=4");
 						return;
 					}
 
-					FS::$dbMgr->Delete("z_eye_icinga_contactgroup_members","name = '".$ctgname."'");
-					FS::$dbMgr->Delete("z_eye_icinga_contactgroups","name = '".$ctgname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$ctgname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroups","name = '".$ctgname."'");
 
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=5");
@@ -1884,7 +1884,7 @@
 					
 					// Now verify datas
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-not-exist");
 							else
@@ -1893,7 +1893,7 @@
                                                 }
 					}
 					else {
-						if(FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$name."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-exist");
 							else
@@ -1905,7 +1905,7 @@
 					if($parent && !in_array("none",$parent)) {
 						$count = count($parent);
 						for($i=0;$i<$count;$i++) {
-							if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$parent[$i]."'")) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$parent[$i]."'")) {
 								if(FS::isAjaxCall())
 									echo $this->loc->s("err-bad-data");
 								else
@@ -1918,7 +1918,7 @@
 					if($hg && is_array($hg)) {
 						$count = count($hg);
 						for($i=0;$i<$count;$i++) {
-							if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$hg[$i]."'")) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$hg[$i]."'")) {
 								if(FS::isAjaxCall())
 									echo $this->loc->s("err-bad-data");
 								else
@@ -1928,7 +1928,7 @@
 						}
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcommand."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$checkcommand."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -1936,7 +1936,7 @@
 						return;
 					}
 					
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$checkperiod."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -1944,7 +1944,7 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$notifperiod."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -1952,26 +1952,26 @@
 						return;
 					}
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
-					FS::$dbMgr->Insert("z_eye_icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hosts","name = '".$name."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
 						failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid",
 						"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 						($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
 						$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
 						($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".($icon ? $icon : 0)."'");
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","name = '".$name."'");
 					if($parent && !in_array("none",$parent)) {
 						$count = count($parent);
 						for($i=0;$i<$count;$i++)
-							FS::$dbMgr->Insert("z_eye_icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
 					}
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
 					if($hg && is_array($hg)) {
 						$count = count($hg);
 						for($i=0;$i<$count;$i++)
-							FS::$dbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$hg[$i]."','".$name."','1'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","'".$hg[$i]."','".$name."','1'");
 					}
 					
 					if(!$this->writeConfiguration()) {
@@ -1997,16 +1997,16 @@
 					}
 
 					// Not exists
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_hosts","addr","name = '".$name."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","addr","name = '".$name."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=2");
 						return;
 					}
 
 					// Remove host and links with parents and hostgroups
-					FS::$dbMgr->Delete("z_eye_icinga_host_parents","name = '".$name."'");
-					FS::$dbMgr->Delete("z_eye_icinga_host_parents","parent = '".$name."'");
-					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
-					FS::$dbMgr->Delete("z_eye_icinga_hosts","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","parent = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hosts","name = '".$name."'");
 
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
@@ -2041,7 +2041,7 @@
 					}
 
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","host","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-not-exist");
 							else
@@ -2050,7 +2050,7 @@
 						}
 					}
 					else {
-						if(FS::$dbMgr->GetOneData("z_eye_icinga_services","host","name = '".$name."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","host","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-exist");
 							else
@@ -2103,7 +2103,7 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_commands","name","name = '".$checkcmd."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$checkcmd."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -2111,7 +2111,7 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$checkperiod."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$checkperiod."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -2119,7 +2119,7 @@
 						return;
 					}
 
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_timeperiods","name","name = '".$notifperiod."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$notifperiod."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -2127,14 +2127,14 @@
 						return;
 					}
 
-					if($mt[0] == 1 && !FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
+					if($mt[0] == 1 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$mt[1]."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
-					if($mt[0] == 2 && !FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$mt[1]."'")) {
+					if($mt[0] == 2 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$mt[1]."'")) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-bad-data");
 						else
@@ -2142,8 +2142,8 @@
 						return;
 					}
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_services","name = '".$name."'");
-					FS::$dbMgr->Insert("z_eye_icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_services","name = '".$name."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
 						retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
 						"'".$name."','".$mt[1]."','".$mt[0]."','".($actcheck == "on" ? 1 : 0)."','".($pascheck == "on" ? 1 : 0)."','".($parcheck == "on" ? 1 : 0)."','".($obsess == "on" ? 1 : 0).
 						"','".($freshness == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
@@ -2175,14 +2175,14 @@
 					}
 					
 					// Not exists
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_services","name","name = '".$name."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","name = '".$name."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=2");
 						return;
 					}
 					
 					// membertype 1 = service, 2 = servicegroup
-					FS::$dbMgr->Delete("z_eye_icinga_servicegroups","member = '".$name."' AND membertype = 1");
-					FS::$dbMgr->Delete("z_eye_icinga_services","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_servicegroups","member = '".$name."' AND membertype = 1");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_services","name = '".$name."'");
 					
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=5");
@@ -2213,7 +2213,7 @@
 					}
 					
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-not-exist");
 							else
@@ -2222,7 +2222,7 @@
                                                 }
 					}
 					else {
-						if(FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-data-exist");
 							else
@@ -2235,7 +2235,7 @@
 						$count = count($members);
 						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
-							if(count($mt) != 2 && !FS::$dbMgr->GetOneData("z_eye_icinga_hosts","name","name = '".$mt[1]."'")) {
+							if(count($mt) != 2 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$mt[1]."'")) {
 								if(FS::isAjaxCall())
 									echo $this->loc->s("err-bad-data");
 								else
@@ -2243,11 +2243,11 @@
 								return;
 							}
 						}
-						if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","name = '".$name."'");
+						if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name = '".$name."'");
 						for($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if(count($mt) == 2 && ($mt[0] == 1 || $mt[0] == 2))
-								FS::$dbMgr->Insert("z_eye_icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[1]."','".$mt[0]."'");
+								FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[1]."','".$mt[0]."'");
 						}
 					}
 					else {
@@ -2258,8 +2258,8 @@
 						return;
 					}
 
-					if($edit) FS::$dbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
-					FS::$dbMgr->Insert("z_eye_icinga_hostgroups","name,alias","'".$name."','".$alias."'");
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups","name = '".$name."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","'".$name."','".$alias."'");
 					if(!$this->writeConfiguration()) {
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-fail-writecfg");
@@ -2283,21 +2283,21 @@
 					}
 
 					// Not exists
-					if(!FS::$dbMgr->GetOneData("z_eye_icinga_hostgroups","name","name = '".$name."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
 					// Used
-					if(FS::$dbMgr->GetOneData("z_eye_icinga_services","name","host = '".$name."' AND hosttype = '2'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","host = '".$name."' AND hosttype = '2'")) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
 					// Delete hostgroup and members
-					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","name = '".$name."'");
-					FS::$dbMgr->Delete("z_eye_icinga_hostgroup_members","host = '".$name."' AND hosttype = 2");
-					FS::$dbMgr->Delete("z_eye_icinga_hostgroups","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = 2");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups","name = '".$name."'");
 
 					if(!$this->writeConfiguration()) {
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=5");

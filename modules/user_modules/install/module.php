@@ -35,7 +35,7 @@
 		private function showMain() {
 			$output = "<h1>".$this->loc->s("title-master-install")."</h1><div id=\"installer\">";
 			// For future, maybe we could resume install
-			$pwdset = FS::$dbMgr->GetOneData("z_eye_users","sha_pwd","username = 'admin'");
+			$pwdset = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","sha_pwd","username = 'admin'");
 			if(!$pwdset) {
 				$output .= $this->showInstaller();
 				return $output."</div>";

@@ -80,13 +80,13 @@
 		
 		public function getUserName() {
 			if($this->getUid())
-				return FS::$dbMgr->GetOneData("z_eye_users","username","uid = '".$this->getUid()."'");
+				return FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$this->getUid()."'");
 			return NULL;
 		}
 
 		public function getGroups() {
 			$groups = array();
-			$query = FS::$dbMgr->Select("z_eye_user_group","gid","uid = '".$this->getUid()."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$this->getUid()."'");
 			while($data = pg_fetch_array($query)) {
 				array_push($groups,$data["gid"]);
 			}
@@ -96,7 +96,7 @@
 
 		public function getUsers() {
 			$users = array();
-			$query = FS::$dbMgr->Select("z_eye_users","uid");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid");
 			while($data = pg_fetch_array($query)) {
 				array_push($users,$data["uid"]);
 			}
@@ -105,7 +105,7 @@
 		}
 
 		public function isInGroup($gname) {
-			$gid = FS::$dbMgr->GetOneData("z_eye_groups","gid","gname = '".$gname."'");
+			$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 			if(in_array($gid,$this->getGroups()))
 				return true;
 			return false;
@@ -118,10 +118,10 @@
 			$groups = $this->getGroups();
 			$count = count($groups);
 			for($i=0;$i<$count;$i++) {
-				if(FS::$dbMgr->GetOneData("z_eye_group_rules","ruleval","rulename = '".$rulename."' AND gid = '".$groups[$i]."'") == "on")
+				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = '".$rulename."' AND gid = '".$groups[$i]."'") == "on")
 					return true;
 			}
-			if(FS::$dbMgr->GetOneData("z_eye_user_rules","ruleval","rulename = '".$rulename."' AND uid = '".$this->getUid()."'") == "on")
+			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = '".$rulename."' AND uid = '".$this->getUid()."'") == "on")
 				return true;
 			return false;
 		}

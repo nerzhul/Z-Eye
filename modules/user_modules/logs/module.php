@@ -48,7 +48,7 @@
 			
 			$output = "";
 			$found = false;
-			$query = FS::$dbMgr->Select("z_eye_logs","date,module,level,_user,txt",$filter,"date",1);
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","date,module,level,_user,txt",$filter,"date",1);
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -94,13 +94,13 @@
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
 				$output .= FS::$iMgr->select("uf","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
-				$query = FS::$dbMgr->Select("z_eye_logs","_user","_user = _user GROUP BY _user","_user",2);
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","_user","_user = _user GROUP BY _user","_user",2);
 				while($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["_user"],$data["_user"]);
 
 				$output .= "</select>".FS::$iMgr->select("af","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
-				$query = FS::$dbMgr->Select("z_eye_logs","module","module = module GROUP BY module","module",2);
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","module","module = module GROUP BY module","module",2);
 				while($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["module"],$data["module"]);
 				

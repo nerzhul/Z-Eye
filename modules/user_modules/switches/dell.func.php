@@ -73,7 +73,7 @@
 			if($device == "" || $field == "" || $pid == "" || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
                         if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
 			snmpset($dip,$community,$field.".".$pid,$vtype,$value);
 			return 0;
@@ -83,19 +83,19 @@
 			if($device == "" || $field == "" || $pid == "" /*|| !FS::$secMgr->isNumeric($pid)*/)
 				return -1;
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			return snmpget($dip,$community,$field.".".$pid);
 		}
 
 		public function getPortId($device,$portname) {
-			$pid = FS::$dbMgr->GetOneData("z_eye_port_id_cache","pid","device = '".$device."' AND portname = '".$portname."'");
+			$pid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_id_cache","pid","device = '".$device."' AND portname = '".$portname."'");
 			if($pid == NULL) $pid = -1;
 			return $pid;
 		}
 
 		public function getPortIndexes($device,$pid) {
-			$query = FS::$dbMgr->Select("z_eye_port_id_cache","switchid,switchportid","device = '".$device."' AND pid = '".$pid."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."port_id_cache","switchid,switchportid","device = '".$device."' AND pid = '".$pid."'");
 			if($data = FS::$dbMgr->Fetch($query))
 				return array($data["switchid"],$data["switchportid"]);
 			return NULL;
@@ -110,7 +110,7 @@
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			if($dip == NULL)
 				return -1;
-			$community = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();

@@ -57,7 +57,7 @@
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"));
 
 			$tmpoutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr>";
-			$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","","name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				$tmpoutput .= "<tr><td>".$data["name"]."</td><td>".($data["ro"] == 't' ? "X" : "")."</td><td>".($data["rw"] == 't' ? "X": "")."</td><td>".
@@ -83,7 +83,7 @@
 						return;
 					}
 
-					if(FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$name."'")) {
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
 						if(FS::isAjaxCall())
 							echo $this->loc->s("err-already-exist");
@@ -111,7 +111,7 @@
 						return;
 					}
 					
-					FS::$dbMgr->Insert("z_eye_snmp_communities","name,ro,rw","'".$name."','".($ro == "on" ? 't' : 'f')."','".
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","'".$name."','".($ro == "on" ? 't' : 'f')."','".
 						($rw == "on" ? 't' : 'f')."'");
 
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
@@ -124,7 +124,7 @@
 						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
-					if(!FS::$dbMgr->GetOneData("z_eye_snmp_communities","name","name = '".$name."'")) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Community '".$name."' not in DB");
 						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=4");
 						return;
@@ -136,9 +136,9 @@
 						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
-					FS::$dbMgr->Delete("z_eye_snmp_communities","name = '".$name."'");
-					FS::$dbMgr->Delete("z_eye_user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
-					FS::$dbMgr->Delete("z_eye_group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
 					return;

@@ -45,7 +45,7 @@
 					$tmpoutput = $this->CreateOrEditServer(true);
 
 					$found = false;
-					$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,dns","dns = '1'");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) {
 							$found = true;
@@ -105,7 +105,7 @@
 				if($shother == NULL) $shother = 1;
 
 				$found = false;
-				$query = FS::$dbMgr->Select("z_eye_dns_zone_cache","zonename","","zonename");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","","zonename");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found) $found = true;
 					$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
@@ -225,7 +225,7 @@
 						if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 					}
 					
-					$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","zonename,record,rectype,recval,server",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
 					$curzone = "";
 					$dnsrecords = array();
 					while($data = FS::$dbMgr->Fetch($query)) {
@@ -304,7 +304,7 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
-				$query = FS::$dbMgr->Select("z_eye_server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
@@ -414,7 +414,7 @@
 
 					$obsoletes = array();
 					// Search deprecated records
-					$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
 						while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -426,7 +426,7 @@
 						}
 					}
 
-					$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'CNAME'");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'CNAME'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						$toquery = "";
 						if($data["recval"][strlen($data["recval"])-1] == ".") {
@@ -509,7 +509,7 @@
 					}
 				
 					if($edit) {	
-						if(!FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-bad-server");
@@ -518,10 +518,10 @@
 							return;
 						}
 
-						FS::$dbMgr->Delete("z_eye_server_list","addr = '".$saddr."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$saddr."'");
 					}
 					else {
-						if(FS::$dbMgr->GetOneData("z_eye_server_list","login","addr ='".$saddr."'")) {
+						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-server-exist");
@@ -530,7 +530,7 @@
 							return;
 						}
 					}
-					FS::$dbMgr->Insert("z_eye_server_list","addr,login,pwd,dns,namedpath,chrootnamed",
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."server_list","addr,login,pwd,dns,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','1','".$namedpath."','".$chrootnamed."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: dns checking");
 					FS::$iMgr->redir("mod=".$this->mid,true);
@@ -545,7 +545,7 @@
 
 					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Removing server '".$srv."' from database");
-						FS::$dbMgr->Delete("z_eye_server_list","addr = '".$srv."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$srv."'");
 					}
 					FS::$iMgr->redir("mod=".$this->mid);
 					return;

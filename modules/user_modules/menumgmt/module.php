@@ -42,7 +42,7 @@
 					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-Menu")."</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-					$query = FS::$dbMgr->Select("z_eye_menus","id,name,isconnected","","id",2);
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","","id",2);
 					while($data = FS::$dbMgr->Fetch($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
 						if($data["isconnected"] == -1)
@@ -63,7 +63,7 @@
 					<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-					$query = FS::$dbMgr->Select("z_eye_menu_items","id,title,link,isconnected","","id",2);
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","","id",2);
 					while($data = FS::$dbMgr->Fetch($query)) {
 						$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 						$link2 = new HTTPLink($data["link"]);
@@ -153,9 +153,9 @@
 				<h2>".$this->loc->s("mod-elmt")."</h2>
 				<table class=\"standardTable\">
 				<tr><th>".$this->loc->s("elmt")."</th><th>".$this->loc->s("Order")."</th><th></th></tr>";
-				$query = FS::$dbMgr->Select("z_eye_menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
 				while($data = FS::$dbMgr->Fetch($query)) {
-					$query2 = FS::$dbMgr->Select("z_eye_menu_items","id,title","id = '".$data["id_menu_item"]."'");
+					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title","id = '".$data["id_menu_item"]."'");
 					if($data2 = FS::$dbMgr->Fetch($query2)) {
 							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>";
 							$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]);
@@ -237,14 +237,14 @@
 			$menu = FS::$secMgr->checkAndSecurisePostData("menu");
 			$order = FS::$secMgr->checkAndSecurisePostData("order");
 			$melemid = FS::$secMgr->checkAndSecurisePostData("m_elem_id");
-			FS::$dbMgr->Insert("z_eye_menu_link","id_menu,id_menu_item,\"order\"","'".$menu."','".$melemid."','".$order."'");
+			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."menu_link","id_menu,id_menu_item,\"order\"","'".$menu."','".$melemid."','".$order."'");
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Added element ".$melemid." to menu ".$menu." (order: ".$order.")");
 		}
 		
 		public function RemoveElementFromMenu() {
 			$menuid = FS::$secMgr->checkAndSecuriseGetData("menu");
 			$itemid = FS::$secMgr->checkAndSecuriseGetData("elem");
-			FS::$dbMgr->Delete("z_eye_menu_link","id_menu = '".$menuid."' AND id_menu_item = '".$itemid."'");
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."menu_link","id_menu = '".$menuid."' AND id_menu_item = '".$itemid."'");
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Removed element '".$itemid."' from menu '".$menuid."'");
 			
 		}

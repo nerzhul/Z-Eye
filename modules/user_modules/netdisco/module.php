@@ -58,7 +58,7 @@
 			$snmpmibs = "/usr/local/share/netdisco-mibs/";
 			$snmpver = 2;
 
-			$count = FS::$dbMgr->Count("z_eye_snmp_communities","name");
+			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
 			if($count < 1) {
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
 					"<br /><br /><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2\">".$this->loc->s("Go")."</a>");

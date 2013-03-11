@@ -233,7 +233,7 @@
 			$total = 0;
 			$this->BWscore = 0;
 
-			$query = FS::$dbMgr->Select("z_eye_port_monitor","device,port,climit,wlimit,description");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."port_monitor","device,port,climit,wlimit,description");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
@@ -241,7 +241,7 @@
 				}
 				$total++;
 				$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$data["device"]."'");
-				$pid = FS::$dbMgr->GetOneData("z_eye_port_id_cache","pid","device = '".$data["device"]."' AND portname = '".$data["port"]."'");
+				$pid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_id_cache","pid","device = '".$data["device"]."' AND portname = '".$data["port"]."'");
 				$tmpoutput .= "<tr style=\"font-size: 12px;\"><td>".$data["description"]."</td>";
 				$incharge = 0;
 				$outcharge = 0;
@@ -333,13 +333,13 @@
 			$atkfound = 0;
 			
 			// Load snort keys for db config
-			$dbname = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
+			$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
 			if($dbname == "") $dbname = "snort";
-			$dbhost = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbhost'");
+			$dbhost = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbhost'");
 			if($dbhost == "") $dbhost = "localhost";
-			$dbuser = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbuser'");
+			$dbuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbuser'");
 			if($dbuser == "") $dbuser = "snort";
-			$dbpwd = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbpwd'");
+			$dbpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbpwd'");
 			if($dbpwd == "") $dbpwd = "snort";
 			
 			$snortDB = new AbstractSQLMgr();

@@ -33,12 +33,12 @@
 		function User() {}
 
 		public function LoadByName($username) {
-			$uid = FS::$dbMgr->GetOneData("z_eye_users","uid","username = '".$username."'");
+			$uid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");
 			$this->LoadFromDB($uid);
 		}
 
 		public function LoadFromDB($uid) {
-			$query = FS::$dbMgr->Select("z_eye_users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
 			if($data = pg_fetch_array($query)) {
 				$this->id = $uid;
 				$this->username = $data["username"];
@@ -54,13 +54,13 @@
 
 		public function Create($uid = 0) {
 			if($uid) $id = $uid;
-			else $id = FS::$dbMgr->GetMax("z_eye_users","uid")+1;
+			else $id = FS::$dbMgr->GetMax(PGDbConfig::getDbPrefix()."users","uid")+1;
 			$this->id = $uid;
-			FS::$dbMgr->Insert("z_eye_users","uid, username, ulevel, subname, name, mail, join_date, last_ip, sha_pwd, last_conn","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW()");
+			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."users","uid, username, ulevel, subname, name, mail, join_date, last_ip, sha_pwd, last_conn","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW()");
 		}
 
 		public function SaveToDB() {
-			FS::$dbMgr->Update("z_eye_users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
+			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
 			last_ip = '".$this->lastip."', last_conn = '".$this->lastconn."', ulevel = '".$this->ulevel."'","uid = '".$_SESSION["uid"]."'");
 		}
 
@@ -74,7 +74,7 @@
 			}
 
 			$hash = FS::$secMgr->EncryptPassword($password,$this->username,$this->id);
-			FS::$dbMgr->Update("z_eye_users","sha_pwd = '".$hash."'","uid = '".$this->id."'");
+			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","sha_pwd = '".$hash."'","uid = '".$this->id."'");
 			return 0;
 		}
 

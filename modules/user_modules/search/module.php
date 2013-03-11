@@ -67,7 +67,7 @@
 				$swmodid = FS::$iMgr->getModuleIdByPath("switches");
 
 				// Prise number
-				$query = FS::$dbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
 				$devprise = array();
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
@@ -142,7 +142,7 @@
 				}
 
 				// Prise number
-				$query = FS::$dbMgr->Select("z_eye_switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'","port");
 				$devprise = array();
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
@@ -178,7 +178,7 @@
 					if($found == 0)
 						$found = 1;
 					$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-					$prise =  FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
+					$prise =  FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 					if(!isset($devportname[$swname]))
                                 	        $devportname[$swname] = array();
 
@@ -218,7 +218,7 @@
 						if($i != $count-1)
 							$dnszone .= ".";
 					}
-					$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) {
 							$found = 1;
@@ -278,7 +278,7 @@
 			$nbresults = 0;
 			
 			if(FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
-				$query = FS::$dbMgr->Select("z_eye_dns_zone_record_cache","zonename,record","recval ILIKE '".$search."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record","recval ILIKE '".$search."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
 						$found = 1;
@@ -293,7 +293,7 @@
 			}
 
 			if(FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
-				$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
 						$found = 1;
@@ -338,7 +338,7 @@
 						$fst = preg_split("#\.#",$data["time_first"]);
 						$lst = preg_split("#\.#",$data["time_last"]);
 						$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-						$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+						$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 						$convport = preg_replace("#\/#","-",$data["port"]);
 						$tmpoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 						$tmpoutput .= "[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
@@ -391,7 +391,7 @@
 
 		private function showRadiusInfos($search) {
 			$output = "";
-			$query = FS::$dbMgr->Select("z_eye_radius_db_list","addr,port,dbname,login,pwd,dbtype,tradcheck,tradreply,tradusrgrp,tradacct");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,login,pwd,dbtype,tradcheck,tradreply,tradusrgrp,tradacct");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$radSQLMgr = new AbstractSQLMgr();
 				$radSQLMgr->setConfig($data["dbtype"],$data["dbname"],$data["port"],$data["addr"],$data["login"],$data["pwd"]);
@@ -572,7 +572,7 @@
 			$search = preg_replace("#[-]#",":",$search);
 
 			if(FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
-				$query = FS::$dbMgr->Select("z_eye_dhcp_ip_cache","ip,hostname,leasetime,distributed,server","macaddr = '".$search."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,hostname,leasetime,distributed,server","macaddr = '".$search."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
 						$found = 1;
@@ -612,7 +612,7 @@
 						$tmpoutput .= "<h2>".$this->loc->s("title-network-places")."</h2><div id=\"searchres\">";
 					}
 						$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-					$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+					$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
 					$tmpoutput .=  "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
 					$tmpoutput .= "[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";

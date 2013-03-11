@@ -57,7 +57,7 @@
 			if(!FS::isAjaxCall())
 				$output .= "<h1>".$this->loc->s("title-network-device-mgmt")."</h1>";
 
-			$count = FS::$dbMgr->Count("z_eye_snmp_communities","name");
+			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
                         if($count < 1) {
                                 $output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
                                         "<br /><br /><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2\">".$this->loc->s("Go")."</a>");
@@ -84,8 +84,8 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$snmpro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
-			$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
+			$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
 				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
@@ -101,7 +101,7 @@
 				$output .= "<h2>".$port." ".$this->loc->s("on")." ".$device."</h2>";
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
-				if(FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'") &&
+				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
 					(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshportinfos") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshportinfos")))
 					$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view"),$sh);
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
@@ -151,7 +151,7 @@
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
 						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => "tooltip-desc"));
-						$piece = FS::$dbMgr->GetOneData("z_eye_switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
+						$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
 						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => "tooltip-plug"));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = $this->devapi->getPortMtuWithPID($device,$portid);
@@ -413,9 +413,9 @@
 					}
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
 					$output .= FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port);
-					$climit = FS::$dbMgr->GetOneData("z_eye_port_monitor","climit","device = '".$device."' AND port = '".$port."'");
-					$wlimit = FS::$dbMgr->GetOneData("z_eye_port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
-					$desc = FS::$dbMgr->GetOneData("z_eye_port_monitor","description","device = '".$device."' AND port = '".$port."'");
+					$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","climit","device = '".$device."' AND port = '".$port."'");
+					$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
+					$desc = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","description","device = '".$device."' AND port = '".$port."'");
 					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),"label" => $this->loc->s("enable-monitor")))."</li><li>";
 					$output .= FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>";
 					$output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
@@ -430,15 +430,15 @@
 						return $output;
 					}
 
-					$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
+					$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 					if(!$sshuser) {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
 							<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
 						return $output;
 					}
 					
-					$sshpwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshpwd","device = '".$device."'");
-					$enablepwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","enablepwd","device = '".$device."'");
+					$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
+					$enablepwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","enablepwd","device = '".$device."'");
 					$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
 					if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
 						switch($stdio) {
@@ -471,8 +471,8 @@
 
 			$output = "";
 
-			$snmpro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$device."'");
-			$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
+			$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
 				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
@@ -1144,7 +1144,7 @@
 					}
 
 					$prisearr = array();
-					$query = FS::$dbMgr->Select("z_eye_switch_port_prises","port,prise","ip = '".$dip."'");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","port,prise","ip = '".$dip."'");
 					while($data = FS::$dbMgr->Fetch($query))
 						$prisearr[$data["port"]] = $data["prise"];
 
@@ -1299,7 +1299,7 @@
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd")) {
 							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						}
-						$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
+						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						$output .= $this->loc->s("ssh-link-state").": ";
 						if($sshuser) {
 							$output .= "<span style=\"color: green;\">".$this->loc->s("Enabled")."</span> ";
@@ -1323,15 +1323,15 @@
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowstart")) {
 							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						}
-						$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
+						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if(!$sshuser) {
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
 								<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
 							return $output;
 						}
 					
-						$sshpwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshpwd","device = '".$device."'");
-						$enablepwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","enablepwd","device = '".$device."'");
+						$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
+						$enablepwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","enablepwd","device = '".$device."'");
 						$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
 						if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
 							switch($stdio) {
@@ -1348,15 +1348,15 @@
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowrun")) {
 							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						}
-						$sshuser = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshuser","device = '".$device."'");
+						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if(!$sshuser) {
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
 								<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
 							return $output;
 						}
 					
-						$sshpwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","sshpwd","device = '".$device."'");
-						$enablepwd = FS::$dbMgr->GetOneData("z_eye_switch_pwd","enablepwd","device = '".$device."'");
+						$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
+						$enablepwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","enablepwd","device = '".$device."'");
 						$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
 						if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
 							switch($stdio) {
@@ -1467,8 +1467,8 @@
 				$query = FS::$dbMgr->Select("device","*","","name");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					// Rights: show only reading/writing switches
-					$snmpro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
-					$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
+					$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");
+					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$data["ip"]."_read") && 
@@ -1570,7 +1570,7 @@
 						}
 
 						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
 							echo "NORIGHTS";
@@ -1579,8 +1579,8 @@
 
 						if($prise == NULL) $prise = "";
 						// Modify Plug for switch port
-						FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$sw."' AND port = '".$port."'");
-						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise","'".$sw."','".$port."','".$prise."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_port_prises","ip = '".$sw."' AND port = '".$port."'");
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,prise","'".$sw."','".$port."','".$prise."'");
 
 						// Return text for AJAX call
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Set plug for device '".$sw."' to '".$prise."' on port '".$port."'");
@@ -1598,7 +1598,7 @@
 							return;
 						}
 						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
 							echo "NORIGHTS";
@@ -1629,7 +1629,7 @@
 							return;
 						}
 						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
 							echo "NORIGHTS";
@@ -1680,7 +1680,7 @@
 
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$sw."'");
 
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$sw."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$sw."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							echo $this->loc->s("err-no-credentials");
@@ -2011,8 +2011,8 @@
 	
 	
 						if($prise == NULL) $prise = "";
-						pg_query("DELETE FROM z_eye_switch_port_prises where ip = '".$dip."' AND port = '".$port."'");
-						pg_query("INSERT INTO z_eye_switch_port_prises (ip,port,prise) VALUES ('".$dip."','".$port."','".$prise."')");
+						FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."' AND port = '".$port."'");
+						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise","'".$dip."','".$port."','".$prise."'");
 	
 						FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
 						FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$dip."' AND port = '".$port."'");
@@ -2066,7 +2066,7 @@
 						}
 
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
@@ -2101,7 +2101,7 @@
 						}
 
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&err=99");
@@ -2127,7 +2127,7 @@
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
@@ -2176,7 +2176,7 @@
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
@@ -2193,7 +2193,7 @@
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
@@ -2223,7 +2223,7 @@
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
@@ -2246,7 +2246,7 @@
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
@@ -2272,11 +2272,11 @@
 								FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3&err=2");
 								return;
 							}
-							FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
-							FS::$dbMgr->Insert("z_eye_port_monitor","device,port,climit,wlimit,description","'".$device."','".$port."','".$climit."','".$wlimit."','".$desc."'");
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."' AND port = '".$port."'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."port_monitor","device,port,climit,wlimit,description","'".$device."','".$port."','".$climit."','".$wlimit."','".$desc."'");
 						}
 						else
-							FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."' AND port = '".$port."'");
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."' AND port = '".$port."'");
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Port monitoring for device '".$device."' and port '".$dport."' edited. Enabled: ".($enmod == "on" ? "yes" : "no").
 							" wlimit: ".$wlimit." climit: ".$climit." desc: '".$desc."'");
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
@@ -2289,7 +2289,7 @@
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
@@ -2308,10 +2308,10 @@
 						FS::$dbMgr->Delete("node_ip","ip = '".$dip."'");
 						FS::$dbMgr->Delete("node_nbt","ip = '".$dip."'");
 						FS::$dbMgr->Delete("admin","device = '".$dip."'");
-						FS::$dbMgr->Delete("z_eye_port_id_cache","device = '".$device."'");
-						FS::$dbMgr->Delete("z_eye_port_monitor","device = '".$device."'");
-						FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."'");
-						FS::$dbMgr->Delete("z_eye_snmp_cache","device = '".$device."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_id_cache","device = '".$device."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_port_prises","ip = '".$dip."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_cache","device = '".$device."'");
 						FS::$dbMgr->Delete("device","ip = '".$dip."'");
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Remove device '".$device."' from Z-Eye");
 						FS::$iMgr->redir("mod=".$this->mid);
@@ -2343,8 +2343,8 @@
 						loadNetdiscoCommunities($snmpro,$snmprw);
 						$devname = FS::$dbMgr->GetOneData("device","name","ip = '".$dip."'");
 
-						$foundro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$devname."'");
-						$foundrw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$devname."'");
+						$foundro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$devname."'");
+						$foundrw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$devname."'");
 						if($foundro && checkSnmp($dip,$foundro) == 0)
 							$devro = $foundro;
 						if($foundrw && checkSnmp($dip,$foundrw) == 0)
@@ -2360,7 +2360,7 @@
 								$devrw = $snmprw[$i];
 						}
 						if($foundro != $devro && strlen($devro) > 0 || $foundrw != $devrw && strlen($devrw) > 0)
-							FS::$dbMgr->Insert("z_eye_snmp_cache","device,snmpro,snmprw","'".$devname."','".$devro."','".$devrw."'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_cache","device,snmpro,snmprw","'".$devname."','".$devro."','".$devrw."'");
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Launch discovering for device '".$dip."'");
 						if(FS::isAjaxCall())
 							echo $this->loc->s("done-with-success");
@@ -2409,7 +2409,7 @@
 							return;
 						}
 						$output = "";
-						$query = FS::$dbMgr->Select("z_eye_save_device_servers","addr,type,path,login,pwd");
+						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login,pwd");
 						while($data = FS::$dbMgr->Fetch($query)) {
 							if(!FS::$secMgr->isIP($data["addr"]))
 								continue;
@@ -2468,7 +2468,7 @@
 					case 22: // SSH pwd set
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						$dip = "";	
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-bad-datas");
@@ -2542,8 +2542,8 @@
 									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=8");
 								return;
 						}
-						FS::$dbMgr->Delete("z_eye_switch_pwd","device = '".$device."'");
-						FS::$dbMgr->Insert("z_eye_switch_pwd","device,sshuser,sshpwd,enablepwd","'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_pwd","device = '".$device."'");
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."switch_pwd","device,sshuser,sshpwd,enablepwd","'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".
 							base64_encode($enablepwd)."'");
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7",true);
 						return;
@@ -2551,7 +2551,7 @@
 					case 23:
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						$dip = "";	
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 							return;
@@ -2563,14 +2563,14 @@
 							return;
 						}
 							
-						FS::$dbMgr->Delete("z_eye_switch_pwd","device = '".$device."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_pwd","device = '".$device."'");
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7");
 						return;
 					// Modify DHCP Snooping (switch)
 					case 24:
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						$dip = "";	
-						$snmprw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$device."'");
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if(!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 							return;
