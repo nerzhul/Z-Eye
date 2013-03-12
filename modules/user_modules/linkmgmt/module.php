@@ -33,7 +33,7 @@
 					$output .= $this->showLinkForm(true);
 			}
 			else {
-				$output .= "<h3>".$this->loc->s("title-link")."</h3>";
+				$output .= FS::$iMgr->h3("title-link");
 				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-link")."</a>
 				<table class=\"standardTable\" width=\"55%\">
 				<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
@@ -62,9 +62,7 @@
 		}
 		
 		public function showLinkForm($edit = false) {
-			$output = "<h3>";
-			$output .= $edit ? $this->loc->s("link-edit") : $this->loc->s("link-create");
-			$output .= "</h3>";
+			$output = FS::$iMgr->h3($edit ? $this->loc->s("link-edit") : $this->loc->s("link-create"),true);
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1));
 			$lnk = NULL;
 			if($edit) {

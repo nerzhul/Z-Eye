@@ -49,7 +49,7 @@
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) {
 							$found = true;
-							$tmpoutput .= "<h2>".$this->loc->s("serverlist")."</h2>".
+							$tmpoutput .= FS::$iMgr->h2("serverlist").
 								"<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
 							"</th><th></th></tr>";
 						}
@@ -232,7 +232,7 @@
 						if($curzone != $data["zonename"]) {
 							$curzone = $data["zonename"];
 							if($curzone != "") $dnsoutput .= "</table>";
-							$dnsoutput .= "<h3>Zone: ".$filter."</h3><table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr>";
+							$dnsoutput .= FS::$iMgr->h3("Zone: ".$filter,true)."<table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr>";
 						}
 						if(!isset($dnsrecords[$data["record"]])) $dnsrecords[$data["record"]] = array();
 						if(!isset($dnsrecords[$data["record"]][$data["rectype"]])) $dnsrecords[$data["record"]][$data["rectype"]] = array();
@@ -273,7 +273,7 @@
 						$output .= $dnsoutput."</table>";
 				}
 				else if($showmodule == 2) {
-					$output .= "<h3>".$this->loc->s("title-old-records")."</h3>";
+					$output .= FS::$iMgr->h3("title-old-records");
 					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
 					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
@@ -296,9 +296,9 @@
 			$namedpath = "";
 			$chrootnamed = "";
 			if($create)
-				$output = "<h2>".$this->loc->s("add-server")."</h2>";
+				$output = FS::$iMgr->h2("add-server");
 			else {
-				$output = "<h2>".$this->loc->s("edit-server")."</h2>";
+				$output = FS::$iMgr->h2("edit-server");
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				if(!$addr || $addr == "") {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
@@ -455,7 +455,7 @@
 						}
 					}
 					if($found) {
-						echo "<h3>".$this->loc->s("found-records")."</h3>".$output;
+						echo FS::$iMgr->h3("found-records").$output;
 						foreach($obsoletes as $key => $value)
 							echo $value;
 					}

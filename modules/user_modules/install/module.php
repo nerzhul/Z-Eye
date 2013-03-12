@@ -66,7 +66,7 @@
 							$('#installer').html(data);
 							});
 						}</script>";
-					$output .= "<h2>".$this->loc->s("title-welcome")."</h2>";
+					$output .= FS::$iMgr->h2("title-welcome");
 					$output .= $this->loc->s("text-welcome")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Lets-Go"),"loadStep1();")."</center>";
 					break;
 				case 1:
@@ -91,7 +91,7 @@
 						});
 							return false;
 						}</script>";
-					$output .= "<h2>".$this->loc->s("title-admin-set")."</h2>";
+					$output .= FS::$iMgr->h2("title-admin-set");
 					$output .= $this->loc->s("text-admin-set")."<br /><br />".FS::$iMgr->form("",array("id" => "admcfg","js" => "false"))."<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 					$output .= FS::$iMgr->idxLine($this->loc->s("Username"),"username");
 					$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name");
@@ -108,7 +108,7 @@
 						$.post('index.php?mod=".$this->mid."&act=2', function(data) {
 							window.location = '/index.php'; });
 						}</script>";
-					$output .= "<h2>".$this->loc->s("title-install-finished")."</h2>";
+					$output .= FS::$iMgr->h2("title-install-finished");
 					$output .= $this->loc->s("text-finish")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Finish"),"loadStep3();")."</center>";
 					break;	
 				default:

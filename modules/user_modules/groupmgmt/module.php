@@ -50,7 +50,7 @@
 			}
 
 			FS::$iMgr->showReturnMenu(true);
-			$output = "<h2>".$this->loc->s("title-edit")." '".$gname."'</h2>";
+			$output = FS::$iMgr->h2($this->loc->s("title-edit")." '".$gname."'",true);
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
 			$rules = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
@@ -66,7 +66,7 @@
 			$output = "";
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
-			$formoutput .= "<h2>".$this->loc->s("title-opts")."</h2>";
+			$formoutput .= FS::$iMgr->h2("title-opts");
 			$formoutput .= $this->loadModuleRuleSets();
                         $formoutput .= "</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>";
 			$formoutput .= "</ul></form>";

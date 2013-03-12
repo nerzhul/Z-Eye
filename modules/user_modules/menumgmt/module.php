@@ -85,9 +85,7 @@
 		}
 		
 		public function showMenuElmForm($edit = false) {
-			$output = "<h2>";
-			$output .= $edit ? $this->loc->s("elmt-edit") : $this->loc->s("elmt-create");
-			$output .= "</h2>";
+			$output = FS::$iMgr->h2($edit ? $this->loc->s("elmt-edit") : $this->loc->s("elmt-create"),true);
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 5 : 4))."<ul class=\"ulform\">";
 			$menuEl = NULL;
 			if($edit) {
@@ -137,7 +135,7 @@
 			
 			if($edit) {
 				$output .= FS::$iMgr->h1("title-menu-node-mgmt").
-					"<h2>".$this->loc->s("add-elmt")."</h2>";
+					FS::$iMgr->h2("add-elmt");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
 				$output .= "<center>".$this->loc->s("elmt")." ";
 				$menuEl = new MenuElement();
@@ -146,9 +144,9 @@
 				$output .= FS::$iMgr->input("order","0",2,2);
 				$output .= FS::$iMgr->hidden("menu",$mid);
 				$output .= FS::$iMgr->submit("",$this->loc->s("Save"));	
-				$output .= "</center></form>
-				<h2>".$this->loc->s("mod-elmt")."</h2>
-				<table class=\"standardTable\">
+				$output .= "</center></form>".
+				FS::$iMgr->h2("mod-elmt").
+				"<table class=\"standardTable\">
 				<tr><th>".$this->loc->s("elmt")."</th><th>".$this->loc->s("Order")."</th><th></th></tr>";
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
 				while($data = FS::$dbMgr->Fetch($query)) {

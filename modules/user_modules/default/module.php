@@ -329,7 +329,7 @@
 			$output = "";
 			$this->SECtotalscore = 10000;
 
-			$tmpoutput = "<h4>".$this->loc->s("err-security")."</h4>";
+			$tmpoutput = FS::$iMgr->h4("err-security");
 			$atkfound = 0;
 			
 			// Load snort keys for db config
@@ -418,7 +418,7 @@
 				if($value["scan"] > 30 || $value["atk"] > 25) {
 					if($menace == 0) {
 						$menace = 1;
-						$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-detect-atk")."</h3>";
+						$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-detect-atk")."</h4>";
 					}
 					$output .= "<span style=\"font-size:15px;\">".$this->loc->s("ipaddr").": ".long2ip($key)." (Scans ".$value["scan"]." ".$this->loc->s("Attack")." ".$value["atk"].")</span><br />";
 				}

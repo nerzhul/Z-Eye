@@ -86,7 +86,7 @@
 		private function showRadiusServerMgmt() {
 			$output = "";
 
-			$tmpoutput = "<h2>".$this->loc->s("title-radius-db")."</h2>";
+			$tmpoutput = FS::$iMgr->h2("title-radius-db");
 			$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>".$this->loc->s("db-type")."</th><th>"
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th></th><th></th></tr>";
 
@@ -132,9 +132,9 @@
 			$tradusrgrp = "radusergroup";
 			$tradacct = "radacct";
 			if($create)
-				$output = "<h2>".$this->loc->s("title-add-radius")."</h2>";
+				$output = FS::$iMgr->h2("title-add-radius");
 			else {
-				$output = "<h2>".$this->loc->s("title-edit-radius")."</h2>";
+				$output = FS::$iMgr->h2("title-edit-radius");
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
 				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
@@ -466,7 +466,7 @@
 				FS::$iMgr->submit("",$this->loc->s("Save")).
 				"</li></ul></form>";
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Profil"));
-				$tmpoutput = "<h3>".$this->loc->s("title-profillist")."</h3>";
+				$tmpoutput = FS::$iMgr->h3("title-profillist");
 				$found = 0;
 
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
@@ -516,7 +516,7 @@
 					$grouplist .= FS::$iMgr->selElmt($groups[$i],$groups[$i]);
 				}
 
-				$output .= "<h3>".$this->loc->s("title-mass-import")."</h3>";
+				$output .= FS::$iMgr->h3("title-mass-import");
 				$output .= "<script type=\"text/javascript\"> function changeUForm() {
 						if(document.getElementsByName('usertype')[0].value == 1) {
 								$('#uptype').show(); $('#csvtooltip').html(\"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b>\");
@@ -554,7 +554,7 @@
 
 				$found = 0;
 				$formoutput = "";
-				$formoutput .= "<h3>".$this->loc->s("title-auto-import")."</h3>";
+				$formoutput .= FS::$iMgr->h3("title-auto-import");
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("subnet","","Subnet DHCP");
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
@@ -593,7 +593,7 @@
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) {
 							$found = 1;
-							$tmpoutput .= "<h3>".$this->loc->s("title-auto-import2")."</h3><table><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
+							$tmpoutput .= FS::$iMgr->h3("title-auto-import2")."<table><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
 							$this->loc->s("Radius-profile")."</th><th></th></tr>";
 						}
 						$tmpoutput .= "<tr><td>".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td><td>".
@@ -609,7 +609,7 @@
 				if(!$radSQLMgr)
 					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
-				$output .= "<h3>".$this->loc->s("title-cleanusers")."</h3>";
+				$output .= FS::$iMgr->h3("title-cleanusers");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=9");
 				$output .= "<table>";
 
@@ -683,7 +683,7 @@
 			$output = "";
 			$ug = FS::$secMgr->checkAndSecurisePostData("ug");
 			$uf = FS::$secMgr->checkAndSecurisePostData("uf");
-			$tmpoutput = "<h3>".$this->loc->s("title-userlist")."</h3>";
+			$tmpoutput = FS::$iMgr->h3("title-userlist");
 			$tmpoutput .= "<script type=\"text/javascript\">
 				$.event.props.push('dataTransfer');
 				$('#raduser #dragtd').on({
@@ -792,7 +792,7 @@
 					$utype = 1;
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= FS::$iMgr->hidden("uedit",1);
-				$formoutput .= "<h2>".$this->loc->s("title-usermod")." '".$radentry."'</h2>";
+				$formoutput .= FS::$iMgr->h2($this->loc->s("title-usermod")." '".$radentry."'",true);
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->hidden("utype",$utype)."<b>".$this->loc->s("User-type").": </b>".
 				($utype == 1 ? "Normal" : $this->loc->s("Mac-addr"));
 				$formoutput .= "</li><li>".
@@ -878,7 +878,7 @@
 				function delAttrElmt(attridx) {
 						$('.attrli'+attridx).remove();
 				}</script>";
-				$formoutput .= "<h2>".$this->loc->s("title-groupmod").": '".$radentry."'</h2>";
+				$formoutput .= FS::$iMgr->h2($this->loc->s("title-groupmod").": '".$radentry."'",true);
 				$formoutput .= "<ul class=\"ulform\">";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
                 $formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);

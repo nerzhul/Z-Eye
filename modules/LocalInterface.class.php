@@ -127,7 +127,7 @@
 					$output .= $this->submit("conn","Connexion");
 					$output .= "</form>";
 			} else {
-				$output .= "<h4>Déconnexion</h4><form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
+				$output .= FS::$iMgr->h4("Déconnexion",true)."<form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
 				$output .= FS::$iMgr->submit("disconnect","Confirmer");
 				$output .= "</form>";
 			}

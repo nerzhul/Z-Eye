@@ -55,7 +55,7 @@
 
 		private function EditUser($user) {
 			$uid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$user."'");
-			$output = "<h2>".$this->loc->s("title-user-mod")."</h2>";
+			$output = FS::$iMgr->h2("title-user-mod");
 			if(!$uid) {
 				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
 				return $output;
@@ -95,7 +95,7 @@
 			if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) 
 				return FS::$iMgr->printError($this->loc->s("err-rights"));
 
-			$output = "<h2>".$this->loc->s("title-directory")."</h2>";
+			$output = FS::$iMgr->h2("title-directory");
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "ldapfrm"));

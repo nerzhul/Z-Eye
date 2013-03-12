@@ -50,7 +50,7 @@
 			$output = "";
 			if(!$create) {
 				FS::$iMgr->showReturnMenu(true);
-				$output = "<h2>".$this->loc->s("title-edit-backup-switch-server")."</h2>";
+				$output = FS::$iMgr->h2("title-edit-backup-switch-server");
 				$addr = FS::$secMgr->checkAndSecuriseGetData("bck");
 				$type = FS::$secMgr->checkAndSecuriseGetData("type");
 				if(!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {

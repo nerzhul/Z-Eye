@@ -60,7 +60,7 @@
 						default: break;
 					}
 					// To add servers
-        	                        $formoutput = "<h2>".$this->loc->s("title-add-server")."</h2>".
+        	                        $formoutput = FS::$iMgr->h2("title-add-server").
 						FS::$iMgr->form("index.php?mod=".$this->mid."&act=5",array("id" => "dhcpmgmtfrm")).
                 	                	"<ul class=\"ulform\"><li>".$this->loc->s("note-needed")."<li>
 						<li>".FS::$iMgr->input("addr","",20,128,$this->loc->s("server-addr"))." (*)</li>
@@ -76,7 +76,7 @@
 					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=5","dhcpmgmtfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 					// To delete servers
 					$found = false;
-					$tmpoutput = "<h2>".$this->loc->s("title-remove-server")."</h2>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
+					$tmpoutput = FS::$iMgr->h2("title-remove-server").FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
 					$tmpoutput .= "<ul class=\"ulform\">".$this->loc->s("Server").": ".FS::$iMgr->select("daddr");
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser");
 					while($data = FS::$dbMgr->Fetch($query)) {
@@ -90,7 +90,7 @@
         	                }
 
 				$netfound = false;
-				$tmpoutput = "<h2>".$this->loc->s("title-subnet-management")."</h2>".$this->loc->s("choose-net");
+				$tmpoutput = FS::$iMgr->h2("title-subnet-management").$this->loc->s("choose-net");
 				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$tmpoutput .= FS::$iMgr->select("f","submit()");
 				$formoutput = "";
@@ -125,7 +125,7 @@
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$iparray = array();
-					$netoutput .= "<h3>Réseau : ".$data["netid"]."/".$data["netmask"]."</h3>";
+					$netoutput .= FS::$iMgr->h3("Réseau : ".$data["netid"]."/".$data["netmask"],true);
 					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
 
 					$netobj = new FSNetwork();
@@ -276,7 +276,7 @@
 					$output .= $netoutput;
 				}
 				else if($showmodule == 2) {
-					$output .= "<h4>".$this->loc->s("title-search-old")."</h4>";
+					$output .= FS::$iMgr->h4("title-search-old");
 					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
 					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
@@ -289,7 +289,7 @@
 					$output .= "</form><div id=\"obsres\"></div>";
 				}
 				else if($showmodule == 3) {
-					$output .= "<h4>Monitoring</h4>";
+					$output .= FS::$iMgr->h4("Monitoring",true);
 					$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","warnuse","subnet = '".$filter."'");
 					$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","crituse","subnet = '".$filter."'");
 					$maxage = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","maxage","subnet = '".$filter."'");
@@ -335,7 +335,7 @@
 		}
 
 		private function showHistory($filter,$interval = 1) {
-			$output = "<h3>".$this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days")."</h3>";
+			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
 			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'","collecteddate",2);
@@ -484,7 +484,7 @@
 						}
 					}
 					if($found) {
-						echo "<h4>".$this->loc->s("title-old-record")."</h4>";
+						echo FS::$iMgr->h4("title-old-record");
 						$logbuffer = "";
 						foreach($obsoletes as $key => $value) {
 							$logbuffer .= $value;

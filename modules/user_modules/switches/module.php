@@ -98,7 +98,7 @@
 				default: break;
 			}
 			if(!FS::isAjaxCall()) {
-				$output .= "<h2>".$port." ".$this->loc->s("on")." ".$device."</h2>";
+				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".$device,true);
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
 				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
@@ -449,9 +449,9 @@
 						}	
 						return $output;
 					}
-					$output .= "<h2>".$this->loc->s("iface-dev-cfg")."</h2>".
+					$output .= FS::$iMgr->h2("iface-dev-cfg").
 						"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd($stdio,"show running-config interface ".$port))."</pre>";
-					$output .= "<h2>".$this->loc->s("iface-dev-status")."</h2>".
+					$output .= FS::$iMgr->h2("iface-dev-status").
 						"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd($stdio,"show interface ".$port))."</pre>";
 					
 				}
@@ -481,15 +481,8 @@
 			}
 			if(!FS::isAjaxCall()) {
 				FS::$iMgr->showReturnMenu(true);
-				$output = "<h2>".$this->loc->s("Device")." ";
-
-				$output .= $device." (";
-				$output .= $dip;
-
 				$dloc = FS::$dbMgr->GetOneData("device","location","name = '".$device."'");
-				if($dloc != NULL)
-				$output .= " - ".$dloc;
-				$output .= ")</h2>";
+				$output = FS::$iMgr->h2($this->loc->s("Device")." ".$device." (".$dip.($dloc != NULL ? " - ".$dloc : "").")",true);
 
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$showmodule);
@@ -540,7 +533,7 @@
 						FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails")) { 
 						$query = FS::$dbMgr->Select("device","*","name ='".$device."'");
 						if($data = FS::$dbMgr->Fetch($query)) {
-							$output .= "<h3>".$this->loc->s("Device-detail")."</h3>";
+							$output .= FS::$iMgr->h3("Device-detail");
 							$output .= "<table class=\"standardTable\">";
 							$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
 							$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
@@ -598,7 +591,7 @@
 							$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
 						}
 						if($found == 1) {
-							$output .= "<h3>".$this->loc->s("Internal-mod")."</h3>";
+							$output .= FS::$iMgr->h3("Internal-mod");
 							$output .= "<table><tr><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("Name")."</th>
 								<th>".$this->loc->s("Type")."</th><th></th><th></th><th></th><th></th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
 						}
@@ -625,7 +618,7 @@
 						$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
 					}
 					if($found == 1) {
-						$output .= "<h3>".$this->loc->s("frontview")."</h3>";
+						$output .= FS::$iMgr->h3("frontview");
 						$output .= "<script>
 							/*
 							* 48 ports + 4 uplinks
@@ -959,7 +952,7 @@
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_dhcpsnmgmt") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_dhcpsnmgmt")) { 
-						$output .= "<h3>".$this->loc->s("title-dhcpsnooping")."</h3>";
+						$output .= FS::$iMgr->h3("title-dhcpsnooping");
 						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=24",array("id" => "dhcpsnfrm"));
 						$enable = $this->devapi->getDHCPSnoopingStatus($device);
 						$opt82 = $this->devapi->getDHCPSnoopingOpt82($device);
@@ -1010,7 +1003,7 @@
 							return true;
 						};";
 						$output .= "</script>";
-						$output .= "<h3>".$this->loc->s("title-retag")."</h3>";
+						$output .= FS::$iMgr->h3("title-retag");
 						if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
 						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&d=".$device."&act=11");
 						$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
@@ -1072,7 +1065,7 @@
 						$output .= "return false;";
 						$output .= "};";
 						$output .= "</script>";
-						$output .= "<h3>".$this->loc->s("title-transfer-conf")."</h3>";
+						$output .= FS::$iMgr->h3("title-transfer-conf");
 						$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
 						$output .= FS::$iMgr->selElmt("TFTP",1);
 						$output .= FS::$iMgr->selElmt("FTP",2);
@@ -1104,13 +1097,13 @@
 						$output .= "return false;";
 						$output .= "};";
 						$output .= "</script>";
-						$output .= "<h3>".$this->loc->s("title-restore-startup")."</h3>";
+						$output .= FS::$iMgr->h3("title-restore-startup");
 						$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
 					}
 					return $output;
 				}
 				else if($showmodule == 5) {
-					$output .= "<h3>".$this->loc->s("VLANlist")."</h3>";
+					$output .= FS::$iMgr->h3("VLANlist");
 					$found = 0;
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswvlans") && 
@@ -1451,7 +1444,7 @@
 					$formoutput .= "</ul></form>";
 					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=18","discoverdev",array("snotif" => $this->loc->s("Discovering-in-progress"), "lock" => true));
 					$showtitle = false;
-					$output .= "<h2>".$this->loc->s("title-global-fct")."</h2>";
+					$output .= FS::$iMgr->h2("title-global-fct");
 					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
 				}
 
@@ -1460,7 +1453,7 @@
 				$outputswitch = "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
 					$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr>";
 
-				$outputwifi = "<h2>".$this->loc->s("title-WiFi-AP")."</h2>";
+				$outputwifi = FS::$iMgr->h2("title-WiFi-AP");
 				$outputwifi .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
 					$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr>";
 
@@ -1509,13 +1502,13 @@
 						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21","backupall",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true));
 					}
 					if($rightsok) {
-						if($showtitle) $output .= "<h2>".$this->loc->s("title-global-fct")."</h2>";
+						if($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
 						// Openable divs
 						$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
 					}
 				}
 				if($foundsw != 0 || $foundwif != 0)
-					$output .= "<h2>".$this->loc->s("title-router-switch")."</h2>";
+					$output .= FS::$iMgr->h2("title-router-switch");
 
 				if($foundsw != 0) {
 					$output .= $outputswitch;
@@ -2056,7 +2049,7 @@
 							FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port);
 						return;
 					case 10: // replace vlan portlist
-						echo "<h3>".$this->loc->s("title-port-modiflist")."</h3>";
+						echo FS::$iMgr->h3("title-port-modiflist");
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 						if(!$device) {

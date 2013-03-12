@@ -54,7 +54,7 @@
 		}
 		
 		private function showDeviceWeatherMap($device) {
-			$output = "<h3>".$this->loc->s("link-state")." ".$device."</h3>";
+			$output = FS::$iMgr->h3($this->loc->s("link-state")." ".$device,true);
 			$output .= FS::$iMgr->img("datas/weathermap/".$device.".png");
 			return $output;	
 		}
