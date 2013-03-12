@@ -41,7 +41,7 @@
 		}
 
 		private function showMain() {
-			$output = "<h1>".$this->loc->s("title-netdisco")."</h1>";;
+			$output = FS::$iMgr->h1("title-netdisco");
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$file = file("/usr/local/etc/netdisco/netdisco.conf");
 

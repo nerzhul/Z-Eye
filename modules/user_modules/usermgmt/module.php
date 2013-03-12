@@ -131,7 +131,7 @@
 		}
 
 		private function showMain() {
-			$output = "<h1>".$this->loc->s("title-usermgmt")."</h1>";
+			$output = FS::$iMgr->h1("title-usermgmt");
 
 			$tmpoutput = "";
 			$found = 0;
@@ -158,7 +158,7 @@
 				$output .= $tmpoutput."</table>";
 			}
 			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
-				$output .= "<h1>".$this->loc->s("title-directorymgmt")."</h1>";
+				$output .= FS::$iMgr->h1("title-directorymgmt");
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "ldapfrm"));
 				$formoutput .= "<ul class=\"ulform\"><li>";
 				$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";

@@ -33,7 +33,7 @@
 	
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<h1>".$this->loc->s("title-dns")."</h1>";
+				$output .= FS::$iMgr->h1("title-dns");
 
 			if($addr && FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 				$output .= $this->CreateOrEditServer(false);

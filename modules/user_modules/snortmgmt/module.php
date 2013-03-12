@@ -40,7 +40,7 @@
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h1>".$this->loc->s("page-title")."</h1>";
+				$output .= FS::$iMgr->h1("page-title");
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh,true);
 				$output .= FS::$iMgr->tabPanElmt(10,"index.php?mod=".$this->mid,$this->loc->s("Reports"),$sh);

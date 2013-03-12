@@ -38,49 +38,48 @@
 					$output .= $this->showMenuForm(true);
 			}
 			else {
-			$output .= "<h1>".$this->loc->s("title-menu-mgmt")."</h1>";
-					$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-Menu")."</a>
+				$output .= FS::$iMgr->h1("title-menu-mgmt");
+				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-Menu")."</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","","id",2);
-					while($data = FS::$dbMgr->Fetch($query)) {
-						$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
-						if($data["isconnected"] == -1)
-							$output .= $this->loc->s("No");
-						else if($data["isconnected"] == 1)
-							$output .= $this->loc->s("Yes");
-						else
-							$output .= $this->loc->s("Both");
-						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
-						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
-						$output .= "</a></td><td>";
-						$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=3&menu=".$data["id"]);
-						$output .= "</a></td></tr>";
-					}
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","","id",2);
+				while($data = FS::$dbMgr->Fetch($query)) {
+					$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
+					if($data["isconnected"] == -1)
+						$output .= $this->loc->s("No");
+					else if($data["isconnected"] == 1)
+						$output .= $this->loc->s("Yes");
+					else
+						$output .= $this->loc->s("Both");
+					$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
+					$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
+					$output .= "</a></td><td>";
+					$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=3&menu=".$data["id"]);
+					$output .= "</a></td></tr>";
+				}
 					
-					$output .= "</table>
-					<h1>".$this->loc->s("title-menu-node-mgmt")."</h1>
-					<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
+				$output .= "</table>".FS::$iMgr->h1("title-menu-node-mgmt").
+					"<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","","id",2);
-					while($data = FS::$dbMgr->Fetch($query)) {
-						$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
-						$link2 = new HTTPLink($data["link"]);
-						$output .= $link2->getIt()."</td><td>";
-						if($data["isconnected"] == -1)
-							$output .= $this->loc->s("No");
-						else if($data["isconnected"] == 1)
-							$output .= $this->loc->s("Yes");
-						else
-							$output .= $this->loc->s("Both");
-						$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
-						$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
-						$output .= "</a></td><td>";
-						$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=6&im=".$data["id"]);
-						$output .= "</a></td></tr>";
-					}
-					$output .= "</table>";
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","","id",2);
+				while($data = FS::$dbMgr->Fetch($query)) {
+					$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
+					$link2 = new HTTPLink($data["link"]);
+					$output .= $link2->getIt()."</td><td>";
+					if($data["isconnected"] == -1)
+						$output .= $this->loc->s("No");
+					else if($data["isconnected"] == 1)
+						$output .= $this->loc->s("Yes");
+					else
+						$output .= $this->loc->s("Both");
+					$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
+					$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
+					$output .= "</a></td><td>";
+					$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=6&im=".$data["id"]);
+					$output .= "</a></td></tr>";
+				}
+				$output .= "</table>";
 			}
 			return $output;
 		}
@@ -115,9 +114,7 @@
 		}
 		
 		public function showMenuForm($edit = false) {
-			$output = "<h1>";
-			$output .= $edit ? $this->loc->s("menu-edit") : $this->loc->s("menu-create");
-			$output .= "</h1>";
+			$output = FS::$iMgr->h1($edit ? $this->loc->s("menu-edit") : $this->loc->s("menu-create"),true);
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".($edit ? 2 : 1))."<ul class=\"ulform\">";
 			$menu = NULL;
 			if($edit) {
@@ -139,8 +136,8 @@
 			$output .= "</ul></form>";
 			
 			if($edit) {
-				$output .= "<h1>".$this->loc->s("title-menu-node-mgmt")."</h1>
-					<h2>".$this->loc->s("add-elmt")."</h2>";
+				$output .= FS::$iMgr->h1("title-menu-node-mgmt").
+					"<h2>".$this->loc->s("add-elmt")."</h2>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=7");
 				$output .= "<center>".$this->loc->s("elmt")." ";
 				$menuEl = new MenuElement();

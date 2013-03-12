@@ -39,7 +39,7 @@
 
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= "<h1>".$this->loc->s("title-ip-management")."</h1>";
+				$output .= FS::$iMgr->h1("title-ip-management");
 
 				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");

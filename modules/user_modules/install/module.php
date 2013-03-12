@@ -33,7 +33,7 @@
 		}
 
 		private function showMain() {
-			$output = "<h1>".$this->loc->s("title-master-install")."</h1><div id=\"installer\">";
+			$output = FS::$iMgr->h1("title-master-install")."<div id=\"installer\">";
 			// For future, maybe we could resume install
 			$pwdset = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","sha_pwd","username = 'admin'");
 			if(!$pwdset) {

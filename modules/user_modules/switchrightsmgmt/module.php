@@ -165,9 +165,9 @@
 			$output = "";	
 			$found = false;
 
-			$grpoutput = "<h1>".$this->loc->s("group-rights")."</h1>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Groups")."</th></tr>";
-			$usroutput = "<h1>".$this->loc->s("user-rights")."</h1>"."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
+			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
 			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
 
@@ -561,8 +561,8 @@
                 	                        }</script>";
 					$output .= "<div id=\"snmpfdiv\">";
 				}
-				$output .= "<h1>".$this->loc->s("group-rights")."</h1>".$grpoutput."</table>";
-				$output .= "<h1>".$this->loc->s("user-rights")."</h1>".$usroutput."</table>";
+				$output .= FS::$iMgr->h1("group-rights").$grpoutput."</table>";
+				$output .= FS::$iMgr->h1("user-rights").$usroutput."</table>";
 				if($community == "")
 					$output .= "</div>";
 			}
@@ -653,7 +653,7 @@
 					$output .= $this->addOrEditBackupServer();
 				else {
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
-					$output = "<h1>".$this->loc->s("title-switchrightsmgmt")."</h1>";
+					$output = FS::$iMgr->h1("title-switchrightsmgmt");
 					$output .= "<div id=\"contenttabs\"><ul>";
 					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp"),$sh);
 					// Show only if there is devices

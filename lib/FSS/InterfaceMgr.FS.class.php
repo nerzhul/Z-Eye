@@ -125,6 +125,22 @@
 			return "<div id=\"backarrow\"><a href=\"javascript:history.back()\">".FS::$iMgr->img("styles/back.png",32,32)."</a></div>";
 		}
 
+		public function h1($str,$raw=false) {
+			return "<h1>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h1>";
+		}
+
+		public function h2($str,$raw=false) {
+			return "<h2>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h2>";
+		}
+
+		public function h3($str,$raw=false) {
+			return "<h3>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h3>";
+		}
+
+		public function h4($str,$raw=false) {
+			return "<h4>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h4>";
+		}
+
 		public function label($for,$value,$class = "") {
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}

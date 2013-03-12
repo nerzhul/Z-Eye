@@ -55,7 +55,7 @@
 		private function showMain() {
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<h1>".$this->loc->s("title-network-device-mgmt")."</h1>";
+				$output .= FS::$iMgr->h1("title-network-device-mgmt");
 
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
                         if($count < 1) {

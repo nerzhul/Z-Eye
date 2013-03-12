@@ -29,7 +29,7 @@
 			$output = "";
 
 			if(!FS::isAJAXCall()) {
-				$output .= "<h1>".$this->loc->s("title-maps")."</h1>";
+				$output .= FS::$iMgr->h1("title-maps");
 				$output .= "<div id=\"contenttabs\"><ul>";
 				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("icinga-map"),$sh);
 				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("net-map"),$sh);

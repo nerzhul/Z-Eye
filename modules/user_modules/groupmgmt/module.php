@@ -34,7 +34,7 @@
 			}
 			if(!FS::isAjaxCall()) {
 				$gname = FS::$secMgr->checkAndSecuriseGetData("g");
-				$output = "<h1>".$this->loc->s("title-mgmt")."</h1>";
+				$output = FS::$iMgr->h1("title-mgmt");
 				if($gname)
 					$output .= $this->editGroup($gname);
 				else

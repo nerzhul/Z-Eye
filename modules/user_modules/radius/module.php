@@ -37,9 +37,9 @@
 
 			if(!FS::isAjaxCall()) {
 				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1)
-					$output .= "<h1>".$this->loc->s("title-deleg")."</h1>";
+					$output .= FS::$iMgr->h1("title-deleg");
 				else
-					$output .= "<h1>".$this->loc->s("title-usermgmt")."</h1>";
+					$output .= FS::$iMgr->h1("title-usermgmt");
 			}
 
 			switch($err) {

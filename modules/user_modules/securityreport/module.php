@@ -41,7 +41,7 @@
 			$this->snortDB->Connect();
 			$output = "";
 			if(!FS::isAjaxCall())
-				$output .= "<h1>".$this->loc->s("title-attack-report")."</h1>";
+				$output .= FS::$iMgr->h1("title-attack-report");
 			$output .= $this->loadAttackGraph();
 			return $output;
 		}

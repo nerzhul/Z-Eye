@@ -42,7 +42,7 @@
 						});
         			        });
 		        	}, 20000);</script>";
-				$output .= "<h1>Speed Reporting</h1>";
+				$output .= FS::$iMgr->h1("Speed Reporting",true);
 			}
 			$output .= "<div id=\"reports\">";
 			$tmpoutput = "<div style=\"width: 100%; display: inline-block;\">".$this->showIcingaReporting()."</div>";

@@ -49,7 +49,7 @@
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-right"));
 
 			if(!FS::isAjaxCall()) {
-				$output .= "<h1>".$this->loc->s("title-icinga")."</h1>";
+				$output .= FS::$iMgr->h1("title-icinga");
 				$output .= "<div id=\"contenttabs\"><ul>";
 				//$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
 				if(FS::$sessMgr->hasRight("mrule_icinga_host_write"))
@@ -226,7 +226,7 @@
 			if(!$hostdata) {
 				return FS::$iMgr>printError($this->loc->s("err-no-host"));
 			}
-			$output = "<h1>".$this->loc->s("title-host-edit")."</h1>";	
+			$output = FS::$iMgr->h1("title-host-edit");	
 
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13",array("id" => "hostfrm")).
 				FS::$iMgr->hidden("edit",1).FS::$iMgr->hidden("name",$host);
@@ -375,7 +375,7 @@
 			else {
                                 return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
                         }
-			$output = "<h1>".$this->loc->s("title-hostgroup-edit")."</h1>";
+			$output = FS::$iMgr->h1("title-hostgroup-edit");
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=19",array("id" => "hgfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
 				<tr><td>".$this->loc->s("Name")."</td><td>".$hostgroup."</td></tr>";
@@ -496,7 +496,7 @@
                                 return FS::$iMgr->printError($this->loc->s("err-no-service"));
                         }
 
-			$output = "<h1>".$this->loc->s("title-edit-service")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=16",array("id" => "srvfrm"));
+			$output = FS::$iMgr->h1("title-edit-service").FS::$iMgr->form("index.php?mod=".$this->mid."&act=16",array("id" => "srvfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$data["template"] == 't',array("type" => "chk"));
 			//$formoutput .= template list
@@ -624,7 +624,7 @@
 			else
                                 return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 
-			$output = "<h1>".$this->loc->s("title-edit-timeperiod")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "tpfrm"));
+			$output = FS::$iMgr->h1("title-edit-timeperiod").FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "tpfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->hidden("name",$data["name"]).FS::$iMgr->hidden("edit",1);
 			$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
@@ -721,7 +721,7 @@
 			else
                                 return FS::$iMgr->printError($this->loc->s("err-no-contact"));
 
-			$output = "<h1>".$this->loc->s("title-edit-contact")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=7",array("id" => "ctfrm"));
+			$output = FS::$iMgr->h1("title-edit-contact").FS::$iMgr->form("index.php?mod=".$this->mid."&act=7",array("id" => "ctfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$data["template"] == "t",array("type" => "chk"));
 			//$output .= template list
@@ -821,7 +821,7 @@
 			else {
                                 return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
                         }
-			$output = "<h1>".$this->loc->s("title-edit-contactgroup")."</h1>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=10",array("id" => "ctgfrm"));
+			$output = FS::$iMgr->h1("title-edit-contactgroup").FS::$iMgr->form("index.php?mod=".$this->mid."&act=10",array("id" => "ctgfrm"));
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
 				<tr><td>".$this->loc->s("Name")."</td><td>".$cg."</td></tr>";
 			$output .= FS::$iMgr->hidden("name",$cg).FS::$iMgr->hidden("edit",1);
@@ -901,7 +901,7 @@
 			if(!$cmd) {
 				return FS::$iMgr->printError($this->loc->s("err-cmd-doesnt-exist"));
 			}
-			$output = "<h1>".$this->loc->s("title-cmd-edit")."</h1>";
+			$output = FS::$iMgr->h1("title-cmd-edit");
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "cmdfrm")).
 				FS::$iMgr->hidden("name",$cmdname).FS::$iMgr->hidden("edit",1).
 				"<ul class=\"ulform\"><li><b>".$this->loc->s("Name").":</b> ";
