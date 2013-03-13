@@ -250,12 +250,9 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			if(!FS::isAjaxCall()) {
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account"),$sh);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-                                $output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+				$output .= FS::$iMgr->tabPan(array(
+					array(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account")),
+					array(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account"))),$sh);
 			}
 			else if(!$sh || $sh == 1) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
@@ -317,17 +314,14 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			if(!FS::isAjaxCall()) {
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Users"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Profils"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-import"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("auto-import-dhcp"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account-deleg"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account-deleg"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("advanced-tools"),$sh);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+				$output .= FS::$iMgr->tabPan(array(
+					array(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Users")),
+					array(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Profils")),
+					array(3,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-import")),
+					array(4,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("auto-import-dhcp")),
+					array(6,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account-deleg")),
+					array(7,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account-deleg")),
+					array(5,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("advanced-tools"))),$sh);
 			}
 			else if(!$sh || $sh == 1) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);

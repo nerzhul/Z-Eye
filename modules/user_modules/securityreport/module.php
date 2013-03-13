@@ -75,15 +75,11 @@
 			if($topmax == NULL || !FS::$secMgr->isNumeric($topmax) || $topmax < 1) $topmax = 10;
 			
 			if(!FS::isAjaxCall()) {
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE"),$showmodule);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"),$showmodule);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
-				$output .= "</div>";
+				$output .= FS::$iMgr->tabPan(array(
+					array(1,"index.php?mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
+					array(2,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans")),
+					array(3,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE")),
+					array(4,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$sh);
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {

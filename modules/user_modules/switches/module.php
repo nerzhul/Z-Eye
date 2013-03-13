@@ -99,20 +99,17 @@
 			}
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".$device,true);
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"),$sh);
+				$panElmts = array();
+				array_push($panElmts,array(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration")));
 				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
 					(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshportinfos") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshportinfos")))
-					$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view"),$sh);
+					array_push($panElmts,array(4,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"),$sh);
+					array_push($panElmts,array(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") ||
 					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon"))
-					$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring"),$sh);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
-				$output .= "</div>";
+					array_push($panElmts,array(3,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring")));
+				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			} else {
 				// Get Port ID
 				$portid = $this->devapi->getPortId($device,$port);
@@ -484,36 +481,33 @@
 				$dloc = FS::$dbMgr->GetOneData("device","location","name = '".$device."'");
 				$output = FS::$iMgr->h2($this->loc->s("Device")." ".$device." (".$dip.($dloc != NULL ? " - ".$dloc : "").")",true);
 
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"),$showmodule);
+				$panElmts = array();
+				array_push($panElmts,array(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswvlans") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswvlans"))
-					$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"),$showmodule);
+					array_push($panElmts,array(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist")));
 
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview"),$showmodule);
+				array_push($panElmts,array(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview")));
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules") ||
 					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails"))
-					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"),$showmodule);
+					array_push($panElmts,array(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod")));
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowstart")) 
-					$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Startup-Cfg"),$showmodule);
+					array_push($panElmts,array(8,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Startup-Cfg")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowrun") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowrun"))
-					$output .= FS::$iMgr->tabPanElmt(9,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Running-Cfg"),$showmodule);
+					array_push($panElmts,array(9,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Running-Cfg")));
 
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools"),$showmodule);
+				array_push($panElmts,array(4,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools")));
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_sshpwd") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd"))
-					$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("SSH"),$showmodule);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("err-fail-tab")."\");}}});</script>";
-				$output .= "</div>";
+					array_push($panElmts,array(7,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("SSH")));
+				$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
 			} else {
 				if($dip == NULL) {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-device"));

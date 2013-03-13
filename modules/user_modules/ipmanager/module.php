@@ -111,14 +111,11 @@
 				if($filter) {
 					if(!FS::$secMgr->isIP($filter))
 						return $output.FS::$iMgr->printError($this->loc->s("bad-filter"));
-					$output .= "<div id=\"contenttabs\"><ul>";
-					$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats"),$showmodule);
-					$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History"),$showmodule);
-					$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring"),$showmodule);
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools"),$showmodule);
-					$output .= "</ul></div>";
-					$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-					$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+					$panElmts = array(array(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats")),
+						array(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History")),
+						array(3,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring")),
+						array(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools")));
+					$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
 				}
 			} else {
 				if(!$showmodule || $showmodule == 1) {

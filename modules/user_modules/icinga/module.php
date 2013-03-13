@@ -50,25 +50,23 @@
 
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-icinga");
-				$output .= "<div id=\"contenttabs\"><ul>";
-				//$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh);
+				$panElmts = array();
+				//array_push($panElmts,array(1,"index.php?mod=".$this->mid,$this->loc->s("General")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_host_write"))
-					$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts"),$sh);
+					array_push($panElmts,array(2,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-					$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups"),$sh);
+					array_push($panElmts,array(3,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
-					$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services"),$sh);
+					array_push($panElmts,array(4,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
-					$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods"),$sh);
+					array_push($panElmts,array(5,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
-					$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts"),$sh);
+					array_push($panElmts,array(6,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-					$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups"),$sh);
+					array_push($panElmts,array(7,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
-					$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands"),$sh);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+					array_push($panElmts,array(8,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands")));
+				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				return $output;
 			}
 			

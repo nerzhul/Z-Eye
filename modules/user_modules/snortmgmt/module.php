@@ -41,21 +41,17 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("page-title");
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("General"),$sh,true);
-				$output .= FS::$iMgr->tabPanElmt(10,"index.php?mod=".$this->mid,$this->loc->s("Reports"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(6,"index.php?mod=".$this->mid,$this->loc->s("Remote"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,"DNS",$sh);
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,"Mail",$sh);
-				$output .= FS::$iMgr->tabPanElmt(7,"index.php?mod=".$this->mid,"FTP",$sh);
-				$output .= FS::$iMgr->tabPanElmt(4,"index.php?mod=".$this->mid,"HTTP",$sh);
-				$output .= FS::$iMgr->tabPanElmt(5,"index.php?mod=".$this->mid,"DB",$sh);
-				$output .= FS::$iMgr->tabPanElmt(8,"index.php?mod=".$this->mid,"SNMP",$sh);
-				$output .= FS::$iMgr->tabPanElmt(9,"index.php?mod=".$this->mid,"SIP",$sh);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
-				$output .= "</div>";
+				$panElmts = array(array(1,"index.php?mod=".$this->mid,$this->loc->s("General")),
+					array(10,"index.php?mod=".$this->mid,$this->loc->s("Reports")),
+					array(6,"index.php?mod=".$this->mid,$this->loc->s("Remote")),
+					array(2,"index.php?mod=".$this->mid,"DNS"),
+					array(3,"index.php?mod=".$this->mid,"Mail"),
+					array(7,"index.php?mod=".$this->mid,"FTP"),
+					array(4,"index.php?mod=".$this->mid,"HTTP"),
+					array(5,"index.php?mod=".$this->mid,"DB"),
+					array(8,"index.php?mod=".$this->mid,"SNMP"),
+					array(9,"index.php?mod=".$this->mid,"SIP"));
+				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			}
 			else if(!$sh || $sh == 1) {
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=".$sh);
