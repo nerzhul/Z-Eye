@@ -111,10 +111,10 @@
 				if($filter) {
 					if(!FS::$secMgr->isIP($filter))
 						return $output.FS::$iMgr->printError($this->loc->s("bad-filter"));
-					$panElmts = array(array(1,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Stats")),
-						array(4,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("History")),
-						array(3,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring")),
-						array(2,"index.php?mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools")));
+					$panElmts = array(array(1,"mod=".$this->mid."&f=".$filter,$this->loc->s("Stats")),
+						array(4,"mod=".$this->mid."&f=".$filter,$this->loc->s("History")),
+						array(3,"mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring")),
+						array(2,"mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools")));
 					$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
 				}
 			} else {

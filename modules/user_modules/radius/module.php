@@ -251,8 +251,8 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->tabPan(array(
-					array(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account")),
-					array(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account"))),$sh);
+					array(1,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account")),
+					array(2,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account"))),$sh);
 			}
 			else if(!$sh || $sh == 1) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
@@ -315,13 +315,13 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->tabPan(array(
-					array(1,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Users")),
-					array(2,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Profils")),
-					array(3,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-import")),
-					array(4,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("auto-import-dhcp")),
-					array(6,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account-deleg")),
-					array(7,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account-deleg")),
-					array(5,"index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("advanced-tools"))),$sh);
+					array(1,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Users")),
+					array(2,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("Profils")),
+					array(3,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-import")),
+					array(4,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("auto-import-dhcp")),
+					array(6,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mono-account-deleg")),
+					array(7,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("mass-account-deleg")),
+					array(5,"mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport,$this->loc->s("advanced-tools"))),$sh);
 			}
 			else if(!$sh || $sh == 1) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);

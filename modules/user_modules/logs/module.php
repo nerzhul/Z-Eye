@@ -75,8 +75,8 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			if(!FS::isAjaxCall()) {
-				$panElmts = array(array(1,"index.php?mod=".$this->mid,$this->loc->s("webapp")),
-					array(2,"index.php?mod=".$this->mid,$this->loc->s("Collector")));
+				$panElmts = array(array(1,"mod=".$this->mid,$this->loc->s("webapp")),
+					array(2,"mod=".$this->mid,$this->loc->s("Collector")));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 		}
 			else if(!$sh || $sh == 1) {

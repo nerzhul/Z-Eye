@@ -100,15 +100,15 @@
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".$device,true);
 				$panElmts = array();
-				array_push($panElmts,array(1,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration")));
+				array_push($panElmts,array(1,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration")));
 				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
 					(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshportinfos") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshportinfos")))
-					array_push($panElmts,array(4,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view")));
+					array_push($panElmts,array(4,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats"))
-					array_push($panElmts,array(2,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats")));
+					array_push($panElmts,array(2,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") ||
 					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") || FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon"))
-					array_push($panElmts,array(3,"index.php?mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring")));
+					array_push($panElmts,array(3,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring")));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			} else {
 				// Get Port ID
@@ -482,31 +482,31 @@
 				$output = FS::$iMgr->h2($this->loc->s("Device")." ".$device." (".$dip.($dloc != NULL ? " - ".$dloc : "").")",true);
 
 				$panElmts = array();
-				array_push($panElmts,array(6,"index.php?mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist")));
+				array_push($panElmts,array(6,"mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswvlans") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswvlans"))
-					array_push($panElmts,array(5,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist")));
+					array_push($panElmts,array(5,"mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist")));
 
-				array_push($panElmts,array(3,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("frontview")));
+				array_push($panElmts,array(3,"mod=".$this->mid."&d=".$device,$this->loc->s("frontview")));
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules") ||
 					FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails"))
-					array_push($panElmts,array(1,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod")));
+					array_push($panElmts,array(1,"mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod")));
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowstart")) 
-					array_push($panElmts,array(8,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Startup-Cfg")));
+					array_push($panElmts,array(8,"mod=".$this->mid."&d=".$device,$this->loc->s("Startup-Cfg")));
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowrun") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowrun"))
-					array_push($panElmts,array(9,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Running-Cfg")));
+					array_push($panElmts,array(9,"mod=".$this->mid."&d=".$device,$this->loc->s("Running-Cfg")));
 
-				array_push($panElmts,array(4,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools")));
+				array_push($panElmts,array(4,"mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools")));
 
 				if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_sshpwd") || 
 					FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd"))
-					array_push($panElmts,array(7,"index.php?mod=".$this->mid."&d=".$device,$this->loc->s("SSH")));
+					array_push($panElmts,array(7,"mod=".$this->mid."&d=".$device,$this->loc->s("SSH")));
 				$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
 			} else {
 				if($dip == NULL) {

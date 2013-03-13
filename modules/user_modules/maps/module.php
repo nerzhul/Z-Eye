@@ -31,9 +31,9 @@
 			if(!FS::isAJAXCall()) {
 				$output .= FS::$iMgr->h1("title-maps");
 				$output .= FS::$iMgr->tabPan(array(
-					array(3,"index.php?mod=".$this->mid,$this->loc->s("icinga-map")),
-					array(2,"index.php?mod=".$this->mid,$this->loc->s("net-map")),
-					array(1,"index.php?mod=".$this->mid,$this->loc->s("net-map-full"))
+					array(3,"mod=".$this->mid,$this->loc->s("icinga-map")),
+					array(2,"mod=".$this->mid,$this->loc->s("net-map")),
+					array(1,"mod=".$this->mid,$this->loc->s("net-map-full"))
 					),$sh);
 			} else {
 				$device = FS::$secMgr->checkAndSecuriseGetData("d");

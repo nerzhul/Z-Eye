@@ -654,11 +654,11 @@
 				else {
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 					$output = FS::$iMgr->h1("title-switchrightsmgmt");
-					$panElmts = array(array(1,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp")));
+					$panElmts = array(array(1,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp")));
 					// Show only if there is devices
 					if(FS::$dbMgr->Count("device","ip") > 0)
-						array_push($panElmts,array(2,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch")));
-					array_push($panElmts,array(3,"index.php?mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-device-backup")));
+						array_push($panElmts,array(2,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch")));
+					array_push($panElmts,array(3,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-device-backup")));
 					$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				}
 			}

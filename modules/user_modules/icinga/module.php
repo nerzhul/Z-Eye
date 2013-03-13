@@ -51,21 +51,21 @@
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-icinga");
 				$panElmts = array();
-				//array_push($panElmts,array(1,"index.php?mod=".$this->mid,$this->loc->s("General")));
+				//array_push($panElmts,array(1,"mod=".$this->mid,$this->loc->s("General")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_host_write"))
-					array_push($panElmts,array(2,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts")));
+					array_push($panElmts,array(2,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-					array_push($panElmts,array(3,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups")));
+					array_push($panElmts,array(3,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
-					array_push($panElmts,array(4,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services")));
+					array_push($panElmts,array(4,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
-					array_push($panElmts,array(5,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods")));
+					array_push($panElmts,array(5,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
-					array_push($panElmts,array(6,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts")));
+					array_push($panElmts,array(6,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-					array_push($panElmts,array(7,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups")));
+					array_push($panElmts,array(7,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups")));
 				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
-					array_push($panElmts,array(8,"index.php?mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands")));
+					array_push($panElmts,array(8,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands")));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				return $output;
 			}

@@ -76,10 +76,10 @@
 			
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->tabPan(array(
-					array(1,"index.php?mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
-					array(2,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans")),
-					array(3,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE")),
-					array(4,"index.php?mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$sh);
+					array(1,"mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
+					array(2,"mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans")),
+					array(3,"mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE")),
+					array(4,"mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$sh);
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {

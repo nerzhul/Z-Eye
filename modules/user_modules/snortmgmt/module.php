@@ -41,16 +41,16 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("page-title");
-				$panElmts = array(array(1,"index.php?mod=".$this->mid,$this->loc->s("General")),
-					array(10,"index.php?mod=".$this->mid,$this->loc->s("Reports")),
-					array(6,"index.php?mod=".$this->mid,$this->loc->s("Remote")),
-					array(2,"index.php?mod=".$this->mid,"DNS"),
-					array(3,"index.php?mod=".$this->mid,"Mail"),
-					array(7,"index.php?mod=".$this->mid,"FTP"),
-					array(4,"index.php?mod=".$this->mid,"HTTP"),
-					array(5,"index.php?mod=".$this->mid,"DB"),
-					array(8,"index.php?mod=".$this->mid,"SNMP"),
-					array(9,"index.php?mod=".$this->mid,"SIP"));
+				$panElmts = array(array(1,"mod=".$this->mid,$this->loc->s("General")),
+					array(10,"mod=".$this->mid,$this->loc->s("Reports")),
+					array(6,"mod=".$this->mid,$this->loc->s("Remote")),
+					array(2,"mod=".$this->mid,"DNS"),
+					array(3,"mod=".$this->mid,"Mail"),
+					array(7,"mod=".$this->mid,"FTP"),
+					array(4,"mod=".$this->mid,"HTTP"),
+					array(5,"mod=".$this->mid,"DB"),
+					array(8,"mod=".$this->mid,"SNMP"),
+					array(9,"mod=".$this->mid,"SIP"));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			}
 			else if(!$sh || $sh == 1) {
