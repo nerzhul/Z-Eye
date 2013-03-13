@@ -79,7 +79,7 @@
 					array(1,"mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
 					array(2,"mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans")),
 					array(3,"mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE")),
-					array(4,"mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$sh);
+					array(4,"mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$showmodule);
 			}
 			else {
 				if(!$showmodule || $showmodule == 1) {
