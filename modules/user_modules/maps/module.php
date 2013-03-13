@@ -30,13 +30,11 @@
 
 			if(!FS::isAJAXCall()) {
 				$output .= FS::$iMgr->h1("title-maps");
-				$output .= "<div id=\"contenttabs\"><ul>";
-				$output .= FS::$iMgr->tabPanElmt(3,"index.php?mod=".$this->mid,$this->loc->s("icinga-map"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(2,"index.php?mod=".$this->mid,$this->loc->s("net-map"),$sh);
-				$output .= FS::$iMgr->tabPanElmt(1,"index.php?mod=".$this->mid,$this->loc->s("net-map-full"),$sh);
-				$output .= "</ul></div>";
-				$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-				$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+				$output .= FS::$iMgr->tabPan(array(
+					array(3,"index.php?mod=".$this->mid,$this->loc->s("icinga-map")),
+					array(2,"index.php?mod=".$this->mid,$this->loc->s("net-map")),
+					array(1,"index.php?mod=".$this->mid,$this->loc->s("net-map-full"))
+					),$sh);
 			} else {
 				$device = FS::$secMgr->checkAndSecuriseGetData("d");
 				if($device != NULL)

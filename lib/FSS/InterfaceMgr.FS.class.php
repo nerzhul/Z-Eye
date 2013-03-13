@@ -418,6 +418,17 @@
 			return $output;
 		}
 
+		public function tabPan($elmts = array(),$cursh) {
+			$output = "<div id=\"contenttabs\"><ul>";
+			$count = count($elmts);
+			for($i=0;$i<$count;$i++)
+				$output .= $this->tabPanElmt($elmts[$i][0],$elmts[$i][1],$elmts[$i][2],$cursh);	
+			$output .= "</ul></div>";
+			$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+                        $output .= "$(anchor.hash).html(\"".$this->cur_module->getLoc()->s("fail-tab")."\");}}});</script>";
+			return ($count > 0 ? $output : "");
+		}
+
 		public function opendiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
 			if($divname == NULL) $divname = uniqid();
 			if($liname == NULL) $liname = uniqid();

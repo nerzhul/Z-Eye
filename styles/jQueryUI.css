@@ -98,7 +98,7 @@ ta/*!
 .ui-tabs { position: relative; padding: .2em; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
 .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
 .ui-tabs .ui-widget-header { background: none; }
-.ui-tabs .ui-tabs-nav .ui-state-default { background-image: linear-gradient(#444, #BBB); background-image: -webkit-linear-gradient(#444, #BBB); background-color: #999; color: white;}
+.ui-tabs .ui-tabs-nav .ui-state-default { background-image: linear-gradient(#222, #666); background-image: -webkit-linear-gradient(#222, #666); background-color: #444; color: white;}
 .ui-tabs .ui-tabs-nav .ui-state-active { background-image: linear-gradient(#4A0000, #8A0000); background-image: -webkit-linear-gradient(#4A0000, #8A0000); background-color: #4A0000; color: white; font-weight: bold;}
 .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 0 0; padding: 0; white-space: nowrap; box-shadow: 1px; border: 0; }
 .ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
