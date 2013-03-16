@@ -436,7 +436,7 @@
 						else
 							$toquery = $data["record"].".".$filter;
 						$out = array();
-						exec("dig -t A ".$toquery." +short|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
+						exec("/usr/bin/dig -t A ".$toquery." +short|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
 						if(count($out) == 0) {
 							$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$this->loc->s("Alone")."<br />";
 						}
