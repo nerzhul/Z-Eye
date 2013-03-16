@@ -77,6 +77,7 @@
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->tabPan(array(
 					array(1,"mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
+					array(5,"mod=".$this->mid."&max=".$topmax,$this->loc->s("Last-logs")),
 					array(2,"mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans")),
 					array(3,"mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE")),
 					array(4,"mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$showmodule);
@@ -245,6 +246,21 @@
 					}
 					if($found)
 						$output .= $tmpoutput."</table>";
+				}
+				else if($showmodule == 5) {
+					$found = false;
+					$output .= FS::$iMgr->h3("last-100");
+					$query = $this->snortDB->Select("acid_event","sig_name,timestamp,ip_src,ip_dst,ip_proto,layer4_sport,layer4_dport","","timestamp",1,100);
+					while($data = $this->snortDB->Fetch($query)) {
+						if(!$found) {
+							$found = true;
+							$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Source")."</th><th>".$this->loc->s("Destination")."</th><th>".$this->loc->s("Alert")."</th></tr>";
+						}
+						$output .= "<tr><td>".$data["timestamp"]."</td><td>".long2ip($data["ip_src"]).":".$data["layer4_sport"]."</td><td>".long2ip($data["ip_dst"]).":".$data["layer4_dport"].
+							"</td><td>".$data["sig_name"]."</td></tr>";
+					}
+					if($found) $output .= "</table>";
+					else $output .= $this->loc->s("No-alert-found");
 				}
 			}
 			return $output;
