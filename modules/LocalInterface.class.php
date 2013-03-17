@@ -65,7 +65,7 @@
 			$output = "<script type=\"text/javascript\">$('#".$id."').submit(function(event) {";
 			// Locking screen if needed
 			if(isset($options["lock"]) && $options["lock"] == true) {
-				$output .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); $('#pop').show();";
+				$output .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); $('#pop').fadeIn();";
 			}
 			// Starting notification
 			if(isset($options["snotif"]) && strlen($options["snotif"]) > 0) {

@@ -260,7 +260,7 @@
 							"</td><td>".$data["sig_name"]."</td></tr>";
 					}
 					if($found) $output .= "</table>";
-					else $output .= $this->loc->s("No-alert-found");
+					else $output .= FS::$iMgr->printError($this->loc->s("No-alert-found"));
 				}
 			}
 			return $output;

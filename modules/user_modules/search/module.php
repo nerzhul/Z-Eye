@@ -218,7 +218,8 @@
 						if($i != $count-1)
 							$dnszone .= ".";
 					}
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","rectype,recval","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'");
+					$curserver = "";
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","rectype,recval,server","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'","server");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) {
 							$found = 1;
@@ -230,10 +231,22 @@
 							case "CNAME": $tmpoutput .= $this->loc->s("Alias").": "; break;
 							default: $tmpoutput .= $this->loc->s("Other")." (".$data["rectype"]."): "; break;
 						}
+						if($curserver != $data["server"]) {
+							$curserver = $data["server"];
+							$tmpoutput .= FS::$iMgr->h3($data["server"],true);
+						}
 						if(FS::$secMgr->isIP($data["recval"]))
-							$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a><br />";
+							$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a>";
 						else
-							$tmpoutput .= $data["recval"]."<br />";
+							$tmpoutput .= $data["recval"];
+						$tmpoutput .= "<br />";
+						if($data["server"]) {
+							$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
+							if($out != NULL) {
+								$tmpoutput .= FS::$iMgr->h4("dig-results");
+								$tmpoutput .= preg_replace("#[\n]#","<br />",$out);
+							}
+						}
 						$nbresults++;
 					}
 					if($found) $tmpoutput .= "</div>";
@@ -278,13 +291,26 @@
 			$nbresults = 0;
 			
 			if(FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record","recval ILIKE '".$search."'");
+				$curserver = "";
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,server","recval ILIKE '".$search."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if($found == 0) {
 						$found = 1;
 						$tmpoutput .= FS::$iMgr->h2("title-dns-assoc")."<div id=\"searchres\">";
 					}
+					if($curserver != $data["server"]) {
+						$curserver = $data["server"];
+						$tmpoutput .= FS::$iMgr->h4($data["server"],true);
+					}
 					$tmpoutput .= $data["record"].".".$data["zonename"]."<br />";
+					// Resolve with DIG to search what the DNS thinks
+					if($data["server"]) {
+						$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
+						if($out != NULL) {
+							$tmpoutput .= FS::$iMgr->h4("dig-results");
+							$tmpoutput .= preg_replace("#[\n]#","<br />",$out);
+						}
+					}
 					$nbresults++;
 				}
 

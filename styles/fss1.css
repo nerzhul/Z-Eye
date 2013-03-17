@@ -22,18 +22,8 @@
 * You can found copy of this licence at: http://creativecommons.org/licenses/by-nd/3.0/legalcode
 */
 
-body {
-	background-color: #5e0000;
-	font-family: Arial, Helvetica, sans-serif;
-	background-attachment: fixed;
-	background-image: linear-gradient(#000,#3e0000);
-	background-image: -ms-linear-gradient(#000,#3e0000);
-	background-image: -o-linear-gradient(#000,#3e0000);
-	background-image: -webkit-linear-gradient(#000,#3e0000);
-}
-
-h3:hover {
-	color: #555;
+body { background-color: #5e0000; font-family: Arial, Helvetica, sans-serif; background-attachment: fixed;
+background-image: linear-gradient(#000,#3e0000); background-image: -ms-linear-gradient(#000,#3e0000); background-image: -o-linear-gradient(#000,#3e0000); background-image: -webkit-linear-gradient(#000,#3e0000);
 }
 
 #main {
@@ -44,8 +34,7 @@ h3:hover {
 	height: auto;
 	margin: auto;
 	margin-top: -10px;
-	padding: 45px;
-	padding-top: 70px;
+	padding: 50px 45px 45px;
 	border-radius: 0px 0px 8px 8px;
 	-webkit-box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.7);
 	box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.7);
@@ -120,17 +109,7 @@ h3:hover {
 	text-align: justify;
 }
 
-#installer h2 {
-        margin-bottom: 30px;
-        margin-left: 7%;
-        margin-right: -45px;
-}
-
-#loghello {
-	display: inline-block;
-	font-size: 11px;
-	margin-right: 10px;
-}
+#installer h2 { margin-bottom: 30px; margin-left: 7%; margin-right: -45px; }
 
 #pop {
 	position: fixed;
