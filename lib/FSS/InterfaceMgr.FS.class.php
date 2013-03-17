@@ -112,15 +112,6 @@
                         return $user->getSubName()." ".$user->getName();
                 }
 
-		private function getJSONLink($jsonstr) {
-			$jsonstr = preg_replace("#\"#","&quot;",$jsonstr);
-			return "javascript:getPage('".$jsonstr."');";
-		}
-
-		public function addJSONLink($jsonstr,$text) {
-			return "<a class=\"monoComponentt_a\" href=\"".FS::$iMgr->getJSONLink($jsonstr)."\">".$text."</a>";
-		}
-
 		public function backLink() {
 			return "<div id=\"backarrow\"><a href=\"javascript:history.back()\">".FS::$iMgr->img("styles/back.png",32,32)."</a></div>";
 		}

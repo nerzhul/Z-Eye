@@ -50,9 +50,7 @@
 		FS::$iMgr->jsinc("lib/jQuery/jQuery.js");
 		FS::$iMgr->jsinc("lib/jQuery/jQueryUI.js");
 		FS::$iMgr->jsinc("lib/jQuery/jquery.jqzoom.js");
-		FS::$iMgr->jsinc("lib/FSS/js/FS-math.js");
-		FS::$iMgr->jsinc("lib/FSS/js/FS-Regex.js");
-		FS::$iMgr->jsinc("lib/FSS/js/FS-interface.js");
+		FS::$iMgr->jsinc("lib/FSS/js/FSS.js");
 		FS::$iMgr->jsinc("lib/HighCharts/highcharts.min.js");
 
 		echo FS::$iMgr->header();
