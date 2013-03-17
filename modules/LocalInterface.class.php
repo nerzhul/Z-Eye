@@ -203,7 +203,7 @@
 			else
 				$output .= $this->printError("Module inconnu !");
 
-			return $output."<script type=\"text/javascript\">$('textarea, input:checkbox, input:radio, input:file').uniform();</script>";
+			return $output;
 		}
 
 		public function removeIcon($link = "") {

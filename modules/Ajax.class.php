@@ -33,7 +33,7 @@
 					break;
 				case 2: // module
 					$mid = FS::$secMgr->checkAndSecuriseGetData("mod");
-					echo FS::$iMgr->loadModule($mid)."<script type=\"text/javascript\">$('input:checkbox, input:radio, textarea').uniform();</script>";
+					echo FS::$iMgr->loadModule($mid);
 					break;
 				case 3: // Action Handler
 					$aMgr = new ActionMgr();
