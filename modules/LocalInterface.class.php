@@ -109,7 +109,7 @@
 				$output .= $this->showSearchForm();
 
 			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
-			$output .= $this->h1("Bienvenue sur Z-Eye",true);
+			$output .= $this->h4("Bienvenue sur Z-Eye",true);
 
 			$output .= "<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>";
 
@@ -117,7 +117,7 @@
 
 			if(!FS::$sessMgr->isConnected()) {
 				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
-					$output .= $this->h1("Identification",true);
+					$output .= $this->h4("Identification",true);
 					$output .= $this->label("uname","Utilisateur");
 					$output .= $this->input("uname","");
 					$output .= $this->label("upwd","Mot de passe");
