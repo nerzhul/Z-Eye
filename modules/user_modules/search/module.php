@@ -36,7 +36,7 @@
 		}
 
 		private function findRefsAndShow($search) {
-			$output = FS::$iMgr->h1("Search").": ".$search,true);
+			$output = FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
 			if(FS::$secMgr->isMacAddr($search)) {
 				$output .= $this->showMacAddrResults($search);
 		        }
