@@ -67,7 +67,7 @@ h2 { background-color: #5e0000; margin-left: 5%; font-size: 17px; }
 	height: 100%;
 	background-color: black;
 	opacity: 0.9;
-	z-index: 900;
+	z-index: 2000;
 	margin-top: 5px;
 	margin-left: -8px;
 }
@@ -98,7 +98,7 @@ h2 { background-color: #5e0000; margin-left: 5%; font-size: 17px; }
         color: white;
         width: 100%;
 	display: none;
-	z-index: 999;
+	z-index: 1000;
 }
 
 #subnotification {
@@ -384,7 +384,7 @@ a:hover { color: #F10; cursor: pointer; }
 	position: fixed;
 	top: 0;
 	width: 100%;
-	z-index: 20;
+	z-index: 950;
 	text-align: center;
 	margin-left: -8px;
 	margin-right: auto;
@@ -406,7 +406,7 @@ a:hover { color: #F10; cursor: pointer; }
 	height: auto;
 	color: #CCC;
 	overflow: hidden;
-	z-index: 3;
+	z-index: 900;
 	display: none;
 }
 
@@ -417,7 +417,7 @@ a:hover { color: #F10; cursor: pointer; }
 #logpanel .contentlog form { margin:0 0 10px 0; }
 #logpanel .contentlog label { float:left; padding-top:8px; clear:both; width:280px; display:block; font-size:10px; margin-bottom:2px; }
 
-#menupanel { z-index: 18; display:inline-block; }
+#menupanel { z-index: 920; display:inline-block; }
 #menupanel a { color: #EEE; text-decoration: none; font-size: 12px; font-style: normal; }
 #menupanel a:hover { font-weight: bold; }
 
