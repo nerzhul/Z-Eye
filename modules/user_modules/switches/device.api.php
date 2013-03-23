@@ -404,7 +404,7 @@
 			return NULL;
 		}
 
-		public function sendSSHCmd($stdio, $cmd, $fusleep = 500000, $iusleep = 50000) {
+		public function sendSSHCmd($stdio, $cmd) {
 			return "";
 		}		
 

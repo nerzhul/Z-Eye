@@ -1165,7 +1165,7 @@
 		*/
 
 		public function showSSHRunCfg($stdio) {
-			return $this->sendSSHCmd($stdio,"show running-config",5000000);
+			return $this->sendSSHCmd($stdio,"show running-config");
 		}
 
 		public function showSSHStartCfg($stdio) {
@@ -1194,22 +1194,22 @@
 			return $stdio;
 		}
 
-		public function sendSSHCmd($stdio, $cmd, $fusleep = 500000, $iusleep = 200000) {
+		public function sendSSHCmd($stdio, $cmd) {
 			$output = "";
 			$output_arr = array();
-			$firstline = true;
+			$promptfind = true;
 
 			fwrite($stdio,$cmd."\n");
-			usleep($fusleep);
 
-			while($line = fgets($stdio)) {
-				if($firstline) $firstline = false;
-				else if(preg_match("# --More-- #",$line)) {
-					fwrite($stdio," ");
-					usleep($iusleep);
+			while(!$promptfind) {
+				while($line = fgets($stdio)) {
+					if(preg_match("# --More-- #",$line))
+						fwrite($stdio," ");
+					else if(preg_match("/^(.+)[#]",$line))
+						$promptfind = true;
+					else array_push($output_arr,$line);
 				}
-				else array_push($output_arr,$line);
-        		}
+			}
 
 			for($i=0;$i<count($output_arr)-2;$i++)
 				$output .= $output_arr[$i];
