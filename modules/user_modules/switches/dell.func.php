@@ -62,7 +62,7 @@
                         	return -1;
 
                         $dup = $dup[1];
-                        return $dup;
+			return $dup;
                 }
 
 		/*
@@ -79,13 +79,14 @@
 			return 0;
 		}
 
-		public function getFieldForPortWithPID($device, $pid, $field) {
+		public function getFieldForPortWithPID($device, $pid, $field, $raw false) {
 			if($device == "" || $field == "" || $pid == "" /*|| !FS::$secMgr->isNumeric($pid)*/)
 				return -1;
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			return snmpget($dip,$community,$field.".".$pid);
+			$out = snmpget($dip,$community,$field.".".$pid);
+                        return $out;
 		}
 
 		public function getPortId($device,$portname) {

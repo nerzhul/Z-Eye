@@ -181,7 +181,7 @@
 			return NULL;
 		}
 
-		public function getFieldForPortWithPID($device, $pid, $field) {
+		public function getFieldForPortWithPID($device, $pid, $field, $raw = false) {
 			return NULL;
 		}
 
@@ -411,6 +411,9 @@
 		public function showSSHRunCfg($stdio) {
 			return "";
 		}
+
+		public function setPortId($pid) { $this->portid = $pid; }
 		public $vendor;
+		private $portid;
 	}
 ?>
