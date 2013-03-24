@@ -91,9 +91,6 @@
 		}
 
 		public function getSwitchAccessVLAN($device) {
-                        if($this->portid == -1)
-                                return -1;
-
                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");
                 }
 
@@ -105,9 +102,6 @@
 		}
 
 		public function getSwitchportMABState($device) {
-			if($this->portid == -1)
-                                return -1;
-
 			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
 		}
 
@@ -119,9 +113,6 @@
 		}
 
 		public function getSwitchportMABType($device) {
-			if($this->portid == -1)
-				return -1;
-
 			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
 		}
 
@@ -133,9 +124,6 @@
                 }
 
                 public function getSwitchportAuthFailVLAN($device) {
-                        if($this->portid == -1)
-                                return -1;
-
                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.3.1.1.3");
                 }
 
@@ -147,9 +135,6 @@
                 }
 
                 public function getSwitchportAuthNoRespVLAN($device) {
-                        if($this->portid == -1)
-                                return -1;
-
                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.3.2.1.2");
                 }
 
@@ -161,9 +146,6 @@
                 }
 
                 public function getSwitchportAuthDeadVLAN($device) {
-                        if($this->portid == -1)
-                                return -1;
-
                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.3.3.1.3");
                 }
 
@@ -176,9 +158,6 @@
                 }
 
                 public function getSwitchportControlMode($device) {
-                        if($this->portid == -1)
-                                return -1;
-
                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.2.1.1.5");
                 }
 
@@ -191,9 +170,6 @@
 		}
 				
 		public function getSwitchportAuthHostMode($device) {
-			if($this->portid == -1)
-					return -1;   
-					
 			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.2.1.1.3");
 		}
 
@@ -205,9 +181,6 @@
 		}
 		
 		public function getSwitchTrunkNativeVlan($device) {
-			if($this->portid == -1)
-				return -1;
-
 			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
 		}
 		
@@ -414,9 +387,6 @@
 		}
 		
 		public function getSwitchTrunkEncap($device) {
-			if($this->portid == -1)
-		                  return -1;
-
 			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.3");
 		}
 
@@ -428,9 +398,6 @@
 		}
 
 		public function getSwitchportMode($device) {
-			if($this->portid == -1)
-		                  return -1;
-
 			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
 		}
 
@@ -442,9 +409,6 @@
 		}
 
 		public function getSwitchportVoiceVlan($device) {
-			if($this->portid == -1)
-				return -1;
-
 			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.68.1.5.1.1.1");
 		}
 
@@ -463,7 +427,7 @@
 		}
 
 		public function getFieldForPortWithPID($device, $field, $raw = false) {
-			if($device == "" || $field == "" || $this->portid == "")
+			if($device == "" || $field == "" || $this->portid == "" || $this->portid == -1)
 				return -1;
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
@@ -874,8 +838,6 @@
 		*/
 
 		public function getPortDHCPSnoopingTrust($device) {
-			if($this->portid == -1)
-				return -1; 
                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.380.1.3.1.1.1");
 		}
 
@@ -887,8 +849,6 @@
 		}
 
 		public function getPortDHCPSnoopingRate($device) {
-			if($this->portid == -1)
-				return -1; 
                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.380.1.3.2.1.1");
 		}
 
