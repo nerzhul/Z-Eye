@@ -418,21 +418,17 @@
 		*/
 
 		public function setFieldForPortWithPID($field, $vtype, $value) {
-			if($this->devip == "" || $field == "" || $this->portid == "" || $this->portid < 1 || $vtype == "")
+			if($this->devip == "" || $this->snmprw == "" || $field == "" || $this->portid == "" || $this->portid < 1 || $vtype == "")
 				return -1;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-                        if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,$field.".".$this->portid,$vtype,$value);
+			snmpset($this->devip,$this->snmprw,$field.".".$this->portid,$vtype,$value);
 			return 0;
 		}
 
 		public function getFieldForPortWithPID($field, $raw = false) {
-			if($this->devip == "" || $field == "" || $this->portid == "" || $this->portid < 1)
+			if($this->devip == "" || $this->snmpro == "" || $field == "" || $this->portid == "" || $this->portid < 1)
 				return -1;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			$out = "";
-			exec("/usr/local/bin/snmpget -v 2c -c ".$community." ".$this->devip." ".$field.".".$this->portid,$out);
+			exec("/usr/local/bin/snmpget -v 2c -c ".$this->snmpro." ".$this->devip." ".$field.".".$this->portid,$out);
 			$outoid = "";
 			for($i=0;$i<count($out);$i++) {
 				$outoid .= $out[$i];
@@ -453,21 +449,17 @@
 		}
 
 		public function setField($field, $vtype, $value) {
-			if($this->devip == "" || $field == "" || $vtype == "")
+			if($this->devip == "" || $this->snmprw == "" || $field == "" || $vtype == "")
 				return NULL;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-                        if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,$field,$vtype,$value);
+			snmpset($this->devip,$this->snmprw,$field,$vtype,$value);
 			return 0;
 		}
 
 		public function getField($field) {
-			if($this->devip == "" || $field == "")
+			if($this->devip == "" || $this->snmpro == "" || $field == "")
 				return NULL;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			$out = "";
-			exec("/usr/local/bin/snmpget -v 2c -c ".$community." ".$this->devip." ".$field,$out);
+			exec("/usr/local/bin/snmpget -v 2c -c ".$this->snmpro." ".$this->devip." ".$field,$out);
 			$outoid = "";
 			for($i=0;$i<count($out);$i++) {
 				$outoid .= $out[$i];
@@ -498,12 +490,10 @@
 		*/
 
 		public function getPortList($vlanFltr = NULL) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmpro == "")
 				return -1;
 			$out = "";
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("/usr/local/bin/snmpwalk -v 2c -c ".$this->snmpro." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {
@@ -538,12 +528,10 @@
 		}
 
 		public function replaceVlan($oldvlan,$newvlan) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmpro == "")
 				return -1;
 			$out = "";
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("snmpwalk -v 2c -c ".$this->snmpro." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {
 				$pdata = explode(" ",$out[$i]);
@@ -581,122 +569,106 @@
 		
 		// Saving running-config => startup-config
 		public function writeMemory() {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmprw == "")
 				return -1;
 			$rand = rand(1,100);
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			snmpget($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpget($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 			return $rand;
 		}
 
 		public function restoreStartupConfig() {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmprw == "")
 				return -1;
 			$rand = rand(1,100);
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","4");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			snmpget($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","4");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpget($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 			return $rand;
 		}
 
 		// Save startup-config to TFTP Server
 		public function exportConfigToTFTP($server,$path) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmprw == "")
 				return -1
 			$rand = rand(1,100);
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
 			return $rand;
 		}
 		
 		// Restore startup-config to TFTP Server
 		public function importConfigFromTFTP($server,$path) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmprw == "")
 				return -1
 			$rand = rand(1,100);
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
 			return $rand;
 		}
 		
 		// Save startup-config to FTP/SCP/SFTP Server
 		public function exportConfigToAuthServer($server,$type,$path,$user,$pwd) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmprw == "")
 				return -1
 			if($type != 2 && $type != 4 && $type != 5)
 				return -1;
 			$rand = rand(1,100);
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
 			return $rand;	
 		}
 		
 		// Restore startup-config to FTP/SCP/SFTP Server
 		public function importConfigFromAuthServer($server,$type,$path,$user,$pwd) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmprw == "")
 				return -1
 			if($type != 2 && $type != 4 && $type != 5)
 				return -1;
 			$rand = rand(1,100);
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
-			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i",$type);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.".$rand,"a",$server);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.".$rand,"s",$path);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
+			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
 			return $rand;	
 		}
 		
 		// Get Copy state from switch, using previous randomized id
-		public function getCopyState(copyId) {
-			if($this->devip == "")
+		public function getCopyState($copyId) {
+			if($this->devip == "" || $this->snmpro == "")
 				return -1
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			$res = snmpget($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
+			$res = snmpget($this->devip,$this->snmpro,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
 			$res = preg_split("# #",$res);
 			return $res[1];
 		}
 		
 		public function getCopyError($copyId) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmpro == "")
 				return -1
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			$res = snmpget($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.13.".$copyId);
+			$res = snmpget($this->devip,$this->snmpro,"1.3.6.1.4.1.9.9.96.1.1.1.1.13.".$copyId);
 			$res = preg_split("# #",$res);
 			return $res[1];
 		}
@@ -835,12 +807,10 @@
                 }
 
 		public function getDHCPSnoopingVlans() {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmpro == "")
 				return -1;
-                        $community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-                        if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			$vlanlist = array();
-			exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$this->devip." 1.3.6.1.4.1.9.9.380.1.2.1.1.2",$out);
+			exec("/usr/local/bin/snmpwalk -v 2c -c ".$this->snmpro." ".$this->devip." 1.3.6.1.4.1.9.9.380.1.2.1.1.2",$out);
 			$count = count($out);
 			for($i=0;$i<count($out);$i++) {
 				$tmpout = preg_split("# #",$out[$i]);

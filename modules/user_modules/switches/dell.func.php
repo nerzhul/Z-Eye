@@ -70,20 +70,16 @@
 		*/
 
 		public function setFieldForPortWithPID($field, $vtype, $value) {
-			if($this->devip == "" || $field == "" || $this->portid < 1 || $vtype == "" || !FS::$secMgr->isNumeric($pid))
+			if($this->devip == "" || $this->snmprw == "" || $field == "" || $this->portid < 1 || $vtype == "" || !FS::$secMgr->isNumeric($pid))
 				return -1;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-                        if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,$field.".".$this->portid,$vtype,$value);
+			snmpset($this->devip,$this->snmprw,$field.".".$this->portid,$vtype,$value);
 			return 0;
 		}
 
 		public function getFieldForPortWithPID($field, $raw = false) {
-			if($this->devip == "" || $field == "" || this->portid < 1)
+			if($this->devip == "" || $this->snmpro == "" || $field == "" || this->portid < 1)
 				return -1;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			$out = snmpget($this->devip,$community,$field.".".$this->portid);
+			$out = snmpget($this->devip,$this->snmpro,$field.".".$this->portid);
                         return $out;
 		}
 
@@ -105,12 +101,10 @@
 		*/
 
 		public function getPortList($vlanFltr = NULL) {
-			if($this->devip == "")
+			if($this->devip == "" || $this->snmpro == "")
 				return -1;
 			$out = "";
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("snmpwalk -v 2c -c ".$this->snmpro." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {

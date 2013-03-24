@@ -23,6 +23,8 @@
 			$this->portid = -1;
 			$this->device = "";
 			$this->devip = "";
+			$this->snmpro = "";
+			$this->snmprw = "";
 		}
 
 		/*
@@ -369,15 +371,19 @@
 		public function setDevice($dev) {
 			$this->device = $dev;
 			$this->devip = FS::$dbMgr->GetOneData("device","ip","name = '".$dev."'");
+			$this->snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
+			if(!$this->snmpro) $this->snmpro = SNMPConfig::$SNMPReadCommunity;
+			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
+			if(!$this->snmprw) $this->snmprw = SNMPConfig::$SNMPWriteCommunity;
 		}
 
 		public function getDeviceIP() { return $this->devip; }
 
 		public function unsetPortId() { $this->portid = -1; }
-		public function unsetDevice() { $this->device = ""; $this->devip = ""; }
+		public function unsetDevice() { $this->device = ""; $this->devip = ""; $this->snmpro = ""; $this->snmprw = ""; }
 		public $vendor;
 		protected $portid;
-		protected $device;
-		protected $devip;
+		protected $device, $devip;
+		protected $snmpro, $snmprw;
 	}
 ?>
