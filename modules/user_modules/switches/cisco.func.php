@@ -427,7 +427,7 @@
 		}
 
 		public function getFieldForPortWithPID($field, $raw = false) {
-			if($this->device == "" || $field == "" || $this->portid == "" || $this->portid == -1)
+			if($this->devip == "" || $field == "" || $this->portid == "" || $this->portid == -1)
 				return -1;
 			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
