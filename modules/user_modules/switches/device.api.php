@@ -18,7 +18,13 @@
 	*/
 
 	class DeviceAPI {
-		function DeviceAPI() { $this->vendor = ""; $this->portid = -1; }
+		function DeviceAPI() {
+			$this->vendor = "";
+			$this->portid = -1;
+			$this->device = "";
+			$this->devip = "";
+		}
+
 		/*
 		* Generic port management
 		*/
@@ -197,20 +203,20 @@
 		* get Port list from a device. If there is a filter, only port with specified vlan are returned
 		*/
 
-		public function getPortList($device,$vlanFltr = NULL) {
+		public function getPortList($vlanFltr = NULL) {
 			return NULL;
 		}
 
-		public function replaceVlan($device,$oldvlan,$newvlan) {
+		public function replaceVlan($oldvlan,$newvlan) {
 			return NULL;
 		}
 
 		// Saving running-config => startup-config
-		public function writeMemory($device) {
+		public function writeMemory() {
 			return NULL;
 		}
 
-		public function restoreStartupConfig($device) {
+		public function restoreStartupConfig() {
 			return NULL;
 		}
 
@@ -409,8 +415,18 @@
 				$this->portid = $pid;
 		}
 
+		public function setDevice($dev) {
+			$this->device = $dev;
+			$this->devip = FS::$dbMgr->GetOneData("device","ip","name = '".$dev."'");
+		}
+
+		public function getDeviceIP() { return $this->devip; }
+
 		public function unsetPortId() { $this->portid = -1; }
+		public function unsetDevice() { $this->device = ""; $this->devip = ""; }
 		public $vendor;
-		private $portid;
+		protected $portid;
+		protected $device;
+		protected $devip;
 	}
 ?>

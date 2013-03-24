@@ -106,14 +106,13 @@
 		* get Port list from a device. If there is a filter, only port with specified vlan are returned
 		*/
 
-		public function getPortList($device,$vlanFltr = NULL) {
-			$out = "";
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			if($dip == NULL)
+		public function getPortList($vlanFltr = NULL) {
+			if($this->devip == "")
 				return -1;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
+			$out = "";
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("snmpwalk -v 2c -c ".$community." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {

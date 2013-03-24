@@ -40,8 +40,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
 		}
 
-		public function getPortState($device) {
-			$dup = $this->getFieldForPortWithPID($device,"ifAdminStatus");
+		public function getPortState() {
+			$dup = $this->getFieldForPortWithPID("ifAdminStatus");
 			$dup = preg_replace("#[a-zA-Z()]#","",$dup);
 			return $dup;
 		}
@@ -50,8 +50,8 @@
 		* Link Management
 		*/
 
-		public function getPortMtu($device) {
-                        return $this->getFieldForPortWithPID($device,"ifMtu");
+		public function getPortMtu() {
+                        return $this->getFieldForPortWithPID("ifMtu");
                 }
 
 		public function setPortDuplexWithPID($device,$pid,$value) {
@@ -61,8 +61,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
 		}
 
-		public function getPortDuplex($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.522.3.15.5");
+		public function getPortDuplex() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.522.3.15.5");
 		}
 
 		public function setPortSpeedWithPID($device,$pid,$value) {
@@ -72,12 +72,12 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
 		}
 		
-		public function getPortSpeed($device) {
-			$idx = $this->getPortIndexes($device,$this->portid);
+		public function getPortSpeed() {
+			$idx = $this->getPortIndexes($this->device,$this->portid);
 			if($idx == NULL)
 				return -2;
 
-			return $this->getFieldForPortWithPID($device,$idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
+			return $this->getFieldForPortWithPID($idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
 		}
 		/*
 		* VLAN management
@@ -90,8 +90,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.2.2.1.2","i",$value);
 		}
 
-		public function getSwitchAccessVLAN($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.68.1.2.2.1.2");
+		public function getSwitchAccessVLAN() {
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.2.2.1.2");
                 }
 
 		public function setSwitchportMABEnableWithPID($device,$pid,$value) {
@@ -101,8 +101,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.1","i",$value);
 		}
 
-		public function getSwitchportMABState($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.654.1.1.1.1.1");
+		public function getSwitchportMABState() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.1");
 		}
 
 		public function setSwitchMABTypeWithPID($device,$pid,$value) {
@@ -112,8 +112,8 @@
                         return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
 		}
 
-		public function getSwitchportMABType($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.654.1.1.1.1.2");
+		public function getSwitchportMABType() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.2");
 		}
 
 		public function setSwitchportAuthFailVLAN($device,$pid,$value) {
@@ -123,8 +123,8 @@
                         return $this->setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.1.1.2" : "1.3.6.1.4.1.9.9.656.1.3.1.1.3"),"i",($value == 0 ? 1 : $value));
                 }
 
-                public function getSwitchportAuthFailVLAN($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.3.1.1.3");
+                public function getSwitchportAuthFailVLAN() {
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.1.1.3");
                 }
 
 		public function setSwitchportAuthNoRespVLAN($device,$pid,$value) {
@@ -134,8 +134,8 @@
                         return $this->setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.2.1.1" : "1.3.6.1.4.1.9.9.656.1.3.2.1.2"),"i",($value == 0 ? 1 : $value));
                 }
 
-                public function getSwitchportAuthNoRespVLAN($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.3.2.1.2");
+                public function getSwitchportAuthNoRespVLAN() {
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.2.1.2");
                 }
 
 		public function setSwitchportAuthDeadVLAN($device,$pid,$value) {
@@ -145,8 +145,8 @@
                         return $this->setFieldForPortWithPID($device,$pid,($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
                 }
 
-                public function getSwitchportAuthDeadVLAN($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.3.3.1.3");
+                public function getSwitchportAuthDeadVLAN() {
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.3.1.3");
                 }
 
 		// authentication port-control 1,2,3
@@ -157,8 +157,8 @@
                         return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
                 }
 
-                public function getSwitchportControlMode($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.2.1.1.5");
+                public function getSwitchportControlMode() {
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.5");
                 }
 
 		// authentication host-mode
@@ -169,8 +169,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
 		}
 				
-		public function getSwitchportAuthHostMode($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.656.1.2.1.1.3");
+		public function getSwitchportAuthHostMode() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.3");
 		}
 
 		public function setSwitchTrunkNativeVlanWithPID($device,$pid,$value) {
@@ -180,8 +180,8 @@
             		return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
 		}
 		
-		public function getSwitchTrunkNativeVlan($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.5");
+		public function getSwitchTrunkNativeVlan() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.5");
 		}
 		
 		public function setSwitchTrunkVlanWithPID($device,$pid,$values) {
@@ -386,8 +386,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.3","i",$value);
 		}
 		
-		public function getSwitchTrunkEncap($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.3");
+		public function getSwitchTrunkEncap() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.3");
 		}
 
 		public function setSwitchportModeWithPID($device, $pid, $value) {
@@ -397,8 +397,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
 		}
 
-		public function getSwitchportMode($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.46.1.6.1.1.13");
+		public function getSwitchportMode() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.13");
 		}
 
 		public function setSwitchportVoiceVlanWithPID($device, $pid, $value) {
@@ -408,8 +408,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
 		}
 
-		public function getSwitchportVoiceVlan($device) {
-			return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.68.1.5.1.1.1");
+		public function getSwitchportVoiceVlan() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.5.1.1.1");
 		}
 
 		/*
@@ -426,14 +426,13 @@
 			return 0;
 		}
 
-		public function getFieldForPortWithPID($device, $field, $raw = false) {
-			if($device == "" || $field == "" || $this->portid == "" || $this->portid == -1)
+		public function getFieldForPortWithPID($field, $raw = false) {
+			if($this->device == "" || $field == "" || $this->portid == "" || $this->portid == -1)
 				return -1;
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
 			$out = "";
-			exec("/usr/local/bin/snmpget -v 2c -c ".$community." ".$dip." ".$field.".".$this->portid,$out);
+			exec("/usr/local/bin/snmpget -v 2c -c ".$community." ".$this->devip." ".$field.".".$this->portid,$out);
 			$outoid = "";
 			for($i=0;$i<count($out);$i++) {
 				$outoid .= $out[$i];
@@ -498,14 +497,13 @@
 		* get Port list from a device. If there is a filter, only port with specified vlan are returned
 		*/
 
-		public function getPortList($device,$vlanFltr = NULL) {
-			$out = "";
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			if($dip == NULL)
+		public function getPortList($vlanFltr = NULL) {
+			if($this->devip == "")
 				return -1;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
+			$out = "";
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("/usr/local/bin/snmpwalk -v 2c -c ".$community." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$plist = array();
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {
@@ -519,18 +517,18 @@
 					array_push($plist,$pname);
 				else {
 					$this->setPortId($pid);
-					$portmode = $this->getSwitchportMode($device);
+					$portmode = $this->getSwitchportMode();
 					if($portmode == 1) {
-						$nvlan = $this->getSwitchTrunkNativeVlan($device);
+						$nvlan = $this->getSwitchTrunkNativeVlan();
 						if(!in_array($pname,$plist) && $vlanFltr == $nvlan)
 							array_push($plist,$pname);
 
-						$vllist = $this->getSwitchportTrunkVlans($device);
+						$vllist = $this->getSwitchportTrunkVlans();
 						if(!in_array($pname,$plist) && in_array($vlanFltr,$vllist))
 							array_push($plist,$pname);
 					}
 					else if($portmode == 2) {
-						$pvlan = $this->getSwitchAccessVLAN($device);
+						$pvlan = $this->getSwitchAccessVLAN();
 						if(!in_array($pname,$plist) && $vlanFltr == $pvlan)
 							array_push($plist,$pname);
 					}
@@ -539,14 +537,13 @@
 			return $plist;
 		}
 
-		public function replaceVlan($device,$oldvlan,$newvlan) {
-			$out = "";
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			if($dip == NULL)
+		public function replaceVlan($oldvlan,$newvlan) {
+			if($this->devip == "")
 				return -1;
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
+			$out = "";
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
 			if(!$community) $community = SNMPConfig::$SNMPReadCommunity;
-			exec("snmpwalk -v 2c -c ".$community." ".$dip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("snmpwalk -v 2c -c ".$community." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {
 				$pdata = explode(" ",$out[$i]);
@@ -556,13 +553,13 @@
 					continue;
 				$pid = $pid[1];
 				$this->setPortId($pid);
-				$portmode = $this->getSwitchportMode($device);
+				$portmode = $this->getSwitchportMode();
 				if($portmode == 1) {
-					$nvlan = $this->getSwitchTrunkNativeVlan($device);
+					$nvlan = $this->getSwitchTrunkNativeVlan();
 					if($oldvlan == $nvlan)
 						$this->setSwitchTrunkNativeVlanWithPID($device,$pid,$newvlan);
 
-					$vllist = $this->getSwitchportTrunkVlans($device);
+					$vllist = $this->getSwitchportTrunkVlans();
 					if(in_array($oldvlan,$vllist)) {
 						$vllist2 = array();
 						$countvl = count($vllist);
@@ -575,7 +572,7 @@
 					}
 				}
 				else if($portmode == 2) {
-					$pvlan = $this->getSwitchAccessVLAN($device);
+					$pvlan = $this->getSwitchAccessVLAN();
 					if($oldvlan == $pvlan)
 						$this->setSwitchAccessVLANWithPID($device,$pid,$newvlan);
 				}
@@ -583,29 +580,31 @@
 		}
 		
 		// Saving running-config => startup-config
-		public function writeMemory($device) {
+		public function writeMemory() {
+			if($this->devip == "")
+				return -1;
 			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpget($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 			return $rand;
 		}
 
-		public function restoreStartupConfig($device) {
+		public function restoreStartupConfig() {
+			if($this->devip == "")
+				return -1;
 			$rand = rand(1,100);
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
+			$community = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
 			if(!$community) $community = SNMPConfig::$SNMPWriteCommunity;
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","4");
-			snmpset($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			snmpget($dip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","4");
+			snmpset($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
+			snmpget($this->devip,$community,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);
 			return $rand;
 		}
 
@@ -782,11 +781,11 @@
 		*/
 
 		public function getPortSecStatus($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.315.1.2.1.1.2");
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.2");
                 }
 
 		public function getPortSecEnable($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.315.1.2.1.1.1");
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.1");
                 }
 
 		public function setPortSecEnableWithPID($device,$pid,$value) {
@@ -797,7 +796,7 @@
                 }
 
 		public function getPortSecViolAct($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.315.1.2.1.1.8");
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.8");
                 }
 
 		public function setPortSecViolActWithPID($device,$pid,$value) {
@@ -808,7 +807,7 @@
                 }
 
 		public function getPortSecMaxMAC($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.315.1.2.1.1.3");
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.3");
                 }
 
 		public function setPortSecMaxMACWithPID($device,$pid,$value) {
@@ -823,7 +822,7 @@
 		*/
 
 		public function getPortCDPEnable($device) {
-                         return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.23.1.1.1.1.2");
+                         return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2");
                 }
 
 		public function setPortCDPEnableWithPID($device,$pid,$value) {
@@ -838,7 +837,7 @@
 		*/
 
 		public function getPortDHCPSnoopingTrust($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.380.1.3.1.1.1");
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.1.1.1");
 		}
 
 		public function setPortDHCPSnoopingTrust($device,$pid,$value) {
@@ -849,7 +848,7 @@
 		}
 
 		public function getPortDHCPSnoopingRate($device) {
-                        return $this->getFieldForPortWithPID($device,"1.3.6.1.4.1.9.9.380.1.3.2.1.1");
+                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.2.1.1");
 		}
 
 		public function setPortDHCPSnoopingRate($device,$pid,$value) {
