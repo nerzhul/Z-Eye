@@ -29,15 +29,19 @@
 		* Generic port management
 		*/
 
-		public function setPortDescWithPID($device,$pid,$value) {
+		public function setPortDesc($value) {
 			return NULL;
 		}
 
-		public function setPortStateWithPID($device,$pid,$value) {
+		public function getPortDesc() {
 			return NULL;
 		}
 
-		public function getPortState($device) {
+		public function setPortState($value) {
+			return NULL;
+		}
+
+		public function getPortState() {
 			return NULL;
 		}
 
@@ -45,23 +49,23 @@
 		* Link Management
 		*/
 
-		public function getPortMtu($device) {
+		public function getPortMtu() {
 			return NULL;
                 }
 
-		public function setPortDuplexWithPID($device,$pid,$value) {
+		public function setPortDuplex($value) {
 			return NULL;
 		}
 
-		public function getPortDuplex($device) {
+		public function getPortDuplex() {
 			return NULL;
 		}
 
-		public function setPortSpeedWithPID($device,$pid,$value) {
+		public function setPortSpeed($value) {
 			return NULL;
 		}
 
-		public function getPortSpeed($device) {
+		public function getPortSpeed() {
 			return NULL;
 		}
 
@@ -69,113 +73,113 @@
 		* VLAN management
 		*/
 
-		public function setSwitchAccessVLANWithPID($device,$pid,$value) {
+		public function setSwitchAccessVLAN($value) {
 			return NULL;
 		}	
 
-		public function getSwitchAccessVLAN($device) {
+		public function getSwitchAccessVLAN() {
 			return NULL;
                 }
 
-		public function setSwitchportMABEnableWithPID($device,$pid,$value) {
+		public function setSwitchportMABEnable($value) {
 			return NULL;
 		}
 
-		public function getSwitchportMABState($device) {
+		public function getSwitchportMABState() {
 			return NULL;
 		}
 
-		public function setSwitchMABTypeWithPID($device,$pid,$value) {
+		public function setSwitchMABType($value) {
 			return NULL;
 		}
 
-		public function getSwitchportMABType($device) {
+		public function getSwitchportMABType() {
 			return NULL;
 		}
 
-		public function setSwitchportAuthFailVLAN($device,$pid,$value) {
+		public function setSwitchportAuthFailVLAN($value) {
 			return NULL;
                 }
 
-                public function getSwitchportAuthFailVLAN($device) {
+                public function getSwitchportAuthFailVLAN() {
 			return NULL;
                 }
 
-		public function setSwitchportAuthNoRespVLAN($device,$pid,$value) {
+		public function setSwitchportAuthNoRespVLAN($value) {
 			return NULL;
                 }
 
-                public function getSwitchportAuthNoRespVLAN($device) {
+                public function getSwitchportAuthNoRespVLAN() {
 			return NULL;
                 }
 
-		public function setSwitchportAuthDeadVLAN($device,$pid,$value) {
+		public function setSwitchportAuthDeadVLAN($value) {
 			return NULL;
                 }
 
-                public function getSwitchportAuthDeadVLAN($device) {
+                public function getSwitchportAuthDeadVLAN() {
 			return NULL;
                 }
 
 		// authentication port-control 1,2,3
-		public function setSwitchportControlMode($device,$pid,$value) {
+		public function setSwitchportControlMode($value) {
 			return NULL;
                 }
 
-                public function getSwitchportControlMode($device) {
+                public function getSwitchportControlMode() {
 			return NULL;
                 }
 
 		// authentication host-mode
-		public function setSwitchportAuthHostMode($device,$pid,$value) {
+		public function setSwitchportAuthHostMode($value) {
 			return NULL;
 		}
 
-		public function getSwitchportAuthHostMode($device) {
+		public function getSwitchportAuthHostMode() {
 			return NULL;
 		}
 
-		public function setSwitchTrunkNativeVlanWithPID($device,$pid,$value) {
+		public function setSwitchTrunkNativeVlan($value) {
 			return NULL;
 		}
 
-		public function getSwitchTrunkNativeVlan($device) {
+		public function getSwitchTrunkNativeVlan() {
 			return NULL;
 		}
 
-		public function setSwitchTrunkVlanWithPID($device,$pid,$values) {
+		public function setSwitchTrunkVlan($values) {
 			return NULL;
 		}
 
-		public function setSwitchNoTrunkVlanWithPID($device,$pid) {
+		public function setSwitchNoTrunkVlan() {
 			return NULL;
 		}
 
-		public function getSwitchportTrunkVlans($device) {
+		public function getSwitchportTrunkVlans() {
 			return NULL;
 		}
 
-		public function setSwitchTrunkEncapWithPID($device,$pid,$value) {
+		public function setSwitchTrunkEncap($value) {
 			return NULL;
 		}
 
-		public function getSwitchTrunkEncap($device) {
+		public function getSwitchTrunkEncap() {
 			return NULL;
 		}
 
-		public function setSwitchportModeWithPID($device, $pid, $value) {
+		public function setSwitchportMode($value) {
 			return NULL;
 		}
 
-		public function getSwitchportMode($device) {
+		public function getSwitchportMode() {
 			return NULL;
 		}
 
-		public function setSwitchportVoiceVlanWithPID($device, $pid, $value) {
+		public function setSwitchportVoiceVlan($value) {
 			return NULL;
 		}
 
-		public function getSwitchportVoiceVlan($device) {
+		public function getSwitchportVoiceVlan() {
 			return NULL;
 		}
 
@@ -183,19 +187,19 @@
 		* Generic public functions
 		*/
 
-		public function setFieldForPortWithPID($device, $pid, $field, $vtype, $value) {
+		public function setFieldForPortWithPID($field, $vtype, $value) {
 			return NULL;
 		}
 
-		public function getFieldForPortWithPID($device, $field, $raw = false) {
+		public function getFieldForPortWithPID($field, $raw = false) {
 			return NULL;
 		}
 
-		public function getPortId($device,$portname) {
+		public function getPortId($portname) {
 			return NULL;
 		}
 
-		public function getPortIndexes($device,$pid) {
+		public function getPortIndexes() {
 			return NULL;
 		}
 
@@ -221,75 +225,31 @@
 		}
 
 		// Save startup-config to TFTP Server
-		public function exportConfigToTFTP($device,$server,$path) {
+		public function exportConfigToTFTP($server,$path) {
 			return NULL;
 		}
 
 		// Restore startup-config to TFTP Server
-		public function importConfigFromTFTP($device,$server,$path) {
+		public function importConfigFromTFTP($server,$path) {
 			return NULL;
 		}
 
 		// Save startup-config to FTP/SCP/SFTP Server
-		public function exportConfigToAuthServer($device,$server,$type,$path,$user,$pwd) {
+		public function exportConfigToAuthServer($server,$type,$path,$user,$pwd) {
 			return NULL;
 		}
 
 		// Restore startup-config to FTP/SCP/SFTP Server
-		public function importConfigFromAuthServer($device,$server,$type,$path,$user,$pwd) {
+		public function importConfigFromAuthServer($server,$type,$path,$user,$pwd) {
 			return NULL;
 		}
 
 		// Get Copy state from switch, using previous randomized id
-		public function getCopyState($device,$copyId) {
+		public function getCopyState($copyId) {
 			return NULL;
 		}
 
-		public function getCopyError($device,$copyId) {
-			return NULL;
-		}
-
-		/*
-		* helpers
-		*/
-
-		public function setPortState($device,$portname,$value) {
-			return NULL;
-		}
-
-		public function setPortDesc($device,$portname,$value) {
-			return NULL;
-		}
-
-		public function getPortDesc($device,$portname) {
-			return NULL;
-		}
-
-		public function setSwitchportMode($device, $portname, $value) {
-			return NULL;
-		}
-
-		public function setSwitchNoTrunkVlan($device,$portname) {
-			return NULL;
-		}
-
-		public function setSwitchTrunkNativeVlan($device,$portname,$value) {
-			return NULL;
-		}
-
-		public function setSwitchTrunkVlan($device,$portname,$values) {
-			return NULL;
-		}
-
-		public function setSwitchAccessVLAN($device,$portname,$value) {
-			return NULL;
-		}
-
-		public function getSwitchAccessVLAN($device,$portname,$value) {
-			return NULL;
-		}
-
-		public function setSwitchTrunkEncap($device,$portname,$value) {
+		public function getCopyError($copyId) {
 			return NULL;
 		}
 
@@ -297,31 +257,31 @@
 		* Port Security
 		*/
 
-		public function getPortSecStatus($device) {
+		public function getPortSecStatus() {
 			return NULL;
                 }
 
-		public function getPortSecEnable($device) {
+		public function getPortSecEnable() {
 			return -1;
                 }
 
-		public function setPortSecEnableWithPID($device,$pid,$value) {
+		public function setPortSecEnable($value) {
 			return NULL;
                 }
 
-		public function getPortSecViolAct($device) {
+		public function getPortSecViolAct() {
 			return NULL;
                 }
 
-		public function setPortSecViolActWithPID($device,$pid,$value) {
+		public function setPortSecViolAct($value) {
 			return NULL;
                 }
 
-		public function getPortSecMaxMAC($device) {
+		public function getPortSecMaxMAC() {
 			return NULL;
                 }
 
-		public function setPortSecMaxMACWithPID($device,$pid,$value) {
+		public function setPortSecMaxMAC($value) {
 			return NULL;
                 }
 
@@ -329,51 +289,51 @@
 		* special
 		*/
 
-		public function getPortCDPEnable($device) {
+		public function getPortCDPEnable() {
 			return NULL;
                 }
 
-		public function setPortCDPEnableWithPID($device,$pid,$value) {
+		public function setPortCDPEnable($value) {
 			return NULL;
                 }
 
-		public function getPortDHCPSnoopingTrust($device) {
+		public function getPortDHCPSnoopingTrust() {
 			return NULL;
 		}
 
-		public function setPortDHCPSnoopingTrust($device,$pid,$value) {
+		public function setPortDHCPSnoopingTrust($value) {
 			return NULL;
 		}
 
-		public function getPortDHCPSnoopingRate($device) {
+		public function getPortDHCPSnoopingRate() {
 			return NULL;
 		}
 
-		public function setPortDHCPSnoopingRate($device,$pid,$value) {
+		public function setPortDHCPSnoopingRate($value) {
 			return NULL;
 		}
 
-		public function getDHCPSnoopingStatus($device) {
+		public function getDHCPSnoopingStatus() {
 			return NULL;
 		}
 
-		public function setDHCPSnoopingStatus($device,$value) {
+		public function setDHCPSnoopingStatus($value) {
 			return NULL;
 		}
 
-		public function getDHCPSnoopingOpt82($device) {
+		public function getDHCPSnoopingOpt82() {
 			return NULL;
 		}
 
-		public function setDHCPSnoopingOpt82($device,$value) {
+		public function setDHCPSnoopingOpt82($value) {
 			return NULL;
 		}
 
-		public function getDHCPSnoopingMatchMAC($device) {
+		public function getDHCPSnoopingMatchMAC() {
 			return NULL;
 		}
 
-		public function setDHCPSnoopingMatchMAC($device) {
+		public function setDHCPSnoopingMatchMAC() {
 			return NULL;
 		}
 
@@ -381,24 +341,15 @@
 			return NULL;
 		}
 
-		public function setDHCPSnoopingVlans($device,$vlans) {
+		public function setDHCPSnoopingVlans($vlans) {
 			return NULL;
 		}
 
-		public function setDHCPSnoopingOnVlan($device,$vlan,$value) {
+		public function setDHCPSnoopingOnVlan($vlan,$value) {
 			return NULL;
 		}
 
-		public function setFieldForPort($device, $portname, $field, $vtype, $value) {
-			return NULL;
-		}
-
-		public function getFieldForPort($device, $portname, $field) {
-			return NULL;
-		}
-
-
-		public function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
+		public function connectToDevice($sshuser,$sshpwd,$enablepwd) {
 			return NULL;
 		}
 

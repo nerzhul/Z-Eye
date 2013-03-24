@@ -113,7 +113,7 @@
 			} else {
 				$this->devapi->setDevice($device);
 				// Get Port ID
-				$portid = $this->devapi->getPortId($device,$port);
+				$portid = $this->devapi->getPortId($port);
 				$this->devapi->setPortId($portid);
 				// Port modification
 				if(!$sh || $sh == 1) {
@@ -464,7 +464,8 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
 			$od = FS::$secMgr->checkAndSecuriseGetData("od");
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
-			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+			$this->devapi->setDevice($device);
+			$dip = $this->devapi->getDeviceIP();
 			if($od == NULL) $od = "port";
 			else if($od == "desc" || $od == "name") $od = "name";
 			else if($od != "vlan" && $od != "prise" && $od != "port") $od = "port";
@@ -951,9 +952,9 @@
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_dhcpsnmgmt")) { 
 						$output .= FS::$iMgr->h3("title-dhcpsnooping");
 						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=24",array("id" => "dhcpsnfrm"));
-						$enable = $this->devapi->getDHCPSnoopingStatus($device);
-						$opt82 = $this->devapi->getDHCPSnoopingOpt82($device);
-						$match = $this->devapi->getDHCPSnoopingMatchMAC($device);
+						$enable = $this->devapi->getDHCPSnoopingStatus();
+						$opt82 = $this->devapi->getDHCPSnoopingOpt82();
+						$match = $this->devapi->getDHCPSnoopingMatchMAC();
 						$output .= $this->loc->s("Enable")." ".FS::$iMgr->check("enable",array("tooltip" => "tooltip-dhcpsnoopingen", "check" => $enable == 1))."<br />";
 						$output .= $this->loc->s("Use-DHCP-opt-82")." ".FS::$iMgr->check("opt82",array("tooltip" => "tooltip-dhcpsnoopingopt", "check" => $opt82 == 1))."<br />";
 						$output .= $this->loc->s("Match-MAC-addr")." ".FS::$iMgr->check("matchmac",array("tooltip" => "tooltip-dhcpsnoopingmatch", "check" => $match == 1))."<br />";
@@ -963,7 +964,7 @@
 						while($data = FS::$dbMgr->Fetch($query))
 							$vlanlist[$data["vlan"]] = $data["description"];
 
-						$dhcpsnvlanlist = $this->devapi->getDHCPSnoopingVlans($device);
+						$dhcpsnvlanlist = $this->devapi->getDHCPSnoopingVlans();
 						if($dhcpsnvlanlist && is_array($dhcpsnvlanlist)) {
 							$output .= $this->loc->s("Apply-VLAN").": <br />";
 							$output .= FS::$iMgr->select("vlansnooping[]","",NULL,true,array("tooltip" => "tooltip-dhcpsnoopingvlan", "size" => count($dhcpsnvlanlist)/4));
@@ -1596,7 +1597,7 @@
 							return;	
 						}
 						if(FS::$dbMgr->GetOneData("device_port","up","ip = '".$sw."' AND port = '".$port."'") != NULL) {
-							if($this->devapi->setPortDesc($sw,$port,$desc) == 0) {
+							if($this->devapi->setPortDesc($desc) == 0) {
 								echo $desc;
 								if($save == "true")
 									$this->devapi->writeMemory();
@@ -1628,7 +1629,7 @@
 							return;	
 						}
 						if(FS::$dbMgr->GetOneData("device_port","type","ip = '".$sw."' AND port = '".$port."'") != NULL) {
-							if($this->setPortDuplex($sw,$port,$dup) == 0) {
+							if($this->setPortDuplex($dup) == 0) {
 								if($save == "true")
 									$this->devapi->writeMemory();
 
@@ -1679,7 +1680,7 @@
 							echo $this->loc->s("err-no-credentials");
 							return;	
 						}
-						$pid = $this->devapi->getPortId($sw,$port);
+						$pid = $this->devapi->getPortId($port);
 						if($pid == -1) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"PID is incorrect (plug edit)");
 							if(FS::isAjaxCall())
@@ -1692,7 +1693,7 @@
 	
 						$logoutput = "Modify port '".$port."' on device '".$sw."'";
 						$logvals = array();
-						$idx = $this->devapi->getPortIndexes($sw,$pid);
+						$idx = $this->devapi->getPortIndexes();
 	
 						if($duplex && FS::$secMgr->isNumeric($duplex)) {
 							if($duplex < 1 || $duplex > 4) {
@@ -1706,7 +1707,7 @@
 	
 							if($idx != NULL) {
 								$logvals["duplex"]["src"] = $this->devapi->getPortDuplex();
-								$this->devapi->setPortDuplexWithPid($sw,$idx[0].".".$idx[1],$duplex);
+								$this->devapi->setPortDuplex($duplex);
 								$logvals["duplex"]["dst"] = $duplex;
 							}
 						}
@@ -1714,7 +1715,7 @@
 						if($speed && FS::$secMgr->isNumeric($speed)) {
 							if($idx != NULL) {
 								$logvals["speed"]["src"] = $this->devapi->getPortSpeed();
-								$this->devapi->setPortSpeedWithPid($sw,$idx[0].".".$idx[1],$speed);
+								$this->devapi->setPortSpeed($speed);
 								$logvals["speed"]["dst"] = $speed;
 							}
 						}
@@ -1748,97 +1749,97 @@
 						if($trunk == 1) {
 							$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
 	
-							$this->devapi->setSwitchAccessVLANWithPID($sw,$pid,1);
+							$this->devapi->setSwitchAccessVLAN(1);
 							$logvals["accessvlan"]["dst"] = 1;
 							// mab disable
 							if($mabst != -1) {
-								$this->devapi->setSwitchportMABEnableWithPID($sw,$pid,2);
+								$this->devapi->setSwitchportMABEnable(2);
 								$logvals["mabst"]["dst"] = 2;
 							}
 							if($failvlan != -1) {
-								$this->devapi->setSwitchportAuthFailVLAN($sw,$pid,0);
+								$this->devapi->setSwitchportAuthFailVLAN(0);
 								$logvals["failvlan"]["dst"] = 0;
 							}
 							if($norespvlan != -1) {
-								$this->devapi->setSwitchportAuthNoRespVLAN($sw,$pid,0);
+								$this->devapi->setSwitchportAuthNoRespVLAN(0);
 								$logvals["norespvlan"]["dst"] = 0;
 							}
 							if($deadvlan != -1) {
-								$this->devapi->setSwitchportAuthDeadVLAN($sw,$pid,0);
+								$this->devapi->setSwitchportAuthDeadVLAN(0);
 								$logvals["deadvlan"]["dst"] = 0;
 							}
 							if($controlmode != -1) {
-								$this->devapi->setSwitchportControlMode($sw,$pid,3);
+								$this->devapi->setSwitchportControlMode(3);
 								$logvals["controlmode"]["dst"] = 3;
 							}
 							// dot1x disable
 							if($authhostmode != -1) {
-								$this->devapi->setSwitchportAuthHostMode($sw,$pid,1);
+								$this->devapi->setSwitchportAuthHostMode(1);
 								$logvals["authhostmode"]["dst"] = 1;
 							}
 	
 							// set settings
-							if($this->devapi->setSwitchTrunkEncapWithPID($sw,$pid,4) != 0) {
+							if($this->devapi->setSwitchTrunkEncap(4) != 0) {
 								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 							}
 							$logvals["trunkencap"]["dst"] = 4;
-							if($this->devapi->setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
+							if($this->devapi->setSwitchportMode($trunk) != 0) {
 								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 							}
 							$logvals["mode"]["dst"] = $trunk;
 							if(in_array("all",$vlanlist)) {
-								if($this->devapi->setSwitchNoTrunkVlanWithPID($sw,$pid) != 0) {
+								if($this->devapi->setSwitchNoTrunkVlan() != 0) {
 									FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 									return;
 								}
 							}
 							else {
-								if($this->devapi->setSwitchTrunkVlanWithPID($sw,$pid,$vlanlist) != 0) {
+								if($this->devapi->setSwitchTrunkVlan($vlanlist) != 0) {
 									FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 									return;
 								}
 							}
 							$logvals["trunkvlan"]["dst"] = $vlanlist;
-							if($this->devapi->setSwitchTrunkNativeVlanWithPID($sw,$pid,$nvlan) != 0) {
+							if($this->devapi->setSwitchTrunkNativeVlan($nvlan) != 0) {
 								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
 								return;
 							}
 							$logvals["nativevlan"]["dst"] = $nvlan;
 						} else if($trunk == 2) {
-							$this->devapi->setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
+							$this->devapi->setSwitchTrunkNativeVlan(1);
 							$logvals["nativevlan"]["dst"] = 1;
-							$this->devapi->setSwitchNoTrunkVlanWithPID($sw,$pid);
+							$this->devapi->setSwitchNoTrunkVlan();
 							$logvals["trunkvlan"]["dst"] = "";
 							// mab disable
 							if($mabst != -1) {
-								$this->devapi->setSwitchportMABEnableWithPID($sw,$pid,2);
+								$this->devapi->setSwitchportMABEnable(2);
 								$logvals["mabst"]["dst"] = 2;
 							}
 							if($failvlan != -1) {
-								$this->devapi->setSwitchportAuthFailVLAN($sw,$pid,0);
+								$this->devapi->setSwitchportAuthFailVLAN(0);
 								$logvals["failvlan"]["dst"] = 0;
 							}
 							if($norespvlan != -1) {
-								$this->devapi->setSwitchportAuthNoRespVLAN($sw,$pid,0);
+								$this->devapi->setSwitchportAuthNoRespVLAN(0);
 								$logvals["norespvlan"]["dst"] = 0;
 							}
 							if($deadvlan != -1) {
-								$this->devapi->setSwitchportAuthDeadVLAN($sw,$pid,0);
+								$this->devapi->setSwitchportAuthDeadVLAN(0);
 								$logvals["deadvlan"]["dst"] = 0;
 							}
 							if($controlmode != -1) {
-								$this->devapi->setSwitchportControlMode($sw,$pid,3);
+								$this->devapi->setSwitchportControlMode(3);
 								$logvals["controlmode"]["dst"] = 3;
 							}
 							// dot1x disable
 							if($authhostmode != -1) {
-								$this->devapi->setSwitchportAuthHostMode($sw,$pid,1);
+								$this->devapi->setSwitchportAuthHostMode(1);
 								$logvals["authhostmode"]["dst"] = 1;
 							}
 							// set settings
-							if($this->devapi->setSwitchportModeWithPID($sw,$pid,$trunk) != 0) {
+							if($this->devapi->setSwitchportMode($trunk) != 0) {
 									if(FS::isAjaxCall())
 										echo "Fail to set Switchport mode";
 									else
@@ -1846,7 +1847,7 @@
 									return;
 							}
 							$logvals["mode"]["dst"] = $trunk;
-							if($this->devapi->setSwitchTrunkEncapWithPID($sw,$pid,5) != 0) {
+							if($this->devapi->setSwitchTrunkEncap(5) != 0) {
 								if(FS::isAjaxCall())
 									echo "Fail to set Switchport Trunk encapsulated VLANs";
 								else
@@ -1854,7 +1855,7 @@
 								return;
 							}
 							$logvals["trunkencap"]["dst"] = 5;
-							if($this->devapi->setSwitchAccessVLANWithPID($sw,$pid,$nvlan) != 0) {
+							if($this->devapi->setSwitchAccessVLAN($nvlan) != 0) {
 								if(FS::isAjaxCall())
 									echo "Fail to set Switchport Access Vlan";
 								else
@@ -1876,55 +1877,55 @@
 								return;
 							}
 							// switchport mode access & no vlan assigned
-							$this->devapi->setSwitchTrunkNativeVlanWithPID($sw,$pid,1);
+							$this->devapi->setSwitchTrunkNativeVlan(1);
 							$logvals["nativevlan"]["dst"] = 1;
-							$this->devapi->setSwitchNoTrunkVlanWithPID($sw,$pid);
+							$this->devapi->setSwitchNoTrunkVlan();
 							$logvals["trunkvlan"]["dst"] = "";
-							$this->devapi->setSwitchportModeWithPID($sw,$pid,2);
+							$this->devapi->setSwitchportMode(2);
 							$logvals["mode"]["dst"] = 2;
-							$this->devapi->setSwitchTrunkEncapWithPID($sw,$pid,5);
+							$this->devapi->setSwitchTrunkEncap(5);
 							$logvals["trunkencap"]["dst"] = 5;
-							$this->devapi->setSwitchAccessVLANWithPID($sw,$pid,1);
+							$this->devapi->setSwitchAccessVLAN(1);
 							$logvals["accessvlan"]["dst"] = 1;
 	
 							// enable mab
 							if($mabst != -1) {
-								$this->devapi->setSwitchportMABEnableWithPID($sw,$pid,1);
+								$this->devapi->setSwitchportMABEnable(1);
 								$logvals["mabst"]["dst"] = 1;
 							}
 							$mabtype = $this->devapi->getSwitchportMABType();
 							if($mabtype != -1) {
 								$logvals["mabtype"]["src"] = $mabtype;
 								// set MAB to EAP or not
-								$this->devapi->setSwitchMABTypeWithPID($sw,$pid,$mabeap == "on" ? 2 : 1);
+								$this->devapi->setSwitchMABType($mabeap == "on" ? 2 : 1);
 								$logvals["mabtype"]["dst"] = ($mabeap == "on" ? 2 : 1);
 							}
 							if($failvlan != -1) {
 								// enable authfail & noresp vlans
-								$this->devapi->setSwitchportAuthFailVLAN($sw,$pid,$nvlan);
+								$this->devapi->setSwitchportAuthFailVLAN($nvlan);
 								$logvals["failvlan"]["dst"] = $nvlan;
 							}
 							if($norespvlan != -1) {
-								$this->devapi->setSwitchportAuthNoRespVLAN($sw,$pid,$noresp);
+								$this->devapi->setSwitchportAuthNoRespVLAN($noresp);
 								$logvals["norespvlan"]["dst"] = $noresp;
 							}
 							if($deadvlan != -1) {
-								$this->devapi->setSwitchportAuthDeadVLAN($sw,$pid,$dead);
+								$this->devapi->setSwitchportAuthDeadVLAN($dead);
 								$logvals["deadvlan"]["dst"] = $dead;
 							}
 							if($controlmode != -1) {
 								// authentication port-control auto
-								$this->devapi->setSwitchportControlMode($sw,$pid,2);
+								$this->devapi->setSwitchportControlMode(2);
 								$logvals["controlmode"]["dst"] = 2;
 							}
 							// Host Mode for Authentication
 							if($authhostmode != -1) {
-								$this->devapi->setSwitchportAuthHostMode($sw,$pid,$dot1xhostmode);
+								$this->devapi->setSwitchportAuthHostMode($dot1xhostmode);
 								$logvals["authhostmode"]["dst"] = $dot1xhostmode;
 							}
 						}
 						$logvals["hostmode"]["src"] = $this->devapi->getPortState();
-						if($this->devapi->setPortStateWithPID($sw,$pid,($shut == "on" ? 2 : 1)) != 0) {
+						if($this->devapi->setPortState($shut == "on" ? 2 : 1) != 0) {
 							if(FS::isAjaxCall())
 								echo "Fail to set switchport shut/no shut state";
 							else
@@ -1933,7 +1934,7 @@
 						}
 						$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
 						$logvals["voicevlan"]["src"] = $this->devapi->getSwitchportVoiceVlan();
-						if($this->devapi->setSwitchportVoiceVlanWithPID($sw,$pid,$voicevlan) != 0) {
+						if($this->devapi->setSwitchportVoiceVlan($voicevlan) != 0) {
 							if(FS::isAjaxCall())
 								echo "Fail to set switchport voice vlan";
 							else
@@ -1943,8 +1944,8 @@
 						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_voicevlan") ||
 							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_voicevlan")) {
 							$logvals["voicevlan"]["dst"] = $voicevlan;
-							$logvals["desc"]["src"] = $this->devapi->getPortDesc($sw,$pid);
-							$this->devapi->setPortDescWithPID($sw,$pid,$desc);
+							$logvals["desc"]["src"] = $this->devapi->getPortDesc();
+							$this->devapi->setPortDesc($desc);
 							$logvals["desc"]["dst"] = $desc;
 						}
 
@@ -1953,7 +1954,7 @@
 							$cdpstate = $this->devapi->getPortCDPEnable();
 							if($cdpstate != NULL) {
 								$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
-								$this->devapi->setPortCDPEnableWithPID($sw,$pid,$cdpen == "on" ? 1 : 2);
+								$this->devapi->setPortCDPEnable($cdpen == "on" ? 1 : 2);
 								$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
 							}
 						}
@@ -1963,14 +1964,14 @@
 							$dhcpsntruststate = $this->devapi->getPortDHCPSnoopingTrust();
 							if($dhcpsntruststate != NULL) {
 								$logvals["dhcpsntrusten"]["src"] = ($dhcpsntruststate == 1 ? true : false);
-								$this->devapi->setPortDHCPSnoopingTrust($sw,$pid,$dhcpsntrusten == "on" ? 1 : 2);
+								$this->devapi->setPortDHCPSnoopingTrust($dhcpsntrusten == "on" ? 1 : 2);
 								$logvals["dhcpsntrusten"]["dst"] = ($dhcpsntrusten == "on" ? true : false);
 							}
 		
 							$dhcpsnrateorig = $this->devapi->getPortDHCPSnoopingRate();
 							if($dhcpsnrateorig != NULL) {
 								$logvals["dhcpsnrate"]["src"] = $dhcpsnrateorig;
-								$this->devapi->setPortDHCPSnoopingRate($sw,$pid,$dhcpsnrate);
+								$this->devapi->setPortDHCPSnoopingRate($dhcpsnrate);
 								$logvals["dhcpsnrate"]["dst"] = $dhcpsnrate;
 							}
 						}
@@ -1981,19 +1982,19 @@
 							if($portsecen != -1) {
 								$psen = FS::$secMgr->checkAndSecurisePostData("psen");
 								$logvals["psen"]["src"] = ($portsecen == 1 ? true : false);
-								$this->devapi->setPortSecEnableWithPID($sw,$pid,$psen == "on" ? 1 : 2);
+								$this->devapi->setPortSecEnable($psen == "on" ? 1 : 2);
 								$logvals["psen"]["dst"] = ($psen == "on" ? true : false);
 	
 								$portsecvact = $this->devapi->getPortSecViolAct();
 								$psviolact = FS::$secMgr->checkAndSecurisePostData("psviolact");
 								$logvals["psviolact"]["src"] = $portsecvact;
-								$this->devapi->setPortSecViolActWithPID($sw,$pid,$psviolact);
+								$this->devapi->setPortSecViolAct($psviolact);
 								$logvals["psviolact"]["dst"] = $psviolact;
 	
 								$psecmaxmac = $this->devapi->getPortSecMaxMAC();
 								$psmaxmac = FS::$secMgr->checkAndSecurisePostData("psmaxmac");
 								$logvals["psmaxmac"]["src"] = $psecmaxmac;
-								$this->devapi->setPortSecMaxMACWithPID($sw,$pid,$psmaxmac);
+								$this->devapi->setPortSecMaxMAC($psmaxmac);
 								$logvals["psmaxmac"]["dst"] = $psmaxmac;
 							}
 						}
@@ -2176,7 +2177,7 @@
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 							return;	
 						}
-						echo $this->devapi->getCopyState($device,$saveid);
+						echo $this->devapi->getCopyState($saveid);
 						return;
 					case 14:
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
@@ -2193,7 +2194,7 @@
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 							return;	
 						}
-						$err = $this->devapi->getCopyError($device,$saveid);
+						$err = $this->devapi->getCopyError($saveid);
 						switch($err) {
 							case 2: echo $this->loc->s("err-transfer-right"); break;
 							case 3: echo $this->loc->s("err-transfer-timeout"); break;
@@ -2412,20 +2413,21 @@
 								
 							$query2 = FS::$dbMgr->Select("device","ip,name");
 							while($data2 = FS::$dbMgr->Fetch($query2)) {
+								$this->devapi->setDevice($data2["name"]);
 								if($data["type"] == 1)
-									$copyId = $this->devapi->exportConfigToTFTP($data2["name"],$data["addr"],$data["path"]."conf-".$data2["name"]);
+									$copyId = $this->devapi->exportConfigToTFTP($data["addr"],$data["path"]."conf-".$data2["name"]);
 								else if($data["type"] == 2 || $data["type"] == 4 || $data["type"] == 5)
-									$copyId = $this->devapi->exportConfigToAuthServer($data2["name"],$data["addr"],$data["type"],$data["path"]."conf-".$data2["name"],$data["login"],$data["pwd"]);
+									$copyId = $this->devapi->exportConfigToAuthServer($data["addr"],$data["type"],$data["path"]."conf-".$data2["name"],$data["login"],$data["pwd"]);
 								
 								sleep(1);
-								$copyState = $this->devapi->getCopyState($data2["name"],$copyId);
+								$copyState = $this->devapi->getCopyState($copyId);
 								while($copyState == 2) {
 									sleep(1);
-									$copyState = $this->devapi->getCopyState($data2["name"],$copyId);
+									$copyState = $this->devapi->getCopyState($copyId);
 								}
 								
 								if($copyState == 4) {
-									$copyErr = $this->devapi->getCopyError($data2["name"],$copyId);
+									$copyErr = $this->devapi->getCopyError($copyId);
 									$output .= "Backup fail for device ".$data2["name"]." (reason: ";
 									switch($copyErr) {
 										case 2: $output .= "bad filename/path/rights"; break;
@@ -2588,7 +2590,7 @@
 							return;
 						}
 
-						$vlanlist = $this->devapi->getDHCPSnoopingVlans($device);
+						$vlanlist = $this->devapi->getDHCPSnoopingVlans();
 						foreach($vlanlist as $vlan => $value)
 							$vlanlist[$vlan] = 2;
 						$count = count($vlans);
@@ -2600,10 +2602,10 @@
 							$vlanlist[$vlans[$i]] = 1;
 						}
 								
-						$this->devapi->setDHCPSnoopingStatus($device,$enable == "on" ? 1 : 2);
-						$this->devapi->setDHCPSnoopingOpt82($device,$opt82 == "on" ? 1 : 2);
-						$this->devapi->setDHCPSnoopingMatchMAC($device,$matchmac == "on" ? 1 : 2);
-						$this->devapi->setDHCPSnoopingVlans($device,$vlanlist);
+						$this->devapi->setDHCPSnoopingStatus($enable == "on" ? 1 : 2);
+						$this->devapi->setDHCPSnoopingOpt82($opt82 == "on" ? 1 : 2);
+						$this->devapi->setDHCPSnoopingMatchMAC($matchmac == "on" ? 1 : 2);
+						$this->devapi->setDHCPSnoopingVlans($vlanlist);
 
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4");
 						return;
