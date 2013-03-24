@@ -79,7 +79,7 @@
 			return 0;
 		}
 
-		public function getFieldForPortWithPID($device, $pid, $field, $raw false) {
+		public function getFieldForPortWithPID($device, $pid, $field, $raw = false) {
 			if($device == "" || $field == "" || $pid == "" /*|| !FS::$secMgr->isNumeric($pid)*/)
 				return -1;
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
