@@ -40,8 +40,8 @@
 			return $this->setFieldForPortWithPID($device,$pid,"ifAdminStatus","i",$value);
 		}
 
-		public function getPortStateWithPID($device,$pid) {
-			$dup = $this->getFieldForPortWithPID($device,$pid,"ifAdminStatus");
+		public function getPortState($device) {
+			$dup = $this->getFieldForPortWithPID($device,"ifAdminStatus");
 			$dup = explode(" ",$dup);
 			if(count($dup) != 2)
 					return -1;
@@ -55,8 +55,8 @@
 		* Link Management
 		*/
 
-		public function getPortMtuWithPID($device,$pid) {
-                        $dup = $this->getFieldForPortWithPID($device,$pid,"ifMtu");
+		public function getPortMtu($device) {
+                        $dup = $this->getFieldForPortWithPID($device,$this->portid,"ifMtu");
                         $dup = explode(" ",$dup);
                         if(count($dup) != 2)
                         	return -1;
@@ -126,18 +126,19 @@
 				if($vlanFltr == NULL || !FS::$secMgr->isNumeric($vlanFltr) || $vlanFltr < 1 || $vlanFltr > 4096)
 					array_push($plist,$pname);
 				else {
-					$portmode = $this->getSwitchportModeWithPID($device,$pid);
+					$this->setPortId($pid);
+					$portmode = $this->getSwitchportMode($device);
 					if($portmode == 1) {
-						$nvlan = $this->getSwitchTrunkNativeVlanWithPID($device,$pid);
+						$nvlan = $this->getSwitchTrunkNativeVlan($device);
 						if(!in_array($pname,$plist) && $vlanFltr == $nvlan)
 							array_push($plist,$pname);
 
-						$vllist = $this->getSwitchportTrunkVlansWithPid($device,$pid);
+						$vllist = $this->getSwitchportTrunkVlans($device);
 						if(!in_array($pname,$plist) && in_array($vlanFltr,$vllist))
 							array_push($plist,$pname);
 					}
 					else if($portmode == 2) {
-						$pvlan = $this->getSwitchAccessVLANWithPID($device,$pid);
+						$pvlan = $this->getSwitchAccessVLANWithPID($device);
 						if(!in_array($pname,$plist) && $vlanFltr == $pvlan)
 							array_push($plist,$pname);
 					}
@@ -176,14 +177,6 @@
 			return -1;
 
 	        	return $this->setSwitchportModeWithPID($device,$pid,$value);
-		}
-
-		public function getSwitchportMode($device, $portname, $value) {
-			$pid = $this->getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-
-	            return $this->getSwitchportModeWithPID($device,$pid,$value);
 		}
 
 		public function setSwitchNoTrunkVlan($device,$portname) {
@@ -225,24 +218,6 @@
 				return -1;
 
 			return $this->setSwitchAccessVLANWithPID($device,$pid,$value);
-		}
-
-		public function getSwitchAccessVLAN($device,$portname,$value) {
-			if(!FS::$secMgr->isNumeric($value))
-				return -1;
-
-			$pid = $this->getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-
-			return $this->getSwitchAccessVLANWithPID($device,$pid);
-		}
-
-		public function getSwitchportTrunkVlans($device,$portname) {
-			$pid = $this->getPortId($device,$portname);
-			if($pid == -1)
-				return -1;
-			return $this->getSwitchportTrunkVlansWithPid($device,$pid);
 		}
 
 		public function setSwitchTrunkEncap($device,$portname,$value) {
