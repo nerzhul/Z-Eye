@@ -351,7 +351,7 @@
 			return NULL;
 		}
 
-		public function connectToDevice($sshuser,$sshpwd,$enablepwd) {
+		public function connectToDevice($server,$sshuser,$sshpwd,$enablepwd) {
 			return NULL;
 		}
 

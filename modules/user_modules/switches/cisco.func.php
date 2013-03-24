@@ -595,7 +595,7 @@
 		// Save startup-config to TFTP Server
 		public function exportConfigToTFTP($server,$path) {
 			if($this->devip == "" || $this->snmprw == "")
-				return -1
+				return -1;
 			$rand = rand(1,100);
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","3");
@@ -609,7 +609,7 @@
 		// Restore startup-config to TFTP Server
 		public function importConfigFromTFTP($server,$path) {
 			if($this->devip == "" || $this->snmprw == "")
-				return -1
+				return -1;
 			$rand = rand(1,100);
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","1");
@@ -623,7 +623,7 @@
 		// Save startup-config to FTP/SCP/SFTP Server
 		public function exportConfigToAuthServer($server,$type,$path,$user,$pwd) {
 			if($this->devip == "" || $this->snmprw == "")
-				return -1
+				return -1;
 			if($type != 2 && $type != 4 && $type != 5)
 				return -1;
 			$rand = rand(1,100);
@@ -641,7 +641,7 @@
 		// Restore startup-config to FTP/SCP/SFTP Server
 		public function importConfigFromAuthServer($server,$type,$path,$user,$pwd) {
 			if($this->devip == "" || $this->snmprw == "")
-				return -1
+				return -1;
 			if($type != 2 && $type != 4 && $type != 5)
 				return -1;
 			$rand = rand(1,100);
@@ -659,7 +659,7 @@
 		// Get Copy state from switch, using previous randomized id
 		public function getCopyState($copyId) {
 			if($this->devip == "" || $this->snmpro == "")
-				return -1
+				return -1;
 			$res = snmpget($this->devip,$this->snmpro,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
 			$res = preg_split("# #",$res);
 			return $res[1];
@@ -667,7 +667,7 @@
 		
 		public function getCopyError($copyId) {
 			if($this->devip == "" || $this->snmpro == "")
-				return -1
+				return -1;
 			$res = snmpget($this->devip,$this->snmpro,"1.3.6.1.4.1.9.9.96.1.1.1.1.13.".$copyId);
 			$res = preg_split("# #",$res);
 			return $res[1];
@@ -878,7 +878,7 @@
 		public function sendSSHCmd($stdio, $cmd) {
 			$output = "";
 			$output_arr = array();
-			$promptfind = true;
+			$promptfind = false;
 
 			fwrite($stdio,$cmd."\n");
 
@@ -886,7 +886,7 @@
 				while($line = fgets($stdio)) {
 					if(preg_match("# --More-- #",$line))
 						fwrite($stdio," ");
-					else if(preg_match("/^(.+)[#]",$line))
+					else if(preg_match("/^(.+)[#]$/",$line))
 						$promptfind = true;
 					else array_push($output_arr,$line);
 				}
