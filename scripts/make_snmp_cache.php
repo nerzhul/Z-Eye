@@ -38,14 +38,18 @@
 			if($foundrw && checkSnmp($data["ip"],$foundrw) == 0)
 				$devrw = $foundrw;
 
-			for($i=0;$i<count($snmpro) && $devro == "";$i++) {
-				if(checkSnmp($data["ip"],$snmpro[$i]) == 0)
-					$devro = $snmpro[$i];
+			if(strlen($devro) == 0) {
+				for($i=0;$i<count($snmpro);$i++) {
+					if(checkSnmp($data["ip"],$snmpro[$i]) == 0)
+						$devro = $snmpro[$i];
+				}
 			}
 
-			for($i=0;$i<count($snmprw) && $devrw == "";$i++) {
-				if(checkSnmp($data["ip"],$snmprw[$i]) == 0)
-					$devrw = $snmprw[$i];
+			if(strlen($devrw) == 0) {
+				for($i=0;$i<count($snmprw);$i++) {
+					if(checkSnmp($data["ip"],$snmprw[$i]) == 0)
+						$devrw = $snmprw[$i];
+				}
 			}
 
 			if(strlen($devro) > 0 || strlen($devrw) > 0)
