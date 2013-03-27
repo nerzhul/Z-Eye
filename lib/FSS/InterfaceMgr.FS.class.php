@@ -132,14 +132,18 @@
 			return "<h4>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h4>";
 		}
 
+		public function js($js) {
+			return "<script type=\"text/javascript\">".$js."</script>";
+		}
+
 		public function label($for,$value,$class = "") {
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
 		private function tooltip($obj,$text) {
-			$output = '<script type="text/javascript">$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($this->cur_module->getLoc()->s($text)).'");
+			$output = $this->js('$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($this->cur_module->getLoc()->s($text)).'");
 			$("#tooltip").fadeIn("fast");}).mouseleave(function(){$("#tooltip").fadeOut("fast",function(){
-			});});</script>';
+			});});');
 			return $output;
 		}
 
@@ -199,20 +203,21 @@
 				$output = FS::$iMgr->hidden($name,(isset($options["value"]) ? $options["value"] : 0));
 			else
 				$output = FS::$iMgr->input($name,(isset($options["value"]) ? $options["value"] : 0));
-			$output .= "<script type=\"text/javascript\">$(function() {
+			$js = "$(function() {
                         	$('#".$slidername."').slider({
 					range: 'min',
 					min: ".$min.",
 					max:".$max.",";
 
-			if(isset($options["value"])) $output .= "value: ".$options["value"].",";
+			if(isset($options["value"])) $js .= "value: ".$options["value"].",";
 
-			$output .= "slide: function(event,ui) { $('#".$name."').val(".(isset($options["valoverride"]) ? $options["valoverride"] : "ui.value").");";
-			if(isset($options["hidden"])) $output .= "$('#".$name."label').html(ui.value);";
-			$output .= "}
+			$js .= "slide: function(event,ui) { $('#".$name."').val(".(isset($options["valoverride"]) ? $options["valoverride"] : "ui.value").");";
+			if(isset($options["hidden"])) $js.= "$('#".$name."label').html(ui.value);";
+			$js.= "}
 				});
-                        });</script>";
-			$output .= "<div id=\"".$slidername."\" ".(isset($options["width"]) ? "style=\"width: ".$options["width"]."\" " : "")."></div>";
+                        });";
+			$output .= $this->js($js).
+				"<div id=\"".$slidername."\" ".(isset($options["width"]) ? "style=\"width: ".$options["width"]."\" " : "")."></div>";
 			if(isset($options["hidden"])) $output .= "<br /><span id=\"".$name."label\">".
 				(isset($options["value"]) ? $options["value"] : 0)."</span> ".$options["hidden"]."<br />";
 			return $output;
@@ -233,11 +238,11 @@
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
                         $output .= "<input type=\"textbox\" value=\"".$def_value."\" name=\"".$name."\" id=\"".$name."\" size=\"20\" />";
-			$output .= "<script type=\"text/javascript\">$('#".$name."').datepicker($.datepicker.regional['fr']);";
-			$output .= "$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
+			$js = "$('#".$name."').datepicker($.datepicker.regional['fr']);
+				$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
 			if($def_value)
-				$output .= "$('#".$name."').datepicker('setDate','".$def_value."');";
-			$output .= "</script>";
+				$js .= "$('#".$name."').datepicker('setDate','".$def_value."');";
+			$output .= $this->js($js);
 			return $output;
 		}
 
@@ -332,11 +337,9 @@
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<progress id=\"".$name."\" value=\"".$value."\" max=\"".$max."\"></progress><span id=\"".$name."val\"></span>";
-			$output .= "<script type=\"text/javascript\">
-				eltBar = document.getElementById(\"".$name."\");
+			$output .= $this->js("eltBar = document.getElementById(\"".$name."\");
 				eltPct = document.getElementById(\"".$name."val\");
-				eltPct.innerHTML = ' ' + Math.floor(eltBar.position * 100) + \"%\";
-				</script>";
+				eltPct.innerHTML = ' ' + Math.floor(eltBar.position * 100) + \"%\";");
 			return $output;
 		}
 
@@ -392,7 +395,7 @@
 		public function imgWithZoom2($path,$title,$id,$bigpath="") {
 			$output = "<a href=\"".(strlen($bigpath) > 0 ? $bigpath : $path)."\" id=\"".$id."\" title=\"".$title."\">"; 
 			$output .= FS::$iMgr->img($path,0,0,"jqzoom-img");
-			$output .= "</a><script type=\"text/javascript\">$('#".$id."').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});</script>";
+			$output .= "</a>".$this->js("$('#".$id."').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});");
 			return $output;
 		}	
 
@@ -405,19 +408,8 @@
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : "")."><a href=\"index.php?".$link."&at=2&sh=".$shid."\">".$label."</a>";
+			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : "")."><a href=\"".$link."&at=2&sh=".$shid."\">".$label."</a>";
 			return $output;
-		}
-
-		public function tabPan($elmts = array(),$cursh) {
-			$output = "<div id=\"contenttabs\"><ul>";
-			$count = count($elmts);
-			for($i=0;$i<$count;$i++)
-				$output .= $this->tabPanElmt($elmts[$i][0],$elmts[$i][1],$elmts[$i][2],$cursh);	
-			$output .= "</ul></div>";
-			$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-                        $output .= "$(anchor.hash).html(\"".$this->cur_module->getLoc()->s("fail-tab")."\");}}});</script>";
-			return ($count > 0 ? $output : "");
 		}
 
 		public function opendiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
@@ -427,11 +419,9 @@
                         $output = "<ul style=\"list-style-type:none;padding:0;\"><li id=\"".$liname."\"><a id=\"".$aname."\" href=\"#\">".$text1."</a>
                        		<a id=\"".$aname."2\" style=\"display:none;\" href=\"#\">".$text2."</a></li></ul>";
                         $output .= "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content."</div>";
-			$output .= "<script type=\"text/javascript\">
-				$(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
+			$output .= $this->js("$(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
 				$(\"#".$aname."2\").click(function(){ $(\"div#".$divname."\").slideUp(\"slow\");});
-				$(\"#".$liname."\").click(function(){ $(\"#".$liname." a\").toggle();});
-				</script>";
+				$(\"#".$liname."\").click(function(){ $(\"#".$liname." a\").toggle();});");
 			return $output;
 		}
 		// Simple methods
