@@ -78,20 +78,17 @@
 				case 3: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 
-			$output .= "<script type=\"text/javascript\">function arangeform() {";
-			$output .= "if(document.getElementsByName('stype')[0].value == 1) {";
-			$output .= "$('#tohide1').hide();";
-			$output .= "$('#tohide2').hide();";
-			$output .= "$('#tohide3').hide();";
-			$output .= "} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {";
-			$output .= "$('#tohide1').show();";
-			$output .= "$('#tohide2').show();";
-			$output .= "$('#tohide3').show();";
-			$output .= "}";
-			$output .= "};</script>";
-
+			$output .= FS::$iMgr->js("function arangeform() {
+				if(document.getElementsByName('stype')[0].value == 1) {
+					$('#tohide1').hide();
+					$('#tohide2').hide();
+					$('#tohide3').hide();
+				} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {
+					$('#tohide1').show();
+					$('#tohide2').show();
+					$('#tohide3').show();
+				}};");
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3",array("id" => "swbckfrm"));
-
 			$output .= "<table>";
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
@@ -301,14 +298,14 @@
 					$output .= FS::$iMgr->select("ip","filterSw()");
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSw()")."</form>";
-					$output .= "<script type=\"text/javascript\">function filterSw() {
+					$output .= FS::$iMgr->js("function filterSw() {
                                    		     	$('#swfdiv').fadeOut('slow',function() {
                                         			$.post('index.php?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
                                                         		$('#swfdiv').html(data);
                                     	        	    	});
 							});
               	                          		$('#swfdiv').fadeIn();
-						}</script><div id=\"swfdiv\">";
+						}")."<div id=\"swfdiv\">";
 				}
 				$output .= $grpoutput."</table>";
 				$output .= $usroutput."</table>";
@@ -551,14 +548,14 @@
 					$output .= FS::$iMgr->select("snmp","filterSNMP()");
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSNMP()")."</form>";
-					$output .= "<script type=\"text/javascript\">function filterSNMP() {
+					$output .= FS::$iMgr->js("function filterSNMP() {
         	                                $('#snmpfdiv').fadeOut('fast',function() {
 	                                       		$.post('index.php?mod=".$this->mid."&at=2&sh=1', $('#snmpfform').serialize(), function(data) {
                                         	                $('#snmpfdiv').html(data);
                         	                        });
 						});
 						$('#snmpfdiv').fadeIn('fast');
-                	                        }</script>";
+                	                        }");
 					$output .= "<div id=\"snmpfdiv\">";
 				}
 				$output .= FS::$iMgr->h1("group-rights").$grpoutput."</table>";

@@ -80,13 +80,13 @@
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 		}
 			else if(!$sh || $sh == 1) {
-				$output = "<script type=\"text/javascript\">function filterAppLogs() {
+				$output = FS::$iMgr->js("function filterAppLogs() {
 					$('#logd').fadeOut();
 					$.post('index.php?mod=".$this->mid."&act=1', $('#logf').serialize(), function(data) {
 						$('#logd').html(data);
 						$('#logd').fadeIn();
 						});
-					}</script>";
+					}");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
 				$output .= FS::$iMgr->select("uf","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);

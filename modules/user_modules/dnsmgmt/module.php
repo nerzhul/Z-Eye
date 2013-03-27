@@ -129,8 +129,8 @@
 						$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">".$this->loc->s("Stats")."</a>";
 						$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">".$this->loc->s("expert-tools")."</a>";
 						$output .= "</ul></div>";
-						$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
-						$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});</script>";
+						$output .= FS::$iMgr->js("$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+						$output .= "$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});");
 					}
 				}
 				else
@@ -274,11 +274,11 @@
 				}
 				else if($showmodule == 2) {
 					$output .= FS::$iMgr->h3("title-old-records");
-					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
+					$output .= FS::$iMgr->js("function searchobsolete() {";
 					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
 					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
 					$output .= "$('#obsres').html(data);";
-					$output .= "});return false;}</script>";
+					$output .= "});return false;}");
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->hidden("obsdata",$filter);
 					$output .= "Intervalle (jours) ".FS::$iMgr->numInput("ival")."<br />";

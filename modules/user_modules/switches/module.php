@@ -117,9 +117,9 @@
 				$this->devapi->setPortId($portid);
 				// Port modification
 				if(!$sh || $sh == 1) {
-					$output .= "<script type=\"text/javascript\">function arangeform() {";
-					$output .= "if(document.getElementsByName('trmode')[0].value == 1) {";
-					$output .= "$('#vltr').show('slow');
+					$output .= FS::$iMgr->js("function arangeform() {
+					if(document.getElementsByName('trmode')[0].value == 1) {
+						$('#vltr').show('slow');
 						if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
 						if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
 						if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
@@ -136,9 +136,7 @@
 						if($('#mabtr').is(':hidden')) $('#mabtr').show('slow');
 						if($('#mabdead').is(':hidden')) $('#mabdead').show('slow');
 						if($('#mabnoresp').is(':hidden')) $('#mabnoresp').show('slow');
-					}";
-					$output .= "};";
-					$output .= "</script>";
+					}};");
 					$query = FS::$dbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if($data = FS::$dbMgr->Fetch($query)) {
 						if($portid != -1 && (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
@@ -532,7 +530,7 @@
 						$query = FS::$dbMgr->Select("device","*","name ='".$device."'");
 						if($data = FS::$dbMgr->Fetch($query)) {
 							$output .= FS::$iMgr->h3("Device-detail");
-							$output .= "<table class=\"standardTable\">";
+							$output .= "<table>";
 							$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
 							$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
 							$output .= "<tr><td>".$this->loc->s("Model")." / ".$this->loc->s("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>";
@@ -979,17 +977,16 @@
 
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_retagvlan") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_retagvlan")) { 
-						$output .= "<script type=\"text/javascript\">";
-						$output .= "function searchports() {";
-						$output .= "$('#subpop').html('".$this->loc->s("search-ports")."...<br /><br /><br />');";
-						$output .= "$('#pop').show();
+						$js = "function searchports() {";
+						$js .= "$('#subpop').html('".$this->loc->s("search-ports")."...<br /><br /><br />');";
+						$js .= "$('#pop').show();
 						var ovlid = document.getElementsByName('oldvl')[0].value;";
-						$output .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
+						$js .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
 							$('#pop').hide();
 							$('#vlplist').html(data); });";
-						$output .= "return false;";
-						$output .= "};";
-						$output .= "function checkTagForm() {
+						$js .= "return false;";
+						$js .= "};";
+						$js .= "function checkTagForm() {
 							if($('#vlplist') == null || $('#vlplist').html().length < 1) {
 								alert('".$this->loc->s("must-verify-ports")." !');
 								return false;
@@ -1000,7 +997,7 @@
 							}
 							return true;
 						};";
-						$output .= "</script>";
+						$output .= FS::$iMgr->js($js);
 						$output .= FS::$iMgr->h3("title-retag");
 						if($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
 						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&d=".$device."&act=11");
@@ -1017,7 +1014,7 @@
 						FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_restorestartupcfg") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_restorestartupcfg")) {
 						// Common JS WARN: it's only for CISCO
-						$output .= "<script type=\"text/javascript\">function checkCopyState(copyId) {
+						$output .= FS::$iMgr->js("function checkCopyState(copyId) {
 							setTimeout(function() {
 								$.post('index.php?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
 									if(data == 2) {
@@ -1037,22 +1034,22 @@
 									else
 										$('#subpop').html('".$this->loc->s("unk-answer").": '+data);
 								}); }, 1000);
-						}</script>";
+						}");
 					}
 
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_exportcfg") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_exportcfg")) {
 
 						// Copy startup-config -> TFTP/FTP server
-						$output .= "<script type=\"text/javascript\">function arangeform() {";
-						$output .= "if(document.getElementsByName('exportm')[0].value == 2 || document.getElementsByName('exportm')[0].value == 4 || document.getElementsByName('exportm')[0].value == 5) {";
-						$output .= "$('#slogin').show();";
-						$output .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
-						$output .= "$('#slogin').hide(); }};";
-						$output .= "function sendbackupreq() {";
-						$output .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-						$output .= "$('#pop').show();";
-						$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
+						$js = "function arangeform() {";
+						$js .= "if(document.getElementsByName('exportm')[0].value == 2 || document.getElementsByName('exportm')[0].value == 4 || document.getElementsByName('exportm')[0].value == 5) {";
+						$js .= "$('#slogin').show();";
+						$js .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
+						$js .= "$('#slogin').hide(); }};";
+						$js .= "function sendbackupreq() {";
+						$js .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
+						$js .= "$('#pop').show();";
+						$js .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
 						srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
 						io: document.getElementsByName('io')[0].value },
 						function(data) { 
@@ -1060,9 +1057,9 @@
 							$('#subpop').html('".$this->loc->s("Copy-in-progress")."...');
 							checkCopyState(copyId);
 						});";
-						$output .= "return false;";
-						$output .= "};";
-						$output .= "</script>";
+						$js .= "return false;};";
+						$output .= FS::$iMgr->js($js);
+
 						$output .= FS::$iMgr->h3("title-transfer-conf");
 						$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
 						$output .= FS::$iMgr->selElmt("TFTP",1);
@@ -1084,17 +1081,16 @@
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_restorestartupcfg") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_restorestartupcfg")) {
 						// Copy startup-config -> running-config
-						$output .= "<script type=\"text/javascript\">function restorestartupconfig() {";
-						$output .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-						$output .= "$('#pop').show();";
-						$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
+						$output .= FS::$imgr->js("function restorestartupconfig() {
+							$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');
+						$('#pop').show();
+						$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
 							var copyId = data;
 							$('#subpop').html('".$this->loc->s("restore-in-progress")."...');
 							checkCopyState(copyId);
-						});";
-						$output .= "return false;";
-						$output .= "};";
-						$output .= "</script>";
+						});
+						return false;
+						};");
 						$output .= FS::$iMgr->h3("title-restore-startup");
 						$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
 					}
@@ -1142,16 +1138,14 @@
 					$found = 0;
 					if($iswif == false) {
 						// Script pour modifier le nom de la prise
-						$output .= "<script type=\"text/javascript\">";
-						$output .= "function modifyPrise(src,sbmit,sw_,swport_,swpr_) { ";
-						$output .= "if(sbmit == true) { ";
-						$output .= "$.post('index.php?at=3&mod=".$this->mid."&d=".$device."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) { ";
-						$output .= "$(src+'l').html(data); $(src+' a').toggle(); ";
-						$output .= "}); } ";
-						$output .= "else $(src).toggle(); }";
-						$output .= "</script>";
+						$output .= FS::$iMgr->js("function modifyPrise(src,sbmit,sw_,swport_,swpr_) {
+						if(sbmit == true) {
+						$.post('index.php?at=3&mod=".$this->mid."&d=".$device."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) {
+						$(src+'l').html(data); $(src+' a').toggle();
+						}); }
+						else $(src).toggle(); }");
 					}
-					$tmpoutput = "<table class=\"standardTable\"><tr><th><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
+					$tmpoutput = "<table><tr><th><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
 					$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">".$this->loc->s("Description")."</a></th>
 						<th>".$this->loc->s("MAC-addr-iface")."</th><th>Up (Link/Admin)</th>";
 					if($iswif == false)
@@ -1433,10 +1427,10 @@
 
 				$showtitle = true;
 				if(FS::$sessMgr->hasRight("mrule_switches_discover")) {
-					$formoutput = "<script type=\"text/javascript\">function showwait() {";
-					$formoutput .= "$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-					$formoutput .= "$('#pop').show();";
-					$formoutput .= "};</script>".FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
+					$formoutput = FS::$iMgr->js("function showwait() {
+					$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');
+					$('#pop').show();
+					};").FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
 					$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
 					$formoutput .= "</li><li>".FS::$iMgr->JSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
 					$formoutput .= "</ul></form>";
@@ -1476,9 +1470,9 @@
 						if($foundsw == 0) $foundsw = 1;
 						$outputswitch .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
 						$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
-						<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div><script type=\"text/javascript\">
-						$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
-						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });</script></td></tr>";
+						<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
+						FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
+						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td></tr>";
 					}
 				}
 				if($foundsw != 0 || $foundwif != 0) {
@@ -1517,29 +1511,27 @@
 					$output .= "</table>";
 				}
 				if($foundsw != 0 || $foundwif != 0) {
-					$output .= "<script type=\"text/javascript\">
-						$.event.props.push('dataTransfer');
+					$output .= FS::$iMgr->js("$.event.props.push('dataTransfer');
 						$('#dev #draga').on({
-								mouseover: function(e) { $('#trash').show(); },
-								mouseleave: function(e) { $('#trash').hide(); },
-								dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
-								dragenter: function(e) { e.preventDefault();},
-								dragover: function(e) { e.preventDefault(); },
-								dragleave: function(e) { },
-								drop: function(e) {},
-								dragend: function() { $('#trash').hide(); }
+							mouseover: function(e) { $('#trash').show(); },
+							mouseleave: function(e) { $('#trash').hide(); },
+							dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+							dragenter: function(e) { e.preventDefault();},
+							dragover: function(e) { e.preventDefault(); },
+							dragleave: function(e) { },
+							drop: function(e) {},
+							dragend: function() { $('#trash').hide(); }
 						});
 						$('#trash').on({
-								dragover: function(e) { e.preventDefault(); },
-								drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-										FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
-										FS::$iMgr->hidden("device","'+e.dataTransfer.getData('text/html')+'").
-										FS::$iMgr->submit("",$this->loc->s("Remove")).
-										FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-										$('#pop').show();
-								}
-						});
-						</script>";
+							dragover: function(e) { e.preventDefault(); },
+							drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
+								FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
+								FS::$iMgr->hidden("device","'+e.dataTransfer.getData('text/html')+'").
+								FS::$iMgr->submit("",$this->loc->s("Remove")).
+								FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
+								$('#pop').show();
+							}
+						});");
 				}
 
 				if($foundsw == 0 && $foundwif == 0)

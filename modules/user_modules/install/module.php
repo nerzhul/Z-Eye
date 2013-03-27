@@ -60,17 +60,17 @@
 
 			switch($step) {
 				case 0:
-					$output .= "<script type=\"text/javascript\">function loadStep1() {
+					$output .= FS::$iMgr->js("function loadStep1() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
 						$.post('index.php?mod=".$this->mid."&at=2&step=1', function(data) {
 							$('#installer').html(data);
 							});
-						}</script>";
+						}");
 					$output .= FS::$iMgr->h2("title-welcome");
 					$output .= $this->loc->s("text-welcome")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Lets-Go"),"loadStep1();")."</center>";
 					break;
 				case 1:
-					$output .= "<script type=\"text/javascript\">function loadStep2() {
+					$output .= FS::$iMgr->js("function loadStep2() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
 						$.post('index.php?mod=".$this->mid."&at=2&step=2', function(data) {
 							$('#installer').html(data);
@@ -89,8 +89,7 @@
 							else if(data == 8) { ".FS::$iMgr->showNotification($this->loc->s("err-name-invalid"),5000,false)." } 
 							else { ".FS::$iMgr->showNotification($this->loc->s("err-unhandled-answer"),5000,false)." }
 						});
-							return false;
-						}</script>";
+							return false;}");
 					$output .= FS::$iMgr->h2("title-admin-set");
 					$output .= $this->loc->s("text-admin-set")."<br /><br />".FS::$iMgr->form("",array("id" => "admcfg","js" => "false"))."<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 					$output .= FS::$iMgr->idxLine($this->loc->s("Username"),"username");
@@ -103,11 +102,11 @@
 					$output .= FS::$iMgr->tableSubmit($this->loc->s("Send"),array("js" => "sendAdmCfg();"))."</form>";
 					break;	
 				case 2:
-					$output .= "<script type=\"text/javascript\">function loadStep3() {
+					$output .= FS::$iMgr->js("function loadStep3() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
 						$.post('index.php?mod=".$this->mid."&act=2', function(data) {
 							window.location = '/index.php'; });
-						}</script>";
+						}");
 					$output .= FS::$iMgr->h2("title-install-finished");
 					$output .= $this->loc->s("text-finish")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Finish"),"loadStep3();")."</center>";
 					break;	

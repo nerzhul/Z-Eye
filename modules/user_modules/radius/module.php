@@ -104,9 +104,10 @@
 
 			$tmpoutput .= "</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>";
 			$tmpoutput .= "<td><div id=\"radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."\">".
-				FS::$iMgr->img("styles/images/loader.gif",24,24)."</div><script type=\"text/javascript\">
-                                $.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
-                                $('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });</script></td><td>".
+				FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>";
+                        $tmpoutput .= FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
+                                $('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
+			$tmpoutput .= "</td><td>".
 				FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"])."</td></tr>";
 			}
 			if($found)
@@ -275,12 +276,12 @@
 				$output .= "</td></tr>";
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
 
-				$output .= "<script type=\"text/javascript\">$('#adduser').submit(function(event) {
+				$output .= FS::$iMgr->js("$('#adduser').submit(function(event) {
 					event.preventDefault();
 					$.post('index.php?mod=".$this->mid."&at=3&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10', $('#adduser').serialize(), function(data) {
 						$('#adduserres').html(data);
 					});
-				});</script>";
+				});");
 			}
 			else if($sh == 2) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
@@ -328,7 +329,7 @@
 				if(!$radSQLMgr)
 					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
-				$formoutput = "<script type=\"text/javascript\"> function changeUForm() {
+				$formoutput = FS::$iMgr->js("function changeUForm() {
 					if(document.getElementsByName('utype')[0].value == 1) {
 						$('#userdf').show();
 					}
@@ -356,7 +357,7 @@
 				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
 				function delAttrElmt(attridx) {
 					$('.attrli'+attridx).remove();
-				}</script>";
+				}");
 
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= "<ul class=\"ulform\"><li>".
@@ -382,13 +383,13 @@
 				$found = 0;
 
 				// Filtering
-				$output .= "<script type=\"text/javascript\">function filterRadiusDatas() {
+				$output .= FS::$iMgr->js("function filterRadiusDatas() {
 					$('#radd').fadeOut();
 					$.post('index.php?mod=".$this->mid."&act=12&r=".$raddb."&h=".$radhost."&p=".$radport."', $('#radf').serialize(), function(data) {
 							$('#radd').html(data);
 							$('#radd').fadeIn();
 							});
-					}</script>";
+					}");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=12&r=".$raddb."&h=".$radhost."&p=".$radport,array("id" => "radf"));
 				$output .= FS::$iMgr->select("uf","filterRadiusDatas()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Type")."--","",true);
@@ -405,7 +406,7 @@
 				$output .= "<div id=\"radd\">".$this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport)."</div>";
 			}
 			else if($sh == 2) {
-				$formoutput = "<script type=\"text/javascript\">attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
+				$formoutput = FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 				$this->raddbCondSelector().
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
@@ -448,8 +449,7 @@
 				$('#editf').on({
 						dragover: function(e) { e.preventDefault(); },
 						drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=2&radentry='+e.dataTransfer.getData('text/html')); }
-				});
-				</script>";
+				});");
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("radgrptpl","addTemplAttributes()","Template");
 				$formoutput .= FS::$iMgr->selElmt($this->loc->s("None"),0);
@@ -511,7 +511,7 @@
 				}
 
 				$output .= FS::$iMgr->h3("title-mass-import");
-				$output .= "<script type=\"text/javascript\"> function changeUForm() {
+				$output .= FS::$iMgr->js("function changeUForm() {
 						if(document.getElementsByName('usertype')[0].value == 1) {
 								$('#uptype').show(); $('#csvtooltip').html(\"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b>\");
 						}
@@ -521,7 +521,7 @@
 						else if(document.getElementsByName('usertype')[0].value == 3) {
 								$('#uptype').hide(); $('#csvtooltip').html('');
 						}
-				}; </script>";
+				};");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=6"); // #todo change this
 				$output .= "<ul class=\"ulform\"><li width=\"100%\">".FS::$iMgr->select("usertype","changeUForm()","Type d'authentification");
 				$output .= FS::$iMgr->selElmt($this->loc->s("User"),1);
@@ -638,12 +638,12 @@
 				$output .= "</td></tr>";
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
 
-				$output .= "<script type=\"text/javascript\">$('#adduser').submit(function(event) {
+				$output .= FS::$iMgr->js("$('#adduser').submit(function(event) {
 					event.preventDefault();
 					$.post('index.php?mod=".$this->mid."&at=3&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10', $('#adduser').serialize(), function(data) {
 						$('#adduserres').html(data);
 					});
-				});</script>";
+				});");
 			}
 			else if($sh == 7) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
@@ -678,8 +678,7 @@
 			$ug = FS::$secMgr->checkAndSecurisePostData("ug");
 			$uf = FS::$secMgr->checkAndSecurisePostData("uf");
 			$tmpoutput = FS::$iMgr->h3("title-userlist");
-			$tmpoutput .= "<script type=\"text/javascript\">
-				$.event.props.push('dataTransfer');
+			$tmpoutput .= FS::$iMgr->js("$.event.props.push('dataTransfer');
 				$('#raduser #dragtd').on({
 					mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
 					mouseleave: function(e) { $('#trash').hide(); $('#editf').hide(); },
@@ -705,8 +704,7 @@
 				$('#editf').on({
 					dragover: function(e) { e.preventDefault(); },
 					drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry='+e.dataTransfer.getData('text/html')); }
-				});
-				</script>";
+				});");
 			$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')".($ug ? " AND username IN (SELECT username FROM radusergroup WHERE groupname = '".$ug."')" : ""));
 			$expirationbuffer = array();
 			while($data = $radSQLMgr->Fetch($query)) {
@@ -759,7 +757,7 @@
 				$grpcount = $radSQLMgr->Count($this->raddbinfos["tradusrgrp"],"groupname","username = '".$radentry."'");
 				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradcheck"],"username","username = '".$radentry."'");
 				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradreply"],"username","username = '".$radentry."'");
-				$formoutput = "<script type=\"text/javascript\">grpidx = ".$grpcount."; 
+				$formoutput = FS::$iMgr->js("grpidx = ".$grpcount."; 
 				function addGrpForm() {
 					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select> <a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
 					grpidx++;
@@ -778,7 +776,7 @@
 				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
 				function delAttrElmt(attridx) {
 					$('.attrli'+attridx).remove();
-				}</script>";
+				}");
 
 				if(FS::$secMgr->isMacAddr($radentry) || preg_match('#^[0-9A-F]{12}$#i', $radentry))
 					$utype = 2;
@@ -861,7 +859,7 @@
 				}
 				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$radentry."'");
 				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$radentry."'");
-				$formoutput = "<script type=\"text/javascript\">attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
+				$formoutput = FS::$iMgr->js("attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 				$this->raddbCondSelector().
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
@@ -871,7 +869,7 @@
 				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
 				function delAttrElmt(attridx) {
 						$('.attrli'+attridx).remove();
-				}</script>";
+				}");
 				$formoutput .= FS::$iMgr->h2($this->loc->s("title-groupmod").": '".$radentry."'",true);
 				$formoutput .= "<ul class=\"ulform\">";
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");

@@ -32,8 +32,7 @@
 		private function showMain() {
 			$output = "";
 			if(!FS::isAjaxCall()) {
-				$output = "<script type=\"text/javascript\">
-			        var refreshId = setInterval(function()
+			        $output = FS::$iMgr->js("var refreshId = setInterval(function()
         			{
 					$.get('index.php?mod=".$this->mid."&at=2', function(data) {
 	        		        	$('#reports').fadeOut(1500,function() {
@@ -41,7 +40,7 @@
 			                		$('#reports').fadeIn(1500);
 						});
         			        });
-		        	}, 20000);</script>";
+		        	}, 20000);");
 				$output .= FS::$iMgr->h1("Speed Reporting",true);
 			}
 			$output .= "<div id=\"reports\">";

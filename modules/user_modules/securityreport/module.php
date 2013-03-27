@@ -145,7 +145,7 @@
 					$tse .= "]";
 					$ssh .= "]";
 
-					$output .= "<script type=\"text/javascript\">(function($){ var hchart;
+					$output .= FS::$iMgr->js("(function($){ var hchart;
 							hchart = new Highcharts.Chart({
 							chart: { renderTo: 'atkst', type: 'line' },
 							title: { text: 'Graphique d\'attaques SNORT' },
@@ -157,8 +157,7 @@
 									{ name: '".$this->loc->s("TSE-atk")."', data: ".$tse." },
 									{ name: '".$this->loc->s("SSH-atk")."', data: ".$ssh." }]
 							});
-						})(jQuery);
-						</script>";
+						})(jQuery);");
 				}
 				else if($showmodule == 2) {
 					$found = 0;

@@ -251,8 +251,7 @@
 						$netoutput .= "</td></tr>";
 					}
 					$netoutput .= "</table></center><br /><hr>";
-					$netoutput .= "<script type=\"text/javascript\">
-						var chart = new Highcharts.Chart({
+					$js = "var chart = new Highcharts.Chart({
 							chart: { renderTo: '".$data["netid"]."', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
 							title: { text: '' },
 							tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
@@ -263,22 +262,23 @@
 										this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
 							}}},
 							series: [{ type: 'pie', data: [";
-					if($used > 0) $netoutput .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
-					if($reserv > 0) $netoutput .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
-					if($fixedip > 0) $netoutput .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
-					if($distrib > 0) $netoutput .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
-					$netoutput .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
-							}]});</script>";
+					if($used > 0) $js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
+					if($reserv > 0) $js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
+					if($fixedip > 0) $js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
+					if($distrib > 0) $js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+					$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
+							}]});";
+					$netoutput .= FS::$iMgr->js($js);
 					}
 					$output .= $netoutput;
 				}
 				else if($showmodule == 2) {
 					$output .= FS::$iMgr->h4("title-search-old");
-					$output .= "<script type=\"text/javascript\">function searchobsolete() {";
-					$output .= "$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');";
-					$output .= "$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {";
-					$output .= "$('#obsres').html(data);";
-					$output .= "});return false;}</script>";
+					$output .= FS::$iMgr->js("function searchobsolete() {
+						$('#obsres').html('".FS::$iMgr->img('styles/images/loader.gif')."');
+						$.post('index.php?at=3&mod=".$this->mid."&act=2', { ival: document.getElementsByName('ival')[0].value, obsdata: document.getElementsByName('obsdata')[0].value}, function(data) {
+							$('#obsres').html(data);
+						});return false;}");
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
 					$output .= FS::$iMgr->hidden("obsdata",$filter);
 					$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
@@ -302,19 +302,19 @@
 					$output .= FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => "tooltip-max-age"))."</li><li>";
 					$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),"tooltip-contact")."</li><li>";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
-					$output .= "<script type=\"text/javascript\">$('#monsubnet').submit(function(event) {
+					$output .= FS::$iMgr->js("$('#monsubnet').submit(function(event) {
         	                                event.preventDefault();
                 	                        $.post('index.php?mod=".$this->mid."&at=3&f=".$filter."&act=3', $('#monsubnet').serialize(), function(data) {
                         	                        $('#monsubnetres').html(data);
                                 	        });
-	                                });</script>";
+	                                });");
 				}
 				else if($showmodule == 4) {
-					$output .= "<script type=\"text/javascript\">function historyDateChange() {
+					$output .= FS::$iMgr->js("function historyDateChange() {
 						$('#hstcontent').hide(\"slow\",function() { $('#hstcontent').html(''); 
 						$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
 							$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
-						}); }); }</script>";
+						}); }); }");
 
 					$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
@@ -404,7 +404,7 @@
 					$lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
 				}
 			}
-			$output .= "<script type=\"text/javascript\">$(function(){ var hstgr;
+			$output .= FS::$iMgr->js("$(function(){ var hstgr;
                         	$(document).ready(function() { hstgr = new Highcharts.Chart({
                                 	chart: { renderTo: 'hstgr', type: 'line' },
                                         title: { text: '' },
@@ -423,7 +423,7 @@
 						data: [".$reserv."], color: 'yellow' },";
 					if($availshow) $output .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
 						data: [".$avail."], color: 'cyan' }";
-			$output .= "]});});});</script>";
+			$output .= "]});});});");
 			return $output;
 		}
 

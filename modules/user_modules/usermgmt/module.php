@@ -79,15 +79,14 @@
                         $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Modify"))."</li>";
                         $output .= "</ul></form>";
 
-			$output .= "<script type=\"text/javascript\">grpidx = ".$grpidx."; function addGrpForm() {
-                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Groupe").$this->addGroupList()."</select>";
-                        $output .= " <a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
+			$output .= FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
+                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Groupe").$this->addGroupList()."</select>
+                        	<a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
                                         grpidx++;
                                 }
                                 function delGrpElmt(grpidx) {
                                         $('.ugroupli'+grpidx).remove();
-                                }</script>";
-
+                                }");
 			return $output;
 		}
 
