@@ -145,7 +145,7 @@
 					case 5: $tmpoutput .= "SFTP"; break;
 				}
 				$tmpoutput .= "</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=4&addr=".$data["addr"]."&type=".$data["type"]);
+				$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&addr=".$data["addr"]."&type=".$data["type"]);
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
@@ -322,7 +322,7 @@
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
 				}
 			}
 			else
@@ -348,7 +348,7 @@
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
 				}
 			}
 			else
@@ -577,7 +577,7 @@
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
 				}
 			}
 			else
@@ -603,7 +603,7 @@
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
 					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
 				}
 			}
 			else

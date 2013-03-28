@@ -80,7 +80,7 @@
 					$tmpoutput .= "<table><tr><th>GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr>";
 				}
 				$tmpoutput .= "<tr><td>".$data["gid"]."</td><td><a href=\"index.php?mod=".$this->mid."&g=".$data["gname"]."\">".$data["gname"]."</a></td><td>".
-					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=2&gname=".$data["gname"])."</td></tr>";
+					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gname=".$data["gname"])."</td></tr>";
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";

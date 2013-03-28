@@ -53,7 +53,7 @@
 					else
 						$output .= $this->loc->s("rewr-other");
 					$output .= "</center></td><td><center>".$data["args"]."</center></td><td>";
-					$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=3&link=".$data["id"]);
+					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&link=".$data["id"]);
 					$output .= "</td></tr>";
 				}
 				$output .= "</table></div>";

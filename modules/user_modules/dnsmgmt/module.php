@@ -56,7 +56,7 @@
 
 						$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
 						$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
-						$tmpoutput .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=4&srv=".$data["addr"]);
+						$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"]);
 						$tmpoutput .= "</td></tr>";
 					}
 					if($found)

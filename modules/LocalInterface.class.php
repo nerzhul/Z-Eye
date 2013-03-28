@@ -206,18 +206,24 @@
 			return $output;
 		}
 
-		public function removeIcon($link = "") {
-			$output = FS::$iMgr->img("styles/images/cross.png",15,15);
-			if($link) $output = "<a href=\"".$link."\">".$output."</a>";
+		public function linkIcon($link,$iconname,$options=array()) {
+			$output = "<a ";
+			if(isset($options["js"]) && $options["js"] == true) {
+				$jsarr = "{";
+				if(isset($options["snotif"])) $jsarr .= "'snotif': '".addslashes($options["snotif"])."'";
+				$jsarr .= "}";
+				$output .= "onclick=\"callbackLink('index.php?".$link."'";
+				if($jsarr != "{}")
+					$output .= ",".$jsarr;
+				$output .= ");\" ";
+			}
+			else
+				$output .= "href=\"index.php?".$link."\"";
+			$output .= ">".FS::$iMgr->img("styles/images/".$iconname.".png",15,15)."</a>";
 			return $output;
 		}
 
-		public function redir($link,$js=false) {
-			if($js && FS::isAjaxCall())
-				echo $this->js("window.location.href=\"index.php?".$link."\";");
-			else
-				header("Location: index.php?".$link);
-		}
+		public function removeIcon($link,$options=array()) { $this->linkIcon($link,"cross",$options); }
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;

@@ -408,8 +408,19 @@
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : "")."><a href=\"".$link."&at=2&sh=".$shid."\">".$label."</a>";
+			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : "")."><a href=\"index.php?".$link."&at=2&sh=".$shid."\">".$label."</a>";
 			return $output;
+		}
+
+		public function tabPan($elmts = array(),$cursh) {
+			$output = "<div id=\"contenttabs\"><ul>";
+			$count = count($elmts);
+			for($i=0;$i<$count;$i++)
+				$output .= $this->tabPanElmt($elmts[$i][0],$elmts[$i][1],$elmts[$i][2],$cursh);	
+			$output .= "</ul></div>";
+			$output .= "<script type=\"text/javascript\">$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {";
+                        $output .= "$(anchor.hash).html(\"".$this->cur_module->getLoc()->s("fail-tab")."\");}}});</script>";
+			return ($count > 0 ? $output : "");
 		}
 
 		public function opendiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
@@ -431,6 +442,13 @@
 
 		public function jsinc($path) {
 			$this->arr_js[count($this->arr_js)] = $path;
+		}
+
+		public function redir($link,$js=false) {
+			if($js && FS::isAjaxCall())
+				echo $this->js("window.location.href=\"index.php?".$link."\";");
+			else
+				header("Location: index.php?".$link);
 		}
 
 		public function printError($msg) {

@@ -108,7 +108,7 @@
                         $tmpoutput .= FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
                                 $('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
 			$tmpoutput .= "</td><td>".
-				FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"])."</td></tr>";
+				FS::$iMgr->removeIcon("mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"])."</td></tr>";
 			}
 			if($found)
 				$output .= $tmpoutput."</table>";
@@ -591,7 +591,7 @@
 							$this->loc->s("Radius-profile")."</th><th></th></tr>";
 						}
 						$tmpoutput .= "<tr><td>".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td><td>".
-							FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8&subnet=".$data["dhcpsubnet"])."</td></tr>";
+							FS::$iMgr->removeIcon("mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=8&subnet=".$data["dhcpsubnet"])."</td></tr>";
 					}
 					if($found) $output .= $tmpoutput."</table>";
 				}
