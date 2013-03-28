@@ -340,8 +340,8 @@
 						$('#userdf').hide();
 					}
 				}; grpidx = 0; function addGrpForm() {
-					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>";
-				$formoutput .= " <a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
+					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
+					<a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
 					grpidx++;
 				}
 				function delGrpElmt(grpidx) {

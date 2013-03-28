@@ -62,7 +62,7 @@
 		}
 
 		public function callbackNotification($link,$id,$options = array()) {
-			$js = FS::$iMgr->js("$('#".$id."').submit(function(event) {";
+			$js = "$('#".$id."').submit(function(event) {";
 			// Locking screen if needed
 			if(isset($options["lock"]) && $options["lock"] == true) {
 				$js .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); $('#pop').fadeIn();";
@@ -84,7 +84,7 @@
 				if(isset($options["lock"]) && $options["lock"] == true) {
 					$js .= "$('#pop').hide();";
 				}
-			$js .= "}); });");
+			$js .= "}); });";
 			return $this->js($js);
 		}
 

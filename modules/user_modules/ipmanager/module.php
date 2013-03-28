@@ -404,7 +404,7 @@
 					$lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
 				}
 			}
-			$output .= FS::$iMgr->js("$(function(){ var hstgr;
+			$js = "$(function(){ var hstgr;
                         	$(document).ready(function() { hstgr = new Highcharts.Chart({
                                 	chart: { renderTo: 'hstgr', type: 'line' },
                                         title: { text: '' },
@@ -417,13 +417,14 @@
 						data: [".$total."], color: 'green' },
 						{ name: '".addslashes($this->loc->s("not-usable"))."',
                                                 data: [".$free."], color: 'black' },";
-					if($bauxshow) $output .= "{ name: '".addslashes($this->loc->s("Baux"))."',
+					if($bauxshow) $js .= "{ name: '".addslashes($this->loc->s("Baux"))."',
 						data: [".$baux."], color: 'red' },";
-					if($reservshow) $output .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
+					if($reservshow) $js .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
 						data: [".$reserv."], color: 'yellow' },";
-					if($availshow) $output .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
+					if($availshow) $js .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
 						data: [".$avail."], color: 'cyan' }";
-			$output .= "]});});});");
+			$js .= "]});});});";
+			$output .= FS::$iMgr->js($js);
 			return $output;
 		}
 
