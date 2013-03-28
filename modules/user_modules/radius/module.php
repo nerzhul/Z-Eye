@@ -442,8 +442,8 @@
 					FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
 					FS::$iMgr->hidden("group","'+e.dataTransfer.getData('text/html')+'").
 					FS::$iMgr->submit("",$this->loc->s("Delete")).
-					FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-					$('#pop').show();
+					FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"unlockScreen()")."</form>');
+					lockScreen();
 						}
 				});
 				$('#editf').on({
@@ -697,8 +697,8 @@
 						FS::$iMgr->check("logdel",array("label" => $this->loc->s("Delete-logs")." ?"))."<br />".
 						FS::$iMgr->check("acctdel",array("label" => $this->loc->s("Delete-accounting")." ?"))."<br />".
 						FS::$iMgr->submit("",$this->loc->s("Delete")).
-						FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"$(\'#pop\').hide()")."</form>');
-						$('#pop').show();
+						FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"unlockScreen()")."</form>');
+						lockScreen();
 					}
 				});
 				$('#editf').on({

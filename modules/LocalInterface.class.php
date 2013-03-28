@@ -29,7 +29,7 @@
 		public function content() {
 			$lockinstall = file_get_contents(dirname(__FILE__)."/../config/LOCK");
 
-			$output = "<div id=\"pop\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
+			$output = "<div id=\"lock\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
 			if($lockinstall) {
 				$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
 				$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
@@ -65,7 +65,7 @@
 			$js = "$('#".$id."').submit(function(event) {";
 			// Locking screen if needed
 			if(isset($options["lock"]) && $options["lock"] == true) {
-				$js .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); $('#pop').fadeIn();";
+				$js .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); lockScreen();";
 			}
 			// Starting notification
 			if(isset($options["snotif"]) && strlen($options["snotif"]) > 0) {
@@ -82,7 +82,7 @@
 					$('#notification').slideUp();
 				},".(isset($options["timeout"]) && $options["timeout"] > 1000 ? $options["timeout"] : 5000).");";
 				if(isset($options["lock"]) && $options["lock"] == true) {
-					$js .= "$('#pop').hide();";
+					$js .= "unlockScreen();";
 				}
 			$js .= "}); });";
 			return $this->js($js);
