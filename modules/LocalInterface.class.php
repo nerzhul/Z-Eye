@@ -223,7 +223,7 @@
 			return $output;
 		}
 
-		public function removeIcon($link,$options=array()) { $this->linkIcon($link,"cross",$options); }
+		public function removeIcon($link,$options=array()) { return $this->linkIcon($link,"cross",$options); }
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;
