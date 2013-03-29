@@ -32,40 +32,40 @@
 			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 	
 			$output = "";
-			if(!FS::isAjaxCall())
+			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-dns");
 
-			if($addr && FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-				$output .= $this->CreateOrEditServer(false);
-			}
-			else {
-				 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-					$output .= $this->showCreateEditErr();
-
-					$tmpoutput = $this->CreateOrEditServer(true);
-
-					$found = false;
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if(!$found) {
-							$found = true;
-							$tmpoutput .= FS::$iMgr->h2("serverlist").
-								"<table class=\"standardTable\"><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
-							"</th><th></th></tr>";
-						}
-
-						$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
-						$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
-						$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"]);
-						$tmpoutput .= "</td></tr>";
-					}
-					if($found)
-						$tmpoutput .= "</table>";
-					$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"));
+				if($addr && FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+					$output .= $this->CreateOrEditServer(false);
 				}
+				else {
+					 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+						$output .= $this->showCreateEditErr();
 
-				$output .= $this->showStats();
+						$tmpoutput = $this->CreateOrEditServer(true);
+
+						$found = false;
+						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
+						while($data = FS::$dbMgr->Fetch($query)) {
+							if(!$found) {
+								$found = true;
+								$tmpoutput .= FS::$iMgr->h2("serverlist").
+									"<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
+								"</th><th></th></tr>";
+							}
+
+							$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
+							$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
+							$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"]);
+							$tmpoutput .= "</td></tr>";
+						}
+						if($found)
+							$tmpoutput .= "</table>";
+							$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"));
+					}
+				}
 			}
+			$output .= $this->showStats();
 			return $output;
 		}
 
