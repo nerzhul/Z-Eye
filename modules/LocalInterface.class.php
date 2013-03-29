@@ -133,9 +133,6 @@
 			}
 
 			$output .= "</div></div></div>";
-		
-			
-				
 			$output .= "</div></div>";
 
 			return $output;

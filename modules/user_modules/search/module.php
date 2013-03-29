@@ -597,6 +597,10 @@
 			$found = 0;
 			$search = preg_replace("#[-]#",":",$search);
 
+			$company = FS::$dbMgr->GetOneData("oui","company","oui = '".substr($search,0,8)."'");
+			if($company)
+				$tmpoutput .= FS::$iMgr->h2("Manufacturer")."<div id=\"searchres\">".$company."</div>";
+
 			if(FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,hostname,leasetime,distributed,server","macaddr = '".$search."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
