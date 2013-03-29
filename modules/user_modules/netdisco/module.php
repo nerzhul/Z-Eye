@@ -26,6 +26,7 @@
 		
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
+			FS::$iMgr->setTitle($this->loc->s("title-netdisco"));
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {

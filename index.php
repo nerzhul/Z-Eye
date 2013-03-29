@@ -53,7 +53,6 @@
 		FS::$iMgr->jsinc("lib/FSS/js/FSS.js");
 		FS::$iMgr->jsinc("lib/HighCharts/highcharts.min.js");
 
-		echo FS::$iMgr->header();
 		echo FS::$iMgr->content();
 		echo FS::$iMgr->footer();
 	}

@@ -44,6 +44,7 @@
 
 		private function showMain() {
 			$output = FS::$iMgr->h1("snmp-communities");
+			FS::$iMgr->setTitle("snmp-communities");
 			$found = false;
 
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "snmpfrm"))."<ul class=\"ulform\">";

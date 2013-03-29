@@ -26,6 +26,7 @@
 
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
+			FS::$iMgr->setTitle($this->loc->s("Search"));
 			$output = "";
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			if($search && strlen($search) > 0)

@@ -25,6 +25,7 @@
 		
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
+			FS::$iMgr->setTitle($this->loc->s("title-switchrightsmgmt"));
 
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");

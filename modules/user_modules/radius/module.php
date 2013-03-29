@@ -36,10 +36,14 @@
 			$output = "";
 
 			if(!FS::isAjaxCall()) {
-				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1)
+				if(FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
 					$output .= FS::$iMgr->h1("title-deleg");
-				else
+					FS::$iMgr->setTitle($this->loc->s("title-deleg"));
+				}
+				else {
 					$output .= FS::$iMgr->h1("title-usermgmt");
+					FS::$iMgr->setTitle($this->loc->s("title-usermgmt"));
+				}
 			}
 
 			switch($err) {

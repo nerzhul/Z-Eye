@@ -25,7 +25,8 @@
 
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
-			$output = "<div id=\"module_connect\">".FS::$iMgr->h4("Disconnect")."<form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">".$this->loc->s("confirm-disconnect")."<br /><br />";
+			FS::$iMgr->setTitle($this->loc->s("Disconnect"));
+			$output = "<div id=\"module_connect\">".FS::$iMgr->h1("Disconnect")."<form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">".$this->loc->s("confirm-disconnect")."<br /><br />";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Confirm"));
 			$output .= "</form></div>";
 			return $output;

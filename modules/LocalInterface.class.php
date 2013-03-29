@@ -46,6 +46,9 @@
 			$output .= $tmpoutput.
 				"<div id=\"notification\"><div id=\"subnotification\"></div></div>
 				<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
+
+			// Add header
+			$output = $this->header().$output;
 			return $output;
 		}
 

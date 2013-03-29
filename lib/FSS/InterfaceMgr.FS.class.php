@@ -39,6 +39,7 @@
 		public function InitComponents() {
 			$this->arr_css = array();
 			$this->arr_js = array();
+			$this->title = "";
 		}
 
 		// header/footer/content
@@ -48,7 +49,7 @@
 				<html lang=\"".Config::getSysLang()."\">
 				<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
 				<head>
-				<title>".Config::getWebsiteName()."</title>";
+				<title>".Config::getWebsiteName().(strlen($this->title) > 0 ? " - ".$this->title : "")."</title>";
 				$count = count($this->arr_css);
 				for($i=0;$i<$count;$i++)
 					$output .= "<link rel=\"stylesheet\" href=\"".$this->arr_css[$i]."\" type=\"text/css\" />";
@@ -481,8 +482,11 @@
 			$this->cur_module = $module;
 		}
 
+		public function setTitle($title) { $this->title = $title; }
+
 		private $cur_module;
 		private $arr_css;
 		private $arr_js;
+		private $title;
 	};
 ?>

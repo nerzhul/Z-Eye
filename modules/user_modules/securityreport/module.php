@@ -25,6 +25,7 @@
 
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
+			FS::$iMgr->setTitle($this->loc->s("title-attack-report"));
 
 			// Load snort keys for db config
 			$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");

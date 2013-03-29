@@ -25,6 +25,7 @@
 		function iConnect() { parent::genModule(); $this->loc = new lConnect(); }
 		public function Load() {
 			FS::$iMgr->setCurrentModule($this);
+			FS::$iMgr->setTitle($this->loc->s("title-conn"));
 			$output = "";
 			$err = FS::$secMgr->checkGetData("err");
 			if($err) {
@@ -34,7 +35,7 @@
 					default: $output .= FS::$iMgr->printError($this->loc->s("err-unk"));	break;
 				}
 			}
-			$output .= "<div id=\"module_connect\">".FS::$iMgr->h4("title-conn");
+			$output .= "<div>".FS::$iMgr->h1("title-conn");
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 			$output .= FS::$iMgr->input("uname",$this->loc->s("Login"));
 			$output .= "<br />";
