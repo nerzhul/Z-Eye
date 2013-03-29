@@ -1081,7 +1081,7 @@
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_restorestartupcfg") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_restorestartupcfg")) {
 						// Copy startup-config -> running-config
-						$output .= FS::$imgr->js("function restorestartupconfig() {
+						$output .= FS::$iMgr->js("function restorestartupconfig() {
 							$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');
 						lockScreen();
 						$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 

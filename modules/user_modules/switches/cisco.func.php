@@ -297,7 +297,7 @@
 			$vlanlist = array();
 			$trunkNoVlan = true;
 			$vlid = 0;
-			$hstr = $this->getFieldForPortWithPid("1.3.6.1.4.1.9.9.46.1.6.1.1.4");
+			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.4",true);
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -316,7 +316,7 @@
 					$vlid++;
 				}
 			}
-			$hstr = $this->getFieldForPortWithPid("1.3.6.1.4.1.9.9.46.1.6.1.1.17");
+			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.17",true);
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -335,7 +335,7 @@
 					$vlid++;
 				}
 			}
-			$hstr = $this->getFieldForPortWithPid("1.3.6.1.4.1.9.9.46.1.6.1.1.18");
+			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.18",true);
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -354,7 +354,7 @@
 					$vlid++;
 				}
 			}
-			$hstr = $this->getFieldForPortWithPid("1.3.6.1.4.1.9.9.46.1.6.1.1.19");
+			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.19",true);
 			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
 			$hstr = preg_replace("#[ \n]#","",$hstr);
 			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE")
@@ -435,6 +435,8 @@
 				if($i<count($out)-1) $outoid .= "";
 			}
 			$outoid = preg_split("# = #",$outoid);
+			if(count($outoid) != 2)
+				return -1;
 			$outoid = $outoid[1];
 			if($raw) return $outoid;
 
