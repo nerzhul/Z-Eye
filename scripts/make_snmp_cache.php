@@ -55,9 +55,11 @@
 			if(strlen($devro) > 0 || strlen($devrw) > 0)
 				$snmpdbrecord[$data["name"]] = array("ro" => $devro, "rw" => $devrw);
 		}
+		FS::$dbMgr->BeginTr();
 		FS::$dbMgr->Delete("z_eye_snmp_cache");
 		foreach($snmpdbrecord as $key => $value)
 			FS::$dbMgr->Insert("z_eye_snmp_cache","device,snmpro,snmprw","'".$key."','".$value["ro"]."','".$value["rw"]."'");
+		FS::$dbMgr->CommitTr();
 	}
 
 	echo "[".Config::getWebsiteName()."][SNMP-Caching] started at ".date('d-m-Y G:i:s')."\n";

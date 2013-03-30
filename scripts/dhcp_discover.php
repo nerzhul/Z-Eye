@@ -1,21 +1,21 @@
 <?php
 	/*
-        * Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
-        *
-        * This program is free software; you can redistribute it and/or modify
-        * it under the terms of the GNU General Public License as published by
-        * the Free Software Foundation; either version 2 of the License, or
-        * (at your option) any later version.
-        *
-        * This program is distributed in the hope that it will be useful,
-        * but WITHOUT ANY WARRANTY; without even the implied warranty of
-        * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        * GNU General Public License for more details.
-        *
-        * You should have received a copy of the GNU General Public License
-        * along with this program; if not, write to the Free Software
-        * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-        */
+	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+	*
+	* This program is free software; you can redistribute it and/or modify
+	* it under the terms of the GNU General Public License as published by
+	* the Free Software Foundation; either version 2 of the License, or
+	* (at your option) any later version.
+	*
+	* This program is distributed in the hope that it will be useful,
+	* but WITHOUT ANY WARRANTY; without even the implied warranty of
+	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	* GNU General Public License for more details.
+	*
+	* You should have received a copy of the GNU General Public License
+	* along with this program; if not, write to the Free Software
+	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+	*/
 	require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 	require_once(dirname(__FILE__)."/../lib/FSS/modules/Network.FS.class.php");
 
@@ -207,6 +207,7 @@
 		while($data = FS::$dbMgr->Fetch($query))
 			$en_hist[$data["subnet"]] = $data["eniphistory"];
 		// Flush ip table for server
+		FS::$dbMgr->BeginTr();
 		FS::$dbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
 			if(isset($value["state"])) $rstate = $value["state"];
@@ -321,6 +322,7 @@
 					$values["active"]."','".$values["reserved"]."','".$values["distributed"]."','".$execdate."'::timestamp");		
 			}
 		}
+		FS::$dbMgr->CommitTr();
 	}
 
 	FS::LoadFSModules();
@@ -386,11 +388,14 @@
 		echo "Aucun serveur DHCP enregistré !\n";
 
 	// Flush subnet table
+	FS::$dbMgr->BeginTr();
 	FS::$dbMgr->Delete("z_eye_dhcp_subnet_cache");
 
 	// Register subnets
 	for($i=0;$i<count($subnet_list);$i++)
 		FS::$dbMgr->Insert("z_eye_dhcp_subnet_cache","netid,netmask","'".$subnet_list[$i][0]."','".$subnet_list[$i][1]."'");
+
+	FS::$dbMgr->CommitTr();
 
 	$end_time = microtime(true);
 	$script_time = $end_time - $start_time;

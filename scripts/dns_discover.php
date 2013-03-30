@@ -45,6 +45,7 @@
 
 	FS::LoadFSModules();
 
+	FS::$dbMgr->BeginTr();
 	FS::$dbMgr->Delete("z_eye_dns_zone_cache");
 	FS::$dbMgr->Delete("z_eye_dns_zone_record_cache");
 
@@ -131,6 +132,8 @@
 			}
 		}
 	}
+	
+	FS::$dbMgr->CommitTr();
 	
 	if($DNSfound)
 		echo "Données collectées sur le(s) serveur(s): ".$DNSServers."\n";

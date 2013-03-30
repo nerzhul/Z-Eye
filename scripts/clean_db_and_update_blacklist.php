@@ -60,6 +60,7 @@ function deleteLocalAlerts($snortDB) {
 
         echo "Cleaning up bad records...\n";
 
+	$snortDB->BeginTr();
 	$snortDB->Delete("acid_event","ip_src between 2175754240 and 2175754495");
         $snortDB->Delete("acid_event","ip_src between 2175779840 and 2175780863");
         $snortDB->Delete("acid_event","ip_src between 175439872 and 175505407");
@@ -68,6 +69,7 @@ function deleteLocalAlerts($snortDB) {
 	$snortDB->Delete("acid_event","ip_src between 2175762688 and 2175762943");
 	$snortDB->Delete("acid_event","ip_src between 3258522368 and 3258522623");
 	$snortDB->Delete("acid_event","sig_name = '(snort decoder) Bad Traffic Same Src/Dst IP'");
+	$snortDB->CommitTr();
 
 	$count = $snortDB->Count("acid_event","cid");
         echo "Deleted records : ".($totalacid-$count)."\n";
