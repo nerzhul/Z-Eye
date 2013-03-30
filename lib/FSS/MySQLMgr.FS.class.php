@@ -154,6 +154,18 @@
 				mysql_close($this->dbConn);
 		}
 
+		public function BeginTr() {
+			mysql_query("BEGIN;");
+		}
+
+		public function CommitTr() {
+			mysql_query("COMMIT;");
+		}
+
+		public function RollbackTr() {
+			mysql_query("ROLLBACK;");
+		}
+
 		private $dbName;
 		private $dbPort;
 		private $dbHost;

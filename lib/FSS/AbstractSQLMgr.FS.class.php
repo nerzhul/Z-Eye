@@ -112,6 +112,18 @@
 			return 0;
                 }
 
+		public function BeginTr() {
+			return $this->dbMgr->BeginTr();
+		}
+
+		public function CommitTr() {
+			return $this->dbMgr->CommitTr();
+		}
+
+		public function RollbackTr() {
+			return $this->dbMgr->RollbackTr();
+		}
+
 		private $dbName;
 		private $dbPort;
 		private $dbHost;

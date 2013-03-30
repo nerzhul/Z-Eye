@@ -156,6 +156,18 @@
 			return 0;
                 }
 
+		public function BeginTr() {
+			pg_query("BEGIN;");
+		}
+
+		public function CommitTr() {
+			pg_query("COMMIT;");
+		}
+
+		public function RollbackTr() {
+			pg_query("ROLLBACK;");
+		}
+
 		private $dbName;
 		private $dbPort;
 		private $dbHost;
