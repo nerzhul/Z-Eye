@@ -24,6 +24,9 @@
 			$this->locales = array(
 				"fr" => array(
 					"Add-community" => "Ajouter une communauté SNMP",
+					"Cancel" => "Annuler",
+					"confirm-remove-community" => "Êtes vous sûr de vouloir supprimer la communauté ",
+					"Done" => "Effectué !",
 					"err-already-exist" => "Cette communauté SNMP existe déjà",
 					"err-invalid-data" => "Les données que vous avez entré ne sont pas valides !",
 					"err-not-exist" => "Cette communauté SNMP n'existe pas",
@@ -33,6 +36,7 @@
 					"err-unable-read" => "Impossible de lire le fichier",
 					"err-write-fail" => "Impossible d'écrire la configuration de netdisco",
 					"menu-title" => "Communautés SNMP",
+					"OK" => "Confirmer",
 					"Read" => "Lecture",
 					"Save" => "Enregistrer",
 					"snmp-community" => "Communauté SNMP",
@@ -49,7 +53,9 @@
 				),
 				"en" => array(
 					"Add-community" => "Add SNMP community",
-					"database" => "Database",
+					"Cancel" => "Cancel",
+					"confirm-remove-community" => "Are you sure you want to remove community ",
+					"Done" => "Done !",
 					"err-already-exist" => "This SNMP community already exists",
 					"err-read-fail" => "Unable to read /usr/local/etc/netdisco/netdisco.conf",
 					"err-readorwrite" => "You must choose read and/or write",
@@ -60,6 +66,7 @@
 					"err-write-fail" => "Unable to write netdisco configuration",
 					"Go" => "Go",
 					"menu-title" => "SNMP communities",
+					"OK" => "Confirm",
 					"Read" => "Read",
 					"Save" => "Save",
 					"snmp-community" => "SNMP community",

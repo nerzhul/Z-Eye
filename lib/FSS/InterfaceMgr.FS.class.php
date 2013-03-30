@@ -484,7 +484,7 @@
 
 		public function setTitle($title) { $this->title = $title; }
 
-		private $cur_module;
+		protected $cur_module;
 		private $arr_css;
 		private $arr_js;
 		private $title;

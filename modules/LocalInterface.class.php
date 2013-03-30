@@ -212,7 +212,15 @@
 				$jsarr = "{";
 				if(isset($options["snotif"])) $jsarr .= "'snotif': '".addslashes($options["snotif"])."'";
 				$jsarr .= "}";
-				$output .= "onclick=\"callbackLink('index.php?".$link."'";
+				// Confirmation div
+				if(isset($options["confirm"]) && is_array($options["confirm"]) && count($options["confirm"]) == 3) {
+					$output .= "onclick=\"confirmPopup('".addslashes($options["confirm"][0])."','".
+						addslashes($this->cur_module->getLoc()->s($options["confirm"][1]))."','".
+						addslashes($this->cur_module->getLoc()->s($options["confirm"][2]))."','index.php?".
+						addslashes($link)."'";
+				}
+				else
+					$output .= "onclick=\"callbackLink('index.php?".addslashes($link)."'";
 				if($jsarr != "{}")
 					$output .= ",".$jsarr;
 				$output .= ");\" ";
