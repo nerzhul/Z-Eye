@@ -25,7 +25,11 @@
 				"fr" => array(
 					"add-server" => "Ajouter un serveur",
 					"Alone" => "Orphelin",
+					"Cancel" => "Annuler",
+					"Confirm" => "Confirmer",
+					"confirm-remove-dnssrc" => "Êtes vous sûr de vouloir supprimer la source de données suivante: ",
 					"chroot-path" => "Chroot Path",
+					"Done" => "Effectué",
 					"edit-server" => "Edition du serveur",
 					"err-bad-login" => "Login au serveur incorrect",
 					"err-bad-server" => "Aucun serveur enregistré avec ces coordonnées",
@@ -68,7 +72,11 @@
 				"en" => array(
 					"add-server" => "Add server",
 					"Alone" => "Alone",
+					"Cancel" => "Cancel",
+					"Confirm" => "Confirm",
+					"confirm-remove-dnssrc" => "Are you sure to want to remove this DNS data source ",
 					"chroot-path" => "Chroot Path",
+					"Done" => "Done",
 					"edit-server" => "Server edit",
 					"err-bad-login" => "Bad server login",
 					"err-bad-server" => "No server found with this datas",

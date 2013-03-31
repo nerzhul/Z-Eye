@@ -24,7 +24,11 @@
 			$this->locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",
+					"Cancel" => "Annuler",
+					"Confirm" => "Confirmer",
+					"confirm-removegrp" => "Êtes vous sûr de vouloir supprimer le groupe ",
 					"Delete" => "Supprimer",
+					"Done" => "Effectué",
 					"err-already-exist" => "Ce groupe existe déjà !",
 					"err-bad-data" => "Données invalides.",
 					"err-not-exist" => "Ce groupe n'existe pas !",
@@ -41,7 +45,11 @@
 				),
 				"en" => array(
 					"Add" => "Add",
+					"Cancel" => "Cancel",
+					"Confirm" => "Confirm",
+					"confirm-removegrp" => "Are you sure to want to remove group ",
 					"Delete" => "Remove",
+					"Done" => "Done",
 					"err-already-exist" => "This group already exists !",
 					"err-bad-data" => "Invalid data(s).",
 					"err-not-exist" => "This group doesn't exists !",

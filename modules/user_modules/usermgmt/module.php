@@ -142,7 +142,7 @@
 					$this->loc->s("Groups")."</th><th>".$this->loc->s("Subname")."</th><th>".$this->loc->s("Name")."</th><th>".
 					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th><th></th></tr>";
 				}
-				$tmpoutput .= "<tr><td>".$data["uid"]."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$data["username"]."\">".$data["username"]."</a></td><td>".
+				$tmpoutput .= "<tr id=\"u".$data["uid"]."tr\"><td>".$data["uid"]."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$data["username"]."\">".$data["username"]."</a></td><td>".
 					($data["sha_pwd"] == "" ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$data["uid"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -150,7 +150,12 @@
 					$tmpoutput .= $gname."<br />";
 				}
 				$tmpoutput .= "</td><td>".$data["subname"]."</td><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".$data["last_ip"]."</td><td>".
-					$data["last_conn"]."</td><td>".$data["join_date"]."</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&uid=".$data["uid"])."</td></tr>";
+					$data["last_conn"]."</td><td>".$data["join_date"]."</td><td>";
+				if($data["uid"] != 1) {
+					$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&uid=".$data["uid"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-removeuser")."'".$data["username"]."' ?","Confirm","Cancel")));
+				}
+				$tmpoutput .= "</td></tr>";
 			}
 
 			if($found) {
@@ -186,7 +191,10 @@
 						$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
 						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr>";
 					}
-					$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"]."</a></td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=5&addr=".$data["addr"])."</tr>";
+					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".
+						$data["addr"]."</a></td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=5&addr=".$data["addr"],array("js" => true,
+							"confirm" => array($this->loc->s("confirm-removedirectory")."'".$data["addr"]."' ?","Confirm","Cancel")))."</tr>";
 				}
 			}
 			if($found) {
@@ -277,24 +285,36 @@
 				case 3: // del user
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to delete user but don't have rights");
+						echo $this->loc->s("err-no-right").FS::$iMgr->js("unlockScreen();");
                                                 return;
                                         }
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					if(!$uid || !FS::$secMgr->isNumeric($uid)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are wrong or missing for user management (User delete)");
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-invalid-bad-data").FS::$iMgr->js("unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","last_conn","uid = '".$uid."'");
 					if(!$exist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove user '".$uid."', doesn't exist");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-invalid-user").FS::$iMgr->js("unlockScreen();");
+						else
 						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						return;
 					}
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."users","uid = '".$uid."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","uid = '".$uid."'");
+					FS::$dbMgr->CommitTr();
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User '".$uid."' removed");
-					FS::$iMgr->redir("mod=".$this->mid);
+					if(FS::isAjaxCall())
+						echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#u".$uid."tr'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				case 4: // add ldap
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
@@ -365,25 +385,35 @@
 				case 5: // LDAP remove
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to remove ldap but don't have rights");
+						echo $this->loc->s("err-no-right").FS::$iMgr->js("unlockScreen();");
                                                 return;
                                         }
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP remove)");
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-invalid-bad-data").FS::$iMgr->js("unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 
 					$serv = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr","addr = '".$addr."'");
 					if(!$serv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove LDAP ".$addr.":".$port.", not exists");
-						FS::$iMgr->redir("mod=".$this->mid."&err=4");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-ldap-exist").FS::$iMgr->js("unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=4");
 						return;
 					}
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr ='".$addr."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"LDAP '".$addr."' removed");
-					FS::$iMgr->redir("mod=".$this->mid);
+					if(FS::isAjaxCall())
+						echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#d".preg_replace("#[.]#","-",$addr)."tr'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				default: break;
 			}

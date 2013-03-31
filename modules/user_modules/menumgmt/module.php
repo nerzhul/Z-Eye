@@ -45,7 +45,7 @@
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","","id",2);
 				while($data = FS::$dbMgr->Fetch($query)) {
-					$output .= "<tr><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
+					$output .= "<tr id=\"m".$data["id"]."tr\"><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
 					if($data["isconnected"] == -1)
 						$output .= $this->loc->s("No");
 					else if($data["isconnected"] == 1)
@@ -55,17 +55,18 @@
 					$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
 					$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 					$output .= "</a></td><td>";
-					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&menu=".$data["id"]);
+					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&menu=".$data["id"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-removemenu")."'".$data["name"]."' ?","Confirm","Cancel")));
 					$output .= "</a></td></tr>";
 				}
 					
 				$output .= "</table>".FS::$iMgr->h1("title-menu-node-mgmt").
 					"<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
-					<table class=\"standardTable\">
+					<table>
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","","id",2);
 				while($data = FS::$dbMgr->Fetch($query)) {
-					$output .= "<tr><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
+					$output .= "<tr id=\"mit".$data["id"]."tr\"><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 					$link2 = new HTTPLink($data["link"]);
 					$output .= $link2->getIt()."</td><td>";
 					if($data["isconnected"] == -1)
@@ -77,7 +78,8 @@
 					$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
 					$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 					$output .= "</a></td><td>";
-					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&im=".$data["id"]);
+					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&im=".$data["id"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-removemenuitem")."'".$data["title"]."' ?","Confirm","Cancel")));
 					$output .= "</a></td></tr>";
 				}
 				$output .= "</table>";
@@ -147,15 +149,16 @@
 				$output .= FS::$iMgr->submit("",$this->loc->s("Save"));	
 				$output .= "</center></form>".
 				FS::$iMgr->h2("mod-elmt").
-				"<table class=\"standardTable\">
+				"<table>
 				<tr><th>".$this->loc->s("elmt")."</th><th>".$this->loc->s("Order")."</th><th></th></tr>";
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title","id = '".$data["id_menu_item"]."'");
 					if($data2 = FS::$dbMgr->Fetch($query2)) {
-							$output .= "<tr><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>";
-							$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"]);
-							$output .= "</a></td></tr>";
+						$output .= "<tr id=\"el".$data2["id"]."tr\"><td>".$data2["title"]."</td><td>".$data["order"]."</td><td>";
+						$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&menu=".$mid."&elem=".$data2["id"],array("js" => true,
+							"confirm" => array($this->loc->s("confirm-removeitem")."'".$data2["title"]."' ?","Confirm","Cancel")));
+						$output .= "</a></td></tr>";
 					}
 				}
 			}
@@ -188,10 +191,14 @@
 		
 		public function RemoveMenu() {
 			$menu = new Menu();
-			$name = FS::$secMgr->checkAndSecuriseGetData("menu");
-			$menu->setId($name);
+			$id = FS::$secMgr->checkAndSecuriseGetData("menu");
+			$menu->setId($id);
 			$menu->Delete();
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' removed");
+			if(FS::isAjaxCall())
+				echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#m".$id."tr'); unlockScreen();");
+			else
+				FS::$iMgr->redir("mod=".$this->mid);
 		}
 		
 		public function addMenuElement() {
@@ -227,6 +234,10 @@
 			$menuEl->Load();
 			$menuEl->Delete();
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Removed menu element id '".$im."'");
+			if(FS::isAjaxCall())
+				echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#mit".$im."tr'); unlockScreen();");
+			else
+				FS::$iMgr->redir("mod=".$this->mid);
 		}
 		
 		public function addElementToMenu() {
@@ -242,6 +253,10 @@
 			$itemid = FS::$secMgr->checkAndSecuriseGetData("elem");
 			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."menu_link","id_menu = '".$menuid."' AND id_menu_item = '".$itemid."'");
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Removed element '".$itemid."' from menu '".$menuid."'");
+			if(FS::isAjaxCall())
+				echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#el".$itemid."tr'); unlockScreen();");
+			else
+				FS::$iMgr->redir("mod=".$this->mid."&do=2&menu=".$menuid);
 			
 		}
 		
@@ -257,7 +272,6 @@
 					break;
 				case 3: // del	
 					$this->RemoveMenu();
-					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 4: // add elm
 					$this->addMenuElement();
@@ -269,7 +283,6 @@
 					break;
 				case 6: // del elem
 					$this->RemoveMenuElement();
-					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				case 7: // add elmtomenu
 					$this->addElementToMenu();
@@ -277,7 +290,6 @@
 					break;								
 				case 8: // del elmtomenu
 					$this->RemoveElementFromMenu();
-					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				default: break;
 			}

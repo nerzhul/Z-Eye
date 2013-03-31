@@ -55,9 +55,10 @@
 								"</th><th></th></tr>";
 							}
 
-							$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
+							$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["addr"])."tr\"><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
 							$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
-							$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"]);
+							$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"],array("js" => true,
+								"confirm" => array($this->loc->s("confirm-remove-dnssrc")."'".$data["addr"]."' ?","Confirm","Cancel")));
 							$tmpoutput .= "</td></tr>";
 						}
 						if($found)
@@ -540,14 +541,21 @@
 				case 4: { 
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-no-rights").FS::$iMgr->js("unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					}
-
-					if($srv = FS::$secMgr->checkAndSecuriseGetData("srv")) {
+					
+					$srv = FS::$secMgr->checkAndSecuriseGetData("srv");
+					if($srv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Removing server '".$srv."' from database");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$srv."'");
 					}
+					if(FS::isAjaxCall())
+						echo $this->lock->s("Done").FS::$iMgr->js("hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr'); unlockScreen();");
+					else
 					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				}

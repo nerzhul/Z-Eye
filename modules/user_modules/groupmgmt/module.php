@@ -80,8 +80,10 @@
 					$found = 1;
 					$tmpoutput .= "<table><tr><th>GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr>";
 				}
-				$tmpoutput .= "<tr><td>".$data["gid"]."</td><td><a href=\"index.php?mod=".$this->mid."&g=".$data["gname"]."\">".$data["gname"]."</a></td><td>".
-					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gname=".$data["gname"])."</td></tr>";
+				$tmpoutput .= "<tr id=\"gr".$data["gid"]."tr\"><td>".$data["gid"]."</td><td><a href=\"index.php?mod=".$this->mid."&g=".$data["gname"]."\">".$data["gname"]."</a></td><td>".
+					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gname=".$data["gname"],array("js" => true, 
+						"confirm" => array($this->loc->s("confirm-removegrp")."'".$data["gname"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";
@@ -147,24 +149,36 @@
 					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"New group '".$gname."' added");
 					FS::$iMgr->redir("mod=".$this->mid);
 					return;
+				// Remove group
 				case 2:
 					$gname = FS::$secMgr->checkAndSecuriseGetData("gname");
 					if(!$gname) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-bad-data").FS::$iMgr->js("unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to remove group");
 						return;
 					}
 					$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 					if(!$gid) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						if(FS::isAjaxCall())
+							echo $this->loc->s("err-not-exist").FS::$iMgr->js("unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"Unable to remove group '".$gname."', group doesn't exists");
 						return;
 					}
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."groups","gname = '".$gname."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","gid = '".$gid."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","gid = '".$gid."'");
+					FS::$dbMgr->CommitTr();
 					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"Group '".$gname."' removed");
-					FS::$iMgr->redir("mod=".$this->mid);
+					if(FS::isAjaxCall())
+						echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#gr".$gid."tr'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid);
                                         return;
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
