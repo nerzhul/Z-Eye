@@ -24,7 +24,6 @@
 	class iLogs extends genModule{
 		function iLogs() { parent::genModule(); $this->loc = new lLogs(); }
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("menu-title"));
 			$output = $this->showLogs();
 			return $output;

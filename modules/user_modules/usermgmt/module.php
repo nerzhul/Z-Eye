@@ -25,8 +25,6 @@
 		function iUserMgmt() { parent::genModule(); $this->loc = new lUserMgmt(); }
 
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
-
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			$output = "";
 			switch($err) {

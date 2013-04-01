@@ -194,6 +194,7 @@
 				require(dirname(__FILE__)."/user_modules/".$path."/main.php");
 
 				if($module->getRulesClass()->canAccessToModule()) {
+					$this->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($id);
 					$output .= $module->getModuleClass()->Load();
 				}

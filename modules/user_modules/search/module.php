@@ -25,7 +25,6 @@
 		function iSearch() { parent::genModule(); $this->loc = new lSearch(); }
 
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("Search"));
 			$output = "";
 			$search = FS::$secMgr->checkAndSecuriseGetData("s");

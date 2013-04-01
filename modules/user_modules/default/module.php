@@ -23,7 +23,6 @@
 		function iDefault() { parent::genModule(); $this->loc = new lDefault(); }
 
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle("Speed Reporting");
 			$output = "";
 			$output .= $this->showMain();

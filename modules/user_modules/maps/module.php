@@ -23,7 +23,6 @@
 	class iMaps extends genModule{
 		function iMaps() { parent::genModule(); $this->loc = new lMaps(); }
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("title-maps"));
 
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");

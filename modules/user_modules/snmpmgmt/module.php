@@ -25,7 +25,6 @@
 		function iSNMPMgmt() { parent::genModule(); $this->loc = new lSNMPMgmt(); }
 		
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {

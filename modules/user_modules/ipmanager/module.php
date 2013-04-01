@@ -24,7 +24,6 @@
 	class iIPManager extends genModule{
 		function iIPManager() { parent::genModule(); $this->loc = new lIPManager(); }
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("title-ip-management"));
 			$output = "";
 			$output .= $this->showStats();

@@ -25,7 +25,6 @@
 	class iMenuMgmt extends genModule{
 		function iMenuMgmt() { parent::genModule(); $this->loc = new lMenuMgmt(); }
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("title-menu-mgmt"));
 			$output = "";
 			if($do = FS::$secMgr->checkGetData("do")) {

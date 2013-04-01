@@ -24,7 +24,6 @@
 		function iSecReport() { parent::genModule(); $this->loc = new lSecReport(); }
 
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("title-attack-report"));
 
 			// Load snort keys for db config

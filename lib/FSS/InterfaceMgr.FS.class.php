@@ -478,10 +478,7 @@
 			return 0;
 		}
 
-		public function setCurrentModule($module) {
-			$this->cur_module = $module;
-		}
-
+		public function setCurrentModule($module) { $this->cur_module = $module; }
 		public function setTitle($title) { $this->title = $title; }
 
 		protected $cur_module;

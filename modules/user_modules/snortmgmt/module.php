@@ -24,7 +24,6 @@
 		function iSnortMgmt() { parent::genModule(); $this->loc = new lSnort(); }
 
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("page-title"));
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");

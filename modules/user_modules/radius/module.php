@@ -26,7 +26,6 @@
 		function iRadius() { parent::genModule(); $this->loc = new lRadius(); $raddbinfos = array(); }
 
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");

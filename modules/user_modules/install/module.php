@@ -23,7 +23,6 @@
 		function iInstall() { parent::genModule(); $this->loc = new lInstall(); }
 
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("title-master-install"));
 			$output = "";
 			if(!FS::isAjaxCall())

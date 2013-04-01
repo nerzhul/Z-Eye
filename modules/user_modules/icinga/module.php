@@ -23,7 +23,6 @@
 	class iIcinga extends genModule{
 		function iIcinga() { parent::genModule(); $this->loc = new lIcinga(); }
 		public function Load() {
-			FS::$iMgr->setCurrentModule($this);
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
 			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
 			switch($edit) {
