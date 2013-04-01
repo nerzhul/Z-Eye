@@ -285,14 +285,14 @@
 				case 3: // del user
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to delete user but don't have rights");
-						echo $this->loc->s("err-no-right").FS::$iMgr->js("unlockScreen();");
+						FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
                                                 return;
                                         }
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					if(!$uid || !FS::$secMgr->isNumeric($uid)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are wrong or missing for user management (User delete)");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-invalid-bad-data").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-invalid-bad-data","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
@@ -301,7 +301,7 @@
 					if(!$exist) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove user '".$uid."', doesn't exist");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-invalid-user").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-invalid-user","unlockScreen();");
 						else
 						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						return;
@@ -312,7 +312,7 @@
 					FS::$dbMgr->CommitTr();
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"User '".$uid."' removed");
 					if(FS::isAjaxCall())
-						echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#u".$uid."tr'); unlockScreen();");
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#u".$uid."tr'); unlockScreen();");
 					else
 						FS::$iMgr->redir("mod=".$this->mid);
 					return;
@@ -337,7 +337,7 @@
 					if(!$addr || !$port || !FS::$secMgr->isNumeric($port) || !$basedn || !$rootdn || !$rootpwd || !$ldapname || !$ldapsurname || !$ldapmail || !$ldapuid || !$ldapfilter) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing/wrong for user management (LDAP add)");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-invalid-bad-data");
+							FS::$iMgr->ajaxEcho("err-invalid-bad-data");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
@@ -348,7 +348,7 @@
 						if(!$serv) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to edit LDAP ".$addr.":".$port.", not exists");
 							if(FS::isAjaxCall())
-								echo $this->loc->s("err-ldap-not-exist");
+								FS::$iMgr->ajaxEcho("err-ldap-not-exist");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&err=10");
 							return;
@@ -358,7 +358,7 @@
 						if($serv) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", already exists");
 							if(FS::isAjaxCall())
-								echo $this->loc->s("err-ldap-exist");
+								FS::$iMgr->ajaxEcho("err-ldap-exist");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&err=4");
 							return;
@@ -370,7 +370,7 @@
 					if(!$ldapMgr->RootConnect()) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", connection fail");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-ldap-bad-data");
+							FS::$iMgr->ajaxEcho("err-ldap-bad-data");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						return;
@@ -385,14 +385,14 @@
 				case 5: // LDAP remove
 					if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User tries to remove ldap but don't have rights");
-						echo $this->loc->s("err-no-right").FS::$iMgr->js("unlockScreen();");
+						FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
                                                 return;
                                         }
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP remove)");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-invalid-bad-data").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-invalid-bad-data","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
@@ -402,7 +402,7 @@
 					if(!$serv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove LDAP ".$addr.":".$port.", not exists");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-ldap-exist").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-ldap-exist","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=4");
 						return;
@@ -411,7 +411,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr ='".$addr."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"LDAP '".$addr."' removed");
 					if(FS::isAjaxCall())
-						echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#d".preg_replace("#[.]#","-",$addr)."tr'); unlockScreen();");
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#d".preg_replace("#[.]#","-",$addr)."tr'); unlockScreen();");
 					else
 						FS::$iMgr->redir("mod=".$this->mid);
 					return;

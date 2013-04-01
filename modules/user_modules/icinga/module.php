@@ -194,7 +194,8 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Address")."</th><th>".$this->loc->s("Template")."</th><th>".$this->loc->s("Parent")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=2&host=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
+				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=2&host=".$data["name"]."\">".
+					$data["name"]."</a></td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
 				if($data["template"] == "t") $output .= $this->loc->s("Yes");
 				else $output .= $this->loc->s("No");
 				$output .= "</td><td>";
@@ -205,7 +206,8 @@
 					else $found2 = true;
 					$output .= $data2["parent"];
 				}
-				$output .="</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=15&host=".$data["name"])."</td></tr>";
+				$output .="</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=15&host=".$data["name"],array("js" => true,
+					"confirm" => array($this->loc->s("confirm-remove-host")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -338,7 +340,8 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=3&hg=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=3&hg=".$data["name"]."\">".
+					$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				$found2 = false;
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'","hosttype,name");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -352,7 +355,8 @@
 					}
 					$output .= ")";
 				}
-				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&hg=".$data["name"])."</td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&hg=".$data["name"],array("js" => true,
+					"confirm" => array($this->loc->s("confirm-remove-hostgroup")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -461,7 +465,8 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Host")."</th><th>".$this->loc->s("Hosttype")."</th><th>".$this->loc->s("Template")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=4&srv=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["host"]."</td><td>";
+				$output .= "<tr id=\"srv_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=4&srv=".$data["name"]."\">".
+					$data["name"]."</a></td><td>".$data["host"]."</td><td>";
 				switch($data["hosttype"]) {
 					case 1: $output .= "Simple"; break;
 					case 2: $output .= "Groupe"; break;
@@ -470,7 +475,8 @@
 				$output .= "</td><td>";
 				if($data["template"] == "t") $output .= $this->loc->s("Yes");
 				else $output .= $this->loc->s("No");
-				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=18&srv=".$data["name"])."</td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=18&srv=".$data["name"],array("js" => true,
+					"confirm" => array($this->loc->s("confirm-remove-service")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -578,9 +584,10 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
+					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias").
+						"</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=5&tp=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=5&tp=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				if($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0)
 					$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].	
 					" ".$this->loc->s("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
@@ -602,7 +609,8 @@
 				if($data["suhs"] != 0 || $data["sums"] != 0 || $data["suhe"] != 0 || $data["sume"] != 0)
 					$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
 					" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
-				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&tp=".$data["name"])."</td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&tp=".$data["name"],array("js" => true,
+					"confirm" => array($this->loc->s("confirm-remove-timeperiod")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -697,9 +705,10 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=6&ct=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["mail"]."</td>
+				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=6&ct=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["mail"]."</td>
 					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
-					FS::$iMgr->removeIcon("mod=".$this->mid."&act=9&ct=".$data["name"])."</td></tr>";
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=9&ct=".$data["name"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-contact")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -792,7 +801,8 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=7&cg=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr id=\"ctg".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=7&cg=".$data["name"]."\">".
+					$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
 				$found2 = false;
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -800,7 +810,8 @@
 					else $found2 = true;
 					$output .= $data2["member"];
 				}
-				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=12&ctg=".$data["name"])."</td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=12&ctg=".$data["name"],array("js" => true,
+					"confirm" => array($this->loc->s("confirm-remove-contactgroup")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -880,8 +891,10 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr>";
 				}
-				$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&edit=8&cmd=".$data["name"]."\">".$data["name"]."</a></td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>".
-						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&cmd=".$data["name"])."</td></tr>";
+				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=8&cmd=".$data["name"]."\">".
+					$data["name"]."</a></td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>".
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&cmd=".$data["name"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-command")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -1378,39 +1391,60 @@
 				// Remove command
 				case 2:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					// @TODO forbid remove when use (host + service)
 					$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
 					if(!$cmdname) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=1");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-data-not-exist","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=2");
 						return;
 					}
 					
 					// Forbid remove if command is used
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","srvcmd = '".$cmdname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-binary-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","hostcmd = '".$cmdname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-binary-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
 					}
 					
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-fail-writecfg","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=8");
+					if(FS::isAjaxCall())
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#cmd_".preg_replace("#[. ]#","-",$cmdname)."'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=8");
 					return;
 				// Add/Edit timeperiod
 				case 4:
@@ -1530,18 +1564,27 @@
 				// Delete timeperiod
 				case 6:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$tpname = FS::$secMgr->checkAndSecuriseGetData("tp");
 					if(!$tpname) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$tpname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=2");
 						return;
 					}
 					
@@ -1549,31 +1592,49 @@
 					
 					// Forbid remove if timeperiod is used
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","srvperiod = '".$tpname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-binary-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","hostperiod = '".$tpname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-binary-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","checkperiod = '".$tpname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-binary-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 					
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","notifperiod = '".$tpname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-binary-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=4");
 						return;
 					}
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_timeperiods","name = '".$tpname."'");
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=5");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-fail-writecfg","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=5");
+					if(FS::isAjaxCall())
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#tp_".preg_replace("#[. ]#","-",$tpname)."'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=5");
 					return;
 				// Add/Edit contact
 				case 7:
@@ -1685,34 +1746,52 @@
 				// Delete contact
 				case 9:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
 					if(!$ctname) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=1");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=1");
 						return;
 					}
 					
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$ctname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=2");
 						return;
 					}
 					
 					// Forbid remove if in existing contact group
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name","member = '".$ctname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-contact-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=4");
 						return;
 					}
 					
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contacts","name = '".$ctname."'");
 					
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=5");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-fail-writecfg","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=6&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=6");
+					if(FS::isAjaxCall())
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ct_".preg_replace("#[. ]#","-",$ctname)."'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=6");
 					return;
 				// Add/Edit contact group
 				case 10:
@@ -1791,24 +1870,36 @@
 				// Delete contact group
 				case 12:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					// @TODO forbid remove when used (service, service_group)
 					$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
 					if(!$ctgname) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=1");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$ctgname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+					FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=2");
 						return;
 					}
 
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","contactgroup = '".$ctgname."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=4");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-ctg-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=4");
 						return;
 					}
 
@@ -1816,10 +1907,16 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroups","name = '".$ctgname."'");
 
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=5");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-fail-writecfg","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=7&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=7");
+					if(FS::isAjaxCall())
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ctg_".preg_replace("#[. ]#","-",$ctgname)."'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=7");
 					return;
 				// Add/Edit host
 				case 13:
@@ -1985,33 +2082,50 @@
 				// Remove host
 				case 15:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("host");
 					if(!$name) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
 					}
 
 					// Not exists
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","addr","name = '".$name."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=2");
 						return;
 					}
 
 					// Remove host and links with parents and hostgroups
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","name = '".$name."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","parent = '".$name."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hosts","name = '".$name."'");
+					FS::$dbMgr->CommitTr();
 
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-fail-writecfg","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=2");
+					if(FS::isAjaxCall())
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#h_".preg_replace("#[. ]#","-",$name)."'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=2");
 					return;
 				// Add/Edit service
 				case 16:
@@ -2163,31 +2277,48 @@
 				// remove service
 				case 18:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if(!$name) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=1");
 						return;
 					}
 					
 					// Not exists
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","name = '".$name."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=2");
 						return;
 					}
 					
 					// membertype 1 = service, 2 = servicegroup
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_servicegroups","member = '".$name."' AND membertype = 1");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_services","name = '".$name."'");
+					FS::$dbMgr->CommitTr();
 					
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=5");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-fail-writecfg","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=4&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=4");
+					if(FS::isAjaxCall())
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#srv_".preg_replace("#[. ]#","-",$name)."'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=4");
 					return;
 				// Add/Edit hostgroup
 				case 19:
@@ -2271,38 +2402,58 @@
 				// remove hostgroup
 				case 21:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("hg");
 					if(!$name) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 						return;
 					}
 
 					// Not exists
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
 					// Used
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","host = '".$name."' AND hosttype = '2'")) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-hg-used","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
 						return;
 					}
 
 					// Delete hostgroup and members
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name = '".$name."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = 2");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups","name = '".$name."'");
+					FS::$dbMgr->CommitTr();
 
 					if(!$this->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=5");
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-fail-writecfg","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=5");
 						return;
 					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=3");
+					if(FS::isAjaxCall())
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#hg_".preg_replace("#[. ]#","-",$name)."'); unlockScreen();");
+					else
+						FS::$iMgr->redir("mod=".$this->mid."&sh=3");
 					return;
 			}
 		}

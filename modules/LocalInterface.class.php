@@ -194,9 +194,9 @@
 				require(dirname(__FILE__)."/user_modules/".$path."/main.php");
 
 				if($module->getRulesClass()->canAccessToModule()) {
-						$module->getModuleClass()->setModuleId($id);
-						$output .= $module->getModuleClass()->Load();
-					}
+					$module->getModuleClass()->setModuleId($id);
+					$output .= $module->getModuleClass()->Load();
+				}
 				else
 					$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");
 			}
@@ -232,6 +232,10 @@
 		}
 
 		public function removeIcon($link,$options=array()) { return $this->linkIcon($link,"cross",$options); }
+
+		public function ajaxEcho($str,$js,$raw=false) {
+			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
+		}
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;

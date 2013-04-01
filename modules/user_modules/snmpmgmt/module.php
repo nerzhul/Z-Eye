@@ -79,7 +79,7 @@
 					if(!$name || $ro && $ro != "on" || $rw && $rw != "on") {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Adding data");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-invalid-data");
+							FS::$iMgr->ajaxEcho("err-invalid-data");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
@@ -88,7 +88,7 @@
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-already-exist");
+							FS::$iMgr->ajaxEcho("err-already-exist");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
 						return;
@@ -97,7 +97,7 @@
 					// User must choose read and/or write
 					if($ro != "on" && $rw != "on") {
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-readorwrite");
+							FS::$iMgr->ajaxEcho("err-readorwrite");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=6");
 						return;
@@ -107,7 +107,7 @@
 					if(!is_array($netdiscoCfg)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-");
+							FS::$iMgr->ajaxEcho("err-read-netdisco");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
@@ -124,7 +124,7 @@
 					if(!$name) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Deleting data");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-invalid-data").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-invalid-data","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
 						return;
@@ -132,7 +132,7 @@
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Community '".$name."' not in DB");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-not-exist").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-not-exist","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=4");
 						return;
@@ -142,7 +142,7 @@
 					if(!is_array($netdiscoCfg)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-read-fail").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-read-fail","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
 						return;
@@ -152,7 +152,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
 					if(FS::isAjaxCall()) {
-						echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#".$name."tr'); unlockScreen();");
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".$name."tr'); unlockScreen();");
 					}
 					else
 						FS::$iMgr->redir("mod=".$this->mid."&sh=2");

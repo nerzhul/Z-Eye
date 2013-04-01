@@ -477,7 +477,7 @@
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to add/edit server");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-no-rights");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
@@ -489,7 +489,7 @@
 						) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some datas are invalid or wrong for add server");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-miss-bad-fields");
+							FS::$iMgr->ajaxEcho("err-miss-bad-fields");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						return;
@@ -497,14 +497,14 @@
 					$conn = ssh2_connect($saddr,22);
 					if(!$conn) {
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-unable-conn");
+							FS::$iMgr->ajaxEcho("err-unable-conn");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-bad-login");
+							FS::$iMgr->ajaxEcho("err-bad-login");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&&err=3");
 						return;
@@ -514,7 +514,7 @@
 						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
 							if(FS::isAjaxCall())
-								echo $this->loc->s("err-bad-server");
+								FS::$iMgr->ajaxEcho("err-bad-server");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&err=5");
 							return;
@@ -526,7 +526,7 @@
 						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
 							if(FS::isAjaxCall())
-								echo $this->loc->s("err-server-exist");
+								FS::$iMgr->ajaxEcho("err-server-exist");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&err=4");
 							return;
@@ -542,7 +542,7 @@
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-no-rights").FS::$iMgr->js("unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-no-rights","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
@@ -554,7 +554,7 @@
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$srv."'");
 					}
 					if(FS::isAjaxCall())
-						echo $this->lock->s("Done").FS::$iMgr->js("hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr'); unlockScreen();");
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr'); unlockScreen();");
 					else
 					FS::$iMgr->redir("mod=".$this->mid);
 					return;

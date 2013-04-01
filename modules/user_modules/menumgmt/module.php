@@ -196,7 +196,7 @@
 			$menu->Delete();
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' removed");
 			if(FS::isAjaxCall())
-				echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#m".$id."tr'); unlockScreen();");
+				FS::$iMgr->ajaxEch("Done","hideAndRemove('#m".$id."tr'); unlockScreen();");
 			else
 				FS::$iMgr->redir("mod=".$this->mid);
 		}
@@ -235,7 +235,7 @@
 			$menuEl->Delete();
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Removed menu element id '".$im."'");
 			if(FS::isAjaxCall())
-				echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#mit".$im."tr'); unlockScreen();");
+				FS::$iMgr->ajaxEcho("Done","hideAndRemove('#mit".$im."tr'); unlockScreen();");
 			else
 				FS::$iMgr->redir("mod=".$this->mid);
 		}
@@ -254,7 +254,7 @@
 			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."menu_link","id_menu = '".$menuid."' AND id_menu_item = '".$itemid."'");
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Removed element '".$itemid."' from menu '".$menuid."'");
 			if(FS::isAjaxCall())
-				echo $this->loc->s("Done").FS::$iMgr->js("hideAndRemove('#el".$itemid."tr'); unlockScreen();");
+				FS::$iMgr->ajaxEcho("Done","hideAndRemove('#el".$itemid."tr'); unlockScreen();");
 			else
 				FS::$iMgr->redir("mod=".$this->mid."&do=2&menu=".$menuid);
 			
