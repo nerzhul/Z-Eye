@@ -54,7 +54,7 @@
 						$output .= $this->loc->s("rewr-other");
 					$output .= "</center></td><td><center>".$data["args"]."</center></td><td>";
 					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&link=".$data["id"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-link")."'#".$data["id"]."'","Confirm","Cancel")));
+						"confirm" => array($this->loc->s("confirm-remove-link")."'#".$data["id"]."' ?","Confirm","Cancel")));
 					$output .= "</td></tr>";
 				}
 				$output .= "</table></div>";

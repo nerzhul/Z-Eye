@@ -206,7 +206,7 @@
 					$output .= $data2["parent"];
 				}
 				$output .="</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=15&host=".$data["name"],array("js" => true,
-					"confirm" => array($this->loc->s("confirm-remove-host")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
+					"confirm" => array($this->loc->s("confirm-remove-host")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -355,7 +355,7 @@
 					$output .= ")";
 				}
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&hg=".$data["name"],array("js" => true,
-					"confirm" => array($this->loc->s("confirm-remove-hostgroup")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
+					"confirm" => array($this->loc->s("confirm-remove-hostgroup")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -475,7 +475,7 @@
 				if($data["template"] == "t") $output .= $this->loc->s("Yes");
 				else $output .= $this->loc->s("No");
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=18&srv=".$data["name"],array("js" => true,
-					"confirm" => array($this->loc->s("confirm-remove-service")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
+					"confirm" => array($this->loc->s("confirm-remove-service")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -609,7 +609,7 @@
 					$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
 					" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&tp=".$data["name"],array("js" => true,
-					"confirm" => array($this->loc->s("confirm-remove-timeperiod")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
+					"confirm" => array($this->loc->s("confirm-remove-timeperiod")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -707,7 +707,7 @@
 				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=6&ct=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["mail"]."</td>
 					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=9&ct=".$data["name"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-contact")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
+						"confirm" => array($this->loc->s("confirm-remove-contact")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -810,7 +810,7 @@
 					$output .= $data2["member"];
 				}
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=12&ctg=".$data["name"],array("js" => true,
-					"confirm" => array($this->loc->s("confirm-remove-contactgroup")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
+					"confirm" => array($this->loc->s("confirm-remove-contactgroup")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
@@ -893,7 +893,7 @@
 				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=8&cmd=".$data["name"]."\">".
 					$data["name"]."</a></td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&cmd=".$data["name"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-command")."'".$data["name"]."'","Confirm","Cancel")))."</td></tr>";
+						"confirm" => array($this->loc->s("confirm-remove-command")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;

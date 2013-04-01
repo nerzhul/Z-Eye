@@ -136,16 +136,18 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($found == false) $found = true;
-				$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&bck=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"];
-				$tmpoutput .= "</td><td>";
+				$tmpoutput .= "<tr id=\"b".preg_replace("#[. ]#","-",$data["addr"]).$data["type"]."\"><td>
+					<a href=\"index.php?mod=".$this->mid."&bck=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"]."</td><td>";
+				$bcktype = "";
 				switch($data["type"]) {
-					case 1: $tmpoutput .= "TFTP"; break;
-					case 2: $tmpoutput .= "FTP"; break;
-					case 4: $tmpoutput .= "SCP"; break;
-					case 5: $tmpoutput .= "SFTP"; break;
+					case 1: $bcktype = "TFTP"; break;
+					case 2: $bcktype = "FTP"; break;
+					case 4: $bcktype = "SCP"; break;
+					case 5: $bcktype = "SFTP"; break;
 				}
-				$tmpoutput .= "</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&addr=".$data["addr"]."&type=".$data["type"]);
+				$tmpoutput .= $bcktype."</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
+				$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&addr=".$data["addr"]."&type=".$data["type"],array("js" => true,
+					"confirm" => array($this->loc->s("confirm-remove-backupsrv")."'".$data["addr"]." (".$bcktype.")' ?","Confirm","Cancel")));
 				$tmpoutput .= "</center></td></tr>";
 			}
 			if($found)
@@ -183,57 +185,11 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				// Init array for device
-				$grprules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
-					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
-					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array(), "portmod_portsec" => array(),
-					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "portmod_dhcpsnooping" => array(), "dhcpsnmgmt" => array());
-				$usrrules = array("read" => array(), "readswdetails" => array(), "readswmodules" => array(), "readswvlans" => array(), "readportstats" => array(), 
-					"write" => array(), "writeportmon" => array(), "restorestartupcfg" => array(), "exportcfg" => array(), "retagvlan" => array(),
-					"sshpwd" => array(), "sshportinfos" => array(), "sshshowstart" => array(), "sshshowrun" => array(), "portmod_portsec" => array(),
-					"portmod_cdp" => array(), "portmod_voicevlan" => array(), "portmod_dhcpsnooping" => array(), "dhcpsnmgmt" => array());
+				$grprules = $this->initIPRules();
+				$usrrules = $this->initIPRules();
 				// Groups
-				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_read")
-						array_push($grprules["read"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readportstats")
-						array_push($grprules["readportstats"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswdetails")
-						array_push($grprules["readswdetails"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswmodules")
-						array_push($grprules["readswmodules"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswvlans")
-						array_push($grprules["readswvlans"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_write")
-						array_push($grprules["write"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_writeportmon")
-						array_push($grprules["writeportmon"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_restorestartupcfg")
-						array_push($grprules["restorestartupcfg"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_exportcfg")
-						array_push($grprules["exportcfg"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_retagvlan")
-						array_push($grprules["retagvlan"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshpwd")
-						array_push($grprules["sshpwd"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshportinfos")
-						array_push($grprules["sshportinfos"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshshowstart")
-						array_push($grprules["sshshowstart"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshshowrun")
-						array_push($grprules["sshshowrun"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_portsec")
-						array_push($grprules["portmod_portsec"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_cdp")
-						array_push($grprules["portmod_cdp"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_voicevlan")
-						array_push($grprules["portmod_voicevlan"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_dhcpsnooping")
-						array_push($grprules["portmod_dhcpsnooping"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_dhcpsnmgmt")
-						array_push($grprules["dhcpsnmgmt"],$data2["gid"]);
-				}
 				$first = true;
+				$grprules = $this->loadIPRules($grprules,1,$data["ip"]);
 				foreach($grprules as $key => $values) {
 					$grpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if($first) $first = false;
@@ -242,47 +198,7 @@
 					$grpoutput .= $this->showIPGroups($data["ip"],$key,$values,$filteri);
 				}
 				// Users			
-				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$data["ip"]."_%'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_read")
-						array_push($usrrules["read"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readportstats")
-						array_push($usrrules["readportstats"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswdetails")
-						array_push($usrrules["readswdetails"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswmodules")
-						array_push($usrrules["readswmodules"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_readswvlans")
-						array_push($usrrules["readswvlans"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_write")
-						array_push($usrrules["write"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_writeportmon")
-						array_push($usrrules["writeportmon"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_restorestartupcfg")
-						array_push($usrrules["restorestartupcfg"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_exportcfg")
-						array_push($usrrules["exportcfg"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_retagvlan")
-						array_push($usrrules["retagvlan"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshpwd")
-						array_push($usrrules["sshpwd"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshportinfos")
-						array_push($usrrules["sshportinfos"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshshowstart")
-						array_push($usrrules["sshshowstart"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_sshshowrun")
-						array_push($usrrules["sshshowrun"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_portsec")
-						array_push($usrrules["portmod_portsec"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_cdp")
-						array_push($usrrules["portmod_cdp"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_voicevlan")
-						array_push($usrrules["portmod_voicevlan"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_portmod_dhcpsnooping")
-						array_push($usrrules["portmod_dhcpsnooping"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_ip_".$data["ip"]."_dhcpsnmgmt")
-						array_push($usrrules["dhcpsnmgmt"],$data2["uid"]);
-				}
+				$usrrules = $this->loadIPRules($usrrules,2,$data["ip"]);
 				$first = true;
 				foreach($usrrules as $key => $values) {
 					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
@@ -315,29 +231,66 @@
 			return $output;
 		}
 
+		private function initIPRules($rulefilter = "") {
+			$rules = array();
+			$rulelist = array("read","readswdetails","readswmodules","readswvlans","readportstats", 
+				"write","writeportmon","restorestartupcfg","exportcfg","retagvlan",
+				"sshpwd","sshportinfos","sshshowstart","sshshowrun","portmod_portsec",
+				"portmod_cdp","portmod_voicevlan","portmod_dhcpsnooping","dhcpsnmgmt");
+			for($i=0;$i<count($rulelist);$i++) {
+				if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
+					$rules[$rulelist[$i]] = array();
+			}
+			return $rules;
+		}
+
+		private function loadIPRules($rules,$type,$ip,$rulefilter = "") {
+			$idx = "";
+			if($type == 1) {
+				$idx = "gid";
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$ip."_%'");
+			}
+			else if($type == 2) {
+				$idx = "uid";	
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_swip_".$ip."_%'");
+			}
+			else
+				return NULL;
+			while($data2 = FS::$dbMgr->Fetch($query2)) {
+				$ruleidx = preg_replace("#mrule_switchmgmt_ip_".$ip."_#","",$data2["rulename"]);
+				switch($ruleidx) {
+					case "read": case "readportstats": case "readswdetails": case "readswmodules":
+					case "readswvlans":
+					case "write": case "writeportmon": case "restorestartupcfg": case "exportcfg":
+					case "retagvlan":
+					case "sshpwd": case "sshportinfos": case "sshshowstart": case "sshshowrun":
+					case "portmod_portsec": case "portmod_cdp": case "portmod_voicevlan":
+					case "portmod_dhcpsnooping": case "dhcpsnmgmt":
+						if($strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)
+							array_push($rules[$ruleidx],$data2[$idx]);
+						break;
+				}
+			}
+			return $rules;
+		}
+
 		private function showIPUsers($ip,$right,$values,$filterIP) { 
 			$output = "";
 
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
+					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
+					$output .= "<span id=\"u".$values[$i].$right."ip\">".$username." ".
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""),
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-userright")."'".$username."' ?","Confirm","Cancel")))."</span><br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
 			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
-			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("gid");
-			$users = $this->getUsers();
-			$found = false;
-			foreach($users as $uid => $username) {
-				if(!in_array($uid,$values)) {
-					if(!$found) $found = true;
-					$tmpoutput .= FS::$iMgr->selElmt($username,$uid);
-				}
-			}
-			if($found) $output .= $tmpoutput."</select>".FS::$iMgr->submit("",$this->loc->s("Add"))."</form>";
+			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."ip\">";
+			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
 			return $output;
 		}
 
@@ -347,23 +300,17 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""))."<br />";
+					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
+					$output .= "<span id=\"g".$values[$i].$right."ip\">".$gname." ".
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""),
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-groupright")."'".$gname."' ?","Confirm","Cancel")))."</span><br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
 			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
-			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("gid");
-			$groups = $this->getUserGroups();
-			$found = false;
-			foreach($groups as $gid => $gname) {
-				if(!in_array($gid,$values)) {
-					if(!$found) $found = true;
-					$tmpoutput .= FS::$iMgr->selElmt($gname,$gid);
-				}
-			}
-			if($found) $output .= $tmpoutput."</select>".FS::$iMgr->submit("",$this->loc->s("Add"))."</form>";
+			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."ip\">";
+			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
 			return $output;
 		}
 
@@ -394,94 +341,10 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				// Init SNMP rights
-				$grprules = array();
-				$usrrules = array();
-				if($data["ro"] == 't') {
-					$grprules["read"] = array();
-					$usrrules["read"] = array();
-					$grprules["readportstats"] = array();
-					$usrrules["readportstats"] = array();
-					$grprules["readswdetails"] = array();
-					$usrrules["readswdetails"] = array();
-					$grprules["readswmodules"] = array();
-					$usrrules["readswmodules"] = array();
-					$grprules["readswvlans"] = array();
-					$usrrules["readswvlans"] = array();
-					$grprules["sshportinfos"] = array();
-					$usrrules["sshportinfos"] = array();
-					$grprules["sshshowstart"] = array();
-					$usrrules["sshshowstart"] = array();
-					$grprules["sshshowrun"] = array();
-					$usrrules["sshshowrun"] = array();
-				}
-				if($data["rw"] == 't') {
-					$grprules["write"] = array();
-					$usrrules["write"] = array();
-					$grprules["writeportmon"] = array();
-					$usrrules["writeportmon"] = array();
-					$grprules["restorestartupcfg"] = array();
-					$usrrules["restorestartupcfg"] = array();
-					$grprules["exportcfg"] = array();
-					$usrrules["exportcfg"] = array();
-					$grprules["retagvlan"] = array();
-					$usrrules["retagvlan"] = array();
-					$grprules["sshpwd"] = array();
-					$usrrules["sshpwd"] = array();
-					$grprules["portmod_portsec"] = array();
-					$usrrules["portmod_portsec"] = array();
-					$grprules["portmod_cdp"] = array();
-					$usrrules["portmod_cdp"] = array();
-					$grprules["portmod_voicevlan"] = array();
-					$usrrules["portmod_voicevlan"] = array();
-					$grprules["portmod_dhcpsnooping"] = array();
-					$usrrules["portmod_dhcpsnooping"] = array();
-					$grprules["dhcpsnmgmt"] = array();
-					$usrrules["dhcpsnmgmt"] = array();
-				}
-				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					// Read rules
-					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_read" && $data["ro"] == 't')
-						array_push($grprules["read"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readportstats" && $data["ro"] == 't')
-						array_push($grprules["readportstats"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswdetails" && $data["ro"] == 't')
-						array_push($grprules["readswdetails"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswmodules" && $data["ro"] == 't')
-						array_push($grprules["readswmodules"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswvlans" && $data["ro"] == 't')
-						array_push($grprules["readswvlans"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshportinfos" && $data["ro"] == 't')
-						array_push($grprules["sshportinfos"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshshowstart" && $data["ro"] == 't')
-						array_push($grprules["sshshowstart"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshshowrun" && $data["ro"] == 't')
-						array_push($grprules["sshshowrun"],$data2["gid"]);
-					// Write rules
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
-						array_push($grprules["write"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
-						array_push($grprules["writeportmon"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_restorestartupcfg" && $data["rw"] == 't')
-						array_push($grprules["restorestartupcfg"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_exportcfg" && $data["rw"] == 't')
-						array_push($grprules["exportcfg"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_retagvlan" && $data["rw"] == 't')
-						array_push($grprules["retagvlan"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshpwd" && $data["rw"] == 't')
-						array_push($grprules["sshpwd"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_portsec" && $data["rw"] == 't')
-						array_push($grprules["portmod_portsec"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_cdp" && $data["rw"] == 't')
-						array_push($grprules["portmod_cdp"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_voicevlan" && $data["rw"] == 't')
-						array_push($grprules["portmod_voicevlan"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_dhcpsnooping" && $data["rw"] == 't')
-						array_push($grprules["portmod_dhcpsnooping"],$data2["gid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_dhcpsnmgmt" && $data["rw"] == 't')
-						array_push($grprules["dhcpsnmgmt"],$data2["gid"]);
-				}
+				$grprules = $this->initSNMPRules($data["ro"],$data["rw"]);
+				$usrrules = $this->initSNMPRules($data["ro"],$data["rw"]);
 				$first = true;
+				$grprules = $this->loadSNMPRules($grprules,1,$data["name"],$data["ro"],$data["rw"]);
 				foreach($grprules as $key => $values) {
 					$grpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if($first) $first = false;
@@ -490,49 +353,7 @@
 					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values,$filterc);
 				}			
 				// Users
-				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$data["name"]."_%'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					// Read rules
-					if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_read" && $data["ro"] == 't')
-						array_push($usrrules["read"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readportstats" && $data["ro"] == 't')
-						array_push($usrrules["readportstats"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswdetails" && $data["ro"] == 't')
-						array_push($usrrules["readswdetails"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswmodules" && $data["ro"] == 't')
-						array_push($usrrules["readswmodules"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_readswvlans" && $data["ro"] == 't')
-						array_push($usrrules["readswvlans"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshportinfos" && $data["ro"] == 't')
-						array_push($usrrules["sshportinfos"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshshowstart" && $data["ro"] == 't')
-						array_push($usrrules["sshshowstart"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshshowrun" && $data["ro"] == 't')
-						array_push($usrrules["sshshowrun"],$data2["uid"]);
-					// Write rules
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_write" && $data["rw"] == 't')
-						array_push($usrrules["write"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_writeportmon" && $data["rw"] == 't')
-						array_push($usrrules["writeportmon"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_restorestartupcfg" && $data["rw"] == 't')
-						array_push($usrrules["restorestartupcfg"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_exportcfg" && $data["rw"] == 't')
-						array_push($usrrules["exportcfg"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_retagvlan" && $data["rw"] == 't')
-						array_push($usrrules["retagvlan"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_sshpwd" && $data["rw"] == 't')
-						array_push($usrrules["sshpwd"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_portsec" && $data["rw"] == 't')
-						array_push($usrrules["portmod_portsec"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_cdp" && $data["rw"] == 't')
-						array_push($usrrules["portmod_cdp"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_voicevlan" && $data["rw"] == 't')
-						array_push($usrrules["portmod_voicevlan"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_portmod_dhcpsnooping" && $data["rw"] == 't')
-						array_push($usrrules["portmod_dhcpsnooping"],$data2["uid"]);
-					else if($data2["rulename"] == "mrule_switchmgmt_snmp_".$data["name"]."_dhcpsnmgmt" && $data["rw"] == 't')
-						array_push($usrrules["dhcpsnmgmt"],$data2["uid"]);
-				}
+				$usrrules = $this->loadSNMPRules($usrrules,2,$data["name"],$data["ro"],$data["rw"]);
 				$first = true;
 				foreach($usrrules as $key => $values) {
 					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
@@ -570,29 +391,80 @@
 			return $output;
 		}
 
+		private function initSNMPRules($ro,$rw,$rulefilter = "") {
+			$rules = array();
+			$rorules = array("read","readportstats","readswdetails","readswmodules","readswvlans",
+				"sshportinfos","sshshowstart","sshshowrun");
+			$rwrules = array("write","writeportmon","restorestartupcfg","exportcfg","retagvlan",
+				"sshpwd","portmod_portsec","portmod_cdp","portmod_voicevlan","portmod_dhcpsnooping",
+				"dhcpsnmgmt");
+			if($ro == 't') {
+				for($i=0;$i<count($rorules);$i++) {
+					if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rorules[$i])
+						$rules[$rorules[$i]] = array();
+				}
+			}
+			if($rw == 't') {
+				for($i=0;$i<count($rwrules);$i++) {
+					if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rwrules[$i])
+						$rules[$rwrules[$i]] = array();
+				}
+			}
+			return $rules;
+		}
+
+		private function loadSNMPRules($rules,$type,$name,$ro,$rw,$rulefilter = "") {
+			$idx = "";
+			if($type == 1) { 
+				$idx = "gid";
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
+			}
+			else if($type == 2) {
+				$idx = "uid";
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
+			}
+			else
+				return NULL;
+			while($data2 = FS::$dbMgr->Fetch($query2)) {
+				$ruleidx = preg_replace("#mrule_switchmgmt_snmp_".$name."_#","",$data2["rulename"]);
+				switch($ruleidx) {
+					// Read rules
+					case "read": case "readportstats": case "readswdetails": case "readswmodules": 
+					case "readswvlans": case "sshportinfos": case "sshshowstart": case "sshshowrun":
+						if($ro == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)) {
+							array_push($rules[$ruleidx],$data2[$idx]);
+						}
+						break;
+					// Write rules
+					case "write": case "writeportmon": case "restorestartupcfg": case "exportcfg":
+					case "retagvlan": case "sshpwd": case "portmod_portsec": case "portmod_cdp":
+					case "portmod_voicevlan": case "portmod_dhcpsnooping": case "dhcpsnmgmt":
+						if($rw == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter))
+							array_push($rules[$ruleidx],$data2[$idx]);
+						break;
+				}
+			}
+			return $rules;
+		}
+
 		private function showSNMPGroups($snmp,$right,$values,$filterSNMP) { 
 			$output = "";
 
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
+					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
+					$output .= "<span id=\"g".$values[$i].$right."snmp\">".$gname." ".
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""),
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-groupright")."'".$gname."' ?","Confirm","Cancel")))."</span><br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
 			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
-			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("gid");
-			$groups = $this->getUserGroups();
-			$found = false;
-			foreach($groups as $gid => $gname) {
-				if(!in_array($gid,$values)) {
-					if(!$found) $found = true;
-					$tmpoutput .= FS::$iMgr->selElmt($gname,$gid);
-				}
-			}
-			if($found) $output .= $tmpoutput."</select>".FS::$iMgr->submit("",$this->loc->s("Add"))."</form>";
+			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."snmp\">";
+			$tmpoutput .= $this->groupSelect("gid",$values);
+			$output .= $tmpoutput."</span></form>";
 			return $output;
 		}
 
@@ -602,24 +474,49 @@
 			$count = count($values);
 			if($count) {
 				for($i=0;$i<count($values);$i++) {
-					$output .= FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'")." ".
-						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""))."<br />";
+					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
+					$output .= "<span id=\"u".$values[$i].$right."snmp\">".$username." ".
+						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""),
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-userright")."'".$username."' ?","Confirm","Cancel")))."</span><br />";
 				}
 			}
 			else
 				$output .= $this->loc->s("None")."<br />";
 			$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
-			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right).FS::$iMgr->select("uid");
+			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."snmp\">";
+			$tmpoutput .= $this->userSelect("uid",$values);
+			$output .= $tmpoutput."</span></form>";
+			return $output;
+		}
+
+		private function userSelect($sname,$values) {
+			$output = FS::$iMgr->select($sname);
 			$users = $this->getUsers();
 			$found = false;
 			foreach($users as $uid => $username) {
 				if(!in_array($uid,$values)) {
 					if(!$found) $found = true;
-					$tmpoutput .= FS::$iMgr->selElmt($username,$uid);
+					$output .= FS::$iMgr->selElmt($username,$uid);
 				}
 			}
-			if($found) $output .= $tmpoutput."</select>".FS::$iMgr->submit("",$this->loc->s("Add"))."</form>";
-			return $output;
+			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
+			if(!$found) return "";
+			else return $output;
+		}
+
+		private function groupSelect($sname,$values) {
+			$output = FS::$iMgr->select($sname);
+			$groups = $this->getUserGroups();
+			$found = false;
+			foreach($groups as $gid => $gname) {
+				if(!in_array($gid,$values)) {
+					if(!$found) $found = true;
+					$output .= FS::$iMgr->selElmt($gname,$gid);
+				}
+			}
+			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
+			if(!$found) return "";
+			else return $output;
 		}
 
 		private function getUserGroups() {
@@ -761,7 +658,7 @@
 
 					FS::$iMgr->redir("mod=".$this->mid.($filter ? "&filter=".$filter : ""));
 					return;
-				case 2: // Remove group from SNMP community
+				case 2: // Remove group/ from SNMP community
 					$gid = FS::$secMgr->checkAndSecuriseGetData("gid");
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					$snmp = FS::$secMgr->checkAndSecuriseGetData("snmp");
@@ -770,7 +667,10 @@
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 
 					if((!$uid && !$gid) || (!$ip && !$snmp) || !$right) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=1".($filter ? "&filter=".$filter : ""));
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("err-bad-datas","unlockScreen();");
+						else
+							FS::$iMgr->redir("mod=".$this->mid."&err=1".($filter ? "&filter=".$filter : ""));
 						return;
 					}
 
@@ -778,7 +678,10 @@
 						if($gid) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."'")) {
-								FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
+								if(FS::isAjaxCall())
+									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
@@ -786,21 +689,74 @@
 						else if($uid) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."'")) {
-								FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
+								if(FS::isAjaxCall())
+									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
 							}
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
 						}
 					}
 					else if($ip) {
-						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
-							$ip."_".$right."' AND gid = '".$gid."'")) {
-							FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
-							return;
+						if($gid) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+								$ip."_".$right."' AND gid = '".$gid."'")) {
+								if(FS::isAjaxCall())
+									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
+								return;
+							}
+						}
+						else if($uid) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+								$ip."_".$right."' AND uid = '".$uid."'")) {
+								if(FS::isAjaxCall())
+									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+								else
+									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
+								return;
+							}
 						}
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
 					}
-					FS::$iMgr->redir("mod=".$this->mid.($filter ? "&filter=".$filter : ""));
+					if(FS::isAjaxCall()) {
+						if($gid) {
+							if($snmp) {
+								$rules = $this->initSNMPRules('t','t',$right);
+								$rules = $this->loadSNMPRules($rules,1,$snmp,'t','t',$right);
+								foreach($rules as $key => $values)
+									echo FS::$iMgr->js("$('#lg".$right."snmp').html('".$this->groupSelect("gid",$values)."');");
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."snmp'); unlockScreen();");
+							}
+							else if($ip) {
+								$rules = $this->initIPRules($right);
+								$rules = $this->loadIPRules($rules,1,$ip,$right);
+								foreach($rules as $key => $values)
+									echo FS::$iMgr->js("$('#lg".$right."ip').html('".$this->groupSelect("gid",$values)."');");
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."ip'); unlockScreen();");
+							}
+						}
+						else if($uid) {
+							if($snmp) {
+								$rules = $this->initSNMPRules('t','t',$right);
+								$rules = $this->loadSNMPRules($rules,2,$snmp,'t','t',$right);
+								foreach($rules as $key => $values)
+									echo FS::$iMgr->js("$('#lu".$right."snmp').html('".$this->userSelect("uid",$values)."');");
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."snmp'); unlockScreen();");
+							}
+							else if($ip) {
+								$rules = $this->initIPRules($right);
+								$rules = $this->loadIPRules($rules,2,$ip,$right);
+								foreach($rules as $key => $values)
+									echo FS::$iMgr->js("$('#lu".$right."ip').html('".$this->userSelect("uid",$values)."');");
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."ip'); unlockScreen();"); 
+							}
+						}
+					}
+					else
+						FS::$iMgr->redir("mod=".$this->mid.($filter ? "&filter=".$filter : ""));
 					return;
 				case 3: // add or edit backup server
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
@@ -858,7 +814,7 @@
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"User don't have rights to remove server '".$saddr."' from switches backup");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-no-rights");
+							FS::$iMgr->ajaxEcho("err-no-rights","unlockScreen();");
 						else
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
 						return;
@@ -868,11 +824,13 @@
 					if($saddr && $stype) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Delete server '".$saddr."' for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
+						if(FS::isAjaxCall())
+							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."'); unlockScreen();");
+						else FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					}
 					else {
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-bad-datas");
+							FS::$iMgr->ajaxEcho("err-bad-datas","unlockScreen();");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 					}
