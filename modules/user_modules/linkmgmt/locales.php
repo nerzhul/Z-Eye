@@ -24,6 +24,10 @@
 			$this->locales = array(
 				"fr" => array(
 					"Action" => "Action",
+					"Cancel" => "Annuler",
+					"Confirm" => "Confirmer",
+					"confirm-remove-link" => "Êtes vous sûr de vouloir supprimer le lien ",
+					"Done" => "Effectué",
 					"link-create" => "Création d'un lien",
 					"link-edit" => "Edition d'un lien",
 					"menu-title" => "Gestion des liens HTTP (dev)",
@@ -37,6 +41,10 @@
 				),
 				"en" => array(
 					"Action" => "Action",
+					"Cancel" => "Cancel",
+					"Confirm" => "Confirm",
+					"confirm-remove-link" => "Are you sure you want to remove link ",
+					"Done" => "Done",
 					"link-create" => "Link creation",
 					"link-edit" => "Link edition",
 					"menu-title" => "HTTP links management (dev)",

@@ -39,7 +39,7 @@
 				<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."http_links","id,type,args","","id",1);
 				while($data = FS::$dbMgr->Fetch($query)) {
-					$output .= "<tr><td><center><a href=\"index.php?mod=".$this->mid."&do=2&link=".$data["id"]."\">".$data["id"]."</a></center></td><td><center>";
+					$output .= "<tr id=\"l".$data["id"]."tr\"><td><center><a href=\"index.php?mod=".$this->mid."&do=2&link=".$data["id"]."\">".$data["id"]."</a></center></td><td><center>";
 					if($data["type"] == 0)
 						$output .= $this->loc->s("Normal");
 					else if($data["type"] == 1)
@@ -53,7 +53,8 @@
 					else
 						$output .= $this->loc->s("rewr-other");
 					$output .= "</center></td><td><center>".$data["args"]."</center></td><td>";
-					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&link=".$data["id"]);
+					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&link=".$data["id"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-link")."'#".$data["id"]."'","Confirm","Cancel")));
 					$output .= "</td></tr>";
 				}
 				$output .= "</table></div>";
@@ -126,7 +127,11 @@
 				
 			$link = new HTTPLink($lid);
 			$link->Delete();
-			FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Link removed '".$link."'");
+			FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Link removed '".$lid."'");
+			if(FS::isAjaxCall())
+				FS::$iMgr->ajaxEcho("Done","hideAndRemove('#l".$lid."tr'); unlockScreen();");
+			else
+				FS::$iMgr->redir("mod=".$this->mid);
 		}
 
 		public function handlePostDatas($act) {
@@ -141,7 +146,6 @@
 					break;
 				case 3: // del
 					$this->RemoveLink();
-					FS::$iMgr->redir("mod=".$this->mid);
 					break;
 				default: break;
 			}
