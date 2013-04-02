@@ -39,7 +39,7 @@
 					"confirm-remove-command" => "Êtes vous sûr de vouloir supprimer la commande ",
 					"confirm-remove-contact" => "Êtes vous sûr de vouloir supprimer le contact ",
 					"confirm-remove-contactgroup" => "Êtes vous sûr de vouloir supprimer le groupe de contacts ",
-					"confirm-remove-host" => "ëtes vous sûr de vouloir supprimer l'hôte ",
+					"confirm-remove-host" => "Êtes vous sûr de vouloir supprimer l'hôte ",
 					"confirm-remove-hostgroup" => "Êtes vous sûr de vouloir supprimer le groupe d'hôtes ",
 					"confirm-remove-service" => "Êtes vous sûr de vouloir supprimer le service ",
 					"confirm-remove-timeperiod" => "Êtes vous sur de vouloir supprimer la période temporelle ",

@@ -22,7 +22,7 @@
 * You can found copy of this licence at: http://creativecommons.org/licenses/by-nd/3.0/legalcode
 */
 
-body { background-color: #5e0000; font-family: Arial, Helvetica, sans-serif; background-attachment: fixed;
+body { background-color: #5e0000; font-family: Verdana,Arial,sans-serif; background-attachment: fixed;
 background-image: linear-gradient(#000,#3e0000); background-image: -ms-linear-gradient(#000,#3e0000); background-image: -o-linear-gradient(#000,#3e0000); background-image: -webkit-linear-gradient(#000,#3e0000);
 }
 
@@ -67,25 +67,9 @@ h2 { background-color: #5e0000; margin-left: 5%; font-size: 17px; }
 	height: 100%;
 	background-color: black;
 	opacity: 0.9;
-	z-index: 2000;
+	z-index: 1000;
 	margin-top: 5px;
 	margin-left: -8px;
-}
-
-#subpop {
-	position: fixed;
-	width: 400px;
-	height: 200px;
-	border-radius: 2px 2px 2px 2px;
-	background-color: #EEE;
-	text-align: center;
-	vertical-align: middle;
-	display: inline-block;
-	padding: 20px;
-	top: 50%;
-	left: 50%;
-        margin-top: -100px;
-        margin-left: -200px;
 }
 
 #notification {
@@ -263,7 +247,6 @@ table {
 	margin: auto;
 	margin-top: 15px;
 	margin-bottom: 15px;
-	border: 1px solid #CCC;
 }
 
 th {
@@ -353,7 +336,7 @@ a:hover { color: #F10; cursor: pointer; }
         vertical-align: center;
         height: 28px;
         margin-top: 10px;
-        border-radius: 3px 3px 3px 3px;
+        border-radius: 3px;
         cursor: pointer;
 }
 
@@ -511,3 +494,79 @@ label { float: left; font-weight: bold; text-align: left; }
 .zoomWrapperImage { display:block; position:relative; overflow:hidden; z-index:110; background-color:white; border-radius:4px }
 .zoomWrapperImage img { border:0px; display:block; position:absolute; z-index:101; }
 .zoomIframe { z-index: -1; filter:alpha(opacity=0); opacity: 0.80; position:absolute; display:block; }
+
+.ui-dialog {
+	position: absolute;
+	top: 0;
+	left: 0;
+	outline: 0;
+	border-radius: 4px;
+	font-size: 12px;
+}
+.ui-dialog .ui-dialog-titlebar {
+	padding: .4em 1em;
+	position: relative;
+}
+.ui-dialog .ui-dialog-title {
+	float: left;
+	margin: .1em 0;
+	white-space: nowrap;
+	width: 90%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+	position: absolute;
+	right: .3em;
+	top: 50%;
+	width: 21px;
+	margin: -10px 0 0 0;
+	padding: 1px;
+	height: 20px;
+}
+.ui-dialog .ui-dialog-content {
+	position: relative;
+	border: 0;
+	padding: .5em 1em;
+	background: none;
+	overflow: auto;
+}
+.ui-dialog .ui-dialog-buttonpane {
+	text-align: center;
+	border-width: 0;
+	background-image: none;
+	margin-top: .5em;
+	padding: .3em 1em .5em .4em;
+}
+.ui-dialog .ui-dialog-buttonpane button {
+	margin: .5em .4em .5em 0;
+	cursor: pointer;
+	background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
+        border: 1px solid #CCC;
+        vertical-align: center;
+        height: 28px;
+        margin-top: 10px;
+        border-radius: 3px;
+        cursor: pointer;
+}
+.ui-dialog .ui-dialog-buttonpane button:hover {
+	margin: .5em .4em .5em 0;
+	cursor: pointer;
+	background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
+        border: 1px solid #CCC;
+        vertical-align: center;
+        height: 28px;
+        margin-top: 10px;
+        border-radius: 3px;
+        cursor: pointer;
+}
+.ui-dialog .ui-resizable-se {
+	width: 12px;
+	height: 12px;
+	right: -5px;
+	bottom: -5px;
+	background-position: 16px 16px;
+}
+.ui-draggable .ui-dialog-titlebar {
+	cursor: move;
+}

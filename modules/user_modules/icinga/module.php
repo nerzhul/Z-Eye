@@ -191,7 +191,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Address")."</th><th>".$this->loc->s("Template")."</th><th>".$this->loc->s("Parent")."</th><th></th></tr>";
+					$output .= "<table width=\"80%\"><tr><th width=\"20%\">".$this->loc->s("Name")."</th><th width=\"20%\">".$this->loc->s("Alias")."</th><th width=\"20%\">".$this->loc->s("Address")."</th><th width=\"15%\">".$this->loc->s("Template")."</th><th width=\"20%\">".$this->loc->s("Parent")."</th><th></th></tr>";
 				}
 				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=2&host=".$data["name"]."\">".
 					$data["name"]."</a></td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
@@ -337,7 +337,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
+					$output .= "<table width=\"80%\"><tr><th width=\"10%\">".$this->loc->s("Name")."</th><th width=\"10%\">".$this->loc->s("Alias")."</th><th width=\"80%\">".$this->loc->s("Members")."</th><th></th></tr>";
 				}
 				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=3&hg=".$data["name"]."\">".
 					$data["name"]."</a></td><td>".$data["alias"]."</td><td>";

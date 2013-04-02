@@ -43,8 +43,7 @@ ta/*!
 
 /* Component containers
 ----------------------------------*/
-.ui-widget { font-family: Verdana,Arial,sans-serif; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-size: 1em; }
 .ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff 50% 50% repeat-x; color: #222222; }
 .ui-widget-header { background-image: linear-gradient(center top , #8A0000, #7A0000); background-color: #7A0000; color: #222222; font-weight: bold; }
 .ui-widget-header a { color: #222222; }
