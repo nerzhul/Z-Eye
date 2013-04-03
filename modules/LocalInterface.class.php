@@ -212,9 +212,9 @@
 			if(isset($options["js"]) && $options["js"] == true) {
 				$jsarr = "{";
 				if(isset($options["snotif"])) $jsarr .= "'snotif': '".addslashes($options["snotif"])."'";
-				$jsarr .= "}";
 				// Confirmation div
 				if(isset($options["confirm"]) && is_array($options["confirm"]) && count($options["confirm"]) == 3) {
+					$jsarr .= ($jsarr != "{" ? "," : "")."'lock': true";
 					$output .= "onclick=\"confirmPopup('".addslashes($options["confirm"][0])."','".
 						addslashes($this->cur_module->getLoc()->s($options["confirm"][1]))."','".
 						addslashes($this->cur_module->getLoc()->s($options["confirm"][2]))."','index.php?".
@@ -222,6 +222,7 @@
 				}
 				else
 					$output .= "onclick=\"callbackLink('index.php?".addslashes($link)."'";
+				$jsarr .= "}";
 				if($jsarr != "{}")
 					$output .= ",".$jsarr;
 				$output .= ");\" ";
