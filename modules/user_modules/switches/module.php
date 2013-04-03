@@ -977,15 +977,12 @@
 
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_retagvlan") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_retagvlan")) { 
-						$js = "function searchports() {";
-						$js .= "$('#subpop').html('".$this->loc->s("search-ports")."...<br /><br /><br />');";
-						$js .= "lockScreen();
-						var ovlid = document.getElementsByName('oldvl')[0].value;";
-						$js .= "$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
-							unlockScreen();
-							$('#vlplist').html(data); });";
-						$js .= "return false;";
-						$js .= "};";
+						$js = "function searchports() {
+							waitingPopup('".$this->loc->s("search-ports")."...');
+							var ovlid = document.getElementsByName('oldvl')[0].value;
+							$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
+							$('#vlplist').html(data); unlockScreen(true); });
+							return false; };";
 						$js .= "function checkTagForm() {
 							if($('#vlplist') == null || $('#vlplist').html().length < 1) {
 								alert('".$this->loc->s("must-verify-ports")." !');
@@ -1023,16 +1020,18 @@
 									}
 									else if(data == 3) {
 										$('#subpop').html('".$this->loc->s("Success")." !');
-										setTimeout(function() { unlockScreen(); },1000);
+										setTimeout(function() { unlockScreen(true); },1000);
 									}
 									else if(data == 4) {
 										$.post('index.php?at=3&mod=".$this->mid."&act=14&d=".$device."&saveid='+copyId, function(data) {
 											$('#subpop').html('".$this->loc->s("Fail")." !<br />Cause: '+data); 
 										});
-										setTimeout(function() { unlockScreen(); },5000);
+										setTimeout(function() { unlockScreen(true); },5000);
 									}
-									else
+									else {
 										$('#subpop').html('".$this->loc->s("unk-answer").": '+data);
+										setTimeout(function() { unlockScreen(true); },5000);
+									}
 								}); }, 1000);
 						}");
 					}
@@ -1047,8 +1046,7 @@
 						$js .= "} else if(document.getElementsByName('exportm')[0].value == 1) {";
 						$js .= "$('#slogin').hide(); }};";
 						$js .= "function sendbackupreq() {";
-						$js .= "$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');";
-						$js .= "lockScreen();";
+						$js .= "waitingPopup('".$this->loc->s("req-sent")."...');";
 						$js .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
 						srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
 						io: document.getElementsByName('io')[0].value },
@@ -1082,8 +1080,7 @@
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_restorestartupcfg")) {
 						// Copy startup-config -> running-config
 						$output .= FS::$iMgr->js("function restorestartupconfig() {
-							$('#subpop').html('".$this->loc->s("req-sent")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');
-						lockScreen();
+							waitingPopup('".$this->loc->s("req-sent")."...');
 						$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
 							var copyId = data;
 							$('#subpop').html('".$this->loc->s("restore-in-progress")."...');
