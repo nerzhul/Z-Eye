@@ -447,7 +447,7 @@
 					FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
 					FS::$iMgr->hidden("group","'+e.dataTransfer.getData('text/html')+'").
 					FS::$iMgr->submit("",$this->loc->s("Delete")).
-					FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"unlockScreen()")."</form>');
+					FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"unlockScreen();")."</form>');
 					lockScreen();
 						}
 				});
@@ -1432,7 +1432,7 @@
 					if(!$raddb || !$radhost || !$radport) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"Some required fields are missing for DHCP sync removal");
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-not-exist","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-not-exist");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=1");
 						return;
@@ -1441,7 +1441,7 @@
 					if(!$subnet) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"No subnet given to DHCP sync removal");
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-miss-data","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-miss-data");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4&err=2");
 						return;
@@ -1450,7 +1450,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import","addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."' AND dhcpsubnet = '".$subnet."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Remove sync between subnet '".$subnet."' and radius");
 					if(FS::isAjaxCall())
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$subnet)."'); unlockScreen();");
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$subnet)."');");
 					else
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&sh=4");
 					return;
@@ -1732,7 +1732,7 @@
 					if(!FS::$sessMgr->hasRight("mrule_radius_manage")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",2,"This user don't have rights to manage radius !");
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-no-right","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-no-right");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
@@ -1745,12 +1745,12 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"radius",0,"Remove Radius DB ".$sdbname."@".$saddr.":".$sport);
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$sdbname.$saddr.$sport)."'); unlockScreen();");
+							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$sdbname.$saddr.$sport)."');");
 						else
 							FS::$iMgr->redir("mod=".$this->mid);
 					}
 					else
-						FS::$iMgr->ajaxEcho("err-miss-data","unlockScreen();");
+						FS::$iMgr->ajaxEcho("err-miss-data");
 					return;
 				// Ping radius db
 				case 15:

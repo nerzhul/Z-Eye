@@ -541,7 +541,7 @@
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-no-rights","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 						return;
@@ -553,7 +553,7 @@
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$srv."'");
 					}
 					if(FS::isAjaxCall())
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr'); unlockScreen();");
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr');");
 					else
 					FS::$iMgr->redir("mod=".$this->mid);
 					return;

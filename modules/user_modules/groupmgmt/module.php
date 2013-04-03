@@ -153,7 +153,7 @@
 					$gname = FS::$secMgr->checkAndSecuriseGetData("gname");
 					if(!$gname) {
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-bad-data","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-bad-data");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",2,"Some datas are missing when try to remove group");
@@ -162,7 +162,7 @@
 					$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 					if(!$gid) {
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-not-exist","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-not-exist");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",1,"Unable to remove group '".$gname."', group doesn't exists");
@@ -175,7 +175,7 @@
 					FS::$dbMgr->CommitTr();
 					FS::$log->i(FS::$sessMgr->getUserName(),"groupmgmt",0,"Group '".$gname."' removed");
 					if(FS::isAjaxCall())
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#gr".$gid."tr'); unlockScreen();");
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#gr".$gid."tr');");
 					else
 						FS::$iMgr->redir("mod=".$this->mid);
                                         return;

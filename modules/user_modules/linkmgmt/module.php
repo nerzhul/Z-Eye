@@ -129,7 +129,7 @@
 			$link->Delete();
 			FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Link removed '".$lid."'");
 			if(FS::isAjaxCall())
-				FS::$iMgr->ajaxEcho("Done","hideAndRemove('#l".$lid."tr'); unlockScreen();");
+				FS::$iMgr->ajaxEcho("Done","hideAndRemove('#l".$lid."tr');");
 			else
 				FS::$iMgr->redir("mod=".$this->mid);
 		}

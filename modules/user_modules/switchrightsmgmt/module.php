@@ -668,7 +668,7 @@
 
 					if((!$uid && !$gid) || (!$ip && !$snmp) || !$right) {
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-bad-datas","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=1".($filter ? "&filter=".$filter : ""));
 						return;
@@ -679,7 +679,7 @@
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."'")) {
 								if(FS::isAjaxCall())
-									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+									FS::$iMgr->ajaxEcho("err-not-found");
 								else
 									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
@@ -690,7 +690,7 @@
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."'")) {
 								if(FS::isAjaxCall())
-									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+									FS::$iMgr->ajaxEcho("err-not-found");
 								else
 									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
@@ -703,7 +703,7 @@
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 								$ip."_".$right."' AND gid = '".$gid."'")) {
 								if(FS::isAjaxCall())
-									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+									FS::$iMgr->ajaxEcho("err-not-found");
 								else
 									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
@@ -713,7 +713,7 @@
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 								$ip."_".$right."' AND uid = '".$uid."'")) {
 								if(FS::isAjaxCall())
-									FS::$iMgr->ajaxEcho("err-not-found","unlockScreen();");
+									FS::$iMgr->ajaxEcho("err-not-found");
 								else
 									FS::$iMgr->redir("mod=".$this->mid."&err=4".($filter ? "&filter=".$filter : ""));
 								return;
@@ -728,14 +728,14 @@
 								$rules = $this->loadSNMPRules($rules,1,$snmp,'t','t',$right);
 								foreach($rules as $key => $values)
 									echo FS::$iMgr->js("$('#lg".$right."snmp').html('".$this->groupSelect("gid",$values)."');");
-								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."snmp'); unlockScreen();");
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."snmp');");
 							}
 							else if($ip) {
 								$rules = $this->initIPRules($right);
 								$rules = $this->loadIPRules($rules,1,$ip,$right);
 								foreach($rules as $key => $values)
 									echo FS::$iMgr->js("$('#lg".$right."ip').html('".$this->groupSelect("gid",$values)."');");
-								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."ip'); unlockScreen();");
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."ip');");
 							}
 						}
 						else if($uid) {
@@ -744,14 +744,14 @@
 								$rules = $this->loadSNMPRules($rules,2,$snmp,'t','t',$right);
 								foreach($rules as $key => $values)
 									echo FS::$iMgr->js("$('#lu".$right."snmp').html('".$this->userSelect("uid",$values)."');");
-								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."snmp'); unlockScreen();");
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."snmp');");
 							}
 							else if($ip) {
 								$rules = $this->initIPRules($right);
 								$rules = $this->loadIPRules($rules,2,$ip,$right);
 								foreach($rules as $key => $values)
 									echo FS::$iMgr->js("$('#lu".$right."ip').html('".$this->userSelect("uid",$values)."');");
-								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."ip'); unlockScreen();"); 
+								FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."ip'); "); 
 							}
 						}
 					}
@@ -814,7 +814,7 @@
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"User don't have rights to remove server '".$saddr."' from switches backup");
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-no-rights","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 						else
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
 						return;
@@ -825,12 +825,12 @@
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Delete server '".$saddr."' for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."'); unlockScreen();");
+							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."');");
 						else FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					}
 					else {
 						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-bad-datas","unlockScreen();");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 					}
