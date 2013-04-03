@@ -283,7 +283,7 @@
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= "<span id=\"u".$values[$i].$right."ip\">".$username." ".
 						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""),
-							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-userright")."'".$username."' ?","Confirm","Cancel")))."</span><br />";
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-userright")."'".$username."' ?","Confirm","Cancel")))."<br /></span>";
 				}
 			}
 			else
@@ -303,7 +303,7 @@
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= "<span id=\"g".$values[$i].$right."ip\">".$gname." ".
 						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&ip=".$ip."&right=".$right.($filterIP ? "&filter=".$filterIP : ""),
-							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-groupright")."'".$gname."' ?","Confirm","Cancel")))."</span><br />";
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-groupright")."'".$gname."' ?","Confirm","Cancel")))."<br /></span>";
 				}
 			}
 			else
@@ -456,7 +456,7 @@
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= "<span id=\"g".$values[$i].$right."snmp\">".$gname." ".
 						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""),
-							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-groupright")."'".$gname."' ?","Confirm","Cancel")))."</span><br />";
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-groupright")."'".$gname."' ?","Confirm","Cancel")))."<br /></span>";
 				}
 			}
 			else
@@ -477,7 +477,7 @@
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= "<span id=\"u".$values[$i].$right."snmp\">".$username." ".
 						FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&uid=".$values[$i]."&snmp=".$snmp."&right=".$right.($filterSNMP ? "&filter=".$filterSNMP : ""),
-							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-userright")."'".$username."' ?","Confirm","Cancel")))."</span><br />";
+							array("js" => true, "confirm" => array($this->loc->s("confirm-remove-userright")."'".$username."' ?","Confirm","Cancel")))."<br /></span>";
 				}
 			}
 			else
