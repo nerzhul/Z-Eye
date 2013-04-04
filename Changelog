@@ -278,3 +278,9 @@ RC2.3
 - Fix bugs in icinga admin module
 - Speed reporting also show host states
 
+1.0
+- Many bugfixes (cf http://gitweb.unix-experience.fr)
+
+1.1
+- In progress
+
