@@ -503,6 +503,7 @@ label { float: left; font-weight: bold; text-align: left; }
 	border-radius: 4px;
 	font-size: 12px;
 }
+.no-close .ui-dialog-titlebar a { display: none; }
 .ui-dialog .ui-dialog-titlebar {
 	padding: .4em 1em;
 	position: relative;

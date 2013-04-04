@@ -68,14 +68,14 @@
 			$js = "$('#".$id."').submit(function(event) {";
 			// Locking screen if needed
 			if(isset($options["lock"]) && $options["lock"] == true) {
-				$js .= "$('#subpop').html('".FS::$iMgr->img("styles/images/loader.gif",32,32)."'); lockScreen();";
+				$js .= "waitingPopup('');";
 			}
 			// Starting notification
 			if(isset($options["snotif"]) && strlen($options["snotif"]) > 0) {
 				$js .= "$('#subnotification').html('".addslashes($options["snotif"])."');
 				$('#notification').slideDown();
 				setTimeout(function() {
-						$('#notification').slideUp();
+					$('#notification').slideUp();
 				},".(isset($options["stimeout"]) && $options["stimeout"] > 1000 ? $options["stimeout"] : 5000).");";
 			}
 			$js .= "event.preventDefault();
@@ -85,7 +85,7 @@
 					$('#notification').slideUp();
 				},".(isset($options["timeout"]) && $options["timeout"] > 1000 ? $options["timeout"] : 5000).");";
 				if(isset($options["lock"]) && $options["lock"] == true) {
-					$js .= "unlockScreen();";
+					$js .= "unlockScreen(true);";
 				}
 			$js .= "}); });";
 			return $this->js($js);
