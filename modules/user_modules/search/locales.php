@@ -21,7 +21,8 @@
     
 	class lSearch extends zLocales {
 		function lSearch() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Accounting" => "Accounting",
 					"Alias" => "Alias",
@@ -151,6 +152,7 @@
 					"Validity" => "Validity",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

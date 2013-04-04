@@ -29,6 +29,17 @@
         */
 
 	class zLocales {
+		function zLocales() { $this->locales = array(
+			"en" => array(
+				"Cancel" => "Cancel",
+				"Confirm" => "Confirm"
+			),
+			"fr" => array(
+				"Cancel" => "Annuler",
+				"Confirm" => "Confirmer")
+			);
+		}
+
 		public function s($str) {
 			if(!isset($_SESSION["lang"]) || !isset($this->locales[$_SESSION["lang"]]))
 				$lang = Config::getDefaultLang();
@@ -40,6 +51,15 @@
 			return $this->locales[$lang][$str];
 		}
 		
+		protected function concat($moduleLocales=array()) {
+			if(!isset($moduleLocales["en"]))
+				$modulesLocales["en"] = array();
+			if(!isset($moduleLocales["fr"]))
+				$modulesLocales["fr"] = array();
+			$this->locales["en"] = array_merge($this->locales["en"],$moduleLocales["en"]);
+			$this->locales["fr"] = array_merge($this->locales["fr"],$moduleLocales["fr"]);
+		}
+
 		protected $locales;
 	};
 ?>

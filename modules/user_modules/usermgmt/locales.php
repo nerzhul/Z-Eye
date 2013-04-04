@@ -21,7 +21,8 @@
     
 	class lUserMgmt extends zLocales {
 		function lUserMgmt() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Adding" => "Ajout...",
 					"attr-mail" => "Attribut Mail",
@@ -160,6 +161,7 @@
 					"User-type" => "User type",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

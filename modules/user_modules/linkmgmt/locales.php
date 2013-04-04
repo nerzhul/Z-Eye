@@ -21,7 +21,8 @@
     
 	class lLinkMgmt extends zLocales {
 		function lLinkMgmt() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Action" => "Action",
 					"Cancel" => "Annuler",
@@ -57,6 +58,7 @@
 					"title-link" => "Link management",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

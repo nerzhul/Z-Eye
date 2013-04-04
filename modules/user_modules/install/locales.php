@@ -21,7 +21,8 @@
 
 	class lInstall extends zLocales {
 		function lInstall() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"err-fields-missing" => "Certains champs sont manquants",
 					"err-mail-invalid" => "Adresse mail invalide",
@@ -84,6 +85,7 @@
 					"Value" => "Value",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

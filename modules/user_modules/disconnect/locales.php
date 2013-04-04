@@ -21,7 +21,8 @@
     
 	class lDisconnect extends zLocales {
 		function lDisconnect() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Confirm" => "Confirmer",
 					"confirm-disconnect" => "Êtes vous sûr de vouloir vous déconnecter ?",
@@ -35,6 +36,7 @@
 					"menu-title" => "Disconnect",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

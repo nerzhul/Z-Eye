@@ -21,7 +21,8 @@
     
 	class lSecReport extends zLocales {
 		function lSecReport() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Action-nb" => "Nombre d'actions",
 					"Alert" => "Alerte",
@@ -85,6 +86,7 @@
 					"violent-days" => " most violent days",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

@@ -21,7 +21,8 @@
     
 	class lRadius extends zLocales {
 		function lRadius() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Account" => "Compte",
 					"Account-nb" => "Nombre de comptes",
@@ -301,6 +302,7 @@
 					"Validity" => "Validity",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

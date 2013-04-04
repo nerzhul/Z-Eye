@@ -21,7 +21,8 @@
     
 	class lLogs extends zLocales {
 		function lLogs() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Collector" => "Collecteur Z-Eye",
 					"Date" => "Date",
@@ -51,6 +52,7 @@
 					"webapp" => "Web application",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

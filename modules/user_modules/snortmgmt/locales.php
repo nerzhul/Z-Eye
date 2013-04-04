@@ -21,7 +21,8 @@
     
 	class lSnort extends zLocales {
 		function lSnort() { 
-			$this->locales = array(
+			parent::zLocales();	
+			$locales = array(
 				"fr" => array(
 					"Activate" => "Activer",
 					"bad-data" => "Donnée(s) entrée(s) invalide(s)",
@@ -129,6 +130,7 @@
 					"User" => "User",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

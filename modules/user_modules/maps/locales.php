@@ -21,7 +21,8 @@
     
 	class lMaps extends zLocales {
 		function lMaps() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"err-no-tab" => "Onglet invalide",
 					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux, ou la page indisponible",
@@ -43,6 +44,7 @@
 					"title-maps" => "Maps",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

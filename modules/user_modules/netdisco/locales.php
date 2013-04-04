@@ -21,7 +21,8 @@
     
 	class lNetdisco extends zLocales {
 		function lNetdisco() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Add-community" => "Ajouter une communauté SNMP",
 					"database" => "Base de données",
@@ -115,6 +116,7 @@
 					"Write" => "Write",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

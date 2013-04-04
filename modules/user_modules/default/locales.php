@@ -21,7 +21,8 @@
 
 	class lDefault extends zLocales {
 		function lDefault() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Attack" => "Attaques",
 					"err-detect-atk" => "Menace détectée !",
@@ -55,6 +56,7 @@
 					"state-srv" => "Services state",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

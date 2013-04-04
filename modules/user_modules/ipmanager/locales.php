@@ -21,7 +21,8 @@
     
 	class lIPManager extends zLocales {
 		function lIPManager() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",
 					"Available-s" => "Distribuables",
@@ -190,6 +191,7 @@
 					"warn-line" => "Warning step",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

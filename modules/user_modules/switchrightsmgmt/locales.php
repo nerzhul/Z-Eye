@@ -21,12 +21,11 @@
     
 	class lSwitchRightsMgmt extends zLocales {
 		function lSwitchRightsMgmt() {
-			$this->locales = array(
+			parent::zLocales();	
+			$locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",
 					"All" => "Tous",
-					"Cancel" => "Annuler",
-					"Confirm" => "Confirmer",
 					"confirm-remove-groupright" => "Êtes vous sûr de vouloir supprimer ce droit pour le groupe ",
 					"confirm-remove-userright" => "Êtes vous sûr de vouloir supprimer ce droit pour l'utilisateur ",
 					"device" => "Equipement",
@@ -89,8 +88,6 @@
 				"en" => array(
 					"Add" => "Add",
 					"All" => "All",
-					"Cancel" => "Cancel",
-					"Confirm" => "Confirm",
 					"confirm-remove-groupright" => "Are you sure you want to remove right for group ",
 					"confirm-remove-userright" => "Are you sure you want to remove right for user ",
 					"device" => "Device",
@@ -151,6 +148,7 @@
 					"Write-port-mon" => "Modification (port monitoring)",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

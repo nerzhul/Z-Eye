@@ -21,7 +21,8 @@
     
 	class lSwitchMgmt extends zLocales {
 		function lSwitchMgmt() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Active" => "Actif",
 					"admin-duplex" => "Duplex Administratif",
@@ -435,6 +436,7 @@
 					"warn-step" => "Warn step (MB)",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

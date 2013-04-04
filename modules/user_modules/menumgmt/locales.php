@@ -21,7 +21,8 @@
     
 	class lMenuMgmt extends zLocales {
 		function lMenuMgmt() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"add-elmt" => "Ajouter un élément",
 					"Both" => "Les deux",
@@ -79,6 +80,7 @@
 					"Yes" => "Yes",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

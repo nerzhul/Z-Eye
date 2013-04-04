@@ -21,7 +21,8 @@
     
 	class lIcinga extends zLocales {
 		function lIcinga() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"active-check-en" => "Vérifications actives",
 					"Add" => "Ajouter",
@@ -273,6 +274,7 @@
 					"Yes" => "Yes",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

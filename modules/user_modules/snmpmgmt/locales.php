@@ -21,7 +21,8 @@
     
 	class lSNMPMgmt extends zLocales {
 		function lSNMPMgmt() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Add-community" => "Ajouter une communauté SNMP",
 					"Cancel" => "Annuler",
@@ -82,6 +83,7 @@
 					"Write" => "Write",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

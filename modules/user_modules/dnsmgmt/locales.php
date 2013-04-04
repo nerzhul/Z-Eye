@@ -21,7 +21,8 @@
     
 	class lDNSManager extends zLocales {
 		function lDNSManager() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"add-server" => "Ajouter un serveur",
 					"Alone" => "Orphelin",
@@ -117,6 +118,7 @@
 					"Value" => "Value",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

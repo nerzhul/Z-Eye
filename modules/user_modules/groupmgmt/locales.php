@@ -21,7 +21,8 @@
     
 	class lGroupMgmt extends zLocales {
 		function lGroupMgmt() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",
 					"Cancel" => "Annuler",
@@ -65,6 +66,7 @@
 					"User-nb" => "User number",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>

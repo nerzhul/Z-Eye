@@ -21,7 +21,8 @@
 
 	class lConnect extends zLocales {
 		function lConnect() {
-			$this->locales = array(
+			parent::zLocales();
+			$locales = array(
 				"fr" => array(
 					"Connect" => "Connexion",
 					"err-bad-user" => "Nom d'utilisateur et/ou mot de passe inconnu",
@@ -41,6 +42,7 @@
 					"title-conn" => "Connect to the admin panel",
 				)
 			);
+			$this->concat($locales);
 		}
 	};
 ?>
