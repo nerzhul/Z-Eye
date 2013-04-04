@@ -29,14 +29,18 @@
         */
 
 	class zLocales {
-		function zLocales() { $this->locales = array(
-			"en" => array(
-				"Cancel" => "Cancel",
-				"Confirm" => "Confirm"
-			),
-			"fr" => array(
-				"Cancel" => "Annuler",
-				"Confirm" => "Confirmer")
+		function zLocales() { 
+			$this->locales = array(
+				"en" => array(
+					"Cancel" => "Cancel",
+					"Confirm" => "Confirm",
+					"Done" => "Done"
+				),
+				"fr" => array(
+					"Cancel" => "Annuler",
+					"Confirm" => "Confirmer",
+					"Done" => "Effectué"
+				)
 			);
 		}
 
