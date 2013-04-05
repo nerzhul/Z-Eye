@@ -146,7 +146,7 @@
 				<div id=\"menuItem\"><div id=\"search\">";
 			$output .= $this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1));
                         $output .= $this->hidden("mod",$this->getModuleIdByPath("search"));
-			$output .= $this->input("s","",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
+			$output .= $this->autoComplete("s",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
 			$output .= "</div></div></div>";
 
 			return $output;
@@ -234,6 +234,13 @@
 		}
 
 		public function removeIcon($link,$options=array()) { return $this->linkIcon($link,"cross",$options); }
+
+		public function autoComplete($name, $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
+			$output = $this->input($name,"",$size,$length,$label,$tooltip);
+			$output .= $this->js("$('#".$name."').autocomplete({source: 'index.php?mod=".$this->getModuleIdByPath("search")."&at=2',
+				minLength: 3});");
+			return $output;
+		}
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;

@@ -77,7 +77,7 @@
 			FS::$log = new FSLogger();
 		}
 
-		public static function isAJAXCall() {
+		public static function isAjaxCall() {
 			if(FS::$secMgr->checkAndSecuriseGetData("at"))
 				return true;
 
