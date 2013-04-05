@@ -235,10 +235,6 @@
 
 		public function removeIcon($link,$options=array()) { return $this->linkIcon($link,"cross",$options); }
 
-		public function ajaxEcho($str,$js,$raw=false) {
-			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
-		}
-
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;
 	};
