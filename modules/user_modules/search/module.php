@@ -85,7 +85,7 @@
 					}
 					$outresults = array_unique($outresults);
 					sort($outresults);
-					for($i=0;$i<count($outresults);$i++) {
+					for($i=0;$i<count($outresults) && $i<10;$i++) {
 						if($i!=0) $output .= ",";
 						$output .= "{\"id\":\"".$outresults[$i]."\",\"value\":\"".$outresults[$i]."\"}";
 					}
