@@ -67,7 +67,7 @@
 				FS::$log->i(FS::$sessMgr->getUserName(),"search",0,"searching '".$search."'");
 			}
 			else {
-				if(preg_match('#^([0-9A-F]{2}:)#',$search) || preg_match('#([0-9A-F]{2}-)#',$search))
+				if(preg_match('#^([0-9A-F]{2}):#i',$search) || preg_match('#([0-9A-F]{2}-)#i',$search))
 					$this->showMacAddrResults($search,true);
 				else if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.#",$search))
 					$this->showIPAddrResults($search,true);
