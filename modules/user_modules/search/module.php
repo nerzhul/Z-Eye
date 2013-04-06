@@ -67,7 +67,7 @@
 				FS::$log->i(FS::$sessMgr->getUserName(),"search",0,"searching '".$search."'");
 			}
 			else {
-				if(preg_match('#^([0-9A-F]{2}):#i',$search) || preg_match('#([0-9A-F]{2}-)#i',$search))
+				if(preg_match('#^([0-9A-F]{2}:)#i',$search) || preg_match('#([0-9A-F]{2}-)#i',$search))
 					$this->showMacAddrResults($search,true);
 				else if(preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.#",$search))
 					$this->showIPAddrResults($search,true);
@@ -811,15 +811,15 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select("node_ip","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
+					$query = FS::$dbMgr->Select("node_ip","mac","text(mac) ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 
-					$query = FS::$dbMgr->Select("node","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
+					$query = FS::$dbMgr->Select("node","mac","text(mac) ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 
-					$query = FS::$dbMgr->Select("node_nbt","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
+					$query = FS::$dbMgr->Select("node_nbt","mac","text(mac) ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 				}
@@ -846,7 +846,7 @@
 					}
 				}
 				else {
-					$query = FS::$dbMgr->Select("device","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
+					$query = FS::$dbMgr->Select("device","mac","text(mac) ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 				}
