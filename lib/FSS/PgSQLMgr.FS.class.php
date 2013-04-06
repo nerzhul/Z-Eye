@@ -68,7 +68,6 @@
 					$sql .= " LIMIT ".$startidx.",".$limit;
 				else
 					$sql .= " LIMIT ".$limit;
-
 			}
 			return pg_query($this->dbLink,$sql);
 		}

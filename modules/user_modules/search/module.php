@@ -413,7 +413,7 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","recval","recval ILIKE '".$search."'%","recval",0,"10",0,array("group" => "recval"));
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","recval","recval ILIKE '".$search."%'","recval",0,"10",0,array("group" => "recval"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["dnsrecord"],$data["recval"]);
 				}
@@ -518,15 +518,15 @@
 					}
 				}
 				else {
-					$query = FS::$dbMgr->Select("node_ip","ip","ip ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
+					$query = FS::$dbMgr->Select("node_ip","ip","host(ip) ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 
-					$query = FS::$dbMgr->Select("node_nbt","ip","ip ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
+					$query = FS::$dbMgr->Select("node_nbt","ip","host(ip) ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 
-					$query = FS::$dbMgr->Select("device","ip","ip ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
+					$query = FS::$dbMgr->Select("device","ip","host(ip) ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 				}
