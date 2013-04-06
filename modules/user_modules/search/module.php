@@ -80,7 +80,7 @@
 					$outresults = array();
 					foreach($this->autoresults as $key => $values) {
 						for($i=0;$i<count($values);$i++) {
-							array_push($outresults,$values);
+							array_push($outresults,$values[$i]);
 						}
 					}
 					$outresults = array_unique($outresults);
