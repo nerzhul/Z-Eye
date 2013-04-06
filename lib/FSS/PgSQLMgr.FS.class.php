@@ -50,12 +50,14 @@
 			return 0;
 		}
 
-		public function Select($table,$fields,$cond = "",$order = "",$ordersens = 0, $limit = 0, $startidx = 0) {
+		public function Select($table,$fields,$cond = "",$order = "",$ordersens = 0, $limit = 0, $startidx = 0, $options = array()) {
 			$sql = "SELECT ".$fields." FROM ".$table."";
 			if(strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
+			if(isset($options["group"]) && strlen($options["group"]) > 0) 
+				$sql .= " GROUP BY ".$options["group"];
 			if(strlen($order) > 0) {
-				$sql .= " ORDER BY ".$order."";
+				$sql .= " ORDER BY ".$order;
 				if($ordersens == 1)
 					$sql .= " DESC";
 				else if($ordersens == 2)
