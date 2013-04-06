@@ -149,11 +149,11 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'","port GROUP BY prise",0,"10");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'","prise",0,"10",0,array("group" => "prise"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["prise"],$data["prise"]);
 					
-					$query = FS::$dbMgr->Select("device_vlan","vlan","vlan ILIKE '".$search."%'","ip GROUP BY prise",0,"10");
+					$query = FS::$dbMgr->Select("device_vlan","vlan","vlan ILIKE '".$search."%'","vlan",0,"10",0,array("group" => "vlan"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["vlan"],$data["vlan"]);
 				}
@@ -257,15 +257,15 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select("device","name","name ILIKE '".$search."%' GROUP BY name",0,"10");
+					$query = FS::$dbMgr->Select("device","name","name ILIKE '".$search."%'","name",0,"10",0,array("group" => "name"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["device"],$data["name"]);
 
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'","port GROUP BY prise",0,"10");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'","prise",0,"10",0,array("group" => "prise"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["prise"],$data["prise"]);
 
-					$query = FS::$dbMgr->Select("device_port","name","name ILIKE '".$search."%'","name GROUP BY name",0,"10");
+					$query = FS::$dbMgr->Select("device_port","name","name ILIKE '".$search."%'","name",0,"10",0,array("group" => "name"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["portname"],$data["name"]);
 				}	
@@ -358,12 +358,12 @@
 				}
 				else {
 					$query = FS::$dbMgr->Select("node_nbt","domain","domain ILIKE '".$search."%'",
-						"domain GROUP BY domain",0,"10");
+						"domain",0,"10",0,array("group" => "domain"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["nbdomain"],$data["domain"]);
 
 					$query = FS::$dbMgr->Select("node_nbt","nbname","nbname ILIKE '".$search."%'",
-						"nbname GROUP BY nbname",0,"10");
+						"nbname",0,"10",0,array("group" => "nbname"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["nbname"],$data["nbname"]);
 				}
@@ -413,7 +413,7 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","recval","recval ILIKE '".$search."'%","recval GROUP BY recval",0,"10");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","recval","recval ILIKE '".$search."'%","recval",0,"10",0,array("group" => "recval"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["dnsrecord"],$data["recval"]);
 				}
@@ -442,7 +442,7 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip","ip ILIKE '".$search."%'","ip GROUP BY ip",0,"10");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip","ip ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 
@@ -518,15 +518,15 @@
 					}
 				}
 				else {
-					$query = FS::$dbMgr->Select("node_ip","ip","ip ILIKE '".$search."%'","ip GROUP BY ip",0,"10");
+					$query = FS::$dbMgr->Select("node_ip","ip","ip ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 
-					$query = FS::$dbMgr->Select("node_nbt","ip","ip ILIKE '".$search."%'","ip GROUP BY ip",0,"10");
+					$query = FS::$dbMgr->Select("node_nbt","ip","ip ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 
-					$query = FS::$dbMgr->Select("device","ip","ip ILIKE '".$search."%'","ip GROUP BY ip",0,"10");
+					$query = FS::$dbMgr->Select("device","ip","ip ILIKE '".$search."%'","ip",0,"10",0,array("group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 				}
@@ -607,7 +607,7 @@
 						$found = 0;
 						$totinbw = 0;
 						$totoutbw = 0;
-						$query2 = $radSQLMgr->Select($data["tradacct"],"calledstationid, SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$tmpsearch."' GROUP BY calledstationid");
+						$query2 = $radSQLMgr->Select($data["tradacct"],"calledstationid, SUM(acctinputoctets) as input, SUM(acctoutputoctets) as output, MIN(acctstarttime) as fst, MAX(acctstoptime) as lst","callingstationid = '".$tmpsearch."'","",0,0,0,array("group" => "calledstationid"));
 						if($data2 = $radSQLMgr->Fetch($query2)) {
 							if($found == 0) {
 								$found = 1;
@@ -751,7 +751,7 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","macaddr","macaddr ILIKE '".$search."%'","macaddr GROUP BY macaddr",0,"10");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","macaddr","macaddr ILIKE '".$search."%'","macaddr",0,"10",0,array("group" => "macaddr"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["macaddr"]);
 				}
@@ -811,15 +811,15 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select("node_ip","mac","mac ILIKE '".$search."%'","mac GROUP BY mac",0,"10");
+					$query = FS::$dbMgr->Select("node_ip","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 
-					$query = FS::$dbMgr->Select("node","mac","mac ILIKE '".$search."%'","mac GROUP BY mac",0,"10");
+					$query = FS::$dbMgr->Select("node","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 
-					$query = FS::$dbMgr->Select("node_nbt","mac","mac ILIKE '".$search."%'","mac GROUP BY mac",0,"10");
+					$query = FS::$dbMgr->Select("node_nbt","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 				}
@@ -846,7 +846,7 @@
 					}
 				}
 				else {
-					$query = FS::$dbMgr->Select("device","mac","mac ILIKE '".$search."%'","mac GROUP BY mac",0,"10");
+					$query = FS::$dbMgr->Select("device","mac","mac ILIKE '".$search."%'","mac",0,"10",0,array("group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["mac"]);
 				}

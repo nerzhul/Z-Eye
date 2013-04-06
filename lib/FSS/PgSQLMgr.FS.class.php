@@ -54,7 +54,7 @@
 			$sql = "SELECT ".$fields." FROM ".$table."";
 			if(strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
-			if(isset($options["group"]) && strlen($options["group"]) > 0) 
+			if(isset($options["group"]) && strlen($options["group"]) > 0)
 				$sql .= " GROUP BY ".$options["group"];
 			if(strlen($order) > 0) {
 				$sql .= " ORDER BY ".$order;

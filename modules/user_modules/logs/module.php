@@ -78,7 +78,7 @@
 				$panElmts = array(array(1,"mod=".$this->mid,$this->loc->s("webapp")),
 					array(2,"mod=".$this->mid,$this->loc->s("Collector")));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
-		}
+			}
 			else if(!$sh || $sh == 1) {
 				$output = FS::$iMgr->js("function filterAppLogs() {
 					$('#logd').fadeOut();
@@ -90,13 +90,13 @@
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
 				$output .= FS::$iMgr->select("uf","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","_user","_user = _user GROUP BY _user","_user",2);
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","_user","","_user",2,0,0,array("group" => "_user"));
 				while($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["_user"],$data["_user"]);
 
 				$output .= "</select>".FS::$iMgr->select("af","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","module","module = module GROUP BY module","module",2);
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","module","","module",2,0,0,array("group" => "module"));
 				while($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["module"],$data["module"]);
 				
