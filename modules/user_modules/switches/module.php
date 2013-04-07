@@ -247,7 +247,7 @@
 						$trunkall = true;
 						$vlannb = 0;
 
-						$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
+						$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
 				                while($data = FS::$dbMgr->Fetch($query)) {
 							$output .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
 							$voicevlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
@@ -568,7 +568,7 @@
 
 					if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswmodules") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules")) { 
-						$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
+						$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'",array("order" => "parent,name"));
 						$found = 0;
 						$devmod = array();
 						while($data = FS::$dbMgr->Fetch($query)) {
@@ -595,7 +595,7 @@
 					return $output;
 				}
 				else if($showmodule == 3) {
-					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'","parent,name");
+					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'",array("order" => "parent,name"));
 					$found = 0;
 					$devmod = array();
 					while($data = FS::$dbMgr->Fetch($query)) {
@@ -734,7 +734,7 @@
 									}
 
 									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'",array("order" => "port"));
 									$arr_res = array();
 									while($data = FS::$dbMgr->Fetch($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -758,7 +758,7 @@
 										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'",array("order" => "port"));
 									$arr_res = array();
 									while($data = FS::$dbMgr->Fetch($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -806,7 +806,7 @@
 									}
 	
 									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'",array("order" => "port"));
 									$arr_res = array();
 									while($data = FS::$dbMgr->Fetch($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -830,7 +830,7 @@
 										if($j < $count) $output .= ",";
 									}
 									$output .= "]; var gptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'",array("order" => "port"));
 									$arr_res = array();
 									while($data = FS::$dbMgr->Fetch($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -882,7 +882,7 @@
 									}
 	
 									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN (".$portlist.")","port");
+									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN (".$portlist.")",array("order" => "port"));
 									$arr_res = array();
 									while($data = FS::$dbMgr->Fetch($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -907,7 +907,7 @@
 									}
 									$output .= "]; var gptab = [";
 									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN ('GigabitEthernet".($i+1)."/0/25', 'GigabitEthernet".($i+1)."/0/26',
-											'GigabitEthernet".($i+1)."/0/27','GigabitEthernet".($i+1)."/0/28')","port");
+											'GigabitEthernet".($i+1)."/0/27','GigabitEthernet".($i+1)."/0/28')",array("order" => "port"));
 									$arr_res = array();
 									while($data = FS::$dbMgr->Fetch($query)) {
 										if(preg_match("#unrouted#",$data["port"]))
@@ -1102,7 +1102,7 @@
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						return $output;
 					}
-					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'","vlan");
+					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
 					$tmpoutput = "<table><tr><th>ID</th><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("creation-date")."</th></tr>";
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) $found = 1;
@@ -1153,7 +1153,7 @@
 					$tmpoutput .= "<th>";
 					if($iswif == true) $tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
 					else $tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr>";
-					$query = FS::$dbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",$od);
+					$query = FS::$dbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",array("order" => $od));
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(preg_match("#unrouted#",$data["port"]))
 							continue;
@@ -1215,7 +1215,7 @@
 							$tmpoutput2 .= "</td><td>";
 						}
 		
-						$query2 = FS::$dbMgr->Select("device_port_vlan","vlan,native,voice","ip = '".$dip."' AND port = '".$data["port"]."'","vlan");
+						$query2 = FS::$dbMgr->Select("device_port_vlan","vlan,native,voice","ip = '".$dip."' AND port = '".$data["port"]."'",array("order" => "vlan"));
 		
 						$nvlan = $data["vlan"];
 						$vlanlist = "";
@@ -1240,10 +1240,10 @@
 						}
 						if($iswif == false) {
 							$tmpoutput2 .= "</td><td>";
-							$query2 = FS::$dbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'","mac");
+							$query2 = FS::$dbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'",array("order" => "mac"));
 							while($data2 = FS::$dbMgr->Fetch($query2)) {
 								$tmpoutput2 .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
-								$query3 = FS::$dbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'","time_last",1,1);
+								$query3 = FS::$dbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'",array("order" => "time_last","ordersens" => 1,"limit" => 5));
 								while($data3 = FS::$dbMgr->Fetch($query3)) {
 									$tmpoutput2 .= "&nbsp;&nbsp;<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
 									$query4 = FS::$dbMgr->Select("node_nbt","nbname,domain,nbuser","mac = '".$data2["mac"]."' AND ip = '".$data3["ip"]."'");
@@ -1446,7 +1446,7 @@
 				$outputwifi .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
 					$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr>";
 
-				$query = FS::$dbMgr->Select("device","*","","name");
+				$query = FS::$dbMgr->Select("device","*","",array("order" => "name"));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					// Rights: show only reading/writing switches
 					$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");

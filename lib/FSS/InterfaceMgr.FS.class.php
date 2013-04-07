@@ -83,7 +83,7 @@
                                 if($data = pg_fetch_array($query)) {
 					$tmpoutput .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$data["name"]."</div><div class=\"menupopup\">";
 					// load menu elements
-					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item","id_menu = '".$mlist[$i]."'","\"order\"");
+					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item","id_menu = '".$mlist[$i]."'",array("order" => "\"order\""));
                                         while($data2 = pg_fetch_array($query2)) {
 						$query3 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","title,link,isconnected","id = '".$data2["id_menu_item"]."'");
                                                 while($data3 = pg_fetch_array($query3)) {

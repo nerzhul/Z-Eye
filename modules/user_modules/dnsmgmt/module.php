@@ -106,7 +106,7 @@
 				if($shother == NULL) $shother = 1;
 
 				$found = false;
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","","zonename");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","",array("order" => "zonename"));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found) $found = true;
 					$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
@@ -226,7 +226,8 @@
 						if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 					}
 					
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,"zonename,record",2);
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,
+						array("order" => "zonename,record","ordersens" => 2));
 					$curzone = "";
 					$dnsrecords = array();
 					while($data = FS::$dbMgr->Fetch($query)) {
@@ -417,7 +418,8 @@
 					// Search deprecated records
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,recval","zonename = '".$filter."' AND rectype = 'A'");
 					while($data = FS::$dbMgr->Fetch($query)) {
-						$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
+						$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'",
+							array("order" => "time_last","ordersens" => 1));
 						while($data2 = FS::$dbMgr->Fetch($query2)) {
 							$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 							if(!$foundrecent) {
@@ -444,7 +446,8 @@
 						else {
 							$count = count($out);
 							for($i=0;$i<$count;$i++) {
-								$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$out[$i]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'","time_last",1);
+								$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$out[$i]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'",
+									array("order" => "time_last","ordersens" => 1));
 								while($data2 = FS::$dbMgr->Fetch($query2)) {
 									$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
 									if(!$foundrecent) {

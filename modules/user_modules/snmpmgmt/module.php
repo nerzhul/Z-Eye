@@ -57,7 +57,7 @@
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"));
 
 			$tmpoutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr>";
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				$tmpoutput .= "<tr id=\"".$data["name"]."tr\"><td>".$data["name"]."</td><td>".($data["ro"] == 't' ? "X" : "")."</td><td>".($data["rw"] == 't' ? "X": "")."</td><td>".

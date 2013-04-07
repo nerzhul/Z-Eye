@@ -52,8 +52,8 @@
 			return $this->dbMgr->Connect();
 		}
 
-		public function Select($table,$fields,$cond = "",$order = "",$ordersens = 0, $limit = 0, $startidx = 0, $options = array()) {
-			return $this->dbMgr->Select($table,$fields,$cond,$order,$ordersens,$limit,$startidx,$options);
+		public function Select($table,$fields,$cond = "",$options = array()) {
+			return $this->dbMgr->Select($table,$fields,$cond,$options);
 		}
 
 		public function GetOneData($table,$field,$cond = "",$order= "",$ordersens = 0, $limit = 0, $startidx = 0) {

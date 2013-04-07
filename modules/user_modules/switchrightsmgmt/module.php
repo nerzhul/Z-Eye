@@ -181,7 +181,7 @@
 				$formoutput .=  FS::$iMgr->selElmt($data["name"],$data["ip"],$filter == $data["ip"]);
 			}
 
-			$query = FS::$dbMgr->Select("device","ip,name",$filteri ? "ip = '".$filteri."'" : "","name");
+			$query = FS::$dbMgr->Select("device","ip,name",$filteri ? "ip = '".$filteri."'" : "",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				// Init array for device
@@ -332,12 +332,12 @@
 			else if($filter) $filterc = $filter;
 			else $filterc = ""; 
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],$filter == $data["name"]);
 			}
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw",($filterc ? "name = '".$filterc."'" : ""),"name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw",($filterc ? "name = '".$filterc."'" : ""),array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				// Init SNMP rights

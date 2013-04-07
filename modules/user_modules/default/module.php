@@ -344,7 +344,8 @@
 			$snortDB = new AbstractSQLMgr();
 			if($snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd) == 0)
 				$snortDB->Connect();
-			$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0'","timestamp",1,0,0,array("group" => "ip_src,ip_dst,sig_name,timestamp"));
+			$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0'",
+				array("group" => "ip_src,ip_dst,sig_name,timestamp","order" => "timestamp","ordersens" => 1));
 			$tmpoutput .= "<table><tr><th>Source</th><th>Destination</th><th>Type</th></tr>";
 
 			$sigarray=array();

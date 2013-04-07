@@ -42,7 +42,7 @@
 				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-Menu")."</a>
 					<table class=\"standardTable\">
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","","id",2);
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","",array("order" => "id","ordersens" => 2));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$output .= "<tr id=\"m".$data["id"]."tr\"><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
 					if($data["isconnected"] == -1)
@@ -63,7 +63,7 @@
 					"<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
 					<table>
 					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","","id",2);
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","",array("order" => "id","ordersens" => 2));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$output .= "<tr id=\"mit".$data["id"]."tr\"><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 					$link2 = new HTTPLink($data["link"]);
@@ -150,7 +150,7 @@
 				FS::$iMgr->h2("mod-elmt").
 				"<table>
 				<tr><th>".$this->loc->s("elmt")."</th><th>".$this->loc->s("Order")."</th><th></th></tr>";
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'","\"order\"");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item,\"order\"","id_menu = '".$mid."'",array("order" => "\"order\""));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title","id = '".$data["id_menu_item"]."'");
 					if($data2 = FS::$dbMgr->Fetch($query2)) {

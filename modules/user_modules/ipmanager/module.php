@@ -94,7 +94,7 @@
 				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$tmpoutput .= FS::$iMgr->select("f","submit()");
 				$formoutput = "";
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","","netid");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","",array("order" => "netid"));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$netfound) $netfound = true;
 					$formoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"],($filter == $data["netid"] ? true : false));
@@ -335,7 +335,8 @@
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
 			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'","collecteddate",2);
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'",
+				array("order" => "collecteddate","ordersens" => 2));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
 				$results[$data["collecteddate"]]["baux"] = $data["ipactive"];

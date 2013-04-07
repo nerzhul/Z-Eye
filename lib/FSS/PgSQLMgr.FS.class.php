@@ -50,30 +50,33 @@
 			return 0;
 		}
 
-		public function Select($table,$fields,$cond = "",$order = "",$ordersens = 0, $limit = 0, $startidx = 0, $options = array()) {
+		public function Select($table,$fields,$cond = "", $options = array()) {
 			$sql = "SELECT ".$fields." FROM ".$table."";
 			if(strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			if(isset($options["group"]) && strlen($options["group"]) > 0)
 				$sql .= " GROUP BY ".$options["group"];
-			if(strlen($order) > 0) {
-				$sql .= " ORDER BY ".$order;
-				if($ordersens == 1)
-					$sql .= " DESC";
-				else if($ordersens == 2)
-					$sql .= " ASC";
+			if(isset($options["order"]) && strlen($options["order"]) > 0) {
+				$sql .= " ORDER BY ".$options["order"];
+				if(isset($options["ordersens"])) {
+					if($options["ordersens"] == 1)
+						$sql .= " DESC";
+					else if($options["ordersens"] == 2)
+						$sql .= " ASC";
+				}
 			}
-			if($limit > 0) {
-				if($startidx > 0)
-					$sql .= " LIMIT ".$startidx.",".$limit;
+			if(isset($options["limit"]) && $options["limit"] > 0) {
+				if(isset($options["startidx"]) && $options["startidx"] > 0)
+					$sql .= " LIMIT ".$options["startidx"].",".($options["startidx"]+$options["limit"]);
 				else
-					$sql .= " LIMIT ".$limit;
+					$sql .= " LIMIT ".$options["limit"];
 			}
 			return pg_query($this->dbLink,$sql);
 		}
 
 		public function GetOneData($table,$field,$cond = "",$order= "",$ordersens = 0, $limit = 0, $startidx = 0) {
-			$query = $this->Select($table,$field,$cond,$order,$ordersens,$limit,$startidx);
+			$options = array("order" => $order, "ordersens" => $ordersens, "limit" => 1, "startidx" => $startidx);
+			$query = $this->Select($table,$field,$cond,$options);
 			if($data = pg_fetch_array($query)) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
@@ -85,9 +88,9 @@
 		public function GetMax($table,$field,$cond = "") {
 			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
 			if($data = pg_fetch_array($query)) {
-					$splstr = preg_split("#[\.]#",$field);
-					$splstr = preg_replace("#`#","",$splstr);
-					return $data["mx"];
+				$splstr = preg_split("#[\.]#",$field);
+				$splstr = preg_replace("#`#","",$splstr);
+				return $data["mx"];
 			}
 			return -1;
 		}
@@ -95,9 +98,9 @@
 		public function GetMin($table,$field,$cond = "") {
                         $query = $this->Select($table,"MIN(".$field.") as mn",$cond);
                         if($data = pg_fetch_array($query)) {
-                                        $splstr = preg_split("#[\.]#",$field);
-                                        $splstr = preg_replace("#`#","",$splstr);
-                                        return $data["mn"];
+                                 $splstr = preg_split("#[\.]#",$field);
+                                 $splstr = preg_replace("#`#","",$splstr);
+                                 return $data["mn"];
                         }
                         return -1;
                 }
@@ -105,9 +108,9 @@
 		public function Sum($table,$field,$cond = "") {
 			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
 			if($data = pg_fetch_array($query)) {
-					$splstr = preg_split("#[\.]#",$field);
-					$splstr = preg_replace("#`#","",$splstr);
-					return $data["mx"];
+				$splstr = preg_split("#[\.]#",$field);
+				$splstr = preg_replace("#`#","",$splstr);
+				return $data["mx"];
 			}
 			return -1;
 		}

@@ -126,7 +126,7 @@
 			$formoutput .= FS::$iMgr->select("icon");
 			$formoutput .= FS::$iMgr->selElmt("Aucun","");
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_icons","id,name","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_icons","id,name","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query))
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["id"]);
 
@@ -135,7 +135,7 @@
 			$formoutput2 = FS::$iMgr->selElmt($this->loc->s("None"),"none",true);
 			$countElmt = 0;
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				$formoutput2 .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
@@ -187,7 +187,7 @@
 			 * Host table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,addr,template","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,addr,template","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -239,7 +239,7 @@
 			$output .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
 			$output .= FS::$iMgr->select("icon");
 			$output .= FS::$iMgr->selElmt("Aucun","",$hostdata["iconid"] == "" ? true : false);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_icons","id,name","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_icons","id,name","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query))
 				$output .= FS::$iMgr->selElmt($data["name"],$data["id"],$hostdata["iconid"] == $data["id"] ? true : false);
 			$output .= "</select></td></tr>";
@@ -252,7 +252,7 @@
 			$output .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
 			$tmpoutput = FS::$iMgr->selElmt($this->loc->s("None"),"none",count($parentlist) > 0 ? false : true);
 			$countElmt = 0;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				if($data["name"] != $host)
@@ -333,7 +333,7 @@
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
 
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -342,7 +342,7 @@
 				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=3&hg=".$data["name"]."\">".
 					$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
 				$found2 = false;
-				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'","hosttype,name");
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'",array("order" => "hosttype,name"));
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					if($found2) $output .= ", ";
 					else $found2 = true;
@@ -458,7 +458,7 @@
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"));
 
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template,ctg","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template,ctg","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -579,7 +579,7 @@
 			 * Timeperiod table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -698,7 +698,7 @@
 			 * Command table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,template","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,template","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -775,7 +775,7 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 			$countElmt = 0;
 			$formoutput2 = "";
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				$formoutput2 .= FS::$iMgr->selElmt($data["name"],$data["name"]);
@@ -794,7 +794,7 @@
 			 * Contactgroup table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -841,7 +841,7 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","member","name = '".$cg."'");
 			while($data = FS::$dbMgr->Fetch($query))
 				array_push($contacts,$data["member"]);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$tmpoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
 			}
@@ -884,7 +884,7 @@
 			 * Command table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
@@ -925,7 +925,7 @@
 		
 		private function getTimePeriodList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias","","alias");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias","",array("order" => "alias"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"],$select == $data["name"]);
 			}
@@ -935,7 +935,7 @@
 
 		private function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
 			}
@@ -945,7 +945,7 @@
 		
 		private function genContactGroupsList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"],$select == $data["name"] ? true : false);
 			}
@@ -955,7 +955,7 @@
 		
 		private function genHostsList($name) {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'","name");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}

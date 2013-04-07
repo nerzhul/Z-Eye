@@ -37,7 +37,7 @@
 				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-link")."</a>
 				<table class=\"standardTable\" width=\"55%\">
 				<tr><th width=\"40px\">Id</th><th width=\"90px\"><center>Type</center></th><th><center>Args</center></th><th width=\"15px\"></th></tr>";
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."http_links","id,type,args","","id",1);
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."http_links","id,type,args","",array("order" => "id","ordersens" => 1));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$output .= "<tr id=\"l".$data["id"]."tr\"><td><center><a href=\"index.php?mod=".$this->mid."&do=2&link=".$data["id"]."\">".$data["id"]."</a></center></td><td><center>";
 					if($data["type"] == 0)
