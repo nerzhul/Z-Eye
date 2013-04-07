@@ -164,8 +164,8 @@
 						// List servers where the data is
 						array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
 						if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
-							$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'","time_last",2);
-							$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'","time_last",2);
+							$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+							$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
 							if($sw && $port) {
 								$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
 								$iparray[ip2long($data2["ip"])]["port"] = $port;
@@ -472,7 +472,7 @@
 					$found = false;
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname","netid = '".$filter."' AND distributed = 3");
 					while($data = FS::$dbMgr->Fetch($query)) {
-						$ltime = FS::$dbMgr->GetOneData("node","time_last","mac = '".$data["macaddr"]."'","time_last",1,1);
+						$ltime = FS::$dbMgr->GetOneData("node","time_last","mac = '".$data["macaddr"]."'",array("order" => "time_last","ordersens" => 1,"limit" => 1));
 						if($ltime) {
 							if(strtotime($ltime) < strtotime("-".$interval." day",strtotime(date("y-m-d H:i:s")))) {
 								$obsoletes[$data["ip"]] = $data["ip"]." - <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a>";

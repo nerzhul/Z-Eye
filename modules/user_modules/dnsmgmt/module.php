@@ -421,7 +421,8 @@
 						$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'",
 							array("order" => "time_last","ordersens" => 1));
 						while($data2 = FS::$dbMgr->Fetch($query2)) {
-							$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
+							$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'",
+								array("order" => "time_last","ordersens" => 1));
 							if(!$foundrecent) {
 								if(!$found) $found = true;
 								$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$data["recval"]."<br />";
@@ -449,7 +450,8 @@
 								$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$out[$i]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'",
 									array("order" => "time_last","ordersens" => 1));
 								while($data2 = FS::$dbMgr->Fetch($query2)) {
-									$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'","time_last",1);
+									$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'",
+										array("order" => "time_last","ordersens" => 1));
 									if(!$foundrecent) {
 										if(!$found) $found = true;
 										$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].".".$filter."\">".$data["record"].".".$filter."</a> / ".$out[$i]."<br />";

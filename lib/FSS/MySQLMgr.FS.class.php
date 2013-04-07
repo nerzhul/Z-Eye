@@ -82,8 +82,7 @@
 			return mysql_query($sql);
 		}
 		
-		public function GetOneData($table,$field,$cond = "",$order= "",$ordersens = 0, $limit = 0, $startidx = 0) {
-			$options = array("order" => $order, "ordersens" => $ordersens, "limit" => 1, "startidx" => $startidx);
+		public function GetOneData($table,$field,$cond = "",$options = array()) {
 			$query = $this->Select($table,$field,$cond,$options);
 			if($data = mysql_fetch_array($query)) {
 				$splstr = preg_split("#[\.]#",$field);

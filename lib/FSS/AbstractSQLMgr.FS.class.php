@@ -56,8 +56,8 @@
 			return $this->dbMgr->Select($table,$fields,$cond,$options);
 		}
 
-		public function GetOneData($table,$field,$cond = "",$order= "",$ordersens = 0, $limit = 0, $startidx = 0) {
-			return $this->dbMgr->GetOneData($table,$field,$cond,$order,$ordersens,$limit,$startidx);
+		public function GetOneData($table,$field,$cond = "",$options = array()) {
+			return $this->dbMgr->GetOneData($table,$field,$cond,$options);
 		}
 
 		public function GetMax($table,$field,$cond = "") {
