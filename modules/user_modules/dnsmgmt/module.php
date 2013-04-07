@@ -126,12 +126,10 @@
 					$output .= FS::$iMgr->submit("",$this->loc->s("Filter"));
 					$output .= "</form>";
 					if($filter) {
-						$output .= "<div id=\"contenttabs\"><ul>";
-						$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."\">".$this->loc->s("Stats")."</a>";
-						$output .= "<li><a href=\"index.php?mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother."&sh=2\">".$this->loc->s("expert-tools")."</a>";
-						$output .= "</ul></div>";
-						$output .= FS::$iMgr->js("$('#contenttabs').tabs({ajaxOptions: { error: function(xhr,status,index,anchor) {".
-							"$(anchor.hash).html(\"".$this->loc->s("fail-tab")."\");}}});");
+						$panElmts = array(
+						array(1,"mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother,$this->loc->s("Stats")),
+						array(2,"mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother,$this->loc->s("expert-tools")));
+						$output .= FS::$iMgr->tabPan($panElmts);
 					}
 				}
 				else
