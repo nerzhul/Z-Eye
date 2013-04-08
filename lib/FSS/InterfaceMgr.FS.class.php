@@ -40,6 +40,7 @@
 			$this->arr_css = array();
 			$this->arr_js = array();
 			$this->title = "";
+			$this->js_buffer = "";
 		}
 
 		// header/footer/content
@@ -134,7 +135,13 @@
 		}
 
 		public function js($js) {
-			return "<script type=\"text/javascript\">".$js."</script>";
+			$this->js_buffer .= $js;
+		}
+
+		public function renderJS() {
+			if(strlen($this->js_buffer) > 0)
+                                echo "<script type=\"text/javascript\">".$this->js_buffer."</script>";
+			echo "";
 		}
 
 		public function label($for,$value,$class = "") {
@@ -489,5 +496,6 @@
 		private $arr_css;
 		private $arr_js;
 		private $title;
+		private $js_buffer;
 	};
 ?>

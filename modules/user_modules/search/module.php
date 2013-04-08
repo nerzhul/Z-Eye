@@ -360,7 +360,7 @@
 				}
 				else {
 					$query = FS::$dbMgr->Select("node_nbt","domain","domain ILIKE '".$search."%'",
-						array("order => "domain","limit" => "10","group" => "domain"));
+						array("order" => "domain","limit" => "10","group" => "domain"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["nbdomain"],$data["domain"]);
 

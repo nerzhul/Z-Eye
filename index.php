@@ -54,6 +54,7 @@
 		FS::$iMgr->jsinc("lib/HighCharts/highcharts.min.js");
 
 		echo FS::$iMgr->content();
+		echo FS::$iMgr->renderJS();
 		echo FS::$iMgr->footer();
 	}
 	/* For optimize times

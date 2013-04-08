@@ -63,6 +63,7 @@
 					FS::$iMgr->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($mid);
 					$module->getModuleClass()->handlePostDatas($act);
+					FS::$iMgr->renderJS();
 
 					break;
 			}
