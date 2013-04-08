@@ -574,4 +574,4 @@ label { float: left; font-weight: bold; text-align: left; }
 .ui-autocomplete li { padding: 5px; margin-left: -40px; }
 .ui-autocomplete li:hover { background-color: #DDD; }
 .ui-autocomplete a { color: #000; }
-.ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; }
+.ui-autocomplete-loading { background: white url('/styles/images/ui-anim_basic_16x16.gif') right center no-repeat; }
