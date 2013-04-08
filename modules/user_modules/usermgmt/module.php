@@ -108,8 +108,8 @@
 				$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,$this->loc->s("attr-uid"),"tooltip-attr-uid")."</li><li>";
 				$output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,$this->loc->s("ldap-filter"),"tooltip-ldap-filter")."</li><li>";
 				$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-				$output .= "</ul></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","ldapfrm",array("snotif" => $this->loc->s("Editing"), "lock" => true));
+				$output .= "</ul>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4",array("snotif" => $this->loc->s("Editing"), "lock" => true))."</form>";
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist"));
@@ -177,10 +177,10 @@
 				$formoutput .= FS::$iMgr->input("ldapuid","",20,40,$this->loc->s("attr-uid"),"tooltip-attr-uid")."</li><li>";
 				$formoutput .= FS::$iMgr->input("ldapfilter","(objectclass=*)",20,200,$this->loc->s("ldap-filter"),"tooltip-ldap-filter")."</li><li>";
 				$formoutput .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-				$formoutput .= "</ul></form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","ldapfrm",array("snotif" => $this->loc->s("Adding"), "lock" => true));
+				$formoutput .= "</ul>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4",array("snotif" => $this->loc->s("Adding"), "lock" => true))."</form>";
 
-				$output .= FS::$iMgr->opendiv("<center>".$formoutput."</center>",$this->loc->s("new-directory"),array("width" => 470));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"),array("width" => 470));
 
 				$found = 0;
 				$tmpoutput = "";

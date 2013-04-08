@@ -338,8 +338,8 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3","dnsfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			
 			return $output;
 		}

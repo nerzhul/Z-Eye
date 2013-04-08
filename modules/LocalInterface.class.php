@@ -64,7 +64,7 @@
 			return $output;
 		}
 
-		public function callbackNotification($link,$id,$options = array()) {
+		public function callbackNotification($link,$options = array()) {
 			$js = "$(this).submit(function(event) { var reqobj = $(event.target);";
 			// Locking screen if needed
 			if(isset($options["lock"]) && $options["lock"] == true) {

@@ -182,9 +182,9 @@
 			// statusmap image
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","hostfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 
-			$output .= FS::$iMgr->opendiv("<center>".$formoutput."</center>",$this->loc->s("new-host"),array("width" => 600));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"),array("width" => 600));
 
 			/*
 			 * Host table
@@ -301,8 +301,8 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$hostdata["hostopts"] == "t" ? true : false,array("type" => "chk"));
 			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$hostdata["contactgroup"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","hostfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 		
@@ -325,8 +325,8 @@
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
 				$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-				$formoutput .= "</table></form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19","subpop #hgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+				$formoutput .= "</table>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			}
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -395,8 +395,8 @@
 
 			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true,$hostlist,$hostgroup)."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19","hgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 
@@ -454,13 +454,13 @@
 				// @ TODO support for contact not only contactlist
 				$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-				$formoutput .= "</table></form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16","subpop #srvfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+				$formoutput .= "</table>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			}
 			else
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-service"));
 
-			$output .= FS::$iMgr->opendiv("<center>".$formoutput."</center>",$this->loc->s("new-service"),array("width" => 700));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"),array("width" => 700));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template,ctg","",array("order" => "name"));
@@ -548,8 +548,8 @@
 			// @ TODO support for contact not only contactlist
 			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$data["ctg"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16","srvfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 
@@ -576,8 +576,8 @@
 			$formoutput .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same")."</td></tr>";
 			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","subpop #tpfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$formoutput .= "</table>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"),array("width" => 580));
 
@@ -656,8 +656,8 @@
 			$output .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".
 				FS::$iMgr->hourlist("suhs","sums",$data["suhs"],$data["sums"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$data["suhe"],$data["sume"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","tpfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 
@@ -693,8 +693,8 @@
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd","notify-host-by-email")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-				$formoutput .= "</table></form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7","subpop #ctfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+				$formoutput .= "</table>";
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			}
 			else
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contact"));
@@ -758,8 +758,8 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$data["hopts"] == "t",array("type" => "chk"));
 			$output .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd",$data["hostcmd"])."</td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7","ctfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 		private function showContactgroupsTab() {
@@ -793,8 +793,8 @@
 			$formoutput .= $formoutput2;
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10","subpop #ctgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$formoutput .= "</table>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"),array("width" => 500));
 
@@ -858,8 +858,8 @@
 			$output .= $tmpoutput;
 			$output .= "</select></td></tr>";
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10","ctgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 
@@ -884,8 +884,8 @@
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1","subpop #cmdfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$formoutput .= "</table>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"),array("width" => 500));
 
@@ -927,8 +927,8 @@
 				"<ul class=\"ulform\"><li><b>".$this->loc->s("Name").":</b> ";
 			$cmd = htmlentities($cmd);
 			$output .= $cmdname."</li><li><b>".$this->loc->s("Command").":</b> ".FS::$iMgr->input("cmd",$cmd,30,200)."</li><li>".
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</ul></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1","cmdfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+				FS::$iMgr->submit("",$this->loc->s("Save"))."</ul>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 		

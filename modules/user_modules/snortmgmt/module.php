@@ -80,8 +80,8 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"dnsenable",$dnsenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-dns"),"dnslist",array("value" => $dnslist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"dnsfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 3) {
 				$smtpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'smtpenable'");
@@ -112,8 +112,8 @@
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-pop"),"poplist",array("value" => $poplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-pop"),"popports",array("value" => $popports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"mailfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 4) {
 				$httpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'httpenable'");
@@ -129,8 +129,8 @@
 
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-http"),"httpports",array("value" => $httpports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"httpfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 5) {
 				$sqlenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'sqlenable'");
@@ -150,8 +150,8 @@
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-oracle"),"oracleports",array("value" => $oracleports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
 
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"sqlfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 6) {
 				$telnetenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'telnetenable'");
@@ -176,8 +176,8 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("en-tse-sensor"),"entse",$tseenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-tse"),"tselist",array("value" => $tselist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"remotefrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 7) {
 				$ftpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'ftpenable'");
@@ -192,8 +192,8 @@
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ftp"),"ftpports",array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"ftpfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 8) {
 				$snmpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'snmpenable'");
@@ -205,8 +205,8 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensnmp",$snmpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-snmp"),"snmplist",array("value" => $snmplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"snmpfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 9) {
 				$sipenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'sipenable'");
@@ -220,8 +220,8 @@
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sip"),"siplist",array("value" => $siplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-sip"),"sipports",array("value" => $sipports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
-				$output .= "</table></form>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"sipfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= "</table>";
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			else if($sh == 10) {
 				$nightreport = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'report_nighten'");
@@ -243,7 +243,7 @@
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
 				$output .= "</table>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,"reportfrm",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=".$sh,array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 			}
 			return $output;
 		}

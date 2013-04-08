@@ -221,8 +221,8 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radusrgrp"),"tradusrgrp",$tradusrgrp,array("tooltip" => "tooltip-radusrgrp"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radacct"),"tradacct",$tradacct,array("tooltip" => "tooltip-radacct"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","radaefrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 
 			return $output;
 		}

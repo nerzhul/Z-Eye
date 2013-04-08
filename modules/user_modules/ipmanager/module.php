@@ -72,8 +72,8 @@
 						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"),"tooltip-reservconfpath")."</li>
 						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"),"tooltip-subnetconfpath")."</li>
                         	        	<li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li>
-                                		</ul></form>";
-					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=5","dhcpmgmtfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+                                		</ul>";
+					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=5",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 					// To delete servers
 					$found = false;
 					$tmpoutput = FS::$iMgr->h2("title-remove-server").FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");

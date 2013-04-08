@@ -363,8 +363,8 @@
 							if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
 								FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 								$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
+								$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=9",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
 								$output .= "</form>";
-								$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=9","swpomod",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
 							}
 							$this->devapi->unsetPortId();
 						}
@@ -1297,8 +1297,8 @@
 						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd"),"enablepwd","",array("type" => "pwd"));
 						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd-repeat"),"enablepwd2","",array("type" => "pwd"));
 						$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-						$output .= "</table></form>";
-						$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=22","sshpwdset",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
+						$output .= "</table>";
+						$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=22",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
 					}
 					else if($showmodule == 8) {
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") && 
@@ -1427,8 +1427,8 @@
 					$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
 					$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
 					$formoutput .= "</li><li>".FS::$iMgr->Submit("",$this->loc->s("Discover"))."</li>";
-					$formoutput .= "</ul></form>";
-					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=18","discoverdev",array("snotif" => $this->loc->s("Discovering-in-progress"), "lock" => true));
+					$formoutput .= "</ul>";
+					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=18",array("snotif" => $this->loc->s("Discovering-in-progress"), "lock" => true))."</form>";
 					$showtitle = false;
 					$output .= FS::$iMgr->h2("title-global-fct");
 					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
@@ -1476,16 +1476,14 @@
 						// Write all devices button
 						$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
 						$formoutput .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"));
-						$formoutput .= "</form>";
-						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20","saveall",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true));
+						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true))."</form>";
 					}
 					if(FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
 						$rightsok = true;
 						// Backup all devices button
 						$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=21",array("id" => "backupall"));
 						$formoutput .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"));
-						$formoutput .= "</form>";
-						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21","backupall",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true));
+						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true))."</form>";
 					}
 					if($rightsok) {
 						if($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
