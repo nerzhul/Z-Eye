@@ -120,12 +120,13 @@
 			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("server-path"),"spath",$spath);
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table></form>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3","swbckfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$output .= "</table>";
+			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3","subpop #swbckfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 			return $output;
 		}
 
 		private function showBackupTab() {
+			FS::$iMgr->setJSBuffer(1);
 			$formoutput = $this->addOrEditBackupServer(true);
 
 			$output = FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Server"));

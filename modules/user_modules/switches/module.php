@@ -1424,12 +1424,9 @@
 
 				$showtitle = true;
 				if(FS::$sessMgr->hasRight("mrule_switches_discover")) {
-					$formoutput = FS::$iMgr->js("function showwait() {
-					$('#subpop').html('".$this->loc->s("Discovering-in-progress")."...<br /><br /><br />".FS::$iMgr->img("styles/images/loader.gif",32,32)."');
-					lockScreen();
-					};").FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
+					$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
 					$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
-					$formoutput .= "</li><li>".FS::$iMgr->JSSubmit("",$this->loc->s("Discover"),"showwait()")."</li>";
+					$formoutput .= "</li><li>".FS::$iMgr->Submit("",$this->loc->s("Discover"))."</li>";
 					$formoutput .= "</ul></form>";
 					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=18","discoverdev",array("snotif" => $this->loc->s("Discovering-in-progress"), "lock" => true));
 					$showtitle = false;

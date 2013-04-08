@@ -161,6 +161,8 @@
 			}
 			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
 				$output .= FS::$iMgr->h1("title-directorymgmt");
+
+				FS::$iMgr->setJSBuffer(1);
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "ldapfrm"));
 				$formoutput .= "<ul class=\"ulform\"><li>";
 				$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
@@ -178,7 +180,7 @@
 				$formoutput .= "</ul></form>";
 				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","ldapfrm",array("snotif" => $this->loc->s("Adding"), "lock" => true));
 
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"));
+				$output .= FS::$iMgr->opendiv("<center>".$formoutput."</center>",$this->loc->s("new-directory"),array("width" => 470));
 
 				$found = 0;
 				$tmpoutput = "";

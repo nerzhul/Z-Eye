@@ -65,21 +65,20 @@
 		}
 
 		public function callbackNotification($link,$id,$options = array()) {
-			$js = "$('#".$id."').submit(function(event) {";
+			$js = "$(this).submit(function(event) { var reqobj = $(event.target);";
 			// Locking screen if needed
 			if(isset($options["lock"]) && $options["lock"] == true) {
-				$js .= "waitingPopup('');";
+				$js .= "waitingPopup(\"\");";
 			}
 			// Starting notification
 			if(isset($options["snotif"]) && strlen($options["snotif"]) > 0) {
-				$js .= "$('#subnotification').html('".addslashes($options["snotif"])."');
-				$('#notification').slideDown();
+				$js .= "$(\"#subnotification\").html(\"".addslashes($options["snotif"])."\");
+				$(\"#notification\").slideDown();
 				setTimeout(function() {
 					$('#notification').slideUp();
 				},".(isset($options["stimeout"]) && $options["stimeout"] > 1000 ? $options["stimeout"] : 5000).");";
 			}
-			$js .= "event.preventDefault();
-				$.post('".$link."&at=3', $('#".$id."').serialize(), function(data) {
+			$js .= "$.post('".$link."&at=3', reqobj.serialize(), function(data) {
 				$('#subnotification').html(data); $('#notification').slideDown();
 				setTimeout(function() {
 					$('#notification').slideUp();
@@ -87,7 +86,7 @@
 				if(isset($options["lock"]) && $options["lock"] == true) {
 					$js .= "unlockScreen(true);";
 				}
-			$js .= "}); });";
+			$js .= "}); return false; });";
 			return $this->js($js);
 		}
 

@@ -40,7 +40,8 @@
 			$this->arr_css = array();
 			$this->arr_js = array();
 			$this->title = "";
-			$this->js_buffer = "";
+			$this->js_buffer = array(0 => "", 1 => "");
+			$this->js_buffer_idx = 0;
 		}
 
 		// header/footer/content
@@ -59,7 +60,6 @@
 				$count = count($this->arr_js);
 				for($i=0;$i<$count;$i++)
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
-				
 				$output .= "</head>
 				<body>";
 			return $output;
@@ -135,13 +135,18 @@
 		}
 
 		public function js($js) {
-			$this->js_buffer .= $js;
+			if(!isset($this->js_buffer[$this->js_buffer_idx])) $this->js_buffer[$this->js_buffer_idx] = "";
+			$this->js_buffer[$this->js_buffer_idx] .= $js;
+		}
+
+		public function setJSBuffer($idx) {
+			$this->js_buffer_idx = $idx;
 		}
 
 		public function renderJS() {
-			if(strlen($this->js_buffer) > 0)
-                                echo "<script type=\"text/javascript\">".$this->js_buffer."</script>";
-			echo "";
+			if(strlen($this->js_buffer[$this->js_buffer_idx]) > 0)
+                        	return "<script type=\"text/javascript\">".$this->js_buffer[$this->js_buffer_idx]."</script>";
+			return "";
 		}
 
 		public function label($for,$value,$class = "") {
@@ -182,7 +187,7 @@
 		public function numInput($name, $def_value = "", $options = array()) {
 			$output = "";
 		        if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric('".$name."');\" />";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" />";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
 			return $output;
 		}
@@ -190,7 +195,7 @@
 		public function IPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP('".$name."');\" />";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP(this);\" />";
 			if($tooltip) $output .= $this->tooltip($name,$tooltip);
 			return $output;
 		}
@@ -198,12 +203,12 @@
 		public function MacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMAC('".$name."');\" />";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMAC(this);\" />";
 			return $output;
 		}
 
 		public function IPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
-			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask('".$name."');\" />";
+			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask(this);\" />";
 		}
 
 		public function slider($slidername, $name, $min, $max, $options = array()) {
@@ -431,18 +436,19 @@
 			return ($count > 0 ? $output : "");
 		}
 
-		public function opendiv($content,$text1,$text2="Fermer",$divname=NULL, $liname=NULL, $aname=NULL) {
-			if($divname == NULL) $divname = uniqid();
-			if($liname == NULL) $liname = uniqid();
-			if($aname == NULL) $aname = uniqid();
-                        $output = "<ul style=\"list-style-type:none;padding:0;\"><li id=\"".$liname."\"><a id=\"".$aname."\" href=\"#\">".$text1."</a>
-                       		<a id=\"".$aname."2\" style=\"display:none;\" href=\"#\">".$text2."</a></li></ul>";
-                        $output .= "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content."</div>";
-			$output .= $this->js("$(\"#".$aname."\").click(function(){ $(\"div#".$divname."\").slideDown(\"slow\");});
-				$(\"#".$aname."2\").click(function(){ $(\"div#".$divname."\").slideUp(\"slow\");});
-				$(\"#".$liname."\").click(function(){ $(\"#".$liname." a\").toggle();});");
+		public function opendiv($content,$text1,$options=array()) {
+			$divname = uniqid();
+			$aname = uniqid();
+                        $output = "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content.$this->renderJS()."</div>";
+			$this->setJSBuffer(0);
+			$output .= "<ul style=\"list-style-type:none;padding:0;\"><li><a id=\"".$aname."\" href=\"#\">".$text1."</a></li></ul>";
+			if(isset($options["width"]) && $options["width"] > 0)
+				$output .= $this->js("$(\"#".$aname."\").click(function(){ formPopup('".$divname."','".$options["width"]."px'); });"); 
+			else
+				$output .= $this->js("$(\"#".$aname."\").click(function(){ formPopup('".$divname."'); });"); 
 			return $output;
 		}
+
 		// Simple methods
 		public function stylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;
@@ -497,5 +503,6 @@
 		private $arr_js;
 		private $title;
 		private $js_buffer;
+		private $js_buffer_idx;
 	};
 ?>

@@ -62,8 +62,10 @@
 					$output .= $this->showCreateOrEditRadiusDB(false);
 				}
 				else {
-					if(FS::$sessMgr->hasRight("mrule_radius_manage"))
-						$output .= FS::$iMgr->opendiv($this->showRadiusServerMgmt(),$this->loc->s("Manage-radius-db"));
+					if(FS::$sessMgr->hasRight("mrule_radius_manage")) {
+						FS::$iMgr->setJSBuffer(1);
+						$output .= FS::$iMgr->opendiv($this->showRadiusServerMgmt(),$this->loc->s("Manage-radius-db"),array("width" => 550));
+					}
 					$output .= $this->showRadiusList($rad);
 				}
 			}
@@ -334,6 +336,7 @@
 				if(!$radSQLMgr)
 					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
+				FS::$iMgr->setJSBuffer(1);
 				$formoutput = FS::$iMgr->js("function changeUForm() {
 					if(document.getElementsByName('utype')[0].value == 1) {
 						$('#userdf').show();
@@ -411,6 +414,7 @@
 				$output .= "<div id=\"radd\">".$this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport)."</div>";
 			}
 			else if($sh == 2) {
+				FS::$iMgr->setJSBuffer(1);
 				$formoutput = FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 				$this->raddbCondSelector().
@@ -464,7 +468,7 @@
 				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
 				FS::$iMgr->submit("",$this->loc->s("Save")).
 				"</li></ul></form>";
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Profil"));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Profil"),array("width" => 450));
 				$tmpoutput = FS::$iMgr->h3("title-profillist");
 				$found = 0;
 

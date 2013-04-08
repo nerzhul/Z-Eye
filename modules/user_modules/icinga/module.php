@@ -100,6 +100,7 @@
 			
 			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 			if(!$tpexist) {
+				FS::$iMgr->setJSBuffer(1);
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 				return $output;
@@ -107,6 +108,7 @@
 			
 			$ctexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","name","");
 			if(!$ctexist) {
+				FS::$iMgr->setJSBuffer(1);
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
 				return $output;
@@ -115,6 +117,7 @@
 			/*
 			 * Ajax new host
 			 */
+			FS::$iMgr->setJSBuffer(1);
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=13",array("id" => "hostfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
@@ -178,10 +181,10 @@
 			// icon image
 			// statusmap image
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","hostfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$formoutput .= "</table>";
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13","hostfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
+			$output .= FS::$iMgr->opendiv("<center>".$formoutput."</center>",$this->loc->s("new-host"),array("width" => 600));
 
 			/*
 			 * Host table
@@ -308,6 +311,7 @@
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
 			$hostexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","");
+			FS::$iMgr->setJSBuffer(1);
 			if(!$hostexist)
 				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-hosts"));
 			else {
@@ -322,7 +326,7 @@
 				$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19","hgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=19","subpop #hgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			}
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -330,7 +334,7 @@
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
 			}	
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"),array("width" => 460));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","",array("order" => "name"));
@@ -407,6 +411,7 @@
 				/*
 				 * Ajax new service
 				 */
+				FS::$iMgr->setJSBuffer(1);
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=16",array("id" => "srvfrm"));
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
@@ -450,12 +455,12 @@
 				$formoutput .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16","srvfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=16","subpop #srvfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			}
 			else
-				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
+				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-service"));
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"));
+			$output .= FS::$iMgr->opendiv("<center>".$formoutput."</center>",$this->loc->s("new-service"),array("width" => 700));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template,ctg","",array("order" => "name"));
@@ -558,6 +563,7 @@
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
 			
+			FS::$iMgr->setJSBuffer(1);
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "tpfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
@@ -571,9 +577,9 @@
 			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","tpfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4","subpop #tpfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"),array("width" => 580));
 
 			/*
 			 * Timeperiod table
@@ -664,6 +670,7 @@
 				/*
 				 * Ajax new contact
 				 */
+				FS::$iMgr->setJSBuffer(1);
 				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=7",array("id" => "ctfrm"));
 				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",true,array("type" => "chk"));
@@ -687,12 +694,12 @@
 				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd","notify-host-by-email")."</td></tr>";
 				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 				$formoutput .= "</table></form>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7","ctfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=7","subpop #ctfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 			}
 			else
-				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
+				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contact"));
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"),array("width" => 600));
 
 			/*
 			 * Command table
@@ -769,6 +776,7 @@
 			/*
 			 * Ajax new contactgroup
 			 */
+			FS::$iMgr->setJSBuffer(1);
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=10",array("id" => "ctgfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
@@ -786,9 +794,9 @@
 			$formoutput .= "</select></td></tr>";
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10","ctgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=10","subpop #ctgfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"),array("width" => 500));
 
 			/*
 			 * Contactgroup table
@@ -870,15 +878,16 @@
 			/*
 			 * Ajax new command
 			 */
+			FS::$iMgr->setJSBuffer(1);
 			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "cmdfrm"));
 			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
 			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
 			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$formoutput .= "</table></form>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1","cmdfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
+			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1","subpop #cmdfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true));
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"));
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"),array("width" => 500));
 
 			/*
 			 * Command table
