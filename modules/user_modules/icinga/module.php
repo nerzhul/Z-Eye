@@ -1346,7 +1346,7 @@
 					}
 
 					if($edit) {
-						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_sommands","cmd","name = '".$cmdname."'")) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
 							if(FS::isAjaxCall())
 								echo $this->loc->s("err-not-found");
 							else
