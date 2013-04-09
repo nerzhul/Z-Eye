@@ -34,12 +34,14 @@
 				"en" => array(
 					"Cancel" => "Cancel",
 					"Confirm" => "Confirm",
-					"Done" => "Done"
+					"Done" => "Done",
+					"Modification" => "Modification"
 				),
 				"fr" => array(
 					"Cancel" => "Annuler",
 					"Confirm" => "Confirmer",
-					"Done" => "Effectué"
+					"Done" => "Effectué",
+					"Modification" => "Modification"
 				)
 			);
 		}

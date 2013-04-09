@@ -42,8 +42,12 @@
 					 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						$output .= $this->showCreateEditErr();
 
+						FS::$iMgr->setJSBuffer(1);
 						$tmpoutput = $this->CreateOrEditServer(true);
+						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("add-server"),array("width" => 500));
 
+						FS::$iMgr->setJSBuffer(1);
+						$tmpoutput = "";
 						$found = false;
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
 						while($data = FS::$dbMgr->Fetch($query)) {
@@ -295,9 +299,7 @@
 			$dns = 0;
 			$namedpath = "";
 			$chrootnamed = "";
-			if($create)
-				$output = FS::$iMgr->h2("add-server");
-			else {
+			if(!$create) {
 				$output = FS::$iMgr->h2("edit-server");
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				if(!$addr || $addr == "") {
@@ -323,7 +325,7 @@
 				$output .= $this->showCreateEditErr();	
 			}
 			
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3",array("id" => "dnsfrm"));
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
 			
 			$output .= "<table class=\"standardTable\">";
 			if($create)
@@ -338,8 +340,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
+			$output .= "</table></form>";
 			
 			return $output;
 		}

@@ -47,13 +47,12 @@
 			$found = false;
 
 			FS::$iMgr->setJSBuffer(1);
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "snmpfrm"))."<ul class=\"ulform\">";
+			$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1")."<ul class=\"ulform\">";
 			$formoutput .= "<li>".FS::$iMgr->input("name","",20,64,$this->loc->s("snmp-community"))."</li>";
 			$formoutput .= "<li>".FS::$iMgr->check("ro",array("label" => $this->loc->s("Read"), "tooltip" => "tooltip-read"))."</li>";
 			$formoutput .= "<li>".FS::$iMgr->check("rw",array("label" => $this->loc->s("Write"), "tooltip" => "tooltip-write"))."</li>";
 			$formoutput .= "<li>".FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-			$formoutput .= "</ul>";
-			$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=1",array("snotif" => $this->loc->s("Add"), "lock" => true))."</form>";
+			$formoutput .= "</ul></form>";
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"));
 

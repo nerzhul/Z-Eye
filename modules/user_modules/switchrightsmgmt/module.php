@@ -88,7 +88,7 @@
 					$('#tohide2').show();
 					$('#tohide3').show();
 				}};");
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3",array("id" => "swbckfrm"));
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
 			$output .= "<table>";
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
@@ -120,8 +120,7 @@
 			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("server-path"),"spath",$spath);
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3","subpop #swbckfrm",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
+			$output .= "</table></form>";
 			return $output;
 		}
 

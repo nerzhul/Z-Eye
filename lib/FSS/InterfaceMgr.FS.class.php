@@ -317,6 +317,12 @@
 			return $output;
 		}
 
+		public function cbkForm($link) {
+			$output = "<form action=\"".$link."\" method=\"POST\" onsubmit=\"return callbackForm('".$link."',this,";
+			$output .= "{'snotif':'".addslashes($this->cur_module->getLoc()->s("Modification"))."'});\" >";
+			return $output;
+		}
+
 		public function idxLine($label,$name,$def_value = "", $options = array()) {
 			$output = "<tr><td>".$label."</td><td><center>";
 			if(isset($options["type"])) {
