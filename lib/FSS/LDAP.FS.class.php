@@ -100,7 +100,7 @@ class LDAP {
                 return null;
         }
 
-        private function & cleanEntries (array &$entries) {
+        private function & cleanEntries($entries) {
 	        unset ($entries ['count']);
 
         	// For each entry
