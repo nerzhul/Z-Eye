@@ -62,11 +62,11 @@
 						}
 						if($found)
 							$tmpoutput .= "</table>";
-							$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"));
+						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"),array("width" => 500));
+						$output .= $this->showStats();
 					}
 				}
 			}
-			$output .= $this->showStats();
 			return $output;
 		}
 
