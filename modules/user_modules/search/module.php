@@ -27,7 +27,7 @@
 			$this->loc = new lSearch();
 			$this->autoresults = array("device" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
-				"prise" => array(), "vlan" => array());
+				"prise" => array(), "room" => array(), "vlan" => array());
 		}
 
 		public function Load() {
@@ -105,33 +105,8 @@
 				if(!$autocomp) {
 					$swmodid = FS::$iMgr->getModuleIdByPath("switches");
 
-					// Prise number
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'",array("order" => "port"));
-					$devprise = array();
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if($found == 0) {
-							$found = 1;
-							$tmpoutput .= FS::$iMgr->h2("Ref-plug")."<div id=\"searchres\">";
-						}
-						$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-						if(!isset($devprise[$swname]))
-							$devprise[$swname] = array();
-
-						$devprise[$swname][$data["port"]] = $data["prise"];
-					}
-					if($found) {
-						foreach($devprise as $device => $devport) {
-							$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
-							foreach($devport as $port => $prise) {
-								$convport = preg_replace("#\/#","-",$port);
-								$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-								$tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> (".$this->loc->s("Plug")." ".$prise.")</li>";
-							}
-							$tmpoutput .= "</ul>";
-						}
-						$tmpoutput .= "</div>";
-					}
-					$found = 0;
+					$tmpoutput .= $this->showPlugResults($search);
+					$tmpoutput .= $this->showRoomResults($search);
 
 					// VLAN on a device
 					$query = FS::$dbMgr->Select("device_vlan","ip,description","vlan = '".$search."'",array("order" => "ip"));
@@ -149,9 +124,8 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'",array("order" => "prise","limit" => "10","group" => "prise"));
-					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["prise"],$data["prise"]);
+					$this->fetchPlugAutoResults($search);
+					$this->fetchRoomAutoResults($search);
 					
 					$query = FS::$dbMgr->Select("device_vlan","vlan","vlan ILIKE '".$search."%'",array("order" => "vlan","limit" => "10","group" => "vlan"));
 					while($data = FS::$dbMgr->Fetch($query))
@@ -192,35 +166,9 @@
 						$nbresults++;
 					}
 
-					// Prise number
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'",array("order" => "port"));
-					$devprise = array();
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if($found == 0) {
-							$found = 1;
-							$tmpoutput .= FS::$iMgr->h2("Ref-plug")."<div id=\"searchres\">";
-						}
-						$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-						if(!isset($devprise[$swname]))
-							$devprise[$swname] = array();
+					$tmpoutput .= $this->showPlugResults($search);
 
-						$devprise[$swname][$data["port"]] = $data["prise"];
-						$nbresults++;
-					}
-					if($found) {
-						foreach($devprise as $device => $devport) {
-							$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
-							foreach($devport as $port => $prise) {
-								$convport = preg_replace("#\/#","-",$port);
-								$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-								$tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ";
-								$tmpoutput .= "<br /><b>".$this->loc->s("Plug").":</b> ".$prise."</li>";
-							}
-							$tmpoutput .= "</ul><br />";
-						}
-						$tmpoutput .= "</div>";
-					}
-					$found = 0;
+					$tmpoutput .= $this->showRoomResults($search);
 
 					// Search device_ports
 					$devportname = array();
@@ -261,9 +209,8 @@
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["device"],$data["name"]);
 
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'",array("order" => "prise","limit" => "10","group" => "prise"));
-					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["prise"],$data["prise"]);
+					$this->fetchPlugAutoResults($search);
+					$this->fetchRoomAutoResults($search);
 
 					$query = FS::$dbMgr->Select("device_port","name","name ILIKE '".$search."%'",array("order" => "name","limit" => "10","group" => "name"));
 					while($data = FS::$dbMgr->Fetch($query))
@@ -861,6 +808,91 @@
 				return $output;
 			}
 		}
+
+		// Prise number
+		private function showPlugResults($search) {	
+			$found = 0;
+			$tmpoutput = "";
+			$swmodid = FS::$iMgr->getModuleIdByPath("switches");
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,prise","prise ILIKE '".$search."%'",array("order" => "port"));
+			$devprise = array();
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= FS::$iMgr->h2("Ref-plug")."<div id=\"searchres\">";
+				}
+				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				if(!isset($devprise[$swname]))
+					$devprise[$swname] = array();
+
+				$devprise[$swname][$data["port"]] = $data["prise"];
+				$nbresults++;
+			}
+			if($found) {
+				foreach($devprise as $device => $devport) {
+					$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+					foreach($devport as $port => $prise) {
+						$convport = preg_replace("#\/#","-",$port);
+						$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
+						$tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ";
+						$tmpoutput .= "<br /><b>".$this->loc->s("Plug").":</b> ".$prise."</li>";
+					}
+					$tmpoutput .= "</ul><br />";
+				}
+				$tmpoutput .= "</div>";
+			}
+			return $tmpoutput;
+		}
+
+		private function fetchPlugAutoResults($search) {	
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'",array("order" => "prise","limit" => "10","group" => "prise"));
+			while($data = FS::$dbMgr->Fetch($query))
+				array_push($this->autoresults["prise"],$data["prise"]);
+		}
+
+		// Room number
+		private function showRoomResults($search) {	
+			$found = 0;
+			$tmpoutput = "";
+			$swmodid = FS::$iMgr->getModuleIdByPath("switches");
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,room","room ILIKE '".$search."%'",array("order" => "port"));
+			$devroom = array();
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if($found == 0) {
+					$found = 1;
+					$tmpoutput .= FS::$iMgr->h2("Ref-room")."<div id=\"searchres\">";
+				}
+				$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
+				if(!isset($devroom[$swname]))
+					$devroom[$swname] = array();
+
+				$devroom[$swname][$data["port"]] = $data["room"];
+				$nbresults++;
+			}
+			if($found) {
+				foreach($devroom as $device => $devport) {
+					$tmpoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
+					foreach($devport as $port => $room) {
+						$convport = preg_replace("#\/#","-",$port);
+						$tmpoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
+						$tmpoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ";
+						$tmpoutput .= "<br /><b>".$this->loc->s("Room").":</b> ".$room."</li>";
+					}
+					$tmpoutput .= "</ul><br />";
+				}
+				$tmpoutput .= "</div>";
+			}
+			return $tmpoutput;
+		}
+
+		private function fetchRoomAutoResults($search) {
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","room","room ILIKE '".$search."%'",array("order" => "room","limit" => "10","group" => "room"));
+			while($data = FS::$dbMgr->Fetch($query))
+				array_push($this->autoresults["room"],$data["room"]);
+		}
+
 		private $autoresults;
 	};
 ?>

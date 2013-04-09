@@ -147,8 +147,11 @@
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
 						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => "tooltip-desc"));
-						$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => "tooltip-plug"));
+
+						$prise = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
+						$room = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","room","ip = '".$dip."' AND port = '".$port."'");
+						$output .= FS::$iMgr->idxLine($this->loc->s("Room"),"room",$room,array("tooltip" => "tooltip-room"));
+						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$prise,array("tooltip" => "tooltip-plug"));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = $this->devapi->getPortMtu();
 						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
@@ -1630,6 +1633,7 @@
 						$port = FS::$secMgr->checkAndSecurisePostData("port");
 						$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 						$prise = FS::$secMgr->checkAndSecurisePostData("prise");
+						$room = FS::$secMgr->checkAndSecurisePostData("room");
 						$shut = FS::$secMgr->checkAndSecurisePostData("shut");
 						$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 						$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
@@ -1982,8 +1986,9 @@
 	
 	
 						if($prise == NULL) $prise = "";
+						if($room == NULL) $room = "";
 						FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."' AND port = '".$port."'");
-						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise","'".$dip."','".$port."','".$prise."'");
+						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise,room","'".$dip."','".$port."','".$prise."','".$room."'");
 	
 						FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
 						FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$dip."' AND port = '".$port."'");
