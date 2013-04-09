@@ -28,6 +28,7 @@
 			$this->autoresults = array("device" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array());
+			$this->nbresults = 0;
 		}
 
 		public function Load() {
@@ -99,7 +100,6 @@
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
-			$nbresults = 0;
 
 			if(FS::$sessMgr->hasRight("mrule_switches_read")) {
 				if(!$autocomp) {
@@ -147,7 +147,6 @@
 			$output = "";
 			$tmpoutput = "";
 			$found = 0;
-			$nbresults = 0;
 
 			if(FS::$sessMgr->hasRight("mrule_switches_read")) {
 				if(!$autocomp) {
@@ -163,7 +162,7 @@
 						$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
 						$tmpoutput .= "<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />";
 						$tmpoutput .= "<b><i>".$this->loc->s("Description").": </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
-						$nbresults++;
+						$this->nbresults++;
 					}
 
 					$tmpoutput .= $this->showPlugResults($search);
@@ -183,7 +182,7 @@
 
 						$devportname[$swname][$data["port"]] = array($data["name"],$prise);
 
-						$nbresults++;
+						$this->nbresults++;
 					}
 
 					if($found) {
@@ -261,7 +260,7 @@
 									$tmpoutput .= preg_replace("#[\n]#","<br />",$out);
 								}
 							}
-							$nbresults++;
+							$this->nbresults++;
 						}
 						if($found) $tmpoutput .= "</div>";
 						$found = 0;
@@ -297,7 +296,7 @@
 						$tmpoutput .= "<tr><td><a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>";
 						$tmpoutput .= "\\\\<a href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>\\<a href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>";
 						$tmpoutput .= ($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
-						$nbresults++;
+						$this->nbresults++;
 					}
 
 					if($found) $tmpoutput .= "</table></div>";
@@ -320,7 +319,7 @@
 
 			if(!$autocomp) {
 				if(strlen($tmpoutput) > 0)
-					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$nbresults,true).$tmpoutput;
+					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$this->nbresults,true).$tmpoutput;
 
 				return $output;
 			}
@@ -331,7 +330,6 @@
 			$tmpoutput = "";
 			$found = 0;
 			$lastmac = "";
-			$nbresults = 0;
 			
 			if(FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
 				if(!$autocomp) {
@@ -355,7 +353,7 @@
 								$tmpoutput .= preg_replace("#[\n]#","<br />",$out);
 							}
 						}
-						$nbresults++;
+						$this->nbresults++;
 					}
 
 					if($found) $tmpoutput .= "</div>";
@@ -384,7 +382,7 @@
 						if($data["distributed"] != 3 && $data["distributed"] != 4)
 							$tmpoutput .= $this->loc->s("Validity")." : ".$data["leasetime"]."<br />";
 						$tmpoutput .= "<br />";
-						$nbresults++;
+						$this->nbresults++;
 					}
 			
 					if($found) $tmpoutput .= "</div>";
@@ -410,7 +408,7 @@
 						$fst = preg_split("#\.#",$data["time_first"]);
 						$lst = preg_split("#\.#",$data["time_last"]);
 						$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")<br />";
-						$nbresults++;
+						$this->nbresults++;
 					}
 				
 					if($found) $tmpoutput .= "</div>";
@@ -448,7 +446,7 @@
 						$tmpoutput .= "\\<a href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a><br />";
 						$tmpoutput .= $this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
 						$tmpoutput .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")<br />";
-						$nbresults++;
+						$this->nbresults++;
 					}
 
 					if($found) $tmpoutput .= "</div>";
@@ -463,7 +461,7 @@
 						$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a>)<br />";
 						$tmpoutput .= "<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />";
 						$tmpoutput .= "<b><i>".$this->loc->s("Description").": </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br /></div>";
-						$nbresults++;
+						$this->nbresults++;
 					}
 				}
 				else {
@@ -483,7 +481,7 @@
 
 			if(!$autocomp) {
 				if(strlen($tmpoutput) > 0)
-					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$nbresults,true).$tmpoutput;
+					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$this->nbresults,true).$tmpoutput;
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 				return $output;
@@ -827,7 +825,7 @@
 					$devprise[$swname] = array();
 
 				$devprise[$swname][$data["port"]] = $data["prise"];
-				$nbresults++;
+				$this->nbresults++;
 			}
 			if($found) {
 				foreach($devprise as $device => $devport) {
@@ -869,7 +867,7 @@
 					$devroom[$swname] = array();
 
 				$devroom[$swname][$data["port"]] = $data["room"];
-				$nbresults++;
+				$this->nbresults++;
 			}
 			if($found) {
 				foreach($devroom as $device => $devport) {
@@ -894,5 +892,6 @@
 		}
 
 		private $autoresults;
+		private $nbresults;
 	};
 ?>
