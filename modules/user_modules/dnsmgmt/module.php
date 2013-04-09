@@ -42,8 +42,12 @@
 					 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						$output .= $this->showCreateEditErr();
 
+						FS::$iMgr->setJSBuffer(1);
 						$tmpoutput = $this->CreateOrEditServer(true);
+						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("add-server"),array("width" => 500));
 
+						FS::$iMgr->setJSBuffer(1);
+						$tmpoutput = "";
 						$found = false;
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
 						while($data = FS::$dbMgr->Fetch($query)) {
@@ -295,9 +299,7 @@
 			$dns = 0;
 			$namedpath = "";
 			$chrootnamed = "";
-			if($create)
-				$output = FS::$iMgr->h2("add-server");
-			else {
+			if(!$create) {
 				$output = FS::$iMgr->h2("edit-server");
 				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 				if(!$addr || $addr == "") {
