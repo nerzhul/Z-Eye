@@ -183,7 +183,7 @@
 				}
 			}
 
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=13",array("id" => "radaefrm"));
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=13");
 
 			if(!$create) {
 				$output .= FS::$iMgr->hidden("saddr",$saddr);
@@ -221,8 +221,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radusrgrp"),"tradusrgrp",$tradusrgrp,array("tooltip" => "tooltip-radusrgrp"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radacct"),"tradacct",$tradacct,array("tooltip" => "tooltip-radacct"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=13",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
+			$output .= "</table></form>";
 
 			return $output;
 		}

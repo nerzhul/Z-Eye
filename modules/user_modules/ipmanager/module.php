@@ -60,8 +60,8 @@
 						default: break;
 					}
 					// To add servers
-        	                        $formoutput = FS::$iMgr->h2("title-add-server").
-						FS::$iMgr->form("index.php?mod=".$this->mid."&act=5",array("id" => "dhcpmgmtfrm")).
+					FS::$iMgr->setJSBuffer(1);
+					$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").
                 	                	"<ul class=\"ulform\"><li>".$this->loc->s("note-needed")."<li>
 						<li>".FS::$iMgr->input("addr","",20,128,$this->loc->s("server-addr"))." (*)</li>
 						<li>".FS::$iMgr->input("sshuser","",20,128,$this->loc->s("ssh-user"))." (*)</li>
@@ -72,11 +72,14 @@
 						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"),"tooltip-reservconfpath")."</li>
 						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"),"tooltip-subnetconfpath")."</li>
                         	        	<li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li>
-                                		</ul>";
-					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=5",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
+                                		</ul></form>";
+	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"id" => "toto"));
+
 					// To delete servers
+					FS::$iMgr->setJSBuffer(1);
+					$formoutput = "";
 					$found = false;
-					$tmpoutput = FS::$iMgr->h2("title-remove-server").FS::$iMgr->form("index.php?mod=".$this->mid."&act=6");
+					$tmpoutput = FS::$iMgr->h2("title-remove-server").FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=6");
 					$tmpoutput .= "<ul class=\"ulform\">".$this->loc->s("Server").": ".FS::$iMgr->select("daddr");
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser");
 					while($data = FS::$dbMgr->Fetch($query)) {
@@ -84,9 +87,9 @@
 						$tmpoutput .= "<li>".FS::$iMgr->selElmt($data["sshuser"]."@".$data["addr"],$data["addr"])."</li>";
 					}
 					$tmpoutput .= "</select><li>".FS::$iMgr->submit("",$this->loc->s("Remove"))."</li><li>".
-						FS::$iMgr->check("histrm",array("label" => $this->loc->s("remove-history")))."</form></ul>";
+						FS::$iMgr->check("histrm",array("label" => $this->loc->s("remove-history")))."</ul></form>";
 					if($found) $formoutput .= $tmpoutput;
-	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"));
+	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"),array("width" => 400));
         	                }
 
 				$netfound = false;
@@ -685,7 +688,7 @@
 					// Later
 					// FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","server = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
                                         return;
 			}
 		}

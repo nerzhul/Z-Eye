@@ -64,32 +64,6 @@
 			return $output;
 		}
 
-		public function callbackNotification($link,$options = array()) {
-			$js = "$(this).submit(function(event) { var reqobj = $(event.target);";
-			// Locking screen if needed
-			if(isset($options["lock"]) && $options["lock"] == true) {
-				$js .= "waitingPopup(\"\");";
-			}
-			// Starting notification
-			if(isset($options["snotif"]) && strlen($options["snotif"]) > 0) {
-				$js .= "$(\"#subnotification\").html(\"".addslashes($options["snotif"])."\");
-				$(\"#notification\").slideDown();
-				setTimeout(function() {
-					$('#notification').slideUp();
-				},".(isset($options["stimeout"]) && $options["stimeout"] > 1000 ? $options["stimeout"] : 5000).");";
-			}
-			$js .= "$.post('".$link."&at=3', reqobj.serialize(), function(data) {
-				$('#subnotification').html(data); $('#notification').slideDown();
-				setTimeout(function() {
-					$('#notification').slideUp();
-				},".(isset($options["timeout"]) && $options["timeout"] > 1000 ? $options["timeout"] : 5000).");";
-				if(isset($options["lock"]) && $options["lock"] == true) {
-					$js .= "unlockScreen(true);";
-				}
-			$js .= "}); return false; });";
-			return $this->js($js);
-		}
-
 		protected function showConnForm() {
 			$output = "<div id=\"logform\"><div id=\"menupanel\">";
 			if($this->showRetMenu) {

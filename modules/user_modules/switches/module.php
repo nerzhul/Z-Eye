@@ -22,20 +22,19 @@
 	require_once(dirname(__FILE__)."/snmpdiscovery.api.php");
 	
 	$device = FS::$secMgr->checkAndSecuriseGetData("d");
-        if($device) {
-		$vendor = FS::$dbMgr->GetOneData("device","vendor","name = '".$device."'");
-		switch($vendor) {
-			case "cisco": require_once(dirname(__FILE__)."/cisco.func.php"); break;
-			case "dell": require_once(dirname(__FILE__)."/dell.func.php"); break;
-			default: require_once(dirname(__FILE__)."/device.api.php"); break;
-		}
-        }
+	if(FS::isAjaxCall() && !$device)
+		$device = FS::$secMgr->checkAndSecurisePostData("sw");
+	require_once(dirname(__FILE__)."/cisco.func.php");
+	require_once(dirname(__FILE__)."/device.api.php");
 	
 	class iSwitchMgmt extends genModule{
 		function iSwitchMgmt() { 
 			parent::genModule(); 
 			$this->loc = new lSwitchMgmt(); 
-			if($device = FS::$secMgr->checkAndSecuriseGetData("d")) {
+			$device = FS::$secMgr->checkAndSecuriseGetData("d");
+			if(FS::isAjaxCall() && !$device)
+				$device = FS::$secMgr->checkAndSecurisePostData("sw");
+			if($device) {
 				$this->vendor = FS::$dbMgr->GetOneData("device","vendor","name = '".$device."'");
 				switch($this->vendor) {
 					case "cisco": $this->devapi = new CiscoAPI(); break;
@@ -141,15 +140,18 @@
 					if($data = FS::$dbMgr->Fetch($query)) {
 						if($portid != -1 && (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
 							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write"))) {
-							$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=9",array("id" => "swpomod"));
+							$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9");
 							$output .= FS::$iMgr->hidden("portid",$portid);
 							$output .= FS::$iMgr->hidden("sw",$device);
 							$output .= FS::$iMgr->hidden("port",$port);
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
 						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",$data["name"],array("tooltip" => "tooltip-desc"));
-						$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$piece,array("tooltip" => "tooltip-plug"));
+
+						$prise = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
+						$room = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","room","ip = '".$dip."' AND port = '".$port."'");
+						$output .= FS::$iMgr->idxLine($this->loc->s("Room"),"room",$room,array("tooltip" => "tooltip-room"));
+						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",$prise,array("tooltip" => "tooltip-plug"));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = $this->devapi->getPortMtu();
 						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
@@ -363,7 +365,6 @@
 							if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
 								FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
 								$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
-								$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=9",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true));
 								$output .= "</form>";
 							}
 							$this->devapi->unsetPortId();
@@ -1285,11 +1286,11 @@
 						$output .= $this->loc->s("ssh-link-state").": ";
 						if($sshuser) {
 							$output .= "<span style=\"color: green;\">".$this->loc->s("Enabled")."</span> ";
-							$output .= FS::$iMgr->removeIcon("index.php?mod=".$this->mid."&act=23&d=".$device);
+							$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=23&d=".$device);
 						}
 						else
 							$output .= "<span style=\"color: red;\">".$this->loc->s("Disabled")."</span>";
-						$output .= FS::$iMgr->form("index.php?act=22&d=".$device,array("id" => "sshpwdset"));
+						$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=22&d=".$device);
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";	
 						$output .= FS::$iMgr->idxLine($this->loc->s("User"),"sshuser",$sshuser);
 						$output .= FS::$iMgr->idxLine($this->loc->s("SSH-pwd"),"sshpwd","",array("type" => "pwd"));
@@ -1297,8 +1298,7 @@
 						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd"),"enablepwd","",array("type" => "pwd"));
 						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd-repeat"),"enablepwd2","",array("type" => "pwd"));
 						$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-						$output .= "</table>";
-						$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&d=".$device."&act=22",array("snotif" => $this->loc->s("mod-in-progress"), "lock" => true))."</form>";
+						$output .= "</table></form>";
 					}
 					else if($showmodule == 8) {
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") && 
@@ -1424,11 +1424,10 @@
 
 				$showtitle = true;
 				if(FS::$sessMgr->hasRight("mrule_switches_discover")) {
-					$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=18",array("id" => "discoverdev"));
+					$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=18");
 					$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
 					$formoutput .= "</li><li>".FS::$iMgr->Submit("",$this->loc->s("Discover"))."</li>";
-					$formoutput .= "</ul>";
-					$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=18",array("snotif" => $this->loc->s("Discovering-in-progress"), "lock" => true))."</form>";
+					$formoutput .= "</ul></form>";
 					$showtitle = false;
 					$output .= FS::$iMgr->h2("title-global-fct");
 					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
@@ -1474,16 +1473,14 @@
 					if(FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
 						$rightsok = true;
 						// Write all devices button
-						$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=20",array("id" => "saveall"));
-						$formoutput .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"));
-						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=20",array("snotif" => $this->loc->s("saveorder-launched"), "stimeout" => 10000, "lock" => true))."</form>";
+						$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=20");
+						$formoutput .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
 					}
 					if(FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
 						$rightsok = true;
 						// Backup all devices button
-						$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=21",array("id" => "backupall"));
-						$formoutput .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"));
-						$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=21",array("snotif" => $this->loc->s("backuporder-launched"), "stimeout" => 10000, "lock" => true))."</form>";
+						$formoutput .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=21");
+						$formoutput .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
 					}
 					if($rightsok) {
 						if($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
@@ -1636,6 +1633,7 @@
 						$port = FS::$secMgr->checkAndSecurisePostData("port");
 						$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 						$prise = FS::$secMgr->checkAndSecurisePostData("prise");
+						$room = FS::$secMgr->checkAndSecurisePostData("room");
 						$shut = FS::$secMgr->checkAndSecurisePostData("shut");
 						$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 						$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
@@ -1988,8 +1986,9 @@
 	
 	
 						if($prise == NULL) $prise = "";
+						if($room == NULL) $room = "";
 						FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."' AND port = '".$port."'");
-						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise","'".$dip."','".$port."','".$prise."'");
+						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise,room","'".$dip."','".$port."','".$prise."','".$room."'");
 	
 						FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
 						FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$dip."' AND port = '".$port."'");
@@ -2371,8 +2370,14 @@
 							FS::$iMgr->redir("mod=".$this->mid."&err=3");
 							return;
 						}
-						$query = FS::$dbMgr->Select("device","name");
+						$query = FS::$dbMgr->Select("device","name,vendor");
 						while($data = FS::$dbMgr->Fetch($query)) {
+							$this->vendor = $data["vendor"];
+							switch($this->vendor) {
+								case "cisco": $this->devapi = new CiscoAPI(); break;
+								case "dell": $this->devapi = DellAPI(); break;
+								default: $this->devapi = DeviceAPI(); break;
+							}
 							$this->devapi->setDevice($data["name"]);
 							$this->devapi->writeMemory();
 						}
@@ -2395,8 +2400,14 @@
 							if(!FS::$secMgr->isIP($data["addr"]))
 								continue;
 								
-							$query2 = FS::$dbMgr->Select("device","ip,name");
+							$query2 = FS::$dbMgr->Select("device","ip,name,vendor");
 							while($data2 = FS::$dbMgr->Fetch($query2)) {
+								$this->vendor = $data2["vendor"];
+								switch($this->vendor) {
+									case "cisco": $this->devapi = new CiscoAPI(); break;
+									case "dell": $this->devapi = DellAPI(); break;
+									default: $this->devapi = DeviceAPI(); break;
+								}
 								$this->devapi->setDevice($data2["name"]);
 								if($data["type"] == 1)
 									$copyId = $this->devapi->exportConfigToTFTP($data["addr"],$data["path"]."conf-".$data2["name"]);

@@ -664,7 +664,10 @@
 				return -1;
 			$res = snmpget($this->devip,$this->snmpro,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$copyId);
 			$res = preg_split("# #",$res);
-			return $res[1];
+			if(count($res) > 1)
+				return $res[1];
+			else
+				return NULL;
 		}
 		
 		public function getCopyError($copyId) {

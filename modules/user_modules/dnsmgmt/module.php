@@ -67,10 +67,10 @@
 						if($found)
 							$tmpoutput .= "</table>";
 						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"),array("width" => 500));
-						$output .= $this->showStats();
 					}
 				}
 			}
+			if(!$addr) $output .= $this->showStats();
 			return $output;
 		}
 
@@ -81,6 +81,7 @@
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
+			if(!$showmodule) $showmodule = 1;
 			if(!FS::isAjaxCall()) {
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
 				$formoutput .= FS::$iMgr->select("f");
@@ -133,7 +134,7 @@
 						$panElmts = array(
 						array(1,"mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother,$this->loc->s("Stats")),
 						array(2,"mod=".$this->mid."&at=2&f=".$filter."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother,$this->loc->s("expert-tools")));
-						$output .= FS::$iMgr->tabPan($panElmts);
+						$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
 					}
 				}
 				else
@@ -325,7 +326,7 @@
 				$output .= $this->showCreateEditErr();	
 			}
 			
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3",array("id" => "dnsfrm"));
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
 			
 			$output .= "<table class=\"standardTable\">";
 			if($create)
@@ -340,8 +341,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
-			$output .= "</table>";
-			$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=3",array("snotif" => $this->loc->s("Modification"), "lock" => true))."</form>";
+			$output .= "</table></form>";
 			
 			return $output;
 		}

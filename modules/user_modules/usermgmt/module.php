@@ -95,7 +95,7 @@
 			$output = FS::$iMgr->h2("title-directory");
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "ldapfrm"));
+				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
 				$output .= "<ul class=\"ulform\">".FS::$iMgr->hidden("addr",$addr).FS::$iMgr->hidden("edit","1")."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
 				$output .= FS::$iMgr->numInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
 				$output .= FS::$iMgr->check("ssl",array("check" => ($data["ssl"] == 1 ? true : false),"label" => "SSL ?"))."</li><li>";
@@ -108,8 +108,7 @@
 				$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,$this->loc->s("attr-uid"),"tooltip-attr-uid")."</li><li>";
 				$output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,$this->loc->s("ldap-filter"),"tooltip-ldap-filter")."</li><li>";
 				$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-				$output .= "</ul>";
-				$output .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4",array("snotif" => $this->loc->s("Editing"), "lock" => true))."</form>";
+				$output .= "</ul></form>";
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist"));
@@ -163,7 +162,7 @@
 				$output .= FS::$iMgr->h1("title-directorymgmt");
 
 				FS::$iMgr->setJSBuffer(1);
-				$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "ldapfrm"));
+				$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
 				$formoutput .= "<ul class=\"ulform\"><li>";
 				$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
 				$formoutput .= FS::$iMgr->numInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
@@ -177,8 +176,7 @@
 				$formoutput .= FS::$iMgr->input("ldapuid","",20,40,$this->loc->s("attr-uid"),"tooltip-attr-uid")."</li><li>";
 				$formoutput .= FS::$iMgr->input("ldapfilter","(objectclass=*)",20,200,$this->loc->s("ldap-filter"),"tooltip-ldap-filter")."</li><li>";
 				$formoutput .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-				$formoutput .= "</ul>";
-				$formoutput .= FS::$iMgr->callbackNotification("index.php?mod=".$this->mid."&act=4",array("snotif" => $this->loc->s("Adding"), "lock" => true))."</form>";
+				$formoutput .= "</ul></form>";
 
 				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"),array("width" => 470));
 
