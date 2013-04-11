@@ -522,7 +522,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",$data["failpreden"] == "t",array("type" => "chk"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",$data["perfdata"] == "t",array("type" => "chk"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",$data["retstatus"] == "t",array("type" => "chk"));
-			$ioutput .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",$data["retnonstatus"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",$data["retnonstatus"] == "t",array("type" => "chk"));
 
 			// Checks
 			$output .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd",$data["checkcmd"])."</td></tr>";

@@ -100,7 +100,7 @@ class LDAP {
                 return null;
         }
 
-        private function & cleanEntries($entries) {
+        private function & cleanEntries ($entries) {
 	        unset ($entries ['count']);
 
         	// For each entry
@@ -132,6 +132,46 @@ class LDAP {
                         return ldap_count_entries($this->connection, $result);
                 }
         }
+
+	public function addEntry($dn,$attributes) {
+                if(!$this->connection)
+                        die("LDAP Not Connected: addEntry fail");
+		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+			return false;
+		return ldap_add($this->connection,$dn,$attributes);
+	}
+
+	public function removeEntry($dn) {
+                if(!$this->connection)
+                        die("LDAP Not Connected: removeEntry fail");
+		if(!FS::$secMgr->isLDAPDN($dn))
+			return false;
+		return ldap_delete($this->connection,$dn);
+	}
+
+	public function modAdd($dn,$attributes) {
+                if(!$this->connection)
+                        die("LDAP Not Connected: modAdd fail");
+		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+			return false;
+		return ldap_mod_add($this->connection,$dn,$attributes);
+	}
+
+	public function modReplace($dn,$attributes) {
+                if(!$this->connection)
+                        die("LDAP Not Connected: modReplace fail");
+		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+			return false;
+		return ldap_mod_replace($this->connection,$dn,$attributes);
+	}
+
+	public function modDelete($dn,$attributes) {
+                if(!$this->connection)
+                        die("LDAP Not Connected: modDelete fail");
+		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+			return false;
+		return ldap_mod_delete($this->connection,$dn,$attributes);
+	}
 
         public function IsConnected() { return $this->isConnected; }
 
