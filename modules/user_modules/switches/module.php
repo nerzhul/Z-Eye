@@ -438,20 +438,22 @@
 					
 					$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
 					$enablepwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","enablepwd","device = '".$device."'");
-					$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
-					if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
-						switch($stdio) {
-							case 1: $output .= FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
-							case 2: $output .= FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
-							case 3: $output .= FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
-							case NULL: $output .= FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
-						}	
-						return $output;
+					if($sshpwd && $enablepwd) {
+						$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
+						if(FS::$secMgr->isNumeric($stdio) && $stdio > 0) {
+							switch($stdio) {
+								case 1: $output .= FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
+								case 2: $output .= FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
+								case 3: $output .= FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
+								case NULL: $output .= FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+							}	
+							return $output;
+						}
+						$output .= FS::$iMgr->h2("iface-dev-cfg").
+							"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd("show running-config interface ".$port))."</pre>";
+						$output .= FS::$iMgr->h2("iface-dev-status").
+							"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd("show interface ".$port))."</pre>";
 					}
-					$output .= FS::$iMgr->h2("iface-dev-cfg").
-						"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd($stdio,"show running-config interface ".$port))."</pre>";
-					$output .= FS::$iMgr->h2("iface-dev-status").
-						"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd($stdio,"show interface ".$port))."</pre>";
 					
 				}
 			}
@@ -1314,16 +1316,18 @@
 					
 						$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
 						$enablepwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","enablepwd","device = '".$device."'");
-						$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
-						if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
-							switch($stdio) {
-								case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
-								case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
-								case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
-								case NULL: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
-							}	
+						if($sshpwd && $enablepwd) {
+							$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
+							if(FS::$secMgr->isNumeric($stdio) && $stdio > 0) {
+								switch($stdio) {
+									case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
+									case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
+									case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
+									default: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+								}	
 						}
-						$output .= "<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->showSSHStartCfg($stdio))."</pre>";
+						$output .= "<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->showSSHStartCfg())."</pre>";
+						}
 					}
 					else if($showmodule == 9) {
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowrun") && 
@@ -1339,16 +1343,19 @@
 					
 						$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
 						$enablepwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","enablepwd","device = '".$device."'");
-						$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
-						if(FS::$secMgr->isNumeric($stdio) && ($stdio > 0 || $stdio == NULL)) {
-							switch($stdio) {
-								case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
-								case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
-								case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
-								case NULL: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
-							}	
+						if($sshpwd && $enablepwd) {
+							$ret = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
+							if(FS::$secMgr->isNumeric($ret) && $ret > 0) {
+								switch($ret) {
+									case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
+									case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
+									case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
+									case NULL: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+								}	
+							}
+							else 
+								$output .= "<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->showSSHRunCfg($stdio))."</pre>";
 						}
-						$output .= "<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->showSSHRunCfg($stdio))."</pre>";
 					}
 					else {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
@@ -2527,12 +2534,6 @@
 									echo $this->loc->s("err-enable-auth-fail");
 								else
 									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=7");
-								return;
-							case NULL:
-								if(FS::isAjaxCall())
-									echo $this->loc->s("err-not-implemented");
-								else
-									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=8");
 								return;
 						}
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_pwd","device = '".$device."'");

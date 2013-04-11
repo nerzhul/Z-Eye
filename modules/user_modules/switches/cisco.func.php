@@ -18,6 +18,7 @@
 	*/
 
 	require_once(dirname(__FILE__)."/device.api.php");
+	require_once(dirname(__FILE__)."/../../../lib/FSS/SSH.FS.class.php");
 	
 	class CiscoAPI extends DeviceAPI {
 		function CiscoAPI() { $this->vendor = "cisco"; }
@@ -850,56 +851,27 @@
 		* SSH commands
 		*/
 
-		public function showSSHRunCfg($stdio) {
-			return $this->sendSSHCmd($stdio,"show running-config");
+		public function showSSHRunCfg() {
+			return $this->ssh->sendCmd("show running-config");
 		}
 
-		public function showSSHStartCfg($stdio) {
-			return $this->sendSSHCmd($stdio,"show startup-config");
+		public function showSSHStartCfg() {
+			return $this->ssh->sendCmd("show startup-config");
 		}
 
 		public function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
-			$conn = ssh2_connect($device,22);
-			if(!$conn)
+			$this->ssh = new SSH($device);
+			if(!$this->ssh->Connect())
 				return 1;
-
-			if(!ssh2_auth_password($conn, $sshuser, $sshpwd))
+			if(!$this->ssh->Authenticate($sshuser, $sshpwd))
 				return 2;
 
-			$stdio = @ssh2_shell($conn,"xterm");
-			fwrite($stdio,"enable\n");
-			usleep(250000);
-			while($line = fgets($stdio)) {}
-
-			fwrite($stdio,$enablepwd."\n");
-			usleep(250000);
-			while($line = fgets($stdio)) {
-				if($line == "% Access denied\r\n")
-        	                	return 3;
-        		}
-			return $stdio;
+			$this->ssh->OpenShell();
+			if(!$this->ssh->tryPrivileged("enable",$enablepwd,"% Access denied\r\n"))
+				return 3;
+			return 0;
 		}
 
-		public function sendSSHCmd($stdio, $cmd) {
-			$output = "";
-			$output_arr = array();
-			$promptfind = false;
-
-			fwrite($stdio,$cmd."\n");
-
-			while(!$promptfind) {
-				while($line = fgets($stdio)) {
-					if(preg_match("# --More-- #",$line))
-						fwrite($stdio," ");
-					else if(preg_match("/^(.+)[#]$/",$line))
-						$promptfind = true;
-					else array_push($output_arr,$line);
-				}
-			}
-
-			for($i=0;$i<count($output_arr)-2;$i++)
-				$output .= $output_arr[$i];
-			return $output;
-		}		
+		private $ssh;
 	}
 ?>
