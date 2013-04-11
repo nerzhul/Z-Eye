@@ -192,6 +192,13 @@
 			return true;
 		}
 
+		public function isLDAPDN($str) {
+			if(preg_match("#^(\w+[=]{1}\w+)([,{1}]\w+[=]{1}\w+)*$#",$str))
+				return true;
+			else
+				return false;
+		}
+
 		private function checkSentData($data) {
 			if(!isset($data))
 				return NULL;
