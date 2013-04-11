@@ -352,6 +352,10 @@
 			return $output;
 		}
 
+		public function formatHTMLId($str) {
+			return preg_replace("#[ .]#","-",$str);
+		}
+
 		public function progress($name,$value,$max=100,$label=NULL) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";

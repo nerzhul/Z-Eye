@@ -83,7 +83,7 @@ class LDAP {
                 $res = $this->getEntries($query);
                 if(count($res))
                         return $res[0];
-                return null;
+                return NULL;
         }
 
         public function getEntries($query) {
@@ -136,23 +136,83 @@ class LDAP {
 	public function addEntry($dn,$attributes) {
                 if(!$this->connection)
                         die("LDAP Not Connected: addEntry fail");
-		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+		if(!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
 			return false;
 		return ldap_add($this->connection,$dn,$attributes);
+	}
+
+	public function modifyEntry($dn,$attributes) {
+		if(!$this->connection)
+                        die("LDAP Not Connected: addEntry fail");
+		if(!is_array($attributes)/* || !FS::$secMgr->isLDAPDN($dn)*/)
+			return false;
+
+		$entryName = preg_split("#[,]#",$dn);
+		$entryName = $entryName[0];
+
+		$entryType = preg_split("#[=]#",$entryName);
+		$entryType = $entryType[0];
+
+		$res = $this->getOneEntry($entryName);
+		$infosRepl = array();
+		$infosRemove = array();
+
+		// Compare our entries with stored entries and generate a diff/add table
+		foreach($attributes as $key => $values) {
+			if($key == "dn")
+				continue;
+			if(!is_array($values)) {
+				// If there is old datas
+				if(isset($res[$key])) {
+					// If old is array we replace
+					if(is_array($res[$key]))
+						$infosRepl[$key] = $values;
+					// else we replace if different
+					else if($values != $res[$key])
+						$infosRepl[$key] = $values;
+				}
+				// If not, we replace
+				else
+					$infosRepl[$key] = $values;
+			}
+			else {
+				// If old datas and array, we compare array
+				if(isset($res[$key]) && is_array($res[$key])) {
+					// if differences, we must replace attributes
+					if(count(array_diff($values,$res[$key])) > 0)
+						$infosRepl[$key] = $values;
+				}
+				// If not, we replace
+				else
+					$infosRepl[$key] = $values;
+			}
+		}
+		// Compare stored entries with our entries and generate a diff/remove table
+		foreach($res as $key => $values) {
+			// Refuse to add DN and entry type to removal informations
+			if(!isset($attributes[$key]) && $key != "dn" && $key != $entryType)
+				$infosRemove[$key] = array();
+		}
+		// Remove useless attributes is there is something to remove
+		if(count($infosRemove) > 0) {
+			if(!$this->modDelete($dn,$infosRemove))
+				return false;
+		}
+		return $this->modReplace($dn,$infosRepl);
 	}
 
 	public function removeEntry($dn) {
                 if(!$this->connection)
                         die("LDAP Not Connected: removeEntry fail");
-		if(!FS::$secMgr->isLDAPDN($dn))
-			return false;
+		/*if(!FS::$secMgr->isLDAPDN($dn))
+			return false;*/
 		return ldap_delete($this->connection,$dn);
 	}
 
 	public function modAdd($dn,$attributes) {
                 if(!$this->connection)
                         die("LDAP Not Connected: modAdd fail");
-		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+		if(!is_array($attributes)/* || !FS::$secMgr->isLDAPDN($dn)*/)
 			return false;
 		return ldap_mod_add($this->connection,$dn,$attributes);
 	}
@@ -160,7 +220,7 @@ class LDAP {
 	public function modReplace($dn,$attributes) {
                 if(!$this->connection)
                         die("LDAP Not Connected: modReplace fail");
-		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+		if(!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
 			return false;
 		return ldap_mod_replace($this->connection,$dn,$attributes);
 	}
@@ -168,9 +228,9 @@ class LDAP {
 	public function modDelete($dn,$attributes) {
                 if(!$this->connection)
                         die("LDAP Not Connected: modDelete fail");
-		if(!is_array($attributes) || !FS::$secMgr->isLDAPDN($dn))
+		if(!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
 			return false;
-		return ldap_mod_delete($this->connection,$dn,$attributes);
+		return ldap_mod_del($this->connection,$dn,$attributes);
 	}
 
         public function IsConnected() { return $this->isConnected; }

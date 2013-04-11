@@ -32,16 +32,26 @@
 		function zLocales() { 
 			$this->locales = array(
 				"en" => array(
+					"Add" => "Add",
 					"Cancel" => "Cancel",
 					"Confirm" => "Confirm",
 					"Done" => "Done",
-					"Modification" => "Modification"
+					"err-bad-datas" => "Invalid datas",
+					"err-no-rights" => "You don't have rights to do that",
+					"Modification" => "Modification",
+					"Modify" => "Modify",
+					"Remove" => "Remove",
 				),
 				"fr" => array(
+					"Add" => "Ajouter",
 					"Cancel" => "Annuler",
 					"Confirm" => "Confirmer",
 					"Done" => "Effectué",
-					"Modification" => "Modification"
+					"err-bad-datas" => "Données invalides",
+					"err-no-rights" => "Vous n'avez pas le droit de faire cela",
+					"Modification" => "Modification",
+					"Modify" => "Modifier",
+					"Remove" => "Supprimer",
 				)
 			);
 		}
