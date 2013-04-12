@@ -363,6 +363,14 @@
 			return $output;
 		}
 
+		// Helper for tabled Add/Submit forms
+		public function aeTableSubmit($add = true, $options = array()) {
+			if($add)
+				return $this->tableSubmit($this->cur_module->getLoc()->s("Add"),$options);
+			else
+				return $this->tableSubmit($this->cur_module->getLoc()->s("Save"),$options);
+		}
+
 		public function formatHTMLId($str) {
 			return preg_replace("#[ .]#","-",$str);
 		}
