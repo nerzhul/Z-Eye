@@ -28,7 +28,7 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class zRules {
+	class FSRules {
 		public function showMgmtInterface() { return ""; }
 
 		public function canAccessToModule() { return false; }

@@ -17,8 +17,7 @@
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
 
-        require_once(dirname(__FILE__)."/../../lib/FSS/objects/Rules.FS.class.php");
-        class rGroupMgmt extends zRules {
+        class rGroupMgmt extends FSRules {
                 function rGroupMgmt() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
