@@ -26,7 +26,6 @@
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
 			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
 			switch($edit) {
-				case 6: $output = $this->editContact(); break;
 				case 7: $output = $this->editContactgroup(); break;
 				default:
 					$output = $this->showTabPanel();
@@ -567,7 +566,7 @@
 			$thhs = 0, $thms = 0, $thhe = 0, $thme = 0,
 			$fhs = 0, $fms = 0, $fhe = 0, $fme = 0,
 			$sahs = 0, $sams = 0, $sahe = 0, $same = 0,
-			$suhs = 0, $shms = 0, $suhe = 0, $sume = 0 ) {
+			$suhs = 0, $sums = 0, $suhe = 0, $sume = 0 ) {
 
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
@@ -603,40 +602,15 @@
 			if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
-			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");
-			if($tpexist) {
-				/*
-				 * Ajax new contact
-				 */
-				FS::$iMgr->setJSBuffer(1);
-				$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7");
-				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",true,array("type" => "chk"));
-				//$formoutput .= template list
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Email"),"mail","");
-				$formoutput .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",true,array("type" => "chk"));
-				$formoutput .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd","notify-service-by-email")."</td></tr>";
-				$formoutput .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod")."</td></tr>";
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",true,array("type" => "chk"));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",true,array("type" => "chk"));
-				$formoutput .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd","notify-host-by-email")."</td></tr>";
-				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-				$formoutput .= "</table></form>";
-			}
-			else
-				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contact"));
+			if(FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+				$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");
+				if($tpexist)
+					$formoutput = $this->showContactForm();	
+				else
+					$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contact"));
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"),array("width" => 600));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"),array("width" => 600));
+			}
 
 			/*
 			 * Command table
@@ -648,7 +622,14 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
 				}
-				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=6&ct=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["mail"]."</td>
+				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
+
+				if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+					$output .= FS::$iMgr->opendiv($this->showContactForm($data["name"],$data["mail"],$data["template"] == 't'),$data["name"],array("width" => 600));
+				else
+					$output .= $data["name"];
+
+				$output .= "</td><td>".$data["mail"]."</td>
 					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=9&ct=".$data["name"],array("js" => true,
 						"confirm" => array($this->loc->s("confirm-remove-contact")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
@@ -657,47 +638,64 @@
 			return $output;
 		}
 
-		private function editContact() {
-			if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) 
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$contact = FS::$secMgr->checkAndSecuriseGetData("ct");
-			if(!$contact) {
-                                return FS::$iMgr->printError($this->loc->s("err-no-contact"));
+		private function showContactForm($name = "",$mail = "", $template = false) {
+			$srvnotifperiod = ""; $srvnotifcmd = "notify-service-by-email"; $srvoptc = true; $srvoptw = true; $srvoptu = true; $srvoptr = true; $srvoptf = true; $srvopts = true;
+			$hostnotifperiod = ""; $hostnotifcmd = "notify-host-by-email"; $hostoptd = true; $hostoptu = true; $hostoptr = true; $hostoptf = true; $hostopts = true;
+			if($name) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
+					"name = '".$name."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$srvnotifperiod = $data["srvperiod"];
+					$srvnotifcmd = $data["srvcmd"];
+					$srvoptc = ($data["soptc"] == 't');
+					$srvoptw = ($data["soptw"] == 't');
+					$srvoptu = ($data["soptu"] == 't');
+					$srvoptr = ($data["soptr"] == 't');
+					$srvoptf = ($data["soptf"] == 't');
+					$srvopts = ($data["sopts"] == 't');
+					$hostnotifperiod = $data["hostperiod"];
+					$hostnotifcmd = $data["hostcmd"];
+					$hostoptd = ($data["hoptd"] == 't');
+					$hostoptu = ($data["hoptu"] == 't');
+					$hostoptr = ($data["hoptr"] == 't');
+					$hostoptf = ($data["hoptf"] == 't');
+					$hostopts = ($data["hopts"] == 't');
+				}
 			}
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
-				"name = '".$contact."'");
-			if($data = FS::$dbMgr->Fetch($query)) {
-				$test = $data["name"];
-			}
-			else
-                                return FS::$iMgr->printError($this->loc->s("err-no-contact"));
 
-			$output = FS::$iMgr->h1("title-edit-contact").FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7");
+			FS::$iMgr->setJSBuffer(1);
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$data["template"] == "t",array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$template,array("type" => "chk"));
 			//$output .= template list
-			$output .= FS::$iMgr->hidden("name",$data["name"]).FS::$iMgr->hidden("edit",1);
-			$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("Email"),"mail",$data["mail"]);
-			$output .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod",$data["srvperiod"])."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",$data["soptc"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",$data["soptw"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",$data["soptu"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",$data["soptr"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",$data["soptf"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",$data["sopts"] == "t",array("type" => "chk"));
-			$output .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd",$data["srvcmd"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod",$data["hostperiod"])."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",$data["hoptd"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",$data["hoptu"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",$data["hoptr"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",$data["hoptf"] == "t",array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$data["hopts"] == "t",array("type" => "chk"));
-			$output .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd",$data["hostcmd"])."</td></tr>";
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			if($name)
+				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
+			else
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
+			$output .= FS::$iMgr->idxLine($this->loc->s("Email"),"mail",$mail);
+			$output .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod",$srvnotifperiod)."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",$srvoptc,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptwarn"),"srvoptw",$srvoptw,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptunreach"),"srvoptu",$srvoptu,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptrec"),"srvoptr",$srvoptr,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptflap"),"srvoptf",$srvoptf,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",$srvopts,array("type" => "chk"));
+			$output .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd",$srvnotifcmd)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod",$hostnotifperiod)."</td></tr>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",$hostopd,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",$hostoptu,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",$hostoptr,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",$hostoptf,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$hostopts,array("type" => "chk"));
+			$output .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd",$hostnotifcmd)."</td></tr>";
+			if($name)
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			else
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$output .= "</table></form>";
 			return $output;
 		}
+
 		private function showContactgroupsTab() {
 			if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
