@@ -17,11 +17,9 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  	*/
 
-	require_once(dirname(__FILE__)."/../../lib/FSS/objects/Locales.FS.class.php");
-    
-	class lSwitchRightsMgmt extends zLocales {
+	class lSwitchRightsMgmt extends FSLocales {
 		function lSwitchRightsMgmt() {
-			parent::zLocales();	
+			parent::FSLocales();	
 			$locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",

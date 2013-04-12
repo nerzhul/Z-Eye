@@ -28,8 +28,8 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class zLocales {
-		function zLocales() { 
+	class FSLocales {
+		function FSLocales() { 
 			$this->locales = array(
 				"en" => array(
 					"Add" => "Add",
