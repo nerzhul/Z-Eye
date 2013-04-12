@@ -17,12 +17,11 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/modules/Network.FS.class.php");
 
-	class iIPManager extends genModule{
-		function iIPManager() { parent::genModule(); $this->loc = new lIPManager(); }
+	class iIPManager extends FSModule{
+		function iIPManager() { parent::FSModule(); $this->loc = new lIPManager(); }
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-ip-management"));
 			$output = "";

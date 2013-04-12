@@ -16,11 +16,11 @@
         * along with this program; if not, write to the Free Software
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
-	require_once(dirname(__FILE__)."/../generic_module.php");
+
 	require_once(dirname(__FILE__)."/locales.php");
 	
-	class iDefault extends genModule{
-		function iDefault() { parent::genModule(); $this->loc = new lDefault(); }
+	class iDefault extends FSModule{
+		function iDefault() { parent::FSModule(); $this->loc = new lDefault(); }
 
 		public function Load() {
 			FS::$iMgr->setTitle("Speed Reporting");

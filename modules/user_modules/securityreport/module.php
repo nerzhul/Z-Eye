@@ -17,11 +17,10 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 
-	class iSecReport extends genModule{
-		function iSecReport() { parent::genModule(); $this->loc = new lSecReport(); }
+	class iSecReport extends FSModule{
+		function iSecReport() { parent::FSModule(); $this->loc = new lSecReport(); }
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-attack-report"));

@@ -17,12 +17,11 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/netdiscoCfg.api.php");
 	
-	class iNetdisco extends genModule{
-		function iNetdisco() { parent::genModule(); $this->loc = new lNetdisco(); }
+	class iNetdisco extends FSModule{
+		function iNetdisco() { parent::FSModule(); $this->loc = new lNetdisco(); }
 		
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-netdisco"));

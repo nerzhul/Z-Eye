@@ -39,6 +39,8 @@
 	require_once(dirname(__FILE__)."/../../modules/LocalInterface.class.php");
 	require_once(dirname(__FILE__)."/../../modules/Ajax.class.php");
 	require_once(dirname(__FILE__)."/SessionMgr".CLASS_EXT);
+	require_once(dirname(__FILE__)."/Module".CLASS_EXT);
+
 	if(Config::enableSNMP())
 		require_once(dirname(__FILE__)."/SNMP".CLASS_EXT);
 

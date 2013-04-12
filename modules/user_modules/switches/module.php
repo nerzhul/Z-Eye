@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/snmpdiscovery.api.php");
 	
@@ -27,9 +26,9 @@
 	require_once(dirname(__FILE__)."/cisco.func.php");
 	require_once(dirname(__FILE__)."/device.api.php");
 	
-	class iSwitchMgmt extends genModule{
+	class iSwitchMgmt extends FSModule{
 		function iSwitchMgmt() { 
-			parent::genModule(); 
+			parent::FSModule(); 
 			$this->loc = new lSwitchMgmt(); 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			if(FS::isAjaxCall() && !$device)

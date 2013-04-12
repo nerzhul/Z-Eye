@@ -28,10 +28,10 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class genModule {
-		function genModule() {}
+	class FSModule {
+		function FSModule() {}
 
-		public function Load() { $this->iMgr->printError("Unknown module !"); }
+		public function Load() { FS::$iMgr->printError("Unknown module !"); }
 		public function setModuleId($id) { $this->mid = $id; }
 		public function getMenuTitle() { return $this->loc->s("menu-title"); }
 		public function getLoc() { return $this->loc; }

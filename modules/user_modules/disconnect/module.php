@@ -17,11 +17,10 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	
-	class iDisconnect extends genModule{
-		function iDisconnect() { parent::genModule(); $this->loc = new lDisconnect(); }
+	class iDisconnect extends FSModule{
+		function iDisconnect() { parent::FSModule(); $this->loc = new lDisconnect(); }
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("Disconnect"));

@@ -17,11 +17,10 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 
-	class iMaps extends genModule{
-		function iMaps() { parent::genModule(); $this->loc = new lMaps(); }
+	class iMaps extends FSModule{
+		function iMaps() { parent::FSModule(); $this->loc = new lMaps(); }
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-maps"));
 

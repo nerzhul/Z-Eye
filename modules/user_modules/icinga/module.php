@@ -17,11 +17,10 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 
-	class iIcinga extends genModule{
-		function iIcinga() { parent::genModule(); $this->loc = new lIcinga(); }
+	class iIcinga extends FSModule{
+		function iIcinga() { parent::FSModule(); $this->loc = new lIcinga(); }
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
 			$output = $this->showTabPanel();

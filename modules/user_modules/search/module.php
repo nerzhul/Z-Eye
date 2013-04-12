@@ -17,13 +17,12 @@
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
 
-	require_once(dirname(__FILE__)."/../generic_module.php");
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../../lib/FSS/LDAP.FS.class.php");
 
-	class iSearch extends genModule{
+	class iSearch extends FSModule{
 		function iSearch() { 
-			parent::genModule();
+			parent::FSModule();
 			$this->loc = new lSearch();
 			$this->autoresults = array("device" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
