@@ -34,13 +34,17 @@
 
 	class FSInterfaceMgr {
 		function FSInterfaceMgr() {
+			$this->InitComponents();
 		}
 
 		public function InitComponents() {
 			$this->arr_css = array();
 			$this->arr_js = array();
 			$this->title = "";
-			$this->js_buffer = array(0 => "", 1 => "");
+			// Create 2 JS buffers
+			$this->js_buffer = array();
+			for($i=0;$i<2;$i++)
+				array_push($this->js_buffer,"");
 			$this->js_buffer_idx = 0;
 		}
 
