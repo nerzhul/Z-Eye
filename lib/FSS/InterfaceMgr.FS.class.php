@@ -346,6 +346,13 @@
 			return $output;
 		}
 
+		public function idxIdLine($label,$name,$value = "",$options = array()) {
+			if($value)
+				return "<tr><td>".$this->cur_module->getLoc()->s($label)."</td><td>".$value."</td></tr>".FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
+			else
+				return $this->idxLine($this->cur_module->getLoc()->s($label),$name,"",$options);
+		}
+
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
 			if(isset($options["js"]))

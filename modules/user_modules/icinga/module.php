@@ -187,10 +187,7 @@
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 			//$output .= template list
-			if($name)
-				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
-			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name",$name);
+			$output .= FS::$iMgr->idxIdLine("Name","name",$name);
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias);
 			$output .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname",$dname);
 			$output .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
@@ -326,10 +323,7 @@
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=19");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			// Global
-			if($name)
-				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
-			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
 
 			$hostlist = array();
@@ -441,10 +435,7 @@
 			//$output .= template list
 
 			// Global
-			if($name) 
-				$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("desc",$name).FS::$iMgr->hidden("edit",1);
-			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc","",array("length" => 120, "size" => 30));
+			$output .= FS::$iMgr->idxIdLine("Description","desc",$name,array("length" => 120, "size" => 30));
 			// @ TODO support hostlist
 			$output .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false,($hosttype && $host ? array($hosttype."$".$host) : array()))."</td></tr>";
 
@@ -565,10 +556,9 @@
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			if($name)
-				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
-			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+
+			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
+
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 120, "size" => 30));
 			$output .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms",$mhs,$mms)."<br />".
 				$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme",$mhe,$mme)."</td></tr>";
@@ -662,10 +652,7 @@
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$template,array("type" => "chk"));
 			//$output .= template list
-			if($name)
-				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
-			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","");
+			$output .= FS::$iMgr->idxIdLine("Name","name",$name);
 			$output .= FS::$iMgr->idxLine($this->loc->s("Email"),"mail",$mail);
 			$output .= "<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod",$srvnotifperiod)."</td></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptcrit"),"srvoptc",$srvoptc,array("type" => "chk"));
@@ -752,10 +739,7 @@
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			if($name)
-				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
-			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
 			$countElmt = 0;
 			$output2 = "";
@@ -828,10 +812,7 @@
 	
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			if($name)
-				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
-			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
+			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd",$value,array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
 			if($name)
 				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
