@@ -21,16 +21,17 @@
 		function rIcinga() { $this->connectedstate = 1; }
 
 		public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Monitoring de services</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_icinga_read",array("check" => in_array("mrule_icinga_read",$activerules),"label" => "Lire les données"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_write",array("check" => in_array("mrule_icinga_write",$activerules),"label" => "Modifier les données"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_cmd_write",array("check" => in_array("mrule_icinga_cmd_write",$activerules),"label" => "Modifier les commandes"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_ctg_write",array("check" => in_array("mrule_icinga_ctg_write",$activerules),"label" => "Modifier les groupes de contacts"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_ct_write",array("check" => in_array("mrule_icinga_ct_write",$activerules),"label" => "Modifier les contacts"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_tp_write",array("check" => in_array("mrule_icinga_tp_write",$activerules),"label" => "Modifier les périodes temporelles"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_srv_write",array("check" => in_array("mrule_icinga_srv_write",$activerules),"label" => "Modifier les services"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_hg_write",array("check" => in_array("mrule_icinga_hg_write",$activerules),"label" => "Modifier les groupes d'hôtes"))."</td></tr>";
-                        $output .= "<tr><td></td><td>".FS::$iMgr->check("mrule_icinga_host_write",array("check" => in_array("mrule_icinga_host_write",$activerules),"label" => "Modifier les hôtes"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Monitoring de services",$activerules,array(
+				array("Lire les données",			"mrule_icinga_read"),
+				array("Modifier les données",			"mrule_icinga_write"),
+				array("Modifier les commandes",				"mrule_icinga_cmd_write"),
+				array("Modifier les groupes de contacts",		"mrule_icinga_ctg_write"),
+				array("Modifier les contacts",				"mrule_icinga_ctg_write"),
+				array("Modifier les périodes temporelles",	"mrule_icinga_tp_write"),
+				array("Modifier les services",				"mrule_icinga_srv_write"),
+				array("Modifier les groupes d'hôtes",		"mrule_icinga_hg_write"),
+				array("Modifier les hôtes",			"mrule_icinga_host_write")
+			));
                         return $output;
 		}
 

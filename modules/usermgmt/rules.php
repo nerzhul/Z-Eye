@@ -21,10 +21,11 @@
                 function rUserMgmt() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Gestion des utilisateurs</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_usermgmt_read",array("check" => in_array("mrule_usermgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->check("mrule_usermgmt_write",array("check" => in_array("mrule_usermgmt_write",$activerules),"label" => "Modifier les utilisateurs"))."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->check("mrule_usermgmt_ldapwrite",array("check" => in_array("mrule_usermgmt_ldapwrite",$activerules),"label" => "Modifier les annuaires"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Gestion des utilisateurs",$activerules,array(
+				array("Lire les données",	"mrule_usermgmt_read"),
+				array("Modifier les utilisateurs",	"mrule_usermgmt_write"),
+				array("Modifier les annuaires",		"mrule_usermgmt_ldapwrite")
+			));
                         return $output;
                 }
 

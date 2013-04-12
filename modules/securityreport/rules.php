@@ -21,8 +21,9 @@
                 function rSecurityReport() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Rapports de sécurité</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_securityreport_read",array("check" => in_array("mrule_securityreport_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Rapports de sécurité",$activerules,array(
+				array("Lire les données",	"mrule_securityreport_read")
+			));
                         return $output;
                 }
 

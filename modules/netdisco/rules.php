@@ -21,8 +21,9 @@
                 function rNetdisco() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Moteur Netdisco</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_netdisco_read",array("check" => in_array("mrule_netdisco_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Moteur Netdisco",$activerules,array(
+				array("Lire les données",	"mrule_netdisco_read")
+			));
                         return $output;
                 }
 

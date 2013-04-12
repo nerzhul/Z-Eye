@@ -21,16 +21,17 @@
                 function rSnortMgmt() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-					$output = "<tr><td>Moteur SNORT</td>";
-                    $output .= "<td>".FS::$iMgr->check("mrule_snortmgmt_read",array("check" => in_array("mrule_snortmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->check("mrule_snortmgmt_write",array("check" => in_array("mrule_snortmgmt_write",$activerules),"label" => "Modifier les données"))."</td></tr>";
-                    return $output;
+			$output = FS::$iMgr->ruleLines("Moteur SNORT",$activerules,array(
+				array("Lire les données",	"mrule_snortmgmt_read"),
+				array("Modifier les données",	"mrule_snortmgmt_write")
+			));
+                	return $output;
                 }
 
                 public function canAccessToModule() {
-					if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_snortmgmt_read"))
-                   		return true;
-                    return false;
+			if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_snortmgmt_read"))
+                  		return true;
+                	return false;
                 }
         };
 ?>

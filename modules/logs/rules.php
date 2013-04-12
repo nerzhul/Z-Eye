@@ -21,8 +21,9 @@
                 function rLogs() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Accès aux Logs Z-Eye</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_logs_read",array("check" => in_array("mrule_logs_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Accès aux Logs Z-Eye",$activerules,array(
+				array("Lire les données",	"mrule_logs_read")
+			));
                         return $output;
                 }
 

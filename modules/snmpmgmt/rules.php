@@ -21,8 +21,9 @@
                 function rSNMPmgmt() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Gestion SNMP</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_snmpmgmt_read",array("check" => in_array("mrule_snmpmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Gestion SNMP",$activerules,array(
+				array("Lire les données",	"mrule_snmpmgmt_read")
+			));
                         return $output;
                 }
 

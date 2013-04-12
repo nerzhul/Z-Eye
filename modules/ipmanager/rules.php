@@ -21,10 +21,10 @@
                 function rIPManager() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Supervision DHCP</td>
-					<td>".FS::$iMgr->check("mrule_ipmanager_read",array("check" => in_array("mrule_ipmanager_read",$activerules),"label" => "Lire les données"))."</td></tr>
-				<tr><td></td>
-					<td>".FS::$iMgr->check("mrule_ipmanager_servermgmt",array("check" => in_array("mrule_ipmanager_servermgmt",$activerules),"label" => "Gérer les serveurs"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Supervision DHCP",$activerules,array(
+				array("Lire les données",	"mrule_ipmanager_read"),
+				array("Gérer les serveurs",	"mrule_ipmanager_servermgmt")
+			));
                         return $output;
                 }
 

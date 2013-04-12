@@ -21,8 +21,7 @@
                 function rDNSMgmt() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-                	$output = "<tr><td>Supervision DNS</td>";
-			$output .= "<td>".FS::$iMgr->check("mrule_dnsmgmt_read",array("check" => in_array("mrule_dnsmgmt_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+			$output = FS::$iMgr->ruleLine("Lire les données","mrule_dnsmgmt_read",$activerules,"Supervision DNS");
 			return $output;
                 }
 

@@ -355,6 +355,21 @@
 				return $this->idxLine($this->cur_module->getLoc()->s($label),$name,"",$options);
 		}
 
+		public function ruleLine($label,$rulename,$rulelist,$idx = "") {
+			return "<tr><td>".$idx."</td><td>".$this->check($rulename,array("check" => in_array($rulename,$rulelist),"label" => $label))."</td></tr>";
+		}
+
+		public function ruleLines($idx,$rulelist,$rules = array()) {
+			$count = count($rules);
+			if($count == 0)
+				return "";
+
+			$output = "";
+			for($i=0;$i<$count;$i++)
+				$output .= $this->ruleLine($rules[$i][0],$rules[$i][1],$rulelist,$i == 0 ? $idx : "");
+			return $output;
+		}
+
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
 			if(isset($options["js"]))

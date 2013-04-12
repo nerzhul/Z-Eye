@@ -21,8 +21,9 @@
                 function rSearch() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-                        $output = "<tr><td>Recherche</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_search_read",array("check" => in_array("mrule_search_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+                        $output = FS::$iMgr->ruleLines("Recherche",$activerules,array(
+				array("Lire les données",	"mrule_search_read")
+			));
                         return $output;
                 }
 

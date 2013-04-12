@@ -21,15 +21,16 @@
                 function rMaps() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Cartographie Réseau</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_netspeed_read",array("check" => in_array("mrule_netspeed_read",$activerules),"label" => "Lire les données"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Cartographie Réseau",$activerules,array(
+				array("Lire les données",	"mrule_netspeed_read")
+			));
                         return $output;
                 }
 
                 public function canAccessToModule() {
-					if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_netspeed_read"))
-						return true;
-					return false;
+			if(FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_netspeed_read"))
+				return true;
+			return false;
                 }
         };
 ?>

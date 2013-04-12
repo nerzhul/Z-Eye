@@ -21,11 +21,12 @@
                 function rRadius() { $this->connectedstate = 1; }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = "<tr><td>Gestion Radius</td>";
-                        $output .= "<td>".FS::$iMgr->check("mrule_radius_read",array("check" => in_array("mrule_radius_read",$activerules),"label" => "Lire les données (Admin)"))."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->check("mrule_radius_write",array("check" => in_array("mrule_radius_write",$activerules),"label" => "Gestion des données (Admin)"))."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->check("mrule_radius_manage",array("check" => in_array("mrule_radius_manage",$activerules),"label" => "Gestion des bases de données Radius (Admin)"))."</td></tr>
-			<tr><td></td><td>".FS::$iMgr->check("mrule_radius_deleg",array("check" => in_array("mrule_radius_deleg",$activerules),"label" => "Gestion des utilisateurs (Délégation)"))."</td></tr>";
+			$output = FS::$iMgr->ruleLines("Gestion Radius",$activerules,array(
+				array("Lire les données (admin)",			"mrule_radius_read"),
+				array("Gestion des données (admin)",			"mrule_radius_write"),
+				array("Gestion des bases de données radius (admin)",	"mrule_radius_manage"),
+				array("Gestion des utilisateurs (délégation)",	"mrule_radius_deleg")
+			));
                         return $output;
                 }
 
