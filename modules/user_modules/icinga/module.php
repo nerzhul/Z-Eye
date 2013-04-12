@@ -24,13 +24,7 @@
 		function iIcinga() { parent::genModule(); $this->loc = new lIcinga(); }
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
-			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
-			switch($edit) {
-				case 7: $output = $this->editContactgroup(); break;
-				default:
-					$output = $this->showTabPanel();
-					break;
-			}
+			$output = $this->showTabPanel();
 			return $output;
 		}
 
@@ -682,7 +676,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("srvoptsched"),"srvopts",$srvopts,array("type" => "chk"));
 			$output .= "<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd",$srvnotifcmd)."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod",$hostnotifperiod)."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",$hostopd,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",$hostoptd,array("type" => "chk"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",$hostoptu,array("type" => "chk"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",$hostoptr,array("type" => "chk"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",$hostoptf,array("type" => "chk"));
@@ -710,26 +704,11 @@
 			/*
 			 * Ajax new contactgroup
 			 */
-			FS::$iMgr->setJSBuffer(1);
-			$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");
-			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
-			$countElmt = 0;
-			$formoutput2 = "";
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				$countElmt++;
-				$formoutput2 .= FS::$iMgr->selElmt($data["name"],$data["name"]);
-			}
-			if($countElmt/4 < 4) $countElmt = 16;
-			$formoutput .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true,array("size" => round($countElmt/4)));
-			$formoutput .= $formoutput2;
-			$formoutput .= "</select></td></tr>";
-			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"),array("width" => 500));
+			if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
+				$formoutput = $this->showContactgroupForm();
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"),array("width" => 500));
+			}
 
 			/*
 			 * Contactgroup table
@@ -741,14 +720,26 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
 				}
-				$output .= "<tr id=\"ctg".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=7&cg=".$data["name"]."\">".
-					$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
+
+				$contacts = array();
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
-				$found2 = false;
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
+					array_push($contacts,$data2["member"]);
+				}
+
+				$output .= "<tr id=\"ctg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
+				if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+					$output .= FS::$iMgr->opendiv($this->showContactgroupForm($data["name"],$data["alias"],$contacts),$data["name"],array("width" => 500));
+				else
+					$output .= $data["name"];
+					
+				$output .= "</td><td>".$data["alias"]."</td><td>";
+
+				$found2 = false;
+				for($i=0;$i<count($contacts);$i++) {
 					if($found2) $output .= ", ";
 					else $found2 = true;
-					$output .= $data2["member"];
+					$output .= $contacts[$i];
 				}
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=12&ctg=".$data["name"],array("js" => true,
 					"confirm" => array($this->loc->s("confirm-remove-contactgroup")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
@@ -757,40 +748,30 @@
 			return $output;
 		}
 
-		private function editContactgroup() {
-			if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) 
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$cg = FS::$secMgr->checkAndSecuriseGetData("cg");
-			if(!$cg)
-				return FS::$iMgr->printError($this->loc->s("err-no-contactgroup"));
-
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","name = '".$cg."'");
-			if($data = FS::$dbMgr->Fetch($query)) {
-				$alias = $data["alias"];
-			}
-			else {
-                                return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
-                        }
-			$output = FS::$iMgr->h1("title-edit-contactgroup").FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
-				<tr><td>".$this->loc->s("Name")."</td><td>".$cg."</td></tr>";
-			$output .= FS::$iMgr->hidden("name",$cg).FS::$iMgr->hidden("edit",1);
+		private function showContactgroupForm($name = "", $alias = "", $contacts = array()) {
+			FS::$iMgr->setJSBuffer(1);
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			if($name)
+				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
+			else
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
-			$tmpoutput = "";
-
-			$contacts = array();
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","member","name = '".$cg."'");
-			while($data = FS::$dbMgr->Fetch($query))
-				array_push($contacts,$data["member"]);
+			$countElmt = 0;
+			$output2 = "";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$tmpoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
+				$countElmt++;
+				$output2 .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
 			}
 			if($countElmt/4 < 4) $countElmt = 16;
 			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true,array("size" => round($countElmt/4)));
-			$output .= $tmpoutput;
+			$output .= $output2;
 			$output .= "</select></td></tr>";
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			if($name)
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			else
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$output .= "</table></form>";
 			return $output;
 		}
