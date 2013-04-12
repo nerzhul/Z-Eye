@@ -26,7 +26,6 @@
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
 			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
 			switch($edit) {
-				case 2: $output = $this->editHost(); break;
 				case 3: $output = $this->editHostgroup(); break;
 				case 4: $output = $this->editService(); break;
 				case 5: $output = $this->editTimeperiod(); break;
