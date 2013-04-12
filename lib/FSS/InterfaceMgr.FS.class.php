@@ -94,7 +94,7 @@
                                                 while($data3 = pg_fetch_array($query3)) {
 							$link = new HTTPLink($data3["link"]);
                                                         $link->Load();
-                                                        $dirpath = dirname(__FILE__)."/../../modules/user_modules/".$link->getArgs();
+                                                        $dirpath = dirname(__FILE__)."/../../modules/".$link->getArgs();
 							if(FS::$sessMgr->getUid() == 1 || (is_dir($dirpath))) {
 								require($dirpath."/main.php");
 								if($module->getRulesClass()->canAccessToModule()) {
@@ -503,11 +503,11 @@
 		}
 
 		public function getModuleIdByPath($path) {
-			$dir = opendir(dirname(__FILE__)."/../../modules/user_modules");
+			$dir = opendir(dirname(__FILE__)."/../../modules");
 			$moduleid = 0;
 			$found = false;
 			while(($elem = readdir($dir)) && $found == false) {
-				$dirpath = dirname(__FILE__)."/../../modules/user_modules/".$elem;
+				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
 				if(is_dir($dirpath)) $moduleid++;
 				if(is_dir($dirpath) && $elem == $path) {
 					$dir2 = opendir($dirpath);

@@ -18,7 +18,7 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
-	require_once(dirname(__FILE__)."/../modules/user_modules/switches/cisco.func.php");
+	require_once(dirname(__FILE__)."/../modules/switches/cisco.func.php");
 	
 	function doSwitchBackup() {
 		$query = FS::$dbMgr->Select("z_eye_save_device_servers","addr,type,path,login,pwd");

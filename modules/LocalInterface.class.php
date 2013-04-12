@@ -148,11 +148,11 @@
 		public function loadModule($id) {
 			$output = "";
 
-			$dir = opendir(dirname(__FILE__)."/user_modules");
+			$dir = opendir(dirname(__FILE__));
 			$found = false;
 			$moduleid = 0;
 			while(($elem = readdir($dir)) && $found == false) {
-				$dirpath = dirname(__FILE__)."/user_modules/".$elem;
+				$dirpath = dirname(__FILE__)."/".$elem;
 				if(is_dir($dirpath)) $moduleid++;
 				if(is_dir($dirpath) && $moduleid == $id) {
 					$dir2 = opendir($dirpath);
@@ -164,7 +164,7 @@
 				}
 			}
 			if($found == true) {
-				require(dirname(__FILE__)."/user_modules/".$path."/main.php");
+				require(dirname(__FILE__)."/".$path."/main.php");
 
 				if($module->getRulesClass()->canAccessToModule()) {
 					$this->setCurrentModule($module->getModuleClass());

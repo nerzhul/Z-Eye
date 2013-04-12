@@ -32,11 +32,11 @@
 				case 0:
 					break;
 				default:
-					$dir = opendir(dirname(__FILE__)."/user_modules");
+					$dir = opendir(dirname(__FILE__));
 					$found = false;
 					$moduleid = 0;
 					while(($elem = readdir($dir)) && $found == false) {
-						$dirpath = dirname(__FILE__)."/user_modules/".$elem;
+						$dirpath = dirname(__FILE__)."/".$elem;
 						if(is_dir($dirpath)) $moduleid++;
 						if(is_dir($dirpath) && /*$elem == $mod_path*/$moduleid == $mid) {
 							$dir2 = opendir($dirpath);
@@ -53,7 +53,7 @@
 						return;
 					}
 
-					require_once(dirname(__FILE__)."/user_modules/".$mod_path."/main.php");
+					require_once(dirname(__FILE__)."/".$mod_path."/main.php");
 
 					if(!$module->getRulesClass()->canAccessToModule()) {
 						header("Location: index.php");
