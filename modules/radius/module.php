@@ -91,8 +91,8 @@
 			$output = "";
 
 			$tmpoutput = FS::$iMgr->h2("title-radius-db");
-			$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>".$this->loc->s("db-type")."</th><th>"
-				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th></th><th></th></tr>";
+			$tmpoutput .= "<table id=\"tRadiusList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Server")."</th><th>".$this->loc->s("Port")."</th><th>".$this->loc->s("db-type")."</th><th>"
+				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th></th><th></th></tr></thead>";
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,login,dbtype");
@@ -116,8 +116,10 @@
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"],array("js" => true,
 					"confirm" => array($this->loc->s("confirm-remove-datasrc")."'".$data["dbname"]."@".$data["addr"].":".$data["port"]."'","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found)
+			if($found) {
 				$output .= $tmpoutput."</table>";
+				FS::$iMgr->jsSortTable("tRadiusList");
+			}
 
 			$output .= $this->showCreateOrEditRadiusDB(true);
 
@@ -191,7 +193,7 @@
 				$output .= FS::$iMgr->hidden("edit",1);
 			}
 
-			$output .= "<table class=\"standardTable\">";
+			$output .= "<table>";
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
@@ -724,7 +726,8 @@
 				if(!$found && (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]) 
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]))) {
 					$found = true;
-					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><tr><th>Id</th><th>Utilisateur</th><th>Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr>";
+					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><thead><tr><th class=\"headerSortDown\">Id</th><th>Utilisateur</th><th>
+						Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr></thead>";
 					if($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
 						$query2 = $radSQLMgr->Select(PGDbConfig::getDbPrefix()."radusers","username,expiration","expiration > 0");
 						while($data2 = $radSQLMgr->Fetch($query2)) {
@@ -747,7 +750,10 @@
 					$tmpoutput .= "</td></tr>";
 				}
 			}
-			if($found) $output = $tmpoutput."</table>";
+			if($found) {
+				$output = $tmpoutput."</table>";
+				FS::$iMgr->jsSortTable("raduser");
+			}
 			return $output;
 		}
 

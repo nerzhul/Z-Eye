@@ -269,13 +269,8 @@ th:last-child {
 	border-radius: 0 4px 0 0;
 }
 
-th a {
-	color: #444;
-}
-
-th a:hover {
-	color: #333;
-}
+th a { color: #444; }
+th a:hover { color: #333; }
 
 tr:hover td {
 	background-color: #CCE;
@@ -291,6 +286,11 @@ td {
 td:hover {
 	background-color: #CCE;
 }
+
+/* Sort tables */
+thead:hover { cursor: pointer; }
+.headerSortDown { text-decoration: underline; }
+.headerSortUp { text-decoration: overline; }
 
 a { text-decoration: none; color: #F33; }
 a:hover { color: #F10; cursor: pointer; }

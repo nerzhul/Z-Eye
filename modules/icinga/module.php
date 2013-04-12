@@ -114,7 +114,9 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table width=\"80%\"><tr><th width=\"20%\">".$this->loc->s("Name")."</th><th width=\"20%\">".$this->loc->s("Alias")."</th><th width=\"20%\">".$this->loc->s("Address")."</th><th width=\"15%\">".$this->loc->s("Template")."</th><th width=\"20%\">".$this->loc->s("Parent")."</th><th></th></tr>";
+					$output .= "<table id=\"thostList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"20%\">".$this->loc->s("Name")."</th><th width=\"20%\">".
+						$this->loc->s("Alias")."</th><th width=\"20%\">".$this->loc->s("Address")."</th><th width=\"15%\">".$this->loc->s("Template").
+						"</th><th width=\"20%\">".$this->loc->s("Parent")."</th><th></th></tr></thead>";
 				}
 
 				$parentlist = array();
@@ -143,7 +145,10 @@
 				$output .="</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=15&host=".$data["name"],array("js" => true,
 					"confirm" => array($this->loc->s("confirm-remove-host")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("thostList");
+			}
 			return $output;
 		}
 
@@ -285,7 +290,8 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table width=\"80%\"><tr><th width=\"10%\">".$this->loc->s("Name")."</th><th width=\"10%\">".$this->loc->s("Alias")."</th><th width=\"80%\">".$this->loc->s("Members")."</th><th></th></tr>";
+					$output .= "<table id=\"thgList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"10%\">".$this->loc->s("Name").
+						"</th><th width=\"10%\">".$this->loc->s("Alias")."</th><th width=\"80%\">".$this->loc->s("Members")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -311,7 +317,10 @@
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&hg=".$data["name"],array("js" => true,
 					"confirm" => array($this->loc->s("confirm-remove-hostgroup")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("thgList");
+			}
 			return $output;
 		}
 		
@@ -356,7 +365,8 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Host")."</th><th>".$this->loc->s("Hosttype")."</th><th>".$this->loc->s("Template")."</th><th></th></tr>";
+					$output .= "<table id=\"tsrvList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Host").
+						"</th><th>".$this->loc->s("Hosttype")."</th><th>".$this->loc->s("Template")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"srv_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -377,7 +387,10 @@
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=18&srv=".$data["name"],array("js" => true,
 					"confirm" => array($this->loc->s("confirm-remove-service")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("tsrvList");
+			}
 			return $output;
 		}
 
@@ -491,8 +504,8 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias").
-						"</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
+					$output .= "<table id=\"ttpList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias").
+						"</th><th>".$this->loc->s("Periods")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -530,7 +543,10 @@
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&tp=".$data["name"],array("js" => true,
 					"confirm" => array($this->loc->s("confirm-remove-timeperiod")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("ttpList");
+			}
 			return $output;
 		}
 
@@ -591,7 +607,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr>";
+					$output .= "<table id=\"tctList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -605,7 +621,10 @@
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=9&ct=".$data["name"],array("js" => true,
 						"confirm" => array($this->loc->s("confirm-remove-contact")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("tctList");
+			}
 			return $output;
 		}
 
@@ -689,7 +708,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr>";
+					$output .= "<table id=\"tctgList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr></thead>";
 				}
 
 				$contacts = array();
@@ -715,7 +734,10 @@
 				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=12&ctg=".$data["name"],array("js" => true,
 					"confirm" => array($this->loc->s("confirm-remove-contactgroup")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("tctgList");
+			}
 			return $output;
 		}
 
@@ -767,7 +789,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr>";
+					$output .= "<table id=\"tcmdList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -784,7 +806,10 @@
 
 				$output .= "</tr>";
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("tcmdList");
+			}
 			return $output;
 		}
 

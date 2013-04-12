@@ -236,7 +236,7 @@
 						if($curzone != $data["zonename"]) {
 							$curzone = $data["zonename"];
 							if($curzone != "") $dnsoutput .= "</table>";
-							$dnsoutput .= FS::$iMgr->h3("Zone: ".$filter,true)."<table><th>".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr>";
+							$dnsoutput .= FS::$iMgr->h3("Zone: ".$filter,true)."<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
 						}
 						if(!isset($dnsrecords[$data["record"]])) $dnsrecords[$data["record"]] = array();
 						if(!isset($dnsrecords[$data["record"]][$data["rectype"]])) $dnsrecords[$data["record"]][$data["rectype"]] = array();
@@ -273,8 +273,10 @@
 						}
 					}
 
-					if(strlen($dnsoutput) > 0)
+					if(strlen($dnsoutput) > 0) {
 						$output .= $dnsoutput."</table>";
+						FS::$iMgr->jsSortTable("dnsRecords");
+					}
 				}
 				else if($showmodule == 2) {
 					$output .= FS::$iMgr->h3("title-old-records");
@@ -328,7 +330,7 @@
 			
 			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
 			
-			$output .= "<table class=\"standardTable\">";
+			$output .= "<table>";
 			if($create)
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 			else {

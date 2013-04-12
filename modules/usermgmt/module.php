@@ -134,9 +134,9 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table><tr><th>UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
+					$tmpoutput .= "<table id=\"userList\"><thead><tr><th class=\"headerSortDown\">UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
 					$this->loc->s("Groups")."</th><th>".$this->loc->s("Subname")."</th><th>".$this->loc->s("Name")."</th><th>".
-					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th><th></th></tr>";
+					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th><th></th></tr></thead>";
 				}
 				$tmpoutput .= "<tr id=\"u".$data["uid"]."tr\"><td>".$data["uid"]."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$data["username"]."\">".$data["username"]."</a></td><td>".
 					($data["sha_pwd"] == "" ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
@@ -156,6 +156,7 @@
 
 			if($found) {
 				$output .= $tmpoutput."</table>";
+				FS::$iMgr->jsSortTable("userList");
 			}
 			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
 				$output .= FS::$iMgr->h1("title-directorymgmt");
@@ -185,8 +186,8 @@
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found) {
 						$found = 1;
-						$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
-						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr>";
+						$tmpoutput .= "<table id=\"ldapList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
+						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr></thead>";
 					}
 					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".
 						$data["addr"]."</a></td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".
@@ -196,6 +197,7 @@
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";
+				FS::$iMgr->jsSortTable("ldapList");
 			}
 			return $output;
 		}

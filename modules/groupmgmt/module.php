@@ -76,7 +76,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table><tr><th>GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr>";
+					$tmpoutput .= "<table id=\"groupList\"><thead><tr><th class=\"headerSortDown\">GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr></thead>";
 				}
 				$tmpoutput .= "<tr id=\"gr".$data["gid"]."tr\"><td>".$data["gid"]."</td><td><a href=\"index.php?mod=".$this->mid."&g=".$data["gname"]."\">".$data["gname"]."</a></td><td>".
 					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".
@@ -85,6 +85,7 @@
 			}
 			if($found) {
 				$output .= $tmpoutput."</table>";
+				FS::$iMgr->jsSortTable("groupList");
 			}
 			return $output;
 		}
@@ -105,7 +106,7 @@
 							if(strlen($tmpoutput) > 0) {
 								if($found == 0) {
 									$found = 1;
-									$output .= "<table><tr><th>Module</th><th>".$this->loc->s("Rule")."</th></tr>";
+									$output .= "<table id=\"ruleList\"><thead><tr><th>Module</th><th>".$this->loc->s("Rule")."</th></tr></thead>";
 								}
 								$output .= $tmpoutput;
 							}
@@ -113,7 +114,9 @@
 					}
 				}
 			}
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+			}
 			return $output;
 		}
 

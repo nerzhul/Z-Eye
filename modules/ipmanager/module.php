@@ -121,139 +121,140 @@
 				}
 			} else {
 				if(!$showmodule || $showmodule == 1) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
-					$iparray = array();
-					$netoutput .= FS::$iMgr->h3("Réseau : ".$data["netid"]."/".$data["netmask"],true);
-					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						$iparray = array();
+						$netoutput .= FS::$iMgr->h3("Réseau : ".$data["netid"]."/".$data["netmask"],true);
+						$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
 
-					$netobj = new FSNetwork();
-					$netobj->setNetAddr($data["netid"]);
-					$netobj->setNetMask($data["netmask"]);
+						$netobj = new FSNetwork();
+						$netobj->setNetAddr($data["netid"]);
+						$netobj->setNetMask($data["netmask"]);
 
-					$swfound = false;
+						$swfound = false;
 
-					// Bufferize switch list
-					$switchlist = array();
+						// Bufferize switch list
+						$switchlist = array();
 
-					$query2 = FS::$dbMgr->Select("device","ip,name");
-					while($data2 = FS::$dbMgr->Fetch($query2))
-						$switchlist[$data2["ip"]] = $data2["name"];
+						$query2 = FS::$dbMgr->Select("device","ip,name");
+						while($data2 = FS::$dbMgr->Fetch($query2))
+							$switchlist[$data2["ip"]] = $data2["name"];
 
-					// Initiate network IPs
-					$lastip = $netobj->getLastUsableIPLong()+1;
-					for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
-						$iparray[$i] = array();
-						$iparray[$i]["mac"] = "";
-						$iparray[$i]["host"] = "";
-						$iparray[$i]["ltime"] = "";
-						$iparray[$i]["distrib"] = 0;
-						$iparray[$i]["servers"] = array();
-						$iparray[$i]["switch"] = "";
-						$iparray[$i]["port"] = "";
-					}
-
-					// Fetch datas
-					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
-					while($data2 = FS::$dbMgr->Fetch($query2)) {
-						// If it's reserved on a host don't override status
-						if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
-							$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
-							$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
-							$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
-							$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
+						// Initiate network IPs
+						$lastip = $netobj->getLastUsableIPLong()+1;
+						for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
+							$iparray[$i] = array();
+							$iparray[$i]["mac"] = "";
+							$iparray[$i]["host"] = "";
+							$iparray[$i]["ltime"] = "";
+							$iparray[$i]["distrib"] = 0;
+							$iparray[$i]["servers"] = array();
+							$iparray[$i]["switch"] = "";
+							$iparray[$i]["port"] = "";
 						}
-						// List servers where the data is
-						array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
-						if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
-							$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
-							$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
-							if($sw && $port) {
-								$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
-								$iparray[ip2long($data2["ip"])]["port"] = $port;
-								$swfound = true;
+
+						// Fetch datas
+						$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
+						while($data2 = FS::$dbMgr->Fetch($query2)) {
+							// If it's reserved on a host don't override status
+							if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
+								$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
+								$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
+								$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
+								$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
 							}
+							// List servers where the data is
+							array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
+							if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
+								$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+								$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+								if($sw && $port) {
+									$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
+									$iparray[ip2long($data2["ip"])]["port"] = $port;
+									$swfound = true;
+								}
+							}
+
 						}
 
-					}
+						$used = 0;
+						$reserv = 0;
+						$free = 0;
+						$distrib = 0;
+						$fixedip = 0;
 
-					$used = 0;
-					$reserv = 0;
-					$free = 0;
-					$distrib = 0;
-					$fixedip = 0;
+						$netoutput .= "<center><table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
+							<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
+						if($swfound)
+							$netoutput .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
+						$netoutput .= "Fin du bail</th><th>Serveurs</th></tr></thead>";
 
-					$netoutput .= "<center><table><tr><th>".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
-						<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
-					if($swfound)
-						$netoutput .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
-					$netoutput .= "Fin du bail</th><th>Serveurs</th></tr>";
-
-					foreach($iparray as $key => $value) {
-						$rstate = "";
-						$style = "";
-						switch($value["distrib"]) {
-							case 1:
-								$rstate = $this->loc->s("Free");
-								$style = "background-color: #BFFFBF;";
-								$free++;
-								break;
-							case 2:
-								$rstate = $this->loc->s("Used");
-								$style = "background-color: #FF6A6A;";
-								$used++;
-								break;
-							case 3:
-								$rstate = $this->loc->s("Reserved");
-								$style = "background-color: #FFFF80;";
-								$reserv++;
-								break;
-							case 4:
-								$rstate = $this->loc->s("Distributed");
-								$style = "background-color: #BFFBFF;";
-								$distrib++;
-								break;
-							default: {
+						foreach($iparray as $key => $value) {
+							$rstate = "";
+							$style = "";
+							switch($value["distrib"]) {
+								case 1:
 									$rstate = $this->loc->s("Free");
 									$style = "background-color: #BFFFBF;";
-									$mac = FS::$dbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
-									if($mac) {
-										$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
-										if($data3 = FS::$dbMgr->Fetch($query3)) {
-											$rstate = $this->loc->s("Stuck-IP");
-											$style = "background-color: orange;";
-											$fixedip++;
+									$free++;
+									break;
+								case 2:
+									$rstate = $this->loc->s("Used");
+									$style = "background-color: #FF6A6A;";
+									$used++;
+									break;
+								case 3:
+									$rstate = $this->loc->s("Reserved");
+									$style = "background-color: #FFFF80;";
+									$reserv++;
+									break;
+								case 4:
+									$rstate = $this->loc->s("Distributed");
+									$style = "background-color: #BFFBFF;";
+									$distrib++;
+									break;
+								default: {
+										$rstate = $this->loc->s("Free");
+										$style = "background-color: #BFFFBF;";
+										$mac = FS::$dbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
+										if($mac) {
+											$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
+											if($data3 = FS::$dbMgr->Fetch($query3)) {
+												$rstate = $this->loc->s("Stuck-IP");
+												$style = "background-color: orange;";
+												$fixedip++;
+											}
+											else
+												$free++;
 										}
 										else
 											$free++;
 									}
-									else
-										$free++;
-								}
-								break;
+									break;
+							}
+							$netoutput .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
+							$netoutput .= long2ip($key)."</a>";
+							$netoutput .= "</td><td>".$rstate."</td><td>";
+							$netoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
+							$netoutput .= $value["host"]."</td><td>";
+							// Show switch column only of a switch is here
+							if($swfound) {
+								$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "");
+								$netoutput .= "</td><td>";
+								$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "");
+								$netoutput .= "</td><td>";
+							}
+							$netoutput .= $value["ltime"]."</td><td>";
+							$count = count($value["servers"]);
+							for($i=0;$i<$count;$i++) {
+								if($i > 0) $netoutput .= "<br />";
+								$netoutput .= $value["servers"][$i];
+							}
+							$netoutput .= "</td></tr>";
 						}
-						$netoutput .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
-						$netoutput .= long2ip($key)."</a>";
-						$netoutput .= "</td><td>".$rstate."</td><td>";
-						$netoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
-						$netoutput .= $value["host"]."</td><td>";
-						// Show switch column only of a switch is here
-						if($swfound) {
-							$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "");
-							$netoutput .= "</td><td>";
-							$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "");
-							$netoutput .= "</td><td>";
-						}
-						$netoutput .= $value["ltime"]."</td><td>";
-						$count = count($value["servers"]);
-						for($i=0;$i<$count;$i++) {
-							if($i > 0) $netoutput .= "<br />";
-							$netoutput .= $value["servers"][$i];
-						}
-						$netoutput .= "</td></tr>";
-					}
-					$netoutput .= "</table></center><br /><hr>";
-					$js = "var chart = new Highcharts.Chart({
+						$netoutput .= "</table></center><br /><hr>";
+						FS::$iMgr->jsSortTable("tipList");
+						$js = "var chart = new Highcharts.Chart({
 							chart: { renderTo: '".$data["netid"]."', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
 							title: { text: '' },
 							tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
@@ -264,13 +265,13 @@
 										this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
 							}}},
 							series: [{ type: 'pie', data: [";
-					if($used > 0) $js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
-					if($reserv > 0) $js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
-					if($fixedip > 0) $js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
-					if($distrib > 0) $js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
-					$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
+						if($used > 0) $js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
+						if($reserv > 0) $js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
+						if($fixedip > 0) $js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
+						if($distrib > 0) $js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+						$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
 							}]});";
-					$netoutput .= FS::$iMgr->js($js);
+						$netoutput .= FS::$iMgr->js($js);
 					}
 					$output .= $netoutput;
 				}

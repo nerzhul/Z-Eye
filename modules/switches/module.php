@@ -1105,14 +1105,17 @@
 						return $output;
 					}
 					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
-					$tmpoutput = "<table><tr><th>ID</th><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("creation-date")."</th></tr>";
+					$tmpoutput = "<table id=\"tvlanList\"><thead><tr><th class=\"headerSortDown\">ID</th><th>".$this->loc->s("Description").
+						"</th><th>".$this->loc->s("creation-date")."</th></tr></thead>";
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) $found = 1;
 						$crdate = preg_split("#\.#",$data["creation"]);
 						$tmpoutput .= "<tr><td>".$data["vlan"]."</td><td>".$data["description"]."</td><td>".$crdate[0]."</td></tr>";
 					}
-					if($found)
+					if($found) {
 						$output .= $tmpoutput."</table>";
+						FS::$iMgr->jsSortTable("tvlanList");
+					}
 					else
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-vlan")." !");
 					return $output;	
@@ -1144,7 +1147,7 @@
 						}); }
 						else $(src).toggle(); }");
 					}
-					$tmpoutput = "<table><tr><th><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
+					$tmpoutput = "<table id=\"tportList\"><thead><tr><th class=\"headerSortDown\"><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
 					$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">".$this->loc->s("Description")."</a></th>
 						<th>".$this->loc->s("MAC-addr-iface")."</th><th>Up (Link/Admin)</th>";
 					if($iswif == false)
@@ -1154,7 +1157,7 @@
 						$tmpoutput .= "<th>POE</th>";
 					$tmpoutput .= "<th>";
 					if($iswif == true) $tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
-					else $tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr>";
+					else $tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr></thead>";
 					$query = FS::$dbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",array("order" => $od));
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(preg_match("#unrouted#",$data["port"]))
@@ -1175,8 +1178,8 @@
 						$tmpoutput2 .= "<a onclick=\"javascript:modifyPrise('#swpr_".$convport." a',false);\"><div id=\"swpr_".$convport."l\" class=\"modport\">";
 						$tmpoutput2 .= ($swpdata == "" ? "Modifier" : $swpdata);
 						$tmpoutput2 .= "</div></a><a style=\"display: none;\">";
-									$tmpoutput2 .= FS::$iMgr->input("swprise-".$convport,$swpdata,10,10);
-									$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPrise('#swpr_".$convport."',true,'".$dip."','".$data["port"]."','swprise-".$convport."');\" />";
+						$tmpoutput2 .= FS::$iMgr->input("swprise-".$convport,$swpdata,10,10);
+						$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPrise('#swpr_".$convport."',true,'".$dip."','".$data["port"]."','swprise-".$convport."');\" />";
 						$tmpoutput2 .= "</a></div>";
 						$tmpoutput2 .= "</td><td>";
 						// Editable state
@@ -1274,6 +1277,7 @@
 					if($found != 0) {
 						$output .= $tmpoutput;
 						$output .= "</table>";
+						FS::$iMgr->jsSortTable("tportList");
 					}
 					else
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-device"));
@@ -1441,12 +1445,12 @@
 
 				$foundsw = 0;
 				$foundwif = 0;
-				$outputswitch = "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
-					$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr>";
+				$outputswitch = "<table id=\"dev\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
+					$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr></thead>";
 
 				$outputwifi = FS::$iMgr->h2("title-WiFi-AP");
-				$outputwifi .= "<table id=\"dev\"><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
-					$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr>";
+				$outputwifi .= "<table id=\"dev2\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
+					$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr></thead>";
 
 				$query = FS::$dbMgr->Select("device","*","",array("order" => "name"));
 				while($data = FS::$dbMgr->Fetch($query)) {
@@ -1500,10 +1504,12 @@
 				if($foundsw != 0) {
 					$output .= $outputswitch;
 					$output .= "</table>";
+					FS::$iMgr->jsSortTable("dev");
 				}
 				if($foundwif != 0) {
 					$output .= $outputwifi;
 					$output .= "</table>";
+					FS::$iMgr->jsSortTable("dev2");
 				}
 				if($foundsw != 0 || $foundwif != 0) {
 					$output .= FS::$iMgr->js("$.event.props.push('dataTransfer');

@@ -388,6 +388,10 @@
 				return $this->tableSubmit($this->cur_module->getLoc()->s("Save"),$options);
 		}
 
+		public function jsSortTable($id) {
+			$this->js("$('#".$id."').tablesorter();");
+		}
+
 		public function formatHTMLId($str) {
 			return preg_replace("#[ .]#","-",$str);
 		}

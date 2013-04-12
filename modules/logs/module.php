@@ -51,8 +51,8 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
-						<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr>";
+					$output .= "<table id=\"tlogList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
+						<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr></thead>";
 				}
 				$date = preg_split("#[.]#",$data["date"]);
 				$lineoutput = "<td>".$date[0]."</td><td>".$data["module"]."</td><td>";
@@ -65,7 +65,10 @@
 				$output .= $lineoutput."</td><td>".$data["_user"]."</td><td>".preg_replace("#[\n]#","<br />",$data["txt"])."</td></tr>";
 			}
 			
-			if($found) $output .= "</table>";
+			if($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("tlogList");
+			}
 			else $output .= FS::$iMgr->printError($this->loc->s("err-no-logs"));
 			return $output;
 		}
