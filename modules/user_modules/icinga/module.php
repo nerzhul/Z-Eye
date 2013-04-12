@@ -32,7 +32,6 @@
 				case 5: $output = $this->editTimeperiod(); break;
 				case 6: $output = $this->editContact(); break;
 				case 7: $output = $this->editContactgroup(); break;
-				case 8: $output = $this->editCmd(); break;
 				default:
 					$output = $this->showTabPanel();
 					break;
@@ -866,14 +865,7 @@
 			/*
 			 * Ajax new command
 			 */
-			FS::$iMgr->setJSBuffer(1);
-			$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
-			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd","",array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
-			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-
+			$formoutput = $this->showCommandForm();
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"),array("width" => 500));
 
 			/*
@@ -886,38 +878,44 @@
 					$found = true;
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr>";
 				}
-				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=8&cmd=".$data["name"]."\">".
-					$data["name"]."</a></td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td><td>".
-					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&cmd=".$data["name"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-command")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
+				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
+
+				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
+					$output .= FS::$iMgr->opendiv($this->showCommandForm($data["name"],$data["cmd"]),$data["name"],array("width" => 500));
+				else
+					$output .= $data["name"];
+
+				$output .= "</td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td>";
+
+				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
+					$output .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&cmd=".$data["name"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-command")."'".$data["name"]."' ?","Confirm","Cancel")))."</td>";
+
+				$output .= "</tr>";
 			}
 			if($found) $output .= "</table>";
 			return $output;
 		}
 
-		private function editCmd() {
-			if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) 
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
-			// TODO: log
-			if(!$cmdname) {
-				return FS::$iMgr->printError($this->loc->s("err-no-cmd"));
-			}
+		private function showCommandForm($name="",$value="") {
+			FS::$iMgr->setJSBuffer(1);
+	
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			if($name)
+				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
+			else
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd",$value,array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
+			if($name)
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			else
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
+			$output .= "</table></form>";
 
-			$cmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'");
-			if(!$cmd) {
-				return FS::$iMgr->printError($this->loc->s("err-cmd-doesnt-exist"));
-			}
-			$output = FS::$iMgr->h1("title-cmd-edit");
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1").
-				FS::$iMgr->hidden("name",$cmdname).FS::$iMgr->hidden("edit",1).
-				"<ul class=\"ulform\"><li><b>".$this->loc->s("Name").":</b> ";
-			$cmd = htmlentities($cmd);
-			$output .= $cmdname."</li><li><b>".$this->loc->s("Command").":</b> ".FS::$iMgr->input("cmd",$cmd,30,200)."</li><li>".
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</ul></form>";
 			return $output;
 		}
-		
+
 		private function getTimePeriodList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias","",array("order" => "alias"));
