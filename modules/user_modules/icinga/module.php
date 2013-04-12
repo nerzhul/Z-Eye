@@ -26,7 +26,6 @@
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
 			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
 			switch($edit) {
-				case 3: $output = $this->editHostgroup(); break;
 				case 4: $output = $this->editService(); break;
 				case 5: $output = $this->editTimeperiod(); break;
 				case 6: $output = $this->editContact(); break;
@@ -286,22 +285,16 @@
 				/*
 				 * Ajax new hostgroup
 				 */
-				$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=19");
-				$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				// Global
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-				$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 60, "size" => 30));
-				$formoutput .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true)."</td></tr>";
-				$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-				$formoutput .= "</table></form>";
+				$formoutput = $this->showHostgroupForm();
 			}
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
-			}	
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"),array("width" => 460));
+			}
+			if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"),array("width" => 460));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","",array("order" => "name"));
@@ -310,8 +303,14 @@
 					$found = true;
 					$output .= "<table width=\"80%\"><tr><th width=\"10%\">".$this->loc->s("Name")."</th><th width=\"10%\">".$this->loc->s("Alias")."</th><th width=\"80%\">".$this->loc->s("Members")."</th><th></th></tr>";
 				}
-				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=3&hg=".$data["name"]."\">".
-					$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
+
+				if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+					$output .= FS::$iMgr->opendiv($this->showHostgroupForm($data["name"],$data["alias"]),$data["name"],array("width" => 460));
+				else
+					$output .= $data["name"];
+
+				$output .= "</td><td>".$data["alias"]."</td><td>";
 				$found2 = false;
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host,hosttype","name = '".$data["name"]."'",array("order" => "hosttype,name"));
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -332,36 +331,28 @@
 			return $output;
 		}
 		
-		private function editHostgroup() {
-			if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) 
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$hostgroup = FS::$secMgr->checkAndSecuriseGetData("hg");
-                        // @TODO: log
-                        if(!$hostgroup) {
-                                return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
-                        }
-
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","name = '".$hostgroup."'");
-			if($data = FS::$dbMgr->Fetch($query)) {
-				$alias = $data["alias"];
-			}
-			else {
-                                return FS::$iMgr->printError($this->loc->s("err-no-hostgroup"));
-                        }
-			$output = FS::$iMgr->h1("title-hostgroup-edit");
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=19");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>
-				<tr><td>".$this->loc->s("Name")."</td><td>".$hostgroup."</td></tr>";
-			$output .= FS::$iMgr->hidden("name",$hostgroup).FS::$iMgr->hidden("edit",1);
+		private function showHostgroupForm($name = "",$alias = "") {
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=19");
+			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			// Global
+			if($name)
+				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
+			else
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
 
 			$hostlist = array();
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","name = '".$hostgroup."'");
-			while($data = FS::$dbMgr->Fetch($query))
-				array_push($hostlist,$data["hosttype"]."$".$data["host"]);
+			if($name) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","name = '".$name."'");
+				while($data = FS::$dbMgr->Fetch($query))
+					array_push($hostlist,$data["hosttype"]."$".$data["host"]);
+			}	
 
-			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true,$hostlist,$hostgroup)."</td></tr>";
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true,$hostlist,$name)."</td></tr>";
+			if($name)
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			else
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$output .= "</table></form>";
 			return $output;
 		}
