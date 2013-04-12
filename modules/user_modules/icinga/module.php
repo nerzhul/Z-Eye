@@ -26,7 +26,6 @@
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
 			$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
 			switch($edit) {
-				case 5: $output = $this->editTimeperiod(); break;
 				case 6: $output = $this->editContact(); break;
 				case 7: $output = $this->editContactgroup(); break;
 				default:
@@ -362,17 +361,15 @@
 
 			$output = "";
 
-			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
-			if($tpexist) {
-				/*
-				 * Ajax new service
-				 */
-				$formoutput = $this->showServiceForm();
-			}
-			else
-				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-service"));
+			if(FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+				$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
+				if($tpexist)
+					$formoutput = $this->showServiceForm();
+				else
+					$formoutput = FS::$iMgr->printError($this->loc->s("err-no-service"));
 
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"),array("width" => 700));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"),array("width" => 700));
+			}
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template","",array("order" => "name"));
@@ -507,22 +504,10 @@
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
 			
-			FS::$iMgr->setJSBuffer(1);
-			$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
-			$formoutput .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
-			$formoutput .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias","",array("length" => 120, "size" => 30));
-			$formoutput .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("thhs","thms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("fhs","fms")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same")."</td></tr>";
-			$formoutput .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums")."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume")."</td></tr>";
-			$formoutput .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
-			$formoutput .= "</table></form>";
-
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"),array("width" => 580));
+			if(FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+				$formoutput = $this->showTimeperiodForm();
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"),array("width" => 580));
+			}
 
 			/*
 			 * Timeperiod table
@@ -535,7 +520,18 @@
 					$output .= "<table><tr><th>".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias").
 						"</th><th>".$this->loc->s("Periods")."</th><th></th></tr>";
 				}
-				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td><a href=\"index.php?mod=".$this->mid."&edit=5&tp=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["alias"]."</td><td>";
+				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
+
+				if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+					$output .= FS::$iMgr->opendiv($this->showTimeperiodForm($data["name"],$data["alias"],$data["mhs"],$data["mms"],$data["mhe"],$data["mme"],
+						$data["tuhs"],$data["tums"],$data["tuhe"],$data["tume"],$data["whs"],$data["wms"],$data["whe"],$data["wme"],
+						$data["thhs"],$data["thms"],$data["thhe"],$data["thme"],$data["fhs"],$data["fms"],$data["fhe"],$data["fme"],
+						$data["sahs"],$data["sams"],$data["sahe"],$data["same"],$data["suhs"],$data["sums"],$data["suhe"],$data["sume"]
+					),$data["name"],array("width" => 580));
+				else
+					$output .= $data["name"];
+
+				$output .= "</td><td>".$data["alias"]."</td><td>";
 				if($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0)
 					$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].	
 					" ".$this->loc->s("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
@@ -564,41 +560,41 @@
 			return $output;
 		}
 
-		private function editTimeperiod() {
-			if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) 
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$tp = FS::$secMgr->checkAndSecuriseGetData("tp");
-			if(!$tp) {
-                                return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
-			}
+		private function showTimeperiodForm($name = "", $alias = "",
+			$mhs = 0, $mms = 0, $mhe = 0, $mme = 0, 
+			$tuhs = 0, $tums = 0, $tuhe = 0, $tume = 0,
+			$whs = 0, $wms = 0, $whe = 0, $wme = 0,
+			$thhs = 0, $thms = 0, $thhe = 0, $thme = 0,
+			$fhs = 0, $fms = 0, $fhe = 0, $fme = 0,
+			$sahs = 0, $sams = 0, $sahe = 0, $same = 0,
+			$suhs = 0, $shms = 0, $suhe = 0, $sume = 0 ) {
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","name = '".$tp."'");
-			if($data = FS::$dbMgr->Fetch($query)) {
-				$name = $data["name"];
-			}
-			else
-                                return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
-
-			$output = FS::$iMgr->h1("title-edit-timeperiod").FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
+			FS::$iMgr->setJSBuffer(1);
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$output .= FS::$iMgr->hidden("name",$data["name"]).FS::$iMgr->hidden("edit",1);
-			$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$data["alias"],array("length" => 120, "size" => 30));
-			$output .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".
-				FS::$iMgr->hourlist("mhs","mms",$data["mhs"],$data["mms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme",$data["mhe"],$data["mme"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".	
-				FS::$iMgr->hourlist("tuhs","tums",$data["tuhs"],$data["tums"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume",$data["tuhe"],$data["tume"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".
-				FS::$iMgr->hourlist("whs","wms",$data["whs"],$data["wms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme",$data["whe"],$data["wme"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".
-				FS::$iMgr->hourlist("thhs","thms",$data["thhs"],$data["thms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme",$data["thhe"],$data["thme"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".
-				FS::$iMgr->hourlist("fhs","fms",$data["fhs"],$data["fms"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme",$data["fhe"],$data["fme"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".
-				FS::$iMgr->hourlist("sahs","sams",$data["sahs"],$data["sams"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same",$data["sahe"],$data["same"])."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".
-				FS::$iMgr->hourlist("suhs","sums",$data["suhs"],$data["sums"])."<br />".$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$data["suhe"],$data["sume"])."</td></tr>";
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			if($name)
+				$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$name."</td></tr>".FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1);
+			else
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name","",array("length" => 60, "size" => 30));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 120, "size" => 30));
+			$output .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms",$mhs,$mms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme",$mhe,$mme)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums",$tuhs,$tums)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume",$tuhe,$tume)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms",$whs,$wms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme",$whe,$wme)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("thhs","thms",$thhs,$thms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme",$thhe,$thme)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("fhs","fms",$fhs,$fms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme",$fhe,$fme)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams",$sahs,$sams)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same",$sahe,$same)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums",$suhs,$sums)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$suhe,$sume)."</td></tr>";
+			if($name)
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			else
+				$output .= FS::$iMgr->tableSubmit($this->loc->s("Add"));
 			$output .= "</table></form>";
 			return $output;
 		}
