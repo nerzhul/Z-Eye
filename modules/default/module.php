@@ -84,7 +84,7 @@
 									$outstate = $this->loc->s("WARN");
 									$stylestate = "color: orange; font-size: 18px;";
 									if($svalues["last_time_ok"])
-										$timedown = (time()-$svalues["last_time_ok"]);
+										$timedown = $this->convertSecToDays(time()-$svalues["last_time_ok"]);
 									else
 										$timedown = $this->loc->s("Since-icinga-start");
 								}
@@ -92,7 +92,7 @@
 									$outstate = $this->loc->s("CRITICAL");
 									$stylestate = "color: red; font-size: 20px;";
 									if($svalues["last_time_ok"])
-										$timedown = (time()-$svalues["last_time_ok"]);
+										$timedown = $this->convertSecToDays(time()-$svalues["last_time_ok"]);
 									else
 										$timedown = $this->loc->s("Since-icinga-start");
 								}
@@ -113,7 +113,7 @@
 								$outstate = $this->loc->s("DOWN");
 								$stylestate = "color: red; font-size: 20px;";
 								if($hosvalues["last_time_up"])
-									$timedown = (time()-$hosvalues["last_time_up"]);
+									$timedown = $this->converSecToDays(time()-$hosvalues["last_time_up"]);
 								else
 									$timedown = $this->loc->s("Since-icinga-start");
 							}
@@ -128,6 +128,33 @@
 				$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga").": ".$this->hsicinga."/".$this->totalicinga."</h4>".
 					$problemoutput."</table>";		
 			}
+			return $output;
+		}
+
+		private function convertSecToDays($time) {
+			$sec = 0; $min = 0; $hour = 0; $day = 0; 
+			if($time >= 60) {
+				$sec = $time % 60;
+				$time = ($time - $sec)/60;
+			} 
+			if($time >= 60) {
+				$min = $time % 60;
+				$time = ($time - $min)/60;
+			}
+			if($time >= 24) {
+				$hour = $time % 24;
+				$time = ($time - $hour)/24;
+			}
+			$day = $time;
+			$output = "";
+			if($day > 0)
+				$output .= $day."d ";
+			if($hour > 0)
+				$output .= $hour."h ";
+			if($min > 0)
+				$output .= $min."m ";
+			if($sec > 0)
+				$output .= $sec."s";
 			return $output;
 		}
 

@@ -40,11 +40,12 @@
 					"out-bw" => "Débit Sortant",
 					"Service" => "Service",
 					"Since-icinga-start" => "Depuis le démarrage du processus Icinga",
-					"State" => "Status",
+					"State" => "Statut",
 					"state-net" => "Etat du réseau",
 					"state-security" => "Etat de la sécurité",
 					"state-srv" => "Etat des services",
-					"Status-information" => "Informations de status",
+					"Status-information" => "Informations de statut",
+					"WARN" => "ATTENTION",
 				),
 				"en" => array(
 					"Attack" => "Attacks",
@@ -70,6 +71,7 @@
 					"state-security" => "Security state",
 					"state-srv" => "Services state",
 					"Status-information" => "Status information",
+					"WARN" => "WARNING",
 				)
 			);
 			$this->concat($locales);
