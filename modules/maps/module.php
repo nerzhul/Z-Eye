@@ -261,6 +261,18 @@
 					return;
 				// Import network nodes
 				case 4:
+					$nodelist = array();
+					$query = FS::$dbMgr->Select("device","ip,name");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						$linklist = array();
+						$query2 = FS::$dbMgr->Select("device_port","remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
+						while($data2 = FS::$dbMgr->Fetch($query2))
+							array_push($linklist,$data2["remote_id"]);
+						array_push($nodelist,array("name" => $data["name"], "label" => $data["ip"],"links" => $linklist));
+					}
+					
+					$this->ImportNodes($nodelist);
+					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
 				// Import icinga nodes
 				case 5:
