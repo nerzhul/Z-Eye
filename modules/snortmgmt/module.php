@@ -472,7 +472,6 @@ preprocessor http_inspect_server: server default \\\n
 			// @ TODO: debug fwrite($file,'dcerpc2_server: default, policy WinXP, detect [smb [139,445], tcp 135, udp 135, rpc-over-http-server 593], autodetect [tcp 1025:, udp 1025:, rpc-over-http-server 1025:], smb_max_chain 3, smb_invalid_shares '."[\"C$\", \"D$\", \"ADMIN$\"]\n");
 			fwrite($file,"preprocessor ssl: ports { 443 465 563 636 989 992 993 994 995 7801 7802 7900 7901 7902 7903 7904 7905 7906 7907 7908 7909 7910 7911 7912 7913 7914 7915 7916 7917 7918 7919 7920 }, trustservers, noinspect_encrypted\n");
 			//fwrite($file,"output database: log, pgsql, user="." password="." dbname="." host="."\n");
-			fwrite($file,"include classification.config\n");
 			fwrite($file,"include reference.config\n");
 			fwrite($file,'include $RULE_PATH/local.rules'."\n");
 			

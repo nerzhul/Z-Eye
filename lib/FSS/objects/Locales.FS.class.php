@@ -40,6 +40,7 @@
 					"err-no-rights" => "You don't have rights to do that",
 					"Modification" => "Modification",
 					"Modify" => "Modify",
+					"Name" => "Nom",
 					"Remove" => "Remove",
 				),
 				"fr" => array(
@@ -51,6 +52,7 @@
 					"err-no-rights" => "Vous n'avez pas le droit de faire cela",
 					"Modification" => "Modification",
 					"Modify" => "Modifier",
+					"Name" => "Nom",
 					"Remove" => "Supprimer",
 				)
 			);

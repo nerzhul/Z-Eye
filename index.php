@@ -51,8 +51,10 @@
 		FS::$iMgr->jsinc("lib/jQuery/jQueryUI.js");
 		FS::$iMgr->jsinc("lib/jQuery/jquery.jqzoom.js");
 		FS::$iMgr->jsinc("lib/jQuery/jquery.tablesorter.js");
+		FS::$iMgr->jsinc("lib/jQuery/jquery.colorpicker.js");
 		FS::$iMgr->jsinc("lib/FSS/js/FSS.js");
 		FS::$iMgr->jsinc("lib/HighCharts/highcharts.min.js");
+		FS::$iMgr->jsinc("lib/Sigma/sigma.min.js");
 
 		echo FS::$iMgr->content();
 		echo FS::$iMgr->renderJS();

@@ -217,6 +217,11 @@
 			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask(this);\" />";
 		}
 
+		public function colorInput($name, $def_value) {
+			$output = "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"6\" maxlength=\"6\" onfocus=\"showColorPicker(this);\"/>";
+			return $output;
+		}
+
 		public function slider($slidername, $name, $min, $max, $options = array()) {
 			if(isset($options["hidden"]))
 				$output = FS::$iMgr->hidden($name,(isset($options["value"]) ? $options["value"] : 0));
@@ -338,6 +343,7 @@
 					case "ipmask": $output .= $this->IPMaskInput($name,$def_value); break;
 					case "num": $output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options); break;
 					case "pwd": $output .= $this->password($name,$def_value); break;
+					case "color": $output .= $this->colorInput($name,$def_value); break;
 					default: break;
 				}
 			}

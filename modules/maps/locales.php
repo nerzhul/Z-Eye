@@ -22,6 +22,8 @@
 			parent::FSLocales();
 			$locales = array(
 				"fr" => array(
+					"Add-Node" => "Ajouter un noeud",
+					"Color" => "Couleur",
 					"err-no-tab" => "Onglet invalide",
 					"fail-tab" => "Impossible de charger l'onglet, le lien peut être faux, ou la page indisponible",
 					"icinga-map" => "Etat des systèmes",
@@ -29,9 +31,14 @@
 					"menu-title" => "Cartes",
 					"net-map" => "Réseau",
 					"net-map-full" => "Réseau (complet)",
+					"PositionX" => "Position X",
+					"PositionY" => "Position Y",
+					"Size" => "Taille",
 					"title-maps" => "Cartes",
 				),
 				"en" => array(
+					"Add-Node" => "Ajouter un noeud",
+					"Color" => "Color",
 					"err-no-tab" => "Bad tab",
 					"fail-tab" => "Unable to load tab, link may be wrong or page unavailable",
 					"icinga-map" => "System states",
@@ -39,6 +46,9 @@
 					"menu-title" => "Maps",
 					"net-map" => "Network",
 					"net-map-full" => "Network (full)",
+					"PositionX" => "Position X",
+					"PositionY" => "Position Y",
+					"Size" => "Size",
 					"title-maps" => "Maps",
 				)
 			);
