@@ -73,16 +73,6 @@
 				$nodelist[count($nodelist)] = $data["name"];
 		}
 		
-		/*$query = FS::$dbMgr->Select("device_port","remote_id","remote_id != ''","ip,remote_id");
-		while($data = pg_fetch_array($query)) {
-			if(in_array("NO-WIFI",$options)) {
-				$dmodel = FS::$dbMgr->GetOneData("device","model","name = '".$data["remote_id"]."'");
-				if(preg_match("#AIRAP#",$dmodel)) continue;
-			}
-			if(!in_array($data["remote_id"],$nodelist))
-				$nodelist[count($nodelist)] = $data["remote_id"];
-		}*/
-		
 		$outlink = array();
 		$query = FS::$dbMgr->Select("device_port","ip,port,speed,remote_id","remote_id != ''","ip,remote_id");
 		while($data = pg_fetch_array($query)) {

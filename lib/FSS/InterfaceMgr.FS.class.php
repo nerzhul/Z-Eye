@@ -218,7 +218,7 @@
 		}
 
 		public function colorInput($name, $def_value) {
-			$output = "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"6\" maxlength=\"6\" onfocus=\"showColorPicker(this);\"/>";
+			$output = "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"6\" maxlength=\"6\" onfocus=\"showColorPicker(this,'".$def_value."');\"/>";
 			return $output;
 		}
 

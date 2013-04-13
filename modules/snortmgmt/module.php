@@ -1216,7 +1216,7 @@ preprocessor http_inspect_server: server default \\\n
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snortmgmt_keys","mkey = 'report_wehour'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snortmgmt_keys","mkey = 'report_wemin'");
 
-					$file = fopen(dirname(__FILE__)."/../../../datas/system/snort.crontab","w+");
+					$file = fopen(dirname(__FILE__)."/../../datas/system/snort.crontab","w+");
 					if(!$file) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"snortmgmt",2,"Unable to write snort.crontab file !");
 						if(FS::isAjaxCall())

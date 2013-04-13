@@ -896,7 +896,7 @@
 		}
 
 		private function writeConfiguration() {
-			$path = dirname(__FILE__)."/../../../datas/icinga-config/";
+			$path = dirname(__FILE__)."/../../datas/icinga-config/";
 				
 			/*
 			 *  Write commands

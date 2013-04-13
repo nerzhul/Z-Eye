@@ -42,8 +42,8 @@
 			}
 			// If installer has finished but no lock found
 			else {
-				$file = fopen(dirname(__FILE__)."/../../../config/LOCK","w");
-				if(file_exists(dirname(__FILE__)."/../../../config/LOCK") && !$file) {
+				$file = fopen(dirname(__FILE__)."/../../config/LOCK","w");
+				if(file_exists(dirname(__FILE__)."/../../config/LOCK") && !$file) {
 					$output .= FS::$iMgr->printError($this->lock->s("err-lock-write"));
 					return $output."</div>";
 				}
@@ -178,7 +178,7 @@
 					echo "0";
 					return;
 				case 2:
-					$file = fopen(dirname(__FILE__)."/../../../config/LOCK","w");
+					$file = fopen(dirname(__FILE__)."/../../config/LOCK","w");
 					fwrite($file,"1");
 					fclose($file);
 					return;

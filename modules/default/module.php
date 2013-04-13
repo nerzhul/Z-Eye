@@ -244,7 +244,7 @@
 				$tmpoutput .= "<tr style=\"font-size: 12px;\"><td>".$data["description"]."</td>";
 				$incharge = 0;
 				$outcharge = 0;
-				$mrtgfile = file(dirname(__FILE__)."/../../../datas/rrd/".$dip."_".$pid.".log");
+				$mrtgfile = file(dirname(__FILE__)."/../../datas/rrd/".$dip."_".$pid.".log");
 				if($mrtgfile) {
 					$res = preg_split("# #",$mrtgfile[1]);
 		        	        if(count($res) == 5) {

@@ -380,7 +380,7 @@
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						return $output;
 					}
-					$file = file(dirname(__FILE__)."/../../../datas/rrd/".$dip."_".$portid.".html");
+					$file = file(dirname(__FILE__)."/../../datas/rrd/".$dip."_".$portid.".html");
 					if($file) {
 						$filebuffer = "";
 						$stopbuffer = 0;

@@ -114,7 +114,7 @@
 			}
 			else if($sh == 2) {
 				$output = "<pre>";
-				$fp = fopen(dirname(__FILE__)."/../../../datas/logs/z_eye_collector.log","r");
+				$fp = fopen(dirname(__FILE__)."/../../datas/logs/z_eye_collector.log","r");
 				fseek($fp,-(sizeof('a')), SEEK_END);
 				$linecount = 30;
 				$fileoutput = "";
