@@ -18,6 +18,69 @@
 	*/
 
 	class icingaBroker {
+		public function readStates($filter = array()) {
+			$stateFile = file("/var/spool/icinga/status.dat");
+			if(!$stateFile)
+				return NULL;
+
+			$stateBuf = array(); 
+			$cursor = "";
+			$curentry = "";
+			$curentrydesc = "";
+			$matchBuf = "";
+			$filterC = count($filter);
+
+			for($i=0;$i<count($stateFile);$i++) {
+				if(preg_match("/^#/",$stateFile[$i]) || $stateFile[$i] == "")
+					continue;
+
+				// if header, we pos cursor and create the array for object attrs
+				if(preg_match("#^(.*) {#",$stateFile[$i],$matchBuf)) {
+					if($matchBuf[1] != "info" && $matchBuf[1] != "programstatus" && $matchBuf[1] != "contactstatus") {
+						$cursor = $matchBuf[1];
+					}
+				}
+				else if(preg_match("#^\t}#",$stateFile[$i])) {
+					$cursor = "";
+					$curentry = "";
+					$curentrydesc = "";
+				}
+
+				if($cursor) {
+					// if we found hostname we set entry cursor and create the array for the object attrs and the host and service arrays
+					if(preg_match("#^\thost_name=(.*)\n#",$stateFile[$i],$matchBuf)) {
+						$curentry = $matchBuf[1];
+						if(!isset($stateBuf[$curentry]))
+							$stateBuf[$curentry] = array();
+						if(!isset($stateBuf[$curentry][$cursor]))
+							$stateBuf[$curentry][$cursor] = array();
+					}
+					// we parse other attributes
+					else if(preg_match("#^\t([\w]+)=(.*)\n#",$stateFile[$i],$matchBuf)) {
+						// if we are in servicestatus object
+						if($cursor == "servicestatus") {
+							// if we found a service_description, we must create the service buffer
+							if($matchBuf[1] == "service_description") {
+								$curentrydesc = $matchBuf[2];
+								$stateBuf[$curentry][$cursor][$curentrydesc] = array();
+							}
+							else if($curentry && $curentrydesc) {
+								// filtering
+								if($filterC == 0 || in_array($matchBuf[1],$filter))
+									$stateBuf[$curentry][$cursor][$curentrydesc][$matchBuf[1]] = $matchBuf[2];
+							}
+						}
+						else if($cursor == "hoststatus") {
+							// filtering
+							if($filterC == 0 || in_array($matchBuf[1],$filter))
+								$stateBuf[$curentry][$cursor][$matchBuf[1]] = $matchBuf[2];
+						}
+					}
+				}
+			}
+			return $stateBuf;
+		}
+
 		public function writeConfiguration() {
 			$path = dirname(__FILE__)."/../../datas/icinga-config/";
 				

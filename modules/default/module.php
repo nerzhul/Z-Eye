@@ -18,9 +18,14 @@
         */
 
 	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/../icinga/icingaBroker.api.php");
 	
 	class iDefault extends FSModule{
-		function iDefault() { parent::FSModule(); $this->loc = new lDefault(); }
+		function iDefault() {
+			parent::FSModule();
+			$this->loc = new lDefault();
+			$this->icingaAPI = new icingaBroker();
+		}
 
 		public function Load() {
 			FS::$iMgr->setTitle("Speed Reporting");
@@ -60,157 +65,70 @@
 		}
 
 		private function showIcingaReporting() {
-			$problemoutput = "";
-			// Icinga Host report
-			$content = file_get_contents("http://127.0.0.1/icinga/cgi-bin/status.cgi?style=hostdetail&limit=0&start=1");
-        		preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
-			if(isset($body[0][0])) {
-			        $body = $body[0][0];
-
-        			// remove all uneeded content
-			       	$body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
-	        		$body = preg_replace("/<img[^>]*>/si","",$body);
-			        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
-        			$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-			        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
-        			$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
-		        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-	        		$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)<\/TD>\n(.*?)<\/TR><TR>#i',"$1",$body);
-			        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
-	        		$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
-			        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
-        			$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
-				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-
-				// At this time this is the table with status of all hosts
-//				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
-				$totalhosts = $hshosts = 0;
-				preg_match_all("#<TR#",$body,$totalhosts);
-				$this->totalicinga = count($totalhosts[0])-1;
-
-				// report nagios
-                	        $content = file_get_contents("https://localhost/icinga/cgi-bin/status.cgi?style=hostdetail&hoststatustypes=12");
-                        	preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
-	                        $body = $body[0][0];
-
-        	                // remove all uneeded content
-                        	$body = preg_replace("/<img[^>]*>/si","",$body);
-        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-                	        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
-                	        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-                        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
-                	        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
-
-        	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*><tr[^>]*>(.*?)<\/tr><\/TD>\n<\/TR>\n<\/TABLE>#i',"$4",$body);
-				// flapping cleanup
-				//$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)\n<\/TR>\n<\/TABLE>\n<\/TD>\n<\/TR>\n<\/TABLE>\n<\/TD>#i',"$1</TR><TR>",$body);
-				$body = preg_replace("#<TABLE[^>]*><TR>(.*?)\n<\/TR><\/TABLE>#i","$1",$body);
-				$body = preg_replace("#<TD[^>]*>\n<TD[^>]*>\n(.*)\n<\/TD>\n<\/TR><\/TABLE>#i","<TD>$1</TD>",$body);
-				// other cleanup
-				$body = preg_replace("#<TD[^>]*><TABLE[^>]*>(.*)<\/TABLE>#i","<TD>$1</TD>",$body);
-
-				// style replace
-				$body = preg_replace('#statusHOSTDOWN#','statusCRITICAL',$body);
-
-				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
-				$body = preg_replace("#<TH[^>]*><input(.+)checkbox(.+)></TH>#","",$body);
-                                $body = preg_replace("#<TD[^>]*><input(.+)checkbox(.+)></TD>#","",$body);
-        			preg_match_all("#<TR#",$body,$hshosts);
-				$this->hsicinga = count($hshosts[0])-1;
-				if($this->hsicinga > 0)
-					$problemoutput .= $body;
+			$output = "";	
+			$problemoutput = "<table style=\"width: 95%; font-size: 15px;\"><tr><th>".$this->loc->s("Host")."</th><th>".$this->loc->s("Service")."</th><th>".$this->loc->s("State").
+				"</th><th style=\"width: 10%\">".$this->loc->s("Duration")."</th><th style=\"width: 60%;\">".$this->loc->s("Status-information")."</th></tr>";
+			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts","state_type","last_time_ok","last_time_up"));
+			// Loop hosts
+			foreach($iStates as $host => $hostvalues) {
+				// Loop types
+				foreach($hostvalues as $hos => $hosvalues) {
+					if($hos == "servicestatus") {
+						// Loop sensors
+						foreach($hosvalues as $sensor => $svalues) {
+							$this->totalicinga++;
+							if($svalues["current_state"] > 0) {
+								$outstate = "";
+								$stylestate = "";
+								if($svalues["current_state"] == 1) {
+									$outstate = $this->loc->s("WARN");
+									$stylestate = "color: orange; font-size: 18px;";
+									if($svalues["last_time_ok"])
+										$timedown = (time()-$svalues["last_time_ok"]);
+									else
+										$timedown = $this->loc->s("Since-icinga-start");
+								}
+								else if($svalues["current_state"] == 2) {
+									$outstate = $this->loc->s("CRITICAL");
+									$stylestate = "color: red; font-size: 20px;";
+									if($svalues["last_time_ok"])
+										$timedown = (time()-$svalues["last_time_ok"]);
+									else
+										$timedown = $this->loc->s("Since-icinga-start");
+								}
+									
+								$this->hsicinga++;
+								$problemoutput .= "<tr><td>".$host."</td><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
+									"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>";
+							}
+						}
+					}
+					else if($hos == "hoststatus") {
+						$this->totalicinga++;
+						if($hosvalues["current_state"] > 0) {
+							$this->hsicinga++;
+							$outstate = "";
+							$stylestate = "";
+							if($hosvalues["current_state"] == 1) {
+								$outstate = $this->loc->s("DOWN");
+								$stylestate = "color: red; font-size: 20px;";
+								if($hosvalues["last_time_up"])
+									$timedown = (time()-$hosvalues["last_time_up"]);
+								else
+									$timedown = $this->loc->s("Since-icinga-start");
+							}
+							$problemoutput .= "<tr><td>".$host."</td><td>".$this->loc->s("Availability")."</td><td style=\"".$stylestate."\">".$outstate.
+								"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>";
+						}
+					}
+				}
 			}
 
-			// Icinga Service report 
-		        $content = file_get_contents("https://127.0.0.1/cgi-bin/icinga/status.cgi?limit=0&start=1");
-        		preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
-			if(isset($body[0][0])) {
-			        $body = $body[0][0];
-
-        			// remove all uneeded content
-			       	$body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
-	        		$body = preg_replace("/<img[^>]*>/si","",$body);
-			        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
-        			$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-			        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
-        			$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
-		        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-	        		$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)<\/TD>\n(.*?)<\/TR><TR>#i',"$1",$body);
-			        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-			        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
-	        		$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
-			        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
-        			$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
-				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-
-				// At this time this is the table with status of all services
-
-//				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
-				$totalservices = $hsservices = 0;
-				preg_match_all("#<TR#",$body,$totalservices);
-				$this->totalicinga += count($totalservices[0])-1;
-
-				// report nagios
-                	        $content = file_get_contents("https://localhost/cgi-bin/icinga/status.cgi?limit=0&servicestatustypes=28");
-                        	preg_match_all("/<table [^>]*status[^>]*>.*<\/table>/si", $content, $body);
-	                        $body = $body[0][0];
-
-        	                // remove all uneeded content
-                	        $body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
-                        	$body = preg_replace("/<img[^>]*>/si","",$body);
-	                        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
-        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-                	        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
-                        	$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
-	                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-                	        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-                        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-	                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
-                        	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-		                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
-                	        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
-                        	$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-
-	                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
-        	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*><tr[^>]*>(.*?)<\/tr><\/TD>\n<\/TR>\n<\/TABLE>#i',"$4",$body);
-				// flapping cleanup
-				$body = preg_replace('#<tr[^>]*><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><\/tr><tr><td[^>]*>(.*)<\/tr><\/table>(.*)<\/TD>#i',"$4",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)\n<\/TR>\n<\/TABLE>\n<\/TD>\n<\/TR>\n<\/TABLE>\n<\/TD>#i',"$1</TR><TR>",$body);
-				$body = preg_replace('#<TABLE[^>]*><TR>(.*?)\n<\/TR><\/TABLE>#i',"$1",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n(.*)<\/TR>\n<\/TABLE>#i',"$1",$body);
-				$body = preg_replace('#<TD[^>]*>\n<TD[^>]*>\n(.*)\n<\/TD>\n<\/TR><\/TABLE>#i',"<TD>$1</TD>",$body);
-				// other cleanup
-				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
-
-				$body = preg_replace("#<TR>\n<TH(.+)>\n</TR>#","",$body);
-				$body = preg_replace("#<TH[^>]*><input(.+)checkbox(.+)></TH>#","",$body);
-                                $body = preg_replace("#<TD[^>]*><input(.+)checkbox(.+)></TD>#","",$body);
-        			preg_match_all("#<TR#",$body,$hsservices);
-				$this->hsicinga += count($hsservices[0])-1;
-				if(count($hsservices[0])-1 > 0)
-			        	$problemoutput .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga").": ".$this->hsicinga."/".$this->totalicinga."</h4>".$body;
+			if($this->hsicinga > 0) {
+				$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga").": ".$this->hsicinga."/".$this->totalicinga."</h4>".
+					$problemoutput."</table>";		
 			}
-			else
-				return "<h4 style=\"font-size:24px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga-off")."</h4>";
-			return $problemoutput;
+			return $output;
 		}
 
 		private function showNetworkReporting() {
@@ -431,5 +349,7 @@
 		private $BWscore;
 		private $SECtotalscore;
 		private $SECscore;
+
+		private $icingaAPI;
 	};
 ?>

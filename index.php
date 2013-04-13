@@ -60,8 +60,8 @@
 		echo FS::$iMgr->renderJS();
 		echo FS::$iMgr->footer();
 	}
-	/* For optimize times
+	/* //For optimize times
 	$end_time = microtime(true);
         $script_time = $end_time - $start_time;
-	echo $script_time; */
+	echo $script_time;*/ 
 ?>
