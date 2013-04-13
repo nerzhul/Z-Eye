@@ -74,7 +74,29 @@
 				$js .= "sigInst.addEdge('e".$data["edgename"]."','n".$data["node1"]."','n".$data["node2"]."',{'color': '#".$data["edge_color"]."',
 					'size': '".$data["edge_size"]."'});";
 			}
-			$js .= "sigInst.draw();";
+			$js .= " sigInst.bind('overnodes',function(event){
+				var nodes = event.content;
+				var neighbors = {};
+				sigInst.iterEdges(function(e){
+					if(nodes.indexOf(e.source)>=0 || nodes.indexOf(e.target)>=0){
+						neighbors[e.source] = 1;
+						neighbors[e.target] = 1;
+					}
+				}).iterNodes(function(n){
+					if(!neighbors[n.id]){
+						n.hidden = 1;
+					}else{
+						n.hidden = 0;
+					}
+				}).draw(2,2,2);
+			}).bind('outnodes',function(){
+				sigInst.iterEdges(function(e){
+					e.hidden = 0;
+				}).iterNodes(function(n){
+					n.hidden = 0;
+				}).draw(2,2,2);
+			});
+			sigInst.draw();";
 			FS::$iMgr->js($js);
 			return $output;
 		}
