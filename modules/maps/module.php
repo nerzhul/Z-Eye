@@ -57,7 +57,7 @@
 			$output	= FS::$iMgr->opendiv($this->showNodeForm(),$this->loc->s("Add-Node"));
 			$output	.= FS::$iMgr->opendiv($this->showEdgeForm(),$this->loc->s("Add-Edge"));
 			$output	.= FS::$iMgr->opendiv($this->showImportForm(),$this->loc->s("Import"));
-			$output .= "<div id=\"sigmap\" style=\"display:inline-block;text-align:left; width:1280px; height:800px;\"></div>";
+			$output .= "<div id=\"sigmap\" style=\"display:inline-block;text-align:left; width:100%; height:800px;\"></div>";
 			
 			$js = "var sigInst = sigma.init(document.getElementById('sigmap')).drawingProperties({
 					defaultLabelColor: '#000'
@@ -151,16 +151,16 @@
 
 			foreach($nodelist as $node => $values) {
 				// Insert nodes. At this time, random values
-				if(!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname = 'mainmap' AND nodename = '".$values["name"]."'")) {
+				if(!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname = 'mainmap' AND nodename = '".$node."'")) {
 					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_nodes","mapname,nodename,node_x,node_y,node_label,node_size,node_color",
-						"'mainmap','".$values["name"]."','".rand(1,200)."','".rand(1,200)."','".$values["label"]."','".rand(10,100)."','000000'");
+						"'mainmap','".$node."','".rand(1,200)."','".rand(1,200)."','".$values["label"]."','10','000000'");
 				}
 
 				// Insert edges
 				for($i=0;$i<count($values["links"]);$i++) {
-					if(!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_edges","edge_size","mapname = 'mainmap' AND node1 = '".$values["name"]."' AND node2 = '".$values["links"][$i]."'")) {
+					if(!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_edges","edge_size","mapname = 'mainmap' AND node1 = '".$node."' AND node2 = '".$values["links"][$i]."'")) {
 						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_edges","mapname,edgename,node1,node2,edge_color,edge_size",
-							"'mainmap','".rand(1,10000000)."','".$values["name"]."','".$values["links"][$i]."','000000','".rand(1,10)."'");
+							"'mainmap','".rand(1,10000000)."','".$node."','".$values["links"][$i]."','000000','".rand(1,10)."'");
 					}
 				}
 			}
@@ -268,8 +268,15 @@
 						$query2 = FS::$dbMgr->Select("device_port","remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
 						while($data2 = FS::$dbMgr->Fetch($query2))
 							array_push($linklist,$data2["remote_id"]);
-						array_push($nodelist,array("name" => $data["name"], "label" => $data["ip"],"links" => $linklist));
+						$nodelist[$data["name"]] = array("label" => $data["name"],"links" => $linklist);
 					}
+
+					$query = FS::$dbMgr->Select("device_port","remote_id","remote_id NOT IN(SELECT name FROM device)");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if(array_key_exists($data["remote_id"],$nodelist))
+							continue;
+						$nodelist[$data["name"]] = array("label" => $data["name"],"links" => array());
+					} 
 					
 					$this->ImportNodes($nodelist);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
@@ -283,7 +290,7 @@
 						$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
 						while($data2 = FS::$dbMgr->Fetch($query2))
 							array_push($linklist,$data2["parent"]);
-						array_push($nodelist,array("name" => $data["name"], "label" => $data["addr"],"links" => $linklist));
+						$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist);
 					}	
 					$this->ImportNodes($nodelist);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
