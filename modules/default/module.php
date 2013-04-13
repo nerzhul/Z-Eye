@@ -101,34 +101,22 @@
 	                        $body = $body[0][0];
 
         	                // remove all uneeded content
-                	        $body = preg_replace("/<tr[^>]*><td colspan=[^>]*><\/td><\/tr>/si","",$body);
                         	$body = preg_replace("/<img[^>]*>/si","",$body);
-	                        $body = preg_replace("/<A[^>]*><\/A>/si","",$body);
         	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
                 	        $body = preg_replace('#<a[^>]*>(.*?)</a>#i',"$1", $body);
-                        	$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*statusEven[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$1",$body);
-	                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
                 	        $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><\/TR>\n<\/TABLE>/si", "",$body);
-                        	$body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*><\/TD><TD[^>]*><\/TD><TD[^>]*><\/TD>\n<\/TR>\n<\/TABLE>/si", "",$body);
-	                        $body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
-        	                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<\/TR>\n<\/TABLE>/si", "",$body);
                         	$body = preg_replace('#<TD[^>]*>\n\n<\/TD>#i',"",$body);
 		                $body = preg_replace("/<TABLE[^>]*>\n<TR>\n<TD[^>]*>\n(.*?)\n<\/TD>\n\n<\/TR>\n<\/TABLE>/si", "$1",$body);
                 	        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD>\n<\/TR>\n<\/TABLE>#i',"$2",$body);
-                        	$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 
-	                        $body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*status(.+)[^>]*>(.*?)<\/TD><\/TR>\n<\/TABLE>#i',"$2",$body);
         	                $body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
 				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*><tr[^>]*>(.*?)<\/tr><\/TD>\n<\/TR>\n<\/TABLE>#i',"$4",$body);
 				// flapping cleanup
-				$body = preg_replace('#<tr[^>]*><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><td[^>]*>(.*)<\/td><\/tr><tr><td[^>]*>(.*)<\/tr><\/table>(.*)<\/TD>#i',"$4",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)\n<\/TR>\n<\/TABLE>\n<\/TD>\n<\/TR>\n<\/TABLE>\n<\/TD>#i',"$1</TR><TR>",$body);
-				$body = preg_replace('#<TABLE[^>]*><TR>(.*?)\n<\/TR><\/TABLE>#i',"$1",$body);
-				$body = preg_replace('#<TABLE[^>]*>\n<TR>\n(.*)<\/TR>\n<\/TABLE>#i',"$1",$body);
-				$body = preg_replace('#<TD[^>]*>\n<TD[^>]*>\n(.*)\n<\/TD>\n<\/TR><\/TABLE>#i',"<TD>$1</TD>",$body);
+				//$body = preg_replace('#<TABLE[^>]*>\n<TR>\n<TD[^>]*>(.*?)\n<\/TR>\n<\/TABLE>\n<\/TD>\n<\/TR>\n<\/TABLE>\n<\/TD>#i',"$1</TR><TR>",$body);
+				$body = preg_replace("#<TABLE[^>]*><TR>(.*?)\n<\/TR><\/TABLE>#i","$1",$body);
+				$body = preg_replace("#<TD[^>]*>\n<TD[^>]*>\n(.*)\n<\/TD>\n<\/TR><\/TABLE>#i","<TD>$1</TD>",$body);
 				// other cleanup
-				$body = preg_replace('#<TABLE[^>]*><TR><TD[^>]*>(.*?)\n<\/TD>\n\n<\/TR><\/TABLE>#i',"$1",$body);
+				$body = preg_replace("#<TD[^>]*><TABLE[^>]*>(.*)<\/TABLE>#i","<TD>$1</TD>",$body);
 
 				// style replace
 				$body = preg_replace('#statusHOSTDOWN#','statusCRITICAL',$body);

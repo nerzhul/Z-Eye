@@ -60,7 +60,8 @@
 			$output .= "<div id=\"sigmap\" style=\"display:inline-block;text-align:left; width:100%; height:800px;\"></div>";
 			
 			$js = "var sigInst = sigma.init(document.getElementById('sigmap')).drawingProperties({
-					defaultLabelColor: '#000'
+					defaultLabelColor: '#000',
+					defaultEdgeType: 'curve'
 				});";
 
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_nodes","nodename,node_label,node_x,node_y,node_size,node_color");
@@ -297,7 +298,7 @@
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(array_key_exists($data["remote_id"],$nodelist))
 							continue;
-						$nodelist[$data["name"]] = array("label" => $data["name"],"links" => array());
+						$nodelist[$data["remote_id"]] = array("label" => $data["remote_id"],"links" => array());
 					} 
 					
 					$this->ImportNodes($nodelist);
