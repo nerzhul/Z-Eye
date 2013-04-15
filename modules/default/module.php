@@ -113,7 +113,7 @@
 								$outstate = $this->loc->s("DOWN");
 								$stylestate = "color: red; font-size: 20px;";
 								if($hosvalues["last_time_up"])
-									$timedown = $this->converSecToDays(time()-$hosvalues["last_time_up"]);
+									$timedown = $this->convertSecToDays(time()-$hosvalues["last_time_up"]);
 								else
 									$timedown = $this->loc->s("Since-icinga-start");
 							}
