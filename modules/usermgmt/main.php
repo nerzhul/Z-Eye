@@ -17,15 +17,15 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MUserMgmt")) {
 		class MUserMgmt extends InterfaceModule {
 			function MUserMgmt() {
-			parent::InterfaceModule();
+				parent::InterfaceModule();
 				$this->conf->modulename = "iUserMgmt";
-				$this->conf->seclevel = 5;
 				$this->moduleclass = new iUserMgmt();
 				$this->rulesclass = new rUserMgmt();
 				$this->conf->connected = $this->rulesclass->getConnectedState();

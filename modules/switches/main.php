@@ -17,6 +17,7 @@
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
 
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
@@ -25,10 +26,9 @@
 			function MSwitches() {
 				parent::InterfaceModule();
 				$this->conf->modulename = "iSwitches";
-				$this->conf->seclevel = 4;
 				$this->moduleclass = new iSwitchMgmt();
 				$this->rulesclass = new rSwitchMgmt();
-                $this->conf->connected = $this->rulesclass->getConnectedState();
+                		$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

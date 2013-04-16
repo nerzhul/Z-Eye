@@ -17,6 +17,7 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
@@ -25,7 +26,6 @@
 			function MNetdisco() {
 				parent::InterfaceModule();
 				$this->conf->modulename = "iNetdisco";
-				$this->conf->seclevel = 5;
 				$this->moduleclass = new iNetdisco();
 				$this->rulesclass = new rNetdisco();
 				$this->conf->connected = $this->rulesclass->getConnectedState();

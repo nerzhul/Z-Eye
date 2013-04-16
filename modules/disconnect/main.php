@@ -25,7 +25,6 @@
 			function MDisconnect() {
 				parent::InterfaceModule();
 				$this->conf->modulename = "iDisconnect";
-				$this->conf->seclevel = 0;
 				$this->moduleclass = new iDisconnect();
 				$this->rulesclass = new rDisconnect();
 				$this->conf->connected = $this->rulesclass->getConnectedState();

@@ -40,11 +40,13 @@
 		public function getConfig() { return $this->conf; }
 		public function getModuleClass() { return $this->moduleclass; }
 		public function getRulesClass() { return $this->rulesclass; }
+		public function getLocalesClass() { return $this->localesclass; }
 
 		protected $moduleclass;
 		protected $conf;
 		protected $mid;
 		protected $rulesclass;
+		protected $localesclass;
 	};
 
 ?>

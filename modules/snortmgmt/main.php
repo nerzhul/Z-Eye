@@ -17,6 +17,7 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
@@ -25,10 +26,9 @@
 			function MSnortMgmt() {
 				parent::InterfaceModule();
 				$this->conf->modulename = "iSnortMgmt";
-				$this->conf->seclevel = 5;
 				$this->moduleclass = new iSnortMgmt();
 				$this->rulesclass = new rSnortMgmt();
-                $this->conf->connected = $this->rulesclass->getConnectedState();
+                		$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}
