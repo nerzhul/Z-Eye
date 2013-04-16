@@ -285,8 +285,6 @@
 					$output .= $this->showRemoveSpan("u","ip",$username,$values[$i],$right,$ip);
 				}
 			}
-			else
-				$output .= $this->loc->s("None")."<br />";
 			$output .= "<span id=\"anchipusrr_".FS::$iMgr->formatHTMLId("u".$ip."-".$right)."\" style=\"display:none;\"></span>";
 			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."ip\">";
@@ -304,8 +302,6 @@
 					$output .= $this->showRemoveSpan("g","ip",$gname,$values[$i],$right,$ip);
 				}
 			}
-			else
-				$output .= $this->loc->s("None")."<br />";
 			$output .= "<span id=\"anchipgrpr_".FS::$iMgr->formatHTMLId("g".$ip."-".$right)."\" style=\"display:none;\"></span>";
 			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."ip\">";
@@ -471,8 +467,6 @@
 					$output .= $this->showRemoveSpan("g","snmp",$gname,$values[$i],$right,$snmp);
 				}
 			}
-			else
-				$output .= $this->loc->s("None")."<br />";
 			$output .= "<span id=\"anchsnmpgrpr_".FS::$iMgr->formatHTMLId("g".$snmp."-".$right)."\" style=\"display:none;\"></span>";
 			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."snmp\">";
@@ -491,8 +485,6 @@
 					$output .= $this->showRemoveSpan("u","snmp",$username,$values[$i],$right,$snmp);
 				}
 			}
-			else
-				$output .= $this->loc->s("None")."<br />";
 			$output .= "<span id=\"anchsnmpusrr_".FS::$iMgr->formatHTMLId("u".$snmp."-".$right)."\" style=\"display:none;\"></span>";
 			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."snmp\">";
@@ -786,37 +778,21 @@
 					}
 					if($gid) {
 						if($snmp) {
-							$rules = $this->initSNMPRules('t','t',$right);
-							$rules = $this->loadSNMPRules($rules,1,$snmp,'t','t',$right);
-							$js = "";
-							foreach($rules as $key => $values)
-								$js .= "$('#lg".$right."snmp').html('".$this->groupSelect("gid",$values)."');";
+							$js = $this->jsUserGroupSelect($right,"snmp","gid",$snmp);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."snmp');".$js);
 						}
 						else if($ip) {
-							$rules = $this->initIPRules($right);
-							$rules = $this->loadIPRules($rules,1,$ip,$right);
-							$js = "";
-							foreach($rules as $key => $values)
-								$js .= "$('#lg".$right."ip').html('".$this->groupSelect("gid",$values)."');";
+							$js = $this->jsUserGroupSelect($right,"ip","gid",$ip);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."ip');".$js);
 						}
 					}
 					else if($uid) {
 						if($snmp) {
-							$rules = $this->initSNMPRules('t','t',$right);
-							$rules = $this->loadSNMPRules($rules,2,$snmp,'t','t',$right);
-							$js = "";
-							foreach($rules as $key => $values)
-								$js .= "$('#lu".$right."snmp').html('".$this->userSelect("uid",$values)."');";
+							$js = $this->jsUserGroupSelect($right,"snmp","uid",$snmp);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."snmp');".$js);
 						}
 						else if($ip) {
-							$rules = $this->initIPRules($right);
-							$rules = $this->loadIPRules($rules,2,$ip,$right);
-							$js = "";
-							foreach($rules as $key => $values)
-								$js .= "$('#lu".$right."ip').html('".$this->userSelect("uid",$values)."');";
+							$js = $this->jsUserGroupSelect($right,"ip","uid",$ip);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."ip');".$js); 
 						}
 					}
