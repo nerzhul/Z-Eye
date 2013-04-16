@@ -25,7 +25,6 @@
 		class MLinkMgmt extends InterfaceModule {
 			function MLinkMgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iLinkMgmt";
 				$this->moduleclass = new iLinkMgmt();
 				$this->rulesclass = new rLinkMgmt();
 			}

@@ -25,7 +25,6 @@
 		class MLogs extends InterfaceModule {
 			function MLogs() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iLogs";
 				$this->moduleclass = new iLogs();
 				$this->rulesclass = new rLogs();
 			}

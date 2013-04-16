@@ -25,7 +25,6 @@
 		class Micinga extends InterfaceModule {
 			function Micinga() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iIcinga";
 				$this->moduleclass = new iIcinga();
 				$this->rulesclass = new rIcinga();
 			}

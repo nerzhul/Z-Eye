@@ -28,11 +28,8 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	require_once(dirname(__FILE__)."/ModuleConfig.FS.class.php");
 	class InterfaceModule {
-		function InterfaceModule() {
-			$this->conf = new ModuleConfig(); 
-		}
+		function InterfaceModule() {}
 		
 		public function handlePostDatas() {}
 		
@@ -43,7 +40,6 @@
 		public function getLocalesClass() { return $this->localesclass; }
 
 		protected $moduleclass;
-		protected $conf;
 		protected $mid;
 		protected $rulesclass;
 		protected $localesclass;

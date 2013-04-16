@@ -25,7 +25,6 @@
 		class MNetdisco extends InterfaceModule {
 			function MNetdisco() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iNetdisco";
 				$this->moduleclass = new iNetdisco();
 				$this->rulesclass = new rNetdisco();
 			}

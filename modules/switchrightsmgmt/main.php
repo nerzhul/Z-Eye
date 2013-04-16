@@ -25,7 +25,6 @@
 		class MSwitchRightsMgmt extends InterfaceModule {
 			function MSwitchRightsMgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iSwitchRightsMgmt";
 				$this->moduleclass = new iSwitchRightsMgmt();
 				$this->rulesclass = new rSwitchRightsMgmt();
 			}

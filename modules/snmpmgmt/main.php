@@ -25,7 +25,6 @@
 		class MSNMPmgmt extends InterfaceModule {
 			function MSNMPmgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iSNMPmgmt";
 				$this->moduleclass = new iSNMPmgmt();
 				$this->rulesclass = new rSNMPmgmt();
 			}

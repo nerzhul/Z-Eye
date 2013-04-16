@@ -25,7 +25,6 @@
 		class MMenuMgmt extends InterfaceModule {
 			function MMenuMgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iMenuMgmt";
 				$this->moduleclass = new iMenuMgmt();
 				$this->rulesclass = new rMenuMgmt();
 			}

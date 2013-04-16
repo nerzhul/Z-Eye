@@ -25,7 +25,6 @@
 		class MSearch extends InterfaceModule {
 			function MSearch() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iSearch";
 				$this->moduleclass = new iSearch();
 				$this->rulesclass = new rSearch();
 			}

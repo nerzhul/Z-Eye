@@ -25,7 +25,6 @@
 		class MSecReport extends InterfaceModule {
 			function MSecReport() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iSecReport";
 				$this->moduleclass = new iSecReport();
 				$this->rulesclass = new rSecurityReport();
 			}

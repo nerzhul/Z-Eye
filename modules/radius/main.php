@@ -25,7 +25,6 @@
 		class MRadius extends InterfaceModule {
 			function MRadius() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iRadius";
 				$this->moduleclass = new iRadius();
 				$this->rulesclass = new rRadius();
 			}

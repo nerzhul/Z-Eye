@@ -25,7 +25,6 @@
 		class MInstall extends InterfaceModule {
 			function MInstall() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iInstall";
 				$this->moduleclass = new iInstall();
 				$this->rulesclass = new rInstall();
 			}

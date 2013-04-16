@@ -25,7 +25,6 @@
 		class Mconnect extends InterfaceModule {
 			function Mconnect() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iConnect";
 				$this->localesclass = new lConnect();
 				$this->moduleclass = new iConnect();
 				$this->rulesclass = new rConnect();

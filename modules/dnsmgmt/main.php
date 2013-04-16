@@ -25,7 +25,6 @@
 		class MDNSMgmt extends InterfaceModule {
 			function MDNSMgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iDNSManager";
 				$this->moduleclass = new iDNSManager();
 				$this->rulesclass = new rDNSMgmt();
 			}

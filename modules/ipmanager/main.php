@@ -25,7 +25,6 @@
 		class MIPManager extends InterfaceModule {
 			function MIPManager() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iIPManager";
 				$this->moduleclass = new iIPManager();
 				$this->rulesclass = new rIPManager();
 			}

@@ -25,7 +25,6 @@
 		class MSnortMgmt extends InterfaceModule {
 			function MSnortMgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iSnortMgmt";
 				$this->moduleclass = new iSnortMgmt();
 				$this->rulesclass = new rSnortMgmt();
 			}

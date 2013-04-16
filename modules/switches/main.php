@@ -25,7 +25,6 @@
 		class MSwitches extends InterfaceModule {
 			function MSwitches() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iSwitches";
 				$this->moduleclass = new iSwitchMgmt();
 				$this->rulesclass = new rSwitchMgmt();
 			}

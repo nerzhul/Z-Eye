@@ -25,7 +25,6 @@
 		class MGroupMgmt extends InterfaceModule {
 			function Mgroupmgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iGroupMgmt";
 				$this->moduleclass = new iGroupMgmt();
 				$this->rulesclass = new rGroupMgmt();
 			}

@@ -25,7 +25,6 @@
 		class MDefault extends InterfaceModule {
 			function MDefault() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iDefault";
 				$this->moduleclass = new iDefault();
 				$this->rulesclass = new rDefault();
 			}

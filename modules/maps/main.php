@@ -25,7 +25,6 @@
 		class MMaps extends InterfaceModule {
 			function MMaps() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iMaps";
 				$this->moduleclass = new iMaps();
 				$this->rulesclass = new rMaps();
 			}

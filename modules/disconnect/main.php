@@ -24,7 +24,6 @@
 		class MDisconnect extends InterfaceModule {
 			function MDisconnect() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iDisconnect";
 				$this->moduleclass = new iDisconnect();
 				$this->rulesclass = new rDisconnect();
 			}

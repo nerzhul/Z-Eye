@@ -25,7 +25,6 @@
 		class MUserMgmt extends InterfaceModule {
 			function MUserMgmt() {
 				parent::InterfaceModule();
-				$this->conf->modulename = "iUserMgmt";
 				$this->moduleclass = new iUserMgmt();
 				$this->rulesclass = new rUserMgmt();
 			}
