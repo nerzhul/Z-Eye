@@ -33,6 +33,7 @@
 	require_once(dirname(__FILE__)."/HTTPLink".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/Locales".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/Rules".CLASS_EXT);
+	require_once(dirname(__FILE__)."/objects/InterfaceModule".CLASS_EXT);
 
 	class FSInterfaceMgr {
 		function FSInterfaceMgr() {
