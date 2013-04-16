@@ -18,7 +18,7 @@
         */
 
         class rSecurityReport extends FSRules {
-                function rSecurityReport() { $this->connectedstate = 1; }
+                function rSecurityReport() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Rapports de sécurité",$activerules,array(

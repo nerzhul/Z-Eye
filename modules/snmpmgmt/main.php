@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iSNMPmgmt";
 				$this->moduleclass = new iSNMPmgmt();
 				$this->rulesclass = new rSNMPmgmt();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

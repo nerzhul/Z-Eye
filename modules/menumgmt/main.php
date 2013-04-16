@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iMenuMgmt";
 				$this->moduleclass = new iMenuMgmt();
 				$this->rulesclass = new rMenuMgmt();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

@@ -18,7 +18,7 @@
         */
 
 	class rConnect extends FSRules {
-		function rConnect() { $this->connectedstate = 0; }
+		function rConnect() {}
 
 		public function showMgmtInterface($activerules = array()) {
 			return "";

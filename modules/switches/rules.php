@@ -18,7 +18,7 @@
         */
 
         class rSwitchMgmt extends FSRules {
-                function rSwitchMgmt() { $this->connectedstate = 1; }
+                function rSwitchMgmt() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des Switches",$activerules,array(

@@ -18,7 +18,7 @@
         */
 
         class rSnortMgmt extends FSRules {
-                function rSnortMgmt() { $this->connectedstate = 1; }
+                function rSnortMgmt() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Moteur SNORT",$activerules,array(

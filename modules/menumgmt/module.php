@@ -40,17 +40,11 @@
 				$output .= FS::$iMgr->h1("title-menu-mgmt");
 				$output .= "<a href=\"index.php?mod=".$this->mid."&do=1\">".$this->loc->s("New-Menu")."</a>
 					<table class=\"standardTable\">
-					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name,isconnected","",array("order" => "id","ordersens" => 2));
+					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th></th><th></th></tr>";
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","id,name","",array("order" => "id","ordersens" => 2));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$output .= "<tr id=\"m".$data["id"]."tr\"><td>".$data["id"]."</td><td>".$data["name"]."</td><td>";
-					if($data["isconnected"] == -1)
-						$output .= $this->loc->s("No");
-					else if($data["isconnected"] == 1)
-						$output .= $this->loc->s("Yes");
-					else
-						$output .= $this->loc->s("Both");
-					$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
+					$output .= "<a href=\"index.php?mod=".$this->mid."&do=2&menu=".$data["id"]."\">";
 					$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 					$output .= "</a></td><td>";
 					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&menu=".$data["id"],array("js" => true,
@@ -61,19 +55,13 @@
 				$output .= "</table>".FS::$iMgr->h1("title-menu-node-mgmt").
 					"<a href=\"index.php?mod=".$this->mid."&do=4\">".$this->loc->s("New-menu-elmt")."</a>
 					<table>
-					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("Connected")."</th><th></th><th></th></tr>";
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","",array("order" => "id","ordersens" => 2));
+					<tr><th width=\"20px\">Id</th><th width=\"200px\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Link")."</th><th></th><th></th></tr>";
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link","",array("order" => "id","ordersens" => 2));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					$output .= "<tr id=\"mit".$data["id"]."tr\"><td>".$data["id"]."</td><td>".$data["title"]."</td><td>";
 					$link2 = new HTTPLink($data["link"]);
 					$output .= $link2->getIt()."</td><td>";
-					if($data["isconnected"] == -1)
-						$output .= $this->loc->s("No");
-					else if($data["isconnected"] == 1)
-						$output .= $this->loc->s("Yes");
-					else
-						$output .= $this->loc->s("Both");
-					$output .= "</td><td><a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
+					$output .= "<a href=\"index.php?mod=".$this->mid."&do=5&im=".$data["id"]."\">";
 					$output .= FS::$iMgr->img("styles/images/pencil.gif",15,15);
 					$output .= "</a></td><td>";
 					$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&im=".$data["id"],array("js" => true,
@@ -101,12 +89,7 @@
 			$output .= "<li>".$this->loc->s("Link")." ";
 			$link = new HTTPLink(0);
 			$output .= $link->CreateSelect($menuEl ? $menuEl->getLink() : 0)."</li>";
-			$output .= "<li>".$this->loc->s("Connected")." ? ";
-			$output .= FS::$iMgr->select("isconnected");
-			$output .= FS::$iMgr->selElmt($this->loc->s("No"),-1,$menuEl && $menuEl->getConnected() == -1 ? true : false);
-			$output .= FS::$iMgr->selElmt($this->loc->s("Yes"),1,$menuEl && $menuEl->getConnected() == 1 ? true : false);
-			$output .= FS::$iMgr->selElmt($this->loc->s("Both"),0,$menuEl && $menuEl->getConnected() == 0 ? true : false);
-			$output .= "</select></li><li>";
+			$output .= "<li>";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Save"));
 			$output .= "</li></ul></form>";
 			return $output;
@@ -125,12 +108,6 @@
 			}
 			$output .= "<li>".$this->loc->s("Name")." ";
 			$output .= FS::$iMgr->input("name",$menu ? $menu->getName() : "")."</li>";
-			$output .= "<li>".$this->loc->s("Connected")." ? ";
-			$output .= FS::$iMgr->select("isconnected");
-			$output .= FS::$iMgr->selElmt($this->loc->s("No"),-1,$menu && $menu->getConnected() == -1 ? true : false);
-			$output .= FS::$iMgr->selElmt($this->loc->s("Yes"),1,$menu && $menu->getConnected() == 1 ? true : false);
-			$output .= FS::$iMgr->selElmt($this->loc->s("Both"),0,$menu && $menu->getConnected() == 0 ? true : false);
-			$output .= "</select></li>";
 			$output .= "<li>".FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
 			$output .= "</ul></form>";
 			
@@ -167,9 +144,7 @@
 		public function RegisterMenu() {
 			$menu = new Menu();
 			$name = FS::$secMgr->checkAndSecurisePostData("name");
-			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
 			$menu->setName($name);
-			$menu->setConnected($isco);
 			$menu->Create();
 			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' added");
 		}
@@ -178,13 +153,11 @@
 			$menu = new Menu();
 			$menuid = FS::$secMgr->checkAndSecurisePostData("menu_id");
 			$name = FS::$secMgr->checkAndSecurisePostData("name");
-			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
 			$menu->setId($menuid);
 			$menu->Load();
 			$menu->setName($name);
-			$menu->setConnected($isco);
 			$menu->SaveToDB();
-			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' (".$menuid.") edited (connected: ".$isco.")");
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu '".$name."' (".$menuid.") edited");
 		}
 		
 		public function RemoveMenu() {
@@ -202,27 +175,23 @@
 		public function addMenuElement() {
 			$menuEl = new MenuElement();
 			$name = FS::$secMgr->checkAndSecurisePostData("name");
-			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
 			$lid = FS::$secMgr->checkAndSecurisePostData("link_id");
 			$menuEl->setName($name);
-			$menuEl->setConn($isco);
 			$menuEl->setLink($lid);
 			$menuEl->Create();
-			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Create menu element '".$lid."' '".$name."' (isco: ".$isco.")");
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Create menu element '".$lid."' '".$name."'");
 		}
 		
 		public function EditMenuElement() {
 			$menuEl = new MenuElement();
 			$name = FS::$secMgr->checkAndSecurisePostData("name");
-			$isco = FS::$secMgr->checkAndSecurisePostData("isconnected");
 			$lid = FS::$secMgr->checkAndSecurisePostData("link_id");
 			$menuEl->setId($_POST["menu_elmt"]);
 			$menuEl->Load();
 			$menuEl->setName($name);
-			$menuEl->setConn($isco);
 			$menuEl->setLink($lid);
 			$menuEl->SaveToDB();
-			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu element '".$name."' edited (isco: ".$isco.")");
+			FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",0,"Menu element '".$name."' edited");
 		}
 		
 		public function RemoveMenuElement() {

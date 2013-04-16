@@ -18,7 +18,7 @@
         */
 
         class rLinkMgmt extends FSRules {
-                function rLinkMgmt() { $this->connectedstate = 1; }
+                function rLinkMgmt() {}
 
                 public function showMgmtInterface() {
                         return "";

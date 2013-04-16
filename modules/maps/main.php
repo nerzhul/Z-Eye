@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iMaps";
 				$this->moduleclass = new iMaps();
 				$this->rulesclass = new rMaps();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

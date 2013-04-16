@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iInstall";
 				$this->moduleclass = new iInstall();
 				$this->rulesclass = new rInstall();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

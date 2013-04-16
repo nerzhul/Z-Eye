@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iRadius";
 				$this->moduleclass = new iRadius();
 				$this->rulesclass = new rRadius();
-       		        	$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

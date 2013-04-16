@@ -18,7 +18,7 @@
         */
 
         class rDisconnect extends FSRules {
-                function rDisconnect() { $this->connectedstate = 1; }
+                function rDisconnect() {}
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

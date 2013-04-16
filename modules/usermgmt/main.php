@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iUserMgmt";
 				$this->moduleclass = new iUserMgmt();
 				$this->rulesclass = new rUserMgmt();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

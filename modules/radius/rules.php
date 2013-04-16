@@ -18,7 +18,7 @@
         */
 
         class rRadius extends FSRules {
-                function rRadius() { $this->connectedstate = 1; }
+                function rRadius() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion Radius",$activerules,array(

@@ -29,7 +29,6 @@
 				$this->localesclass = new lConnect();
 				$this->moduleclass = new iConnect();
 				$this->rulesclass = new rConnect();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

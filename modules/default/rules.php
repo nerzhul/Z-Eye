@@ -18,7 +18,7 @@
         */
 
         class rDefault extends FSRules {
-                function rDefault() { $this->connectedstate = 2; }
+                function rDefault() {}
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

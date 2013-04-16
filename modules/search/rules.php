@@ -18,7 +18,7 @@
         */
 
         class rSearch extends FSRules {
-                function rSearch() { $this->connectedstate = 1; }
+                function rSearch() {}
 
                 public function showMgmtInterface($activerules = array()) {
                         $output = FS::$iMgr->ruleLines("Recherche",$activerules,array(

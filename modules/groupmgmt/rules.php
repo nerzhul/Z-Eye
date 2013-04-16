@@ -18,7 +18,7 @@
         */
 
         class rGroupMgmt extends FSRules {
-                function rGroupMgmt() { $this->connectedstate = 1; }
+                function rGroupMgmt() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des groupes",$activerules,array(

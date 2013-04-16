@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iLinkMgmt";
 				$this->moduleclass = new iLinkMgmt();
 				$this->rulesclass = new rLinkMgmt();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

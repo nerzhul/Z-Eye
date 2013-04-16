@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iSnortMgmt";
 				$this->moduleclass = new iSnortMgmt();
 				$this->rulesclass = new rSnortMgmt();
-                		$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

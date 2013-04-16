@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iSearch";
 				$this->moduleclass = new iSearch();
 				$this->rulesclass = new rSearch();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

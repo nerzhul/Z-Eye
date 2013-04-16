@@ -18,7 +18,7 @@
         */
 
         class rUserMgmt extends FSRules {
-                function rUserMgmt() { $this->connectedstate = 1; }
+                function rUserMgmt() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des utilisateurs",$activerules,array(

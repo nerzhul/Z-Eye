@@ -18,7 +18,7 @@
         */
 
 	class rIcinga extends FSRules {
-		function rIcinga() { $this->connectedstate = 1; }
+		function rIcinga() {}
 
 		public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Monitoring de services",$activerules,array(

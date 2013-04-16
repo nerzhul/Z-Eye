@@ -27,7 +27,6 @@
 				$this->conf->modulename = "iDisconnect";
 				$this->moduleclass = new iDisconnect();
 				$this->rulesclass = new rDisconnect();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

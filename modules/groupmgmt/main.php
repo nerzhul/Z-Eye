@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iGroupMgmt";
 				$this->moduleclass = new iGroupMgmt();
 				$this->rulesclass = new rGroupMgmt();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

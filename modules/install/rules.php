@@ -18,7 +18,7 @@
         */
 
         class rInstall extends FSRules {
-                function rInstall() { $this->connectedstate = 2; }
+                function rInstall() {}
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

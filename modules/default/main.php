@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iDefault";
 				$this->moduleclass = new iDefault();
 				$this->rulesclass = new rDefault();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

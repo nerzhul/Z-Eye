@@ -18,7 +18,7 @@
         */
 
         class rSwitchRightsMgmt extends FSRules {
-                function rSwitchRightsMgmt() { $this->connectedstate = 1; }
+                function rSwitchRightsMgmt() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des droits sur les équipements réseau",$activerules,array(

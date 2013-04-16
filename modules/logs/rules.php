@@ -18,7 +18,7 @@
         */
 
         class rLogs extends FSRules {
-                function rLogs() { $this->connectedstate = 1; }
+                function rLogs() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Accès aux Logs Z-Eye",$activerules,array(

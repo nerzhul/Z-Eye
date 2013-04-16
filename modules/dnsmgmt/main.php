@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iDNSManager";
 				$this->moduleclass = new iDNSManager();
 				$this->rulesclass = new rDNSMgmt();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

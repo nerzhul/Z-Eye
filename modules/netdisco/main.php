@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iNetdisco";
 				$this->moduleclass = new iNetdisco();
 				$this->rulesclass = new rNetdisco();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

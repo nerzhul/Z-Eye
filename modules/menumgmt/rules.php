@@ -18,7 +18,7 @@
         */
 
         class rMenuMgmt extends FSRules {
-                function rMenuMgmt() { $this->connectedstate = 1; }
+                function rMenuMgmt() {}
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

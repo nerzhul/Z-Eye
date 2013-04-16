@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iSwitches";
 				$this->moduleclass = new iSwitchMgmt();
 				$this->rulesclass = new rSwitchMgmt();
-                		$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

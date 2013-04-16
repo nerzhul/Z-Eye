@@ -18,7 +18,7 @@
         */
 
         class rNetdisco extends FSRules {
-                function rNetdisco() { $this->connectedstate = 1; }
+                function rNetdisco() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Moteur Netdisco",$activerules,array(

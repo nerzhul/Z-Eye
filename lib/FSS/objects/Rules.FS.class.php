@@ -33,8 +33,6 @@
 
 		public function canAccessToModule() { return false; }
 
-		public function getConnectedState() { return $this->connectedstate; }
-		protected $connectedstate;
 		//protected $rulelist; // array
 	};
 ?>

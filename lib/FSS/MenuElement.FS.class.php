@@ -33,21 +33,20 @@
 		function MenuElement() {}
 
 		public function Load() {
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","id = '".$this->id."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","id,title,link","id = '".$this->id."'");
 			if($data = pg_fetch_array($query)) {
 				$this->name = $data["title"];
 				$this->link = $data["link"];
-				$this->isconnected = $data["isconnected"];
 			}
 		}
 
 		public function Create() {
 			$id = FS::$dbMgr->GetMax(PGDbConfig::getDbPrefix()."menu_items","id")+1;
-			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."menu_items","id,title,link,isconnected","'".$id."','".$this->name."','".$this->link."','".$this->isconnected."'");
+			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."menu_items","id,title,link","'".$id."','".$this->name."','".$this->link."'");
 		}
 
 		public function SaveToDB() {
-			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."menu_items","title = '".$this->name."', link = '".$this->link."', isconnected = '".$this->isconnected."'","id = '".$this->id."'");
+			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."menu_items","title = '".$this->name."', link = '".$this->link."'");
 		}
 
 		public function Delete() {
@@ -68,12 +67,9 @@
 		}
 
 		public function setLink($link) { $this->link = $link; }
-		public function setConn($conn) { $this->isconnected = $conn; }
 		public function getLink() { return $this->link; }
-		public function getConnected() { return $this->isconnected; }
 
 		private $link;
-		private $isconnected;
 
 	};
 

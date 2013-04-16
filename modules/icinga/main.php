@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iIcinga";
 				$this->moduleclass = new iIcinga();
 				$this->rulesclass = new rIcinga();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}

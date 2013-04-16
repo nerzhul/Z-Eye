@@ -18,7 +18,7 @@
         */
 
         class rSNMPmgmt extends FSRules {
-                function rSNMPmgmt() { $this->connectedstate = 1; }
+                function rSNMPmgmt() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion SNMP",$activerules,array(

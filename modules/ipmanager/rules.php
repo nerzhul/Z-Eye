@@ -18,7 +18,7 @@
         */
 
         class rIPManager extends FSRules {
-                function rIPManager() { $this->connectedstate = 1; }
+                function rIPManager() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Supervision DHCP",$activerules,array(

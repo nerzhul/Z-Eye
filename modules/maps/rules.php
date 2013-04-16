@@ -18,7 +18,7 @@
         */
 
         class rMaps extends FSRules {
-                function rMaps() { $this->connectedstate = 1; }
+                function rMaps() {}
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Cartographie Réseau",$activerules,array(

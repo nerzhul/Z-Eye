@@ -28,7 +28,6 @@
 				$this->conf->modulename = "iSecReport";
 				$this->moduleclass = new iSecReport();
 				$this->rulesclass = new rSecurityReport();
-				$this->conf->connected = $this->rulesclass->getConnectedState();
 			}
 		};
 	}
