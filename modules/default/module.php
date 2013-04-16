@@ -84,7 +84,7 @@
 									$outstate = $this->loc->s("WARN");
 									$stylestate = "color: orange; font-size: 18px;";
 									if($svalues["last_time_ok"])
-										$timedown = $this->convertSecToDays(time()-$svalues["last_time_ok"]);
+										$timedown = $this->timeInterval($svalues["last_time_ok"]);
 									else
 										$timedown = $this->loc->s("Since-icinga-start");
 								}
@@ -92,7 +92,7 @@
 									$outstate = $this->loc->s("CRITICAL");
 									$stylestate = "color: red; font-size: 20px;";
 									if($svalues["last_time_ok"])
-										$timedown = $this->convertSecToDays(time()-$svalues["last_time_ok"]);
+										$timedown = $this->timeInterval($svalues["last_time_ok"]);
 									else
 										$timedown = $this->loc->s("Since-icinga-start");
 								}
@@ -113,7 +113,7 @@
 								$outstate = $this->loc->s("DOWN");
 								$stylestate = "color: red; font-size: 20px;";
 								if($hosvalues["last_time_up"])
-									$timedown = $this->convertSecToDays(time()-$hosvalues["last_time_up"]);
+									$timedown = $this->timeInterval($hosvalues["last_time_up"]);
 								else
 									$timedown = $this->loc->s("Since-icinga-start");
 							}
@@ -131,30 +131,19 @@
 			return $output;
 		}
 
-		private function convertSecToDays($time) {
-			$sec = 0; $min = 0; $hour = 0; $day = 0; 
-			if($time >= 60) {
-				$sec = $time % 60;
-				$time = ($time - $sec)/60;
-			} 
-			if($time >= 60) {
-				$min = $time % 60;
-				$time = ($time - $min)/60;
-			}
-			if($time >= 24) {
-				$hour = $time % 24;
-				$time = ($time - $hour)/24;
-			}
-			$day = $time;
+		private function timeInterval($time) {
+			$dt1 = new DateTime("now");
+        		$dt2 = new DateTime(date("Y-m-d H:i:s",$time));
+        		$interval = $dt1->diff($dt2);
 			$output = "";
-			if($day > 0)
-				$output .= $day."d ";
-			if($hour > 0)
-				$output .= $hour."h ";
-			if($min > 0)
-				$output .= $min."m ";
-			if($sec > 0)
-				$output .= $sec."s";
+			if($interval->d > 0)
+				$output .= $interval->d."d ";
+			if($interval->h > 0)
+				$output .= $interval->h."h ";
+			if($interval->i > 0)
+				$output .= $interval->i."m ";
+			if($interval->s > 0)
+				$output .= $interval->s."s";
 			return $output;
 		}
 
