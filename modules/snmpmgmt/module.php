@@ -61,7 +61,7 @@
 				if(!$found) $found = true;
 				$tmpoutput .= "<tr id=\"".$data["name"]."tr\"><td>".$data["name"]."</td><td>".($data["ro"] == 't' ? "X" : "")."</td><td>".($data["rw"] == 't' ? "X": "")."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&snmp=".$data["name"],array("js" => true, "confirm" => 
-						array($this->loc->s("confirm-remove-community")."'".$data["name"]."' ?","OK","Cancel")))."</td></tr>";
+						array($this->loc->s("confirm-remove-community")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
 			if($found) $output .= $tmpoutput."</table>";	
 			return $output;

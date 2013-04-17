@@ -64,20 +64,11 @@
 	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"id" => "toto"));
 
 					// To delete servers
-					FS::$iMgr->setJSBuffer(1);
-					$formoutput = "";
-					$found = false;
-					$tmpoutput = FS::$iMgr->h2("title-remove-server").FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=6");
-					$tmpoutput .= "<ul class=\"ulform\">".$this->loc->s("Server").": ".FS::$iMgr->select("daddr");
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if(!$found) $found = true;
-						$tmpoutput .= "<li>".FS::$iMgr->selElmt($data["sshuser"]."@".$data["addr"],$data["addr"])."</li>";
+					if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
+						FS::$iMgr->setJSBuffer(1);
+						$formoutput = $this->showDHCPSrvList();
+	                            		$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"),array("width" => 400));
 					}
-					$tmpoutput .= "</select><li>".FS::$iMgr->submit("",$this->loc->s("Remove"))."</li><li>".
-						FS::$iMgr->check("histrm",array("label" => $this->loc->s("remove-history")))."</ul></form>";
-					if($found) $formoutput .= $tmpoutput;
-	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"),array("width" => 400));
         	                }
 
 				$netfound = false;
@@ -323,18 +314,32 @@
 			return $output;
 		}
 
-		private function showDHCPSrvForm() {
+		private function showDHCPSrvForm($addr = "",$user = "",$dhcpdpath = "",$leasepath = "",$reservconfpath = "",$subnetconfpath = "") {
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr","",array("length" => 128)).
-				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser","",array("length" => 128)).
+				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("length" => 128)).
+				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2","",array("type" => "pwd")).
-				FS::$iMgr->idxLine($this->loc->s("dhcpd-path"),"dhcpdpath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
-				FS::$iMgr->idxLine($this->loc->s("lease-path"),"leasepath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
-				FS::$iMgr->idxLine($this->loc->s("reservconf-path"),"reservconfpath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
-				FS::$iMgr->idxLine($this->loc->s("subnetconf-path"),"subnetconfpath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-subnetconfpath")).
+				FS::$iMgr->idxLine($this->loc->s("dhcpd-path"),"dhcpdpath",$dhcpdpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
+				FS::$iMgr->idxLine($this->loc->s("lease-path"),"leasepath",$leasepath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
+				FS::$iMgr->idxLine($this->loc->s("reservconf-path"),"reservconfpath",$reservconfpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
+				FS::$iMgr->idxLine($this->loc->s("subnetconf-path"),"subnetconfpath",$subnetconfpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-subnetconfpath")).
 				FS::$iMgr->tableSubmit($this->loc->s("Save")).
                         	"</table></form>";
+			return $output;
+		}
+
+		private function showDHCPSrvList() {
+			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("ssh-user")."</th><th></th></tr>";
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$output .= "<tr><td>".$data["addr"]."</td><td>".$data["sshuser"]."</td><td>".
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
+					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
+					"</td></tr>";
+			}
+			$output .= "</table>";
 			return $output;
 		}
 
@@ -671,27 +676,28 @@
 					return;
 				// Delete DHCP Server
 				case 6:
-					$addr = FS::$secMgr->checkAndSecurisePostData("daddr");
-					$histrm = FS::$secMgr->checkAndSecurisePostData("histrm");
+					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"No DHCP server specified to remove");
-						FS::$iMgr->redir("mod=".$this->mid."&err=7");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr = '".$addr."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Unknown DHCP server specified to remove");
-						FS::$iMgr->redir("mod=".$this->mid."&err=8");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
-					if($histrm == "on")
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_history","server = '".$addr."'");
-
+					FS::$dbMgr->BeginTr();
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_history","server = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_cache","server = '".$addr."'");
 					// Later
 					// FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","server = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
+					FS::$dbMgr->CommitTr();
+
+					FS::$iMgr->ajaxEcho("Done");
 					FS::$iMgr->redir("mod=".$this->mid,true);
                                         return;
 			}
