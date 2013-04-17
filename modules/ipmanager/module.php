@@ -60,18 +60,7 @@
 					}
 					// To add servers
 					FS::$iMgr->setJSBuffer(1);
-					$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").
-                	                	"<ul class=\"ulform\"><li>".$this->loc->s("note-needed")."<li>
-						<li>".FS::$iMgr->input("addr","",20,128,$this->loc->s("server-addr"))." (*)</li>
-						<li>".FS::$iMgr->input("sshuser","",20,128,$this->loc->s("ssh-user"))." (*)</li>
-						<li>".FS::$iMgr->password("sshpwd","",$this->loc->s("ssh-pwd"))." (*)</li>
-						<li>".FS::$iMgr->password("sshpwd2","",$this->loc->s("ssh-pwd-repeat"))." (*)</li>
-						<li>".FS::$iMgr->input("dhcpdpath","",30,980,$this->loc->s("dhcpd-path"),"tooltip-dhcpdpath")." (*)</li>
-						<li>".FS::$iMgr->input("leasepath","",30,980,$this->loc->s("lease-path"),"tooltip-leasepath")." (*)</li>
-						<li>".FS::$iMgr->input("reservconfpath","",30,980,$this->loc->s("reservconf-path"),"tooltip-reservconfpath")."</li>
-						<li>".FS::$iMgr->input("subnetconfpath","",30,980,$this->loc->s("subnetconf-path"),"tooltip-subnetconfpath")."</li>
-                        	        	<li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li>
-                                		</ul></form>";
+					$formoutput = $this->showDHCPSrvForm();
 	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"id" => "toto"));
 
 					// To delete servers
@@ -331,6 +320,21 @@
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("no-tab"));
 			}
+			return $output;
+		}
+
+		private function showDHCPSrvForm() {
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr","",array("length" => 128)).
+				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser","",array("length" => 128)).
+				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd","",array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2","",array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("dhcpd-path"),"dhcpdpath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
+				FS::$iMgr->idxLine($this->loc->s("lease-path"),"leasepath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
+				FS::$iMgr->idxLine($this->loc->s("reservconf-path"),"reservconfpath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
+				FS::$iMgr->idxLine($this->loc->s("subnetconf-path"),"subnetconfpath","",array("length" => 980, "size" => 30, "tooltip" => "tooltip-subnetconfpath")).
+				FS::$iMgr->tableSubmit($this->loc->s("Save")).
+                        	"</table></form>";
 			return $output;
 		}
 
