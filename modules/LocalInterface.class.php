@@ -92,19 +92,18 @@
 			$output .= "</div><div class=\"left\">";
 
 			if(!FS::$sessMgr->isConnected()) {
-				$output .= "<form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("connect")."&act=1\" method=\"post\">";
+				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection");
 					$output .= $this->h4("Identification",true);
 					$output .= $this->label("uname","Utilisateur");
 					$output .= $this->input("uname","");
 					$output .= $this->label("upwd","Mot de passe");
 					$output .= $this->password("upwd","");
 					$output .= $this->hidden("redir",$_SERVER["REQUEST_URI"]);
-					$output .= "<div class=\"clearlogform\"></div>";
-					$output .= $this->submit("conn","Connexion");
+					$output .= $this->submit("conn",FS::$iMgr->getLocale("Connection"));
 					$output .= "</form>";
 			} else {
 				$output .= FS::$iMgr->h4("Déconnexion",true)."<form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
-				$output .= FS::$iMgr->submit("disconnect","Confirmer");
+				$output .= FS::$iMgr->submit("disconnect",FS::$iMgr->getLocale("Confirm"));
 				$output .= "</form>";
 			}
 

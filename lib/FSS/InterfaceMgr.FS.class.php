@@ -126,19 +126,19 @@
 		}
 
 		public function h1($str,$raw=false) {
-			return "<h1>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h1>";
+			return "<h1>".($raw ? $str : $this->getLocale($str))."</h1>";
 		}
 
 		public function h2($str,$raw=false) {
-			return "<h2>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h2>";
+			return "<h2>".($raw ? $str : $this->getLocale($str))."</h2>";
 		}
 
 		public function h3($str,$raw=false) {
-			return "<h3>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h3>";
+			return "<h3>".($raw ? $str : $this->getLocale($str))."</h3>";
 		}
 
 		public function h4($str,$raw=false) {
-			return "<h4>".($raw ? $str : $this->cur_module->getLoc()->s($str))."</h4>";
+			return "<h4>".($raw ? $str : $this->getLocale($str))."</h4>";
 		}
 
 		public function js($js) {
@@ -161,7 +161,7 @@
 		}
 
 		private function tooltip($obj,$text) {
-			$output = $this->js('$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($this->cur_module->getLoc()->s($text)).'");
+			$output = $this->js('$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($this->getLocale($text)).'");
 			$("#tooltip").fadeIn("fast");}).mouseleave(function(){$("#tooltip").fadeOut("fast",function(){
 			});});');
 			return $output;
@@ -329,9 +329,9 @@
 			return $output;
 		}
 
-		public function cbkForm($link) {
+		public function cbkForm($link, $textid = "Modification") {
 			$output = "<form action=\"".$link."\" method=\"POST\" onsubmit=\"return callbackForm('".$link."',this,";
-			$output .= "{'snotif':'".addslashes($this->cur_module->getLoc()->s("Modification"))."'});\" >";
+			$output .= "{'snotif':'".addslashes($this->getLocale($textid))."'});\" >";
 			return $output;
 		}
 
@@ -552,6 +552,14 @@
 			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
 		}
 
+		public function getLocale($locid) {
+			if($this->cur_module)
+				return $this->cur_module->getLoc()->s($locid);
+			else {
+				$loc = new FSLocales();
+				return $loc->s($locid);
+			}	
+		}
 		public function setCurrentModule($module) { $this->cur_module = $module; }
 		public function setTitle($title) { $this->title = $title; }
 

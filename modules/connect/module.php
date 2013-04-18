@@ -69,6 +69,7 @@
 
 			$url = FS::$secMgr->checkAndSecurisePostData("redir");
 			if($url == NULL || $url == "index.php") $url = "m-0.html";
+			$url = preg_replace("#^/index\.php\?#","",$url);
 
 			if($ldapok) {
 				$ldapMgr->RootConnect();
@@ -92,7 +93,7 @@
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$this->connectUser($data["uid"],$data["ulevel"]);
 					FS::$log->i("None","connect",0,"Login success for user '".$username."'");
-					header("Location: ".$url);
+					FS::$iMgr->redir($url,true);
 					return;
 				}
 				else {
@@ -101,7 +102,7 @@
 					if($data = FS::$dbMgr->Fetch($query)) { 
 							$this->connectUser($data["uid"],$data["ulevel"]);
 							FS::$log->i("None","connect",0,"Login success for user '".$username."'");
-							header("Location: ".$url);
+							FS::$iMgr->redir($url,true);
 							return;
 					}
 				}
@@ -111,17 +112,17 @@
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if($data["sha_pwd"] != $encryptPwd) {
 						FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Bad password)");
-						FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						FS::$iMgr->ajaxEcho("err-bad-user");
 						return;
 					}
 					$this->connectUser($data["uid"],$data["ulevel"]);
 					FS::$log->i("None","connect",0,"Login success for user '".$username."'");
-					header("Location: ".$url);
+					FS::$iMgr->redir($url,true);
 					return;
 				}
 			}
 			FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Unknown user)");
-			FS::$iMgr->redir("mod=".$this->mid."&err=1");
+			FS::$iMgr->ajaxEcho("err-bad-user");
 		}
 		
 		private function connectUser($uid,$ulevel) {
@@ -134,9 +135,13 @@
 		}
 
 		public function handlePostDatas($act) {
-			$user = FS::$secMgr->checkAndSecurisePostData("uname");
-			$pwd = FS::$secMgr->checkAndSecurisePostData("upwd");
-			$this->TryConnect($user,$pwd);
+			switch($act) {
+				case 1:
+					$user = FS::$secMgr->checkAndSecurisePostData("uname");
+					$pwd = FS::$secMgr->checkAndSecurisePostData("upwd");
+					$this->TryConnect($user,$pwd);
+					return;
+			}
 		}
 	};
 ?>
