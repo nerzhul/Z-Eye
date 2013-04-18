@@ -55,16 +55,23 @@
 
 			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"));
 
-			$tmpoutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr>";
+			// Div for Ajax modifications
+			$output .= "<div id=\"snmptable\">";
+			$tmpoutput = "<table id=\"snmpList\"><thead><tr id=\"snmpthead\"><th class=\"headerSortDown\">".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr></thead>";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
-				$tmpoutput .= "<tr id=\"".$data["name"]."tr\"><td>".$data["name"]."</td><td>".($data["ro"] == 't' ? "X" : "")."</td><td>".($data["rw"] == 't' ? "X": "")."</td><td>".
-					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&snmp=".$data["name"],array("js" => true, "confirm" => 
-						array($this->loc->s("confirm-remove-community")."'".$data["name"]."' ?","Confirm","Cancel")))."</td></tr>";
+				$tmpoutput .= $this->tableCommunityLine($data["name"],$data["ro"] == 't',$data["rw"] == 't');
 			}
-			if($found) $output .= $tmpoutput."</table>";	
+			if($found) $output .= $tmpoutput."</table>".FS::$iMgr->jsSortTable("snmpList");
+			$output .= "</div>";
 			return $output;
+		}
+
+		private function tableCommunityLine($name,$ro,$rw) {
+			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".$name."</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
+				FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&snmp=".$name,array("js" => true, "confirm" => 
+					array($this->loc->s("confirm-remove-community")."'".$name."' ?","Confirm","Cancel")))."</td></tr>";
 		}
 
 		public function handlePostDatas($act) {
@@ -76,38 +83,26 @@
 
 					if(!$name || $ro && $ro != "on" || $rw && $rw != "on") {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Adding data");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-invalid-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->ajaxEcho("err-invalid-data");
 						return;
 					}
 
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-already-exist");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=3");
+						FS::$iMgr->ajaxEcho("err-already-exist");
 						return;
 					}
 
 					// User must choose read and/or write
 					if($ro != "on" && $rw != "on") {
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-readorwrite");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=6");
+						FS::$iMgr->ajaxEcho("err-readorwrite");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if(!is_array($netdiscoCfg)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-read-netdisco");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
+						FS::$iMgr->ajaxEcho("err-read-netdisco");
 						return;
 					}
 					
@@ -115,7 +110,9 @@
 						($rw == "on" ? 't' : 'f')."'");
 
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
-					FS::$iMgr->redir("mod=".$this->mid."&sh=2",true);
+					$jscontent = $this->tableCommunityLine($name,$ro == "on",$rw == "on");
+					$js = "$('".addslashes($jscontent)."').insertAfter('#snmpthead')";
+					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				case 2: // Remove SNMP community
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
