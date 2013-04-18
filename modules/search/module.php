@@ -24,7 +24,7 @@
 		function iSearch() { 
 			parent::FSModule();
 			$this->loc = new lSearch();
-			$this->autoresults = array("device" => array(), "dnsrecord" => array(), "ip" => array(),
+			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array());
 			$this->nbresults = 0;
@@ -283,7 +283,7 @@
 			if(FS::$sessMgr->hasRight("mrule_switches_read")) {
 				if(!$autocomp) {
 					// Netbios INFOS
-					$query = FS::$dbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '".$search."' OR nbname ILIKE '".$search."'");
+					$query = FS::$dbMgr->Select("node_nbt","mac,ip,domain,nbname,nbuser,time_first,time_last","domain ILIKE '%".$search."%' OR nbname ILIKE '%".$search."%'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) {
 							$found = 1;
@@ -304,18 +304,49 @@
 					$tmpoutput .= $this->showRadiusInfos($search);
 				}
 				else {
-					$query = FS::$dbMgr->Select("node_nbt","domain","domain ILIKE '".$search."%'",
+					$query = FS::$dbMgr->Select("node_nbt","domain","domain ILIKE '%".$search."%'",
 						array("order" => "domain","limit" => "10","group" => "domain"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["nbdomain"],$data["domain"]);
 
-					$query = FS::$dbMgr->Select("node_nbt","nbname","nbname ILIKE '".$search."%'",
+					$query = FS::$dbMgr->Select("node_nbt","nbname","nbname ILIKE '%".$search."%'",
 						array("order" => "nbname","limit" => "10","group" => "nbname"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["nbname"],$data["nbname"]);
 				}
 			}
 
+			if(FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
+				if(!$autocomp) {
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","hostname,macaddr,ip,leasetime,distributed,server","hostname ILIKE '%".$search."%'");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if($found == 0) {
+							$found = 1;
+							$tmpoutput .= FS::$iMgr->h2("title-dhcp-hostname")."<div id=\"searchres\">";
+						}
+						$tmpoutput .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+						if(strlen($data["ip"]) > 0)
+							$tmpoutput .= "<b>".$this->loc->s("link-ip")."</b>: ".$data["ip"]."<br />";
+						if(strlen($data["macaddr"]) > 0)
+							$tmpoutput .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+						$tmpoutput .= "<b>".$this->loc->s("attribution-type")."</b>: ".($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
+						if($data["distributed"] != 3 && $data["distributed"] != 4)
+							$tmpoutput .= "<b>".$this->loc->s("Validity")."</b>: ".$data["leasetime"]."<br />";
+						$tmpoutput .= "<br />";
+						$this->nbresults++;
+					}
+			
+					if($found) $tmpoutput .= "</div>";
+					$found = 0;
+				}
+				else {
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","hostname","hostname ILIKE '%".$search."%'",array("order" => "hostname","limit" => "10","group" => "hostname"));
+					while($data = FS::$dbMgr->Fetch($query))
+						array_push($this->autoresults["dhcphostname"],$data["hostname"]);
+
+				}
+			}
+			
 			if(!$autocomp) {
 				if(strlen($tmpoutput) > 0)
 					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$this->nbresults,true).$tmpoutput;
