@@ -45,23 +45,24 @@
 	}
 	else {
 		FS::$sessMgr->InitSessionIfNot();
-		FS::$iMgr->stylesheet("styles/fss1.css");
-		FS::$iMgr->stylesheet("styles/jQueryUI.css");
-		FS::$iMgr->jsinc("lib/jQuery/jQuery.js");
-		FS::$iMgr->jsinc("lib/jQuery/jQueryUI.js");
-		FS::$iMgr->jsinc("lib/jQuery/jquery.jqzoom.js");
-		FS::$iMgr->jsinc("lib/jQuery/jquery.tablesorter.js");
-		FS::$iMgr->jsinc("lib/jQuery/jquery.colorpicker.js");
-		FS::$iMgr->jsinc("lib/FSS/js/FSS.js");
-		FS::$iMgr->jsinc("lib/HighCharts/highcharts.min.js");
-		FS::$iMgr->jsinc("lib/Sigma/sigma.min.js");
+		FS::$iMgr->stylesheet("/styles/fss1.css");
+		FS::$iMgr->stylesheet("/styles/jQueryUI.css");
+		FS::$iMgr->jsinc("/lib/jQuery/jQuery.js");
+		FS::$iMgr->jsinc("/lib/jQuery/jQueryUI.js");
+		FS::$iMgr->jsinc("/lib/jQuery/jquery.jqzoom.js");
+		FS::$iMgr->jsinc("/lib/jQuery/jquery.tablesorter.js");
+		FS::$iMgr->jsinc("/lib/jQuery/jquery.colorpicker.js");
+		FS::$iMgr->jsinc("/lib/FSS/js/FSS.js");
+		FS::$iMgr->jsinc("/lib/HighCharts/highcharts.min.js");
+		FS::$iMgr->jsinc("/lib/Sigma/sigma.min.js");
+
 
 		echo FS::$iMgr->content();
 		echo FS::$iMgr->renderJS();
 		echo FS::$iMgr->footer();
 	}
-	/* //For optimize times
+	/* For optimize times
 	$end_time = microtime(true);
         $script_time = $end_time - $start_time;
-	echo $script_time;*/ 
+	echo $script_time; */
 ?>
