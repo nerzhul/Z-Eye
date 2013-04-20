@@ -315,9 +315,12 @@
 		}
 
 		private function showDHCPSrvForm($addr = "",$user = "",$dhcpdpath = "",$leasepath = "",$reservconfpath = "",$subnetconfpath = "") {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("length" => 128)).
-				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>";
+			if($addr)
+				$output .= "<tr><td>".$this->loc->s("server-addr")."</td><td>".$addr.FS::$iMgr->hidden("addr",$addr).FS::$iMgr->hidden("edit",1);
+			else
+				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("length" => 128));
+			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("dhcpd-path"),"dhcpdpath",$dhcpdpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
@@ -332,9 +335,10 @@
 		private function showDHCPSrvList() {
 			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("ssh-user")."</th><th></th></tr>";
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= "<tr><td>".$data["addr"]."</td><td>".$data["sshuser"]."</td><td>".
+				$output .= "<tr><td>".FS::$iMgr->opendiv($this->showDHCPSrvForm($data["addr"],$data["sshuser"],$data["dhcpdpath"],$data["leasespath"],$data["reservconfpath"],
+					$data["subnetconfpath"]),$data["addr"])."</td><td>".$data["sshuser"]."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
 					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
 					"</td></tr>";
@@ -544,9 +548,10 @@
 					}
 					echo $this->showHistory($filter,$daterange);
 					return;
-				// Add DHCP server
+				// Add/Edit DHCP server
 				case 5:
 					$saddr = FS::$secMgr->checkAndSecurisePostData("addr");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
                                         $slogin = FS::$secMgr->checkAndSecurisePostData("sshuser");
                                         $spwd = FS::$secMgr->checkAndSecurisePostData("sshpwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("sshpwd2");
@@ -561,43 +566,39 @@
 						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath))
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-bad-datas");
-						else
-                                                	FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
                                                 return;
                                         }
 					if($spwd != $spwd2) {
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-pwd-not-match");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEcho("err-pwd-not-match");
                                                 return;
                                         }
 
-                                        $conn = ssh2_connect($saddr,22);
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr ='".$saddr."'");
+					if($edit) {
+						if(!$exist) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to edit server '".$saddr."': not exists");
+							FS::$iMgr->ajaxEcho("err-not-exists");
+							return;
+						}
+					}
+					else {
+						if($exist) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
+							FS::$iMgr->ajaxEcho("err-already-exists");
+							return;
+						}
+
+					}
+					$conn = ssh2_connect($saddr,22);
                                         if(!$conn) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"SSH Connection failed for '".$saddr."'");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-ssh-conn-failed");
-						else
-                                                	FS::$iMgr->redir("mod=".$this->mid."&err=3");
+						FS::$iMgr->ajaxEcho("err-ssh-conn-failed");
                                                 return;
                                         }
 					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-ssh-auth-failed");
-						else
-                                                	FS::$iMgr->redir("mod=".$this->mid."&err=4");
-                                                return;
-                                        }
-                                        if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr ='".$saddr."'")) {
-                                                FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-already-exists");
-						else
-                                                	FS::$iMgr->redir("mod=".$this->mid."&err=5");
+						FS::$iMgr->ajaxEcho("err-ssh-auth-failed");
                                                 return;
                                         }
 					/*
@@ -612,10 +613,7 @@
 
 					if($cmdret != 0) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-unable-read")." '".$dhcpdpath."'";
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$dhcpdpath);
+						FS::$iMgr->ajaxEcho("err-unable-read")." '".$dhcpdpath."'";
                                                 return;
 					}
 
@@ -628,10 +626,7 @@
 
                                         if($cmdret != 0) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$leasepath."' on '".$saddr."'");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-unable-read")." '".$leasepath."'";
-						else
-                                                	FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$leasepath);
+						FS::$iMgr->ajaxEcho("err-unable-read")." '".$leasepath."'";
                                                 return;
                                         }
 
@@ -644,10 +639,7 @@
 
                                         	if($cmdret != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
-							if(FS::isAjaxCall())
-								echo $this->loc->s("err-unable-read")." '".$reservconfpath."'";
-							else
-	                                        	        FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$reservconfpath);
+							FS::$iMgr->ajaxEcho("err-unable-read")." '".$reservconfpath."'";
         	                                        return;
                 	                        }
 					}
@@ -661,17 +653,21 @@
 
                                         	if($cmdret != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
-							if(FS::isAjaxCall())
-								echo $this->loc->s("err-unable-read")." '".$subnetconfpath."'";
-							else
-	                                                	FS::$iMgr->redir("mod=".$this->mid."&err=6&file=".$subnetconfpath);
+							FS::$iMgr->ajaxEcho("err-unable-read")." '".$subnetconfpath."'";
         	                                        return;
                 	                        }
 					}
 
+					FS::$dbMgr->BeginTr();
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
 						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
+					FS::$dbMgr->CommitTr();
+
+					if($edit)
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Edited DHCP server '".$saddr."' (login: '".$slogin."')");
+					else
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				// Delete DHCP Server
