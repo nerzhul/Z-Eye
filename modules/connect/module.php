@@ -100,10 +100,10 @@
 					$user->Create();
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 					if($data = FS::$dbMgr->Fetch($query)) { 
-							$this->connectUser($data["uid"],$data["ulevel"]);
-							FS::$log->i("None","connect",0,"Login success for user '".$username."'");
-							FS::$iMgr->redir($url,true);
-							return;
+						$this->connectUser($data["uid"],$data["ulevel"]);
+						FS::$log->i("None","connect",0,"Login success for user '".$username."'");
+						FS::$iMgr->redir($url,true);
+						return;
 					}
 				}
 			} else {

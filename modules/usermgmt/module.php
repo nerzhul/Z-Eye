@@ -128,30 +128,20 @@
 		private function showMain() {
 			$output = FS::$iMgr->h1("title-usermgmt");
 
+			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapuserimport")) {
+				$output .= FS::$iMgr->opendiv($this->showUserImportForm(),$this->loc->s("import-user"),array("width" => 400));
+			}
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,mail,last_ip,join_date,last_conn,name,subname,sha_pwd");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"userList\"><thead><tr><th class=\"headerSortDown\">UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
+					$tmpoutput .= "<table id=\"userList\"><thead id=\"userthead\"><tr><th class=\"headerSortDown\">UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
 					$this->loc->s("Groups")."</th><th>".$this->loc->s("Subname")."</th><th>".$this->loc->s("Name")."</th><th>".
 					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th><th></th></tr></thead>";
+					$tmpoutput .= $this->showUserTr($data["uid"],$data["username"],$data["sha_pwd"] == "",$data["subname"],$data["name"],$data["mail"],$data["last_ip"],$data["last_conn"],$data["join_date"]);
 				}
-				$tmpoutput .= "<tr id=\"u".$data["uid"]."tr\"><td>".$data["uid"]."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$data["username"]."\">".$data["username"]."</a></td><td>".
-					($data["sha_pwd"] == "" ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
-				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$data["uid"]."'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$data2["gid"]."'");
-					$tmpoutput .= $gname."<br />";
-				}
-				$tmpoutput .= "</td><td>".$data["subname"]."</td><td>".$data["name"]."</td><td>".$data["mail"]."</td><td>".$data["last_ip"]."</td><td>".
-					$data["last_conn"]."</td><td>".$data["join_date"]."</td><td>";
-				if($data["uid"] != 1) {
-					$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&uid=".$data["uid"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-removeuser")."'".$data["username"]."' ?","Confirm","Cancel")));
-				}
-				$tmpoutput .= "</td></tr>";
 			}
 
 			if($found) {
@@ -187,6 +177,58 @@
 			return $output;
 		}
 
+		private function showUserTr($uid, $username = "", $localuser = false, $subname = "", $name = "", $mail = "",$last_ip = "",$last_conn = "", $join_date = "") {
+			$output = "<tr id=\"u".$uid."tr\"><td>".$uid."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$username."\">".$username."</a></td><td>".
+				($localuser ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$data["gid"]."'");
+				$output .= $gname."<br />";
+			}
+
+			if(preg_match("#[.]#",$last_conn)) {
+				$last_conn = preg_split("#[.]#",$last_conn);
+				$last_conn = $last_conn[0];
+			}
+			if(preg_match("#[.]#",$join_date)) {
+				$join_date = preg_split("#[.]#",$join_date);
+				$join_date = $join_date[0];
+			}
+			$output .= "</td><td>".$subname."</td><td>".$name."</td><td>".$mail."</td><td>".$last_ip."</td><td>".$last_conn."</td><td>".$join_date."</td><td>";
+			if($uid != 1) {
+				$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&uid=".$uid,array("js" => true,
+					"confirm" => array($this->loc->s("confirm-removeuser")."'".$username."' ?","Confirm","Cancel")));
+			}
+			$output .= "</td></tr>";
+			return $output;
+		}
+
+		private function showUserImportForm() {
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=6");
+			$output .= "<table>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"username","");
+
+			$countElmt = 0;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$countElmt++;
+				$tmpoutput .= FS::$iMgr->selElmt($data["gname"],$data["gid"]);
+			}
+
+			if($countElmt > 0) {
+				if($countElmt > 12)
+					$size = round($countElmt/4);
+				else
+					$size = $countElmt;
+				$output .= "<tr><td>".$this->loc->s("Groups")."</td><td>".FS::$iMgr->select("groups[]","",NULL,true,array("size" => $size));
+				$output .= $tmpoutput;
+				$output .= "</select></td></tr>";
+			}
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Import"));
+			$output .= "</table></form>";
+			return $output;
+		}
+
 		private function showDirectoryForm() {
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
 			$output .= "<table>";
@@ -204,6 +246,60 @@
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
 			return $output;
+		}
+
+		private function SearchAndImportUser($username,$groups = array()) {
+			if(!$username) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			// If user already exists
+			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'")) {
+				FS::$ilog->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User '".$username."' already exists");
+				FS::$iMgr->ajaxEcho("err-user-already-exists");
+			}
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$ldapMgr = new LDAP();
+				$ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
+				$ldapMgr->RootConnect();
+				$result = $ldapMgr->GetOneEntry($data["ldapuid"]."=".$username);
+				if($result) {
+					$grpcount = 0;
+					if($groups && is_array($groups)) {
+						$grpcount = count($groups);
+						for($i=0;$i<$grpcount;$i++) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gid = '".$groups[$i]."'")) {
+								FS::$ilog->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Group '".$groups[$i]."' doesn't exists");
+								FS::$iMgr->ajaxEcho("err-group-not-exists");
+								return;
+							}
+						}
+					}
+
+					$mail = is_array($result[$data["ldapmail"]]) ? $result[$data["ldapmail"]][0] : $result[$data["ldapmail"]];
+					$surname = $result[$data["ldapsurname"]];
+					$name = $result[$data["ldapname"]];
+
+					$user = new User();
+					$user->setUsername($username);
+					$user->setSubName($surname);
+					$user->setName($name);
+					$user->setUserLevel(4);
+					$user->setMail($mail);
+					$user->Create();
+
+					$uid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");
+					for($i=0;$i<$grpcount;$i++)
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_group","uid,gid","'".$uid."','".$groups[$i]."'");
+					$jscontent = "";
+					$js = "$('".$jscontent."').addAfter('#userthead');";
+
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				}
+			}
+			FS::$iMgr->ajaxEcho("err-user-not-found");
 		}
 		public function handlePostDatas($act) {
 			switch($act) {
@@ -339,10 +435,7 @@
 
 					if(!$addr || !$port || !FS::$secMgr->isNumeric($port) || !$basedn || !$rootdn || !$rootpwd || !$ldapname || !$ldapsurname || !$ldapmail || !$ldapuid || !$ldapfilter) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing/wrong for user management (LDAP add)");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-invalid-bad-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEcho("err-invalid-bad-data");
 						return;
 					}
 
@@ -350,20 +443,14 @@
 					if($edit) {
 						if(!$serv) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to edit LDAP ".$addr.":".$port.", not exists");
-							if(FS::isAjaxCall())
-								FS::$iMgr->ajaxEcho("err-ldap-not-exist");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&err=10");
+							FS::$iMgr->ajaxEcho("err-ldap-not-exist");
 							return;
 						}
 					}
 					else {
 						if($serv) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", already exists");
-							if(FS::isAjaxCall())
-								FS::$iMgr->ajaxEcho("err-ldap-exist");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&err=4");
+							FS::$iMgr->ajaxEcho("err-ldap-exist");
 							return;
 						}
 					}
@@ -372,10 +459,7 @@
 					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
 					if(!$ldapMgr->RootConnect()) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to add LDAP ".$addr.":".$port.", connection fail");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-ldap-bad-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=3");
+						FS::$iMgr->ajaxEcho("err-ldap-bad-data");
 						return;
 					}
 
@@ -394,29 +478,25 @@
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Some fields are missing for user management (LDAP remove)");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-invalid-bad-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEcho("err-invalid-bad-data");
 						return;
 					}
 
 					$serv = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr","addr = '".$addr."'");
 					if(!$serv) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",1,"Unable to remove LDAP ".$addr.":".$port.", not exists");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-ldap-exist");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=4");
+						FS::$iMgr->ajaxEcho("err-ldap-exist");
 						return;
 					}
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr ='".$addr."'");
 					FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",0,"LDAP '".$addr."' removed");
-					if(FS::isAjaxCall())
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#d".preg_replace("#[.]#","-",$addr)."tr');");
-					else
-						FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#d".preg_replace("#[.]#","-",$addr)."tr');");
+					return;
+				case 6: // LDAP Import
+					$username = FS::$secMgr->checkAndSecurisePostData("username");
+					$groups = FS::$secMgr->checkAndSecurisePostData("groups");
+					$this->SearchAndImportUser($username,$groups);
 					return;
 				default: break;
 			}
