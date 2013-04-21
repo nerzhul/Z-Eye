@@ -161,8 +161,8 @@
 		}
 
 		private function tooltip($obj,$text) {
-			$output = "onmouseover=\"function(){\$('#tooltip').html('".addslashes($this->getLocale($text))."'); \$('#tooltip').fadeIn('fast');}\" ";
-			$output .= "onmouseout=\"function(){\$('#tooltip').fadeOut('fast');}\" ";
+			$output = "onmouseover=\"showTooltip('".addslashes($this->getLocale($text))."');\" ";
+			$output .= "onmouseout=\"hideTooltip();\" ";
 			return $output;
 		}
 
