@@ -502,7 +502,7 @@
 			$aname = uniqid();
                         $output = "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content.$this->renderJS()."</div>";
 			$this->setJSBuffer(0);
-			$output .= "<ul style=\"list-style-type:none;padding:0;\"><li><a id=\"".$aname."\" href=\"#\">".$text1."</a></li></ul>";
+			$output .= "<a id=\"".$aname."\" href=\"#\">".$text1."</a>";
 			if(isset($options["width"]) && $options["width"] > 0)
 				$output .= $this->js("$(\"#".$aname."\").click(function(){ formPopup('".$divname."','".$options["width"]."px'); });"); 
 			else
