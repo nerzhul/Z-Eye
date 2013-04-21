@@ -209,6 +209,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"username","");
 
 			$countElmt = 0;
+			$tmpoutput = "";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
@@ -296,6 +297,7 @@
 					$js = "$('".$jscontent."').addAfter('#userthead');";
 
 					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->redir("m-".$this->mid.".html",true);
 					return;
 				}
 			}
