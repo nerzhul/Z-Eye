@@ -24,7 +24,8 @@
 			$output = FS::$iMgr->ruleLines("Gestion des utilisateurs",$activerules,array(
 				array("Lire les données",	"mrule_usermgmt_read"),
 				array("Modifier les utilisateurs",	"mrule_usermgmt_write"),
-				array("Modifier les annuaires",		"mrule_usermgmt_ldapwrite")
+				array("Modifier les annuaires",		"mrule_usermgmt_ldapwrite"),
+				array("Importer un utilisateur",	"mrule_usermgmt_ldapuserimport")
 			));
                         return $output;
                 }
