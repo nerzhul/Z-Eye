@@ -45,15 +45,8 @@
 			FS::$iMgr->setTitle("snmp-communities");
 			$found = false;
 
-			FS::$iMgr->setJSBuffer(1);
-			$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1")."<ul class=\"ulform\">";
-			$formoutput .= "<li>".FS::$iMgr->input("name","",20,64,$this->loc->s("snmp-community"))."</li>";
-			$formoutput .= "<li>".FS::$iMgr->check("ro",array("label" => $this->loc->s("Read"), "tooltip" => "tooltip-read"))."</li>";
-			$formoutput .= "<li>".FS::$iMgr->check("rw",array("label" => $this->loc->s("Write"), "tooltip" => "tooltip-write"))."</li>";
-			$formoutput .= "<li>".FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-			$formoutput .= "</ul></form>";
-
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"));
+			$formoutput = $this->showCommunityForm();
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"),array("width" => 400));
 
 			// Div for Ajax modifications
 			$output .= "<div id=\"snmptable\">";
@@ -68,8 +61,23 @@
 			return $output;
 		}
 
+		private function showCommunityForm($name = "", $ro = false, $rw = false) {
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1")."<table>";
+			if($name)
+				$output .= "<tr><td>".$this->loc->s("snmp-community")."</td><td>".$name.FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1)."</td></tr>";
+			else
+				$output .= FS::$iMgr->idxLine($this->loc->s("snmp-community"),"name",$name,array("length" => 64, "size" => 20));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Read"),"ro",$ro,array("type" => "chk", "tooltip" => "tooltip-read"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Write"),"rw",$rw,array("type" => "chk", "tooltip" => "tooltip-write"));
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
+			return $output;
+		}
+
 		private function tableCommunityLine($name,$ro,$rw) {
-			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".$name."</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
+			FS::$iMgr->setJSBuffer(1);
+			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv($this->showCommunityForm($name,$ro,$rw),$name,array("width" => 400)).
+				"</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&snmp=".$name,array("js" => true, "confirm" => 
 					array($this->loc->s("confirm-remove-community")."'".$name."' ?","Confirm","Cancel")))."</td></tr>";
 		}
@@ -80,17 +88,28 @@
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$ro = FS::$secMgr->checkAndSecurisePostData("ro");
 					$rw = FS::$secMgr->checkAndSecurisePostData("rw");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
-					if(!$name || $ro && $ro != "on" || $rw && $rw != "on") {
+					if(!$name || $ro && $ro != "on" || $rw && $rw != "on" || $edit && $edit != 1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Adding data");
 						FS::$iMgr->ajaxEcho("err-invalid-data");
 						return;
 					}
 
-					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
-						FS::$iMgr->ajaxEcho("err-already-exist");
-						return;
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'");
+					if($edit) {
+						if(!$exist) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' not exists");
+							FS::$iMgr->ajaxEcho("err-not-exist");
+							return;
+						}
+					}
+					else {
+						if($exist) {
+							FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
+							FS::$iMgr->ajaxEcho("err-already-exist");
+							return;
+						}
 					}
 
 					// User must choose read and/or write
@@ -106,51 +125,44 @@
 						return;
 					}
 					
+					FS::$dbMgr->BeginTr();
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","'".$name."','".($ro == "on" ? 't' : 'f')."','".
 						($rw == "on" ? 't' : 'f')."'");
+					FS::$dbMgr->CommitTr();
 
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
+					$js = "";
+					if($edit) $js .= "hideAndRemove('#".$name."tr'); setTimeout(function() {";
 					$jscontent = $this->tableCommunityLine($name,$ro == "on",$rw == "on");
-					$js = "$('".addslashes($jscontent)."').insertAfter('#snmpthead')";
+					$js .= "$('".addslashes($jscontent)."').insertAfter('#snmpthead')";
+					if($edit) $js .= "},1000);";	
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				case 2: // Remove SNMP community
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
 					if(!$name) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Deleting data");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-invalid-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=1");
+						FS::$iMgr->ajaxEcho("err-invalid-data");
 						return;
 					}
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Community '".$name."' not in DB");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-not-exist");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=4");
+						FS::$iMgr->ajaxEcho("err-not-exist");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if(!is_array($netdiscoCfg)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
-						if(FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-read-fail");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=2&err=5");
+						FS::$iMgr->ajaxEcho("err-read-fail");
 						return;
 					}
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
-					if(FS::isAjaxCall()) {
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".$name."tr');");
-					}
-					else
-						FS::$iMgr->redir("mod=".$this->mid."&sh=2");
+					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".$name."tr');");
 					return;
 				default: break;
 			}

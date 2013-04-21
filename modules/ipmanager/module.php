@@ -563,7 +563,8 @@
                                                 $dhcpdpath == NULL || $dhcpdpath == "" || !FS::$secMgr->isPath($dhcpdpath) ||
                                                 $leasepath == NULL || $leasepath == "" || !FS::$secMgr->isPath($leasepath) ||
 						$reservconfpath && ($reservconfpath == "" || !FS::$secMgr->isPath($reservconfpath)) ||
-						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath))
+						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath)) ||
+						$edit && $edit != 1
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
 						FS::$iMgr->ajaxEcho("err-bad-datas");

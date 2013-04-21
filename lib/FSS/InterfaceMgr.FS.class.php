@@ -161,9 +161,8 @@
 		}
 
 		private function tooltip($obj,$text) {
-			$output = $this->js('$("#'.$obj.'").mouseenter(function(){$("#tooltip").html("'.addslashes($this->getLocale($text)).'");
-			$("#tooltip").fadeIn("fast");}).mouseleave(function(){$("#tooltip").fadeOut("fast",function(){
-			});});');
+			$output = "onmouseover=\"function(){\$('#tooltip').html('".addslashes($this->getLocale($text))."'); \$('#tooltip').fadeIn('fast');}\" ";
+			$output .= "onmouseout=\"function(){\$('#tooltip').fadeOut('fast');}\" ";
 			return $output;
 		}
 
@@ -171,8 +170,9 @@
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".(isset($options["width"]) ? $options["width"] : 400).
-				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\">".$def_value."</textarea>";
+				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\" ";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
+			$output .= ">".$def_value."</textarea>";
 			return $output;
 		}
 
@@ -186,24 +186,27 @@
 		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" />";
-			if($tooltip) $output .= $this->tooltip($name,$tooltip);
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" ";
+			$output .= $this->tooltip($name,$tooltip);
+			$output .= "/>";
 			return $output;
 		}
 
 		public function numInput($name, $def_value = "", $options = array()) {
 			$output = "";
 		        if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" />";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
+			$output .= " />";
 			return $output;
 		}
 
 		public function IPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
                         if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP(this);\" />";
+			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP(this);\" ";
 			if($tooltip) $output .= $this->tooltip($name,$tooltip);
+			$output .= " />";
 			return $output;
 		}
 
@@ -288,8 +291,9 @@
 		}
 
 		public function submit($name, $value, $options = array()) {
-			$output = "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" />";
+			$output = "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" ";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
+			$output .= " />";
 			return $output;
 		}
 
@@ -426,8 +430,8 @@
 				$output .= " size=\"".$options["size"]."\" ";
 			if(isset($options["style"]))
 				$output .= " style=\"".$style."\" ";
-			$output .= ">";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
+			$output .= ">";
 			return $output;
 		}
 
@@ -445,8 +449,8 @@
 			$output .= "<input type=\"checkbox\" name=\"".$name."\" id=\"".$name."\" ";
 			if(isset($options["check"]) && $options["check"])
 				$output .= "checked ";
-			$output .= " />";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($name,$options["tooltip"]);
+			$output .= " />";
 			return $output;
 		}
 
