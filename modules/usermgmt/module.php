@@ -162,23 +162,8 @@
 				$output .= FS::$iMgr->h1("title-directorymgmt");
 
 				FS::$iMgr->setJSBuffer(1);
-				$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
-				$formoutput .= "<ul class=\"ulform\"><li>";
-				$formoutput .= FS::$iMgr->input("addr","",20,40,$this->loc->s("ldap-addr"))."</li><li>";
-				$formoutput .= FS::$iMgr->numInput("port","389",array("size" => 5, "length" => 5,"label" => $this->loc->s("ldap-port")))."</li><li>";
-				$formoutput .= FS::$iMgr->check("ssl",array("label" => $this->loc->s("SSL")." ?"))."</li><li>";
-				$formoutput .= FS::$iMgr->input("dn","",20,200,$this->loc->s("base-dn"),"tooltip-base-dn")."</li><li>";
-				$formoutput .= FS::$iMgr->input("rootdn","",20,200,$this->loc->s("root-dn"),"tooltip-root-dn")."</li><li>";
-				$formoutput .= FS::$iMgr->password("rootpwd","",$this->loc->s("root-pwd"))."</li><li>";
-				$formoutput .= FS::$iMgr->input("ldapname","",20,40,$this->loc->s("attr-name"),"tooltip-attr-name")."</li><li>";
-				$formoutput .= FS::$iMgr->input("ldapsurname","",20,40,$this->loc->s("attr-subname"),"tooltip-attr-subname")."</li><li>";
-				$formoutput .= FS::$iMgr->input("ldapmail","",20,40,$this->loc->s("attr-mail"),"tooltip-attr-mail")."</li><li>";
-				$formoutput .= FS::$iMgr->input("ldapuid","",20,40,$this->loc->s("attr-uid"),"tooltip-attr-uid")."</li><li>";
-				$formoutput .= FS::$iMgr->input("ldapfilter","(objectclass=*)",20,200,$this->loc->s("ldap-filter"),"tooltip-ldap-filter")."</li><li>";
-				$formoutput .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-				$formoutput .= "</ul></form>";
 
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-directory"),array("width" => 470));
+				$output .= FS::$iMgr->opendiv($this->showDirectoryForm(),$this->loc->s("new-directory"),array("width" => 470));
 
 				$found = 0;
 				$tmpoutput = "";
@@ -199,6 +184,25 @@
 				$output .= $tmpoutput."</table>";
 				FS::$iMgr->jsSortTable("ldapList");
 			}
+			return $output;
+		}
+
+		private function showDirectoryForm() {
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
+			$output .= "<table>";
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-addr"),"addr","",array("length" => 40, "size" => 20));
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-port"),"port","389",array("size" => 5, "length" => 5));
+			$output .= FS::$iMgr->idxLine($this->loc->s("SSL")." ?","ssl",false,array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("base-dn"),"dn","",array("size" => 20, "length" => 200,"tooltip" => "tooltip-base-dn"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("root-dn"),"rootdn","",array("size" => 20, "length" => 200,"tooltip" => "tooltip-root-dn"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("root-pwd"),"rootpwd","",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-name"),"ldapname","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-name"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-subname"),"ldapsurname","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-subname"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-mail"),"ldapmail","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-mail"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-uid"),"ldapuid","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-uid"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-filter"),"ldapfilter","(objectclass=*)",array("size" => 20, "length" => 200,"tooltip" => "tooltip-ldap-filter"));
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= "</table></form>";
 			return $output;
 		}
 		public function handlePostDatas($act) {
