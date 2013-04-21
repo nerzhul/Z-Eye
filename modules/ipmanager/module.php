@@ -61,9 +61,9 @@
 					// To add servers
 					FS::$iMgr->setJSBuffer(1);
 					$formoutput = $this->showDHCPSrvForm();
-	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"id" => "toto"));
+	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"line" => true));
 
-					// To delete servers
+					// To edit/delete servers
 					if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
 						FS::$iMgr->setJSBuffer(1);
 						$formoutput = $this->showDHCPSrvList();

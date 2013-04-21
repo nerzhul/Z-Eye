@@ -1440,7 +1440,7 @@
 					$formoutput .= "</ul></form>";
 					$showtitle = false;
 					$output .= FS::$iMgr->h2("title-global-fct");
-					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"));
+					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"),array("line" => true));
 				}
 
 				$foundsw = 0;

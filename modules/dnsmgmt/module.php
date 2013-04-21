@@ -43,7 +43,7 @@
 
 						FS::$iMgr->setJSBuffer(1);
 						$tmpoutput = $this->CreateOrEditServer(true);
-						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("add-server"),array("width" => 500));
+						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("add-server"),array("width" => 500, "line" => true));
 
 						FS::$iMgr->setJSBuffer(1);
 						$tmpoutput = "";

@@ -502,11 +502,12 @@
 			$aname = uniqid();
                         $output = "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content.$this->renderJS()."</div>";
 			$this->setJSBuffer(0);
-			$output .= "<a id=\"".$aname."\" href=\"#\">".$text1."</a>";
+			$output .= "<a id=\"".$aname."\" href=\"#\" onclick=\"formPopup('".$divname."'";
 			if(isset($options["width"]) && $options["width"] > 0)
-				$output .= $this->js("$(\"#".$aname."\").click(function(){ formPopup('".$divname."','".$options["width"]."px'); });"); 
-			else
-				$output .= $this->js("$(\"#".$aname."\").click(function(){ formPopup('".$divname."'); });"); 
+				$output .= ",'".$options["width"]."px'";
+			$output .= ");\">".$text1."</a>";
+			if(isset($options["line"]) && $options["line"])
+				$output .= "<br />";
 			return $output;
 		}
 

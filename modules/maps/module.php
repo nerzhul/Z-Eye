@@ -54,8 +54,8 @@
 		}
 
 		private function showSigmaMap() {
-			$output	= FS::$iMgr->opendiv($this->showNodeForm(),$this->loc->s("Add-Node"));
-			$output	.= FS::$iMgr->opendiv($this->showEdgeForm(),$this->loc->s("Add-Edge"));
+			$output	= FS::$iMgr->opendiv($this->showNodeForm(),$this->loc->s("Add-Node"),array("line" => true));
+			$output	.= FS::$iMgr->opendiv($this->showEdgeForm(),$this->loc->s("Add-Edge"),array("line" => true));
 			$output	.= FS::$iMgr->opendiv($this->showImportForm(),$this->loc->s("Import"));
 			$output .= "<div id=\"sigmap\" style=\"display:inline-block;text-align:left; width:100%; height:800px;\"></div>";
 			
