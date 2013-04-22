@@ -21,9 +21,9 @@
                 function rGroupMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Gestion des groupes",$activerules,array(
-				array("Lire les données", 	"mrule_groupmgmt_read"),
-				array("Modifier les données", 	"mrule_groupmgmt_write")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),		"mrule_groupmgmt_read"),
+				array($this->loc->s("rule-write-datas"), 	"mrule_groupmgmt_write")
 			));
                         return $output;
                 }

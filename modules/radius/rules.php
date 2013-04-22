@@ -21,11 +21,11 @@
                 function rRadius($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Gestion Radius",$activerules,array(
-				array("Lire les données (admin)",			"mrule_radius_read"),
-				array("Gestion des données (admin)",			"mrule_radius_write"),
-				array("Gestion des bases de données radius (admin)",	"mrule_radius_manage"),
-				array("Gestion des utilisateurs (délégation)",	"mrule_radius_deleg")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),		"mrule_radius_read"),
+				array($this->loc->s("rule-write-datas"),	"mrule_radius_write"),
+				array($this->loc->s("rule-db-mgmt"),		"mrule_radius_manage"),
+				array($this->loc->s("rule-user-mgmt-deleg"),	"mrule_radius_deleg")
 			));
                         return $output;
                 }

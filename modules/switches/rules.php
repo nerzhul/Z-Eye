@@ -21,12 +21,12 @@
                 function rSwitchMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Gestion des Switches",$activerules,array(
-				array("Lire les données",		"mrule_switches_read"),
-				array("Modifier les données",		"mrule_switches_write"),
-				array("Découvrir un équipement",	"mrule_switches_discover"),
-				array("Sauvegarde globale des configurations",	"mrule_switches_globalsave"),
-				array("Export global des configurations",	"mrule_switches_globalbackup")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),			"mrule_switches_read"),
+				array($this->loc->s("rule-write-datas"),		"mrule_switches_write"),
+				array($this->loc->s("rule-discover-device"),		"mrule_switches_discover"),
+				array($this->loc->s("rule-save-devices"),		"mrule_switches_globalsave"),
+				array($this->loc->s("rule-export-cfg"),			"mrule_switches_globalbackup")
 			));
                 	return $output;
                 }

@@ -21,9 +21,9 @@
                 function rSnortMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Moteur SNORT",$activerules,array(
-				array("Lire les données",	"mrule_snortmgmt_read"),
-				array("Modifier les données",	"mrule_snortmgmt_write")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),		"mrule_snortmgmt_read"),
+				array($this->loc->s("rule-write-datas"),	"mrule_snortmgmt_write")
 			));
                 	return $output;
                 }

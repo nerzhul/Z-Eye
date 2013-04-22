@@ -21,9 +21,9 @@
                 function rSwitchRightsMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Gestion des droits sur les équipements réseau",$activerules,array(
-				array("Lire les données",		"mrule_switchrightsmgmt_read"),
-				array("Gérer les serveurs de backup",	"mrule_switchmgmt_backup")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),			"mrule_switchrightsmgmt_read"),
+				array($this->loc->s("rule-manage-backupservers"),	"mrule_switchmgmt_backup")
 			));
                         return $output;
                 }

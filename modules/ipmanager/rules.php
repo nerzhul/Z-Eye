@@ -21,9 +21,9 @@
                 function rIPManager($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Supervision DHCP",$activerules,array(
-				array("Lire les données",	"mrule_ipmanager_read"),
-				array("Gérer les serveurs",	"mrule_ipmanager_servermgmt")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),		"mrule_ipmanager_read"),
+				array($this->loc->s("rule-manage-servers"),	"mrule_ipmanager_servermgmt")
 			));
                         return $output;
                 }

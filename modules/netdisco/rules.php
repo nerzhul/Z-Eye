@@ -21,14 +21,16 @@
                 function rNetdisco($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Moteur Netdisco",$activerules,array(
-				array("Lire les données",	"mrule_netdisco_read")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),		"mrule_netdisco_read"),
+				array($this->loc->s("rule-write-datas"),	"mrule_netdisco_write")
+				
 			));
                         return $output;
                 }
 
                 public function canAccessToModule() {
-			if (FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_netdisco_read"))
+			if (FS::$sessMgr->isConnected() && FS::$sessMgr->hasRight("mrule_netdisco_write"))
                                 return true;
                         return false;
                 }

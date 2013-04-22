@@ -21,8 +21,8 @@
                 function rLogs($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Accès aux Logs Z-Eye",$activerules,array(
-				array("Lire les données",	"mrule_logs_read")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),	"mrule_logs_read")
 			));
                         return $output;
                 }

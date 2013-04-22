@@ -21,11 +21,11 @@
                 function rUserMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Gestion des utilisateurs",$activerules,array(
-				array("Lire les données",	"mrule_usermgmt_read"),
-				array("Modifier les utilisateurs",	"mrule_usermgmt_write"),
-				array("Modifier les annuaires",		"mrule_usermgmt_ldapwrite"),
-				array("Importer un utilisateur",	"mrule_usermgmt_ldapuserimport")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),			"mrule_usermgmt_read"),
+				array($this->loc->s("rule-modify-user"),		"mrule_usermgmt_write"),
+				array($this->loc->s("rule-modify-directory"),		"mrule_usermgmt_ldapwrite"),
+				array($this->loc->s("rule-import-user"),		"mrule_usermgmt_ldapuserimport")
 			));
                         return $output;
                 }

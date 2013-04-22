@@ -43,6 +43,8 @@
 					"Modify" => "Modify",
 					"Name" => "Nom",
 					"Remove" => "Remove",
+					"rule-read-datas" => "Read datas",
+					"rule-write-datas" => "Write datas",
 				),
 				"fr" => array(
 					"Add" => "Ajouter",
@@ -56,6 +58,8 @@
 					"Modify" => "Modifier",
 					"Name" => "Nom",
 					"Remove" => "Supprimer",
+					"rule-read-datas" => "Lire les données",
+					"rule-write-datas" => "Ecrire les données",
 				)
 			);
 		}

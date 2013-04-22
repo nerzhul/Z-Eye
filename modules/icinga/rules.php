@@ -21,16 +21,16 @@
 		function rIcinga($locales) { parent::FSRules($locales); }
 
 		public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Monitoring de services",$activerules,array(
-				array("Lire les données",			"mrule_icinga_read"),
-				array("Modifier les données",			"mrule_icinga_write"),
-				array("Modifier les commandes",				"mrule_icinga_cmd_write"),
-				array("Modifier les groupes de contacts",		"mrule_icinga_ctg_write"),
-				array("Modifier les contacts",				"mrule_icinga_ctg_write"),
-				array("Modifier les périodes temporelles",	"mrule_icinga_tp_write"),
-				array("Modifier les services",				"mrule_icinga_srv_write"),
-				array("Modifier les groupes d'hôtes",		"mrule_icinga_hg_write"),
-				array("Modifier les hôtes",			"mrule_icinga_host_write")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),			"mrule_icinga_read"),
+				array($this->loc->s("rule-write-datas"),		"mrule_icinga_write"),
+				array($this->loc->s("rule-modify-cmd"),			"mrule_icinga_cmd_write"),
+				array($this->loc->s("rule-modify-ctg"),			"mrule_icinga_ctg_write"),
+				array($this->loc->s("rule-modify-contact"),		"mrule_icinga_ctg_write"),
+				array($this->loc->s("rule-modify-timeperiod"),		"mrule_icinga_tp_write"),
+				array($this->loc->s("rule-modify-service"),		"mrule_icinga_srv_write"),
+				array($this->loc->s("rule-modify-hg"),			"mrule_icinga_hg_write"),
+				array($this->loc->s("rule-modify-host"),		"mrule_icinga_host_write")
 			));
                         return $output;
 		}

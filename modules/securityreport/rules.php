@@ -21,8 +21,8 @@
                 function rSecurityReport($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Rapports de sécurité",$activerules,array(
-				array("Lire les données",	"mrule_securityreport_read")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),	"mrule_securityreport_read")
 			));
                         return $output;
                 }

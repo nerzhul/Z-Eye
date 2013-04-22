@@ -21,8 +21,8 @@
                 function rSearch($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-                        $output = FS::$iMgr->ruleLines("Recherche",$activerules,array(
-				array("Lire les données",	"mrule_search_read")
+                        $output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),	"mrule_search_read")
 			));
                         return $output;
                 }

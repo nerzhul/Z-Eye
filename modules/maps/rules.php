@@ -21,8 +21,8 @@
                 function rMaps($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Cartographie Réseau",$activerules,array(
-				array("Lire les données",	"mrule_netspeed_read")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),	"mrule_netspeed_read")
 			));
                         return $output;
                 }

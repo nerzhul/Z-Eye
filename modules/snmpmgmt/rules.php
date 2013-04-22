@@ -21,8 +21,8 @@
                 function rSNMPmgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines("Gestion SNMP",$activerules,array(
-				array("Lire les données",	"mrule_snmpmgmt_read")
+			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
+				array($this->loc->s("rule-read-datas"),	"mrule_snmpmgmt_read")
 			));
                         return $output;
                 }
