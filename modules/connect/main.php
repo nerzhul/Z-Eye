@@ -26,7 +26,7 @@
 			function Mconnect() {
 				parent::InterfaceModule(new lConnect());
 				$this->moduleclass = new iConnect($this->locales);
-				$this->rulesclass = new rConnect();
+				$this->rulesclass = new rConnect($this->locales);
 			}
 		};
 	}

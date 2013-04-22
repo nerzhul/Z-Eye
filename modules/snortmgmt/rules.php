@@ -18,7 +18,7 @@
         */
 
         class rSnortMgmt extends FSRules {
-                function rSnortMgmt() {}
+                function rSnortMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Moteur SNORT",$activerules,array(

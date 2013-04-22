@@ -18,7 +18,7 @@
         */
 
         class rIPManager extends FSRules {
-                function rIPManager() {}
+                function rIPManager($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Supervision DHCP",$activerules,array(

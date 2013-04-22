@@ -18,7 +18,7 @@
         */
 
         class rDisconnect extends FSRules {
-                function rDisconnect() {}
+                function rDisconnect($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

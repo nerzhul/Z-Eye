@@ -26,7 +26,7 @@
 			function MDNSMgmt() {
 				parent::InterfaceModule(new lDNSManager());
 				$this->moduleclass = new iDNSManager($this->locales);
-				$this->rulesclass = new rDNSMgmt();
+				$this->rulesclass = new rDNSMgmt($this->locales);
 			}
 		};
 	}

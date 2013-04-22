@@ -26,7 +26,7 @@
 			function MSwitchRightsMgmt() {
 				parent::InterfaceModule(new lSwitchRightsMgmt());
 				$this->moduleclass = new iSwitchRightsMgmt($this->locales);
-				$this->rulesclass = new rSwitchRightsMgmt();
+				$this->rulesclass = new rSwitchRightsMgmt($this->locales);
 			}
 		};
 	}

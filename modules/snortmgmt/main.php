@@ -26,7 +26,7 @@
 			function MSnortMgmt() {
 				parent::InterfaceModule(new lSnort());
 				$this->moduleclass = new iSnortMgmt($this->locales);
-				$this->rulesclass = new rSnortMgmt();
+				$this->rulesclass = new rSnortMgmt($this->locales);
 			}
 		};
 	}

@@ -26,7 +26,7 @@
 			function MLogs() {
 				parent::InterfaceModule(new lLogs());
 				$this->moduleclass = new iLogs($this->locales);
-				$this->rulesclass = new rLogs();
+				$this->rulesclass = new rLogs($this->locales);
 			}
 		};
 	}

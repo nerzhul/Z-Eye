@@ -26,7 +26,7 @@
 			function MLinkMgmt() {
 				parent::InterfaceModule(new lLinkMgmt());
 				$this->moduleclass = new iLinkMgmt($this->locales);
-				$this->rulesclass = new rLinkMgmt();
+				$this->rulesclass = new rLinkMgmt($this->locales);
 			}
 		};
 	}

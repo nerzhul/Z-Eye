@@ -18,7 +18,7 @@
         */
 
         class rMaps extends FSRules {
-                function rMaps() {}
+                function rMaps($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Cartographie Réseau",$activerules,array(

@@ -26,7 +26,7 @@
 			function MUserMgmt() {
 				parent::InterfaceModule(new lUserMgmt());
 				$this->moduleclass = new iUserMgmt($this->locales);
-				$this->rulesclass = new rUserMgmt();
+				$this->rulesclass = new rUserMgmt($this->locales);
 			}
 		};
 	}

@@ -18,7 +18,7 @@
         */
 
         class rLinkMgmt extends FSRules {
-                function rLinkMgmt() {}
+                function rLinkMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface() {
                         return "";

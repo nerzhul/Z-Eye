@@ -18,7 +18,7 @@
         */
 
         class rSwitchMgmt extends FSRules {
-                function rSwitchMgmt() {}
+                function rSwitchMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des Switches",$activerules,array(

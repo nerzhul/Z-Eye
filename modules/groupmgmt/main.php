@@ -26,7 +26,7 @@
 			function Mgroupmgmt() {
 				parent::InterfaceModule(new lGroupMgmt());
 				$this->moduleclass = new iGroupMgmt($this->locales);
-				$this->rulesclass = new rGroupMgmt();
+				$this->rulesclass = new rGroupMgmt($this->locales);
 			}
 		};
 	}

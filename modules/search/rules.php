@@ -18,7 +18,7 @@
         */
 
         class rSearch extends FSRules {
-                function rSearch() {}
+                function rSearch($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
                         $output = FS::$iMgr->ruleLines("Recherche",$activerules,array(

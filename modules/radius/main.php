@@ -26,7 +26,7 @@
 			function MRadius() {
 				parent::InterfaceModule(new lRadius());
 				$this->moduleclass = new iRadius($this->locales);
-				$this->rulesclass = new rRadius();
+				$this->rulesclass = new rRadius($this->locales);
 			}
 		};
 	}

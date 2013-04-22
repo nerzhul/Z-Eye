@@ -18,7 +18,7 @@
         */
 
         class rSecurityReport extends FSRules {
-                function rSecurityReport() {}
+                function rSecurityReport($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Rapports de sécurité",$activerules,array(

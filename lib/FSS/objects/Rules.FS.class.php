@@ -29,10 +29,12 @@
         */
 
 	class FSRules {
+		function FSRules($locales) { $this->loc = $locales; }
+
 		public function showMgmtInterface() { return ""; }
 
 		public function canAccessToModule() { return false; }
 
-		//protected $rulelist; // array
+		protected $loc;
 	};
 ?>

@@ -26,7 +26,7 @@
 			function MSNMPmgmt() {
 				parent::InterfaceModule(new lSNMPmgmt());
 				$this->moduleclass = new iSNMPmgmt($this->locales);
-				$this->rulesclass = new rSNMPmgmt();
+				$this->rulesclass = new rSNMPmgmt($this->locales);
 			}
 		};
 	}

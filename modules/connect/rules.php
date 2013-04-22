@@ -18,7 +18,7 @@
         */
 
 	class rConnect extends FSRules {
-		function rConnect() {}
+		function rConnect($locales) { parent::FSRules($locales); }
 
 		public function showMgmtInterface($activerules = array()) {
 			return "";

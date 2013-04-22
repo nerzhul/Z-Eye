@@ -18,7 +18,7 @@
         */
 
         class rGroupMgmt extends FSRules {
-                function rGroupMgmt() {}
+                function rGroupMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des groupes",$activerules,array(

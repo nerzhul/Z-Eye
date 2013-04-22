@@ -18,7 +18,7 @@
         */
 
 	class rIcinga extends FSRules {
-		function rIcinga() {}
+		function rIcinga($locales) { parent::FSRules($locales); }
 
 		public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Monitoring de services",$activerules,array(

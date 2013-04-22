@@ -18,7 +18,7 @@
         */
 
         class rRadius extends FSRules {
-                function rRadius() {}
+                function rRadius($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion Radius",$activerules,array(

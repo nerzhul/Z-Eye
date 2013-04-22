@@ -26,7 +26,7 @@
 			function MSearch() {
 				parent::InterfaceModule(new lSearch());
 				$this->moduleclass = new iSearch($this->locales);
-				$this->rulesclass = new rSearch();
+				$this->rulesclass = new rSearch($this->locales);
 			}
 		};
 	}

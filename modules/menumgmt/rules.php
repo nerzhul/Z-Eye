@@ -18,7 +18,7 @@
         */
 
         class rMenuMgmt extends FSRules {
-                function rMenuMgmt() {}
+                function rMenuMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

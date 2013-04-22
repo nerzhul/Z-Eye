@@ -18,7 +18,7 @@
         */
 
         class rNetdisco extends FSRules {
-                function rNetdisco() {}
+                function rNetdisco($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Moteur Netdisco",$activerules,array(

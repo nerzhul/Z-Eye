@@ -26,7 +26,7 @@
 			function Micinga() {
 				parent::InterfaceModule(new lIcinga());
 				$this->moduleclass = new iIcinga($this->locales);
-				$this->rulesclass = new rIcinga();
+				$this->rulesclass = new rIcinga($this->locales);
 			}
 		};
 	}

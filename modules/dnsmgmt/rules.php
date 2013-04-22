@@ -18,7 +18,7 @@
         */
 
         class rDNSMgmt extends FSRules {
-                function rDNSMgmt() {}
+                function rDNSMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLine("Lire les données","mrule_dnsmgmt_read",$activerules,"Supervision DNS");

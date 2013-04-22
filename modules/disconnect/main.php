@@ -26,7 +26,7 @@
 			function MDisconnect() {
 				parent::InterfaceModule(new lDisconnect());
 				$this->moduleclass = new iDisconnect($this->locales);
-				$this->rulesclass = new rDisconnect();
+				$this->rulesclass = new rDisconnect($this->locales);
 			}
 		};
 	}

@@ -18,7 +18,7 @@
         */
 
         class rInstall extends FSRules {
-                function rInstall() {}
+                function rInstall($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

@@ -18,7 +18,7 @@
         */
 
         class rUserMgmt extends FSRules {
-                function rUserMgmt() {}
+                function rUserMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des utilisateurs",$activerules,array(

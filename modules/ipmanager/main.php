@@ -26,7 +26,7 @@
 			function MIPManager() {
 				parent::InterfaceModule(new lIPManager());
 				$this->moduleclass = new iIPManager($this->locales);
-				$this->rulesclass = new rIPManager();
+				$this->rulesclass = new rIPManager($this->locales);
 			}
 		};
 	}

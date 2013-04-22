@@ -18,7 +18,7 @@
         */
 
         class rSwitchRightsMgmt extends FSRules {
-                function rSwitchRightsMgmt() {}
+                function rSwitchRightsMgmt($locales) { parent::FSRules($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines("Gestion des droits sur les équipements réseau",$activerules,array(
