@@ -24,8 +24,8 @@
 	if(!class_exists("MRadius")) {
 		class MRadius extends InterfaceModule {
 			function MRadius() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iRadius();
+				parent::InterfaceModule(new lRadius());
+				$this->moduleclass = new iRadius($this->locales);
 				$this->rulesclass = new rRadius();
 			}
 		};

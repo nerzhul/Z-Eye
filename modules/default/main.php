@@ -24,8 +24,8 @@
 	if(!class_exists("MDefault")) {
 		class MDefault extends InterfaceModule {
 			function MDefault() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iDefault();
+				parent::InterfaceModule(new lDefault());
+				$this->moduleclass = new iDefault($this->locales);
 				$this->rulesclass = new rDefault();
 			}
 		};

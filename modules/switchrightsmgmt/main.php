@@ -24,8 +24,8 @@
 	if(!class_exists("MSwitchRightsMgmt")) {
 		class MSwitchRightsMgmt extends InterfaceModule {
 			function MSwitchRightsMgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iSwitchRightsMgmt();
+				parent::InterfaceModule(new lSwitchRightsMgmt());
+				$this->moduleclass = new iSwitchRightsMgmt($this->locales);
 				$this->rulesclass = new rSwitchRightsMgmt();
 			}
 		};

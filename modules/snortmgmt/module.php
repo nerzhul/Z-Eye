@@ -17,10 +17,8 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
-
-	class iSnortMgmt extends FSModule{
-		function iSnortMgmt() { parent::FSModule(); $this->loc = new lSnort(); }
+	class iSnortMgmt extends FSModule {
+		function iSnortMgmt($locales) { parent::FSModule($locales); }
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("page-title"));

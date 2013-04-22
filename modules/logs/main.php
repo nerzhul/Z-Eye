@@ -24,8 +24,8 @@
 	if(!class_exists("MLogs")) {
 		class MLogs extends InterfaceModule {
 			function MLogs() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iLogs();
+				parent::InterfaceModule(new lLogs());
+				$this->moduleclass = new iLogs($this->locales);
 				$this->rulesclass = new rLogs();
 			}
 		};

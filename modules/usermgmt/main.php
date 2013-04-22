@@ -24,8 +24,8 @@
 	if(!class_exists("MUserMgmt")) {
 		class MUserMgmt extends InterfaceModule {
 			function MUserMgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iUserMgmt();
+				parent::InterfaceModule(new lUserMgmt());
+				$this->moduleclass = new iUserMgmt($this->locales);
 				$this->rulesclass = new rUserMgmt();
 			}
 		};

@@ -24,9 +24,8 @@
 	if(!class_exists("Mconnect")) {
 		class Mconnect extends InterfaceModule {
 			function Mconnect() {
-				parent::InterfaceModule();
-				$this->localesclass = new lConnect();
-				$this->moduleclass = new iConnect();
+				parent::InterfaceModule(new lConnect());
+				$this->moduleclass = new iConnect($this->locales);
 				$this->rulesclass = new rConnect();
 			}
 		};

@@ -24,8 +24,8 @@
 	if(!class_exists("MNetdisco")) {
 		class MNetdisco extends InterfaceModule {
 			function MNetdisco() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iNetdisco();
+				parent::InterfaceModule(new lNetdisco());
+				$this->moduleclass = new iNetdisco($this->locales);
 				$this->rulesclass = new rNetdisco();
 			}
 		};

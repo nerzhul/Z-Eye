@@ -17,14 +17,15 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/module.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MDisconnect")) {
 		class MDisconnect extends InterfaceModule {
 			function MDisconnect() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iDisconnect();
+				parent::InterfaceModule(new lDisconnect());
+				$this->moduleclass = new iDisconnect($this->locales);
 				$this->rulesclass = new rDisconnect();
 			}
 		};

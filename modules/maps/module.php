@@ -17,10 +17,9 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
-
 	class iMaps extends FSModule{
-		function iMaps() { parent::FSModule(); $this->loc = new lMaps(); }
+		function iMaps($locales) { parent::FSModule($locales); }
+
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-maps"));
 

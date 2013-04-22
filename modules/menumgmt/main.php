@@ -24,8 +24,8 @@
 	if(!class_exists("MMenuMgmt")) {
 		class MMenuMgmt extends InterfaceModule {
 			function MMenuMgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iMenuMgmt();
+				parent::InterfaceModule(new lMenuMgmt());
+				$this->moduleclass = new iMenuMgmt($this->locales);
 				$this->rulesclass = new rMenuMgmt();
 			}
 		};

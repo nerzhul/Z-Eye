@@ -17,12 +17,14 @@
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/PDFgen.FS.class.php");
 
 	class iRadius extends FSModule{
-		function iRadius() { parent::FSModule(); $this->loc = new lRadius(); $raddbinfos = array(); }
+		function iRadius($locales) {
+			parent::FSModule($locales);
+			$raddbinfos = array();
+		}
 
 		public function Load() {
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");

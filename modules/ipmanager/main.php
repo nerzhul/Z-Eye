@@ -24,8 +24,8 @@
 	if(!class_exists("MIPManager")) {
 		class MIPManager extends InterfaceModule {
 			function MIPManager() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iIPManager();
+				parent::InterfaceModule(new lIPManager());
+				$this->moduleclass = new iIPManager($this->locales);
 				$this->rulesclass = new rIPManager();
 			}
 		};

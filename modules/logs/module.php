@@ -17,11 +17,11 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
 	class iLogs extends FSModule{
-		function iLogs() { parent::FSModule(); $this->loc = new lLogs(); }
+		function iLogs($locales) { parent::FSModule($locales); }
+
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("menu-title"));
 			$output = $this->showLogs();

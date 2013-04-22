@@ -24,8 +24,8 @@
 	if(!class_exists("MSwitches")) {
 		class MSwitches extends InterfaceModule {
 			function MSwitches() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iSwitchMgmt();
+				parent::InterfaceModule(new lSwitchMgmt());
+				$this->moduleclass = new iSwitchMgmt($this->locales);
 				$this->rulesclass = new rSwitchMgmt();
 			}
 		};

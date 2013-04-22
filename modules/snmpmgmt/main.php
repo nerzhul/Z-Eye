@@ -24,8 +24,8 @@
 	if(!class_exists("MSNMPmgmt")) {
 		class MSNMPmgmt extends InterfaceModule {
 			function MSNMPmgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iSNMPmgmt();
+				parent::InterfaceModule(new lSNMPmgmt());
+				$this->moduleclass = new iSNMPmgmt($this->locales);
 				$this->rulesclass = new rSNMPmgmt();
 			}
 		};

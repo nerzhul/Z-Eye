@@ -17,12 +17,12 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/Menu.FS.class.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/MenuElement.FS.class.php");
 
 	class iMenuMgmt extends FSModule{
-		function iMenuMgmt() { parent::FSModule(); $this->loc = new lMenuMgmt(); }
+		function iMenuMgmt($locales) { parent::FSModule($locales); }
+
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-menu-mgmt"));
 			$output = "";

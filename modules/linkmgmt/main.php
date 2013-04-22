@@ -24,8 +24,8 @@
 	if(!class_exists("MLinkMgmt")) {
 		class MLinkMgmt extends InterfaceModule {
 			function MLinkMgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iLinkMgmt();
+				parent::InterfaceModule(new lLinkMgmt());
+				$this->moduleclass = new iLinkMgmt($this->locales);
 				$this->rulesclass = new rLinkMgmt();
 			}
 		};

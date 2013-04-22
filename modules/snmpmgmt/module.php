@@ -17,11 +17,10 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../netdisco/netdiscoCfg.api.php");
 	
 	class iSNMPMgmt extends FSModule{
-		function iSNMPMgmt() { parent::FSModule(); $this->loc = new lSNMPMgmt(); }
+		function iSNMPMgmt($locales) { parent::FSModule($locales); }
 		
 		public function Load() {
 			$output = "";

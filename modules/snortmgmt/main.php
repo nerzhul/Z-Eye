@@ -24,8 +24,8 @@
 	if(!class_exists("MSnortMgmt")) {
 		class MSnortMgmt extends InterfaceModule {
 			function MSnortMgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iSnortMgmt();
+				parent::InterfaceModule(new lSnort());
+				$this->moduleclass = new iSnortMgmt($this->locales);
 				$this->rulesclass = new rSnortMgmt();
 			}
 		};

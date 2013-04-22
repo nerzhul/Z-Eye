@@ -17,11 +17,10 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
 	class iGroupMgmt extends FSModule{
-		function iGroupMgmt() { parent::FSModule(); $this->loc = new lGroupMgmt(); }
+		function iGroupMgmt($locales) { parent::FSModule($locales); }
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-mgmt"));
 			$output = "";

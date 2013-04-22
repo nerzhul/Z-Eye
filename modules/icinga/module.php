@@ -17,13 +17,11 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/icingaBroker.api.php");
 
 	class iIcinga extends FSModule{
-		function iIcinga() {
-			parent::FSModule();
-			$this->loc = new lIcinga();
+		function iIcinga($locales) {
+			parent::FSModule($locales);
 			$this->icingaAPI = new icingaBroker();
 		}
 

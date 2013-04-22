@@ -24,8 +24,8 @@
 	if(!class_exists("MGroupMgmt")) {
 		class MGroupMgmt extends InterfaceModule {
 			function Mgroupmgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iGroupMgmt();
+				parent::InterfaceModule(new lGroupMgmt());
+				$this->moduleclass = new iGroupMgmt($this->locales);
 				$this->rulesclass = new rGroupMgmt();
 			}
 		};

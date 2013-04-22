@@ -24,8 +24,8 @@
 	if(!class_exists("MDNSMgmt")) {
 		class MDNSMgmt extends InterfaceModule {
 			function MDNSMgmt() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iDNSManager();
+				parent::InterfaceModule(new lDNSManager());
+				$this->moduleclass = new iDNSManager($this->locales);
 				$this->rulesclass = new rDNSMgmt();
 			}
 		};

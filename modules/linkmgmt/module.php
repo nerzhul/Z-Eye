@@ -17,10 +17,8 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
-
 	class iLinkMgmt extends FSModule{
-		function iLinkMgmt() { parent::FSModule(); $this->loc = new lLinkMgmt(); }
+		function iLinkMgmt($locales) { parent::FSModule($locales); }
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-link"));

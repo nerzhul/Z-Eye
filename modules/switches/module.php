@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/snmpdiscovery.api.php");
 	
 	$device = FS::$secMgr->checkAndSecuriseGetData("d");
@@ -27,9 +26,8 @@
 	require_once(dirname(__FILE__)."/device.api.php");
 	
 	class iSwitchMgmt extends FSModule{
-		function iSwitchMgmt() { 
-			parent::FSModule(); 
-			$this->loc = new lSwitchMgmt(); 
+		function iSwitchMgmt($locales) { 
+			parent::FSModule($locales); 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			if(FS::isAjaxCall() && !$device)
 				$device = FS::$secMgr->checkAndSecurisePostData("sw");

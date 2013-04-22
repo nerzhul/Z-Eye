@@ -24,8 +24,8 @@
 	if(!class_exists("MSecReport")) {
 		class MSecReport extends InterfaceModule {
 			function MSecReport() {
-				parent::InterfaceModule();
-				$this->moduleclass = new iSecReport();
+				parent::InterfaceModule(new lSecReport());
+				$this->moduleclass = new iSecReport($this->locales);
 				$this->rulesclass = new rSecurityReport();
 			}
 		};
