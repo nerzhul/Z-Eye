@@ -62,6 +62,7 @@
 					"Stats" => "Statistiques",
 					"title-dns" => "Supervision DNS",
 					"title-old-records" => "Recherche d'enregistrements obsolètes",
+					"tooltip-chroot" => "Le chroot est une sécurité d'environnement DNS. Généralement il s'agit du répertoire /var/named. Si vous ne chrootez pas, indiquez '/'",
 					"tooltip-rights" => "Attention l'utilisateur doit avoir des droits de lecture. Créer un groupe et y ajouter votre utilisateur SSH est une bonne idée",
 					"Value" => "Valeur",
 				),
@@ -105,6 +106,7 @@
 					"Stats" => "Statistics",
 					"title-dns" => "DNS supervision",
 					"title-old-records" => "Search old records",
+					"tooltip-chroot" => "Chroot is a DNS environment security. Often it's /var/named directory. If you don't chroot, write '/'",
 					"tooltip-rights" => "Warning, your user need read rights. Use a special group (and add your SSH user into) may be a good idea",
 					"Value" => "Value",
 				)
