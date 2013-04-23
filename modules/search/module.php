@@ -21,7 +21,7 @@
 
 	class iSearch extends FSModule{
 		function iSearch($locales) { 
-			parent::FSModule();
+			parent::FSModule($locales);
 			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array());
