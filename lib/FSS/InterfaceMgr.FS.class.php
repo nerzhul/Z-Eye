@@ -187,7 +187,8 @@
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" ";
-			$output .= $this->tooltip($name,$tooltip);
+			if($tooltip)
+				$output .= $this->tooltip($name,$tooltip);
 			$output .= "/>";
 			return $output;
 		}
