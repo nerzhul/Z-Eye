@@ -30,7 +30,6 @@
 
 	require_once(dirname(__FILE__)."/FS.main.php");
 	require_once(dirname(__FILE__)."/MySQLMgr".CLASS_EXT);
-	require_once(dirname(__FILE__)."/HTTPLink".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/Locales".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/Rules".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/InterfaceModule".CLASS_EXT);
