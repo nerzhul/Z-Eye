@@ -1619,7 +1619,7 @@
 						$logvals = array();
 						$idx = $this->devapi->getPortIndexes();
 	
-						$this->devapi->handleDuplex(&$logvals);
+						$this->devapi->handleDuplex($logvals);
 	
 						if($speed && FS::$secMgr->isNumeric($speed)) {
 							if($idx != NULL) {
@@ -1843,18 +1843,18 @@
 						}
 						$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
 
-						if($this->devapi->handleVoiceVlan(&logvals,$voicevlan) != 0)
+						if($this->devapi->handleVoiceVlan(logvals,$voicevlan) != 0)
 							return;
 
 						$logvals["desc"]["src"] = $this->devapi->getPortDesc();
 						$this->devapi->setPortDesc($desc);
 						$logvals["desc"]["dst"] = $desc;
 
-						$this->devapi->handleCDP(&$logvals);
+						$this->devapi->handleCDP($logvals);
 
-						$this->devapi->handleDHCPSnooping(&$logvals,$dhcpsntrusten,dhcpsnrate);
+						$this->devapi->handleDHCPSnooping($logvals,$dhcpsntrusten,dhcpsnrate);
 
-						$this->devapi->handlePortSecurity(&$logvals);
+						$this->devapi->handlePortSecurity($logvals);
 
 						if($wr == "on")
 							$this->devapi->writeMemory();

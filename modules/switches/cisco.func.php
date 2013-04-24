@@ -162,13 +162,13 @@
 				if($dhcpsntrust != NULL) {
 					$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-rate"),"dhcpsnrate","",
 						array("type" => "num", "value" => $dhcpsnrate, "size" => 4, "length" => 4, 
-							tooltip" => "dhcp-snooping-rate-tooltip"))."</td></tr>";
+							"tooltip" => "dhcp-snooping-rate-tooltip"));
 				}
 			}
 			return $output;
 		}
 
-		public function handleDHCPSnooping($logvals,$dhcpsntrusten,dhcpsnrate) {
+		public function handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate) {
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_dhcpsnooping") ||
 				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_dhcpsnooping")) {
 				$dhcpsntruststate = $this->getPortDHCPSnoopingTrust();

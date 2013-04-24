@@ -50,7 +50,7 @@
 		protected $rulesclass;
 		protected $locales;
 		protected $menu;
-		protected $menupriority
+		protected $menupriority;
 	};
 
 ?>

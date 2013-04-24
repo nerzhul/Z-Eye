@@ -44,7 +44,7 @@
 		public function handleCDP($logvals) {}
 
 		public function showDHCPSnoopingOpts() { return ""; }
-		public function handleDHCPSnooping($logvals,$dhcpsntrusten,dhcpsnrate) {}
+		public function handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate) {}
 
 		/*
 		* Generic port management
