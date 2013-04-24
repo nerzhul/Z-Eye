@@ -38,6 +38,7 @@
 					case "dell": $this->devapi = DellAPI(); break;
 					default: $this->devapi = DeviceAPI(); break;
 				}
+				$this->devapi->setLocales($this->loc);
 			}
 			else
 				$this->vendor = "";
@@ -1843,7 +1844,7 @@
 						}
 						$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
 
-						if($this->devapi->handleVoiceVlan(logvals,$voicevlan) != 0)
+						if($this->devapi->handleVoiceVlan($logvals,$voicevlan) != 0)
 							return;
 
 						$logvals["desc"]["src"] = $this->devapi->getPortDesc();
@@ -1852,7 +1853,7 @@
 
 						$this->devapi->handleCDP($logvals);
 
-						$this->devapi->handleDHCPSnooping($logvals,$dhcpsntrusten,dhcpsnrate);
+						$this->devapi->handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate);
 
 						$this->devapi->handlePortSecurity($logvals);
 
