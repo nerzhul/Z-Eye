@@ -183,20 +183,9 @@
 						else
 							$output .= $this->loc->s("Unavailable");
 						$output .= "</td></tr>";
-						$dup = $this->devapi->getPortDuplex();
-						if($dup != -1) {
-							$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
-							if($dup > 0 && $dup < 5) {
-								$output .= FS::$iMgr->select("duplex");
-								$output .= FS::$iMgr->selElmt("Auto",4,$dup == 1 ? true : false);
-								$output .= FS::$iMgr->selElmt("Half",1,$dup == 2 ? true : false);
-								$output .= FS::$iMgr->selElmt("Full",2,$dup == 3 ? true : false);
-								$output .= "</select>";
-							}
-							else
-								$output .= $this->loc->s("Unavailable");
-						}
-						$output .= "</td></tr>";
+
+						$output .= $this->devapi->showDuplexOpts();
+
 						$output .= "<tr><td>".$this->loc->s("switchport-mode")."</td><td>";
 						$trmode = $this->devapi->getSwitchportMode();
 
@@ -1594,7 +1583,6 @@
 						$dhcpsnrate = FS::$secMgr->checkAndSecurisePostData("dhcpsnrate");
 						$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 						$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
-						$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
 						$speed = FS::$secMgr->checkAndSecurisePostData("speed");
 						$voicevlan = FS::$secMgr->checkAndSecurisePostData("voicevlan");
 						$wr = FS::$secMgr->checkAndSecurisePostData("wr");
@@ -1631,22 +1619,7 @@
 						$logvals = array();
 						$idx = $this->devapi->getPortIndexes();
 	
-						if($duplex && FS::$secMgr->isNumeric($duplex)) {
-							if($duplex < 1 || $duplex > 4) {
-								FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are wrong: duplex (plug edit)");
-								if(FS::isAjaxCall())
-									echo "Duplex field is wrong (".$duplex.")";
-								else
-									FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=1");
-								return;
-							}
-	
-							if($idx != NULL) {
-								$logvals["duplex"]["src"] = $this->devapi->getPortDuplex();
-								$this->devapi->setPortDuplex($duplex);
-								$logvals["duplex"]["dst"] = $duplex;
-							}
-						}
+						$this->devapi->handleDuplex(&$logvals);
 	
 						if($speed && FS::$secMgr->isNumeric($speed)) {
 							if($idx != NULL) {

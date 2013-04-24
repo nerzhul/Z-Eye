@@ -26,6 +26,42 @@
 		/*
 		* Interface functions
 		*/
+		public function showDuplexOpts() {
+			$output = "";
+			$dup = $this->getPortDuplex();
+			if($dup != -1) {
+				$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
+				if($dup > 0 && $dup < 5) {
+					$output .= FS::$iMgr->select("duplex");
+					$output .= FS::$iMgr->selElmt("Auto",4,$dup == 1 ? true : false);
+					$output .= FS::$iMgr->selElmt("Half",1,$dup == 2 ? true : false);
+					$output .= FS::$iMgr->selElmt("Full",2,$dup == 3 ? true : false);
+					$output .= "</select>";
+				}
+				else
+					$output .= $this->loc->s("Unavailable");
+			}
+			$output .= "</td></tr>";
+			return $output;
+		}
+
+		public function handleDuplex($logvals) {
+			$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
+			if($duplex && FS::$secMgr->isNumeric($duplex)) {
+				if($duplex < 1 || $duplex > 4) {
+					FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are wrong: duplex (plug edit)");
+					FS::$iMgr->ajaxEcho("Duplex field is wrong (".$duplex.")");
+					return;
+				}
+
+				if($idx != NULL) {
+					$logvals["duplex"]["src"] = $this->devapi->getPortDuplex();
+					$this->devapi->setPortDuplex($duplex);
+					$logvals["duplex"]["dst"] = $duplex;
+				}
+			}
+		}
+
 		public function showPortSecurityOpts() {
 			$output = "";
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_portsec") ||

@@ -31,6 +31,9 @@
 		* Interface & handler functions, herited and modified by each vendor
 		*/
 
+		public function showDuplexOpts() { return ""; }
+		public function handleDuplex($logvals) {}
+
 		public function showVoiceVlanOpts($voicevlanoutput) { return ""; }
 		public function handleVoiceVlan($logvals,$voicevlan) {}
 
