@@ -297,13 +297,7 @@
 
 						$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
 
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
-							$cdp = $this->devapi->getPortCDPEnable();
-							if($cdp != NULL) {
-								$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
-							}
-						}
+						$output .= $this->devapi->showCDPOpts();
 
 						$output .= $this->devapi->showDHCPSnoopingOpts();
 
@@ -1596,7 +1590,6 @@
 						$prise = FS::$secMgr->checkAndSecurisePostData("prise");
 						$room = FS::$secMgr->checkAndSecurisePostData("room");
 						$shut = FS::$secMgr->checkAndSecurisePostData("shut");
-						$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 						$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
 						$dhcpsnrate = FS::$secMgr->checkAndSecurisePostData("dhcpsnrate");
 						$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
@@ -1884,40 +1877,11 @@
 						$this->devapi->setPortDesc($desc);
 						$logvals["desc"]["dst"] = $desc;
 
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
-							$cdpstate = $this->devapi->getPortCDPEnable();
-							if($cdpstate != NULL) {
-								$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
-								$this->devapi->setPortCDPEnable($cdpen == "on" ? 1 : 2);
-								$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
-							}
-						}
+						$this->devapi->handleCDP(&$logvals);
 
 						$this->devapi->handleDHCPSnooping(&$logvals,$dhcpsntrusten,dhcpsnrate);
 
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_portsec") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
-							$portsecen = $this->devapi->getPortSecEnable();
-							if($portsecen != -1) {
-								$psen = FS::$secMgr->checkAndSecurisePostData("psen");
-								$logvals["psen"]["src"] = ($portsecen == 1 ? true : false);
-								$this->devapi->setPortSecEnable($psen == "on" ? 1 : 2);
-								$logvals["psen"]["dst"] = ($psen == "on" ? true : false);
-	
-								$portsecvact = $this->devapi->getPortSecViolAct();
-								$psviolact = FS::$secMgr->checkAndSecurisePostData("psviolact");
-								$logvals["psviolact"]["src"] = $portsecvact;
-								$this->devapi->setPortSecViolAct($psviolact);
-								$logvals["psviolact"]["dst"] = $psviolact;
-	
-								$psecmaxmac = $this->devapi->getPortSecMaxMAC();
-								$psmaxmac = FS::$secMgr->checkAndSecurisePostData("psmaxmac");
-								$logvals["psmaxmac"]["src"] = $psecmaxmac;
-								$this->devapi->setPortSecMaxMAC($psmaxmac);
-								$logvals["psmaxmac"]["dst"] = $psmaxmac;
-							}
-						}
+						$this->devapi->handlePortSecurity(&$logvals);
 
 						if($wr == "on")
 							$this->devapi->writeMemory();

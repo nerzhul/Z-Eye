@@ -60,6 +60,31 @@
 			return $output;
 		}
 
+		public function handlePortSecurity($logvals) {
+			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_portsec") ||
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
+				$portsecen = $this->getPortSecEnable();
+				if($portsecen != -1) {
+					$psen = FS::$secMgr->checkAndSecurisePostData("psen");
+					$logvals["psen"]["src"] = ($portsecen == 1 ? true : false);
+					$this->setPortSecEnable($psen == "on" ? 1 : 2);
+					$logvals["psen"]["dst"] = ($psen == "on" ? true : false);
+
+					$portsecvact = $this->getPortSecViolAct();
+					$psviolact = FS::$secMgr->checkAndSecurisePostData("psviolact");
+					$logvals["psviolact"]["src"] = $portsecvact;
+					$this->setPortSecViolAct($psviolact);
+					$logvals["psviolact"]["dst"] = $psviolact;
+
+					$psecmaxmac = $this->getPortSecMaxMAC();
+					$psmaxmac = FS::$secMgr->checkAndSecurisePostData("psmaxmac");
+					$logvals["psmaxmac"]["src"] = $psecmaxmac;
+					$this->setPortSecMaxMAC($psmaxmac);
+					$logvals["psmaxmac"]["dst"] = $psmaxmac;
+				}
+			}
+		}
+
 		public function showVoiceVlanOpts($voicevlanoutput) {
 			$output = "";
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_voicevlan") ||
@@ -125,6 +150,32 @@
 				}
 			}
 		}
+
+		public function showCDPOpts() {
+			$output = "";
+			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") ||
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
+				$cdp = $this->getPortCDPEnable();
+				if($cdp != NULL) {
+					$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
+				}
+			}
+			return $output;
+		}
+
+		public function handleCDP($logvals) {
+			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") ||
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
+				$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
+				$cdpstate = $this->getPortCDPEnable();
+				if($cdpstate != NULL) {
+					$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
+					$this->setPortCDPEnable($cdpen == "on" ? 1 : 2);
+					$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
+				}
+			}
+		}
+
 		/*
 		* Generic port management
 		*/

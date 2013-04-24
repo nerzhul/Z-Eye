@@ -37,6 +37,9 @@
 		public function showPortSecurityOpts() { return ""; }
 		public function handlePortSecurity($logvals) {}
 
+		public function showCDPOpts() { return ""; }
+		public function handleCDP($logvals) {}
+
 		public function showDHCPSnoopingOpts() { return ""; }
 		public function handleDHCPSnooping($logvals,$dhcpsntrusten,dhcpsnrate) {}
 
