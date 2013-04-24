@@ -231,13 +231,13 @@
 								break;
 						}
 						$output .= "</td><td id=\"vln\">";
-						$voicevlanoutput = FS::$iMgr->selElmt($this->loc->s("None"),4096);
-						$voicevlan = $this->devapi->getSwitchportVoiceVlan();
 						$output .= FS::$iMgr->select("nvlan","");
 						// Added none for VLAN fail
 						if($trmode == 3)
 							$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$nvlan == 0 ? true : false);
 
+						$voicevlanoutput = FS::$iMgr->selElmt($this->loc->s("None"),4096);
+                                		$voicevlan = $this->devapi->getSwitchportVoiceVlan();
 						$deadvlan = $this->devapi->getSwitchportAuthDeadVLAN();
 						$deadvlanoutput = "";
 						$norespvlan = $this->devapi->getSwitchportAuthNoRespVLAN();
@@ -290,46 +290,11 @@
 						$output .= FS::$iMgr->selElmt($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
 						$output .= FS::$iMgr->selElmt($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
 						$output .= "</select></td></tr>";
-						/*
-						* Voice vlan
-						*/
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_voicevlan") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_voicevlan")) {
-							$output .= "<tr><td>".$this->loc->s("voice-vlan")."</td><td>";
-							$output .= FS::$iMgr->select("voicevlan","",null,false,array("tooltip" => "tooltip-voicevlan"));
-							$output .= $voicevlanoutput;
-							$output .= "</select></td></tr>";
-						}
 
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_portsec") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
-							$portsecen = $this->devapi->getPortSecEnable();
-                	                                if($portsecen != -1) {
-								$output .= "<tr><td colspan=\"2\">".$this->loc->s("portsecurity")."</td></tr>";
-								// check for enable/disable PortSecurity
-								$output .= "<tr><td>".$this->loc->s("portsec-enable")."</td><td>".FS::$iMgr->check("psen",array("check" => $portsecen == 1 ? true : false))."</td></tr>";
-								// Active Status for PortSecurity
-								$output .= "<tr><td>".$this->loc->s("portsec-status")."</td><td>";
-                        	                                $portsecstatus = $this->devapi->getPortSecStatus();
-								switch($portsecstatus) {
-									case 1: $output .= $this->loc->s("Active"); break;
-									case 2: $output .= $this->loc->s("Inactive"); break;
-									case 3: $output .= "<span style=\"color:red;\">".$this->loc->s("Violation")."</span>"; break;
-									default: $output .= $this->loc->s("unk"); break;
-								}
-                        	                                $output .= "</td></tr>";
-								// Action when violation is performed
-								$psviolact = $this->devapi->getPortSecViolAct();
-								$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact","",NULL,false,array("tooltip" => "portsec-viol-tooltip"));
-								$output .= FS::$iMgr->selElmt($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
-								$output .= FS::$iMgr->selElmt($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
-								$output .= FS::$iMgr->selElmt($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
-								$output .= "</select>";
-								// Maximum MAC addresses before violation mode
-								$psmaxmac = $this->devapi->getPortSecMaxMAC();
-								$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => "portsec-maxmac-tooltip"))."</td></tr>";
-							}
-						}
+						$output .= $this->devapi->showVoiceVlanOpts($voicevlanoutput);
+
+						$output .= $this->devapi->showPortSecurityOpts();
+
 						$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
 
 						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") ||
@@ -340,21 +305,7 @@
 							}
 						}
 
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_dhcpsnooping") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_dhcpsnooping")) {
-							// DHCP snooping options
-							$dhcpsntrust = $this->devapi->getPortDHCPSnoopingTrust();
-							if($dhcpsntrust != NULL) {
-								$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-trust-enable"),"dhcpsntrusten",$dhcpsntrust == 1 ? true : false,
-									array("type" => "chk", "tooltip" => "dhcp-snooping-trust-tooltip"))."</td></tr>";
-							}
-
-							$dhcpsnrate = $this->devapi->getPortDHCPSnoopingRate();
-							if($dhcpsntrust != NULL) {
-								$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-rate"),"dhcpsnrate","",
-									array("type" => "num", "value" => $dhcpsnrate, "size" => 4, "length" => 4, "tooltip" => "dhcp-snooping-rate-tooltip"))."</td></tr>";
-							}
-						}
+						$output .= $this->devapi->showDHCPSnoopingOpts();
 
 						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
 						$output .= "</table>";
@@ -1925,21 +1876,13 @@
 							return;
 						}
 						$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
-						$logvals["voicevlan"]["src"] = $this->devapi->getSwitchportVoiceVlan();
-						if($this->devapi->setSwitchportVoiceVlan($voicevlan) != 0) {
-							if(FS::isAjaxCall())
-								echo "Fail to set switchport voice vlan";
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port."&err=2");
+
+						if($this->devapi->handleVoiceVlan(&logvals,$voicevlan) != 0)
 							return;
-						}
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_voicevlan") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_voicevlan")) {
-							$logvals["voicevlan"]["dst"] = $voicevlan;
-							$logvals["desc"]["src"] = $this->devapi->getPortDesc();
-							$this->devapi->setPortDesc($desc);
-							$logvals["desc"]["dst"] = $desc;
-						}
+
+						$logvals["desc"]["src"] = $this->devapi->getPortDesc();
+						$this->devapi->setPortDesc($desc);
+						$logvals["desc"]["dst"] = $desc;
 
 						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_cdp") ||
 							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
@@ -1951,23 +1894,8 @@
 							}
 						}
 
-						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_dhcpsnooping") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_dhcpsnooping")) {
-							$dhcpsntruststate = $this->devapi->getPortDHCPSnoopingTrust();
-							if($dhcpsntruststate != NULL) {
-								$logvals["dhcpsntrusten"]["src"] = ($dhcpsntruststate == 1 ? true : false);
-								$this->devapi->setPortDHCPSnoopingTrust($dhcpsntrusten == "on" ? 1 : 2);
-								$logvals["dhcpsntrusten"]["dst"] = ($dhcpsntrusten == "on" ? true : false);
-							}
-		
-							$dhcpsnrateorig = $this->devapi->getPortDHCPSnoopingRate();
-							if($dhcpsnrateorig != NULL) {
-								$logvals["dhcpsnrate"]["src"] = $dhcpsnrateorig;
-								$this->devapi->setPortDHCPSnoopingRate($dhcpsnrate);
-								$logvals["dhcpsnrate"]["dst"] = $dhcpsnrate;
-							}
-						}
-	
+						$this->devapi->handleDHCPSnooping(&$logvals,$dhcpsntrusten,dhcpsnrate);
+
 						if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_portmod_portsec") ||
 							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
 							$portsecen = $this->devapi->getPortSecEnable();

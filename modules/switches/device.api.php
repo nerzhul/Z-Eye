@@ -28,6 +28,19 @@
 		}
 
 		/*
+		* Interface & handler functions, herited and modified by each vendor
+		*/
+
+		public function showVoiceVlanOpts($voicevlanoutput) { return ""; }
+		public function handleVoiceVlan($logvals,$voicevlan) {}
+
+		public function showPortSecurityOpts() { return ""; }
+		public function handlePortSecurity($logvals) {}
+
+		public function showDHCPSnoopingOpts() { return ""; }
+		public function handleDHCPSnooping($logvals,$dhcpsntrusten,dhcpsnrate) {}
+
+		/*
 		* Generic port management
 		*/
 
