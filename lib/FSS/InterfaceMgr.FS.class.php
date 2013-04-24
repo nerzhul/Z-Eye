@@ -80,40 +80,47 @@
 			return "<div id=\"main\"></div>";
 		}
 
-		protected function loadMenus($mlist) {
-                        $output = "";
-			$count = count($mlist);
-			for($i=0;$i<$count;$i++) {
-				$haselemtoshow = 0;
-				$tmpoutput = "";
-				// Load menu
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menus","name","id = '".$mlist[$i]."'");
-                                if($data = pg_fetch_array($query)) {
-					$tmpoutput .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$data["name"]."</div><div class=\"menupopup\">";
-					// load menu elements
-					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_link","id_menu_item","id_menu = '".$mlist[$i]."'",array("order" => "\"order\""));
-                                        while($data2 = pg_fetch_array($query2)) {
-						$query3 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."menu_items","title,link","id = '".$data2["id_menu_item"]."'");
-                                                while($data3 = pg_fetch_array($query3)) {
-							$link = new HTTPLink($data3["link"]);
-                                                        $link->Load();
-                                                        $dirpath = dirname(__FILE__)."/../../modules/".$link->getArgs();
-							if(is_dir($dirpath)) {
-								require($dirpath."/main.php");
+		public function loadMenus() {
+			$output = "";
+			$found = false;
+			$moduleid = 0;
+			$menus = array();
+
+			$dir = opendir(dirname(__FILE__)."/../../modules/");
+			while($elem = readdir($dir)) {
+				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
+				if(is_dir($dirpath)) {
+					$moduleid++;
+					$dir2 = opendir($dirpath);
+					while($elem2 = readdir($dir2)) {
+						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php") {
+							$path = $elem;
+							require(dirname(__FILE__)."/../../modules/".$path."/main.php");
+							$menuname = $module->getMenu();
+							if($menuname && $module->getRulesClass()->canAccessToModule()) {
+								if(!isset($menus[$menuname])) {
+									$menus[$menuname] = array();
+								}
 								if($module->getRulesClass()->canAccessToModule()) {
-	                                                                $tmpoutput .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$module->getModuleClass()->getMenuTitle()."</a></div>";
-									$haselemtoshow = 1;
+									array_push($menus[$menuname],
+										"<div class=\"menuItem\"><a href=\"index.php?mod=".$moduleid."\">".
+										$module->getModuleClass()->getMenuTitle()."</a></div>"
+									);
 								}
 							}
 						}
 					}
-					$tmpoutput .= "</div></div>";
 				}
-				if($haselemtoshow) $output .= $tmpoutput;
-
 			}
-                        return $output;
-                }
+
+			foreach($menus as $menuname => $elemts) {
+				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$menuname."</div><div class=\"menupopup\">";
+				for($i=0;$i<count($elemts);$i++)
+					$output .= $elemts[$i];
+				$output .= "</div></div>";
+			}
+			return $output;
+		}
 
 		public function getRealNameById($id) {
                         $user = new User();

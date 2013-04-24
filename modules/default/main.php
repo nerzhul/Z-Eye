@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lDefault());
 				$this->moduleclass = new iDefault($this->locales);
 				$this->rulesclass = new rDefault($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}
