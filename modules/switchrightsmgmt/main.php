@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lSwitchRightsMgmt());
 				$this->moduleclass = new iSwitchRightsMgmt($this->locales);
 				$this->rulesclass = new rSwitchRightsMgmt($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

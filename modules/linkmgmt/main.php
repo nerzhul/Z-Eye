@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lLinkMgmt());
 				$this->moduleclass = new iLinkMgmt($this->locales);
 				$this->rulesclass = new rLinkMgmt($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

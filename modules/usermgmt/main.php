@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lUserMgmt());
 				$this->moduleclass = new iUserMgmt($this->locales);
 				$this->rulesclass = new rUserMgmt($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

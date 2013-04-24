@@ -29,7 +29,11 @@
         */
 
 	class InterfaceModule {
-		function InterfaceModule($locales) { $this->locales = $locales; }
+		function InterfaceModule($locales) {
+			$this->locales = $locales;
+			$this->menu = "";
+			$this->menupriority = 0;
+		}
 		
 		public function handlePostDatas() {}
 		
@@ -38,11 +42,15 @@
 		public function getModuleClass() { return $this->moduleclass; }
 		public function getRulesClass() { return $this->rulesclass; }
 		public function getLoc() { return $this->locales; }
+		public function getMenu() { return $this->menu; }
+		public function getMenuPriority() { return $this->menupriority; }
 
 		protected $moduleclass;
 		protected $mid;
 		protected $rulesclass;
 		protected $locales;
+		protected $menu;
+		protected $menupriority
 	};
 
 ?>

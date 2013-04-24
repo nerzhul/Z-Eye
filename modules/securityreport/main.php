@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lSecReport());
 				$this->moduleclass = new iSecReport($this->locales);
 				$this->rulesclass = new rSecurityReport($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

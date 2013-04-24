@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lSnort());
 				$this->moduleclass = new iSnortMgmt($this->locales);
 				$this->rulesclass = new rSnortMgmt($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lGroupMgmt());
 				$this->moduleclass = new iGroupMgmt($this->locales);
 				$this->rulesclass = new rGroupMgmt($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

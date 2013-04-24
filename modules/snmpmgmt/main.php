@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lSNMPmgmt());
 				$this->moduleclass = new iSNMPmgmt($this->locales);
 				$this->rulesclass = new rSNMPmgmt($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

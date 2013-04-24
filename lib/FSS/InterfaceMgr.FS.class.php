@@ -98,7 +98,7 @@
 							$link = new HTTPLink($data3["link"]);
                                                         $link->Load();
                                                         $dirpath = dirname(__FILE__)."/../../modules/".$link->getArgs();
-							if(FS::$sessMgr->getUid() == 1 || (is_dir($dirpath))) {
+							if(is_dir($dirpath)) {
 								require($dirpath."/main.php");
 								if($module->getRulesClass()->canAccessToModule()) {
 	                                                                $tmpoutput .= "<div class=\"menuItem\"><a href=\"".$link->getIt()."\">".$module->getModuleClass()->getMenuTitle()."</a></div>";

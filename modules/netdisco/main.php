@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lNetdisco());
 				$this->moduleclass = new iNetdisco($this->locales);
 				$this->rulesclass = new rNetdisco($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

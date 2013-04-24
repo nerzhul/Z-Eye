@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lRadius());
 				$this->moduleclass = new iRadius($this->locales);
 				$this->rulesclass = new rRadius($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

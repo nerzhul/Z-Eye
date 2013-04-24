@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lMaps());
 				$this->moduleclass = new iMaps($this->locales);
 				$this->rulesclass = new rMaps($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

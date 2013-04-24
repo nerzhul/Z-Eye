@@ -27,6 +27,7 @@
 				parent::InterfaceModule(new lDNSManager());
 				$this->moduleclass = new iDNSManager($this->locales);
 				$this->rulesclass = new rDNSMgmt($this->locales);
+				$this->menu = $this->locales->s("menu-name");
 			}
 		};
 	}

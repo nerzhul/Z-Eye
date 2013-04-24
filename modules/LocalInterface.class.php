@@ -144,6 +144,34 @@
 				return $this->printError("Module inconnu !");
 		}
 
+		public function loadMenus2($menulist = array()) {
+			$dir = opendir(dirname(__FILE__));
+			$found = false;
+			$moduleid = 0;
+			$menus = array();
+			while($elem = readdir($dir)) {
+				$dirpath = dirname(__FILE__)."/".$elem;
+				if(is_dir($dirpath)) {
+					$moduleid++;
+					$dir2 = opendir($dirpath);
+					while($elem2 = readdir($dir2)) {
+						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php") {
+							require(dirname(__FILE__)."/".$path."/main.php");
+							if(!isset($menus[$module->getMenu()])) {
+								$menus[$module->getMenu()] = array();
+							}
+							if($module->getRulesClass()->canAccessToModule()) {
+                                                        	array_push($menus[$module->getMenu()],
+									"<div class=\"menuItem\"><a href=\"index.php?mod=".$moduleid."\">".
+									$module->getModuleClass()->getMenuTitle()."</a></div>"
+								);
+							}
+						}
+					}
+				}
+			}
+			var_dump($menus);
+		}
 		public function loadModule($id) {
 			$output = "";
 
