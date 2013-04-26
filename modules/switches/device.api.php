@@ -36,10 +36,10 @@
 		public function handleDuplex($logvals) {}
 
 		public function showVlanOpts() { return ""; }
-		public function handleVlanOpts($logvals) {}
+		public function handleVlan($logvals) {}
 
 		public function showVoiceVlanOpts($voicevlanoutput) { return ""; }
-		public function handleVoiceVlan($logvals,$voicevlan) {}
+		public function handleVoiceVlan($logvals) {}
 
 		public function showPortSecurityOpts() { return ""; }
 		public function handlePortSecurity($logvals) {}
@@ -50,6 +50,7 @@
 		public function showDHCPSnoopingOpts() { return ""; }
 		public function handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate) {}
 
+		public function checkFields() { return true; }
 		/*
 		* Generic port management
 		*/

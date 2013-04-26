@@ -65,7 +65,7 @@
 		public function showPortSecurityOpts() {
 			$output = "";
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_portsec") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_portsec")) {
 				$portsecen = $this->getPortSecEnable();
 				if($portsecen != -1) {
 					$output .= "<tr><td colspan=\"2\">".$this->loc->s("portsecurity")."</td></tr>";
@@ -98,7 +98,7 @@
 
 		public function handlePortSecurity($logvals) {
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_portsec") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_portsec")) {
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_portsec")) {
 				$portsecen = $this->getPortSecEnable();
 				if($portsecen != -1) {
 					$psen = FS::$secMgr->checkAndSecurisePostData("psen");
@@ -124,7 +124,7 @@
 		public function showVoiceVlanOpts($voicevlanoutput) {
 			$output = "";
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_voicevlan") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_voicevlan")) {
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_voicevlan")) {
 				$output .= "<tr><td>".$this->loc->s("voice-vlan")."</td><td>";
 				$output .= FS::$iMgr->select("voicevlan","",null,false,array("tooltip" => "tooltip-voicevlan"));
 				$output .= $voicevlanoutput;
@@ -133,9 +133,10 @@
 			return $output;
 		}
 
-		public function handleVoiceVlan($logvals,$voicevlan) {
+		public function handleVoiceVlan($logvals) {
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_voicevlan") ||
-                        	FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_voicevlan")) {
+                        	FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_voicevlan")) {
+				$voicevlan = FS::$secMgr->checkAndSecurisePostData("voicevlan");
 				$logvals["voicevlan"]["src"] = $this->getSwitchportVoiceVlan();
 				if($this->setSwitchportVoiceVlan($voicevlan) != 0) {
 					FS::$iMgr->ajaxEcho("Fail to set switchport voice vlan");
@@ -216,7 +217,7 @@
 			$trunkall = true;
 			$vlannb = 0;
 
-			$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
+			$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$this->devip."'",array("order" => "vlan"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
 				$voicevlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
@@ -264,11 +265,230 @@
 			$output .= $this->showVoiceVlanOpts($voicevlanoutput);
 			return $output;
 		}
+		
+		public function handleVlans($logvals) {
+			$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
+			$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
+			$port = FS::$secMgr->checkAndSecurisePostData("port");
+
+			$logvals["accessvlan"]["src"] = $this->getSwitchAccessVLAN();
+			$logvals["trunkencap"]["src"] = $this->getSwitchTrunkEncap();
+			$logvals["mode"]["src"] = $this->getSwitchportMode();
+			$logvals["trunkvlan"]["src"] = $this->getSwitchportTrunkVlans();
+			$logvals["nativevlan"]["src"] = $this->getSwitchTrunkNativeVlan();
+
+			// @TODO
+			// Mab & 802.1X
+			$mabst = $this->getSwitchportMABState();
+			if($mabst != -1)
+				$logvals["mabst"]["src"] = $mabst;
+			$failvlan = $this->getSwitchportAuthFailVLAN();
+			if($failvlan != -1)
+				$logvals["failvlan"]["src"] = $failvlan;
+			$norespvlan = $this->getSwitchportAuthNoRespVLAN();
+			if($norespvlan != -1)
+				$logvals["norespvlan"]["src"] = $norespvlan;
+			$deadvlan = $this->getSwitchportAuthDeadVLAN();
+			if($deadvlan != -1)
+				$logvals["deadvlan"]["src"] = $deadvlan;
+			$controlmode = $this->getSwitchportControlMode();
+			if($controlmode != -1)
+				$logvals["controlmode"]["src"] = $controlmode;
+			$authhostmode = $this->getSwitchportAuthHostMode();
+			if($authhostmode != -1)
+				$logvals["authhostmode"]["src"] = $authhostmode;
+
+			if($trunk == 1) {
+				$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
+
+				$this->setSwitchAccessVLAN(1);
+				$logvals["accessvlan"]["dst"] = 1;
+				// mab disable
+				if($mabst != -1) {
+					$this->setSwitchportMABEnable(2);
+					$logvals["mabst"]["dst"] = 2;
+				}
+				if($failvlan != -1) {
+					$this->setSwitchportAuthFailVLAN(0);
+					$logvals["failvlan"]["dst"] = 0;
+				}
+				if($norespvlan != -1) {
+					$this->setSwitchportAuthNoRespVLAN(0);
+					$logvals["norespvlan"]["dst"] = 0;
+				}
+				if($deadvlan != -1) {
+					$this->setSwitchportAuthDeadVLAN(0);
+					$logvals["deadvlan"]["dst"] = 0;
+				}
+				if($controlmode != -1) {
+					$this->setSwitchportControlMode(3);
+					$logvals["controlmode"]["dst"] = 3;
+				}
+				// dot1x disable
+				if($authhostmode != -1) {
+					$this->setSwitchportAuthHostMode(1);
+					$logvals["authhostmode"]["dst"] = 1;
+				}
+
+				// set settings
+				if($this->setSwitchTrunkEncap(4) != 0) {
+					FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+					return;
+				}
+				$logvals["trunkencap"]["dst"] = 4;
+				if($this->setSwitchportMode($trunk) != 0) {
+					FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+					return;
+				}
+				$logvals["mode"]["dst"] = $trunk;
+				if(in_array("all",$vlanlist)) {
+					if($this->setSwitchNoTrunkVlan() != 0) {
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+						return;
+					}
+				}
+				else {
+					if($this->setSwitchTrunkVlan($vlanlist) != 0) {
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+						return;
+					}
+				}
+				$logvals["trunkvlan"]["dst"] = $vlanlist;
+				if($this->setSwitchTrunkNativeVlan($nvlan) != 0) {
+					FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+					return;
+				}
+				$logvals["nativevlan"]["dst"] = $nvlan;
+			} else if($trunk == 2) {
+				$this->setSwitchTrunkNativeVlan(1);
+				$logvals["nativevlan"]["dst"] = 1;
+				$this->setSwitchNoTrunkVlan();
+				$logvals["trunkvlan"]["dst"] = "";
+				// mab disable
+				if($mabst != -1) {
+					$this->setSwitchportMABEnable(2);
+					$logvals["mabst"]["dst"] = 2;
+				}
+				if($failvlan != -1) {
+					$this->setSwitchportAuthFailVLAN(0);
+					$logvals["failvlan"]["dst"] = 0;
+				}
+				if($norespvlan != -1) {
+					$this->setSwitchportAuthNoRespVLAN(0);
+					$logvals["norespvlan"]["dst"] = 0;
+				}
+				if($deadvlan != -1) {
+					$this->setSwitchportAuthDeadVLAN(0);
+					$logvals["deadvlan"]["dst"] = 0;
+				}
+				if($controlmode != -1) {
+					$this->setSwitchportControlMode(3);
+					$logvals["controlmode"]["dst"] = 3;
+				}
+				// dot1x disable
+				if($authhostmode != -1) {
+					$this->setSwitchportAuthHostMode(1);
+					$logvals["authhostmode"]["dst"] = 1;
+				}
+				// set settings
+				if($this->setSwitchportMode($trunk) != 0) {
+					echo "Fail to set Switchport mode";
+					return;
+				}
+				$logvals["mode"]["dst"] = $trunk;
+				if($this->setSwitchTrunkEncap(5) != 0) {
+					echo "Fail to set Switchport Trunk encapsulated VLANs";
+					return;
+				}
+				$logvals["trunkencap"]["dst"] = 5;
+				if($this->setSwitchAccessVLAN($nvlan) != 0) {
+					echo "Fail to set Switchport Access Vlan";
+					return;
+				}
+				$logvals["accessvlan"]["dst"] = $nvlan;
+
+			} else if($trunk == 3) {
+				$dot1xhostmode = FS::$secMgr->checkAndSecurisePostData("dot1xhostmode");
+				$mabeap = FS::$secMgr->checkAndSecurisePostData("mabeap");
+				$noresp = FS::$secMgr->checkAndSecurisePostData("norespvlan");
+				$dead = FS::$secMgr->checkAndSecurisePostData("deadvlan");
+				if($dot1xhostmode < 1 || $dot1xhostmode > 4) {
+					echo "Dot1x hostmode is wrong (".$dot1xhostmode.")";
+					return;
+				}
+				// switchport mode access & no vlan assigned
+				$this->setSwitchTrunkNativeVlan(1);
+				$logvals["nativevlan"]["dst"] = 1;
+				$this->setSwitchNoTrunkVlan();
+				$logvals["trunkvlan"]["dst"] = "";
+				$this->setSwitchportMode(2);
+				$logvals["mode"]["dst"] = 2;
+				$this->setSwitchTrunkEncap(5);
+				$logvals["trunkencap"]["dst"] = 5;
+				$this->setSwitchAccessVLAN(1);
+				$logvals["accessvlan"]["dst"] = 1;
+
+				// enable mab
+				if($mabst != -1) {
+					$this->setSwitchportMABEnable(1);
+					$logvals["mabst"]["dst"] = 1;
+				}
+				$mabtype = $this->getSwitchportMABType();
+				if($mabtype != -1) {
+					$logvals["mabtype"]["src"] = $mabtype;
+					// set MAB to EAP or not
+					$this->setSwitchMABType($mabeap == "on" ? 2 : 1);
+					$logvals["mabtype"]["dst"] = ($mabeap == "on" ? 2 : 1);
+				}
+				if($failvlan != -1) {
+					// enable authfail & noresp vlans
+					$this->setSwitchportAuthFailVLAN($nvlan);
+					$logvals["failvlan"]["dst"] = $nvlan;
+				}
+				if($norespvlan != -1) {
+					$this->setSwitchportAuthNoRespVLAN($noresp);
+					$logvals["norespvlan"]["dst"] = $noresp;
+				}
+				if($deadvlan != -1) {
+					$this->setSwitchportAuthDeadVLAN($dead);
+					$logvals["deadvlan"]["dst"] = $dead;
+				}
+				if($controlmode != -1) {
+					// authentication port-control auto
+					$this->setSwitchportControlMode(2);
+					$logvals["controlmode"]["dst"] = 2;
+				}
+				// Host Mode for Authentication
+				if($authhostmode != -1) {
+					$this->setSwitchportAuthHostMode($dot1xhostmode);
+					$logvals["authhostmode"]["dst"] = $dot1xhostmode;
+				}
+			}
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Update("device_port","vlan ='".$nvlan."'","ip='".$this->devip."' and port='".$port."'");
+			FS::$dbMgr->Update("device_port_vlan","vlan ='".$nvlan."'","ip='".$this->devip."' and port='".$port."' and native='t'");
+			FS::$dbMgr->Delete("device_port_vlan","ip = '".$this->devip."' AND port='".$port."'");
+			$vllist = FS::$secMgr->checkAndSecurisePostData("vllist");
+			if($trunk == 1) {
+				if($vllist) {
+					// Insert VLAN in database only if not in trunk All mode
+					if(!in_array("all",$vllist)) {
+						$count = count($vllist);
+						for($i=0;$i<$count;$i++)
+							FS::$dbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$this->devip."','".$port."','".$vllist[$i]."','f',NOW(),NOW()");
+					}
+				}
+			}
+			else if ($trunk == 2) {
+				FS::$dbMgr->Insert("device_port_vlan","ip,port,vlan,native,creation,last_discover","'".$this->devip."','".$port."','".$nvlan."','t',NOW(),NOW()");
+			}
+			FS::$dbMgr->CommitTr();
+		}
 
 		public function showDHCPSnoopingOpts() {
 			$output = "";
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_dhcpsnooping")) {
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_dhcpsnooping")) {
 				// DHCP snooping options
 				$dhcpsntrust = $this->getPortDHCPSnoopingTrust();
 				if($dhcpsntrust != NULL) {
@@ -289,7 +509,7 @@
 
 		public function handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate) {
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_dhcpsnooping")) {
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_dhcpsnooping")) {
 				$dhcpsntruststate = $this->getPortDHCPSnoopingTrust();
 				if($dhcpsntruststate != NULL) {
 					$logvals["dhcpsntrusten"]["src"] = ($dhcpsntruststate == 1 ? true : false);
@@ -309,7 +529,7 @@
 		public function showCDPOpts() {
 			$output = "";
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_cdp") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_cdp")) {
 				$cdp = $this->getPortCDPEnable();
 				if($cdp != NULL) {
 					$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
@@ -320,7 +540,7 @@
 
 		public function handleCDP($logvals) {
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_cdp") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_portmod_cdp")) {
+				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_cdp")) {
 				$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 				$cdpstate = $this->getPortCDPEnable();
 				if($cdpstate != NULL) {
@@ -329,6 +549,14 @@
 					$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
 				}
 			}
+		}
+
+		public function checkFields() {
+			if(!FS::$secMgr->checkAndSecurisePostData("duplex") || !FS::$secMgr->checkAndSecurisePostData("trmode") ||
+				FS::$secMgr->checkAndSecurisePostData("nvlan"))
+				return false;
+
+			return true;
 		}
 
 		/*

@@ -35,7 +35,7 @@
 			}
 			$output .= "<div id=\"tooltip\"></div>";
 			
-			$output = "<div id=\"main\">";
+			$output .= "<div id=\"main\">";
 			$output .= $this->showModule();
 			$output .= "</div>";
 			if($lockinstall)

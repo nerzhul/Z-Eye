@@ -124,11 +124,11 @@
 		public function loadModule($id) {
 			$output = "";
 
-			$dir = opendir(dirname(__FILE__));
+			$dir = opendir(dirname(__FILE__)."/../../modules/");
 			$found = false;
 			$moduleid = 0;
 			while(($elem = readdir($dir)) && $found == false) {
-				$dirpath = dirname(__FILE__)."/".$elem;
+				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
 				if(is_dir($dirpath)) $moduleid++;
 				if(is_dir($dirpath) && $moduleid == $id) {
 					$dir2 = opendir($dirpath);
@@ -140,7 +140,7 @@
 				}
 			}
 			if($found == true) {
-				require(dirname(__FILE__)."/".$path."/main.php");
+				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
 
 				if($module->getRulesClass()->canAccessToModule()) {
 					$this->setCurrentModule($module->getModuleClass());
@@ -269,10 +269,10 @@
 		}
 
 		public function autoComplete($name, $options = array()) {
-			$output = $this->input($name,"",(isset($options["size"]) $options["size"] : 20,
-				isset($options["length"]) ? $options["length"] : 40, isset($options["label"]) ? $options["label"] : NULL,
-				isset($options["tooltip"]) ? $options["tooltip"] : NULL);
-			$output .= $this->js("$('#".$name."').autocomplete({source: 'index.php?mod=".$this->getModuleIdByPath("search")."&at=2',
+			$output = $this->input($name,"",(isset($options["size"]) ? $options["size"] : 20),
+				(isset($options["length"]) ? $options["length"] : 40), (isset($options["label"]) ? $options["label"] : NULL),
+				(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
+			$this->js("$('#".$name."').autocomplete({source: 'index.php?mod=".$this->getModuleIdByPath("search")."&at=2',
 				minLength: 3});");
 			return $output;
 		}
