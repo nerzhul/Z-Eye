@@ -66,9 +66,9 @@
 
 			$output .= "<li id=\"logintoggle\">";
 			if(!FS::$sessMgr->isConnected())
-					$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>";
+				$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>";
 			else
-					$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
+				$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
 			$output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
 			</li></ul></div></div>";
 
@@ -109,7 +109,7 @@
 				<div id=\"menuItem\"><div id=\"search\">";
 			$output .= $this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1));
                         $output .= $this->hidden("mod",$this->getModuleIdByPath("search"));
-			$output .= $this->autoComplete("s",30,60)." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
+			$output .= $this->autoComplete("s",array("size" => 30,"length" => 60))." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
 			$output .= "</div></div></div>";
 
 			return $output;
@@ -162,13 +162,6 @@
 		}
 
 		public function removeIcon($link,$options=array()) { return $this->linkIcon($link,"cross",$options); }
-
-		public function autoComplete($name, $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
-			$output = $this->input($name,"",$size,$length,$label,$tooltip);
-			$output .= $this->js("$('#".$name."').autocomplete({source: 'index.php?mod=".$this->getModuleIdByPath("search")."&at=2',
-				minLength: 3});");
-			return $output;
-		}
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;

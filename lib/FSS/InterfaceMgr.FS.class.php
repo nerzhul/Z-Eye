@@ -268,6 +268,15 @@
 			return $output;
 		}
 
+		public function autoComplete($name, $options = array()) {
+			$output = $this->input($name,"",(isset($options["size"]) $options["size"] : 20,
+				isset($options["length"]) ? $options["length"] : 40, isset($options["label"]) ? $options["label"] : NULL,
+				isset($options["tooltip"]) ? $options["tooltip"] : NULL);
+			$output .= $this->js("$('#".$name."').autocomplete({source: 'index.php?mod=".$this->getModuleIdByPath("search")."&at=2',
+				minLength: 3});");
+			return $output;
+		}
+
 		public function slider($slidername, $name, $min, $max, $options = array()) {
 			if(isset($options["hidden"]))
 				$output = FS::$iMgr->hidden($name,(isset($options["value"]) ? $options["value"] : 0));
