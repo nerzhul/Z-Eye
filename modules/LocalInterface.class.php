@@ -51,10 +51,6 @@
 			return $output;
 		}
 
-		public function showNotification($text,$timeout = 5000) {
-			return "showNotification({'snotif':'".addslashes($text)."','timeout': '.$timeout.'});";
-		}
-
 		protected function showConnForm() {
 			$output = "<div id=\"logform\"><div id=\"menupanel\">";
 			if($this->showRetMenu) {
