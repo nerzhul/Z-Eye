@@ -51,6 +51,10 @@
 			return $output."</div>";
 		}
 
+		private function showNotification($text,$timeout = 5000) {
+			return "showNotification({'snotif':'".addslashes($text)."','timeout': '.$timeout.'});";
+		}
+
 		private function showInstaller() {
 			if(!FS::isAjaxCall()) $step = 0; 
 			else $step = FS::$secMgr->checkAndSecuriseGetData("step");
@@ -68,7 +72,7 @@
 					$output .= $this->loc->s("text-welcome")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Lets-Go"),"loadStep1();")."</center>";
 					break;
 				case 1:
-					$output .= FS::$iMgr->js("function loadStep2() {
+					FS::$iMgr->js("function loadStep2() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
 						$.post('index.php?mod=".$this->mid."&at=2&step=2', function(data) {
 							$('#installer').html(data);
@@ -77,17 +81,17 @@
 						function sendAdmCfg() {
 						$.post('index.php?mod=".$this->mid."&act=1',$('#admcfg').serialize(), function(data) {
 							if(data == 0) loadStep2();
-							else if(data == 1) { ".FS::$iMgr->showNotification($this->loc->s("err-fields-missing"),5000,false)." } 
-							else if(data == 2) { ".FS::$iMgr->showNotification($this->loc->s("err-username-invalid"),5000,false)." } 
-							else if(data == 3) { ".FS::$iMgr->showNotification($this->loc->s("err-mail-invalid"),5000,false)." } 
-							else if(data == 4) { ".FS::$iMgr->showNotification($this->loc->s("err-pwd-match"),5000,false)." } 
-							else if(data == 5) { ".FS::$iMgr->showNotification($this->loc->s("err-mail-match"),5000,false)." } 
-							else if(data == 6) { ".FS::$iMgr->showNotification($this->loc->s("err-pwd-too-weak"),5000,false)." } 
-							else if(data == 7) { ".FS::$iMgr->showNotification($this->loc->s("err-surname-invalid"),5000,false)." } 
-							else if(data == 8) { ".FS::$iMgr->showNotification($this->loc->s("err-name-invalid"),5000,false)." } 
-							else { ".FS::$iMgr->showNotification($this->loc->s("err-unhandled-answer"),5000,false)." }
+							else if(data == 1) { ".$this->showNotification($this->loc->s("err-fields-missing"),5000)." } 
+							else if(data == 2) { ".$this->showNotification($this->loc->s("err-username-invalid"),5000)." } 
+							else if(data == 3) { ".$this->showNotification($this->loc->s("err-mail-invalid"),5000)." } 
+							else if(data == 4) { ".$this->showNotification($this->loc->s("err-pwd-match"),5000)." } 
+							else if(data == 5) { ".$this->showNotification($this->loc->s("err-mail-match"),5000)." } 
+							else if(data == 6) { ".$this->showNotification($this->loc->s("err-pwd-too-weak"),5000)." } 
+							else if(data == 7) { ".$this->showNotification($this->loc->s("err-surname-invalid"),5000)." } 
+							else if(data == 8) { ".$this->showNotification($this->loc->s("err-name-invalid"),5000)." } 
+							else { ".$this->showNotification($this->loc->s("err-unhandled-answer"),5000)." }
 						});
-							return false;}");
+					return false;}");
 					$output .= FS::$iMgr->h2("title-admin-set");
 					$output .= $this->loc->s("text-admin-set")."<br /><br />".FS::$iMgr->form("",array("id" => "admcfg","js" => "false"))."<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 					$output .= FS::$iMgr->idxLine($this->loc->s("Username"),"username");
@@ -100,11 +104,11 @@
 					$output .= FS::$iMgr->tableSubmit($this->loc->s("Send"),array("js" => "sendAdmCfg();"))."</form>";
 					break;	
 				case 2:
-					$output .= FS::$iMgr->js("function loadStep3() {
+					FS::$iMgr->js("function loadStep3() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
 						$.post('index.php?mod=".$this->mid."&act=2', function(data) {
 							window.location = '/index.php'; });
-						}");
+					}");
 					$output .= FS::$iMgr->h2("title-install-finished");
 					$output .= $this->loc->s("text-finish")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Finish"),"loadStep3();")."</center>";
 					break;	

@@ -51,16 +51,8 @@
 			return $output;
 		}
 
-		public function showNotification($text,$timeout = 5000, $jsbraces = true) {
-			$output = "";
-			if($jsbraces) $output .= "<script type=\"text/javascript\">";
-			$output .= "$('#subnotification').html('".addslashes($text)."');
-				$('#notification').slideDown();
-				setTimeout(function() {
-					$('#notification').slideUp();
-				},".$timeout.");";
-			if($jsbraces) $output .= "</script>";
-			return $output;
+		public function showNotification($text,$timeout = 5000) {
+			return "showNotification({'snotif':'".addslashes($text)."','timeout': '.$timeout.'});";
 		}
 
 		protected function showConnForm() {
