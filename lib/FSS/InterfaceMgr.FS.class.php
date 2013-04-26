@@ -121,6 +121,41 @@
 			return $output;
 		}
 
+		public function loadModule($id) {
+			$output = "";
+
+			$dir = opendir(dirname(__FILE__));
+			$found = false;
+			$moduleid = 0;
+			while(($elem = readdir($dir)) && $found == false) {
+				$dirpath = dirname(__FILE__)."/".$elem;
+				if(is_dir($dirpath)) $moduleid++;
+				if(is_dir($dirpath) && $moduleid == $id) {
+					$dir2 = opendir($dirpath);
+					while(($elem2 = readdir($dir2)) && $found == false) {
+						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+							$found = true;
+							$path = $elem;
+					}
+				}
+			}
+			if($found == true) {
+				require(dirname(__FILE__)."/".$path."/main.php");
+
+				if($module->getRulesClass()->canAccessToModule()) {
+					$this->setCurrentModule($module->getModuleClass());
+					$module->getModuleClass()->setModuleId($id);
+					$output .= $module->getModuleClass()->Load();
+				}
+				else
+					$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");
+			}
+			else
+				$output .= $this->printError($this->getLocale("err-unk-module"));
+
+			return $output;
+		}
+
 		public function getRealNameById($id) {
                         $user = new User();
                         $user->LoadFromDB($id);
@@ -564,7 +599,7 @@
 			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
 		}
 
-		public function getLocale($locid) {
+		protected function getLocale($locid) {
 			if($this->cur_module)
 				return $this->cur_module->getLoc()->s($locid);
 			else {
