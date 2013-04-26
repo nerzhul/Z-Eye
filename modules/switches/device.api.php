@@ -35,6 +35,9 @@
 		public function showDuplexOpts() { return ""; }
 		public function handleDuplex($logvals) {}
 
+		public function showVlanOpts() { return ""; }
+		public function handleVlanOpts($logvals) {}
+
 		public function showVoiceVlanOpts($voicevlanoutput) { return ""; }
 		public function handleVoiceVlan($logvals,$voicevlan) {}
 

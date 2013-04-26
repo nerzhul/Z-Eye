@@ -146,6 +146,125 @@
 			return 0;
 		}
 
+		public function showVlanOpts() {
+			FS::$iMgr->js("function arangeform() {
+				if(document.getElementsByName('trmode')[0].value == 1) {
+					$('#vltr').show('slow');
+					if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
+					if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
+					if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
+					$('#vllabel').html('".$this->loc->s("native-vlan")."');
+				} else if(document.getElementsByName('trmode')[0].value == 2) {
+					if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
+					if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
+					if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
+					if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
+					$('#vllabel').html('".$this->loc->s("Vlan")."');
+				} else if(document.getElementsByName('trmode')[0].value == 3) {
+					if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
+					$('#vllabel').html('".$this->loc->s("fail-vlan")."');
+					if($('#mabtr').is(':hidden')) $('#mabtr').show('slow');
+					if($('#mabdead').is(':hidden')) $('#mabdead').show('slow');
+					if($('#mabnoresp').is(':hidden')) $('#mabnoresp').show('slow');
+			}};");
+			$output = "<tr><td>".$this->loc->s("switchport-mode")."</td><td>";
+			$trmode = $this->getSwitchportMode();
+
+			$mabstate = $this->getSwitchportMABState();
+			if($mabstate == 1)
+				$trmode = 3;
+			$output .= FS::$iMgr->select("trmode","arangeform()");
+			$output .= FS::$iMgr->selElmt("Access",2,$trmode == 2 ? true : false);
+			$output .= FS::$iMgr->selElmt("Trunk",1,$trmode == 1 ? true : false);
+			if($mabstate != -1)
+				$output .= FS::$iMgr->selElmt("802.1X - MAB",3,$trmode == 3 ? true : false);
+			$output .= "</select>";
+			$output .= "<tr><td id=\"vllabel\">";
+			$portoptlabel = "";
+			$nvlan = 1;
+			$vllist = array();
+			switch($trmode) {
+				case 1:
+					$output .= $this->loc->s("native-vlan");
+					$portoptlabel = $this->loc->s("encap-vlan");
+					$nvlan = $this->getSwitchTrunkNativeVlan();
+					$vllist = $this->getSwitchportTrunkVlans();
+					break;
+				case 2:
+					$output .= $this->loc->s("Vlan");
+					$nvlan = $this->getSwitchAccessVLAN();
+					break;
+				case 3:
+					$output .= $this->loc->s("fail-vlan");
+					$portoptlabel = $this->loc->s("MAB-opt");
+					$nvlan = $this->getSwitchportAuthFailVLAN();
+					break;
+			}
+			$output .= "</td><td id=\"vln\">";
+			$output .= FS::$iMgr->select("nvlan","");
+			// Added none for VLAN fail
+			if($trmode == 3)
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$nvlan == 0 ? true : false);
+
+			$voicevlanoutput = FS::$iMgr->selElmt($this->loc->s("None"),4096);
+			$voicevlan = $this->getSwitchportVoiceVlan();
+			$deadvlan = $this->getSwitchportAuthDeadVLAN();
+			$deadvlanoutput = "";
+			$norespvlan = $this->getSwitchportAuthNoRespVLAN();
+			$norespvlanoutput = "";
+			$trunkvlanoutput = "";
+			$trunkall = true;
+			$vlannb = 0;
+
+			$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$output .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$nvlan == $data["vlan"] ? true : false);
+				$voicevlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$voicevlan == $data["vlan"] ? true : false);
+				$deadvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$deadvlan == $data["vlan"] ? true : false);
+				$norespvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],$norespvlan == $data["vlan"] ? true : false);
+				$trunkvlanoutput .= FS::$iMgr->selElmt($data["vlan"]." - ".$data["description"],$data["vlan"],in_array($data["vlan"],$vllist) ? true : false);
+				if($trunkall && in_array($data["vlan"],$vllist)) $trunkall = false;
+				$vlannb++;
+			}
+			$output .= "</select></td></tr>";
+			$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
+			$output .= FS::$iMgr->select("vllist[]","",NULL,true,array("size" => round($vlannb/4)));
+			$output .= FS::$iMgr->selElmt($this->loc->s("All"),"all",$trunkall);
+			$output .= $trunkvlanoutput;
+			$output .= "</select>";
+			$output .= "</td></tr>";
+			/*
+			* MAB tables
+			*/
+
+			// NoResp Vlan
+			$output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-noresp")."</td><td>";
+			$output .= FS::$iMgr->select("norespvlan","",NULL,false,array("tooltip" => "MAB-noresp-tooltip"));
+			$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
+			$output .= $norespvlanoutput;
+			$output .= "</select></td></tr>";
+			// Dead Vlan
+			$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-dead")."</td><td>";
+			$output .= FS::$iMgr->select("deadvlan","",NULL,false,array("tooltip" => "MAB-dead-tooltip"));
+			$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
+			$output .= $deadvlanoutput;
+			$output .= "</select></td></tr>";
+			// Other options
+			$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-opt")."</td><td>";
+			$mabeap = $this->getSwitchportMABType();
+			$dot1xhostmode = $this->getSwitchportAuthHostMode();
+			$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
+			$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode","");
+			$output .= FS::$iMgr->selElmt($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
+			$output .= FS::$iMgr->selElmt($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
+			$output .= FS::$iMgr->selElmt($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
+			$output .= FS::$iMgr->selElmt($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
+			$output .= "</select></td></tr>";
+
+			$output .= $this->showVoiceVlanOpts($voicevlanoutput);
+			return $output;
+		}
+
 		public function showDHCPSnoopingOpts() {
 			$output = "";
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
