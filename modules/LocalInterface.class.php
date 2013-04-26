@@ -28,27 +28,32 @@
 		public function content() {
 			$lockinstall = file_get_contents(dirname(__FILE__)."/../config/LOCK");
 
-			$output = "<div id=\"lock\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
+			$output = $this->header().$this->popupContainer();
 			if($lockinstall) {
 				$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
 				$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
 			}
 			$output .= "<div id=\"tooltip\"></div>";
 			
-
-			$tmpoutput = "<div id=\"main\">";
-			$tmpoutput .= $this->showModule();
-			$tmpoutput .= "</div>";
-			// must be after because of return button
+			$output = "<div id=\"main\">";
+			$output .= $this->showModule();
+			$output .= "</div>";
 			if($lockinstall)
 				$output .= $this->showConnForm();
-			$output .= $tmpoutput.
-				"<div id=\"notification\"><div id=\"subnotification\"></div></div>
-				<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
-
-			// Add header
-			$output = $this->header().$output;
+			$output .= $this->notifContainer().$this->copyrightContainer();
 			return $output;
+		}
+
+		private function popupContainer() {
+			return "<div id=\"lock\" style=\"display:none;\"><div id=\"subpop\"></div></div>";
+		}
+
+		private function notifContainer() {
+			return "<div id=\"notification\"><div id=\"subnotification\"></div></div>";
+		}
+
+		private function copyrightContainer() {
+			return "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
 		}
 
 		protected function showConnForm() {
