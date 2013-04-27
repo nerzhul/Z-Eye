@@ -143,27 +143,8 @@
 							$output .= "unk";
 						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
 						$output .= $this->devapi->showStateOpts();
-						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
-                                                $sp = $this->devapi->getPortSpeed();
-						if($sp > 0) {
-							$output .= FS::$iMgr->select("speed","",null,false,array("tooltip" => "tooltip-speed"));
-							$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
-							if(preg_match("#Ethernet#",$port)) {
-								$output .= FS::$iMgr->selElmt("10 Mbits",10000000,$sp == 10000000 ? true : false);
-								if(preg_match("#FastEthernet#",$port))
-									$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
-								if(preg_match("#GigabitEthernet#",$port)) {
-									$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
-									$output .= FS::$iMgr->selElmt("1 Gbit",1000000000,$sp == 1000000000 ? true : false);
-									if(preg_match("#TenGigabitEthernet#",$port))
-										$output .= FS::$iMgr->selElmt("10 Gbits",10,$sp == 10 ? true : false);
-								}
-							}
-							$output .= "</select>";
-						}
-						else
-							$output .= $this->loc->s("Unavailable");
-						$output .= "</td></tr>";
+					
+						$output .= $this->devapi->showSpeedOpts();
 
 						$output .= $this->devapi->showDuplexOpts();
 
@@ -177,7 +158,8 @@
 
 						$output .= $this->devapi->showDHCPSnoopingOpts();
 
-						$output .= FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
+						$output .= $this->devapi->showSaveCfg();
+
 						$output .= "</table>";
 						if($portid != -1) {
 							if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
@@ -1465,8 +1447,6 @@
 						$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 						$prise = FS::$secMgr->checkAndSecurisePostData("prise");
 						$room = FS::$secMgr->checkAndSecurisePostData("room");
-						$speed = FS::$secMgr->checkAndSecurisePostData("speed");
-						$wr = FS::$secMgr->checkAndSecurisePostData("wr");
 						if($port == NULL || $sw == NULL || !$this->devapi->checkFields()) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (plug edit)");
 							echo "Some fields are missing (port, switch, trunk or native vlan)";
@@ -1496,13 +1476,7 @@
 	
 						$this->devapi->handleDuplex($logvals);
 	
-						if($speed && FS::$secMgr->isNumeric($speed)) {
-							if($idx != NULL) {
-								$logvals["speed"]["src"] = $this->devapi->getPortSpeed();
-								$this->devapi->setPortSpeed($speed);
-								$logvals["speed"]["dst"] = $speed;
-							}
-						}
+						$this->devapi->handleSpeed($logvals);
 	
 						$this->devapi->handleVlan($logvals);
 
@@ -1521,10 +1495,8 @@
 
 						$this->devapi->handlePortSecurity($logvals);
 
-						if($wr == "on")
-							$this->devapi->writeMemory();
-	
-	
+						$this->devapi->handleSaveCfg();
+
 						if($prise == NULL) $prise = "";
 						if($room == NULL) $room = "";
 						FS::$dbMgr->BeginTr();

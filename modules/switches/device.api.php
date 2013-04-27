@@ -35,6 +35,9 @@
 		public function showStateOpts() { return ""; }
 		public function handleState($logvals) {}
 
+		public function showSpeedOpts() { return ""; }
+		public function handleSpeed($logvals) {}
+
 		public function showDuplexOpts() { return ""; }
 		public function handleDuplex($logvals) {}
 
@@ -52,6 +55,9 @@
 
 		public function showDHCPSnoopingOpts() { return ""; }
 		public function handleDHCPSnooping($logvals) {}
+
+		public function showSaveCfg() { return ""; }
+		public function handleSaveCfg() {}
 
 		public function checkFields() { return true; }
 		/*

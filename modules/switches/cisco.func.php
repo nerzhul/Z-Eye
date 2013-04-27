@@ -36,12 +36,47 @@
 			$port = FS::$secMgr->checkAndSecurisePostData("port");
 			$shut = FS::$secMgr->checkAndSecurisePostData("shut");
 			$logvals["hostmode"]["src"] = $this->getPortState();
-			if($this->devapi->setPortState($shut == "on" ? 2 : 1) != 0) {
+			if($this->setPortState($shut == "on" ? 2 : 1) != 0) {
 				echo "Fail to set switchport shut/no shut state";
 				return;
 			}
 			$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
 			FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$this->devip."' AND port = '".$port."'");
+		}
+
+		public function showSpeedOpts() {
+			$output = "";
+			$sp = $this->getPortSpeed();
+			$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
+			if($sp > 0) {
+				$output .= FS::$iMgr->select("speed","",null,false,array("tooltip" => "tooltip-speed"));
+				$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
+				if(preg_match("#Ethernet#",$port)) {
+					$output .= FS::$iMgr->selElmt("10 Mbits",10000000,$sp == 10000000 ? true : false);
+					if(preg_match("#FastEthernet#",$port))
+						$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
+					if(preg_match("#GigabitEthernet#",$port)) {
+						$output .= FS::$iMgr->selElmt("100 Mbits",100000000,$sp == 100000000 ? true : false);
+						$output .= FS::$iMgr->selElmt("1 Gbit",1000000000,$sp == 1000000000 ? true : false);
+						if(preg_match("#TenGigabitEthernet#",$port))
+							$output .= FS::$iMgr->selElmt("10 Gbits",10,$sp == 10 ? true : false);
+					}
+				}
+				$output .= "</select>";
+			}
+			else
+				$output .= $this->loc->s("Unavailable");
+			$output .= "</td></tr>";
+			return $output;
+		}
+
+		public function handleSpeed($logvals) {
+			$speed = FS::$secMgr->checkAndSecurisePostData("speed");
+			if($speed && FS::$secMgr->isNumeric($speed)) {
+				$logvals["speed"]["src"] = $this->getPortSpeed();
+				$this->setPortSpeed($speed);
+				$logvals["speed"]["dst"] = $speed;
+			}
 		}
 
 		public function showDuplexOpts() {
@@ -570,6 +605,16 @@
 					$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
 				}
 			}
+		}
+
+		public function showSaveCfg() {
+			return FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
+		}
+
+		public function handleSaveCfg() {
+			$wr = FS::$secMgr->checkAndSecurisePostData("wr");
+			if($wr == "on")
+				$this->writeMemory();
 		}
 
 		public function checkFields() {
