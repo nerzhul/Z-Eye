@@ -142,7 +142,7 @@
 						else
 							$output .= "unk";
 						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
-						$output .= "<tr><td>".$this->loc->s("Shutdown")."</td><td>".FS::$iMgr->check("shut",array("check" => $data["up_admin"] == "down" ? true : false, "tooltip" => "tooltip-shut"))."</td></tr>";
+						$output .= $this->devapi->showStateOpts();
 						$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
                                                 $sp = $this->devapi->getPortSpeed();
 						if($sp > 0) {
@@ -1465,9 +1465,6 @@
 						$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 						$prise = FS::$secMgr->checkAndSecurisePostData("prise");
 						$room = FS::$secMgr->checkAndSecurisePostData("room");
-						$shut = FS::$secMgr->checkAndSecurisePostData("shut");
-						$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
-						$dhcpsnrate = FS::$secMgr->checkAndSecurisePostData("dhcpsnrate");
 						$speed = FS::$secMgr->checkAndSecurisePostData("speed");
 						$wr = FS::$secMgr->checkAndSecurisePostData("wr");
 						if($port == NULL || $sw == NULL || !$this->devapi->checkFields()) {
@@ -1509,12 +1506,7 @@
 	
 						$this->devapi->handleVlan($logvals);
 
-						$logvals["hostmode"]["src"] = $this->devapi->getPortState();
-						if($this->devapi->setPortState($shut == "on" ? 2 : 1) != 0) {
-							echo "Fail to set switchport shut/no shut state";
-							return;
-						}
-						$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
+						$this->devapi->handleState($logvals);
 
 						if($this->devapi->handleVoiceVlan($logvals) != 0)
 							return;
@@ -1525,7 +1517,7 @@
 
 						$this->devapi->handleCDP($logvals);
 
-						$this->devapi->handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate);
+						$this->devapi->handleDHCPSnooping($logvals);
 
 						$this->devapi->handlePortSecurity($logvals);
 

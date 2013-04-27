@@ -32,6 +32,9 @@
 		* Interface & handler functions, herited and modified by each vendor
 		*/
 
+		public function showStateOpts() { return ""; }
+		public function handleState($logvals) {}
+
 		public function showDuplexOpts() { return ""; }
 		public function handleDuplex($logvals) {}
 
@@ -48,7 +51,7 @@
 		public function handleCDP($logvals) {}
 
 		public function showDHCPSnoopingOpts() { return ""; }
-		public function handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate) {}
+		public function handleDHCPSnooping($logvals) {}
 
 		public function checkFields() { return true; }
 		/*

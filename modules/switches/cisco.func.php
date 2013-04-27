@@ -26,6 +26,24 @@
 		/*
 		* Interface functions
 		*/
+
+		public function showStateOpts() {
+			$state = $this->getPortState();
+			return FS::$iMgr->idxLine($this->loc->s("Shutdown"),"shut",$state == 2 ? true : false, array("type" => "chk", "tooltip" => "tooltip-shut"));
+		}
+
+		public function handleState($logvals) {
+			$port = FS::$secMgr->checkAndSecurisePostData("port");
+			$shut = FS::$secMgr->checkAndSecurisePostData("shut");
+			$logvals["hostmode"]["src"] = $this->getPortState();
+			if($this->devapi->setPortState($shut == "on" ? 2 : 1) != 0) {
+				echo "Fail to set switchport shut/no shut state";
+				return;
+			}
+			$logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
+			FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$this->devip."' AND port = '".$port."'");
+		}
+
 		public function showDuplexOpts() {
 			$output = "";
 			$dup = $this->getPortDuplex();
@@ -507,9 +525,12 @@
 			return $output;
 		}
 
-		public function handleDHCPSnooping($logvals,$dhcpsntrusten,$dhcpsnrate) {
+		public function handleDHCPSnooping($logvals) {
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
 				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_dhcpsnooping")) {
+				$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
+        	                $dhcpsnrate = FS::$secMgr->checkAndSecurisePostData("dhcpsnrate");
+
 				$dhcpsntruststate = $this->getPortDHCPSnoopingTrust();
 				if($dhcpsntruststate != NULL) {
 					$logvals["dhcpsntrusten"]["src"] = ($dhcpsntruststate == 1 ? true : false);
