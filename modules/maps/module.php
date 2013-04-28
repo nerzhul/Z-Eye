@@ -31,8 +31,8 @@
 				$output .= FS::$iMgr->tabPan(array(
 					array(3,"mod=".$this->mid,$this->loc->s("icinga-map")),
 					array(2,"mod=".$this->mid,$this->loc->s("net-map")),
-					array(1,"mod=".$this->mid,$this->loc->s("net-map-full")),
-					array(4,"mod=".$this->mid,"Sigma")
+					array(1,"mod=".$this->mid,$this->loc->s("net-map-full"))/*,
+					array(4,"mod=".$this->mid,"Sigma")*/
 					),$sh);
 			} else {
 				$device = FS::$secMgr->checkAndSecuriseGetData("d");
@@ -44,8 +44,8 @@
 					$output .= $this->showGeneralLightWeatherMap();
 				else if($sh == 3)
 					$output .= $this->showIcingaMap();
-				else if($sh == 4)
-					$output .= $this->showSigmaMap();
+				/*else if($sh == 4)
+					$output .= $this->showSigmaMap();*/
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
 			}
