@@ -49,7 +49,8 @@
 
 			// Div for Ajax modifications
 			$output .= "<div id=\"snmptable\">";
-			$tmpoutput = "<table id=\"snmpList\"><thead><tr id=\"snmpthead\"><th class=\"headerSortDown\">".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr></thead>";
+			$tmpoutput = $this->showSNMPTableHead();
+
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
@@ -58,6 +59,11 @@
 			if($found) $output .= $tmpoutput."</table>".FS::$iMgr->jsSortTable("snmpList");
 			$output .= "</div>";
 			return $output;
+		}
+
+		private function showSNMPTableHead() {
+			FS::$iMgr->setJSBuffer(1);
+			return "<table id=\"snmpList\"><thead><tr id=\"snmpthead\"><th class=\"headerSortDown\">".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr></thead>";
 		}
 
 		private function showCommunityForm($name = "", $ro = false, $rw = false) {
@@ -131,10 +137,18 @@
 					FS::$dbMgr->CommitTr();
 
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
+
 					$js = "";
+
+					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
+					if($count == 1) {
+						$jscontent = $this->showSNMPTableHead()."</table>";
+						$js .= "$('#snmptable').html('".addslashes($jscontent)."'); $('#snmptable').show('slow');";
+					}
+
 					if($edit) $js .= "hideAndRemove('#".$name."tr'); setTimeout(function() {";
 					$jscontent = $this->tableCommunityLine($name,$ro == "on",$rw == "on");
-					$js .= "$('".addslashes($jscontent)."').insertAfter('#snmpthead')";
+					$js .= "$('".addslashes($jscontent)."').insertAfter('#snmpthead');";
 					if($edit) $js .= "},1000);";	
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
@@ -161,7 +175,12 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".$name."tr');");
+					
+					$js = "hideAndRemove('#".$name."tr');";
+					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
+					if($count == 0)
+						$js .= "$('#snmptable').hide('slow',function() { $('#snmptable').html(''); });";
+					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				default: break;
 			}
