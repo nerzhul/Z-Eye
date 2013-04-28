@@ -35,7 +35,14 @@
 		public function handleState($logvals) {
 			$port = FS::$secMgr->checkAndSecurisePostData("port");
 			$shut = FS::$secMgr->checkAndSecurisePostData("shut");
-			$logvals["hostmode"]["src"] = $this->getPortState();
+
+			$portstate = $this->getPortState();
+
+			// If it's same state do nothing
+			if($portstate == ($shut == "on" ? 2 : 1))
+				return;
+
+			$logvals["hostmode"]["src"] = $portstate;
 			if($this->setPortState($shut == "on" ? 2 : 1) != 0) {
 				echo "Fail to set switchport shut/no shut state";
 				return;
@@ -73,7 +80,13 @@
 		public function handleSpeed($logvals) {
 			$speed = FS::$secMgr->checkAndSecurisePostData("speed");
 			if($speed && FS::$secMgr->isNumeric($speed)) {
-				$logvals["speed"]["src"] = $this->getPortSpeed();
+				$portspeed = $this->getPortSpeed();
+
+				// If it's same speed do nothing
+				if($portspeed == $speed)
+					return;
+
+				$logvals["speed"]["src"] = $portspeed;
 				$this->setPortSpeed($speed);
 				$logvals["speed"]["dst"] = $speed;
 			}
@@ -107,11 +120,15 @@
 					return;
 				}
 
-				if($idx != NULL) {
-					$logvals["duplex"]["src"] = $this->getPortDuplex();
-					$this->setPortDuplex($duplex);
-					$logvals["duplex"]["dst"] = $duplex;
-				}
+				$portduplex = $this->getPortDuplex();
+
+				// If same duplex, do nothing
+				if($portduplex == $duplex)
+					return;
+
+				$logvals["duplex"]["src"] = $portduplex;
+				$this->setPortDuplex($duplex);
+				$logvals["duplex"]["dst"] = $duplex;
 			}
 		}
 
@@ -152,24 +169,39 @@
 		public function handlePortSecurity($logvals) {
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_portsec") ||
 				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_portsec")) {
+
 				$portsecen = $this->getPortSecEnable();
+
+				// if not -1, portsec is available on this switch
 				if($portsecen != -1) {
 					$psen = FS::$secMgr->checkAndSecurisePostData("psen");
-					$logvals["psen"]["src"] = ($portsecen == 1 ? true : false);
-					$this->setPortSecEnable($psen == "on" ? 1 : 2);
-					$logvals["psen"]["dst"] = ($psen == "on" ? true : false);
+
+					// Modify only if different
+					if($portsecen != $psen) {
+						$logvals["psen"]["src"] = ($portsecen == 1 ? true : false);
+						$this->setPortSecEnable($psen == "on" ? 1 : 2);
+						$logvals["psen"]["dst"] = ($psen == "on" ? true : false);
+					}
 
 					$portsecvact = $this->getPortSecViolAct();
 					$psviolact = FS::$secMgr->checkAndSecurisePostData("psviolact");
-					$logvals["psviolact"]["src"] = $portsecvact;
-					$this->setPortSecViolAct($psviolact);
-					$logvals["psviolact"]["dst"] = $psviolact;
+
+					// Modify only if different
+					if($portsecvact != $psviolact) {
+						$logvals["psviolact"]["src"] = $portsecvact;
+						$this->setPortSecViolAct($psviolact);
+						$logvals["psviolact"]["dst"] = $psviolact;
+					}
 
 					$psecmaxmac = $this->getPortSecMaxMAC();
 					$psmaxmac = FS::$secMgr->checkAndSecurisePostData("psmaxmac");
-					$logvals["psmaxmac"]["src"] = $psecmaxmac;
-					$this->setPortSecMaxMAC($psmaxmac);
-					$logvals["psmaxmac"]["dst"] = $psmaxmac;
+
+					// Modify only if different
+					if($psecmaxmac != $psmaxmac) {
+						$logvals["psmaxmac"]["src"] = $psecmaxmac;
+						$this->setPortSecMaxMAC($psmaxmac);
+						$logvals["psmaxmac"]["dst"] = $psmaxmac;
+					}
 				}
 			}
 		}
@@ -190,7 +222,14 @@
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_voicevlan") ||
                         	FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_voicevlan")) {
 				$voicevlan = FS::$secMgr->checkAndSecurisePostData("voicevlan");
-				$logvals["voicevlan"]["src"] = $this->getSwitchportVoiceVlan();
+
+				$portvoicevlan = $this->getSwitchportVoiceVlan();
+
+				// Do nothing if it's the same
+				if($voicevlan == $portvoicevlan)
+					return 0;
+
+				$logvals["voicevlan"]["src"] = $portvoicevlan;
 				if($this->setSwitchportVoiceVlan($voicevlan) != 0) {
 					FS::$iMgr->ajaxEcho("Fail to set switchport voice vlan");
 					return 1;
@@ -567,14 +606,18 @@
         	                $dhcpsnrate = FS::$secMgr->checkAndSecurisePostData("dhcpsnrate");
 
 				$dhcpsntruststate = $this->getPortDHCPSnoopingTrust();
-				if($dhcpsntruststate != NULL) {
+
+				// Modify only if exists and different
+				if($dhcpsntruststate != NULL && $dhcpsntruststate != $dhcpsntrusten) {
 					$logvals["dhcpsntrusten"]["src"] = ($dhcpsntruststate == 1 ? true : false);
 					$this->setPortDHCPSnoopingTrust($dhcpsntrusten == "on" ? 1 : 2);
 					$logvals["dhcpsntrusten"]["dst"] = ($dhcpsntrusten == "on" ? true : false);
 				}
 
 				$dhcpsnrateorig = $this->getPortDHCPSnoopingRate();
-				if($dhcpsnrateorig != NULL) {
+
+				// Modify only if exists and different
+				if($dhcpsnrateorig != NULL && $dhcpsnrateorig != $dhcpsnrate) {
 					$logvals["dhcpsnrate"]["src"] = $dhcpsnrateorig;
 					$this->setPortDHCPSnoopingRate($dhcpsnrate);
 					$logvals["dhcpsnrate"]["dst"] = $dhcpsnrate;
@@ -599,7 +642,9 @@
 				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_cdp")) {
 				$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 				$cdpstate = $this->getPortCDPEnable();
-				if($cdpstate != NULL) {
+
+				// Modify only if different
+				if($cdpstate != NULL && $cdpstate != ($cdpen == "on" ? 1 : 2)) {
 					$logvals["cdp"]["src"] = ($cdpstate == 1 ? true : false);
 					$this->setPortCDPEnable($cdpen == "on" ? 1 : 2);
 					$logvals["cdp"]["dst"] = ($cdpen == "on" ? true : false);
