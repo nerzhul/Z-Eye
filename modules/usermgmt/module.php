@@ -229,20 +229,37 @@
 			return $output;
 		}
 
-		private function showDirectoryForm() {
+		private function showDirectoryForm($addr = "") {
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
+
+			$port = 389; $ssl = false; $dn = ""; $rootdn = ""; $ldapname = ""; $ldapsurname = ""; $ldapmail = "";
+			$ldapuid = ""; $ldapfilter = "(objectclass=*)";
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","port,dn,rootdn,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$port = $data["port"];
+				$dn = $data["dn"];
+				$rootdn = $data["rootdn"];
+				$ldapuid = $data["ldapuid"];
+				$ldapfilter = $data["filter"];
+				$ldapmail = $data["ldapmail"];
+				$ldapname = $data["ldapname"];
+				$ldapsurname = $data["ldapsurname"];
+				$ssl = ($data["ssl"] == 't');
+			}
+
 			$output .= "<table>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-addr"),"addr","",array("length" => 40, "size" => 20));
-			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-port"),"port","389",array("size" => 5, "length" => 5));
-			$output .= FS::$iMgr->idxLine($this->loc->s("SSL")." ?","ssl",false,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("base-dn"),"dn","",array("size" => 20, "length" => 200,"tooltip" => "tooltip-base-dn"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("root-dn"),"rootdn","",array("size" => 20, "length" => 200,"tooltip" => "tooltip-root-dn"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("root-pwd"),"rootpwd","",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("attr-name"),"ldapname","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-name"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("attr-subname"),"ldapsurname","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-subname"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("attr-mail"),"ldapmail","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-mail"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("attr-uid"),"ldapuid","",array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-uid"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-filter"),"ldapfilter","(objectclass=*)",array("size" => 20, "length" => 200,"tooltip" => "tooltip-ldap-filter"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-addr"),	"addr",		$addr,		array("type" => "idxedit", "length" => 40, "size" => 20, "edit" => $edit));
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-port"),	"port",		$port,		array("size" => 5, "length" => 5));
+			$output .= FS::$iMgr->idxLine($this->loc->s("SSL")." ?",	"ssl",		$ssl,		array("type" => "chk"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("base-dn"),		"dn",		$dn,		array("size" => 20, "length" => 200,"tooltip" => "tooltip-base-dn"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("root-dn"),		"rootdn",	$rootdn,	array("size" => 20, "length" => 200,"tooltip" => "tooltip-root-dn"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("root-pwd"),	"rootpwd",	"",		array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-name"),	"ldapname",	$ldapname,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-name"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-subname"),	"ldapsurname",	$ldapsurname,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-subname"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-mail"),	"ldapmail",	$ldapmail,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-mail"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("attr-uid"),	"ldapuid",	$ldapuid,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-uid"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-filter"),	"ldapfilter",	$ldapfilter,	array("size" => 20, "length" => 200,"tooltip" => "tooltip-ldap-filter"));
 			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
 			$output .= "</table></form>";
 			return $output;

@@ -394,6 +394,13 @@
 			$output = "<tr><td>".$label."</td><td><center>";
 			if(isset($options["type"])) {
 				switch($options["type"]) {
+					case "idxedit": 
+						if($options["edit"])
+							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
+						else
+							$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
+                                        			(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
+						break;
 					case "chk": $options["check"] = $def_value; $output .= $this->check($name, $options); break;
 					case "ip": $output .= $this->IPInput($name,$def_value); break;
 					case "ipmask": $output .= $this->IPMaskInput($name,$def_value); break;
