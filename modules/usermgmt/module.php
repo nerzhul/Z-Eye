@@ -272,8 +272,9 @@
 			}
 			// If user already exists
 			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'")) {
-				FS::$ilog->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User '".$username."' already exists");
+				FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"User '".$username."' already exists");
 				FS::$iMgr->ajaxEcho("err-user-already-exists");
+				return;
 			}
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
 			while($data = FS::$dbMgr->Fetch($query)) {
