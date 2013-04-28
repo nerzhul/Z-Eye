@@ -28,8 +28,6 @@
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-user")); break;
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-bad-data")); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-bad-data")); break;
-				case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-exist")); break;
 				case 5: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-match")); break;
 				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-short")); break;
 				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-complex")); break;
@@ -39,11 +37,8 @@
 			}
 
 			$user = FS::$secMgr->checkAndSecuriseGetData("user");
-			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 			if($user)
 				$output .= $this->EditUser($user);
-			else if($addr)
-				$output .= $this->EditServer($addr);
 			else
 				$output .= $this->showMain();
 			return $output;
@@ -83,36 +78,6 @@
                                 function delGrpElmt(grpidx) {
                                         $('.ugroupli'+grpidx).remove();
                                 }");
-			return $output;
-		}
-
-		private function EditServer($addr) {
-			if(!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) 
-				return FS::$iMgr->printError($this->loc->s("err-rights"));
-
-			$output = FS::$iMgr->h2("title-directory");
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl","addr = '".$addr."'");
-			if($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
-				$output .= "<ul class=\"ulform\">".FS::$iMgr->hidden("addr",$addr).FS::$iMgr->hidden("edit","1")."<li><b>".$this->loc->s("Directory").": </b>".$addr."</li><li>";
-				$output .= FS::$iMgr->numInput("port",$data["port"],array("size" => 5, "length" => 5, "label" => $this->loc->s("ldap-port")))."</li><li>";
-				$output .= FS::$iMgr->check("ssl",array("check" => ($data["ssl"] == 1 ? true : false),"label" => "SSL ?"))."</li><li>";
-				$output .= FS::$iMgr->input("dn",$data["dn"],20,200,$this->loc->s("base-dn"),"tooltip-base-dn")."</li><li>";
-				$output .= FS::$iMgr->input("rootdn",$data["rootdn"],20,200,$this->loc->s("root-dn"),"tooltip-root-dn")."</li><li>";
-				$output .= FS::$iMgr->password("rootpwd",$data["dnpwd"],$this->loc->s("root-pwd"))."</li><li>";
-				$output .= FS::$iMgr->input("ldapname",$data["ldapname"],20,40,$this->loc->s("attr-name"),"tooltip-attr-name")."</li><li>";
-				$output .= FS::$iMgr->input("ldapsurname",$data["ldapsurname"],20,40,$this->loc->s("attr-subname"),"tooltip-attr-subname")."</li><li>";
-				$output .= FS::$iMgr->input("ldapmail",$data["ldapmail"],20,40,$this->loc->s("attr-mail"),"tooltip-attr-mail")."</li><li>";
-				$output .= FS::$iMgr->input("ldapuid",$data["ldapuid"],20,40,$this->loc->s("attr-uid"),"tooltip-attr-uid")."</li><li>";
-				$output .= FS::$iMgr->input("ldapfilter",$data["filter"],20,200,$this->loc->s("ldap-filter"),"tooltip-ldap-filter")."</li><li>";
-				$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-				$output .= "</ul></form>";
-			}
-			else {
-				$output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist"));
-					return $output;
-			}
-
 			return $output;
 		}
 
