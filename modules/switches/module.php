@@ -1504,7 +1504,6 @@
 						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise,room","'".$dip."','".$port."','".$prise."','".$room."'");
 	
 						FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
-						FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$dip."' AND port = '".$port."'");
 						FS::$dbMgr->CommitTr();
 	
 						foreach($logvals as $keys => $values) {

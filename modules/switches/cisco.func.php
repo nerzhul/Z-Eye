@@ -358,7 +358,7 @@
 			return $output;
 		}
 		
-		public function handleVlans($logvals) {
+		public function handleVlan($logvals) {
 			$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 			$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
 			$port = FS::$secMgr->checkAndSecurisePostData("port");
@@ -663,8 +663,8 @@
 		}
 
 		public function checkFields() {
-			if(!FS::$secMgr->checkAndSecurisePostData("duplex") || !FS::$secMgr->checkAndSecurisePostData("trmode") ||
-				FS::$secMgr->checkAndSecurisePostData("nvlan"))
+			if(!FS::$secMgr->checkAndSecurisePostData("trmode") ||
+				!FS::$secMgr->checkAndSecurisePostData("nvlan"))
 				return false;
 
 			return true;
