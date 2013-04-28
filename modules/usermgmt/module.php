@@ -139,8 +139,8 @@
 					$tmpoutput .= "<table id=\"userList\"><thead id=\"userthead\"><tr><th class=\"headerSortDown\">UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
 					$this->loc->s("Groups")."</th><th>".$this->loc->s("Subname")."</th><th>".$this->loc->s("Name")."</th><th>".
 					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th><th></th></tr></thead>";
-					$tmpoutput .= $this->showUserTr($data["uid"],$data["username"],$data["sha_pwd"] == "",$data["subname"],$data["name"],$data["mail"],$data["last_ip"],$data["last_conn"],$data["join_date"]);
 				}
+				$tmpoutput .= $this->showUserTr($data["uid"],$data["username"],$data["sha_pwd"] == "",$data["subname"],$data["name"],$data["mail"],$data["last_ip"],$data["last_conn"],$data["join_date"]);
 			}
 
 			if($found) {
