@@ -51,8 +51,7 @@
 						while($data = FS::$dbMgr->Fetch($query)) {
 							if(!$found) {
 								$found = true;
-								$tmpoutput .= FS::$iMgr->h2("serverlist").
-									"<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
+								$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
 								"</th><th></th></tr>";
 							}
 
