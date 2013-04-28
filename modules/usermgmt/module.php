@@ -163,8 +163,8 @@
 						$tmpoutput .= "<table id=\"ldapList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
 						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr></thead>";
 					}
-					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".
-						$data["addr"]."</a></td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".
+					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td>".FS::$iMgr->opendiv($this->showDirectoryForm($data["addr"]),$data["addr"],array("width" => 470)).
+						"</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".
 						FS::$iMgr->removeIcon("mod=".$this->mid."&act=5&addr=".$data["addr"],array("js" => true,
 							"confirm" => array($this->loc->s("confirm-removedirectory")."'".$data["addr"]."' ?","Confirm","Cancel")))."</tr>";
 				}
@@ -249,7 +249,7 @@
 			}
 
 			$output .= "<table>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-addr"),	"addr",		$addr,		array("type" => "idxedit", "length" => 40, "size" => 20, "edit" => $edit));
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-addr"),	"addr",		$addr,		array("type" => "idxedit", "length" => 40, "size" => 20, "edit" => $addr != ""));
 			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-port"),	"port",		$port,		array("size" => 5, "length" => 5));
 			$output .= FS::$iMgr->idxLine($this->loc->s("SSL")." ?",	"ssl",		$ssl,		array("type" => "chk"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("base-dn"),		"dn",		$dn,		array("size" => 20, "length" => 200,"tooltip" => "tooltip-base-dn"));
