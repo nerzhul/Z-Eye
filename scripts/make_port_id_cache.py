@@ -38,7 +38,7 @@ defaultSNMPRO = "public"
 max_threads = 30
 
 def zeye_log(text):
-        logfile = open("/usr/local/www/datas/logs/z_eye_collector.log","a")
+        logfile = open("/usr/local/www/z-eye/datas/logs/z_eye_collector.log","a")
         logfile.writelines("%s\n"  % text)
         logfile.close()
 
