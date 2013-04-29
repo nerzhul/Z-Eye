@@ -24,8 +24,26 @@
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-ip-management"));
+			$output = $this->showMain();
+			return $output;
+		}
+
+		private function showMain() {
 			$output = "";
-			$output .= $this->showStats();
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+
+			if(!FS::isAjaxCall()) {
+				$output .= FS::$iMgr->h1("title-ip-management");
+				$output .= FS::$iMgr->tabPan(array(
+					array(1,"mod=".$this->mid,$this->loc->s("Consult")),
+					array(2,"mod=".$this->mid,$this->loc->s("Manage"))),$sh);
+			}	
+			else {
+				switch($sh) {
+					case 1: $output .= $this->showStats(); break;
+					case 2: $output .= $this->showManagement(); break;
+				}
+			}
 			return $output;
 		}
 
@@ -38,8 +56,6 @@
 
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				$output .= FS::$iMgr->h1("title-ip-management");
-
 				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
 					switch($err) {
@@ -62,6 +78,7 @@
 					FS::$iMgr->setJSBuffer(1);
 					$formoutput = $this->showDHCPSrvForm();
 	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"line" => true));
+
 
 					// To edit/delete servers
 					if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
@@ -314,13 +331,61 @@
 			return $output;
 		}
 
+		private function showManagement() {
+			$output = FS::$iMgr->h2("title-declared-subnets");
+			$formoutput = $this->showDHCPSubnetForm();
+	                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("declare-subnet"),array("width" => 600,"line" => true));
+
+			$output .= "<div id=\"declsubnets\">";
+
+			$found = 0;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_desc,subnet_short_name");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) {
+					$found = 1;
+					$output .= $this->showDeclaredNetTableHead();
+				}
+				$output .= $this->tableDeclaredNetEntry($data["netid"],$data["netmask"],$data["subnet_desc"],$data["subnet_short_name"],$data["vlanid"]);
+			}
+			if($found) $output .= "</table>".FS::$iMgr->jsSortTable("declsubnettable");
+			$output .= "</div>";
+			return $output;
+		}
+
+		private function showDeclaredNetTableHead() {
+			return "<table id=\"declsubnettable\"><thead id=\"declsubnethead\"><tr><th>".$this->loc->s("netid")."/".$this->loc->s("netmask")."</th><th>".
+				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th><th></th></thead></tr>";
+		}
+
+		private function tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid) {
+			$net = new FSNetwork();
+			$net->SetNetAddr($netid);
+			$net->SetNetMask($netmask);
+			$net->CalcCIDR();
+			return "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv($this->showDHCPSubnetForm($netid,$netmask,$vlanid,$shortname,$desc),$netid,array("width" => 600)).
+				"/".$netmask." (/".$net->getCIDR().")</td><td>".$vlanid."</td><td>".
+				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>".
+				FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&netid=".$netid,array("js" => true, "confirm" =>
+				array($this->loc->s("confirm-remove-declared-subnet").$netid."' ?","Confirm","Cancel"))).
+				"</td></tr>";
+		}
+
+		private function showDHCPSubnetForm($netid = "",$netmask = "", $vlanid = 0, $shortname = "", $desc = "") {
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("netid"),"netid",$netid,array("type" => "idxipedit", "length" => 16, "edit" => $netid != "")).
+				FS::$iMgr->idxLine($this->loc->s("netmask"),"netmask",$netmask,array("length" => 16, "type" => "ip")).
+				FS::$iMgr->idxLine($this->loc->s("vlanid"),"vlanid",$vlanid,array("length" => 4, "type" => "num", "value" => $vlanid, "tooltip" => "tooltip-vlanid")).
+				FS::$iMgr->idxLine($this->loc->s("subnet-shortname"),"shortname",$shortname,array("length" => 32, "tooltip" => "tooltip-shortname")).
+				FS::$iMgr->idxLine($this->loc->s("subnet-desc"),"desc",$desc,array("length" => 128, "tooltip" => "tooltip-desc")).
+				FS::$iMgr->tableSubmit($this->loc->s("Save")).
+				"</table></form>";
+			return $output;
+		}
+
 		private function showDHCPSrvForm($addr = "",$user = "",$dhcpdpath = "",$leasepath = "",$reservconfpath = "",$subnetconfpath = "") {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>";
-			if($addr)
-				$output .= "<tr><td>".$this->loc->s("server-addr")."</td><td>".$addr.FS::$iMgr->hidden("addr",$addr).FS::$iMgr->hidden("edit",1);
-			else
-				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("length" => 128));
-			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("type" => "idxedit", "length" => 128, "edit" => $addr != "")).
+				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("dhcpd-path"),"dhcpdpath",$dhcpdpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
@@ -697,6 +762,84 @@
 					FS::$iMgr->ajaxEcho("Done");
 					FS::$iMgr->redir("mod=".$this->mid,true);
                                         return;
+				// Add DHCP subnet
+				case 7:
+					$netid = FS::$secMgr->checkAndSecurisePostData("netid");
+					$netmask = FS::$secMgr->checkAndSecurisePostData("netmask");
+					$vlanid = FS::$secMgr->checkAndSecurisePostData("vlanid");
+					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
+					$shortname = FS::$secMgr->checkAndSecurisePostData("shortname");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
+					if(!$netid || !FS::$secMgr->isIP($netid) || !$netmask || !FS::$secMgr->isMaskAddr($netmask) || !$vlanid || !FS::$secMgr->isNumeric($vlanid) ||
+						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $edit && $edit != 1) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas entered when adding Declared subnet");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$netid."'");
+					if($edit) {
+						if(!$exist) {
+							FS::$iMgr->ajaxEcho("err-subnet-not-exists");
+							return;
+						}
+					}
+					else {
+						if($exist) {
+							FS::$iMgr->ajaxEcho("err-subnet-already-exists");
+							return;
+						}
+					}
+
+					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid != '".$netid."' AND vlanid = '".$vlanid."'")) {
+						FS::$iMgr->ajaxEcho("err-vlan-already-used");
+						return;
+					}
+					
+
+					FS::$dbMgr->BeginTr();
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc","'".$netid."','".$netmask.
+						"','".$vlanid."','".$shortname."','".$desc."'");
+
+					$js = "";
+					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid");
+					// One record we must create table if it's not and edit
+					if($count == 1 && !$edit) {
+						$jscontent = $this->showDeclaredNetTableHead()."</table>".FS::$iMgr->jsSortTable("declsubnettable");
+						$js .= "$('#declsubnets').html('".addslashes($jscontent)."'); $('#declsubnets').show('slow');";
+					}
+
+					if($edit) $js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr'); setTimeout(function(){";
+					$jscontent = $this->tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid);
+					$js .= "$('".addslashes($jscontent)."').insertAfter('#declsubnethead');";
+					if($edit) $js .= "},1200);";
+
+					FS::$dbMgr->CommitTr();
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Remove DHCP subnet
+				case 8:
+					$netid = FS::$secMgr->checkAndSecuriseGetData("netid");
+					if(!$netid || !FS::$secMgr->isIP($netid)) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas given when deleting Declared subnet");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+					
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
+
+					$js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr');";
+					
+					// Also remove table is no record
+					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid");
+					if($count == 0) {
+						$js .= "$('#declsubnets').hide('slow',function() { $('#declsubnets').html(''); });";
+					}
+
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
 			}
 		}
 	};
