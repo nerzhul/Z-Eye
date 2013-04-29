@@ -908,11 +908,24 @@
 					}
 					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
 					$tmpoutput = "<table id=\"tvlanList\"><thead><tr><th class=\"headerSortDown\">ID</th><th>".$this->loc->s("Description").
-						"</th><th>".$this->loc->s("creation-date")."</th></tr></thead>";
+						"</th><th>".$this->loc->s("ip-network")."</th><th>".$this->loc->s("creation-date")."</th></tr></thead>";
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(!$found) $found = 1;
+						$netid = "";
+						$cidr = "";
+
+						$query2 = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","vlanid = '".$data["vlan"]."'");
+						if($data2 = FS::$dbMgr->Fetch($query2)) {
+							$netid = $data2["netid"];
+							$net = new FSNetwork();
+							$net->SetNetAddr($netid);
+							$net->SetNetMask($data["netmask"]);
+							$net->calcCIDR();
+							$cidr = $net->getCIDR();
+						}
+
 						$crdate = preg_split("#\.#",$data["creation"]);
-						$tmpoutput .= "<tr><td>".$data["vlan"]."</td><td>".$data["description"]."</td><td>".$crdate[0]."</td></tr>";
+						$tmpoutput .= "<tr><td>".$data["vlan"]."</td><td>".$data["description"]."</td><td>".($netid ? $netid."/".$cidr : "")."</td><td>".$crdate[0]."</td></tr>";
 					}
 					if($found) {
 						$output .= $tmpoutput."</table>";
@@ -1872,8 +1885,8 @@
 							$this->vendor = $data["vendor"];
 							switch($this->vendor) {
 								case "cisco": $this->devapi = new CiscoAPI(); break;
-								case "dell": $this->devapi = new DellAPI(); break;
-								default: $this->devapi = new DeviceAPI(); break;
+								case "dell": $this->devapi = DellAPI(); break;
+								default: $this->devapi = DeviceAPI(); break;
 							}
 							$this->devapi->setDevice($data["name"]);
 							$this->devapi->writeMemory();
@@ -1902,8 +1915,8 @@
 								$this->vendor = $data2["vendor"];
 								switch($this->vendor) {
 									case "cisco": $this->devapi = new CiscoAPI(); break;
-									case "dell": $this->devapi = new DellAPI(); break;
-									default: $this->devapi = new DeviceAPI(); break;
+									case "dell": $this->devapi = DellAPI(); break;
+									default: $this->devapi = DeviceAPI(); break;
 								}
 								$this->devapi->setDevice($data2["name"]);
 								if($data["type"] == 1)
