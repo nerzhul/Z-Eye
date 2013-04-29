@@ -77,7 +77,7 @@
 		}
 
 		public function getFieldForPortWithPID($field, $raw = false) {
-			if($this->devip == "" || $this->snmpro == "" || $field == "" || this->portid < 1)
+			if($this->devip == "" || $this->snmpro == "" || $field == "" || $this->portid < 1)
 				return -1;
 			$out = snmpget($this->devip,$this->snmpro,$field.".".$this->portid);
                         return $out;

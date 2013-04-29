@@ -23,6 +23,7 @@
 	if(FS::isAjaxCall() && !$device)
 		$device = FS::$secMgr->checkAndSecurisePostData("sw");
 	require_once(dirname(__FILE__)."/cisco.func.php");
+	require_once(dirname(__FILE__)."/dell.func.php");
 	require_once(dirname(__FILE__)."/device.api.php");
 	
 	class iSwitchMgmt extends FSModule{
