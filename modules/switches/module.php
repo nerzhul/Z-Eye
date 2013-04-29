@@ -36,8 +36,8 @@
 				$this->vendor = FS::$dbMgr->GetOneData("device","vendor","name = '".$device."'");
 				switch($this->vendor) {
 					case "cisco": $this->devapi = new CiscoAPI(); break;
-					case "dell": $this->devapi = DellAPI(); break;
-					default: $this->devapi = DeviceAPI(); break;
+					case "dell": $this->devapi = new DellAPI(); break;
+					default: $this->devapi = new DeviceAPI(); break;
 				}
 				$this->devapi->setLocales($this->loc);
 			}
