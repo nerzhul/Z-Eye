@@ -1872,8 +1872,8 @@
 							$this->vendor = $data["vendor"];
 							switch($this->vendor) {
 								case "cisco": $this->devapi = new CiscoAPI(); break;
-								case "dell": $this->devapi = DellAPI(); break;
-								default: $this->devapi = DeviceAPI(); break;
+								case "dell": $this->devapi = new DellAPI(); break;
+								default: $this->devapi = new DeviceAPI(); break;
 							}
 							$this->devapi->setDevice($data["name"]);
 							$this->devapi->writeMemory();
@@ -1902,8 +1902,8 @@
 								$this->vendor = $data2["vendor"];
 								switch($this->vendor) {
 									case "cisco": $this->devapi = new CiscoAPI(); break;
-									case "dell": $this->devapi = DellAPI(); break;
-									default: $this->devapi = DeviceAPI(); break;
+									case "dell": $this->devapi = new DellAPI(); break;
+									default: $this->devapi = new DeviceAPI(); break;
 								}
 								$this->devapi->setDevice($data2["name"]);
 								if($data["type"] == 1)
