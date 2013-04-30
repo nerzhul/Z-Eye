@@ -963,8 +963,8 @@
 						else $(src).toggle(); }");
 					}
 					$tmpoutput = "<table id=\"tportList\"><thead><tr><th class=\"headerSortDown\"><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
-					$tmpoutput .= "<a href=\"index.php?mod=".$this->mid."&d=".$device."&od=desc\">".$this->loc->s("Description")."</a></th>
-						<th>".$this->loc->s("MAC-addr-iface")."</th><th>Up (Link/Admin)</th>";
+					$tmpoutput .= $this->loc->s("Description")."</th>
+						<th>".$this->loc->s("Prise")."</th><th>Up (Link/Admin)</th>";
 					if($iswif == false)
 						$tmpoutput .= "<th>".$this->loc->s("Duplex")." (Link/Admin)</th>";
 					$tmpoutput .= "<th>Vitesse</th>";
