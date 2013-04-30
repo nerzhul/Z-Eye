@@ -27,14 +27,14 @@
 		*/
 
 		public function setPortDesc($value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1)
+			if(!FS::$secMgr->isNumeric($this->portid) || $this->portid == -1)
 				return -1;
 
 			return $this->setFieldForPortWithPID("ifAlias","s",$value);
 		}
 
 		public function setPortState($value) {
-			if(!FS::$secMgr->isNumeric($pid) || $pid == -1 || ($value != 1 && $value != 2))
+			if(!FS::$secMgr->isNumeric($this->portid) || $this->portid == -1 || ($value != 1 && $value != 2))
 				return NULL;
 
 			return $this->setFieldForPortWithPID("ifAdminStatus","i",$value);
@@ -70,7 +70,7 @@
 		*/
 
 		public function setFieldForPortWithPID($field, $vtype, $value) {
-			if($this->devip == "" || $this->snmprw == "" || $field == "" || $this->portid < 1 || $vtype == "" || !FS::$secMgr->isNumeric($pid))
+			if($this->devip == "" || $this->snmprw == "" || $field == "" || $this->portid < 1 || $vtype == "" || !FS::$secMgr->isNumeric($this->portid))
 				return -1;
 			snmpset($this->devip,$this->snmprw,$field.".".$this->portid,$vtype,$value);
 			return 0;
