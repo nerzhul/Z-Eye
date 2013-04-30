@@ -23,6 +23,34 @@
 		function DellAPI() { $this->vendor = "dell"; }
 
 		/*
+		* Interface
+		*/
+
+		public function showStateOpts() {
+                        $state = $this->getPortState();
+                        return FS::$iMgr->idxLine($this->loc->s("Shutdown"),"shut",$state == 2 ? true : false, array("type" => "chk", "tooltip" => "tooltip-shut"));
+                }
+
+                public function handleState($logvals) {
+                        $port = FS::$secMgr->checkAndSecurisePostData("port");
+                        $shut = FS::$secMgr->checkAndSecurisePostData("shut");
+
+                        $portstate = $this->getPortState();
+
+                        // If it's same state do nothing
+                        if($portstate == ($shut == "on" ? 2 : 1))
+                                return;
+
+                        $logvals["hostmode"]["src"] = $portstate;
+                        if($this->setPortState($shut == "on" ? 2 : 1) != 0) {
+                                echo "Fail to set switchport shut/no shut state";
+                                return;
+                        }
+                        $logvals["hostmode"]["dst"] = ($shut == "on" ? 2 : 1);
+                        FS::$dbMgr->Update("device_port","up_admin = '".($shut == "on" ? "down" : "up")."'","ip = '".$this->devip."' AND port = '".$port."'");
+                }
+
+		/*
 		* Generic port management
 		*/
 
@@ -34,22 +62,17 @@
 		}
 
 		public function setPortState($value) {
-			if(!FS::$secMgr->isNumeric($this->portid) || $this->portid == -1 || ($value != 1 && $value != 2))
-				return NULL;
+                        if($value != 1 && $value != 2)
+                                return NULL;
 
-			return $this->setFieldForPortWithPID("ifAdminStatus","i",$value);
-		}
+                        return $this->setFieldForPortWithPID("ifAdminStatus","i",$value);
+                }
 
-		public function getPortState() {
-			$dup = $this->getFieldForPortWithPID("ifAdminStatus");
-			$dup = explode(" ",$dup);
-			if(count($dup) != 2)
-					return -1;
-
-			$dup = $dup[1];
-			$dup = preg_replace("#[a-zA-Z()]#","",$dup);
-			return $dup;
-		}
+                public function getPortState() {
+                        $dup = $this->getFieldForPortWithPID("ifAdminStatus");
+                        $dup = preg_replace("#[a-zA-Z()]#","",$dup);
+                        return $dup;
+                }
 
 		/*
 		* Link Management
