@@ -51,8 +51,8 @@ def fetchSNMPInfos(ip,devname,devcom,vendor):
 		tc_mutex.release()
 		if vendor == "cisco":
 			cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
-		else:
-			cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
+		elif vendor == "dell":
+			cmd = "snmpwalk -v 2c -c %s %s ifName | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
 		pipe = os.popen('{ ' + cmd + '; }', 'r')
 		text = pipe.read()
 		pipe.close()
@@ -75,7 +75,8 @@ def fetchSNMPInfos(ip,devname,devcom,vendor):
 					pid = pdata2[1]
 					swid = 0
 					swpid = 0
-					if stopSwIDSearch == 0:
+					""" it's a cisco specific mib. We must found another mean for other constructors """
+					if stopSwIDSearch == 0 and vendor == "cisco":
 						cmd = "snmpwalk -v 2c -c %s %s 1.3.6.1.4.1.9.5.1.4.1.1.11 | grep %s" % (devcom,ip,pid)
 						pipe2 = os.popen('{ ' + cmd + '; }', 'r')
 						text2 = pipe2.read()
