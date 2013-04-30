@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# $FreeBSD: ports/net-mgmt/netdisco/files/netdisco.in,v 1.5 2012/02/17 17:22:20 scheidell Exp $
+# 
+# PROVIDE: z-eye
+# REQUIRE: DAEMON LOGIN postgresql
+# BEFORE: apache24
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+name="z_eye"
+rcvar=z_eye_enable
+
+load_rc_config $name
+
+: ${z_eye_enable="NO"}
+
+start_cmd=${name}_start
+stop_cmd=${name}_stop
+restart_cmd=${name}_restart
+
+command="/usr/local/www/z-eye/service/z-eye.py"
+#command_interpreter="/usr/local/bin/python2.7"
+
+z_eye_start() {
+	$command start
+}
+
+z_eye_stop() {
+	$command stop
+}
+
+z_eye_restart() {
+	$command restart
+}
+
+run_rc_command "$1"

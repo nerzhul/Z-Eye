@@ -36,15 +36,15 @@ def usage():
 if __name__ == "__main__":
         daemon = ZEyeDaemon("/var/run/z-eye.pid")
         if len(sys.argv) == 2:
-                if '-daemon' == sys.argv[1]:
+                if 'start' == sys.argv[1]:
+			print "Starting Z-Eye daemon"
                         daemon.start()
-			print "Z-Eye daemon started"
                 elif 'stop' == sys.argv[1]:
-			print "Stopping Z-Eye daemon..."
+			print "Stopping Z-Eye daemon"
                         daemon.stop()
                 elif 'restart' == sys.argv[1]:
-                        daemon.restart()
 			print "Restarting Z-Eye daemon"
+                        daemon.restart()
                 else:
 			print "Unknown arg"
 			usage()
