@@ -50,7 +50,9 @@ class ZEyeServiceMgr(threading.Thread):
 		if os.path.exists("/tmp/snort_restart"):
 			snortFile = open("/tmp/snort_restart", 'r')
 			if snortFile:
-				if snortFile.read() == "1":
+				rf = snortFile.read()
+				rf = re.sub("\n","",rf)
+				if rf == "1":
 					cmd = "service snort restart"
 					pipe = os.popen(cmd, 'r')
 					text = pipe.read()
