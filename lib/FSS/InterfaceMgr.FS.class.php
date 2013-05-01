@@ -485,7 +485,7 @@
 			$output = "";
 			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$selId = preg_replace("#\[|\]#","",$name);
-			$output .= "<select name=\"".$name."\" id=\"".$selId."\"";
+			$output .= "<select name=\"".$name.($multival ? "[]" : "")."\" id=\"".$selId."\"";
 			if(strlen($js) > 0)
 				$output .= " onchange=\"javascript:".$js.";\" ";
 			if($multival)

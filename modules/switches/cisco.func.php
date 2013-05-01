@@ -321,7 +321,7 @@
 			}
 			$output .= "</select></td></tr>";
 			$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
-			$output .= FS::$iMgr->select("vllist[]","",NULL,true,array("size" => round($vlannb/4)));
+			$output .= FS::$iMgr->select("vllist","",NULL,true,array("size" => round($vlannb/4)));
 			$output .= FS::$iMgr->selElmt($this->loc->s("All"),"all",$trunkall);
 			$output .= $trunkvlanoutput;
 			$output .= "</select>";

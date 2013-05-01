@@ -769,7 +769,7 @@
 						$dhcpsnvlanlist = $this->devapi->getDHCPSnoopingVlans();
 						if($dhcpsnvlanlist && is_array($dhcpsnvlanlist)) {
 							$output .= $this->loc->s("Apply-VLAN").": <br />";
-							$output .= FS::$iMgr->select("vlansnooping[]","",NULL,true,array("tooltip" => "tooltip-dhcpsnoopingvlan", "size" => count($dhcpsnvlanlist)/4));
+							$output .= FS::$iMgr->select("vlansnooping","",NULL,true,array("tooltip" => "tooltip-dhcpsnoopingvlan", "size" => count($dhcpsnvlanlist)/4));
 
 							foreach($dhcpsnvlanlist as $vlan => $value)
 								$output .= FS::$iMgr->selElmt($vlan." - ".$vlanlist[$vlan],$vlan,$value == 1);

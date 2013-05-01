@@ -329,7 +329,7 @@
 
 		private function showDeclaredNetTableHead() {
 			return "<table id=\"declsubnettable\"><thead id=\"declsubnethead\"><tr><th>".$this->loc->s("netid")."/".$this->loc->s("netmask")."</th><th>".
-				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th><th></th></thead></tr>";
+				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th><th></th></tr></thead>";
 		}
 
 		private function tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid) {
@@ -397,12 +397,14 @@
 				// To add DHCP cluster
 				FS::$iMgr->setJSBuffer(1);
 				$formoutput = $this->showDHCPClusterForm();
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("add-cluster"),array("width" => "500"));
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("add-cluster"),array("width" => "500")).
+					"<div id=\"clusterdiv\">";
 
 				// To edit/delete clusters
 				if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr") > 0) {
 					$output .= $this->showDHCPClusterList();
 				}
+				$output .= "</div>";
 			}
 			else
 				$output .= FS::$iMgr->printError("err-need-dhcp-server");
@@ -424,17 +426,19 @@
 		}
 
 		private function showDHCPClusterForm($name = "") {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7")."<table>".
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit")).
-				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers");
+				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
+			if($name) {}
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr",array(),array("order" => "addr")).
+				"</select>";
 
 			$output .= FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 
-		private function showDHCPCLusterList() {
-			$output = "<table id=\"clusterlist\"><thead><tr><th>".$this->loc->s("Cluster-name")."</th><th>".$this->loc->s("Cluster-members")."</th></tr></thead>";
-
+		private function showDHCPClusterList() {
+			$output = $this->showTableHeadCluster();
 			$clusters = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername,dhcpaddr");
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -444,16 +448,27 @@
 			}
 
 			foreach($clusters as $clustername => $dhcplist) {
-				$output .= "<tr><td>".$clustername."</td><td><ul>";
-				for($i=0;$i<count($dhcplist);$i++)
-					$output .= "<li>".$dhcplist[$i]."</li>";
-				$output .= "</ul></td></tr>";
+				$output .= $this->showDHCPClusterTableEntry($clustername,$dhcplist);
 			}
 
-			$output .= "</table>";
+			$output .= "</table>".FS::$iMgr->jsSortTable("clustertable");
 			return $output;
 		}
 
+		private function showTableHeadCluster() {
+			return "<table id=\"clustertable\"><thead id=\"clusterth\"><tr><th>".$this->loc->s("Cluster-name")."</th><th>".$this->loc->s("Cluster-members")."</th><th></th></tr></thead>";
+		}
+
+		private function showDHCPClusterTableEntry($clustername,$members) {
+			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".$clustername."</td><td><ul>";
+			for($i=0;$i<count($members);$i++)
+				$output .= "<li>".$members[$i]."</li>";
+			$output .= "</ul></td><td>".
+				FS::$iMgr->removeIcon("mod=".$this->mid."&act=10&cluster=".$clustername,array("js" => true, "confirm" =>
+				array($this->loc->s("confirm-remove-cluster").$clustername."' ?","Confirm","Cancel"))).
+				"</td></tr>";
+			return $output;
+		}
 
 		private function showHistory($filter,$interval = 1) {
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
@@ -659,6 +674,11 @@
 					return;
 				// Add/Edit DHCP server
 				case 5:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
 					$saddr = FS::$secMgr->checkAndSecurisePostData("addr");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
                                         $slogin = FS::$secMgr->checkAndSecurisePostData("sshuser");
@@ -782,6 +802,11 @@
 					return;
 				// Delete DHCP Server
 				case 6:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"No DHCP server specified to remove");
@@ -886,12 +911,90 @@
 					return;
 				// Add/Edit cluster
 				case 9:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
+					$cname = FS::$secMgr->checkAndSecurisePostData("cname");
+					$cmembers = FS::$secMgr->checkAndSecurisePostData("clustermembers");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+					if(!$cname || !$cmembers || !is_array($cmembers) || $edit && $edit != 1) {
+						if(!$cmembers || !is_array($cmembers))
+							FS::$iMgr->ajaxEcho("err-cluster-need-members");
+						else
+							FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$cname."'");
+					if($edit) {
+						if(!$exist) {
+							FS::$iMgr->ajaxEcho("err-cluster-not-exists");
+							return;
+						}
+					}
+					else {
+						if($exist) {
+							FS::$iMgr->ajaxEcho("err-cluster-already-exists");
+							return;
+						}
+					}
+
+					$count = count($cmembers);
+					for($i=0;$i<$count;$i++) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr = '".$cmembers[$i]."'")) {
+							FS::$iMgr->ajaxEcho("err-dhcpserver-not-exists");
+							return;
+						}
+					}
+					
+					FS::$dbMgr->BeginTr();
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername = '".$cname."'");
+					for($i=0;$i<$count;$i++)
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername,dhcpaddr","'".$cname."','".$cmembers[$i]."'");
+					FS::$dbMgr->CommitTr();
+
 					$js = "";
+					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername");
+					if($count == 1 && !$edit) {
+						$jscontent = $this->showTableHeadCluster()."</table>".FS::$iMgr->jsSortTable("clustertable");
+						$js .= "$('#clusterdiv').html('".addslashes($jscontent)."'); $('#clusterdiv').show('slow');";
+					}
+					if($edit) $js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($clustername)."tr'); setTimeout(function() {";
+					$jscontent = $this->showDHCPClusterTableEntry($cname,$cmembers);
+					$js .= "$('".addslashes($jscontent)."').insertAfter('#clusterth');";
+					if($edit) $js .= "},1200);";
+
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Remove cluster
 				case 10:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
+					$cname = FS::$secMgr->checkAndSecuriseGetData("cluster");
+					if(!$cname) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$cname."'")) {
+						FS::$iMgr->ajaxEcho("err-cluster-not-exists");
+						return;
+					}
+
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername = '".$cname."'");
+
 					$js = "";
+					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername");
+					if($count == 0)
+						$js .= "hideAndRemove('#clustertable');";
+					else
+						$js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($cname)."tr');";
+
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 			}

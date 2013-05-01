@@ -70,9 +70,9 @@
                         $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Modify"))."</li>";
                         $output .= "</ul></form>";
 
-			$output .= FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
-                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Groupe").$this->addGroupList()."</select>
-                        	<a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
+			FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
+                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Groupe").$this->addGroupList()."</select><a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a> </li>').
+                        	insertBefore('#formactions');
                                         grpidx++;
                                 }
                                 function delGrpElmt(grpidx) {
@@ -183,7 +183,7 @@
 					$size = round($countElmt/4);
 				else
 					$size = $countElmt;
-				$output .= "<tr><td>".$this->loc->s("Groups")."</td><td>".FS::$iMgr->select("groups[]","",NULL,true,array("size" => $size));
+				$output .= "<tr><td>".$this->loc->s("Groups")."</td><td>".FS::$iMgr->select("groups","",NULL,true,array("size" => $size));
 				$output .= $tmpoutput;
 				$output .= "</select></td></tr>";
 			}

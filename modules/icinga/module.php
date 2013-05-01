@@ -217,7 +217,7 @@
 			}
 
 			if($countElmt/4 < 4) $countElmt = 16;
-			$output .= FS::$iMgr->select("parent[]","",NULL,true,array("size" => round($countElmt/4)));
+			$output .= FS::$iMgr->select("parent","",NULL,true,array("size" => round($countElmt/4)));
 			$output .= $output2;
 			$output .= "</select></td></tr>";
 
@@ -230,7 +230,7 @@
 					array_push($hglist,$data["name"]);
 			}
 
-			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups[]",false,$hglist,"",true)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups",false,$hglist,"",true)."</td></tr>";
 
 			// Checks
 			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand",$checkcmd)."</td></tr>";
@@ -339,7 +339,7 @@
 					array_push($hostlist,$data["hosttype"]."$".$data["host"]);
 			}	
 
-			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true,$hostlist,$name)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members",true,$hostlist,$name)."</td></tr>";
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
@@ -752,7 +752,7 @@
 				$output2 .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
 			}
 			if($countElmt/4 < 4) $countElmt = 16;
-			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts[]","",NULL,true,array("size" => round($countElmt/4)));
+			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts","",NULL,true,array("size" => round($countElmt/4)));
 			$output .= $output2;
 			$output .= "</select></td></tr>";
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
@@ -830,7 +830,7 @@
 
 		private function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name","name",$tocheck,array("order" => "name"));
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name","name",array($tocheck),array("order" => "name"));
 			$output .= "</select>";
 			return $output;
 		}
