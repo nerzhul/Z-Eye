@@ -83,9 +83,7 @@
 
 		private function addGrouplist($gid=-1) {
 			$output = "";
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname");
-			while($data = FS::$dbMgr->Fetch($query))
-				$output .= FS::$iMgr->selElmt($data["gname"],$data["gid"],$gid == $data["gid"] ? true : false);
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gname","gid",$gid,array(),array("order" => "gname"));
 			return $output;
 		}
 

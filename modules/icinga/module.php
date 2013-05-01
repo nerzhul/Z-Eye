@@ -823,20 +823,14 @@
 
 		private function getTimePeriodList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias","",array("order" => "alias"));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->selElmt($data["alias"],$data["name"],$select == $data["name"]);
-			}
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name",array($select),array("order" => "alias"));
 			$output .= "</select>";
 			return $output;
 		}
 
 		private function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name","",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= FS::$iMgr->selElmt($data["name"],$data["name"],$tocheck != NULL && $tocheck == $data["name"] ? true : false);
-			}
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name","name",$tocheck,array("order" => "name"));
 			$output .= "</select>";
 			return $output;
 		}

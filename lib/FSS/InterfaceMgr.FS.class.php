@@ -507,9 +507,9 @@
 			return $output;
 		}
 
-		public function selElmtFromDB($table,$labelfield,$valuefield,$selected = array()) {
+		public function selElmtFromDB($table,$labelfield,$valuefield,$selected = array(),$sqlopts = array()) {
 			$output = "";
-			$query = FS::$dbMgr->Select($table,$labelfield.",".$valuefield);
+			$query = FS::$dbMgr->Select($table,$labelfield.",".$valuefield,"",$sqlopts);
                         while($data = FS::$dbMgr->Fetch($query)) {
                                 $output .= FS::$iMgr->selElmt($data[$labelfield],$data[$valuefield],in_array($data[$valuefield],$selected));
                         }
