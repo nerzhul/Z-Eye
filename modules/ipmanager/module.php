@@ -425,12 +425,11 @@
 			return $output;
 		}
 
-		private function showDHCPClusterForm($name = "") {
+		private function showDHCPClusterForm($name = "",$members = array()) {
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit", "edit" => $name != "")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
-			if($name) {}
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr",array(),array("order" => "addr")).
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr",$members,array("order" => "addr")).
 				"</select>";
 
 			$output .= FS::$iMgr->tableSubmit("Save");
@@ -460,7 +459,7 @@
 		}
 
 		private function showDHCPClusterTableEntry($clustername,$members) {
-			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".$clustername."</td><td><ul>";
+			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv($this->showDHCPClusterForm($clustername,$members),$clustername)."</td><td><ul>";
 			for($i=0;$i<count($members);$i++)
 				$output .= "<li>".$members[$i]."</li>";
 			$output .= "</ul></td><td>".
@@ -961,7 +960,7 @@
 						$jscontent = $this->showTableHeadCluster()."</table>".FS::$iMgr->jsSortTable("clustertable");
 						$js .= "$('#clusterdiv').html('".addslashes($jscontent)."'); $('#clusterdiv').show('slow');";
 					}
-					if($edit) $js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($clustername)."tr'); setTimeout(function() {";
+					if($edit) $js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($cname)."tr'); setTimeout(function() {";
 					$jscontent = $this->showDHCPClusterTableEntry($cname,$cmembers);
 					$js .= "$('".addslashes($jscontent)."').insertAfter('#clusterth');";
 					if($edit) $js .= "},1200);";
