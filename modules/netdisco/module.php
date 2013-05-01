@@ -88,7 +88,7 @@
 			$output .= FS::$iMgr->selElmt("1","1",$netdiscoCfg["snmpver"] == 1 ? true : false);
 			$output .= FS::$iMgr->selElmt("2c","2",$netdiscoCfg["snmpver"] == 2 ? true : false);
 			$output .= "</select></td></tr>";
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= FS::$iMgr->tableSubmit("Save");
 			$output .= "</table></form>";
 			return $output;
 		}

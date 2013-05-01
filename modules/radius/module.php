@@ -223,7 +223,7 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radgrprep"),"tradgrprep",$tradgrprep,array("tooltip" => "tooltip-radgrprep"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radusrgrp"),"tradusrgrp",$tradusrgrp,array("tooltip" => "tooltip-radusrgrp"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("table-radacct"),"tradacct",$tradacct,array("tooltip" => "tooltip-radacct"));
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= FS::$iMgr->tableSubmit("Save");
 			$output .= "</table></form>";
 
 			return $output;
@@ -283,7 +283,7 @@
 				$output .= FS::$iMgr->calendar("enddate","",$this->loc->s("To"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
 				$output .= "</td></tr>";
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
+				$output .= FS::$iMgr->tableSubmit("Save")."</table></form>";
 
 				$output .= FS::$iMgr->js("$('#adduser').submit(function(event) {
 					event.preventDefault();
@@ -312,7 +312,7 @@
 		                $output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
                 		$output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
 		                $output .= "</td></tr>";
-                		$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
+                		$output .= FS::$iMgr->tableSubmit("Save")."</table></form>";
 			}
 			else if($sh && $sh > 2)
 				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));
@@ -633,7 +633,7 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("SQL-table"),"cleanradsqltable",$radexptable,array("tooltip" => "tooltip-ac-sqltable"));
 				$output .= FS::$iMgr->idxLine($this->loc->s("user-field"),"cleanradsqluserfield",$radexpuser,array("tooltip" => "tooltip-ac-sqluserfield"));
 				$output .= FS::$iMgr->idxLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",$radexpdate,array("tooltip" => "tooltip-ac-sqlexpirationfield"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</form>";
+				$output .= FS::$iMgr->tableSubmit("Save")."</table></form>";
 			}
 			else if($sh == 6) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
@@ -653,7 +653,7 @@
 				$output .= FS::$iMgr->calendar("enddate","",$this->loc->s("To"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
 				$output .= "</td></tr>";
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
+				$output .= FS::$iMgr->tableSubmit("Save")."</table></form>";
 
 				$output .= FS::$iMgr->js("$('#adduser').submit(function(event) {
 					event.preventDefault();
@@ -681,7 +681,7 @@
 				$output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
 				$output .= "</td></tr>";
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table></form>";
+				$output .= FS::$iMgr->tableSubmit("Save")."</table></form>";
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));

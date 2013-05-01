@@ -65,7 +65,7 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("User"),"dbuser",$dbuser);
 				$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"dbpwd",$dbpwd,array("type" => "pwd"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("lan-list"),"lanlist",array("width" => 250, "height" => 100, "value" => $lanlist));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 2) {
@@ -76,7 +76,7 @@
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"dnsenable",$dnsenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-dns"),"dnslist",array("value" => $dnslist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 3) {
@@ -107,7 +107,7 @@
 				$output .= FS::$iMgr->idxLine("Activer les sondes POP","enpop",$popenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-pop"),"poplist",array("value" => $poplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-pop"),"popports",array("value" => $popports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 4) {
@@ -123,7 +123,7 @@
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-http"),"httplist",array("value" => $httplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-http"),"httpports",array("value" => $httpports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 5) {
@@ -143,7 +143,7 @@
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("sql-oracle"),"oraclelist",array("value" => $oraclelist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-oracle"),"oracleports",array("value" => $oracleports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
 
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 6) {
@@ -168,7 +168,7 @@
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ssh"),"sshports",array("value" => $sshports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
 				$output .= FS::$iMgr->idxLine($this->loc->s("en-tse-sensor"),"entse",$tseenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-tse"),"tselist",array("value" => $tselist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 7) {
@@ -183,7 +183,7 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enftp",$ftpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-ftp"),"ftpports",array("value" => $ftpports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 8) {
@@ -195,7 +195,7 @@
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensnmp",$snmpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-snmp"),"snmplist",array("value" => $snmplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 9) {
@@ -209,7 +209,7 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensip",$sipenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sip"),"siplist",array("value" => $siplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("port-sip"),"sipports",array("value" => $sipports, "width" => 250, "height" => 100, "tooltip" => "tooltip-port"));
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			else if($sh == 10) {
@@ -230,7 +230,7 @@
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-we")."</th></tr>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"), "wereport", $wereport == 1 ? true : false,array("type" => "chk"));
 				$output .= "<tr><td>".$this->loc->s("sent-hour")."</td><td>".FS::$iMgr->hourlist("hwe","mwe",$weh,$wem)."</td></tr>";
-				$output .= FS::$iMgr->tableSubmit($this->loc->s("Register"));
+				$output .= FS::$iMgr->tableSubmit("Register");
 				$output .= "</table></form>";
 			}
 			return $output;

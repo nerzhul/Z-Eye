@@ -116,7 +116,7 @@
 			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
 			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("server-path"),"spath",$spath);
-			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"));
+			$output .= FS::$iMgr->tableSubmit("Save");
 			$output .= "</table></form>";
 			return $output;
 		}

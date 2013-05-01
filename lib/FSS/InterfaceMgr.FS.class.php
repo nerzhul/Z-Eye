@@ -448,9 +448,9 @@
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
 			if(isset($options["js"]))
-				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,$options["js"]);
+				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label),$options["js"]);
 			else
-				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$label);
+				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label));
 			$output .= "</center></th></tr>";
 			return $output;
 		}
@@ -458,9 +458,9 @@
 		// Helper for tabled Add/Submit forms
 		public function aeTableSubmit($add = true, $options = array()) {
 			if($add)
-				return $this->tableSubmit($this->cur_module->getLoc()->s("Add"),$options);
+				return $this->tableSubmit("Add",$options);
 			else
-				return $this->tableSubmit($this->cur_module->getLoc()->s("Save"),$options);
+				return $this->tableSubmit("Save",$options);
 		}
 
 		public function jsSortTable($id) {
