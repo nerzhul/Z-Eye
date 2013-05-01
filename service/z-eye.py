@@ -23,9 +23,11 @@ import sys,time
 
 import Daemon
 import serviceManager
+import MRTGCfgDiscoverer
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
+		MRTGCfgDiscoverer.ZEyeMRTGDiscoverer().start()
 		serviceManager.ZEyeServiceMgr().start()	
 		while True:
 			time.sleep(1)
