@@ -426,12 +426,34 @@
 		}
 
 		private function showDHCPClusterForm($name = "") {
-			$output = "";
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit")).
+				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers");
+
+			$output .= FS::$iMgr->tableSubmit($this->loc->s("Save"))."</table>";
 			return $output;
 		}
 
 		private function showDHCPCLusterList() {
 			$output = "<table id=\"clusterlist\"><thead><tr><th>".$this->loc->s("Cluster-name")."</th><th>".$this->loc->s("Cluster-members")."</th></tr></thead>";
+
+			$clusters = array();
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername,dhcpaddr");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!isset($clusters[$data["clustername"]]))
+					$clusters[$data["clustername"]] = array();
+				array_push($clusters[$data["clustername"]],$data["dhcpaddr"]);
+			}
+
+			foreach($clusters as $clustername => $dhcplist) {
+				$output .= "<tr><td>".$clustername."</td><td><ul>";
+				for($i=0;$i<count($dhcplist);$i++)
+					$output .= "<li>".$dhcplist[$i]."</li>";
+				$output .= "</ul></td></tr>";
+			}
+
+			$output .= "</table>";
+			return $output;
 		}
 
 
@@ -439,7 +461,8 @@
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
 			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate","collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'",
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate",
+				"collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'",
 				array("order" => "collecteddate","ordersens" => 2));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
@@ -861,6 +884,16 @@
 						$js .= "$('#declsubnets').hide('slow',function() { $('#declsubnets').html(''); });";
 					}
 
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Add/Edit cluster
+				case 9:
+					$js = "";
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Remove cluster
+				case 10:
+					$js = "";
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 			}
