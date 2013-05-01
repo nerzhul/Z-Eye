@@ -427,7 +427,7 @@
 
 		private function showDHCPClusterForm($name = "") {
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit")).
+				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit", "edit" => $name != "")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
 			if($name) {}
 			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr",array(),array("order" => "addr")).
