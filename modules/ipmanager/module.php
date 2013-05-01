@@ -34,14 +34,21 @@
 
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-ip-management");
-				$output .= FS::$iMgr->tabPan(array(
+				$tabs = array(
 					array(1,"mod=".$this->mid,$this->loc->s("Consult")),
-					array(2,"mod=".$this->mid,$this->loc->s("Manage"))),$sh);
+					array(2,"mod=".$this->mid,$this->loc->s("Manage-Subnets"))
+					);
+				
+				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt"))
+					array_push($tabs,array(3,"mod=".$this->mid,$this->loc->s("Manage-Servers")));
+
+				$output .= FS::$iMgr->tabPan($tabs,$sh);
 			}	
 			else {
 				switch($sh) {
 					case 1: $output .= $this->showStats(); break;
-					case 2: $output .= $this->showManagement(); break;
+					case 2: $output .= $this->showSubnetMgmt(); break;
+					case 3: $output .= $this->showDHCPMgmt(); break;
 				}
 			}
 			return $output;
@@ -56,38 +63,6 @@
 
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			if(!FS::isAjaxCall()) {
-				if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
-					$err = FS::$secMgr->checkAndSecuriseGetData("err");
-					switch($err) {
-						case 1: case 7: case 8: $output .= FS::$iMgr->printError($this->loc->s("err-bad-datas")); break;
-						case 2: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-not-match")); break;
-						case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-conn-failed")); break;
-						case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-auth-failed")); break;
-						case 5: $output .= FS::$iMgr->printError($this->loc->s("err-already-exists")); break;
-						case 6: {
-							$file = FS::$secMgr->checkAndSecuriseGetData("file");
-							if($file)
-								$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." '".$file."'");
-							else
-								$output .= FS::$iMgr->printError($this->loc->s("bad-datas"));
-							break;
-						}
-						default: break;
-					}
-					// To add servers
-					FS::$iMgr->setJSBuffer(1);
-					$formoutput = $this->showDHCPSrvForm();
-	                                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"line" => true));
-
-
-					// To edit/delete servers
-					if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
-						FS::$iMgr->setJSBuffer(1);
-						$formoutput = $this->showDHCPSrvList();
-	                            		$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"),array("width" => 400));
-					}
-        	                }
-
 				$netfound = false;
 				$tmpoutput = FS::$iMgr->h2("title-subnet-management").$this->loc->s("choose-net");
 				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
@@ -331,7 +306,7 @@
 			return $output;
 		}
 
-		private function showManagement() {
+		private function showSubnetMgmt() {
 			$output = FS::$iMgr->h2("title-declared-subnets");
 			$formoutput = $this->showDHCPSubnetForm();
 	                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("declare-subnet"),array("width" => 600,"line" => true));
@@ -411,6 +386,43 @@
 			$output .= "</table>";
 			return $output;
 		}
+
+		private function showDHCPMgmt() {
+			$output = "";
+			if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+				$err = FS::$secMgr->checkAndSecuriseGetData("err");
+				switch($err) {
+					case 1: case 7: case 8: $output .= FS::$iMgr->printError($this->loc->s("err-bad-datas")); break;
+					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-not-match")); break;
+					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-conn-failed")); break;
+					case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-auth-failed")); break;
+					case 5: $output .= FS::$iMgr->printError($this->loc->s("err-already-exists")); break;
+					case 6: {
+						$file = FS::$secMgr->checkAndSecuriseGetData("file");
+						if($file)
+							$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." '".$file."'");
+						else
+							$output .= FS::$iMgr->printError($this->loc->s("bad-datas"));
+						break;
+					}
+					default: break;
+				}
+				// To add servers
+				FS::$iMgr->setJSBuffer(1);
+				$formoutput = $this->showDHCPSrvForm();
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"line" => true));
+
+
+				// To edit/delete servers
+				if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
+					FS::$iMgr->setJSBuffer(1);
+					$formoutput = $this->showDHCPSrvList();
+					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"),array("width" => 400));
+				}
+			}
+			return $output;
+		}
+
 
 		private function showHistory($filter,$interval = 1) {
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
