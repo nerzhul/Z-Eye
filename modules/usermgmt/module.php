@@ -190,7 +190,6 @@
 				$output .= "</select></td></tr>";
 			}
 			$output .= FS::$iMgr->tableSubmit("Import");
-			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -226,7 +225,6 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("attr-uid"),	"ldapuid",	$ldapuid,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-uid"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-filter"),	"ldapfilter",	$ldapfilter,	array("size" => 20, "length" => 200,"tooltip" => "tooltip-ldap-filter"));
 			$output .= FS::$iMgr->tableSubmit("Save");
-			$output .= "</table></form>";
 			return $output;
 		}
 

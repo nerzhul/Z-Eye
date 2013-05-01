@@ -451,7 +451,7 @@
 				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label),$options["js"]);
 			else
 				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label));
-			$output .= "</center></th></tr>";
+			$output .= "</center></th></tr></table></form>";
 			return $output;
 		}
 
@@ -504,6 +504,15 @@
 			if($selected)
 				$output .= " selected=\"selected\"";
 			$output .= ">".$name."</option>";
+			return $output;
+		}
+
+		public function selElmtFromDB($table,$labelfield,$valuefield,$selected = array()) {
+			$output = "";
+			$query = FS::$dbMgr->Select($table,$labelfield.",".$valuefield);
+                        while($data = FS::$dbMgr->Fetch($query)) {
+                                $output .= FS::$iMgr->selElmt($data[$labelfield],$data[$valuefield],in_array($data[$valuefield],$selected));
+                        }
 			return $output;
 		}
 

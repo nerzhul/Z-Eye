@@ -75,7 +75,6 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("Read"),"ro",$ro,array("type" => "chk", "tooltip" => "tooltip-read"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Write"),"rw",$rw,array("type" => "chk", "tooltip" => "tooltip-write"));
 			$output .= FS::$iMgr->tableSubmit("Save");
-			$output .= "</table></form>";
 			return $output;
 		}
 

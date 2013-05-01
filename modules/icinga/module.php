@@ -202,9 +202,7 @@
 			$output .= FS::$iMgr->select("icon");
 			$output .= FS::$iMgr->selElmt("Aucun","",($icon == ""));
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_icons","id,name","",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query))
-				$output .= FS::$iMgr->selElmt($data["name"],$data["id"],$icon == $data["id"]);
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_icons","name","id",array($icon));
 
 			$output .= "</select></td></tr>";
 			$output .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
@@ -262,7 +260,6 @@
 			// icon image
 			// statusmap image
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -344,7 +341,6 @@
 
 			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members[]",true,$hostlist,$name)."</td></tr>";
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -481,7 +477,6 @@
 			// @ TODO support for contact not only contactlist
 			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$ctg)."</td></tr>";
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -585,7 +580,6 @@
 			$output .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums",$suhs,$sums)."<br />".
 				$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$suhe,$sume)."</td></tr>";
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -680,7 +674,6 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$hostopts,array("type" => "chk"));
 			$output .= "<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd",$hostnotifcmd)."</td></tr>";
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -763,7 +756,6 @@
 			$output .= $output2;
 			$output .= "</select></td></tr>";
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 		}
 
@@ -825,7 +817,6 @@
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd",$value,array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 
 			return $output;
 		}

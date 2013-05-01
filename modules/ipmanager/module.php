@@ -352,8 +352,7 @@
 				FS::$iMgr->idxLine($this->loc->s("vlanid"),"vlanid",$vlanid,array("length" => 4, "type" => "num", "value" => $vlanid, "tooltip" => "tooltip-vlanid")).
 				FS::$iMgr->idxLine($this->loc->s("subnet-shortname"),"shortname",$shortname,array("length" => 32, "tooltip" => "tooltip-shortname")).
 				FS::$iMgr->idxLine($this->loc->s("subnet-desc"),"desc",$desc,array("length" => 128, "tooltip" => "tooltip-desc")).
-				FS::$iMgr->tableSubmit("Save").
-				"</table></form>";
+				FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 
@@ -367,8 +366,7 @@
 				FS::$iMgr->idxLine($this->loc->s("lease-path"),"leasepath",$leasepath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
 				FS::$iMgr->idxLine($this->loc->s("reservconf-path"),"reservconfpath",$reservconfpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
 				FS::$iMgr->idxLine($this->loc->s("subnetconf-path"),"subnetconfpath",$subnetconfpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-subnetconfpath")).
-				FS::$iMgr->tableSubmit("Save").
-                        	"</table></form>";
+				FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 
@@ -430,7 +428,7 @@
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers");
 
-			$output .= FS::$iMgr->tableSubmit("Save")."</table>";
+			$output .= FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 

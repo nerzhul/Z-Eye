@@ -341,7 +341,6 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-chroot"));
 			$output .= FS::$iMgr->tableSubmit("Save");
-			$output .= "</table></form>";
 			
 			return $output;
 		}

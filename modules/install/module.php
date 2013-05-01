@@ -101,7 +101,7 @@
 					$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"pwd2","",array("type" => "pwd"));
 					$output .= FS::$iMgr->idxLine($this->loc->s("Mail"),"mail");
 					$output .= FS::$iMgr->idxLine($this->loc->s("Mail-repeat"),"mail2");
-					$output .= FS::$iMgr->tableSubmit("Send",array("js" => "sendAdmCfg();"))."</form>";
+					$output .= FS::$iMgr->tableSubmit("Send",array("js" => "sendAdmCfg();"));
 					break;	
 				case 2:
 					FS::$iMgr->js("function loadStep3() {

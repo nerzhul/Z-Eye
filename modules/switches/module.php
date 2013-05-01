@@ -1118,7 +1118,6 @@
 						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd"),"enablepwd","",array("type" => "pwd"));
 						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd-repeat"),"enablepwd2","",array("type" => "pwd"));
 						$output .= FS::$iMgr->tableSubmit("Save");
-						$output .= "</table></form>";
 					}
 					else if($showmodule == 8) {
 						if(!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") && 

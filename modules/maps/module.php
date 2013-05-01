@@ -121,7 +121,6 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("Size"),"nsize","",array("type" => "num", "length" => 2, "size" => 2));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Color"),"ncolor","000000",array("type" => "color", "length" => 6, "size" => 6));
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 
 		}
@@ -136,7 +135,6 @@
 			$output .= FS::$iMgr->idxLine($this->loc->s("Size"),"esize","",array("type" => "num", "length" => 2, "size" => 2));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Color"),"ecolor","000000",array("type" => "color", "length" => 6, "size" => 6));
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			$output .= "</table></form>";
 			return $output;
 		}
 
