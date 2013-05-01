@@ -392,10 +392,22 @@
 				return "";
 
 			$output = FS::$iMgr->h2("title-dhcp-cluster-mgmt");
-			// To add DHCP cluster
-			FS::$iMgr->setJSBuffer(1);
-			$formoutput = $this->showDHCPClusterForm();
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("add-cluster"),array("width" => "500"));
+
+			$dhcpcount = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr");
+			
+			if($dhcpcount > 0) {
+				// To add DHCP cluster
+				FS::$iMgr->setJSBuffer(1);
+				$formoutput = $this->showDHCPClusterForm();
+				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("add-cluster"),array("width" => "500"));
+
+				// To edit/delete clusters
+				if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr") > 0) {
+					$output .= $this->showDHCPClusterList();
+				}
+			}
+			else
+				$output .= FS::$iMgr->printError("err-need-dhcp-server");
 
 
 			$output .= FS::$iMgr->h2("title-dhcp-server-mgmt");
@@ -406,7 +418,7 @@
 
 
 			// To edit/delete servers
-			if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
+			if($dhcpcount > 0) {
 				$output .= $this->showDHCPSrvList();
 			}
 
@@ -416,6 +428,10 @@
 		private function showDHCPClusterForm($name = "") {
 			$output = "";
 			return $output;
+		}
+
+		private function showDHCPCLusterList() {
+			$output = "<table id=\"clusterlist\"><thead><tr><th>".$this->loc->s("Cluster-name")."</th><th>".$this->loc->s("Cluster-members")."</th></tr></thead>";
 		}
 
 
@@ -767,7 +783,7 @@
 					FS::$dbMgr->CommitTr();
 
 					FS::$iMgr->ajaxEcho("Done");
-					FS::$iMgr->redir("mod=".$this->mid,true);
+					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
                                         return;
 				// Add DHCP subnet
 				case 7:
