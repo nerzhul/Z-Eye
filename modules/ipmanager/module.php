@@ -660,7 +660,7 @@
 					}
 
 					FS::$dbMgr->BeginTr();
-					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$saddr."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
 						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
 					FS::$dbMgr->CommitTr();
