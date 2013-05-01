@@ -378,7 +378,7 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= "<tr><td>".FS::$iMgr->opendiv($this->showDHCPSrvForm($data["addr"],$data["sshuser"],$data["dhcpdpath"],$data["leasespath"],$data["reservconfpath"],
-					$data["subnetconfpath"]),$data["addr"])."</td><td>".$data["sshuser"]."</td><td>".
+					$data["subnetconfpath"]),$data["addr"],array("width" => 600))."</td><td>".$data["sshuser"]."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
 					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
 					"</td></tr>";
@@ -388,38 +388,33 @@
 		}
 
 		private function showDHCPMgmt() {
-			$output = "";
-			if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
-				$err = FS::$secMgr->checkAndSecuriseGetData("err");
-				switch($err) {
-					case 1: case 7: case 8: $output .= FS::$iMgr->printError($this->loc->s("err-bad-datas")); break;
-					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-not-match")); break;
-					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-conn-failed")); break;
-					case 4: $output .= FS::$iMgr->printError($this->loc->s("err-ssh-auth-failed")); break;
-					case 5: $output .= FS::$iMgr->printError($this->loc->s("err-already-exists")); break;
-					case 6: {
-						$file = FS::$secMgr->checkAndSecuriseGetData("file");
-						if($file)
-							$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." '".$file."'");
-						else
-							$output .= FS::$iMgr->printError($this->loc->s("bad-datas"));
-						break;
-					}
-					default: break;
-				}
-				// To add servers
-				FS::$iMgr->setJSBuffer(1);
-				$formoutput = $this->showDHCPSrvForm();
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600,"line" => true));
+			if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt"))
+				return "";
+
+			$output = FS::$iMgr->h2("title-dhcp-cluster-mgmt");
+			// To add DHCP cluster
+			FS::$iMgr->setJSBuffer(1);
+			$formoutput = $this->showDHCPClusterForm();
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("add-cluster"),array("width" => "500"));
 
 
-				// To edit/delete servers
-				if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
-					FS::$iMgr->setJSBuffer(1);
-					$formoutput = $this->showDHCPSrvList();
-					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Server-mgmt"),array("width" => 400));
-				}
+			$output .= FS::$iMgr->h2("title-dhcp-server-mgmt");
+			// To add servers
+			FS::$iMgr->setJSBuffer(1);
+			$formoutput = $this->showDHCPSrvForm();
+			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600));
+
+
+			// To edit/delete servers
+			if(FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr") > 0) {
+				$output .= $this->showDHCPSrvList();
 			}
+
+			return $output;
+		}
+
+		private function showDHCPClusterForm($name = "") {
+			$output = "";
 			return $output;
 		}
 
@@ -737,7 +732,7 @@
 					}
 
 					FS::$dbMgr->BeginTr();
-					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
+					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$saddr."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
 						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
 					FS::$dbMgr->CommitTr();

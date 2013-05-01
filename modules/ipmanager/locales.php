@@ -23,6 +23,7 @@
 			$locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",
+					"add-cluster" => "Ajouter un cluster",
 					"Available-s" => "Distribuables",
 					"bad-filter" => "Filtre invalide !",
 					"Baux" => "Baux",
@@ -100,6 +101,8 @@
 					"Switch" => "Equipement",
 					"title-add-server" => "Ajouter un serveur DHCP",
 					"title-declared-subnets" => "Réseaux déclarés",
+					"title-dhcp-cluster-mgmt" => "Gestion des clusters DHCP",
+					"title-dhcp-server-mgmt" => "Gestion des serveurs DHCP",
 					"title-history-1d" => "Historique depuis 24 heures",
 					"title-history-1w" => "Historique depuis 1 semaine",
 					"title-history-1m" => "Historique depuis 1 mois",
@@ -127,6 +130,7 @@
 				),
 				"en" => array(
 					"Add" => "Ajouter",
+					"add-cluster" => "Ajouter un cluster",
 					"Available-s" => "Distributable",
 					"bad-filter" => "Bad filter",
 					"Baux" => "Leases",
@@ -203,6 +207,8 @@
 					"Switch" => "Device",
 					"title-add-server" => "Add DHCP server",
 					"title-declared-subnets" => "Declared networks",
+					"title-dhcp-cluster-mgmt" => "DHCP cluster management",
+					"title-dhcp-server-mgmt" => "DHCP server management",
 					"title-history-1d" => "History since 24 hours",
                                         "title-history-1w" => "History since 1 week",
                                         "title-history-1m" => "History since 1 month",
