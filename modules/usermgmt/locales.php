@@ -23,6 +23,7 @@
 			$locales = array(
 				"fr" => array(
 					"Adding" => "Ajout...",
+					"Add-to-new-group" => "Ajouter à un noueau groupe",
 					"attr-mail" => "Attribut Mail",
 					"attr-name" => "Attribut Nom",
 					"attr-subname" => "Attribut Prénom",
@@ -97,6 +98,7 @@
 				),
 				"en" => array(
 					"Adding" => "Adding...",
+					"Add-to-new-group" => "Add new group",
 					"attr-mail" => "Mail attribute",
 					"attr-name" => "Name Attribute",
 					"attr-subname" => "Subname Attribute",

@@ -67,7 +67,7 @@
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
-                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Modify"))."</li>";
+                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("Add-to-new-group"),"addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
                         $output .= "</ul></form>";
 
 			FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
@@ -275,12 +275,13 @@
 					$js = "$('".$jscontent."').addAfter('#userthead');";
 
 					FS::$iMgr->ajaxEcho("Done",$js);
-					FS::$iMgr->redir("m-".$this->mid.".html",true);
+					FS::$iMgr->redir("index.php?mod=".$this->mid,true);
 					return;
 				}
 			}
 			FS::$iMgr->ajaxEcho("err-user-not-found");
 		}
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1: // add user
