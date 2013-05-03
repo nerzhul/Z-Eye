@@ -472,9 +472,6 @@ label { float: left; font-weight: bold; text-align: left; }
 	color: #DDD;
 }
 
-.statusWARNING { color:orange; }
-.statusCRITICAL { color:red; }
-
 #searchres { text-align:left; display:inline-block; }
 #searchres li { margin-bottom: 10px; }
 #searchres li:hover { background-color: rgba(245, 235, 235, 0.94); }
@@ -761,4 +758,5 @@ label { float: left; font-weight: bold; text-align: left; }
 	background-position: bottom;
 }
 
-
+/* special classes */
+.ctrel { text-align: center; }
