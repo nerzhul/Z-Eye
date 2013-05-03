@@ -1794,19 +1794,13 @@
 					case 18: // Device discovery
 						if(!FS::$sessMgr->hasRight("mrule_switches_discover")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");
-							if(FS::isAjaxCall())
-								echo $this->loc->s("err-no-rights");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&err=3");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;
 						}
 						$dip = FS::$secMgr->getPost("dip","i4");
 						if(!$dip) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are missing (device discovery)");
-							if(FS::isAjaxCall())
-								echo $this->loc->s("err-bad-datas");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 						exec("/usr/local/bin/netdisco -d ".$dip);
@@ -1838,10 +1832,7 @@
 						if($foundro != $devro && strlen($devro) > 0 || $foundrw != $devrw && strlen($devrw) > 0)
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_cache","device,snmpro,snmprw","'".$devname."','".$devro."','".$devrw."'");
 						FS::$log->i(FS::$sessMgr->getUserName(),"switches",0,"Launch discovering for device '".$dip."'");
-						if(FS::isAjaxCall())
-							echo $this->loc->s("done-with-success");
-						else
-							FS::$iMgr->redir("mod=".$this->mid);
+						FS::$iMgr->redir("mod=".$this->mid,true);
 						return;
 					case 19: // device status
 						$dip = FS::$secMgr->getPost("dip","i4");
