@@ -67,7 +67,7 @@
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
-                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp","Nouveau Groupe","addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Modify"))."</li>";
+                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("Add-to-new-group"),"addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
                         $output .= "</ul></form>";
 
 			$output .= FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
