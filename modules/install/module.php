@@ -144,17 +144,17 @@
 						return;
 					}
 
-					if(!FS::$secMgr->isAlphaNumeric($username)) {
+					if(!FS::$secMgr->isAlphabetic($username)) {
 						echo "2";
 						return;
 					}
 
-					if(!FS::$secMgr->isAlphabetic($surname)) {
+					if(!FS::$secMgr->isPersonName($surname)) {
 						echo "7";
 						return;
 					}
 
-					if(!FS::$secMgr->isAlphabetic($name)) {
+					if(!FS::$secMgr->isPersonName($name)) {
 						echo "8";
 						return;
 					}
