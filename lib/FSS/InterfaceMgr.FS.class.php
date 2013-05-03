@@ -392,7 +392,7 @@
 
 		public function idxLine($label,$name,$def_value = "", $options = array()) {
 			$output = "<tr";
-			if(isset($options["tooltip"]))
+			if(isset($options["tooltip"])) {
 				$output .= $this->tooltip($options["tooltip"]);
 				unset($options["tooltip"]);
 			}
