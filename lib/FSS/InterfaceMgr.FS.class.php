@@ -218,9 +218,9 @@
 		}
 
 		public function tabledTextArea($label,$name,$options = array()) {
-			$output = "<tr><td>".$label."</td><td><center>";
+			$output = "<tr><td>".$label."</td><td class=\"ctrel\">";
 			$output .= $this->textarea($name,(isset($options["value"]) ? $options["value"] : ""),$options);
-			$output .= "</center></td></tr>";
+			$output .= "</td></tr>";
 			return $output;
 		}
 
@@ -396,7 +396,7 @@
 				$output .= $this->tooltip($options["tooltip"]);
 				unset($options["tooltip"]);
 			}
-			$output .= "><td>".$label."</td><td><center>";
+			$output .= "><td>".$label."</td><td class=\"ctrel\">";
 			if(isset($options["type"])) {
 				switch($options["type"]) {
 					case "idxedit": 
@@ -404,7 +404,7 @@
 							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
 						else
 							$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
-                                        			(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
+                                        			(isset($options["label"]) ? $options["label"] : NULL));
 						break;
 					case "chk": $options["check"] = $def_value; $output .= $this->check($name, $options); break;
 					case "ip": $output .= $this->IPInput($name,$def_value); break;
@@ -417,8 +417,8 @@
 			}
 			else
 				$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
-					(isset($options["label"]) ? $options["label"] : NULL),(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
-			$output .= "</center></td></tr>";
+					(isset($options["label"]) ? $options["label"] : NULL));
+			$output .= "</td></tr>";
 			return $output;
 		}
 
@@ -445,12 +445,12 @@
 		}
 
 		public function tableSubmit($label,$options = array()) {
-			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\"><center>";
+			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\" class=\"ctrel\">";
 			if(isset($options["js"]))
 				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$label,$options["js"]);
 			else
 				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$label);
-			$output .= "</center></th></tr>";
+			$output .= "</th></tr>";
 			return $output;
 		}
 
