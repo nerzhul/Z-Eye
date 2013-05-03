@@ -30,6 +30,7 @@
 
 	class FSSessionMgr {
 		function FSSessionMgr() {
+			$this->groupBuf = array();
 		}
 
 		public function InitSessionIfNot() {
@@ -85,13 +86,16 @@
 		}
 
 		public function getGroups() {
-			$groups = array();
+			if(is_array($this->groupBuf) && count($this->groupBuf) > 0)
+				return $this->groupBuf;
+
+			$this->groupBuf = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$this->getUid()."'");
 			while($data = pg_fetch_array($query)) {
-				array_push($groups,$data["gid"]);
+				array_push($this->groupBuf,$data["gid"]);
 			}
-			$groups = array_unique($groups);
-			return $groups;
+			$this->groupBuf = array_unique($this->groupBuf);
+			return $this->groupBuf;
 		}
 
 		public function getUsers() {
@@ -111,8 +115,14 @@
 			return false;
 		}
 
+		public function isInGIDGroup($gid) {
+			if(in_array($gid,$this->getGroups()))
+				return true;
+			return false;
+		}
+
 		public function hasRight($rulename) {
-			if($this->getUid() == 1)
+			if($this->getUid() == 1 || $this->isInGIDGroup(1))
 				return true;
 
 			$groups = $this->getGroups();
@@ -125,5 +135,7 @@
 				return true;
 			return false;
 		}
+
+		private $groupBuf;
 	};
 ?>
