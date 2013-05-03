@@ -279,12 +279,13 @@
 					$js = "$('".$jscontent."').addAfter('#userthead');";
 
 					FS::$iMgr->ajaxEcho("Done",$js);
-					FS::$iMgr->redir("m-".$this->mid.".html",true);
+					FS::$iMgr->redir("index.php?mod=".$this->mid,true);
 					return;
 				}
 			}
 			FS::$iMgr->ajaxEcho("err-user-not-found");
 		}
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1: // add user

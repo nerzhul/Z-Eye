@@ -96,7 +96,7 @@
 				default: break;
 			}
 			if(!FS::isAjaxCall()) {
-				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".$device,true);
+				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." <a href=\"index.php?mod=".$this->mid."&d=".$device."\">".$device."</a>",true);
 				$panElmts = array();
 				array_push($panElmts,array(1,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration")));
 				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
