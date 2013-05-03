@@ -35,30 +35,23 @@
 		}
 
 		public function isNumeric($str) {
-			if(is_numeric($str))
-				return true;
-			return false;
+			return is_numeric($str) == true;
 		}
 
 		public function isAlphaNumeric($str) {
-			if(preg_match("#^[\w]+$#i",$str))
-				return true;
-			else
-				return false;
+			return preg_match("#^[\w]+$#i",$str) == true;
 		}
 
 		public function isAlphabetic($str) {
-			if(preg_match("#^[a-zA-Z]+$#",$str))
-				return true;
-			else
-				return false;
+			return preg_match("#^[a-zA-Z]+$#",$str) == true;
+		}
+
+		public function isPersonName($str) {
+			return preg_match("#^[\w]+([-][\w]+)*$#i",$str) == true;
 		}
 
 		public function isMail($str) {
-			if(preg_match('#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#',$str))
-				return true;
-			else
-				return false;
+			return preg_match('#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#',$str) == true;
 		}
 
 		public function isPath($str) {
