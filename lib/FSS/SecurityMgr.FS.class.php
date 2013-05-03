@@ -47,7 +47,7 @@
 		}
 
 		public function isPersonName($str) {
-			return preg_match("#^[\w]+([-][\w]+)*$#i",$str) == true;
+			return preg_match("#^[\w]+([- ][\w]+)*$#i",$str) == true;
 		}
 
 		public function isMail($str) {
