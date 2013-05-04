@@ -570,8 +570,8 @@
 			for($i=0;$i<$count;$i++)
 				$output .= $this->tabPanElmt($elmts[$i][0],$elmts[$i][1],$elmts[$i][2],$cursh);	
 			$output .= "</ul></div>";
-			FS::$iMgr->js("$('#contenttabs').tabs({cache: false; ajaxOptions: { error: function(xhr,status,index,anchor) {";
-                        $output .= "$(anchor.hash).html(\"".$this->cur_module->getLoc()->s("fail-tab")."\");}},
+			FS::$iMgr->js("$('#contenttabs').tabs({cache: false; ajaxOptions: { error: function(xhr,status,index,anchor) {
+                        	$(anchor.hash).html(\"".$this->cur_module->getLoc()->s("fail-tab")."\");}},
 				select: function(event, ui) { 
       			        	$('.tabs li a .loader').remove();
                 			$('.tabs li a').eq(ui.index).append('<span class=\"loader\"></span>'); 
