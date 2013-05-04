@@ -89,6 +89,7 @@
 			$promptfind = false;
 
 			fwrite($this->stdio,$cmd."\n");
+			usleep(10000);
 
 			while(!$promptfind) {
 				while($line = fgets($this->stdio)) {
