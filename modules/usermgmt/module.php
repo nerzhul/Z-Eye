@@ -249,7 +249,7 @@
 						$grpcount = count($groups);
 						for($i=0;$i<$grpcount;$i++) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gid = '".$groups[$i]."'")) {
-								FS::$ilog->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Group '".$groups[$i]."' doesn't exists");
+								FS::$log->i(FS::$sessMgr->getUserName(),"usermgmt",2,"Group '".$groups[$i]."' doesn't exists");
 								FS::$iMgr->ajaxEcho("err-group-not-exists");
 								return;
 							}
@@ -275,7 +275,7 @@
 					$js = "$('".$jscontent."').addAfter('#userthead');";
 
 					FS::$iMgr->ajaxEcho("Done",$js);
-					FS::$iMgr->redir("index.php?mod=".$this->mid,true);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				}
 			}
