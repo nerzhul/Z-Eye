@@ -199,7 +199,7 @@
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
-				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td>".FS::$iMgr->select("sdbtype").FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>";
+				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td class=\"ctrel\">".FS::$iMgr->select("sdbtype").FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname,array("tooltip" => "tooltip-dbname"));
 			}
 			else {
