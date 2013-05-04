@@ -476,6 +476,8 @@ label { float: left; font-weight: bold; text-align: left; }
 #searchres li { margin-bottom: 10px; }
 #searchres li:hover { background-color: rgba(245, 235, 235, 0.94); }
 
+.loader { height: 32px; background-repeat: no-repeat; background-image: url('/styles/images/loader.gif'); width: 32px; display: inline-block; }
+
 /* JQZoom */
 #jqzoom-img { max-width: 75%; }
 .zoomPad { position:relative; z-index:99; cursor:crosshair; text-align:left; }
