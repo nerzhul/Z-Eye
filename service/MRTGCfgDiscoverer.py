@@ -28,6 +28,7 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 	sleepingTimer = 0
 	defaultSNMPRO = "public"
 	startTime = 0
+	threadCounter = 0
 
 	def __init__(self):
 		""" 30 mins between two discover """
@@ -39,6 +40,23 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 		while True:
 			self.launchCfgGenerator()
 			time.sleep(self.sleepingTimer)
+
+	def incrThreadNb(self):
+		self.tc_mutex.acquire()
+		self.threadCounter += 1
+		self.tc_mutex.release()
+
+	def decrThreadNb(self):
+		self.tc_mutex.acquire()
+		self.threadCounter = self.threadCounter - 1
+		self.tc_mutex.release()
+
+	def getThreadNb(self):
+		val = 0
+		self.tc_mutex.acquire()
+		val = self.threadCounter
+		self.tc_mutex.release()
+		return val
 
 	def launchCfgGenerator(self):
 		Logger.ZEyeLogger().write("MRTG configuration discovery started")
@@ -72,17 +90,24 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
+
+		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
+		time.sleep(1)
+		while self.getThreadNb() > 0:
+			time.sleep(1)
+
 		totaltime = datetime.datetime.now() - starttime
 		Logger.ZEyeLogger().write("MRTG configuration discovery done (time: %s)" % totaltime)
 
 	def fetchMRTGInfos(self,ip,devname,devcom):
+		self.incrThreadNb()
+
 		try:
 			text = subprocess.check_output(["/usr/local/bin/perl","/usr/local/bin/cfgmaker", "%s@%s" % (devcom,ip)])
 			text += "\nWorkDir: /usr/local/www/z-eye/datas/rrd"
 			cfgfile = open("/usr/local/www/z-eye/datas/mrtg-config/mrtg-%s.cfg" % devname,"w")
 			cfgfile.writelines(text)
 			cfgfile.close()
-			Logger.ZEyeLogger().write("MRTG-Config-Discovery: wrote file /usr/local/www/z-eye/datas/mrtg-config/mrtg-%s.cfg" % devname)
 		except Exception, e:
 			Logger.ZEyeLogger().write("MRTG-Config-Discovery: FATAL %s" % e)
-			return
+		self.decrThreadNb()
