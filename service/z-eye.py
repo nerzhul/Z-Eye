@@ -22,6 +22,7 @@
 import sys,time
 
 import Daemon
+import Logger
 import serviceManager
 import MRTGCfgDiscoverer
 
@@ -40,9 +41,11 @@ if __name__ == "__main__":
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
 			print "Starting Z-Eye daemon"
+			Logger.ZEyeLogger().write("Starting Z-Eye daemon")
                         daemon.start()
                 elif 'stop' == sys.argv[1]:
 			print "Stopping Z-Eye daemon"
+			Logger.ZEyeLogger().write("Stopping Z-Eye daemon")
                         daemon.stop()
                 elif 'restart' == sys.argv[1]:
 			print "Restarting Z-Eye daemon"

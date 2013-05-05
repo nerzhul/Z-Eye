@@ -21,6 +21,7 @@
 from pyPgSQL import PgSQL
 import datetime,os,re,sys,time,thread,threading
 
+import Logger
 import netdiscoCfg
 
 class ZEyeMRTGDiscoverer(threading.Thread):
@@ -34,12 +35,14 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
+		Logger.ZEyeLogger().write("MRTG Config discoverer launched")
 		while True:
 			self.launchCfgGenerator()
 			time.sleep(self.sleepingTimer)
 
 	def launchCfgGenerator(self):
-		self.startTime = datetime.datetime.now();
+		Logger.ZEyeLogger().write("MRTG configuration discovery started")
+		starttime = datetime.datetime.now()
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
@@ -59,15 +62,18 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 						devcom = self.defaultSNMPRO
 					thread.start_new_thread(self.fetchMRTGInfos,(devip,devname,devcom))
 			except StandardError, e:
+				Logger.ZEyeLogger().write("MRTG-Config-Discovery: FATAL %s" % e)
 				return
 				
 		except PgSQL.Error, e:
+			Logger.ZEyeLogger().write("MRTG-Config-Discovery: FATAL PgSQL %s" % e)
 			sys.exit(1);	
 
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
-		totaltime = datetime.datetime.now()
+		totaltime = datetime.datetime.now() - starttime
+		Logger.ZEyeLogger().write("MRTG configuration discovery done (time: %s)" % totaltime)
 
 	def fetchMRTGInfos(self,ip,devname,devcom):
 		try:
@@ -80,4 +86,5 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 			cfgfile.writelines(text)
 			cfgfile.close()
 		except Exception, e:
+			Logger.ZEyeLogger().write("MRTG-Config-Discovery: FATAL %s" % e)
 			return

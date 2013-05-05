@@ -20,6 +20,8 @@
 
 import os,re,time,threading
 
+import Logger
+
 class ZEyeServiceMgr(threading.Thread):
 	sleepingTimer = 0
 	def __init__(self):
@@ -27,6 +29,7 @@ class ZEyeServiceMgr(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
+		Logger.ZEyeLogger().write("ServiceMgr launched")
 		while True:
 			self.restartIcinga()
 			self.restartSnort()
@@ -39,6 +42,7 @@ class ZEyeServiceMgr(threading.Thread):
 				rf = icingaFile.read()
 				rf = re.sub("\n","",rf)
 				if rf == "1":
+					Logger.ZEyeLogger().write("ServiceMgr restarted Icinga")
 					cmd = "service icinga restart"
 					pipe = os.popen(cmd, 'r')
 					text = pipe.read()
@@ -53,6 +57,7 @@ class ZEyeServiceMgr(threading.Thread):
 				rf = snortFile.read()
 				rf = re.sub("\n","",rf)
 				if rf == "1":
+					Logger.ZEyeLogger().write("ServiceMgr restarted SNORT")
 					cmd = "service snort restart"
 					pipe = os.popen(cmd, 'r')
 					text = pipe.read()
