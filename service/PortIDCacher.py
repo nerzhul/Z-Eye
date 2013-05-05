@@ -130,7 +130,7 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 					if pgres2:
 						devcom = pgres2[0]
 					else:
-						devcom = defaultSNMPRO
+						devcom = self.defaultSNMPRO
 					thread.start_new_thread(self.fetchSNMPInfos,(devip,devname,devcom,vendor))
 				""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 				time.sleep(1)
