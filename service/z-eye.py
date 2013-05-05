@@ -21,16 +21,19 @@
 
 import sys,time
 
-import Daemon
 import Logger
-import serviceManager
+
+import Daemon
 import MRTGCfgDiscoverer
 import MRTGDataRefresh
+import PortIDCacher
+import serviceManager
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
 		MRTGCfgDiscoverer.ZEyeMRTGDiscoverer().start()
 		MRTGDataRefresh.ZEyeMRTGDataRefresher().start()
+		PortIDCacher.ZEyeSwitchesPortIDCacher().start()
 		serviceManager.ZEyeServiceMgr().start()	
 		while True:
 			time.sleep(1)

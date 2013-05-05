@@ -74,7 +74,7 @@ class ZEyeMRTGDataRefresher(threading.Thread):
 		for file in _dir:
 			filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+file
 			if(os.path.isfile(filename)):
-				while self.threadCounter >= max_threads:
+				while self.threadCounter >= self.max_threads:
 					time.sleep(1)
 				thread.start_new_thread(self.refreshMRTG,(filename,0))
 
