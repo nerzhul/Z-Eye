@@ -20,6 +20,7 @@
 
 from pyPgSQL import PgSQL
 import datetime,re,sys,time,thread,threading,subprocess
+from threading import Lock
 
 import Logger
 import netdiscoCfg
@@ -29,6 +30,7 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 	defaultSNMPRO = "public"
 	startTime = 0
 	threadCounter = 0
+	tc_muter = Lock()
 
 	def __init__(self):
 		""" 30 mins between two discover """
