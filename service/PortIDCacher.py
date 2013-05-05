@@ -20,7 +20,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, sys, thread, os, string, time, commands, threading
+import datetime, sys, thread, subprocess, string, time, commands, threading
 from threading import Lock
 
 import Logger
@@ -65,13 +65,12 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 		self.incrThreadNb()
 
 		try:
+			text = ""
 			if vendor == "cisco":
-				cmd = "snmpwalk -v 2c -c %s %s ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
+				text = subprocess.check_output(["/usr/local/bin/snmpwalk","-v","2c","-c","%s" % devcom,"%s" % ip,"ifDescr"])
 			elif vendor == "dell":
-				cmd = "snmpwalk -v 2c -c %s %s ifName | grep -ve Stack | grep -ve Vlan | grep -ve Null | grep -ve unrouted" % (devcom,ip)
-			pipe = os.popen('{ ' + cmd + '; }', 'r')
-			text = pipe.read()
-			pipe.close()
+				text = subprocess.check_output(["/usr/local/bin/snmpwalk","-v","2c","-c","%s" % devcom,"%s" % ip,"ifName"])
+			
 			pgsqlCon2 = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			pgcursor2 = pgsqlCon2.cursor()
 			stopSwIDSearch = 0
@@ -93,10 +92,7 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 						swpid = 0
 						""" it's a cisco specific mib. We must found another mean for other constructors """
 						if stopSwIDSearch == 0 and vendor == "cisco":
-							cmd = "snmpwalk -v 2c -c %s %s 1.3.6.1.4.1.9.5.1.4.1.1.11 | grep %s" % (devcom,ip,pid)
-							pipe2 = os.popen('{ ' + cmd + '; }', 'r')
-							text2 = pipe2.read()
-							pipe2.close()
+							text2 = subprocess.check_output(["/usr/local/bin/snmpwalk","-v","2c","-c","%s" % devcom,"%s" % ip, "1.3.6.1.4.1.9.5.1.4.1.1.11","|","grep","%s" % pid])
 							piddata = string.split(text2, " ")
 							if len(piddata) == 4:
 								piddata = string.split(piddata[0], ".")

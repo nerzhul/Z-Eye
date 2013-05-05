@@ -20,6 +20,7 @@
 
 from pyPgSQL import PgSQL
 import datetime,re,sys,time,thread,threading,subprocess
+from threading import Lock
 
 import Logger
 import netdiscoCfg
@@ -29,6 +30,7 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 	defaultSNMPRO = "public"
 	startTime = 0
 	threadCounter = 0
+	tc_mutex = Lock()
 
 	def __init__(self):
 		""" 30 mins between two discover """
@@ -43,7 +45,7 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 
 	def incrThreadNb(self):
 		self.tc_mutex.acquire()
-		self.threadCounter += 1
+		self.threadCounter = self.threadCounter + 1
 		self.tc_mutex.release()
 
 	def decrThreadNb(self):
@@ -94,6 +96,7 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
+			Logger.ZEyeLogger().write("MRTG configuration discovery waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime

@@ -19,7 +19,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import datetime, time, os, subprocess, thread, threading
+import datetime, time, os,re, subprocess, thread, threading
 from threading import Lock
 
 import Logger
@@ -45,7 +45,7 @@ class ZEyeMRTGDataRefresher(threading.Thread):
 
 	def incrThreadNb(self):
 		self.tc_mutex.acquire()
-		self.threadCounter += 1
+		self.threadCounter = self.threadCounter + 1
 		self.tc_mutex.release()
 
 	def decrThreadNb(self):
@@ -71,21 +71,25 @@ class ZEyeMRTGDataRefresher(threading.Thread):
 		self.decrThreadNb()
 
 	def launchRefreshProcess(self):
-		starttime = datetime.datetime.now()
-		Logger.ZEyeLogger().write("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
+		try:
+			starttime = datetime.datetime.now()
+			Logger.ZEyeLogger().write("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
 
-		_dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
-		for file in _dir:
-			filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+file
-			# Launch only if it's a .cfg, recent MRTG create .ok files
-			if(os.path.isfile(filename) and re.search("\.cfg",filename) != None):
-				while self.getThreadNb() >= self.max_threads:
-					time.sleep(1)
-				thread.start_new_thread(self.refreshMRTG,(filename,0))
+			_dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
+			for file in _dir:
+				filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+file
+				# Launch only if it's a .cfg, recent MRTG create .ok files
+				if(os.path.isfile(filename) and re.search("cfg",filename) != None):
+					while self.getThreadNb() >= self.max_threads:
+						time.sleep(1)
+					thread.start_new_thread(self.refreshMRTG,(filename,0))
 
-		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
-		time.sleep(1)
-		while self.getThreadNb() > 0:
+			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
-		totaltime = datetime.datetime.now() - starttime 
-		Logger.ZEyeLogger().write("MRTG datas refresh done (time: %s)" % totaltime)
+			while self.getThreadNb() > 0:
+				time.sleep(1)
+			totaltime = datetime.datetime.now() - starttime 
+			Logger.ZEyeLogger().write("MRTG datas refresh done (time: %s)" % totaltime)
+		except Exception, e:
+			Logger.ZEyeLogger().write("MRTG Data Refresher: FATAL %s" % e)
+
