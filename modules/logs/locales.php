@@ -44,7 +44,7 @@
 					"Filter" => "Filter",
 					"Level" => "Level",
 					"menu-name" => "Z-Eye Admin",
-					"menu-title" => "Z-Eye logs",
+					"menu-title" => "Z-Eye Logs",
 					"Module" => "Module",
 					"Service" => "Z-Eye Service",
 					"Stats" => "Statistics",
