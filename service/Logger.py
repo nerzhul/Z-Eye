@@ -22,7 +22,7 @@
 import datetime
 
 class ZEyeLogger():
-	logfilepath = "/usr/local/www/z-eye/datas/logs/z_eye_collector.log"
+	logfilepath = "/var/log/z-eye.log"
 	
 	def write(self,text):
         	logfile = open(self.logfilepath,"a")

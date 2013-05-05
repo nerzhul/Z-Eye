@@ -25,10 +25,12 @@ import Daemon
 import Logger
 import serviceManager
 import MRTGCfgDiscoverer
+import MRTGDataRefresh
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
 		MRTGCfgDiscoverer.ZEyeMRTGDiscoverer().start()
+		MRTGDataRefresh.ZEyeMRTGDataRefresher().start()
 		serviceManager.ZEyeServiceMgr().start()	
 		while True:
 			time.sleep(1)

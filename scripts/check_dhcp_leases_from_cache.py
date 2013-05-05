@@ -59,11 +59,9 @@ try:
 			ipcount = pgcursor.fetchone()[0]
 			maxips = len(list(ipaddr.IPv4Network("%s/%s" % (subnet,netmask)))) - 2
 			if float(ipcount)/float(maxips) >= cuse:
-				print "TEST3"
 				print "Le subnet %s/%s est utilisé à plus de %f%" % (subnet,netmask,float(ipcount)/float(maxips))
 				critdetect = 1
 			elif float(ipcount)/float(maxips) >= wuse:
-				print "TEST4"
 				print "Le subnet %s/%s est utilisé à plus de %f %f%" % (subnet,netmask,float(ipcount)/float(maxips))
 				warndetect = 1
         except StandardError, e:
