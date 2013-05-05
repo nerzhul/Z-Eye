@@ -54,6 +54,13 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 		self.threadCounter = self.threadCounter - 1
 		self.tc_mutex.release()
 
+	def getThreadNb(self):
+		val = 0
+		self.tc_mutex.acquire()
+		val = self.threadCounter
+		self.tc_mutex.release()
+		return val
+
 	def fetchSNMPInfos(self,ip,devname,devcom,vendor):
 		self.incrThreadNb()
 
@@ -118,7 +125,7 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 			try:
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
-					while self.threadCounter >= self.max_threads:
+					while self.getThreadNb() >= self.max_threads:
 						time.sleep(1)
 
 					pgcursor.execute("SELECT snmpro FROM z_eye_snmp_cache where device = '%s'" % idx[1])
@@ -146,7 +153,9 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 			if pgsqlCon:
 				pgsqlCon.close()
 
-			while self.threadCounter > 0:
+			# We must wait 1 sec, else threadCounter == 0 because of fast algo
+			time.sleep(1)
+			while self.getThreadNb() > 0:
 				time.sleep(1)
 
 			totaltime = datetime.datetime.now() - starttime 
