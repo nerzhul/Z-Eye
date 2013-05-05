@@ -19,7 +19,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime,os,re,sys,time,thread,threading
+import datetime,re,sys,time,thread,threading,subprocess
 
 import Logger
 import netdiscoCfg
@@ -77,14 +77,12 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 
 	def fetchMRTGInfos(self,ip,devname,devcom):
 		try:
-			cmd = "cfgmaker %s@%s" % (devcom,ip)
-			pipe = os.popen(cmd, 'r')
-			text = pipe.read()
-			pipe.close()
-			text = re.sub("\/var\/www\/mrtg","/usr/local/www/z-eye/datas/rrd",text)
+			text = subprocess.check_output(["/usr/local/bin/perl","/usr/local/bin/cfgmaker", "%s@%s" % (devcom,ip)])
+			text += "\nWorkDir: /usr/local/www/z-eye/datas/rrd"
 			cfgfile = open("/usr/local/www/z-eye/datas/mrtg-config/mrtg-%s.cfg" % devname,"w")
 			cfgfile.writelines(text)
 			cfgfile.close()
+			Logger.ZEyeLogger().write("MRTG-Config-Discovery: wrote file /usr/local/www/z-eye/datas/mrtg-config/mrtg-%s.cfg" % devname)
 		except Exception, e:
 			Logger.ZEyeLogger().write("MRTG-Config-Discovery: FATAL %s" % e)
 			return
