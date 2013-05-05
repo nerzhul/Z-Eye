@@ -22,7 +22,6 @@
 			parent::FSLocales();
 			$locales = array(
 				"fr" => array(
-					"Collector" => "Collecteur Z-Eye",
 					"Date" => "Date",
 					"Entry" => "Entrée",
 					"err-no-logs" => "Aucun log collecté",
@@ -30,14 +29,14 @@
 					"Filter" => "Filtrer",
 					"Level" => "Niveau",
 					"menu-name" => "Moteur Z-Eye",
-					"menu-title" => "Journaux Z-Eye",
+					"menu-title" => "Admin Z-Eye",
 					"Module" => "Module",
+					"Service" => "Service Z-Eye",
 					"Stats" => "Statistiques",
 					"User" => "Utilisateur",
 					"webapp" => "Application Web",
 				),
 				"en" => array(
-					"Collector" => "Z-Eye Collector",
 					"Date" => "Date",
 					"Entry" => "Entry",
 					"err-no-logs" => "No log found",
@@ -45,8 +44,9 @@
 					"Filter" => "Filter",
 					"Level" => "Level",
 					"menu-name" => "Z-Eye Engine",
-					"menu-title" => "Z-Eye logs",
+					"menu-title" => "Z-Eye Admin",
 					"Module" => "Module",
+					"Service" => "Z-Eye Service",
 					"Stats" => "Statistics",
 					"User" => "User",
 					"webapp" => "Web application",

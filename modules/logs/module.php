@@ -78,7 +78,7 @@
 			$output = "";
 			if(!FS::isAjaxCall()) {
 				$panElmts = array(array(1,"mod=".$this->mid,$this->loc->s("webapp")),
-					array(2,"mod=".$this->mid,$this->loc->s("Collector")));
+					array(2,"mod=".$this->mid,$this->loc->s("Service")));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			}
 			else if(!$sh || $sh == 1) {
@@ -114,7 +114,7 @@
 			}
 			else if($sh == 2) {
 				$output = "<pre>";
-				$fp = fopen(dirname(__FILE__)."/../../datas/logs/z_eye_collector.log","r");
+				$fp = fopen("/var/log/z-eye.log","r");
 				fseek($fp,-(sizeof('a')), SEEK_END);
 				$linecount = 30;
 				$fileoutput = "";
