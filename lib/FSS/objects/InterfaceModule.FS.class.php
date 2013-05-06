@@ -36,6 +36,7 @@
 		}
 		
 		public function handlePostDatas() {}
+		public function getIfaceElmt() {}
 		
 		public function setModuleId($mid) { $this->mid = $mid; }
 		public function getConfig() { return $this->conf; }

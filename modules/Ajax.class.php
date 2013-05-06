@@ -28,17 +28,22 @@
 			$type = FS::$secMgr->checkAndSecuriseGetData("at");
 			switch($type) {
 				case 1: // menu
-					$mid = FS::$secMgr->checkAndSecuriseGetData("mid");
-					echo FS::$iMgr->LoadMenu($mid);
+					$mod = FS::$secMgr->checkAndSecuriseGetData("mid");
+					echo FS::$iMgr->LoadMenu($mod);
 					break;
 				case 2: // module
-					$mid = FS::$secMgr->checkAndSecuriseGetData("mod");
-					echo FS::$iMgr->loadModule($mid);
+					$mod = FS::$secMgr->checkAndSecuriseGetData("mod");
+					echo FS::$iMgr->loadModule($mod);
 					echo FS::$iMgr->renderJS();
 					break;
 				case 3: // Action Handler
 					$aMgr = new ActionMgr();
 					$aMgr->DoAction(FS::$secMgr->checkAndSecuriseGetData("act"));
+					break;
+				case 4: // module: getIfaceElmt()
+					$mod = FS::$secMgr->checkAndSecuriseGetData("mod");
+					echo FS::$iMgr->loadModule($mod,2);
+					echo FS::$iMgr->renderJS();
 					break;
 				default: $this->honeyPot(); break;
 			}

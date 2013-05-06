@@ -121,7 +121,7 @@
 			return $output;
 		}
 
-		public function loadModule($id) {
+		public function loadModule($id,$act=1) {
 			$output = "";
 
 			$dir = opendir(dirname(__FILE__)."/../../modules/");
@@ -145,7 +145,11 @@
 				if($module->getRulesClass()->canAccessToModule()) {
 					$this->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($id);
-					$output .= $module->getModuleClass()->Load();
+					switch($act) {
+						case 1: default: $output .= $module->getModuleClass()->Load(); break;
+						case 2: $output .= $module->getModuleClass()->getIfaceElmt(); break;
+					}
+						
 				}
 				else
 					$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");

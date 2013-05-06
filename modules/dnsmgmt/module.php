@@ -62,9 +62,10 @@
 								"confirm" => array($this->loc->s("confirm-remove-dnssrc")."'".$data["addr"]."' ?","Confirm","Cancel")));
 							$tmpoutput .= "</td></tr>";
 						}
-						if($found)
+						if($found) {
 							$tmpoutput .= "</table>";
-						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"),array("width" => 500));
+							$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"),array("width" => 500));
+						}
 					}
 				}
 			}
