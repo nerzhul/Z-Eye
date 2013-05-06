@@ -584,16 +584,14 @@
 			return ($count > 0 ? $output : "");
 		}
 
+		/*
+		* lnkadd option contain get arguments in HTML form for AJAX calls
+		*/
 		public function opendiv($callid,$text1,$options=array()) {
 			$divname = uniqid();
 			$aname = uniqid();
 
-			$content = "";
-                        /*$output = "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content.$this->renderJS()."</div>";*/
-			$output = "";
-
-			$this->setJSBuffer(0);
-			$output .= "<a id=\"".$aname."\" href=\"#\" onclick=\"formPopup('".$this->cur_module->getModuleId()."','".$callid."','".
+			$output = "<a id=\"".$aname."\" href=\"#\" onclick=\"formPopup('".$this->cur_module->getModuleId()."','".$callid."','".
 				(isset($options["lnkadd"]) ? $options["lnkadd"] : "")."'";
 			
 			if(isset($options["width"]) && $options["width"] > 0)
