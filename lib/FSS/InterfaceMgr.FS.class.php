@@ -34,7 +34,7 @@
 	require_once(dirname(__FILE__)."/objects/Rules".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/InterfaceModule".CLASS_EXT);
 
-	class FSInterfaceMgr {
+	abstract class FSInterfaceMgr {
 		function __construct() {
 			$this->InitComponents();
 		}

@@ -28,7 +28,7 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class FSLocales {
+	abstract class FSLocales {
 		function __construct() { 
 			$this->locales = array(
 				"en" => array(

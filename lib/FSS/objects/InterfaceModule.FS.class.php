@@ -28,7 +28,7 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class InterfaceModule {
+	abstract class InterfaceModule {
 		function __construct($locales) {
 			$this->locales = $locales;
 			$this->menu = "";

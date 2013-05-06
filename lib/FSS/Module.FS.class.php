@@ -28,7 +28,7 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class FSModule {
+	abstract class FSModule {
 		function __construct($locales) { $this->loc = $locales; }
 
 		public function Load() { FS::$iMgr->printError("Unknown module !"); }

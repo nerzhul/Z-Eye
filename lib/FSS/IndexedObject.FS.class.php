@@ -28,7 +28,7 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class IndexedObject {
+	abstract class IndexedObject {
 		function __construct() {}
 
 		public function	Load() {}

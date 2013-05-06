@@ -28,7 +28,7 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	class FSRules {
+	abstract class FSRules {
 		function __construct($locales) { $this->loc = $locales; }
 
 		public function showMgmtInterface() { return ""; }

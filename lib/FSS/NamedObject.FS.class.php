@@ -29,7 +29,8 @@
         */
 
 	require_once(dirname(__FILE__)."/IndexedObject.FS.class.php");
-	class NamedObject extends IndexedObject {
+
+	abstract class NamedObject extends IndexedObject {
 		function __construct() {}
 
 		public function Load() {}
