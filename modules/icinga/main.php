@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("Micinga")) {
-		class Micinga extends InterfaceModule {
+		final class Micinga extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lIcinga());
 				$this->moduleclass = new iIcinga($this->locales);

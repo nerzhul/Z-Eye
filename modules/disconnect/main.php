@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MDisconnect")) {
-		class MDisconnect extends InterfaceModule {
+		final class MDisconnect extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lDisconnect());
 				$this->moduleclass = new iDisconnect($this->locales);

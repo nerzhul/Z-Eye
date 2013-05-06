@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MNetdisco")) {
-		class MNetdisco extends InterfaceModule {
+		final class MNetdisco extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lNetdisco());
 				$this->moduleclass = new iNetdisco($this->locales);

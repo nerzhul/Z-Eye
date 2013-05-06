@@ -26,7 +26,7 @@
 	require_once(dirname(__FILE__)."/dell.func.php");
 	require_once(dirname(__FILE__)."/device.api.php");
 	
-	class iSwitchMgmt extends FSModule {
+	final class iSwitchMgmt extends FSModule {
 		function __construct($locales) { 
 			parent::__construct($locales); 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");

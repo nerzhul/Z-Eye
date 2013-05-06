@@ -19,7 +19,7 @@
 	
 	require_once(dirname(__FILE__)."/netdiscoCfg.api.php");
 	
-	class iNetdisco extends FSModule {
+	final class iNetdisco extends FSModule {
 		function __construct($locales) { parent::__construct($locales); }
 		
 		public function Load() {

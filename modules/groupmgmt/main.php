@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MGroupMgmt")) {
-		class MGroupMgmt extends InterfaceModule {
+		final class MGroupMgmt extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lGroupMgmt());
 				$this->moduleclass = new iGroupMgmt($this->locales);

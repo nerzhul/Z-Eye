@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MSecReport")) {
-		class MSecReport extends InterfaceModule {
+		final class MSecReport extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lSecReport());
 				$this->moduleclass = new iSecReport($this->locales);

@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MMaps")) {
-		class MMaps extends InterfaceModule {
+		final class MMaps extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lMaps());
 				$this->moduleclass = new iMaps($this->locales);

@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("Mconnect")) {
-		class Mconnect extends InterfaceModule {
+		final class Mconnect extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lConnect());
 				$this->moduleclass = new iConnect($this->locales);

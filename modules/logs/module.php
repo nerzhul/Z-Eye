@@ -19,7 +19,7 @@
 
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
-	class iLogs extends FSModule{
+	final class iLogs extends FSModule{
 		function __construct($locales) { parent::__construct($locales); }
 
 		public function Load() {

@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MRadius")) {
-		class MRadius extends InterfaceModule {
+		final class MRadius extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lRadius());
 				$this->moduleclass = new iRadius($this->locales);

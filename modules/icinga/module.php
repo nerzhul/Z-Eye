@@ -19,7 +19,7 @@
 
 	require_once(dirname(__FILE__)."/icingaBroker.api.php");
 
-	class iIcinga extends FSModule {
+	final class iIcinga extends FSModule {
 		function __construct($locales) {
 			parent::__construct($locales);
 			$this->icingaAPI = new icingaBroker();

@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MSearch")) {
-		class MSearch extends InterfaceModule {
+		final class MSearch extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lSearch());
 				$this->moduleclass = new iSearch($this->locales);

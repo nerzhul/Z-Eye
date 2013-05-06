@@ -19,7 +19,7 @@
 
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
-	class iSearch extends FSModule {
+	final class iSearch extends FSModule {
 		function __construct($locales) { 
 			parent::__construct($locales);
 			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),

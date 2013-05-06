@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MUserMgmt")) {
-		class MUserMgmt extends InterfaceModule {
+		final class MUserMgmt extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lUserMgmt());
 				$this->moduleclass = new iUserMgmt($this->locales);

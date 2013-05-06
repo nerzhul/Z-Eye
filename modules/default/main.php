@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MDefault")) {
-		class MDefault extends InterfaceModule {
+		final class MDefault extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lDefault());
 				$this->moduleclass = new iDefault($this->locales);

@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MLogs")) {
-		class MLogs extends InterfaceModule {
+		final class MLogs extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lLogs());
 				$this->moduleclass = new iLogs($this->locales);

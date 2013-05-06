@@ -19,7 +19,7 @@
 	
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 
-	class iIPManager extends FSModule{
+	final class iIPManager extends FSModule{
 		function __construct($locales) { parent::__construct($locales); }
 
 		public function Load() {

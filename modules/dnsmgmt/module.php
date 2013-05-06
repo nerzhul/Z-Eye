@@ -19,7 +19,7 @@
 
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 
-	class iDNSManager extends FSModule{
+	final class iDNSManager extends FSModule{
 		function __construct($locales) { parent::__construct($locales); }
 
 		public function Load() {

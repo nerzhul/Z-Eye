@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MDNSMgmt")) {
-		class MDNSMgmt extends InterfaceModule {
+		final class MDNSMgmt extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lDNSManager());
 				$this->moduleclass = new iDNSManager($this->locales);

@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MSNMPmgmt")) {
-		class MSNMPmgmt extends InterfaceModule {
+		final class MSNMPmgmt extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lSNMPmgmt());
 				$this->moduleclass = new iSNMPmgmt($this->locales);

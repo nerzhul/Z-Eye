@@ -19,7 +19,7 @@
 
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
-	class iConnect extends FSModule{
+	final class iConnect extends FSModule{
 		function __construct($locales) { parent::__construct($locales); }
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-conn"));

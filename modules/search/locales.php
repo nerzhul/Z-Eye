@@ -17,7 +17,7 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
     
-	class lSearch extends FSLocales {
+	final class lSearch extends FSLocales {
 		function __construct() {
 			parent::__construct();
 			$locales = array(

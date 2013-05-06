@@ -19,7 +19,7 @@
 	
 	require_once(dirname(__FILE__)."/../netdisco/netdiscoCfg.api.php");
 	
-	class iSNMPMgmt extends FSModule {
+	final class iSNMPMgmt extends FSModule {
 		function __construct($locales) { parent::__construct($locales); }
 		
 		public function Load() {

@@ -20,7 +20,7 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/PDFgen.FS.class.php");
 
-	class iRadius extends FSModule {
+	final class iRadius extends FSModule {
 		function __construct($locales) {
 			parent::__construct($locales);
 			$raddbinfos = array();

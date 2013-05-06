@@ -17,7 +17,7 @@
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
 
-	class rConnect extends FSRules {
+	final class rConnect extends FSRules {
 		function __construct($locales) { parent::__construct($locales); }
 
 		public function showMgmtInterface($activerules = array()) {

@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MIPManager")) {
-		class MIPManager extends InterfaceModule {
+		final class MIPManager extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lIPManager());
 				$this->moduleclass = new iIPManager($this->locales);

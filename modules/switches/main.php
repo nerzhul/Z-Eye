@@ -22,7 +22,7 @@
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("MSwitches")) {
-		class MSwitches extends InterfaceModule {
+		final class MSwitches extends InterfaceModule {
 			function __construct() {
 				parent::__construct(new lSwitchMgmt());
 				$this->moduleclass = new iSwitchMgmt($this->locales);

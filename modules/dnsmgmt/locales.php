@@ -17,7 +17,7 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	class lDNSManager extends FSLocales {
+	final class lDNSManager extends FSLocales {
 		function __construct() {
 			parent::__construct();
 			$locales = array(
