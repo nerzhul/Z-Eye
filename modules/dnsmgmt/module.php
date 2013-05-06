@@ -41,31 +41,12 @@
 					 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						$output .= $this->showCreateEditErr();
 
-						FS::$iMgr->setJSBuffer(1);
-						$tmpoutput = $this->CreateOrEditServer(true);
-						$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("add-server"),array("width" => 500, "line" => true));
+						$output .= FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("width" => 500, "line" => true));
 
-						FS::$iMgr->setJSBuffer(1);
 						$tmpoutput = "";
 						$found = false;
-						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
-						while($data = FS::$dbMgr->Fetch($query)) {
-							if(!$found) {
-								$found = true;
-								$tmpoutput .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
-								"</th><th></th></tr>";
-							}
-
-							$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["addr"])."tr\"><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
-							$tmpoutput .= "</td><td>".$data["login"]."</td><td>";
-							$tmpoutput .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"],array("js" => true,
-								"confirm" => array($this->loc->s("confirm-remove-dnssrc")."'".$data["addr"]."' ?","Confirm","Cancel")));
-							$tmpoutput .= "</td></tr>";
-						}
-						if($found) {
-							$tmpoutput .= "</table>";
-							$output .= FS::$iMgr->opendiv($tmpoutput,$this->loc->s("modify-servers"),array("width" => 500));
-						}
+						if($exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","addr","dns = '1'"))
+							$output .= FS::$iMgr->opendiv(2,$this->loc->s("modify-servers"),array("width" => 500));
 					}
 				}
 			}
@@ -347,6 +328,29 @@
 			return $output;
 		}
 
+		private function showServerList() {
+			$output = "";
+			$found = false;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) {
+					$found = true;
+					$output .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
+					"</th><th></th></tr>";
+				}
+
+				$output .= "<tr id=\"".preg_replace("#[.]#","-",$data["addr"])."tr\"><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
+				$output .= "</td><td>".$data["login"]."</td><td>";
+				$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"],array("js" => true,
+					"confirm" => array($this->loc->s("confirm-remove-dnssrc")."'".$data["addr"]."' ?","Confirm","Cancel")));
+				$output .= "</td></tr>";
+			}
+			if($found) {
+				$output .= "</table>";
+			}
+			return $output;
+		}
+
 		private function showCreateEditErr() {
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
@@ -358,6 +362,16 @@
 				case 99: return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->CreateOrEditServer(true);
+				case 2: return $this->showServerList();
+				default: return;
+			}
+		}
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:

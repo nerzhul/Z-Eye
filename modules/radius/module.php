@@ -65,7 +65,7 @@
 				else {
 					if(FS::$sessMgr->hasRight("mrule_radius_manage")) {
 						FS::$iMgr->setJSBuffer(1);
-						$output .= FS::$iMgr->opendiv($this->showRadiusServerMgmt(),$this->loc->s("Manage-radius-db"),array("width" => 550));
+						$output .= FS::$iMgr->opendiv(1,$this->loc->s("Manage-radius-db"),array("width" => 550));
 					}
 					$output .= $this->showRadiusList($rad);
 				}
@@ -337,58 +337,7 @@
 				if(!$radSQLMgr)
 					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
-				FS::$iMgr->setJSBuffer(1);
-				$formoutput = FS::$iMgr->js("function changeUForm() {
-					if(document.getElementsByName('utype')[0].value == 1) {
-						$('#userdf').show();
-					}
-					else if(document.getElementsByName('utype')[0].value == 2) {
-						$('#userdf').hide();
-					}
-					else if(document.getElementsByName('utype')[0].value == 3) {
-						$('#userdf').hide();
-					}
-				}; grpidx = 0; function addGrpForm() {
-					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
-					<a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
-					grpidx++;
-				}
-				function delGrpElmt(grpidx) {
-						$('.ugroupli'+grpidx).remove();
-				}
-				attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-				$this->raddbCondSelector().
-				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
-				FS::$iMgr->selElmt("check",1).
-				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertBefore('#formactions');
-				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
-				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
-				function delAttrElmt(attridx) {
-					$('.attrli'+attridx).remove();
-				}");
-
-				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
-				$formoutput .= "<ul class=\"ulform\"><li>".
-				FS::$iMgr->select("utype","changeUForm()",$this->loc->s("Auth-Type"));
-				$formoutput .= FS::$iMgr->selElmt($this->loc->s("User"),1);
-				$formoutput .= FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2);
-				//$formoutput .= FS::$iMgr->selElmt("Code PIN",3);
-				$formoutput .= "</select></li><li>".
-				FS::$iMgr->input("username","",20,40,$this->loc->s("User"))."</li><li>";
-				$formoutput .= "<fieldset id=\"userdf\" style=\"border:0; padding:0; margin-left: -1px;\"><li>".
-				FS::$iMgr->password("pwd","",$this->loc->s("Password"))."</li><li>".
-				FS::$iMgr->select("upwdtype","",$this->loc->s("Pwd-Type")).
-				FS::$iMgr->selElmt("Cleartext-Password",1).
-				FS::$iMgr->selElmt("User-Password",2).
-				FS::$iMgr->selElmt("Crypt-Password",3).
-				FS::$iMgr->selElmt("MD5-Password",4).
-				FS::$iMgr->selElmt("SHA1-Password",5).
-				FS::$iMgr->selElmt("CHAP-Password",6).
-				"</select></li></li><li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
-				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','')").
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-User"));
+				$output .= FS::$iMgr->opendiv(2,$this->loc->s("New-User"));
 				$found = 0;
 
 				// Filtering
@@ -415,61 +364,7 @@
 				$output .= "<div id=\"radd\">".$this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport)."</div>";
 			}
 			else if($sh == 2) {
-				FS::$iMgr->setJSBuffer(1);
-				$formoutput = FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-				$this->raddbCondSelector().
-				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
-				FS::$iMgr->selElmt("check",1).
-				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
-				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
-				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
-				function delAttrElmt(attridx) {
-					$('.attrli'+attridx).remove();
-				}
-				function addTemplAttributes() {
-					switch($('#radgrptpl').val()) {
-						case '1':
-							addAttrElmt('Tunnel-Private-Group-Id','','=','2');
-							addAttrElmt('Tunnel-Type','13','=','2');
-							addAttrElmt('Tunnel-Medium-Type','6','=','2');
-							break;
-					}
-				};
-				$.event.props.push('dataTransfer');
-					$('#radgrp #dragtd').on({
-					mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
-							mouseleave: function(e) { $('#trash').hide(); $('#editf').hide(); },
-							dragstart: function(e) { $('#trash').show(); $('#editf').show(); e.dataTransfer.setData('text/html', $(this).text()); },
-							dragenter: function(e) { e.preventDefault();},
-							dragover: function(e) { e.preventDefault(); },
-							drop: function(e) {},
-							dragend: function() { $('#trash').hide(); $('#editf').hide(); }
-					});
-				$('#trash').on({
-					dragover: function(e) { e.preventDefault(); },
-					drop: function(e) { $('#subpop').html('".$this->loc->s("Delete-profil")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-					FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
-					FS::$iMgr->hidden("group","'+e.dataTransfer.getData('text/html')+'").
-					FS::$iMgr->submit("",$this->loc->s("Delete")).
-					FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"unlockScreen();")."</form>');
-					lockScreen();
-						}
-				});
-				$('#editf').on({
-						dragover: function(e) { e.preventDefault(); },
-						drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=2&radentry='+e.dataTransfer.getData('text/html')); }
-				});");
-				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
-				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("radgrptpl","addTemplAttributes()","Template");
-				$formoutput .= FS::$iMgr->selElmt($this->loc->s("None"),0);
-				$formoutput .= FS::$iMgr->selElmt("VLAN",1);
-				$formoutput .= "</select></li><li>".
-				FS::$iMgr->input("groupname","",20,40,$this->loc->s("Profilname"))."</li><li>".
-				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
-				FS::$iMgr->submit("",$this->loc->s("Save")).
-				"</li></ul></form>";
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Profil"),array("width" => 450));
+				$output .= FS::$iMgr->opendiv(3,$this->loc->s("New-Profil"),array("width" => 450));
 				$tmpoutput = FS::$iMgr->h3("title-profillist");
 				$found = 0;
 
@@ -492,7 +387,7 @@
 							$groups[$data["groupname"]] = $rcount;
 					else
 						$groups[$data["groupname"]] += $rcount;
-                }
+               			 }
 				if(count($groups) > 0) {
 					$output .= "<table id=\"radgrp\" style=\"width:30%;\"><tr><th>".$this->loc->s("Group")."</th><th style=\"width:30%\">".$this->loc->s("User-nb")."</th></tr>";
 					foreach($groups as $key => $value)
@@ -687,7 +582,121 @@
 			}
 			return $output;
 		}
-		
+
+		/*
+		* Radius group form, support VLAN auto complete fields
+		*/
+		private function showGroupForm() {
+			$output = FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
+				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
+				$this->raddbCondSelector().
+				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
+				FS::$iMgr->selElmt("check",1).
+				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
+				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
+				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
+				function delAttrElmt(attridx) {
+					$('.attrli'+attridx).remove();
+				}
+				function addTemplAttributes() {
+					switch($('#radgrptpl').val()) {
+						case '1':
+							addAttrElmt('Tunnel-Private-Group-Id','','=','2');
+							addAttrElmt('Tunnel-Type','13','=','2');
+							addAttrElmt('Tunnel-Medium-Type','6','=','2');
+							break;
+					}
+				};
+				$.event.props.push('dataTransfer');
+					$('#radgrp #dragtd').on({
+					mouseover: function(e) { $('#trash').show(); $('#editf').show(); },
+							mouseleave: function(e) { $('#trash').hide(); $('#editf').hide(); },
+							dragstart: function(e) { $('#trash').show(); $('#editf').show(); e.dataTransfer.setData('text/html', $(this).text()); },
+							dragenter: function(e) { e.preventDefault();},
+							dragover: function(e) { e.preventDefault(); },
+							drop: function(e) {},
+							dragend: function() { $('#trash').hide(); $('#editf').hide(); }
+					});
+				$('#trash').on({
+					dragover: function(e) { e.preventDefault(); },
+					drop: function(e) { $('#subpop').html('".$this->loc->s("Delete-profil")." \''+e.dataTransfer.getData('text/html')+'\' ?".
+						FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=5").
+						FS::$iMgr->hidden("group","'+e.dataTransfer.getData('text/html')+'").
+						FS::$iMgr->submit("",$this->loc->s("Delete")).
+						FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"unlockScreen();")."</form>');
+						lockScreen();
+					}
+				});
+				$('#editf').on({
+					dragover: function(e) { e.preventDefault(); },
+					drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=2&radentry='+e.dataTransfer.getData('text/html')); }
+				});");
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3").
+				"<ul class=\"ulform\"><li>".FS::$iMgr->select("radgrptpl","addTemplAttributes()","Template").
+				FS::$iMgr->selElmt($this->loc->s("None"),0).
+				FS::$iMgr->selElmt("VLAN",1).
+				"</select></li><li>".
+				FS::$iMgr->input("groupname","",20,40,$this->loc->s("Profilname"))."</li><li>".
+				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
+				FS::$iMgr->submit("",$this->loc->s("Save")).
+				"</li></ul></form>";
+			return $output;
+		}
+
+		private function showUserForm() {
+			$output = FS::$iMgr->js("function changeUForm() {
+				if(document.getElementsByName('utype')[0].value == 1) {
+					$('#userdf').show();
+				}
+				else if(document.getElementsByName('utype')[0].value == 2) {
+					$('#userdf').hide();
+				}
+				else if(document.getElementsByName('utype')[0].value == 3) {
+					$('#userdf').hide();
+				}
+			}; grpidx = 0; function addGrpForm() {
+				$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
+				<a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
+				grpidx++;
+			}
+			function delGrpElmt(grpidx) {
+					$('.ugroupli'+grpidx).remove();
+			}
+			attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
+			FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
+			$this->raddbCondSelector().
+			"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
+			FS::$iMgr->selElmt("check",1).
+			FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertBefore('#formactions');
+			$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
+			$('#attrtarget'+attridx).val(attrtarget); attridx++;};
+			function delAttrElmt(attridx) {
+				$('.attrli'+attridx).remove();
+			}");
+
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
+			$output .= "<ul class=\"ulform\"><li>".
+				FS::$iMgr->select("utype","changeUForm()",$this->loc->s("Auth-Type"));
+			$output .= FS::$iMgr->selElmt($this->loc->s("User"),1).
+				FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2).
+			//$output .= FS::$iMgr->selElmt("Code PIN",3);
+				"</select></li><li>".
+				FS::$iMgr->input("username","",20,40,$this->loc->s("User"))."</li><li>".
+				"<fieldset id=\"userdf\" style=\"border:0; padding:0; margin-left: -1px;\"><li>".
+				FS::$iMgr->password("pwd","",$this->loc->s("Password"))."</li><li>".
+				FS::$iMgr->select("upwdtype","",$this->loc->s("Pwd-Type")).
+				FS::$iMgr->selElmt("Cleartext-Password",1).
+				FS::$iMgr->selElmt("User-Password",2).
+				FS::$iMgr->selElmt("Crypt-Password",3).
+				FS::$iMgr->selElmt("MD5-Password",4).
+				FS::$iMgr->selElmt("SHA1-Password",5).
+				FS::$iMgr->selElmt("CHAP-Password",6).
+				"</select></li></li><li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
+				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','')").
+				FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
+			return $output;
+		}
+	
 		private function showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport) {
 			$found = false;
 			$output = "";
@@ -980,6 +989,16 @@
 				FS::$iMgr->selElmt("!~","!~",$select == "!~").
 				FS::$iMgr->selElmt("=*","=*",$select == "=*").
 				FS::$iMgr->selElmt("!*","!*",$select == "!*");
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->showRadiusServerMgmt();
+				case 2: return $this->showUserForm();
+				case 3: return $this->showGroupForm();
+				default: return;
+			}
 		}
 
 		public function handlePostDatas($act) {

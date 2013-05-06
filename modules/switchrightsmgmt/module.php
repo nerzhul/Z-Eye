@@ -77,13 +77,13 @@
 
 			$output .= FS::$iMgr->js("function arangeform() {
 				if(document.getElementsByName('stype')[0].value == 1) {
-					$('#tohide1').hide();
-					$('#tohide2').hide();
-					$('#tohide3').hide();
+					$('#tohide1').fadeOut();
+					$('#tohide2').fadeOut();
+					$('#tohide3').fadeOut();
 				} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {
-					$('#tohide1').show();
-					$('#tohide2').show();
-					$('#tohide3').show();
+					$('#tohide1').fadeIn();
+					$('#tohide2').fadeIn();
+					$('#tohide3').fadeIn();
 				}};");
 			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
 			$output .= "<table>";
@@ -121,10 +121,7 @@
 		}
 
 		private function showBackupTab() {
-			FS::$iMgr->setJSBuffer(1);
-			$formoutput = $this->addOrEditBackupServer(true);
-
-			$output = FS::$iMgr->opendiv($formoutput,$this->loc->s("New-Server"));
+			$output = FS::$iMgr->opendiv(1,$this->loc->s("New-Server"));
 
 			$tmpoutput = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th></th></tr>";
@@ -613,6 +610,14 @@
 					$js .= "$('#lg".$right.$type."').html('".$this->groupSelect("gid",$values)."');";
 			}
 			return $js;
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->addOrEditBackupServer(true);
+				default: return;
+			}
 		}
 
 		public function handlePostDatas($act) {

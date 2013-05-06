@@ -91,7 +91,7 @@
 			$output = FS::$iMgr->h1("title-usermgmt");
 
 			if(FS::$sessMgr->hasRight("mrule_usermgmt_ldapuserimport")) {
-				$output .= FS::$iMgr->opendiv($this->showUserImportForm(),$this->loc->s("import-user"),array("width" => 400));
+				$output .= FS::$iMgr->opendiv(1,$this->loc->s("import-user"),array("width" => 400));
 			}
 			$tmpoutput = "";
 			$found = 0;
@@ -115,7 +115,7 @@
 
 				FS::$iMgr->setJSBuffer(1);
 
-				$output .= FS::$iMgr->opendiv($this->showDirectoryForm(),$this->loc->s("new-directory"),array("width" => 470));
+				$output .= FS::$iMgr->opendiv(2,$this->loc->s("new-directory"),array("width" => 470));
 
 				$found = 0;
 				$tmpoutput = "";
@@ -126,7 +126,7 @@
 						$tmpoutput .= "<table id=\"ldapList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
 						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr></thead>";
 					}
-					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td>".FS::$iMgr->opendiv($this->showDirectoryForm($data["addr"]),$data["addr"],array("width" => 470)).
+					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td>".FS::$iMgr->opendiv(3,$data["addr"],array("width" => 470, "lnkadd" => "addr=".$data["addr"])).
 						"</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".
 						FS::$iMgr->removeIcon("mod=".$this->mid."&act=5&addr=".$data["addr"],array("js" => true,
 							"confirm" => array($this->loc->s("confirm-removedirectory")."'".$data["addr"]."' ?","Confirm","Cancel")))."</tr>";
@@ -280,6 +280,19 @@
 				}
 			}
 			FS::$iMgr->ajaxEcho("err-user-not-found");
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->showUserImportForm();
+				case 2: return $this->showDirectoryForm();
+				case 3: 
+					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+					if(!$addr) return $this->loc->s("err-bad-datas");
+					return $this->showDirectoryForm($addr);
+				default: return;
+			}
 		}
 
 		public function handlePostDatas($act) {

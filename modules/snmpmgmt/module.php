@@ -44,8 +44,7 @@
 			FS::$iMgr->setTitle("snmp-communities");
 			$found = false;
 
-			$formoutput = $this->showCommunityForm();
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Add-community"),array("width" => 400));
+			$output .= FS::$iMgr->opendiv(1,$this->loc->s("Add-community"),array("width" => 400));
 
 			// Div for Ajax modifications
 			$output .= "<div id=\"snmptable\">";
@@ -66,10 +65,17 @@
 			return "<table id=\"snmpList\"><thead><tr id=\"snmpthead\"><th class=\"headerSortDown\">".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr></thead>";
 		}
 
-		private function showCommunityForm($name = "", $ro = false, $rw = false) {
+		private function showCommunityForm($name = "") {
+			$ro = ""; $rw = "";
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1")."<table>";
-			if($name)
+			if($name)  {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","ro,rw","name = '".$name."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$ro = $data["ro"] == 't';
+					$rw = $data["rw"] == 't';
+				}
 				$output .= "<tr><td>".$this->loc->s("snmp-community")."</td><td>".$name.FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1)."</td></tr>";
+			}
 			else
 				$output .= FS::$iMgr->idxLine($this->loc->s("snmp-community"),"name",$name,array("length" => 64, "size" => 20));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Read"),"ro",$ro,array("type" => "chk", "tooltip" => "tooltip-read"));
@@ -80,10 +86,24 @@
 
 		private function tableCommunityLine($name,$ro,$rw) {
 			FS::$iMgr->setJSBuffer(1);
-			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv($this->showCommunityForm($name,$ro,$rw),$name,array("width" => 400)).
+			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv(2,$name,array("width" => 400, "lnkadd" => "name=".$name)).
 				"</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&snmp=".$name,array("js" => true, "confirm" => 
 					array($this->loc->s("confirm-remove-community")."'".$name."' ?","Confirm","Cancel")))."</td></tr>";
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return showCommunityForm();
+				case 2:
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showCommunityForm($name);
+				default: return;
+			}
 		}
 
 		public function handlePostDatas($act) {

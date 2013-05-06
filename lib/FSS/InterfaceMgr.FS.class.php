@@ -584,17 +584,24 @@
 			return ($count > 0 ? $output : "");
 		}
 
-		public function opendiv($content,$text1,$options=array()) {
+		public function opendiv($callid,$text1,$options=array()) {
 			$divname = uniqid();
 			$aname = uniqid();
-                        $output = "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content.$this->renderJS()."</div>";
+
+			$content = "";
+                        /*$output = "<div id=\"".$divname."\" style=\"display:none; margin-bottom: 15px;\">".$content.$this->renderJS()."</div>";*/
+			$output = "";
+
 			$this->setJSBuffer(0);
-			$output .= "<a id=\"".$aname."\" href=\"#\" onclick=\"formPopup('".$divname."'";
+			$output .= "<a id=\"".$aname."\" href=\"#\" onclick=\"formPopup('".$this->cur_module->getModuleId()."','".$callid."','".
+				(isset($options["lnkadd"]) ? $options["lnkadd"] : "")."'";
+			
 			if(isset($options["width"]) && $options["width"] > 0)
 				$output .= ",'".$options["width"]."px'";
 			$output .= ");\">".$text1."</a>";
 			if(isset($options["line"]) && $options["line"])
 				$output .= "<br />";
+
 			return $output;
 		}
 

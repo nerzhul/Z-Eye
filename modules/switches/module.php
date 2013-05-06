@@ -1234,6 +1234,14 @@
 				return $output;
 			}
 
+			private function showDeviceDiscovery() {
+				$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=18");
+				$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
+				$output .= "</li><li>".FS::$iMgr->Submit("",$this->loc->s("Discover"))."</li>";
+				$output .= "</ul></form>";
+				return $output;
+			}
+
 			protected function showDeviceList() {
 				$output = "";
 				$err = FS::$secMgr->checkAndSecuriseGetData("err");
@@ -1248,13 +1256,9 @@
 
 				$showtitle = true;
 				if(FS::$sessMgr->hasRight("mrule_switches_discover")) {
-					$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=18");
-					$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
-					$formoutput .= "</li><li>".FS::$iMgr->Submit("",$this->loc->s("Discover"))."</li>";
-					$formoutput .= "</ul></form>";
 					$showtitle = false;
 					$output .= FS::$iMgr->h2("title-global-fct");
-					$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Discover-device"),array("line" => true));
+					$output .= FS::$iMgr->opendiv(1,$this->loc->s("Discover-device"),array("line" => true));
 				}
 
 				$foundsw = 0;
@@ -1293,23 +1297,10 @@
 					}
 				}
 				if($foundsw != 0 || $foundwif != 0) {
-					$rightsok = false;
-					if(FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
-						$rightsok = true;
-						// Write all devices button
-						$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=20");
-						$formoutput .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
-					}
-					if(FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
-						$rightsok = true;
-						// Backup all devices button
-						$formoutput .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=21");
-						$formoutput .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
-					}
-					if($rightsok) {
+					if(FS::$sessMgr->hasRight("mrule_switches_globalsave") || FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
 						if($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
 						// Openable divs
-						$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("Advanced-Functions"));
+						$output .= FS::$iMgr->opendiv(2,$this->loc->s("Advanced-Functions"));
 					}
 				}
 				if($foundsw != 0 || $foundwif != 0)
@@ -1353,6 +1344,31 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
 
 				return $output;
+			}
+
+			private function showAdvancedFunctions() {
+				$output = "";
+				if(FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
+					// Write all devices button
+					$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=20");
+					$output .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
+				}
+				if(FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
+					$rightsok = true;
+					// Backup all devices button
+					$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=21");
+					$output .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
+				}
+				return $output;
+			}
+
+			public function getIfaceElmt() {
+				$el = FS::$secMgr->checkAndSecuriseGetData("el");
+				switch($el) {
+					case 1: return $this->showDeviceDiscovery();
+					case 2: return $this->showAdvancedFunctions();
+					default: return;
+				}
 			}
 
 			public function handlePostDatas($act) {

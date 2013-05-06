@@ -31,8 +31,8 @@
 				$output .= FS::$iMgr->tabPan(array(
 					array(3,"mod=".$this->mid,$this->loc->s("icinga-map")),
 					array(2,"mod=".$this->mid,$this->loc->s("net-map")),
-					array(1,"mod=".$this->mid,$this->loc->s("net-map-full"))/*,
-					array(4,"mod=".$this->mid,"Sigma")*/
+					array(1,"mod=".$this->mid,$this->loc->s("net-map-full")),
+					array(4,"mod=".$this->mid,"Sigma")
 					),$sh);
 			} else {
 				$device = FS::$secMgr->checkAndSecuriseGetData("d");
@@ -44,8 +44,8 @@
 					$output .= $this->showGeneralLightWeatherMap();
 				else if($sh == 3)
 					$output .= $this->showIcingaMap();
-				/*else if($sh == 4)
-					$output .= $this->showSigmaMap();*/
+				else if($sh == 4)
+					$output .= $this->showSigmaMap();
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
 			}
@@ -53,9 +53,9 @@
 		}
 
 		private function showSigmaMap() {
-			$output	= FS::$iMgr->opendiv($this->showNodeForm(),$this->loc->s("Add-Node"),array("line" => true));
-			$output	.= FS::$iMgr->opendiv($this->showEdgeForm(),$this->loc->s("Add-Edge"),array("line" => true));
-			$output	.= FS::$iMgr->opendiv($this->showImportForm(),$this->loc->s("Import"));
+			$output	= FS::$iMgr->opendiv(1,$this->loc->s("Add-Node"),array("line" => true));
+			$output	.= FS::$iMgr->opendiv(2,$this->loc->s("Add-Edge"),array("line" => true));
+			$output	.= FS::$iMgr->opendiv(3,$this->loc->s("Import"));
 			$output .= "<div id=\"sigmap\" style=\"display:inline-block;text-align:left; width:100%; height:800px;\"></div>";
 			
 			$js = "var sigInst = sigma.init(document.getElementById('sigmap')).drawingProperties({
@@ -183,6 +183,16 @@
 							"'mainmap','".rand(1,10000000)."','".$node."','".$values["links"][$i]."','000000','".rand(1,10)."'");
 					}
 				}
+			}
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->$this->showNodeForm();
+				case 2: return $this->showEdgeForm();
+				case 3: return $this->showImportForm();
+				default: return;
 			}
 		}
 		

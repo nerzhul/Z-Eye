@@ -91,24 +91,20 @@
 			
 			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 			if(!$tpexist) {
-				FS::$iMgr->setJSBuffer(1);
-				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
+				$output .= FS::$iMgr->opendiv(1,$this->loc->s("new-host"));
 				return $output;
 			}
 			
 			$ctexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","name","");
 			if(!$ctexist) {
-				FS::$iMgr->setJSBuffer(1);
-				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-host"));
+				$output .= FS::$iMgr->opendiv(2,$this->loc->s("new-host"));
 				return $output;
 			}
 
 			/*
 			 * Ajax new host
 			 */
-			$output .= FS::$iMgr->opendiv($this->showHostForm(),$this->loc->s("new-host"),array("width" => 600));
+			$output .= FS::$iMgr->opendiv(3,$this->loc->s("new-host"),array("width" => 600));
 
 			/*
 			 * Host table
@@ -132,7 +128,7 @@
 				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_host_write"))
-					$output .= FS::$iMgr->opendiv($this->showHostForm($data["name"],$data["alias"],$data["addr"],$parentlist),$data["name"],array("width" => 600));
+					$output .= FS::$iMgr->opendiv(10,$data["name"],array("width" => 600, "lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -156,16 +152,18 @@
 			return $output;
 		}
 
-		private function showHostForm($name = "",$alias = "", $address = "",$parentlist = array()) {
-			$dname = ""; $icon = "";
+		private function showHostForm($name = "") {
+			$dname = ""; $icon = ""; $alias = ""; $address = ""; $parentlist = array();
 			$checkcmd = "check-host-alive"; $checkperiod = ""; $checkintval = 3; $retcheckintval = 1; $maxcheck = 10;
 			$eventhdlen = true; $flapen = true; $failpreden = true; $perfdata = true; $retstatus = true; $retnonstatus = true;
 			$notifen = true; $notifperiod = ""; $notifintval = 0; $ctg = "";
 			$hostoptd = true; $hostoptu = true; $hostoptr = true; $hostoptf = true; $hostopts = true;
 			if($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","dname,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$name."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","dname,alias,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$name."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$dname = $data["dname"];
+					$alias = $data["alias"];
+					$addr = $data["addr"];
 					$icon = $data["iconid"];
 					$checkcmd = $data["alivecommand"];
 					$checkperiod = $data["checkperiod"];
@@ -187,6 +185,11 @@
 					$hostoptr = $data["hostoptr"];
 					$hostoptf = $data["hostoptf"];
 					$hostopts = $data["hostopts"];
+				}
+				$parentlist = array();
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_host_parents","parent","name = '".$name."'");
+				while($data = FS::$dbMgr->Fetch($query)) {
+					array_push($parentlist,$data["parent"]);
 				}
 			}
 
@@ -267,16 +270,6 @@
 			if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
-			$hostexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","");
-			FS::$iMgr->setJSBuffer(1);
-			if(!$hostexist)
-				$formoutput = FS::$iMgr->printError($this->loc->s("err-no-hosts"));
-			else {
-				/*
-				 * Ajax new hostgroup
-				 */
-				$formoutput = $this->showHostgroupForm();
-			}
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
@@ -284,7 +277,7 @@
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
 			}
 			if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-hostgroup"),array("width" => 460));
+				$output .= FS::$iMgr->opendiv(4,$this->loc->s("new-hostgroup"),array("width" => 460));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","",array("order" => "name"));
@@ -297,7 +290,7 @@
 				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-					$output .= FS::$iMgr->opendiv($this->showHostgroupForm($data["name"],$data["alias"]),$data["name"],array("width" => 460));
+					$output .= FS::$iMgr->opendiv(11,$data["name"],array("width" => 460, "lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -325,11 +318,13 @@
 			return $output;
 		}
 		
-		private function showHostgroupForm($name = "",$alias = "") {
+		private function showHostgroupForm($name = "") {
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=19");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			// Global
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
+
+			$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","alias","name = '".$name."'");
 			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
 
 			$hostlist = array();
@@ -350,15 +345,8 @@
 
 			$output = "";
 
-			if(FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-				$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
-				if($tpexist)
-					$formoutput = $this->showServiceForm();
-				else
-					$formoutput = FS::$iMgr->printError($this->loc->s("err-no-service"));
-
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-service"),array("width" => 700));
-			}
+			if(FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+				$output .= FS::$iMgr->opendiv(5,$this->loc->s("new-service"),array("width" => 700));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template","",array("order" => "name"));
@@ -371,7 +359,7 @@
 				$output .= "<tr id=\"srv_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
-					$output .= FS::$iMgr->opendiv($this->showServiceForm($data["name"],$data["hosttype"],$data["host"]),$data["name"],array("width" => 700));
+					$output .= FS::$iMgr->opendiv(12,$data["name"],array("width" => 700, "lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -394,17 +382,20 @@
 			return $output;
 		}
 
-		private function showServiceForm($name = "", $hosttype = "", $host = "") {
+		private function showServiceForm($name = "") {
+			$hosttype = ""; $host = "";
 			$actcheck = true; $pascheck = true; $parcheck = true; $obsess = true; $freshness = false;
 			$notifen = true; $eventhdlen = true; $flapen = true; $failpreden = true; $perfdata = true; $retstatus = true; $retnonstatus = true;
 			$checkcmd = ""; $checkperiod = ""; $checkintval = 3; $retcheckintval = 1; $maxcheck = 10;
 			$notifperiod = ""; $srvoptc = true; $srvoptw = true; $srvoptu = true; $srvoptr = true; $srvoptf = true; $srvopts = true; 
 			$notifintval = 0; $ctg = "";
 			if($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","ctg,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","host,hosttype,ctg,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
 					retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
 					"name = '".$name."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
+					$host = $data["host"];
+					$hosttype = $data["hosttype"];
 					$actcheck = ($data["actcheck"] == 't');
 					$pascheck = ($data["pascheck"] == 't');
 					$parcheck = ($data["parcheck"] == 't');
@@ -490,10 +481,8 @@
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
 			
-			if(FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
-				$formoutput = $this->showTimeperiodForm();
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-timeperiod"),array("width" => 580));
-			}
+			if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+				$output .= FS::$iMgr->opendiv(6,$this->loc->s("new-timeperiod"),array("width" => 580));
 
 			/*
 			 * Timeperiod table
@@ -509,11 +498,7 @@
 				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
-					$output .= FS::$iMgr->opendiv($this->showTimeperiodForm($data["name"],$data["alias"],$data["mhs"],$data["mms"],$data["mhe"],$data["mme"],
-						$data["tuhs"],$data["tums"],$data["tuhe"],$data["tume"],$data["whs"],$data["wms"],$data["whe"],$data["wme"],
-						$data["thhs"],$data["thms"],$data["thhe"],$data["thme"],$data["fhs"],$data["fms"],$data["fhe"],$data["fme"],
-						$data["sahs"],$data["sams"],$data["sahe"],$data["same"],$data["suhs"],$data["sums"],$data["suhe"],$data["sume"]
-					),$data["name"],array("width" => 580));
+					$output .= FS::$iMgr->opendiv(13,$data["name"],array("width" => 580, "lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -549,14 +534,28 @@
 			return $output;
 		}
 
-		private function showTimeperiodForm($name = "", $alias = "",
-			$mhs = 0, $mms = 0, $mhe = 0, $mme = 0, 
-			$tuhs = 0, $tums = 0, $tuhe = 0, $tume = 0,
-			$whs = 0, $wms = 0, $whe = 0, $wme = 0,
-			$thhs = 0, $thms = 0, $thhe = 0, $thme = 0,
-			$fhs = 0, $fms = 0, $fhe = 0, $fme = 0,
-			$sahs = 0, $sams = 0, $sahe = 0, $same = 0,
-			$suhs = 0, $sums = 0, $suhe = 0, $sume = 0 ) {
+		private function showTimeperiodForm($name = "") {
+			$alias = "";
+			$mhs = 0;  $mms = 0;  $mhe = 0;  $mme = 0;
+			$tuhs = 0; $tums = 0; $tuhe = 0; $tume = 0;
+			$whs = 0;  $wms = 0;  $whe = 0;  $wme = 0;
+			$thhs = 0; $thms = 0; $thhe = 0; $thme = 0;
+			$fhs = 0;  $fms = 0;  $fhe = 0;  $fme = 0;
+			$sahs = 0; $sams = 0; $sahe = 0; $same = 0;
+			$suhs = 0; $sums = 0; $suhe = 0; $sume = 0;
+			if($name) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","name = '".$name."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$alias = $data["alias"];
+					$mhs = $data["mhs"]; $mms = $data["mms"]; $mhe = $data["mhe"]; $mme = $data["mme"];
+					$tuhs = $data["tuhs"]; $tums = $data["tums"]; $tuhe = $data["tuhe"]; $tume = $data["tume"];
+					$whs = $data["whs"]; $wms = $data["wms"]; $whe = $data["whe"]; $wme = $data["wme"];
+					$thhs = $data["thhs"]; $thms = $data["thms"]; $thhe = $data["thhe"]; $thme = $data["thme"];
+					$fhs = $data["fhs"]; $fms = $data["fms"]; $fhe = $data["fhe"]; $fme = $data["fme"];
+					$sahs = $data["sahs"]; $sams = $data["sams"]; $sahe = $data["sahe"]; $same = $data["same"];
+					$suhs = $data["suhs"]; $sums = $data["sums"]; $suhe = $data["suhe"]; $sume = $data["sume"];
+				}
+			}
 
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
@@ -587,15 +586,9 @@
 			if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
-			if(FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-				$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");
-				if($tpexist)
-					$formoutput = $this->showContactForm();	
-				else
-					$formoutput = FS::$iMgr->printError($this->loc->s("err-no-contact"));
 
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contact"),array("width" => 600));
-			}
+			if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+				$output .= FS::$iMgr->opendiv(7,$this->loc->s("new-contact"),array("width" => 600));
 
 			/*
 			 * Command table
@@ -610,7 +603,7 @@
 				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
-					$output .= FS::$iMgr->opendiv($this->showContactForm($data["name"],$data["mail"],$data["template"] == 't'),$data["name"],array("width" => 600));
+					$output .= FS::$iMgr->opendiv(14,$data["name"],array("width" => 600, "lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -626,13 +619,16 @@
 			return $output;
 		}
 
-		private function showContactForm($name = "",$mail = "", $template = false) {
+		private function showContactForm($name = "") {
+			$mail = ""; $template = false;
 			$srvnotifperiod = ""; $srvnotifcmd = "notify-service-by-email"; $srvoptc = true; $srvoptw = true; $srvoptu = true; $srvoptr = true; $srvoptf = true; $srvopts = true;
 			$hostnotifperiod = ""; $hostnotifcmd = "notify-host-by-email"; $hostoptd = true; $hostoptu = true; $hostoptr = true; $hostoptf = true; $hostopts = true;
 			if($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","mail,template,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
 					"name = '".$name."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
+					$mail = $data["mail"];
+					$template = $data["template"] == 't';
 					$srvnotifperiod = $data["srvperiod"];
 					$srvnotifcmd = $data["srvcmd"];
 					$srvoptc = ($data["soptc"] == 't');
@@ -692,10 +688,8 @@
 			 * Ajax new contactgroup
 			 */
 
-			if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-				$formoutput = $this->showContactgroupForm();
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-contactgroup"),array("width" => 500));
-			}
+			if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+				$output .= FS::$iMgr->opendiv(8,$this->loc->s("new-contactgroup"),array("width" => 500));
 
 			/*
 			 * Contactgroup table
@@ -716,7 +710,7 @@
 
 				$output .= "<tr id=\"ctg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 				if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-					$output .= FS::$iMgr->opendiv($this->showContactgroupForm($data["name"],$data["alias"],$contacts),$data["name"],array("width" => 500));
+					$output .= FS::$iMgr->opendiv(15,$data["name"],array("width" => 500, "lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 					
@@ -738,8 +732,16 @@
 			return $output;
 		}
 
-		private function showContactgroupForm($name = "", $alias = "", $contacts = array()) {
-			FS::$iMgr->setJSBuffer(1);
+		private function showContactgroupForm($name = "") {
+			$alias = "";
+			$contacts = array();
+			if($name) {
+				$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'");
+                        	$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
+                        	while($data = FS::$dbMgr->Fetch($query2)) {
+                	                array_push($contacts,$data2["member"]);
+             	        	}
+			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
@@ -774,8 +776,7 @@
 			/*
 			 * Ajax new command
 			 */
-			$formoutput = $this->showCommandForm();
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("new-cmd"),array("width" => 500));
+			$output .= FS::$iMgr->opendiv(9,$this->loc->s("new-cmd"),array("width" => 500));
 
 			/*
 			 * Command table
@@ -790,7 +791,7 @@
 				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
-					$output .= FS::$iMgr->opendiv($this->showCommandForm($data["name"],$data["cmd"]),$data["name"],array("width" => 500));
+					$output .= FS::$iMgr->opendiv(16,$data["name"],array("width" => 500, "lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -809,8 +810,11 @@
 			return $output;
 		}
 
-		private function showCommandForm($name="",$value="") {
-			FS::$iMgr->setJSBuffer(1);
+		private function showCommandForm($name="") {
+			$value = "";
+			if($name) {
+				$value = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$name."'");
+			}
 	
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
@@ -889,6 +893,109 @@
 				return true;
 
 			return false;
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
+				case 2: return FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
+				case 3: return $this->showHostForm();
+				case 4:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+						return $this->loc->s("err-no-rights");
+
+					$hostexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","");
+					if(!$hostexist)
+						return FS::$iMgr->printError($this->loc->s("err-no-hosts"));
+					return $this->showHostgroupForm();
+				case 5:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+						return $this->loc->s("err-no-rights");
+						
+					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
+					if($tpexist)
+						return $this->showServiceForm();
+					return FS::$iMgr->printError($this->loc->s("err-no-service"));
+				case 6:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+						return $this->loc->s("err-no-rights");
+
+					return $this->showTimeperiodForm();
+				case 7:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+						return $this->loc->s("err-no-rights");
+
+					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");
+					if($tpexist)
+						return $this->showContactForm();	
+					else
+						return FS::$iMgr->printError($this->loc->s("err-no-contact"));
+				case 8:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+						return $this->loc->s("err-no-rights");
+
+					return $this->showContactgroupForm();
+				case 9: return $this->showCommandForm();
+				case 10:
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					return $this->showHostForm($name);
+				case 11:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+						return $this->loc->s("err-no-rights");
+
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showHostgroupForm($name);
+				case 12:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+						return $this->loc->s("err-no-rights");
+
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showServiceForm($name);
+				case 13:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+						return $this->loc->s("err-no-rights");
+
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showTimeperiodForm($name);
+				case 14:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+						return $this->loc->s("err-no-rights");
+
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showContactForm($name);
+				case 15:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+						return $this->loc->s("err-no-rights");
+
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showContactgroupForm($name);
+				case 16:
+					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
+						return $this->loc->s("err-no-rights");
+
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showCommandForm($name);	
+				default: return;
+			}
 		}
 
 		public function handlePostDatas($act) {

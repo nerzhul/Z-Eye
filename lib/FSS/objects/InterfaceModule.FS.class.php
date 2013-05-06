@@ -39,6 +39,7 @@
 		public function getIfaceElmt() {}
 		
 		public function setModuleId($mid) { $this->mid = $mid; }
+		public function getModuleId() { return $this->mid; }
 		public function getConfig() { return $this->conf; }
 		public function getModuleClass() { return $this->moduleclass; }
 		public function getRulesClass() { return $this->rulesclass; }

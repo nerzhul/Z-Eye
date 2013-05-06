@@ -62,14 +62,7 @@
 		}
 
 		private function showMain() {
-			$output = "";
-			$formoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-			$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
-			$formoutput .= FS::$iMgr->h2("title-opts");
-			$formoutput .= $this->loadModuleRuleSets();
-                        $formoutput .= "</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>";
-			$formoutput .= "</ul></form>";
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("New-group"));
+			$output = FS::$iMgr->opendiv(1,$this->loc->s("New-group"),array("width" => 650));
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname,description");
@@ -118,6 +111,24 @@
 				$output .= "</table>";
 			}
 			return $output;
+		}
+
+		private function getGroupForm() {
+			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
+			$output .= FS::$iMgr->h2("title-opts");
+			$output .= $this->loadModuleRuleSets();
+                        $output .= "</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>";
+			$moutput .= "</ul></form>";
+			return $output;
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->getGroupForm();
+				default: return;
+			}
 		}
 
 		public function handlePostDatas($act) {

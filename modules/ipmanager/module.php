@@ -308,8 +308,7 @@
 
 		private function showSubnetMgmt() {
 			$output = FS::$iMgr->h2("title-declared-subnets");
-			$formoutput = $this->showDHCPSubnetForm();
-	                $output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("declare-subnet"),array("width" => 600,"line" => true));
+	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("width" => 600,"line" => true));
 
 			$output .= "<div id=\"declsubnets\">";
 
@@ -337,7 +336,7 @@
 			$net->SetNetAddr($netid);
 			$net->SetNetMask($netmask);
 			$net->CalcCIDR();
-			return "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv($this->showDHCPSubnetForm($netid,$netmask,$vlanid,$shortname,$desc),$netid,array("width" => 600)).
+			return "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("width" => 600, "lnkadd" => "netid=".$netid)).
 				"/".$netmask." (/".$net->getCIDR().")</td><td>".$vlanid."</td><td>".
 				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&netid=".$netid,array("js" => true, "confirm" =>
@@ -345,7 +344,17 @@
 				"</td></tr>";
 		}
 
-		private function showDHCPSubnetForm($netid = "",$netmask = "", $vlanid = 0, $shortname = "", $desc = "") {
+		private function showDHCPSubnetForm($netid = "") {
+			$netmask = ""; $vlanid = 0; $shortname = ""; $desc = "";
+			if($netid) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask,vlanid,subnet_desc,subnet_short_name","netid = '".$netid."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$netmask = $data["netmask"];
+					$vlanid = $data["vlanid"];
+					$shortname = $data["subnet_short_name"];
+					$desc = $data["subnet_desc"];
+				}
+			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("netid"),"netid",$netid,array("type" => "idxipedit", "length" => 16, "edit" => $netid != "")).
 				FS::$iMgr->idxLine($this->loc->s("netmask"),"netmask",$netmask,array("length" => 16, "type" => "ip")).
@@ -356,7 +365,18 @@
 			return $output;
 		}
 
-		private function showDHCPSrvForm($addr = "",$user = "",$dhcpdpath = "",$leasepath = "",$reservconfpath = "",$subnetconfpath = "") {
+		private function showDHCPSrvForm($addr = "") {
+			$user = ""; $dhcpdpath = ""; $leasepath = ""; $reservconfpath = ""; $subnetconfpath = "";
+			if($addr) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath","addr = '".$addr."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$user = $data["sshuser"];
+					$dhcpdpath = $data["dhcpdpath"];
+					$leasepath = $data["leasespath"];
+					$reservconfpath = $data["reservconfpath"];
+					$subnetconfpath = $data["subnetconfpath"];
+				}
+			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("type" => "idxedit", "length" => 128, "edit" => $addr != "")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
@@ -375,8 +395,7 @@
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= "<tr><td>".FS::$iMgr->opendiv($this->showDHCPSrvForm($data["addr"],$data["sshuser"],$data["dhcpdpath"],$data["leasespath"],$data["reservconfpath"],
-					$data["subnetconfpath"]),$data["addr"],array("width" => 600))."</td><td>".$data["sshuser"]."</td><td>".
+				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("width" => 600, "lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["sshuser"]."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
 					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
 					"</td></tr>";
@@ -395,9 +414,7 @@
 			
 			if($dhcpcount > 0) {
 				// To add DHCP cluster
-				FS::$iMgr->setJSBuffer(1);
-				$formoutput = $this->showDHCPClusterForm();
-				$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("add-cluster"),array("width" => "500")).
+				$output .= FS::$iMgr->opendiv(4,$this->loc->s("add-cluster"),array("width" => "500")).
 					"<div id=\"clusterdiv\">";
 
 				// To edit/delete clusters
@@ -407,14 +424,12 @@
 				$output .= "</div>";
 			}
 			else
-				$output .= FS::$iMgr->printError("err-need-dhcp-server");
+				$output .= FS::$iMgr->printError($this->loc->s("err-need-dhcp-server"));
 
 
 			$output .= FS::$iMgr->h2("title-dhcp-server-mgmt");
 			// To add servers
-			FS::$iMgr->setJSBuffer(1);
-			$formoutput = $this->showDHCPSrvForm();
-			$output .= FS::$iMgr->opendiv($formoutput,$this->loc->s("title-add-server"),array("width" => 600));
+			$output .= FS::$iMgr->opendiv(5,$this->loc->s("title-add-server"),array("width" => 600));
 
 
 			// To edit/delete servers
@@ -425,7 +440,14 @@
 			return $output;
 		}
 
-		private function showDHCPClusterForm($name = "",$members = array()) {
+		private function showDHCPClusterForm($name = "") {
+			$members = array();
+			if($name) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$name."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					array_push($members,$data["dhcpaddr"]);
+				}
+			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit", "edit" => $name != "")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
@@ -459,7 +481,7 @@
 		}
 
 		private function showDHCPClusterTableEntry($clustername,$members) {
-			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv($this->showDHCPClusterForm($clustername,$members),$clustername)."</td><td><ul>";
+			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv(6,$clustername,array("width" => 400, "lnkadd" => "name=".$clustername))."</td><td><ul>";
 			for($i=0;$i<count($members);$i++)
 				$output .= "<li>".$members[$i]."</li>";
 			$output .= "</ul></td><td>".
@@ -580,6 +602,34 @@
                 		else if(!ssh2_auth_password($conn, $data["login"], $data["pwd"])) {
                 			return "Authentication error for server '".$data["addr"]."' with login '".$data["login"];
 		                }
+			}
+		}
+
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->showDHCPSubnetForm();
+				case 2:
+					$netid = FS::$secMgr->checkAndSecuriseGetData("netid");
+					if(!$netid)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showDHCPSubnetForm($netid);
+				case 3: 
+					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+					if(!$addr)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showDHCPSrvForm($addr);
+				case 4: return $this->showDHCPClusterForm();
+				case 5: return $this->showDHCPSrvForm();
+				case 6:
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if(!$name)
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showDHCPClusterForm($name);
+				default: return;
 			}
 		}
 
