@@ -18,8 +18,8 @@
 	*/
 
 	class lDefault extends FSLocales {
-		function lDefault() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Attack" => "Attaques",

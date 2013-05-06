@@ -29,7 +29,7 @@
         */
 
 	class IndexedObject {
-		function IndexedObject() {}
+		function __construct() {}
 
 		public function	Load() {}
 

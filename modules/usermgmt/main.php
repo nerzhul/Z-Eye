@@ -23,8 +23,8 @@
 
 	if(!class_exists("MUserMgmt")) {
 		class MUserMgmt extends InterfaceModule {
-			function MUserMgmt() {
-				parent::InterfaceModule(new lUserMgmt());
+			function __construct() {
+				parent::__construct(new lUserMgmt());
 				$this->moduleclass = new iUserMgmt($this->locales);
 				$this->rulesclass = new rUserMgmt($this->locales);
 				$this->menu = $this->locales->s("menu-name");

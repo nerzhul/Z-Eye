@@ -29,7 +29,7 @@
         */
 
 	class FSLocales {
-		function FSLocales() { 
+		function __construct() { 
 			$this->locales = array(
 				"en" => array(
 					"Add" => "Add",

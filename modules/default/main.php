@@ -23,8 +23,8 @@
 
 	if(!class_exists("MDefault")) {
 		class MDefault extends InterfaceModule {
-			function MDefault() {
-				parent::InterfaceModule(new lDefault());
+			function __construct() {
+				parent::__construct(new lDefault());
 				$this->moduleclass = new iDefault($this->locales);
 				$this->rulesclass = new rDefault($this->locales);
 				$this->menu = $this->locales->s("menu-name");

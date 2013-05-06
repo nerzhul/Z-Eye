@@ -18,7 +18,7 @@
 	*/
 
 	class ActionMgr {
-		function ActionMgr() {}
+		function __construct() {}
 
 		public function HoneyPot() {
 			echo "Honeypot";

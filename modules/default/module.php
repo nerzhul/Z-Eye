@@ -20,8 +20,8 @@
 	require_once(dirname(__FILE__)."/../icinga/icingaBroker.api.php");
 	
 	class iDefault extends FSModule{
-		function iDefault($locales) {
-			parent::FSModule($locales);
+		function __construct($locales) {
+			parent::__construct($locales);
 			$this->icingaAPI = new icingaBroker();
 		}
 

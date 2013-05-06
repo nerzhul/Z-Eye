@@ -29,7 +29,7 @@
 	*/
 
 	class LDAP {
-		function LDAP() {
+		function __construct() {
 			$this->isConnected = false;
 			$this->connection = null;
 		}

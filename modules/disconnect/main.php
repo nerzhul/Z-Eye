@@ -23,8 +23,8 @@
 
 	if(!class_exists("MDisconnect")) {
 		class MDisconnect extends InterfaceModule {
-			function MDisconnect() {
-				parent::InterfaceModule(new lDisconnect());
+			function __construct() {
+				parent::__construct(new lDisconnect());
 				$this->moduleclass = new iDisconnect($this->locales);
 				$this->rulesclass = new rDisconnect($this->locales);
 			}

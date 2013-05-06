@@ -18,7 +18,7 @@
         */
 
         class rDNSMgmt extends FSRules {
-                function rDNSMgmt($locales) { parent::FSRules($locales); }
+                function __construct($locales) { parent::__construct($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLine($this->loc->s("rule-read-datas"),"mrule_dnsmgmt_read",$activerules,$this->loc->s("menu-title"));

@@ -18,7 +18,7 @@
         */
 
         class rSnortMgmt extends FSRules {
-                function rSnortMgmt($locales) { parent::FSRules($locales); }
+                function __construct($locales) { parent::__construct($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(

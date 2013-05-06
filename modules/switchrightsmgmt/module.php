@@ -18,7 +18,7 @@
 	*/
 	
 	class iSwitchRightsMgmt extends FSModule {
-		function iSwitchRightsMgmt($locales) { parent::FSModule($locales); }
+		function __construct($locales) { parent::__construct($locales); }
 		
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-switchrightsmgmt"));

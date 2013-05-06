@@ -23,8 +23,8 @@
 
 	if(!class_exists("MLogs")) {
 		class MLogs extends InterfaceModule {
-			function MLogs() {
-				parent::InterfaceModule(new lLogs());
+			function __construct() {
+				parent::__construct(new lLogs());
 				$this->moduleclass = new iLogs($this->locales);
 				$this->rulesclass = new rLogs($this->locales);
 				$this->menu = $this->locales->s("menu-name");

@@ -23,8 +23,8 @@
 
 	if(!class_exists("MNetdisco")) {
 		class MNetdisco extends InterfaceModule {
-			function MNetdisco() {
-				parent::InterfaceModule(new lNetdisco());
+			function __construct() {
+				parent::__construct(new lNetdisco());
 				$this->moduleclass = new iNetdisco($this->locales);
 				$this->rulesclass = new rNetdisco($this->locales);
 				$this->menu = $this->locales->s("menu-name");

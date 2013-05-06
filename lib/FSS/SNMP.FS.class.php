@@ -30,7 +30,7 @@
 
 	require_once(dirname(__FILE__)."/../../config/snmp.conf.php");
 	class SNMPMgr {
-        	function SNMPMgr() {}
+        	function __construct() {}
 
 		public function get($addr,$path) {
 			return snmpget($addr,SNMPConfig::$SNMPReadCommunity,$path);

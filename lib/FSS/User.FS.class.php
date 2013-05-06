@@ -30,7 +30,7 @@
 
 	require_once("NamedObject.FS.class.php");
 	class User extends NamedObject {
-		function User() {}
+		function __construct() {}
 
 		public function LoadByName($username) {
 			$uid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");

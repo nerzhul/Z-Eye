@@ -18,7 +18,7 @@
         */
 
         class rDefault extends FSRules {
-                function rDefault($locales) { parent::FSRules($locales); }
+                function __construct($locales) { parent::__construct($locales); }
 
                 public function showMgmtInterface($activerules = array()) {
                         return "";

@@ -18,8 +18,8 @@
 	*/
     
 	class lRadius extends FSLocales {
-		function lRadius() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Account" => "Compte",

@@ -20,7 +20,8 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
 	class iGroupMgmt extends FSModule{
-		function iGroupMgmt($locales) { parent::FSModule($locales); }
+		function __construct($locales) { parent::__construct($locales); }
+
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-mgmt"));
 			$output = "";

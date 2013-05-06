@@ -23,8 +23,8 @@
 
 	if(!class_exists("MInstall")) {
 		class MInstall extends InterfaceModule {
-			function MInstall() {
-				parent::InterfaceModule(new lInstall());
+			function __construct() {
+				parent::__construct(new lInstall());
 				$this->moduleclass = new iInstall($this->locales);
 				$this->rulesclass = new rInstall($this->locales);
 			}

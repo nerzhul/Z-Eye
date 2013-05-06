@@ -18,8 +18,8 @@
 	*/
 
 	class lNetdisco extends FSLocales {
-		function lNetdisco() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Add-community" => "Ajouter une communauté SNMP",

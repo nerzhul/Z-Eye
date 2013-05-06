@@ -23,8 +23,8 @@
 
 	if(!class_exists("Micinga")) {
 		class Micinga extends InterfaceModule {
-			function Micinga() {
-				parent::InterfaceModule(new lIcinga());
+			function __construct() {
+				parent::__construct(new lIcinga());
 				$this->moduleclass = new iIcinga($this->locales);
 				$this->rulesclass = new rIcinga($this->locales);
 				$this->menu = $this->locales->s("menu-name");

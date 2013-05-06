@@ -29,7 +29,7 @@
         */
 
 	class FSSessionMgr {
-		function FSSessionMgr() {
+		function __construct() {
 			$this->groupBuf = array();
 		}
 

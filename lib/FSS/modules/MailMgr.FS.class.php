@@ -29,7 +29,7 @@
         */
 
 	class FSMailMgr {
-		function FSMailMgr() {}	
+		function __construct() {}	
 		
 		public function Reinit() {
 			$this->sender = "";

@@ -18,8 +18,8 @@
  	*/
     
 	class lSNMPMgmt extends FSLocales {
-		function lSNMPMgmt() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Add-community" => "Ajouter une communauté SNMP",

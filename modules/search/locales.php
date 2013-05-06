@@ -18,8 +18,8 @@
 	*/
     
 	class lSearch extends FSLocales {
-		function lSearch() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Accounting" => "Accounting",

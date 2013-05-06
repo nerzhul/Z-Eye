@@ -23,8 +23,8 @@
 
 	if(!class_exists("MIPManager")) {
 		class MIPManager extends InterfaceModule {
-			function MIPManager() {
-				parent::InterfaceModule(new lIPManager());
+			function __construct() {
+				parent::__construct(new lIPManager());
 				$this->moduleclass = new iIPManager($this->locales);
 				$this->rulesclass = new rIPManager($this->locales);
 				$this->menu = $this->locales->s("menu-name");

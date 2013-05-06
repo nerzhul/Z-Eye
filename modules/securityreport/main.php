@@ -23,8 +23,8 @@
 
 	if(!class_exists("MSecReport")) {
 		class MSecReport extends InterfaceModule {
-			function MSecReport() {
-				parent::InterfaceModule(new lSecReport());
+			function __construct() {
+				parent::__construct(new lSecReport());
 				$this->moduleclass = new iSecReport($this->locales);
 				$this->rulesclass = new rSecurityReport($this->locales);
 				$this->menu = $this->locales->s("menu-name");

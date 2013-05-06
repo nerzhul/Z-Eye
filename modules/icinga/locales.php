@@ -18,8 +18,8 @@
 	*/
     
 	class lIcinga extends FSLocales {
-		function lIcinga() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"active-check-en" => "Vérifications actives",

@@ -19,8 +19,8 @@
 	
 	require_once(dirname(__FILE__)."/netdiscoCfg.api.php");
 	
-	class iNetdisco extends FSModule{
-		function iNetdisco($locales) { parent::FSModule($locales); }
+	class iNetdisco extends FSModule {
+		function __construct($locales) { parent::__construct($locales); }
 		
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-netdisco"));

@@ -20,7 +20,7 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
 	class iLogs extends FSModule{
-		function iLogs($locales) { parent::FSModule($locales); }
+		function __construct($locales) { parent::__construct($locales); }
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("menu-title"));

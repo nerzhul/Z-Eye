@@ -31,6 +31,8 @@
 	require_once("fpdf.php");
 
 	class PDFgen extends FPDF {
+		public function __construct() {}
+
 		public function Header() {
 			// Arial bold 15
 			$this->SetFont('helvetica','B',15);

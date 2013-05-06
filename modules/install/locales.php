@@ -18,8 +18,8 @@
 	*/
 
 	class lInstall extends FSLocales {
-		function lInstall() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"err-fields-missing" => "Certains champs sont manquants",

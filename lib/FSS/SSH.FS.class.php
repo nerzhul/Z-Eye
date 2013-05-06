@@ -29,7 +29,7 @@
 	*/
 
 	class SSH {
-		function SSH($server,$port=22) {
+		function __construct($server,$port=22) {
 			$this->conn = NULL;
 			$this->addr = $server;
 			$this->port = $port;

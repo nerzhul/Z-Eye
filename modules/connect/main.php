@@ -23,8 +23,8 @@
 
 	if(!class_exists("Mconnect")) {
 		class Mconnect extends InterfaceModule {
-			function Mconnect() {
-				parent::InterfaceModule(new lConnect());
+			function __construct() {
+				parent::__construct(new lConnect());
 				$this->moduleclass = new iConnect($this->locales);
 				$this->rulesclass = new rConnect($this->locales);
 			}

@@ -30,9 +30,9 @@
 
 	require_once(dirname(__FILE__)."/FS.main.php");
 	require_once(dirname(__FILE__)."/AbstractSQLMgr".CLASS_EXT);
+
 	class FSSecurityMgr {
-		function FSSecurityMgr() {
-		}
+		function __construct() {}
 
 		public function isNumeric($str) {
 			return is_numeric($str) == true;

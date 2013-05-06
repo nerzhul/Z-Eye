@@ -23,8 +23,8 @@
 
 	if(!class_exists("MSNMPmgmt")) {
 		class MSNMPmgmt extends InterfaceModule {
-			function MSNMPmgmt() {
-				parent::InterfaceModule(new lSNMPmgmt());
+			function __construct() {
+				parent::__construct(new lSNMPmgmt());
 				$this->moduleclass = new iSNMPmgmt($this->locales);
 				$this->rulesclass = new rSNMPmgmt($this->locales);
 				$this->menu = $this->locales->s("menu-name");

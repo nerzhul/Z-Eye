@@ -23,8 +23,8 @@
 
 	if(!class_exists("MSwitchRightsMgmt")) {
 		class MSwitchRightsMgmt extends InterfaceModule {
-			function MSwitchRightsMgmt() {
-				parent::InterfaceModule(new lSwitchRightsMgmt());
+			function __construct() {
+				parent::__construct(new lSwitchRightsMgmt());
 				$this->moduleclass = new iSwitchRightsMgmt($this->locales);
 				$this->rulesclass = new rSwitchRightsMgmt($this->locales);
 				$this->menu = $this->locales->s("menu-name");

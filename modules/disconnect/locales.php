@@ -18,8 +18,8 @@
 	*/
 
 	class lDisconnect extends FSLocales {
-		function lDisconnect() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Confirm" => "Confirmer",

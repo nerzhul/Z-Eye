@@ -23,8 +23,8 @@
 
 	if(!class_exists("MSearch")) {
 		class MSearch extends InterfaceModule {
-			function MSearch() {
-				parent::InterfaceModule(new lSearch());
+			function __construct() {
+				parent::__construct(new lSearch());
 				$this->moduleclass = new iSearch($this->locales);
 				$this->rulesclass = new rSearch($this->locales);
 			}

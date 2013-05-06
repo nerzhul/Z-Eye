@@ -18,8 +18,8 @@
 	*/
     
 	class lUserMgmt extends FSLocales {
-		function lUserMgmt() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Adding" => "Ajout...",

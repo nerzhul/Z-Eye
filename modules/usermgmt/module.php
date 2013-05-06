@@ -20,7 +20,7 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
 	class iUserMgmt extends FSModule {
-		function iUserMgmt($locales) { parent::FSModule($locales); }
+		function __construct($locales) { parent::__construct($locales); }
 
 		public function Load() {
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");

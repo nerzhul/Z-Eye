@@ -30,7 +30,7 @@
 
 	require_once(dirname(__FILE__)."/IndexedObject.FS.class.php");
 	class NamedObject extends IndexedObject {
-		function NamedObject() {}
+		function __construct() {}
 
 		public function Load() {}
 

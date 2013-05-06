@@ -29,7 +29,7 @@
         */
 
 	class InterfaceModule {
-		function InterfaceModule($locales) {
+		function __construct($locales) {
 			$this->locales = $locales;
 			$this->menu = "";
 			$this->menupriority = 0;

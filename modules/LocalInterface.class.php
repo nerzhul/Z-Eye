@@ -20,8 +20,8 @@
 	require_once(dirname(__FILE__)."/../lib/FSS/User.FS.class.php");
 
 	class LocalInterface extends FSInterfaceMgr {
-		function LocalInterface() {
-			parent::FSInterfaceMgr();
+		function __construct() {
+			parent::__construct();
 			$this->showRetMenu = false;
 		}
 

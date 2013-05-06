@@ -19,7 +19,7 @@
 	
 	require_once(dirname(__FILE__)."/ActionMgr.class.php");
 	class AjaxManager {
-		function AjaxManager() {}
+		function __construct() {}
 		
 		private function honeyPot() {
 		}

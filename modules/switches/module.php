@@ -26,9 +26,9 @@
 	require_once(dirname(__FILE__)."/dell.func.php");
 	require_once(dirname(__FILE__)."/device.api.php");
 	
-	class iSwitchMgmt extends FSModule{
-		function iSwitchMgmt($locales) { 
-			parent::FSModule($locales); 
+	class iSwitchMgmt extends FSModule {
+		function __construct($locales) { 
+			parent::__construct($locales); 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			if(FS::isAjaxCall() && !$device)
 				$device = FS::$secMgr->checkAndSecurisePostData("sw");

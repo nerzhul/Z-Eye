@@ -29,7 +29,7 @@
         */
 
 	class FSRules {
-		function FSRules($locales) { $this->loc = $locales; }
+		function __construct($locales) { $this->loc = $locales; }
 
 		public function showMgmtInterface() { return ""; }
 

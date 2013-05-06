@@ -29,7 +29,7 @@
         */
 
 	class FSModule {
-		function FSModule($locales) { $this->loc = $locales; }
+		function __construct($locales) { $this->loc = $locales; }
 
 		public function Load() { FS::$iMgr->printError("Unknown module !"); }
 		public function setModuleId($id) { $this->mid = $id; }

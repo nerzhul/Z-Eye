@@ -23,8 +23,8 @@
 
 	if(!class_exists("MMaps")) {
 		class MMaps extends InterfaceModule {
-			function MMaps() {
-				parent::InterfaceModule(new lMaps());
+			function __construct() {
+				parent::__construct(new lMaps());
 				$this->moduleclass = new iMaps($this->locales);
 				$this->rulesclass = new rMaps($this->locales);
 				$this->menu = $this->locales->s("menu-name");

@@ -18,8 +18,8 @@
 	*/
     
 	class lGroupMgmt extends FSLocales {
-		function lGroupMgmt() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",

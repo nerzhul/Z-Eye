@@ -18,8 +18,8 @@
 	*/
 
 	class lDNSManager extends FSLocales {
-		function lDNSManager() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"add-server" => "Ajouter un serveur",

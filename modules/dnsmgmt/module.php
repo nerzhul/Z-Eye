@@ -20,7 +20,8 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 
 	class iDNSManager extends FSModule{
-		function iDNSManager($locales) { parent::FSModule($locales); }
+		function __construct($locales) { parent::__construct($locales); }
+
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-dns"));
 			return $this->showMain();

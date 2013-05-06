@@ -35,7 +35,7 @@
 	require_once(dirname(__FILE__)."/objects/InterfaceModule".CLASS_EXT);
 
 	class FSInterfaceMgr {
-		function FSInterfaceMgr() {
+		function __construct() {
 			$this->InitComponents();
 		}
 

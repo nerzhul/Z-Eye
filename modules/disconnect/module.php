@@ -18,7 +18,7 @@
 	*/
 	
 	class iDisconnect extends FSModule{
-		function iDisconnect($locales) { parent::FSModule($locales); }
+		function __construct($locales) { parent::__construct($locales); }
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("Disconnect"));

@@ -29,8 +29,7 @@
         */
 
 	class FSNetwork {
-		function FSNetwork() {
-		}
+		function __construct() {}
 
 		public function getFirstUsableIP() {
 			return long2ip(ip2long($this->net_addr) + 1);

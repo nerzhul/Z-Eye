@@ -30,8 +30,9 @@
 
 	require_once(dirname(__FILE__)."/../../config/pgdb.conf.php");
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
+
 	class FSPostgreSQLMgr {
-		function FSPostgreSQLMgr() {
+		function __construct() {
 			$this->dbName = "";
 			$this->dbPort = "";
 			$this->dbHost = "";

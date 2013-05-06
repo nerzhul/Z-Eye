@@ -18,8 +18,8 @@
         */
 
 	class lConnect extends FSLocales {
-		function lConnect() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Connect" => "Connexion",

@@ -31,7 +31,7 @@
 	define('MAX_LINE_LENGHT',4096);
 	
 	class FSFileMgr {
-		function FSFileMgr() {
+		function __construct() {
 			$this->file = NULL;
 			$this->open_mode = "";
 			$this->path = "";

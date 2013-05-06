@@ -45,7 +45,7 @@
 		require_once(dirname(__FILE__)."/SNMP".CLASS_EXT);
 
 	class FS {
-		function FS() {}
+		function __construct() {}
 
 		public static function LoadFSModules() {
 			// AbstractSQL connector

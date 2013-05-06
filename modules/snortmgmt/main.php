@@ -23,8 +23,8 @@
 
 	if(!class_exists("MSnortMgmt")) {
 		class MSnortMgmt extends InterfaceModule {
-			function MSnortMgmt() {
-				parent::InterfaceModule(new lSnort());
+			function __construct() {
+				parent::__construct(new lSnort());
 				$this->moduleclass = new iSnortMgmt($this->locales);
 				$this->rulesclass = new rSnortMgmt($this->locales);
 				$this->menu = $this->locales->s("menu-name");

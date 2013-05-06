@@ -18,8 +18,8 @@
 	*/
     
 	class lLogs extends FSLocales {
-		function lLogs() {
-			parent::FSLocales();
+		function __construct() {
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"Date" => "Date",
@@ -44,7 +44,7 @@
 					"Filter" => "Filter",
 					"Level" => "Level",
 					"menu-name" => "Z-Eye Admin",
-					"menu-title" => "Z-Eye Logs",
+					"menu-title" => "Z-Eye logs",
 					"Module" => "Module",
 					"Service" => "Z-Eye Service",
 					"Stats" => "Statistics",

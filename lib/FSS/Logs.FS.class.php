@@ -29,6 +29,7 @@
         */
 
 	class FSLogger {
+		function __construct() {}
 		function Log() {}
 		
 		/*

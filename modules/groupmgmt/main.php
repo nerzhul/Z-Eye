@@ -23,8 +23,8 @@
 
 	if(!class_exists("MGroupMgmt")) {
 		class MGroupMgmt extends InterfaceModule {
-			function Mgroupmgmt() {
-				parent::InterfaceModule(new lGroupMgmt());
+			function __construct() {
+				parent::__construct(new lGroupMgmt());
 				$this->moduleclass = new iGroupMgmt($this->locales);
 				$this->rulesclass = new rGroupMgmt($this->locales);
 				$this->menu = $this->locales->s("menu-name");

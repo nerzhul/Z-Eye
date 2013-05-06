@@ -29,7 +29,7 @@
         */
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
 	class FSMySQLMgr {
-		function FSMySQLMgr() {
+		function __construct() {
 			$this->dbName = "";
 			$this->dbPort = 3306;
 			$this->dbHost = "";

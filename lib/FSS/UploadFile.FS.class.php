@@ -29,7 +29,7 @@
         */
 
 	class UploadFile {
-		function UploadFile($data){
+		function __construct($data){
 			$this->field_name = $data;
 		}
 
