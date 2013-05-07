@@ -104,7 +104,7 @@
 			/*
 			 * Ajax new host
 			 */
-			$output .= FS::$iMgr->opendiv(3,$this->loc->s("new-host"),array("width" => 600));
+			$output .= FS::$iMgr->opendiv(3,$this->loc->s("new-host"));
 
 			/*
 			 * Host table
@@ -128,7 +128,7 @@
 				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_host_write"))
-					$output .= FS::$iMgr->opendiv(10,$data["name"],array("width" => 600, "lnkadd" => "name=".$data["name"]));
+					$output .= FS::$iMgr->opendiv(10,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -277,7 +277,7 @@
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
 			}
 			if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-				$output .= FS::$iMgr->opendiv(4,$this->loc->s("new-hostgroup"),array("width" => 460));
+				$output .= FS::$iMgr->opendiv(4,$this->loc->s("new-hostgroup"));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","",array("order" => "name"));
@@ -290,7 +290,7 @@
 				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-					$output .= FS::$iMgr->opendiv(11,$data["name"],array("width" => 460, "lnkadd" => "name=".$data["name"]));
+					$output .= FS::$iMgr->opendiv(11,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -346,7 +346,7 @@
 			$output = "";
 
 			if(FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
-				$output .= FS::$iMgr->opendiv(5,$this->loc->s("new-service"),array("width" => 700));
+				$output .= FS::$iMgr->opendiv(5,$this->loc->s("new-service"));
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template","",array("order" => "name"));
@@ -359,7 +359,7 @@
 				$output .= "<tr id=\"srv_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
-					$output .= FS::$iMgr->opendiv(12,$data["name"],array("width" => 700, "lnkadd" => "name=".$data["name"]));
+					$output .= FS::$iMgr->opendiv(12,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -482,7 +482,7 @@
 			 */
 			
 			if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
-				$output .= FS::$iMgr->opendiv(6,$this->loc->s("new-timeperiod"),array("width" => 580));
+				$output .= FS::$iMgr->opendiv(6,$this->loc->s("new-timeperiod"));
 
 			/*
 			 * Timeperiod table
@@ -498,7 +498,7 @@
 				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
-					$output .= FS::$iMgr->opendiv(13,$data["name"],array("width" => 580, "lnkadd" => "name=".$data["name"]));
+					$output .= FS::$iMgr->opendiv(13,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -588,7 +588,7 @@
 			$output = "";
 
 			if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
-				$output .= FS::$iMgr->opendiv(7,$this->loc->s("new-contact"),array("width" => 600));
+				$output .= FS::$iMgr->opendiv(7,$this->loc->s("new-contact"));
 
 			/*
 			 * Command table
@@ -603,7 +603,7 @@
 				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
-					$output .= FS::$iMgr->opendiv(14,$data["name"],array("width" => 600, "lnkadd" => "name=".$data["name"]));
+					$output .= FS::$iMgr->opendiv(14,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 
@@ -689,7 +689,7 @@
 			 */
 
 			if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-				$output .= FS::$iMgr->opendiv(8,$this->loc->s("new-contactgroup"),array("width" => 500));
+				$output .= FS::$iMgr->opendiv(8,$this->loc->s("new-contactgroup"));
 
 			/*
 			 * Contactgroup table
@@ -710,7 +710,7 @@
 
 				$output .= "<tr id=\"ctg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 				if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-					$output .= FS::$iMgr->opendiv(15,$data["name"],array("width" => 500, "lnkadd" => "name=".$data["name"]));
+					$output .= FS::$iMgr->opendiv(15,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 					
@@ -776,7 +776,7 @@
 			/*
 			 * Ajax new command
 			 */
-			$output .= FS::$iMgr->opendiv(9,$this->loc->s("new-cmd"),array("width" => 500));
+			$output .= FS::$iMgr->opendiv(9,$this->loc->s("new-cmd"));
 
 			/*
 			 * Command table
@@ -791,7 +791,7 @@
 				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
-					$output .= FS::$iMgr->opendiv(16,$data["name"],array("width" => 500, "lnkadd" => "name=".$data["name"]));
+					$output .= FS::$iMgr->opendiv(16,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
 

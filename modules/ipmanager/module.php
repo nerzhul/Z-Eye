@@ -308,7 +308,7 @@
 
 		private function showSubnetMgmt() {
 			$output = FS::$iMgr->h2("title-declared-subnets");
-	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("width" => 600,"line" => true));
+	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
 
 			$output .= "<div id=\"declsubnets\">";
 
@@ -336,7 +336,7 @@
 			$net->SetNetAddr($netid);
 			$net->SetNetMask($netmask);
 			$net->CalcCIDR();
-			return "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("width" => 600, "lnkadd" => "netid=".$netid)).
+			return "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
 				"/".$netmask." (/".$net->getCIDR().")</td><td>".$vlanid."</td><td>".
 				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&netid=".$netid,array("js" => true, "confirm" =>
@@ -395,7 +395,7 @@
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("width" => 600, "lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["sshuser"]."</td><td>".
+				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["sshuser"]."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
 					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
 					"</td></tr>";
@@ -414,7 +414,7 @@
 			
 			if($dhcpcount > 0) {
 				// To add DHCP cluster
-				$output .= FS::$iMgr->opendiv(4,$this->loc->s("add-cluster"),array("width" => "500")).
+				$output .= FS::$iMgr->opendiv(4,$this->loc->s("add-cluster")).
 					"<div id=\"clusterdiv\">";
 
 				// To edit/delete clusters
@@ -429,7 +429,7 @@
 
 			$output .= FS::$iMgr->h2("title-dhcp-server-mgmt");
 			// To add servers
-			$output .= FS::$iMgr->opendiv(5,$this->loc->s("title-add-server"),array("width" => 600));
+			$output .= FS::$iMgr->opendiv(5,$this->loc->s("title-add-server"));
 
 
 			// To edit/delete servers
@@ -481,7 +481,7 @@
 		}
 
 		private function showDHCPClusterTableEntry($clustername,$members) {
-			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv(6,$clustername,array("width" => 400, "lnkadd" => "name=".$clustername))."</td><td><ul>";
+			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv(6,$clustername,array("lnkadd" => "name=".$clustername))."</td><td><ul>";
 			for($i=0;$i<count($members);$i++)
 				$output .= "<li>".$members[$i]."</li>";
 			$output .= "</ul></td><td>".

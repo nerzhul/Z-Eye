@@ -65,7 +65,7 @@
 				else {
 					if(FS::$sessMgr->hasRight("mrule_radius_manage")) {
 						FS::$iMgr->setJSBuffer(1);
-						$output .= FS::$iMgr->opendiv(1,$this->loc->s("Manage-radius-db"),array("width" => 550));
+						$output .= FS::$iMgr->opendiv(1,$this->loc->s("Manage-radius-db"));
 					}
 					$output .= $this->showRadiusList($rad);
 				}
@@ -364,7 +364,7 @@
 				$output .= "<div id=\"radd\">".$this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport)."</div>";
 			}
 			else if($sh == 2) {
-				$output .= FS::$iMgr->opendiv(3,$this->loc->s("New-Profil"),array("width" => 450));
+				$output .= FS::$iMgr->opendiv(3,$this->loc->s("New-Profil"));
 				$tmpoutput = FS::$iMgr->h3("title-profillist");
 				$found = 0;
 

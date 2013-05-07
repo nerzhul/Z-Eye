@@ -592,9 +592,6 @@
 
 			$output = "<a id=\"".$aname."\" href=\"#\" onclick=\"formPopup('".$this->cur_module->getModuleId()."','".$callid."','".
 				(isset($options["lnkadd"]) ? $options["lnkadd"] : "")."'";
-			
-			if(isset($options["width"]) && $options["width"] > 0)
-				$output .= ",'".$options["width"]."px'";
 			$output .= ");\">".$text1."</a>";
 			if(isset($options["line"]) && $options["line"])
 				$output .= "<br />";

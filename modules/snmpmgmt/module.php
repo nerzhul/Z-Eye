@@ -44,7 +44,7 @@
 			FS::$iMgr->setTitle("snmp-communities");
 			$found = false;
 
-			$output .= FS::$iMgr->opendiv(1,$this->loc->s("Add-community"),array("width" => 400));
+			$output .= FS::$iMgr->opendiv(1,$this->loc->s("Add-community"));
 
 			// Div for Ajax modifications
 			$output .= "<div id=\"snmptable\">";
@@ -86,7 +86,7 @@
 
 		private function tableCommunityLine($name,$ro,$rw) {
 			FS::$iMgr->setJSBuffer(1);
-			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv(2,$name,array("width" => 400, "lnkadd" => "name=".$name)).
+			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv(2,$name,array("lnkadd" => "name=".$name)).
 				"</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&snmp=".$name,array("js" => true, "confirm" => 
 					array($this->loc->s("confirm-remove-community")."'".$name."' ?","Confirm","Cancel")))."</td></tr>";

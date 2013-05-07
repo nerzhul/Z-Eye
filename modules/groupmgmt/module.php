@@ -62,7 +62,7 @@
 		}
 
 		private function showMain() {
-			$output = FS::$iMgr->opendiv(1,$this->loc->s("New-group"),array("width" => 650));
+			$output = FS::$iMgr->opendiv(1,$this->loc->s("New-group"));
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname,description");

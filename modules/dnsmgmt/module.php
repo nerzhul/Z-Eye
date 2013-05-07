@@ -41,12 +41,12 @@
 					 if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 						$output .= $this->showCreateEditErr();
 
-						$output .= FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("width" => 500, "line" => true));
+						$output .= FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("line" => true));
 
 						$tmpoutput = "";
 						$found = false;
 						if($exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","addr","dns = '1'"))
-							$output .= FS::$iMgr->opendiv(2,$this->loc->s("modify-servers"),array("width" => 500));
+							$output .= FS::$iMgr->opendiv(2,$this->loc->s("modify-servers"));
 					}
 				}
 			}
