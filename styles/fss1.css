@@ -99,10 +99,11 @@ h2 { background-color: #5e0000; margin-left: 5%; font-size: 17px; }
 #menuStack, #hstslide { display:inline-block; }
 
 div#menuStack div.menupopup { display: none; border-radius:0 0 2px 2px;}
-div#menuStack:hover div.menupopup { display:block; }
+div#menuStack div.userpopup { left: 10px; top: 40px; display: none; border-radius:0 0 2px 2px;}
+div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:block; }
 div#menuStack div { font-size: 12px; }
 
-.menupopup {
+.menupopup, .userpopup {
 	position: absolute;
 	display: block;
 	background-color: #050505;
@@ -139,7 +140,7 @@ div#menuStack div { font-size: 12px; }
 }
 
 .menuItem { padding:10px 3px; width: 150px; }
-.menuItem:hover { background-color: #000; font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
+.menuItem:hover, .userItem:hover { background-color: #000; font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
 
 .searchButton {
 	background-image: linear-gradient(#FAFAFA, #DCDCDC);
@@ -401,6 +402,8 @@ canvas { display: inline-block; }
 
 #search { position:fixed; top:4px; right:10px; }
 #search input { margin-left: 20px; }
+
+.userMenu { position:fixed; top: 0px; left:10px; }
 
 *[draggable=true] {
 	-moz-user-select: none;

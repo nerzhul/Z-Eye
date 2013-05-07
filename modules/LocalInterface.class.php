@@ -72,8 +72,10 @@
 			$output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
 			</li></ul></div></div>";
 
-			if(FS::$sessMgr->isConnected())
+			if(FS::$sessMgr->isConnected()) {
+				$output .= $this->showUserForm();
 				$output .= $this->showSearchForm();
+			}
 
 			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
 			$output .= $this->h4("Bienvenue sur Z-Eye",true);
@@ -104,15 +106,18 @@
 			return $output;
 		}
 
-		protected function showSearchForm() {
-			$output = "<div id=\"menuStack\">
-				<div id=\"menuItem\"><div id=\"search\">";
-			$output .= $this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1));
-                        $output .= $this->hidden("mod",$this->getModuleIdByPath("search"));
-			$output .= $this->autoComplete("s",array("size" => 30,"length" => 60))." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>";
-			$output .= "</div></div></div>";
+		private function showUserForm() {
+			return "<div id=\"menuStack\"><div id=\"menuTitle\" class=\"userMenu\">".FS::$sessMgr->getUserName()."</div><div class=\"userpopup\"><div class=\"menuItem\"></div>".
 
-			return $output;
+			"</div></div>";
+		}
+
+		protected function showSearchForm() {
+			return "<div id=\"menuStack\"><div id=\"search\">".
+				$this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1)).
+                        	$this->hidden("mod",$this->getModuleIdByPath("search")).
+				$this->autoComplete("s",array("size" => 30,"length" => 60))." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>".
+				"</div></div>";
 		}
 
 		public function showModule() {
