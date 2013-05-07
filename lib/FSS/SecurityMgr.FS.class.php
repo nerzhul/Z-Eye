@@ -50,6 +50,10 @@
 			return preg_match("#^[\w]+([- ][\w]+)*$#i",$str) == true;
 		}
 
+		public function isSentence($str) {
+			return preg_match("#^[\w]+([-_ ][\w]+)*$#i",$str) == true;
+		}
+
 		public function isMail($str) {
 			return preg_match('#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#',$str) == true;
 		}

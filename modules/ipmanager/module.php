@@ -366,10 +366,12 @@
 		}
 
 		private function showDHCPSrvForm($addr = "") {
-			$user = ""; $dhcpdpath = ""; $leasepath = ""; $reservconfpath = ""; $subnetconfpath = "";
+			$user = ""; $dhcpdpath = ""; $leasepath = ""; $reservconfpath = ""; $subnetconfpath = ""; $alias = ""; $description = "";
 			if($addr) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath","addr = '".$addr."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
+					$alias = $data["alias"];
+					$description = $data["description"];
 					$user = $data["sshuser"];
 					$dhcpdpath = $data["dhcpdpath"];
 					$leasepath = $data["leasespath"];
@@ -379,6 +381,8 @@
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("type" => "idxedit", "length" => 128, "edit" => $addr != "")).
+				FS::$iMgr->idxLine($this->loc->s("server-alias"),"alias",$alias,array("length" => 64, "tooltip" => "tooltip-dhcp-alias")).
+				FS::$iMgr->idxLine($this->loc->s("server-desc"),"description",$description,array("length" => 128, "tooltip" => "tooltip-dhcp-desc")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2","",array("type" => "pwd")).
@@ -391,11 +395,12 @@
 		}
 
 		private function showDHCPSrvList() {
-			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("ssh-user")."</th><th></th></tr>";
+			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("ssh-user")."</th><th></th></tr>";
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["sshuser"]."</td><td>".
+				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["alias"]."</td><td>".$data["description"]."</td><td>".
+					$data["sshuser"]."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
 					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
 					"</td></tr>";
@@ -451,10 +456,12 @@
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit", "edit" => $name != "")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr",$members,array("order" => "addr")).
-				"</select>";
 
-			$output .= FS::$iMgr->tableSubmit("Save");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias","",array("order" => "addr"));
+			while($data = FS::$dbMgr->Fetch($query))
+				$output .= FS::$iMgr->selElmt($data["addr"].($data["alias"] ? " (".$data["alias"].")" : ""),$data["addr"],in_array($data["addr"],$members));
+
+			$output .= "</select>".FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 
@@ -734,6 +741,8 @@
                                         $spwd = FS::$secMgr->checkAndSecurisePostData("sshpwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("sshpwd2");
                                         $dhcpdpath = FS::$secMgr->checkAndSecurisePostData("dhcpdpath");
+                                        $alias = FS::$secMgr->checkAndSecurisePostData("alias");
+                                        $desc = FS::$secMgr->checkAndSecurisePostData("description");
                                         $leasepath = FS::$secMgr->checkAndSecurisePostData("leasepath");
 					$reservconfpath = FS::$secMgr->checkAndSecurisePostData("reservconfpath");
 					$subnetconfpath = FS::$secMgr->checkAndSecurisePostData("subnetconfpath");
@@ -742,6 +751,7 @@
                                                 $leasepath == NULL || $leasepath == "" || !FS::$secMgr->isPath($leasepath) ||
 						$reservconfpath && ($reservconfpath == "" || !FS::$secMgr->isPath($reservconfpath)) ||
 						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath)) ||
+						$alias && !FS::$secMgr->isAlphaNumeric($alias) || $desc && !FS::$secMgr->isSentence($desc) ||
 						$edit && $edit != 1
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
@@ -839,8 +849,8 @@
 
 					FS::$dbMgr->BeginTr();
 					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$saddr."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$slogin."','".$spwd."','".
-						$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$alias."','".$desc.
+						"','".$slogin."','".$spwd."','".$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
 					FS::$dbMgr->CommitTr();
 
 					if($edit)
