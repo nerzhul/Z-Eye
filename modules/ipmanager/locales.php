@@ -24,6 +24,7 @@
 				"fr" => array(
 					"Add" => "Ajouter",
 					"add-cluster" => "Ajouter un cluster",
+					"Advanced-tools" => "Outils avancés",
 					"Available-s" => "Distribuables",
 					"bad-filter" => "Filtre invalide !",
 					"Baux" => "Baux",
@@ -142,6 +143,7 @@
 				"en" => array(
 					"Add" => "Ajouter",
 					"add-cluster" => "Ajouter un cluster",
+					"Advanced-tools" => "Advanced tools",
 					"Available-s" => "Distributable",
 					"bad-filter" => "Bad filter",
 					"Baux" => "Leases",
