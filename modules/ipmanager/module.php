@@ -78,11 +78,11 @@
 					$netarray[$data["netid"]] = $data["netmask"];
 			}
 
-			$query = FS::$dbMgr->Select("subnets","net");
+			/*$query = FS::$dbMgr->Select("subnets","net");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($netarray[$data["netid"]]))
 					$netarray[$data["netid"]] = "";
-			}
+			}*/
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
 			while($data = FS::$dbMgr->Fetch($query)) {
