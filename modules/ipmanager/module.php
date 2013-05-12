@@ -257,7 +257,7 @@
 			$output .= "</table>";
 			FS::$iMgr->jsSortTable("tipList");
 
-			$js = "var chart = new Highcharts.Chart({
+			$js = "setTimeout(function() { var chart = new Highcharts.Chart({
 				chart: { renderTo: 'netHCr', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
 				title: { text: '' },
 				tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
@@ -273,7 +273,7 @@
 			if($fixedip > 0) $js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
 			if($distrib > 0) $js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
 			$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
-				}]});";
+				}]});},300);";
 			FS::$iMgr->js($js);
 
 			return $output;
@@ -593,26 +593,25 @@
 					$lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
 				}
 			}
-			$js = "$(function(){ var hstgr;
-                        	$(document).ready(function() { hstgr = new Highcharts.Chart({
-                                	chart: { renderTo: 'netHCr', type: 'line' },
-                                        title: { text: '' },
-					tooltip: { crosshairs: true },
-                                        xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round($totalvals/10)." },
-                                        yAxis: { title: { text: 'Nombre d\'adresses' } },
-                                        legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
-                                        	x: -10, y: 100 },
-                                        series: [ { name: '".addslashes($this->loc->s("Usable"))."',
-						data: [".$total."], color: 'green' },
-						{ name: '".addslashes($this->loc->s("not-usable"))."',
-                                                data: [".$free."], color: 'black' },";
-					if($bauxshow) $js .= "{ name: '".addslashes($this->loc->s("Baux"))."',
-						data: [".$baux."], color: 'red' },";
-					if($reservshow) $js .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
-						data: [".$reserv."], color: 'yellow' },";
-					if($availshow) $js .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
-						data: [".$avail."], color: 'cyan' }";
-			$js .= "]});});});";
+                        $js = "setTimeout(function() { var hstgr = new Highcharts.Chart({
+                                chart: { renderTo: 'netHCr', type: 'line' },
+                                       title: { text: '' },
+				tooltip: { crosshairs: true },
+                                       xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round($totalvals/10)." },
+                                       yAxis: { title: { text: 'Nombre d\'adresses' } },
+                                       legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
+                                       	x: -10, y: 100 },
+                                       series: [ { name: '".addslashes($this->loc->s("Usable"))."',
+					data: [".$total."], color: 'green' },
+					{ name: '".addslashes($this->loc->s("not-usable"))."',
+                                               data: [".$free."], color: 'black' },";
+				if($bauxshow) $js .= "{ name: '".addslashes($this->loc->s("Baux"))."',
+					data: [".$baux."], color: 'red' },";
+				if($reservshow) $js .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
+					data: [".$reserv."], color: 'yellow' },";
+				if($availshow) $js .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
+					data: [".$avail."], color: 'cyan' }";
+			$js .= "]});},300);";
 			FS::$iMgr->js($js);
 			return $output;
 		}
@@ -676,7 +675,10 @@
 						case 2: $subout = $this->showSubnetHistory($filtr); break;
 						case 3: $subout = $this->showSubnetMonitoring($filtr); break;
 					}
-					$js = "$('#netHCr').html(''); $('#netshowcont').html('".addslashes(preg_replace("[\n]","",$subout))."');";
+					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$subout))."');";
+					if($view == 3) 
+						$js .= "$('#netHCr').html('');";
+
 					FS::$iMgr->ajaxEcho("Done",$js);
 					//FS::$iMgr->redir("mod=".$this->mid."&sh=11&f=".$filtr);
 					return;
