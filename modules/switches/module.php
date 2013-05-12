@@ -25,6 +25,7 @@
 	require_once(dirname(__FILE__)."/cisco.func.php");
 	require_once(dirname(__FILE__)."/dell.func.php");
 	require_once(dirname(__FILE__)."/device.api.php");
+	require_once(dirname(__FILE__)."/../../lib/FSS/module/Network.FS.class.php");
 	
 	final class iSwitchMgmt extends FSModule {
 		function __construct($locales) { 
@@ -914,12 +915,12 @@
 						$netid = "";
 						$cidr = "";
 
-						$query2 = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","vlanid = '".$data["vlan"]."'");
+						$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","vlanid = '".$data["vlan"]."'");
 						if($data2 = FS::$dbMgr->Fetch($query2)) {
 							$netid = $data2["netid"];
 							$net = new FSNetwork();
 							$net->SetNetAddr($netid);
-							$net->SetNetMask($data["netmask"]);
+							$net->SetNetMask($data2["netmask"]);
 							$net->calcCIDR();
 							$cidr = $net->getCIDR();
 						}
