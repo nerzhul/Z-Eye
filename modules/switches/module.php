@@ -25,7 +25,7 @@
 	require_once(dirname(__FILE__)."/cisco.func.php");
 	require_once(dirname(__FILE__)."/dell.func.php");
 	require_once(dirname(__FILE__)."/device.api.php");
-	require_once(dirname(__FILE__)."/../../lib/FSS/module/Network.FS.class.php");
+	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 	
 	final class iSwitchMgmt extends FSModule {
 		function __construct($locales) { 
