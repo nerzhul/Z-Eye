@@ -90,10 +90,9 @@ class ZEyeSwitchesBackup(threading.Thread):
 							devcom = self.defaultSNMPRW
 						# save type = 1 (TFTP)
 						if idx[0] == 1:
-							thread.start_new_thread(self.doBackup,(devip,devname,devcom,idx[1],idx[2]))
+							thread.start_new_thread(self.doBackup,(devip,devname,devcom,idx[1],"%sconf-%s" % (idx[2], devname)))
 						elif idx[0] == 2 or idx[0] == 4 or idx[0] == 5:
-							thread.start_new_thread(self.doAuthBackup,(devip,devname,devcom,idx[1],idx[2],idx[3],idx[4]))
-							
+							thread.start_new_thread(self.doAuthBackup,(devip,devname,devcom,idx[1],"%sconf-%s" % (idx[2], devname),idx[3],idx[4]))
 			except StandardError, e:
 				Logger.ZEyeLogger().write("Switches-backup: FATAL %s" % e)
 				return
@@ -115,7 +114,7 @@ class ZEyeSwitchesBackup(threading.Thread):
 		totaltime = datetime.datetime.now() - starttime
 		Logger.ZEyeLogger().write("Switches backup done (time: %s)" % totaltime)
 
-	def snmpset(self,ip,devcom,mib,value):
+	def snmpset(self,devname,ip,devcom,mib,value):
 		cmdGen = cmdgen.CommandGenerator()
 		errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
 			cmdgen.CommunityData(devcom),
@@ -123,11 +122,17 @@ class ZEyeSwitchesBackup(threading.Thread):
 			(mib, value)
 		)
 		if errorIndication:
-			Logger.ZEyeLogger().write("Switches-backup: errorIndication %s" % errorIndication)
+			Logger.ZEyeLogger().write("Switches-backup: errorIndication on %s: %s" % (devname,errorIndication))
+			return -1
 		elif errorStatus:
-			Logger.ZEyeLogger().write("Switches-backup: errorStatus %s at %s" % (errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
+			if errorStatus.prettyPrint() == "'noAccess'":
+				Logger.ZEyeLogger().write("Switches-backup: community %s cannot write on %s@%s" % (devcom,mib,devname))
+			else:
+				Logger.ZEyeLogger().write("Switches-backup: errorStatus on %s: %s at %s" % (devname,errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
+			return -1
+		return 0
 
-	def snmpget(self,ip,devcom,mib):
+	def snmpget(self,devname,ip,devcom,mib):
 		cmdGen = cmdgen.CommandGenerator()
 		errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
 			cmdgen.CommunityData(devcom),
@@ -135,31 +140,38 @@ class ZEyeSwitchesBackup(threading.Thread):
 			mib
 		)
 		if errorIndication:
-			Logger.ZEyeLogger().write("Switches-backup: errorIndication %s" % errorIndication)
+			Logger.ZEyeLogger().write("Switches-backup: errorIndication on %s: %s" % (devname,errorIndication))
+			return -1
 		elif errorStatus:
-			Logger.ZEyeLogger().write("Switches-backup: errorStatus %s at %s" % (errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
+			if errorStatus.prettyPrint() == "'noAccess'":
+				Logger.ZEyeLogger().write("Switches-backup: community %s cannot read on %s@%s" % (devcom,mib,devname))
+			else:
+				Logger.ZEyeLogger().write("Switches-backup: errorStatus on %s: %s at %s" % (devname, errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
+			return -1
 		else:
 			for name, val in varBinds:
 				return val.prettyPrint()
+		return 0
 
 	def doBackup(self,ip,devname,devcom,addr,path):
 		self.incrThreadNb()
 
 		try:
 			rand = random.randint(1,100)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.%d" % rand,1)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.%d" % rand,3)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.%d" % rand,1)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.%d" % rand,rfc1902.IpAddress(addr))
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.%d" % rand,path)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.%d" % rand,1)
+			if self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.%d" % rand,rfc1902.Integer(1)) < 0:
+				self.decrThreadNb()
+				return
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.%d" % rand,rfc1902.Integer(3))
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.%d" % rand,rfc1902.Integer(1))
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.%d" % rand,rfc1902.IpAddress(addr))
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.%d" % rand,rfc1902.OctetString(path))
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.%d" % rand,rfc1902.Integer(1))
 
 			time.sleep(1)
-			copyState = self.snmpget(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.%d" % rand)
-			Logger.ZEyeLogger().write("Switches-backup: copystate for %s: %s" % (devname,copyState))
+			copyState = self.snmpget(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.%d" % rand)
 			while copyState == 2:
 				time.sleep(1)
-				copyState = self.snmpget(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.%d" % rand)
+				copyState = self.snmpget(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.%d" % rand)
 		except Exception, e:
 			Logger.ZEyeLogger().write("Switches-backup: FATAL %s" % e)
 
@@ -170,14 +182,16 @@ class ZEyeSwitchesBackup(threading.Thread):
 
 		try:
 			rand = random.randint(1,100)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.%d" % rand,1)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.%d" % rand,3)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.%d" % rand,1)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.%d" % rand,rfc1902.IpAddress(addr))
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.%d" % rand,path)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.%d" % rand,login)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.%d" % rand,pwd)
-			self.snmpset(ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.%d" % rand,1)
+			if self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.%d" % rand,rfc1902.Integer(1)) != 0:
+				self.decrThreadNb()
+				return
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.%d" % rand,rfc1902.Integer(3))
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.%d" % rand,rfc1902.Integer(1))
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.5.%d" % rand,rfc1902.IpAddress(addr))
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.6.%d" % rand,path)
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.%d" % rand,login)
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.%d" % rand,pwd)
+			self.snmpset(devname,ip,devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.%d" % rand,rfc1902.Integer(1))
 		except Exception, e:
 			Logger.ZEyeLogger().write("Switches-backup: FATAL %s" % e)
 
