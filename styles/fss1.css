@@ -403,7 +403,19 @@ canvas { display: inline-block; }
 #search { position:fixed; top:4px; right:10px; }
 #search input { margin-left: 20px; }
 
-.userMenu { position:fixed; top: 0px; left:10px; }
+.userMenu { position:fixed; top: 0px; left:10px;
+	display: inline-block;
+	padding: 12px 6px 12px 6px;
+	margin-top: 1px;
+	background-image: -moz-linear-gradient(#232323, #050505);
+	background-image: -moz-linear-gradient(#232323, #050505);
+	background-image: -o-linear-gradient(#232323, #050505);
+	background-image: -webkit-linear-gradient(#232323, #050505);
+	background-image: -ms-linear-gradient(#232323, #050505);
+	vertical-align: center;
+	cursor: pointer;
+	width: auto;
+}
 
 *[draggable=true] {
 	-moz-user-select: none;

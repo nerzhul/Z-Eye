@@ -62,29 +62,24 @@
 				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\" onclick=\"javascript:history.back()\">Retour</div></div>";
 			}
                         $output .= $this->loadMenus();
-			$output .= "<div id=\"menuStack\"><div id=\"menuTitle\"><ul class=\"login\">";
-
-			$output .= "<li id=\"logintoggle\">";
-			if(!FS::$sessMgr->isConnected())
-				$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>";
-			else
-				$output .= "<a id=\"loginopen\" class=\"open\" href=\"#\">Déconnexion</a>";
-			$output .= "<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
-			</li></ul></div></div>";
 
 			if(FS::$sessMgr->isConnected()) {
 				$output .= $this->showUserForm();
 				$output .= $this->showSearchForm();
 			}
 
-			$output .= "<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">";
-			$output .= $this->h4("Bienvenue sur Z-Eye",true);
-
-			$output .= "<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>";
-
-			$output .= "</div><div class=\"left\">";
-
 			if(!FS::$sessMgr->isConnected()) {
+				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\"><ul class=\"login\">";
+
+				$output .= "<li id=\"logintoggle\">".
+					"<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>".
+					"<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
+					</li></ul></div></div>".
+					"<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">".
+					$this->h4("Bienvenue sur Z-Eye",true).
+					"<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>".
+					"</div><div class=\"left\">";
+
 				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection");
 					$output .= $this->h4("Identification",true);
 					$output .= $this->label("uname","Utilisateur");
@@ -92,22 +87,19 @@
 					$output .= $this->label("upwd","Mot de passe");
 					$output .= $this->password("upwd","");
 					$output .= $this->hidden("redir",$_SERVER["REQUEST_URI"]);
-					$output .= $this->submit("conn",FS::$iMgr->getLocale("Connection"));
-					$output .= "</form>";
-			} else {
-				$output .= FS::$iMgr->h4("Déconnexion",true)."<form class=\"clearfixlogform\" action=\"index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1\" method=\"post\">Êtes vous sûr de vouloir vous déconnecter ?<br /><br />";
-				$output .= FS::$iMgr->submit("disconnect",FS::$iMgr->getLocale("Confirm"));
-				$output .= "</form>";
+					$output .= $this->submit("conn",$this->getLocale("Connection"));
+					$output .= "</form></div></div></div>";
 			}
 
-			$output .= "</div></div></div>";
 			$output .= "</div></div>";
 
 			return $output;
 		}
 
 		private function showUserForm() {
-			return "<div id=\"menuStack\"><div id=\"menuTitle\" class=\"userMenu\">".FS::$sessMgr->getUserName()."</div><div class=\"userpopup\"><div class=\"menuItem\"></div>".
+			return "<div id=\"menuStack\"><div class=\"userMenu\">".FS::$sessMgr->getUserRealName()." (".FS::$sessMgr->getUserName().")</div><div class=\"userpopup\">".
+			"<div class=\"menuItem\"><a href=\"#\" onclick=\"confirmPopup('".addslashes($this->getLocale("confirm-disconnect"))."','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',
+				'index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1',{});\">".$this->getLocale("Disconnection")."</a></div>".
 
 			"</div></div>";
 		}

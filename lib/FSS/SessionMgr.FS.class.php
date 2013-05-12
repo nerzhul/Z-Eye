@@ -85,6 +85,15 @@
 			return NULL;
 		}
 
+		public function getUserRealName() {
+			if($this->getUid()) {
+				$name = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","name","uid = '".$this->getUid()."'");
+				$surname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","subname","uid = '".$this->getUid()."'");
+				return $surname." ".$name;
+			}
+			return NULL;
+		}
+
 		public function getGroups() {
 			if(is_array($this->groupBuf) && count($this->groupBuf) > 0)
 				return $this->groupBuf;

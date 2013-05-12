@@ -22,9 +22,9 @@
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("Disconnect"));
-			$output = "<div id=\"module_connect\">".FS::$iMgr->h1("Disconnect")."<form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">".$this->loc->s("confirm-disconnect")."<br /><br />";
+			$output = FS::$iMgr->h1("Disconnect")."<form action=\"index.php?mod=".$this->mid."&act=1\" method=\"post\">".$this->loc->s("confirm-disconnect")."<br /><br />";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Confirm"));
-			$output .= "</form></div>";
+			$output .= "</form>";
 			return $output;
 		}
 
@@ -38,7 +38,7 @@
 					break;
 				default: break;
 			}
-			FS::$iMgr->redir("mod=0");	
+			FS::$iMgr->redir("mod=0",true);	
 		}
 		
 		public function handlePostDatas($act) {
