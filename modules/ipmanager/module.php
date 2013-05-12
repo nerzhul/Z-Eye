@@ -320,7 +320,7 @@
 
 		private function showAdvancedTools() {
 			$output = FS::$iMgr->h4("title-search-old");
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=2",array("id" => "obsfrm"));
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=2");
 			$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Search"));
 			$output .= "</form><div id=\"obsres\"></div>";
@@ -470,7 +470,7 @@
 			$members = array();
 			if($name) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$name."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
+				while($data = FS::$dbMgr->Fetch($query)) {
 					array_push($members,$data["dhcpaddr"]);
 				}
 			}

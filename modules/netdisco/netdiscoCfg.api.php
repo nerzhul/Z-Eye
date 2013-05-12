@@ -31,7 +31,6 @@
 			$netdiscoCfg["dbpwd"] = "password";
 			$netdiscoCfg["snmptimeout"] = 1;
 			$netdiscoCfg["snmptry"] = 3;
-			$netdiscoCfg["snmpmibs"] = "/usr/local/share/netdisco-mibs/";
 
 			if(!$file)
 				return FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
@@ -59,8 +58,6 @@
 						$netdiscoCfg["snmptimeout"] = $res[1]/1000000;
 					else if(preg_match("#^snmpretries$#",$res[0]))
 						$netdiscoCfg["snmptry"] = $res[1];
-					else if(preg_match("#^mibhome$#",$res[0]))
-						$netdiscoCfg["snmpmibs"] = $res[1];
 					else if(preg_match("#^snmpver$#",$res[0]))
 						$netdiscoCfg["snmpver"] = $res[1];
 				} else if(count($res) == 4) {
@@ -103,12 +100,12 @@
 			fwrite($file,"topofile = /usr/local/etc/netdisco/netdisco-topology.txt\n");
 			
 			fwrite($file,"timeout = 90\nmacsuck_timeout = 90\nmacsuck_all_vlans = true\n");
-			fwrite($file,"arpnip          = true\n");
-			fwrite($file,"\n# -- Database Maintenance and Data Removal --\nexpire_devices = ".$devicetimeout."expire_nodes = ".$nodetimeout."\n");
+			fwrite($file,"arpnip = true\narpwalk = true\nmacwalk = true");
+			fwrite($file,"\n# -- Database Maintenance and Data Removal --\nexpire_devices = ".$devicetimeout."\nexpire_nodes = ".$nodetimeout."\n");
 			fwrite($file,"expire_nodes_archive = 60\n");
 			fwrite($file,"\n# ---- Admin Panel Daemon Settings ----\ndaemon_bg       = true\ndaemon_pid      = /var/run/netdisco_daemon.pid\n");
 			fwrite($file,"daemon_poll     = 2\n");
-			fwrite($file,"\n# ---- Port Control Settings ---vlanctl             = true,portctl_timeout      = 60\n");
+			fwrite($file,"\n# ---- Port Control Settings ---\nvlanctl = true\nportctl_timeout      = 60\n");
 			fwrite($file,"\n# Data Archiving and Logging\ncompresslogs    = true\ncompress        = /bin/gzip -f\ndatadir = /var/log/netdisco\n");
 			fwrite($file,"logextension    = txt");
 			fwrite($file,"\n# ---- Database Settings ----\ndb_Pg = dbi:Pg:dbname=".$dbname.";host=".$pghost."\ndb_Pg_user = ".$dbuser."\ndb_Pg_pw = ".$dbpwd."\n");
@@ -136,9 +133,7 @@
 			if(!$snmprw) $snmprw = "private";
 			fwrite($file,"\n# ---- SNMP Settings ----\ncommunity = ".$snmpro."\ncommunity_rw = ".$snmprw."\nsnmptimeout = ".($snmptimeout*1000000)."\n");
 			fwrite($file,"snmpretries = ".$snmptry."\nsnmpver = ".$snmpver."\n");
-			fwrite($file,"mibhome = /usr/local/share/netdisco-mibs/\n");
-			fwrite($file,"mibdirs = ".'$mibhome/allied,  $mibhome/asante, $mibhome/cisco, \\'."\n");
-			fwrite($file,'$mibhome/foundry, $mibhome/hp,     $mibhome/nortel, $mibhome/extreme, $mibhome/rfc,     $mibhome/net-snmp'."\n".'bulkwalk_off = true'."\n");
+			fwrite($file,"mibdirs = /usr/local/share/netdisco-mibs/allied /usr/local/share/netdisco-mibs/arista /usr/local/share/netdisco-mibs/aruba /usr/local/share/netdisco-mibs/asante /usr/local/share/netdisco-mibs/cabletron /usr/local/share/netdisco-mibs/cisco /usr/local/share/netdisco-mibs/cyclades /usr/local/share/netdisco-mibs/dell /usr/local/share/netdisco-mibs/enterasys /usr/local/share/netdisco-mibs/extreme /usr/local/share/netdisco-mibs/foundry /usr/local/share/netdisco-mibs/hp /usr/local/share/netdisco-mibs/juniper /usr/local/share/netdisco-mibs/mikrotik /usr/local/share/netdisco-mibs/net-snmp /usr/local/share/netdisco-mibs/netgear /usr/local/share/netdisco-mibs/netscreen /usr/local/share/netdisco-mibs/nortel /usr/local/share/netdisco-mibs/packetfront /usr/local/share/netdisco-mibs/rfc");
 			fclose($file);
 
 			$file = fopen("/usr/local/etc/netdisco/netdisco-topology.txt","w+");
