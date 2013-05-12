@@ -59,261 +59,262 @@
 		private function showStats() {
 			$output = "";
 			$formoutput = "";
-			$netoutput = "";
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 
-			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
-			if(!$showmodule || $showmodule == 1) {
-				$netfound = false;
-				$tmpoutput = FS::$iMgr->h2("title-subnet-management").$this->loc->s("choose-net");
-				$tmpoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-				$tmpoutput .= FS::$iMgr->select("f","submit()");
-				$formoutput = "";
+			$netfound = false;
+			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput .= FS::$iMgr->select("f");
+			$formoutput = "";
 
-				// @TODO: see if a subnet is under another subnet
+			// @TODO: see if a subnet is under another subnet
 
-				// We bufferize all netid because of multiple sources
-				$netarray = array();
+			// We bufferize all netid because of multiple sources
+			$netarray = array();
 
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
-				while($data = FS::$dbMgr->Fetch($query)) {
-					if(!isset($netarray[$data["netid"]]))
-						$netarray[$data["netid"]] = $data["netmask"];
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!isset($netarray[$data["netid"]]))
+					$netarray[$data["netid"]] = $data["netmask"];
+			}
+
+			$query = FS::$dbMgr->Select("subnets","net");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!isset($netarray[$data["netid"]]))
+					$netarray[$data["netid"]] = "";
+			}
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!isset($netarray[$data["netid"]]))
+					$netarray[$data["netid"]] = $data["netmask"];
+			}
+			
+			ksort($netarray);
+			foreach($netarray as $netid => $netmask) {
+				$formoutput .= FS::$iMgr->selElmt($netid."/".$netmask,$netid,$filter == $netid);
+			}
+
+			$tmpoutput .= $formoutput;
+			$tmpoutput .= "</select> ";
+			$tmpoutput .= FS::$iMgr->select("view").FS::$iMgr->selElmt($this->loc->s("Stats"),1).FS::$iMgr->selElmt($this->loc->s("History"),2).
+				FS::$iMgr->selElmt($this->loc->s("Monitoring"),3)."</select> ";
+			
+			$tmpoutput .= FS::$iMgr->submit("","Consulter");
+			$tmpoutput .= "</form><br />";
+
+			if(count($netarray) == 0)
+				return FS::$iMgr->printError($this->loc->s("no-net-found"));
+
+			$output .= $tmpoutput.
+				"<div id=\"netHCr\"></div><div id=\"netshowcont\"></div>";
+					
+			return $output;
+		}
+
+		private function showSubnetIPList($filter) {
+			$netid = ""; $netmask = "";
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$netid = $data["netid"]; $netmask = $data["netmask"];
+			}
+			if(!$netid) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","netid = '".$filter."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$netid = $data["netid"]; $netmask = $data["netmask"];
 				}
+			}
+			// @TODO: netdisco subnets
+			$iparray = array();
+			$output = FS::$iMgr->h3("Réseau : ".$netid."/".$netmask,true);
+			$output .= "<center><div id=\"".FS::$iMgr->formatHTMLId($netid)."\"></div></center>";
 
-				$query = FS::$dbMgr->Select("subnets","net");
-				while($data = FS::$dbMgr->Fetch($query)) {
-					if(!isset($netarray[$data["netid"]]))
-						$netarray[$data["netid"]] = "";
+			$netobj = new FSNetwork();
+			$netobj->setNetAddr($netid);
+			$netobj->setNetMask($netmask);
+
+			$swfound = false;
+
+			// Bufferize switch list
+			$switchlist = array();
+
+			$query2 = FS::$dbMgr->Select("device","ip,name");
+			while($data2 = FS::$dbMgr->Fetch($query2))
+				$switchlist[$data2["ip"]] = $data2["name"];
+
+			// Initiate network IPs
+			$lastip = $netobj->getLastUsableIPLong();
+			for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
+				$iparray[$i] = array();
+				$iparray[$i]["mac"] = "";
+				$iparray[$i]["host"] = "";
+				$iparray[$i]["ltime"] = "";
+				$iparray[$i]["distrib"] = 0;
+				$iparray[$i]["servers"] = array();
+				$iparray[$i]["switch"] = "";
+				$iparray[$i]["port"] = "";
+			}
+
+			// Fetch datas
+			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$netid."'");
+			while($data2 = FS::$dbMgr->Fetch($query2)) {
+				// If it's reserved on a host don't override status
+				if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
+					$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
+					$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
+					$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
+					$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
 				}
-
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
-				while($data = FS::$dbMgr->Fetch($query)) {
-					if(!isset($netarray[$data["netid"]]))
-						$netarray[$data["netid"]] = $data["netmask"];
-				}
-				
-				ksort($netarray);
-				foreach($netarray as $netid => $netmask) {
-					$formoutput .= FS::$iMgr->selElmt($netid."/".$netmask,$netid,$filter == $netid);
-				}
-
-				$tmpoutput .= $formoutput;
-				$tmpoutput .= "</select> ";
-				$tmpoutput .= FS::$iMgr->submit("","Consulter");
-				$tmpoutput .= "</form><br />";
-				if(count($netarray) == 0)
-                                        return $output.= FS::$iMgr->printError($this->loc->s("no-net-found"));
-
-				$output .= $tmpoutput;
-
-				if($filter) {
-					if(!FS::$secMgr->isIP($filter))
-						return $output.FS::$iMgr->printError($this->loc->s("bad-filter"));
-					$panElmts = array(array(11,"mod=".$this->mid."&f=".$filter,$this->loc->s("Stats")),
-						array(14,"mod=".$this->mid."&f=".$filter,$this->loc->s("History")),
-						array(13,"mod=".$this->mid."&f=".$filter,$this->loc->s("Monitoring")),
-						array(12,"mod=".$this->mid."&f=".$filter,$this->loc->s("Expert-tools")));
-					$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
-				}
-			} else if($showmodule == 11) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
-					$iparray = array();
-					$netoutput .= FS::$iMgr->h3("Réseau : ".$data["netid"]."/".$data["netmask"],true);
-					$netoutput .= "<center><div id=\"".$data["netid"]."\"></div></center>";
-
-					$netobj = new FSNetwork();
-					$netobj->setNetAddr($data["netid"]);
-					$netobj->setNetMask($data["netmask"]);
-
-					$swfound = false;
-
-					// Bufferize switch list
-					$switchlist = array();
-
-					$query2 = FS::$dbMgr->Select("device","ip,name");
-					while($data2 = FS::$dbMgr->Fetch($query2))
-						$switchlist[$data2["ip"]] = $data2["name"];
-
-					// Initiate network IPs
-					$lastip = $netobj->getLastUsableIPLong()+1;
-					for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
-						$iparray[$i] = array();
-						$iparray[$i]["mac"] = "";
-						$iparray[$i]["host"] = "";
-						$iparray[$i]["ltime"] = "";
-						$iparray[$i]["distrib"] = 0;
-						$iparray[$i]["servers"] = array();
-						$iparray[$i]["switch"] = "";
-						$iparray[$i]["port"] = "";
+				// List servers where the data is
+				array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
+				if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
+					$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+					$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+					if($sw && $port) {
+						$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
+						$iparray[ip2long($data2["ip"])]["port"] = $port;
+						$swfound = true;
 					}
+				}
 
-					// Fetch datas
-					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$data["netid"]."'");
-					while($data2 = FS::$dbMgr->Fetch($query2)) {
-						// If it's reserved on a host don't override status
-						if($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
-							$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
-							$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
-							$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
-							$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
-						}
-						// List servers where the data is
-						array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
-						if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
-							$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
-							$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
-							if($sw && $port) {
-								$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
-								$iparray[ip2long($data2["ip"])]["port"] = $port;
-								$swfound = true;
-							}
-						}
+			}
 
-					}
+			$used = 0;
+			$reserv = 0;
+			$free = 0;
+			$distrib = 0;
+			$fixedip = 0;
 
-					$used = 0;
-					$reserv = 0;
-					$free = 0;
-					$distrib = 0;
-					$fixedip = 0;
+			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
+				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
+			if($swfound)
+				$output .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
+			$output .= "Fin du bail</th><th>Serveurs</th></tr></thead>";
 
-					$netoutput .= "<center><table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
-						<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
-					if($swfound)
-						$netoutput .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
-					$netoutput .= "Fin du bail</th><th>Serveurs</th></tr></thead>";
-
-					foreach($iparray as $key => $value) {
-						$rstate = "";
-						$style = "";
-						switch($value["distrib"]) {
-							case 1:
-								$rstate = $this->loc->s("Free");
-								$style = "background-color: #BFFFBF;";
-								$free++;
-								break;
-							case 2:
-								$rstate = $this->loc->s("Used");
-								$style = "background-color: #FF6A6A;";
-								$used++;
-								break;
-							case 3:
-								$rstate = $this->loc->s("Reserved");
-								$style = "background-color: #FFFF80;";
-								$reserv++;
-								break;
-							case 4:
-								$rstate = $this->loc->s("Distributed");
-								$style = "background-color: #BFFBFF;";
-								$distrib++;
-								break;
-							default: {
-									$rstate = $this->loc->s("Free");
-									$style = "background-color: #BFFFBF;";
-									$mac = FS::$dbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
-									if($mac) {
-										$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
-										if($data3 = FS::$dbMgr->Fetch($query3)) {
-											$rstate = $this->loc->s("Stuck-IP");
-											$style = "background-color: orange;";
-											$fixedip++;
-										}
-										else
-											$free++;
-									}
-									else
-										$free++;
+			foreach($iparray as $key => $value) {
+				$rstate = "";
+				$style = "";
+				switch($value["distrib"]) {
+					case 1:
+						$rstate = $this->loc->s("Free");
+						$style = "background-color: #BFFFBF;";
+						$free++;
+						break;
+					case 2:
+						$rstate = $this->loc->s("Used");
+						$style = "background-color: #FF6A6A;";
+						$used++;
+						break;
+					case 3:
+						$rstate = $this->loc->s("Reserved");
+						$style = "background-color: #FFFF80;";
+						$reserv++;
+						break;
+					case 4:
+						$rstate = $this->loc->s("Distributed");
+						$style = "background-color: #BFFBFF;";
+						$distrib++;
+						break;
+					default: {
+							$rstate = $this->loc->s("Free");
+							$style = "background-color: #BFFFBF;";
+							$mac = FS::$dbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
+							if($mac) {
+								$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
+								if($data3 = FS::$dbMgr->Fetch($query3)) {
+									$rstate = $this->loc->s("Stuck-IP");
+									$style = "background-color: orange;";
+									$fixedip++;
 								}
-								break;
+								else
+									$free++;
+							}
+							else
+								$free++;
 						}
-						$netoutput .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
-						$netoutput .= long2ip($key)."</a>";
-						$netoutput .= "</td><td>".$rstate."</td><td>";
-						$netoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
-						$netoutput .= $value["host"]."</td><td>";
-						// Show switch column only of a switch is here
-						if($swfound) {
-							$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "");
-							$netoutput .= "</td><td>";
-							$netoutput .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "");
-							$netoutput .= "</td><td>";
-						}
-						$netoutput .= $value["ltime"]."</td><td>";
-						$count = count($value["servers"]);
-						for($i=0;$i<$count;$i++) {
-							if($i > 0) $netoutput .= "<br />";
-							$netoutput .= $value["servers"][$i];
-						}
-						$netoutput .= "</td></tr>";
-					}
-					$netoutput .= "</table></center><br /><hr>";
-					FS::$iMgr->jsSortTable("tipList");
-					$js = "var chart = new Highcharts.Chart({
-						chart: { renderTo: '".$data["netid"]."', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
-						title: { text: '' },
-						tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
-									Math.round(this.percentage*100)/100+' %)'; } },
-						plotOptions: {
-							pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: {
-									enabled: true,formatter: function() { return '<b>'+this.point.name+'</b>: '+
-									this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
-						}}},
-						series: [{ type: 'pie', data: [";
-					if($used > 0) $js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
-					if($reserv > 0) $js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
-					if($fixedip > 0) $js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
-					if($distrib > 0) $js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
-					$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
-						}]});";
-					$netoutput .= FS::$iMgr->js($js);
+						break;
 				}
-				$output .= $netoutput;
+				$output .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
+				$output .= long2ip($key)."</a>";
+				$output .= "</td><td>".$rstate."</td><td>";
+				$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
+				$output .= $value["host"]."</td><td>";
+				// Show switch column only of a switch is here
+				if($swfound) {
+					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "");
+					$output .= "</td><td>";
+					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "");
+					$output .= "</td><td>";
+				}
+				$output .= $value["ltime"]."</td><td>";
+				$count = count($value["servers"]);
+				for($i=0;$i<$count;$i++) {
+					if($i > 0) $output .= "<br />";
+					$output .= $value["servers"][$i];
+				}
+				$output .= "</td></tr>";
 			}
-			else if($showmodule == 13) {
-				$output .= FS::$iMgr->h4("Monitoring",true);
-				$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","warnuse","subnet = '".$filter."'");
-				$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","crituse","subnet = '".$filter."'");
-				$maxage = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","maxage","subnet = '".$filter."'");
-				$enmon = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","enmon","subnet = '".$filter."'");
-				$eniphistory = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","eniphistory","subnet = '".$filter."'");
-				$contact = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","contact","subnet = '".$filter."'");
-				$output .= "<div id=\"monsubnetres\"></div>";
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&f=".$filter."&act=3",array("id" => "monsubnet"));
-				$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
-					<li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>";
-				$output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => "tooltip-%use"))."</li><li>";
-				$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => "tooltip-%use"))."</li><li>";
-				$output .= FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => "tooltip-max-age"))."</li><li>";
-				$output .= FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),"tooltip-contact")."</li><li>";
-				$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
-				$output .= FS::$iMgr->js("$('#monsubnet').submit(function(event) {
-					event.preventDefault();
-					$.post('index.php?mod=".$this->mid."&at=3&f=".$filter."&act=3', $('#monsubnet').serialize(), function(data) {
-						$('#monsubnetres').html(data);
-					});
-				});");
-			}
-			else if($showmodule == 14) {
-				$output .= FS::$iMgr->js("function historyDateChange() {
-					$('#hstcontent').hide(\"slow\",function() { $('#hstcontent').html(''); 
-					$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
-						$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
-					}); }); }");
+			$output .= "</table>";
+			FS::$iMgr->jsSortTable("tipList");
 
-				$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
-				$output .= FS::$iMgr->hidden("filter",$filter);
-				$date = FS::$dbMgr->GetMin(PGDbConfig::getDbPrefix()."dhcp_subnet_history","collecteddate");
-				if(!$date) $date = "now";
-				$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
-				$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
-				$output .= FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
-			}
-			else
-				$output .= FS::$iMgr->printError($this->loc->s("no-tab"));
+			$js = "var chart = new Highcharts.Chart({
+				chart: { renderTo: 'netHCr', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false },
+				title: { text: '' },
+				tooltip: { formatter: function() { return '<b>'+this.point.name+'</b>: '+this.y+' ('+
+							Math.round(this.percentage*100)/100+' %)'; } },
+				plotOptions: {
+					pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: {
+							enabled: true,formatter: function() { return '<b>'+this.point.name+'</b>: '+
+							this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
+				}}},
+				series: [{ type: 'pie', data: [";
+			if($used > 0) $js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
+			if($reserv > 0) $js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
+			if($fixedip > 0) $js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
+			if($distrib > 0) $js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+			$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
+				}]});";
+			FS::$iMgr->js($js);
+
+			return $output;
+		}
+
+		private function showSubnetHistory($filter) {
+			$output = FS::$iMgr->js("function historyDateChange() {
+				$('#hstcontent').hide(\"slow\",function() { $('#hstcontent').html(''); 
+				$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
+					$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
+				}); }); }");
+
+			$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
+			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
+			$output .= FS::$iMgr->hidden("filter",$filter);
+			$date = FS::$dbMgr->GetMin(PGDbConfig::getDbPrefix()."dhcp_subnet_history","collecteddate");
+			if(!$date) $date = "now";
+			$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
+			$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
+			$output .= FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
+			return $output;
+		}
+
+		private function showSubnetMonitoring($filter) {
+			$output = FS::$iMgr->h4("Monitoring",true);
+			$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","warnuse","subnet = '".$filter."'");
+			$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","crituse","subnet = '".$filter."'");
+			$maxage = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","maxage","subnet = '".$filter."'");
+			$enmon = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","enmon","subnet = '".$filter."'");
+			$eniphistory = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","eniphistory","subnet = '".$filter."'");
+			$contact = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","contact","subnet = '".$filter."'");
+
+			$output .= "<div id=\"monsubnetres\"></div>".
+				FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&f=".$filter."&act=3").
+				"<ul class=\"ulform\"><li>".FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
+				<li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>".
+				FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => "tooltip-%use"))."</li><li>".
+				FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => "tooltip-%use"))."</li><li>".
+				FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => "tooltip-max-age"))."</li><li>".
+				FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),"tooltip-contact")."</li><li>".
+				FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
 			return $output;
 		}
 
@@ -520,7 +521,6 @@
 
 		private function showHistory($filter,$interval = 1) {
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
-			$output .= "<div id=\"hstgr\"></div>";
 			$results = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate",
 				"collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'",
@@ -595,7 +595,7 @@
 			}
 			$js = "$(function(){ var hstgr;
                         	$(document).ready(function() { hstgr = new Highcharts.Chart({
-                                	chart: { renderTo: 'hstgr', type: 'line' },
+                                	chart: { renderTo: 'netHCr', type: 'line' },
                                         title: { text: '' },
 					tooltip: { crosshairs: true },
                                         xAxis: { categories: [".$labels."], gridLineWidth: 1, tickInterval: ".round($totalvals/10)." },
@@ -613,7 +613,7 @@
 					if($availshow) $js .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
 						data: [".$avail."], color: 'cyan' }";
 			$js .= "]});});});";
-			$output .= FS::$iMgr->js($js);
+			FS::$iMgr->js($js);
 			return $output;
 		}
 
@@ -664,14 +664,21 @@
 			switch($act) {
 				case 1:
 					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
-					if($filtr == NULL) {
+					$view = FS::$secMgr->checkAndSecurisePostData("view");
+					if(!$filtr || !$view || !FS::$secMgr->isNumeric($view) || $view < 1 || $view > 3) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to filter values");
-						FS::$iMgr->redir("mod=".$this->mid."");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
 					}
-					else {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User filter by ".$filtr);
-						FS::$iMgr->redir("mod=".$this->mid."&sh=11&f=".$filtr);
+					
+					switch($view) {
+						case 1: $subout = $this->showSubnetIPList($filtr); break;
+						case 2: $subout = $this->showSubnetHistory($filtr); break;
+						case 3: $subout = $this->showSubnetMonitoring($filtr); break;
 					}
+					$js = "$('#netHCr').html(''); $('#netshowcont').html('".addslashes(preg_replace("[\n]","",$subout))."');";
+					FS::$iMgr->ajaxEcho("Done",$js);
+					//FS::$iMgr->redir("mod=".$this->mid."&sh=11&f=".$filtr);
 					return;
 				case 2:
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
@@ -723,22 +730,27 @@
 					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || $warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
 						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to monitor subnet");
-						echo FS::$iMgr->printError($this->loc->s("err-miss-data"));
+						FS::$iMgr->ajaxEcho("err-miss-data");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid","netid = '".$filtr."'");
+					if(!$exist) 
+						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid = '".$filtr."'");
+
 					if(!$exist) {
-						echo FS::$iMgr->printError($this->loc->s("err-bad-subnet"));
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"User try to monitor inexistant subnet '".$filtr."'");
+						FS::$iMgr->ajaxEcho("err-bad-subnet");
 						return;
 					}
 
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_monitoring","subnet = '".$filtr."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage,eniphistory","'".$filtr."','".$warn."','".$crit."','".$contact."','".($enmon == "on" ? "1" : "0").
-						"','".$maxage."','".($eniphistory == "on" ? "t" : "f")."'");
-					echo FS::$iMgr->printDebug($this->loc->s("modif-record"));
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_monitoring","subnet,warnuse,crituse,contact,enmon,maxage,eniphistory","'".$filtr."','".$warn."','".$crit."','".$contact."','".
+						($enmon == "on" ? "1" : "0")."','".$maxage."','".($eniphistory == "on" ? "t" : "f")."'");
+					FS::$dbMgr->CommitTr();
 
 					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
+					FS::$iMgr->ajaxEcho("modif-record");
 					return;
 				case 4:
 					$filter = FS::$secMgr->checkAndSecurisePostData("filter");
