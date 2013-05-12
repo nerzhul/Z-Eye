@@ -27,6 +27,7 @@ import Daemon
 import MRTGCfgDiscoverer
 import MRTGDataRefresh
 import PortIDCacher
+import SwitchesBackup
 import serviceManager
 
 class ZEyeDaemon(Daemon.Daemon):
@@ -34,6 +35,7 @@ class ZEyeDaemon(Daemon.Daemon):
 		MRTGCfgDiscoverer.ZEyeMRTGDiscoverer().start()
 		MRTGDataRefresh.ZEyeMRTGDataRefresher().start()
 		PortIDCacher.ZEyeSwitchesPortIDCacher().start()
+		SwitchesBackup.ZEyeSwitchesBackup().start()
 		serviceManager.ZEyeServiceMgr().start()	
 		while True:
 			time.sleep(1)
