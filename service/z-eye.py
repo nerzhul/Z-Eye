@@ -26,6 +26,7 @@ import Logger
 import Daemon
 import MRTGCfgDiscoverer
 import MRTGDataRefresh
+import PeriodicCmd
 import PortIDCacher
 import SwitchesBackup
 import serviceManager
@@ -34,9 +35,14 @@ class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
 		MRTGCfgDiscoverer.ZEyeMRTGDiscoverer().start()
 		MRTGDataRefresh.ZEyeMRTGDataRefresher().start()
+		PeriodicCmd.ZEyePeriodicCmd(15*60,15,"Netdisco device discovery","/usr/local/bin/perl /usr/local/bin/netdisco -a -w -m -C /usr/local/etc/netdisco/netdisco.conf -R").start()
+		PeriodicCmd.ZEyePeriodicCmd(5*60,60,"Netdisco device MAC walk","/usr/local/bin/perl /usr/local/bin/netdisco -a -w -m -C /usr/local/etc/netdisco/netdisco.conf -m").start()
+		PeriodicCmd.ZEyePeriodicCmd(5*60,90,"Netdisco device ARP walk","/usr/local/bin/perl /usr/local/bin/netdisco -a -w -m -C /usr/local/etc/netdisco/netdisco.conf -a").start()
+		PeriodicCmd.ZEyePeriodicCmd(15*60,1200,"Netdisco device netbios walk","/usr/local/bin/perl /usr/local/bin/netdisco -a -w -m -C /usr/local/etc/netdisco/netdisco.conf -w").start()
 		PortIDCacher.ZEyeSwitchesPortIDCacher().start()
 		SwitchesBackup.ZEyeSwitchesBackup().start()
 		serviceManager.ZEyeServiceMgr().start()	
+		
 		while True:
 			time.sleep(1)
 
