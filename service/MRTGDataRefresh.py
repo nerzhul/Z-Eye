@@ -79,7 +79,7 @@ class ZEyeMRTGDataRefresher(threading.Thread):
 			for file in _dir:
 				filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+file
 				# Launch only if it's a .cfg, recent MRTG create .ok files
-				if(os.path.isfile(filename) and re.search("cfg",filename) != None):
+				if(os.path.isfile(filename) and re.search("cfg$",filename) != None):
 					while self.getThreadNb() >= self.max_threads:
 						time.sleep(1)
 					thread.start_new_thread(self.refreshMRTG,(filename,0))
