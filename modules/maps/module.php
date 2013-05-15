@@ -171,9 +171,10 @@
 
 			foreach($nodelist as $node => $values) {
 				// Insert nodes. At this time, random values
-				if(!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname = 'mainmap' AND nodename = '".$node."'")) {
+				if($values["placed"] == false && !FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname = 'mainmap' AND nodename = '".$node."'")) {
 					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_nodes","mapname,nodename,node_x,node_y,node_label,node_size,node_color",
 						"'mainmap','".$node."','".rand(1,200)."','".rand(1,200)."','".$values["label"]."','10','000000'");
+					$values["placed"] = true;
 				}
 
 				// Insert edges
@@ -298,7 +299,7 @@
 						$query2 = FS::$dbMgr->Select("device_port","remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
 						while($data2 = FS::$dbMgr->Fetch($query2))
 							array_push($linklist,$data2["remote_id"]);
-						$nodelist[$data["name"]] = array("label" => $data["name"],"links" => $linklist);
+						$nodelist[$data["name"]] = array("label" => $data["name"],"links" => $linklist, "placed" => false);
 					}
 
 					$query = FS::$dbMgr->Select("device_port","remote_id","remote_id NOT IN(SELECT name FROM device)");
@@ -320,7 +321,7 @@
 						$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
 						while($data2 = FS::$dbMgr->Fetch($query2))
 							array_push($linklist,$data2["parent"]);
-						$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist);
+						$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist, "placed" => false);
 					}	
 					$this->ImportNodes($nodelist);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
