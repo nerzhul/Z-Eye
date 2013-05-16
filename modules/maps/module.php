@@ -104,11 +104,10 @@
 		// This form imports nodes from devices or icinga
 		private function showImportForm() {
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
-			$output .= FS::$iMgr->submit("",$this->loc->s("Import-Network-Nodes"))."</form>";
+			$output .= FS::$iMgr->submit("",$this->loc->s("Import-Nodes"))."</form>";
 
-			//$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5");
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=6");
-			$output .= FS::$iMgr->submit("",$this->loc->s("Import-Icinga-Nodes"))."</form>";
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5");
+			$output .= FS::$iMgr->submit("","Import de test")."</form>";
 			return $output;
 		}
 		
@@ -349,6 +348,21 @@
 						$nodelist[$data["name"]] = array("label" => $data["name"],"links" => $linklist, "placed" => false);
 					}
 
+					$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if(!array_key_exists($data["name"],$nodelist))
+							$linklist = array();
+						$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
+						while($data2 = FS::$dbMgr->Fetch($query2)) {
+							if(!array_key_exists($data["name"],$nodelist))
+								array_push($linklist,$data2["parent"]);
+							else if(!in_array($nodelist[$data["name"]]["links"],$data2["parent"]))
+								array_push($data2["parent"],$nodelist[$data["name"]]["links"]);
+						}
+						if(!array_key_exists($data["name"],$nodelist))
+							$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist, "placed" => false);
+					}
+
 					$query = FS::$dbMgr->Select("device_port","remote_id","remote_id NOT IN(SELECT name FROM device)");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if(array_key_exists($data["remote_id"],$nodelist))
@@ -359,22 +373,8 @@
 					$this->ImportNodes($nodelist);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
-				// Import icinga nodes
-				case 5:
-					$nodelist = array();
-					$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						$linklist = array();
-						$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
-						while($data2 = FS::$dbMgr->Fetch($query2))
-							array_push($linklist,$data2["parent"]);
-						$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist, "placed" => false);
-					}
-					$this->ImportNodes($nodelist);
-					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
-					return;
 				// test
-				case 6:
+				case 5:
 					FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_nodes");
 					FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_edges");
 					$nodelist = array(
