@@ -106,8 +106,8 @@
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
 			$output .= FS::$iMgr->submit("",$this->loc->s("Import-Network-Nodes"))."</form>";
 
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5");
-			//$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=6");
+			//$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5");
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=6");
 			$output .= FS::$iMgr->submit("",$this->loc->s("Import-Icinga-Nodes"))."</form>";
 			return $output;
 		}
@@ -172,19 +172,32 @@
 			if($pY === NULL)
 				$pY = rand(1,200);
 
-			$linkCount = count($nodelist[$node]["links"]);
 			if($nodelist[$node]["placed"] == false && !FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname 
 = 'mainmap' AND nodename = '".$node."'")) {
+				$color = "007308";
+				$linkCount = count($nodelist[$node]["links"]);
+				$totalLinks = $linkCount;
+				$size = round(10 + 1.5*$linkCount);
+				if($size > 20) $size = 20;
 				FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_nodes","mapname,nodename,node_x,node_y,node_label,node_size,node_color",
-					"'mainmap','".$node."','".$pX."','".$pY."','".$nodelist[$node]["label"]."','10','000000'");
+					"'mainmap','".$node."','".$pX."','".$pY."','".$nodelist[$node]["label"]."','".$size."','".$color."'");
 				$nodelist[$node]["placed"] = true;
+
+				foreach($nodelist as $node2 => $values) {
+					if($node == $node2 || in_array($node2,$nodelist[$node]["links"]))
+						continue;
+					if(in_array($node,$values["links"]))
+						$totalLinks++;
+				}
 
 				for($i=0;$i<$linkCount;$i++) {
 					$node2 = $nodelist[$node]["links"][$i];
 					if(isset($nodelist[$node2]) && $nodelist[$node2]["placed"] == false) {
-						$dist = 10;
-						$pX2 = round($pX + $dist * cos(2*$i*pi()/$linkCount));
-						$pY2 = round($pY + $dist * sin(2*$i*pi()/$linkCount));
+						$dist = 10*$totalLinks+$size;
+						if(count($nodelist[$node2]["links"]) < 2)
+							$dist = round($dist/4);
+						$pX2 = round($pX + $dist * cos(2*$i*pi()/$totalLinks));
+						$pY2 = round($pY + $dist * sin(2*$i*pi()/$totalLinks));
 						$this->placeNode($node2,$nodelist,$pX2,$pY2);
 					}
 
@@ -192,6 +205,21 @@
 					if(!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_edges","edge_size","mapname = 'mainmap' AND node1 = '".$node."' AND node2 = '".$nodelist[$node]["links"][$i]."'")) {
 						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_edges","mapname,edgename,node1,node2,edge_color,edge_size",
 							"'mainmap','".rand(1,10000000)."','".$node."','".$nodelist[$node]["links"][$i]."','000000','".rand(1,10)."'");
+					}
+				}
+
+				$cursorid = $totalLinks - $linkCount + 1;
+				foreach($nodelist as $node2 => $values) {
+					if($node == $node2 || in_array($node2,$nodelist[$node]["links"]))
+						continue;
+					if(in_array($node,$values["links"])) {
+						$dist = 10*$totalLinks+$size;
+						if(count($nodelist[$node2]["links"]) < 2)
+							$dist = round($dist/4);
+						$pX2 = round($pX + $dist * cos(2*($totalLinks-$cursorid)*pi()/$totalLinks));
+						$pY2 = round($pY + $dist * sin(2*($totalLinks-$cursorid)*pi()/$totalLinks));
+						$this->placeNode($node2,$nodelist);
+						$cursorid--;
 					}
 				}
 			}
@@ -209,7 +237,7 @@
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
-				case 1: return $this->$this->showNodeForm();
+				case 1: return $this->showNodeForm();
 				case 2: return $this->showEdgeForm();
 				case 3: return $this->showImportForm();
 				default: return;
@@ -350,17 +378,27 @@
 					FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_nodes");
 					FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_edges");
 					$nodelist = array(
-				"ttot" => array("label" => "ttot", "links" => array("test2","test3","test4","test5","test6","test7","test8","test9","test10"), "placed" => false),
-				"test2" => array("label" => "test2", "links" => array("ttot","test3"), "placed" => false),
+				"ttot" => array("label" => "ttot", "links" => array("esx1","test2","test3","test4","test5","test6","test7","test8","test9","test10"), "placed" => false),
+				"test2" => array("label" => "test2", "links" => array("ttot","test3","esx2"), "placed" => false),
 				"test3" => array("label" => "test3", "links" => array("test2","ttot","test4"), "placed" => false),
 				"test4" => array("label" => "test4", "links" => array("ttot","test3","test6"), "placed" => false),
 				"test5" => array("label" => "test5", "links" => array("ttot","test3","test6"), "placed" => false),
+				"vm1" => array("label" => "vm".$i, "links" => array(), "placed" => false),
 				"test6" => array("label" => "test6", "links" => array(), "placed" => false),
-				"test7" => array("label" => "test7", "links" => array(), "placed" => false),
+				"test7" => array("label" => "test7", "links" => array("test11"), "placed" => false),
 				"test8" => array("label" => "test8", "links" => array(), "placed" => false),
 				"test10" => array("label" => "test10", "links" => array(), "placed" => false),
+				"test11" => array("label" => "test11", "links" => array("test2","test7","test9"), "placed" => false),
+				"test12" => array("label" => "test12", "links" => array("test3","test10","test11"), "placed" => false),
+				"esx1" => array("label" => "esx1", "links" => array("vm1","vm2","vm3","vm4","vm5","vm6","vm7","vm8","vm9","vm10","vm11","vm12","vm13"), "placed" => false),
+				"esx2" => array("label" => "esx2", "links" => array("2vm1","2vm2","2vm3","2vm4","2vm5","2vm6","2vm7"), "placed" => false),
 				"test9" => array("label" => "test9", "links" => array(), "placed" => false)
 					);
+					for($i=2;$i<=13;$i++)
+						$nodelist["vm".$i] = array("label" => "vm".$i, "links" => array(), "placed" => false);
+					for($i=1;$i<=7;$i++)
+						$nodelist["2vm".$i] = array("label" => "2vm".$i, "links" => array(), "placed" => false);
+
 					$this->ImportNodes($nodelist);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
