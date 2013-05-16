@@ -265,10 +265,6 @@ th:last-child {
 th a { color: #444; }
 th a:hover { color: #333; }
 
-tr:hover td {
-	background-color: #CCE;
-}
-
 td {
 	background-color: #EEE;
 	border: 1px solid #CCC;
@@ -276,9 +272,9 @@ td {
 	opacity: 0.7;
 }
 
-td:hover {
-	background-color: #CCE;
-}
+tr:hover td, td:hover { background-color: #CCE; }
+
+#hr { color:#999; border-top: 1px solid rgb(210,210,210); padding-bottom: 8px; margin-top: 8px;} 
 
 /* Sort tables */
 thead:hover { cursor: pointer; }
@@ -487,7 +483,10 @@ label { float: left; font-weight: bold; text-align: left; }
 	color: #DDD;
 }
 
-#searchres { text-align:left; display:inline-block; }
+#searchres { text-align:left; display:inline-block; margin: 15px; margin-left: 10px; background-color: rgba(255,255,255,0.8); border-radius: 4px;
+ padding: 27px; padding-top: 15px; width: 400px;
+ border-style: solid; border-color: #D8D8D8; border-width: 1px 1px 2px; }
+#searchres h3 { padding-left: 15px; }
 #searchres li { margin-bottom: 10px; }
 #searchres li:hover { background-color: rgba(245, 235, 235, 0.94); }
 

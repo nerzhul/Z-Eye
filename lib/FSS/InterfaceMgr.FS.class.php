@@ -186,6 +186,8 @@
 			return "<h4>".($raw ? $str : $this->getLocale($str))."</h4>";
 		}
 
+		public function hr() { return "<div id=\"hr\"></div>"; }
+
 		public function js($js) {
 			if(!isset($this->js_buffer[$this->js_buffer_idx])) $this->js_buffer[$this->js_buffer_idx] = "";
 			$this->js_buffer[$this->js_buffer_idx] .= $js;
