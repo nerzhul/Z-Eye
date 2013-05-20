@@ -207,7 +207,7 @@
 			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
 		}
 
-		private function tooltip($text) {
+		public function tooltip($text) {
 			$output = "onmouseover=\"showTooltip('".addslashes($this->getLocale($text))."');\" ";
 			$output .= "onmouseout=\"hideTooltip();\" ";
 			return $output;

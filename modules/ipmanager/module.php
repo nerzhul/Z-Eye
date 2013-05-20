@@ -349,7 +349,8 @@
 
 		private function showDeclaredNetTableHead() {
 			return "<table id=\"declsubnettable\"><thead id=\"declsubnethead\"><tr><th>".$this->loc->s("netid")."/".$this->loc->s("netmask")."</th><th>".
-				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th><th></th></tr></thead>";
+				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th>
+				<th>".$this->loc->s("dhcp-clusters")."</th><th></th></tr></thead>";
 		}
 
 		private function tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid) {
@@ -357,12 +358,26 @@
 			$net->SetNetAddr($netid);
 			$net->SetNetMask($netmask);
 			$net->CalcCIDR();
-			return "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
+			$output = "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
 				"/".$netmask." (/".$net->getCIDR().")</td><td>".$vlanid."</td><td>".
-				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>".
-				FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&netid=".$netid,array("js" => true, "confirm" =>
+				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>";
+			
+			$found = false;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found)
+					$found = true;
+				else
+					$output .= "<br />";
+				$output .= $data["clustername"];
+			}
+
+			if(!$found) $output .= $this->loc->s("None");
+
+			$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&netid=".$netid,array("js" => true, "confirm" =>
 				array($this->loc->s("confirm-remove-declared-subnet").$netid."' ?","Confirm","Cancel"))).
 				"</td></tr>";
+			return $output;
 		}
 
 		private function showDHCPSubnetForm($netid = "") {
@@ -381,8 +396,28 @@
 				FS::$iMgr->idxLine($this->loc->s("netmask"),"netmask",$netmask,array("length" => 16, "type" => "ip")).
 				FS::$iMgr->idxLine($this->loc->s("vlanid"),"vlanid",$vlanid,array("length" => 4, "type" => "num", "value" => $vlanid, "tooltip" => "tooltip-vlanid")).
 				FS::$iMgr->idxLine($this->loc->s("subnet-shortname"),"shortname",$shortname,array("length" => 32, "tooltip" => "tooltip-shortname")).
-				FS::$iMgr->idxLine($this->loc->s("subnet-desc"),"desc",$desc,array("length" => 128, "tooltip" => "tooltip-desc")).
-				FS::$iMgr->tableSubmit("Save");
+				FS::$iMgr->idxLine($this->loc->s("subnet-desc"),"desc",$desc,array("length" => 128, "tooltip" => "tooltip-desc"));
+
+			// Clusters associated to subnet (if there is clusters)
+			$clusters = array();
+			if($netid) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
+				while($data = FS::$dbMgr->Fetch($query)) {
+					array_push($clusters,$data["clustername"]);
+				}
+			}
+
+			$found = false;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","",array("order" => "clustername"));
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) {
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>".$this->loc->s("dhcp-cluster")."</td><td>".FS::$iMgr->select("subnetclusters","",NULL,true);
+				}
+				$output .= FS::$iMgr->selElmt($data["clustername"],$data["clustername"],in_array($data["clustername"],$clusters));
+			}
+			if($found) $output .= "</select></td></tr>";
+
+			$output .= FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 
@@ -509,10 +544,18 @@
 		}
 
 		private function showDHCPClusterTableEntry($clustername,$members) {
-			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv(6,$clustername,array("lnkadd" => "name=".$clustername))."</td><td><ul>";
-			for($i=0;$i<count($members);$i++)
-				$output .= "<li>".$members[$i]."</li>";
-			$output .= "</ul></td><td>".
+			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv(6,$clustername,array("lnkadd" => "name=".$clustername))."</td><td>";
+
+			$found = false;
+			for($i=0;$i<count($members);$i++) {
+				if(!$found)
+					$found = true;
+				else
+					$output .= "<br />";
+				$output .= $members[$i];
+			}
+
+			$output .= "</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=10&cluster=".$clustername,array("js" => true, "confirm" =>
 				array($this->loc->s("confirm-remove-cluster").$clustername."' ?","Confirm","Cancel"))).
 				"</td></tr>";
@@ -932,10 +975,12 @@
 					$vlanid = FS::$secMgr->checkAndSecurisePostData("vlanid");
 					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 					$shortname = FS::$secMgr->checkAndSecurisePostData("shortname");
+					$subnetclusters = FS::$secMgr->checkAndSecurisePostData("subnetclusters");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$netid || !FS::$secMgr->isIP($netid) || !$netmask || !FS::$secMgr->isMaskAddr($netmask) || !$vlanid || !FS::$secMgr->isNumeric($vlanid) ||
-						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $edit && $edit != 1) {
+						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $subnetclusters && !is_array($subnetclusters) 
+						|| $edit && $edit != 1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas entered when adding Declared subnet");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
@@ -959,12 +1004,32 @@
 						FS::$iMgr->ajaxEcho("err-vlan-already-used");
 						return;
 					}
+
+					if($subnetclusters) {
+						for($i=0;$i<count($subnetclusters);$i++) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$subnetclusters[$i]."'")) {
+								FS::$iMgr->ajaxEcho("err-cluster-not-exists");
+								return;
+							}
+						}
+					}
 					
 
 					FS::$dbMgr->BeginTr();
-					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
+					if($edit) {
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
+					}
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc","'".$netid."','".$netmask.
 						"','".$vlanid."','".$shortname."','".$desc."'");
+
+					if($subnetclusters) {
+						for($i=0;$i<count($subnetclusters);$i++) {
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername,subnet","'".$subnetclusters[$i]."','".$netid."'");
+						}
+					}
+
+					FS::$dbMgr->CommitTr();
 
 					$js = "";
 					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid");
@@ -979,7 +1044,6 @@
 					$js .= "$('".addslashes($jscontent)."').insertAfter('#declsubnethead');";
 					if($edit) $js .= "},1200);";
 
-					FS::$dbMgr->CommitTr();
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Remove DHCP subnet
@@ -991,7 +1055,10 @@
 						return;
 					}
 					
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
+					FS::$dbMgr->CommitTr();
 
 					$js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr');";
 					
