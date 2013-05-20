@@ -159,6 +159,7 @@
 		}
 
 		public function removeIcon($link,$options=array()) { return $this->linkIcon($link,"cross",$options); }
+		public function searchIcon($search) { return $this->linkIcon("mod=".$this->getModuleIdByPath("search")."&s=".$search,"search"); }
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}
 		private $showRetMenu;

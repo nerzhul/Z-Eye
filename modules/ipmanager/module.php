@@ -185,7 +185,7 @@
 			$distrib = 0;
 			$fixedip = 0;
 
-			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th>".$this->loc->s("Status")."</th>
+			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th></th><th>".$this->loc->s("Status")."</th>
 				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
 			if($swfound)
 				$output .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
@@ -234,10 +234,10 @@
 						}
 						break;
 				}
-				$output .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">";
-				$output .= long2ip($key)."</a>";
-				$output .= "</td><td>".$rstate."</td><td>";
-				$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
+				$output .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">".
+					long2ip($key)."</a></td><td>".FS::$iMgr->searchIcon(long2ip($key)).
+					"</td><td>".$rstate."</td><td>".
+					"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
 				$output .= $value["host"]."</td><td>";
 				// Show switch column only of a switch is here
 				if($swfound) {
