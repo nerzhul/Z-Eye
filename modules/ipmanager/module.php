@@ -451,13 +451,27 @@
 		}
 
 		private function showDHCPSrvList() {
-			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("ssh-user")."</th><th></th></tr>";
+			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("ssh-user")."</th>
+				<th>".$this->loc->s("member-of")."<th></th></tr>";
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["alias"]."</td><td>".$data["description"]."</td><td>".
-					$data["sshuser"]."</td><td>".
-					FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
+					$data["sshuser"]."</td><td>";
+
+				$found = false;
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","dhcpaddr = '".$data["addr"]."'");
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
+					if(!$found)
+						$found = true;
+					else
+						$output .= "<br />";
+					$output .= $data2["clustername"];
+				}
+
+				if(!$found) $output .= $this->loc->s("None");
+				
+				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
 					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
 					"</td></tr>";
 			}
