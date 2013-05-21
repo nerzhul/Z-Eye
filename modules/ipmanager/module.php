@@ -1293,6 +1293,14 @@
 						}
 					}
 
+					if($hostname) {
+						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_ip","ip","hostname = '".$hostname."' AND ip != '".$ip."'");
+						if($exist) {
+							FS::$iMgr->ajaxEcho("err-hostname-already-defined");
+							return;
+						}
+					}
+
 					// change comment form
 					if($comment) {
 						$comment = preg_replace("#[\n\r]+#","\r",$comment);
