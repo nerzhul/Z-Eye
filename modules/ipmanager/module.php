@@ -142,6 +142,8 @@
 			while($data2 = FS::$dbMgr->Fetch($query2))
 				$switchlist[$data2["ip"]] = $data2["name"];
 
+			// for Z-Eye ipmanager request. Not the better idea, i think 
+			$iplist = "";
 			// Initiate network IPs
 			$lastip = $netobj->getLastUsableIPLong();
 			for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
@@ -149,10 +151,15 @@
 				$iparray[$i]["mac"] = "";
 				$iparray[$i]["host"] = "";
 				$iparray[$i]["ltime"] = "";
+				// 0: unk/free, 1: free, 2: used, 3: reserved (cache), 4: distributed, 5: reserved (Z-Eye)
 				$iparray[$i]["distrib"] = 0;
 				$iparray[$i]["servers"] = array();
 				$iparray[$i]["switch"] = "";
 				$iparray[$i]["port"] = "";
+				$iparray[$i]["comment"] = "";
+	
+				if($iplist != "") $iplist .= ",";
+				$iplist .= "'".long2ip($i)."'";
 			}
 
 			// Fetch datas
@@ -179,6 +186,28 @@
 
 			}
 
+			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv","ip IN (".$iplist.")");
+			while($data2 = FS::$dbMgr->Fetch($query2)) {
+				$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
+				$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
+				$iparray[ip2long($data2["ip"])]["comment"] = preg_replace("#[\r\n]#","<br />",$data2["comment"]);
+				$iparray[ip2long($data2["ip"])]["distrib"] = ($data2["reserv"] == 't' ? 5 : $iparray[ip2long($data2["ip"])]["distrib"]);
+
+				// search only if we haven't search on the previous loop
+				if($iparray[ip2long($data2["ip"])]["switch"] == "") {
+					// if there is a MAC address only
+					if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
+						$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+						$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+						if($sw && $port) {
+							$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
+							$iparray[ip2long($data2["ip"])]["port"] = $port;
+							$swfound = true;
+						}
+					}
+				}
+			}
+
 			$used = 0;
 			$reserv = 0;
 			$free = 0;
@@ -186,7 +215,7 @@
 			$fixedip = 0;
 
 			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th></th><th>".$this->loc->s("Status")."</th>
-				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>";
+				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>".$this->loc->s("Comment")."</th><th>";
 			if($swfound)
 				$output .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
 			$output .= "Fin du bail</th><th>Serveurs</th></tr></thead>";
@@ -215,6 +244,11 @@
 						$style = "background-color: #BFFBFF;";
 						$distrib++;
 						break;
+					case 5:
+						$rstate = $this->loc->s("Reserved-by-ipmanager");
+						$style = "background-color: #FFFF80;";
+						$reserv++;
+						break;
 					default: {
 							$rstate = $this->loc->s("Free");
 							$style = "background-color: #BFFFBF;";
@@ -234,17 +268,17 @@
 						}
 						break;
 				}
-				$output .= "<tr style=\"$style\"><td>".FS::$iMgr->opendiv(7,long2ip($key),array("lnkadd" => "ip=".long2ip($key))).
+				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\"><td>".FS::$iMgr->opendiv(7,long2ip($key),array("lnkadd" => "ip=".long2ip($key))).
 					"</td><td>".FS::$iMgr->searchIcon(long2ip($key)).
 					"</td><td>".$rstate."</td><td>".
 					"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
-				$output .= $value["host"]."</td><td>";
+				$output .= $value["host"]."</td><td>".$value["comment"]."</td><td>";
 				// Show switch column only of a switch is here
 				if($swfound) {
-					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "");
-					$output .= "</td><td>";
-					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "");
-					$output .= "</td><td>";
+					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "").
+						"</td><td>";
+					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "").
+						"</td><td>";
 				}
 				$output .= $value["ltime"]."</td><td>";
 				$count = count($value["servers"]);
@@ -577,20 +611,22 @@
 		}
 
 		private function showIPForm($ip = "") {
-			$mac = ""; $hostname = ""; $reserv = false;
+			$mac = ""; $hostname = ""; $comment = ""; $reserv = false;
 			if($ip) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname","ip = '".$ip."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment,reserv","ip = '".$ip."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
-					$mac = $data["madaddr"];
+					$mac = $data["macaddr"];
 					$hostname = $data["hostname"];
+					$comment = $data["comment"];
 					$reserv = $data["reserv"] == 't';
 				}
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=11")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("IP-Addr"),"ip",$ip,array("type" => "idxedit", "edit" => $ip != "")).
-				FS::$iMgr->idxLine($this->loc->s("Reserv"),"reserv",$reserv,array("type" => "chk", "value" => $reserv, "tooltip" => "tooltip-ip-reserv")).
-				FS::$iMgr->idxLine($this->loc->s("MAC-Addr"),"mac",$mac,array("value" => $mac)).
+				FS::$iMgr->idxLine($this->loc->s("Reserv"),"reserv",$reserv,array("type" => "chk", "tooltip" => "tooltip-ip-reserv")).
+				FS::$iMgr->idxLine($this->loc->s("MAC-Addr"),"mac",$mac).
 				FS::$iMgr->idxLine($this->loc->s("Hostname"),"hostname",$hostname,array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")).
+				FS::$iMgr->idxLine($this->loc->s("Comment"),"comment","",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment")).
 				FS::$iMgr->tableSubmit("Save");
 
 			return $output;
@@ -1208,13 +1244,73 @@
 					$ip = FS::$secMgr->checkAndSecurisePostData("ip");
 					$mac = FS::$secMgr->checkAndSecurisePostData("mac");
 					$hostname = FS::$secMgr->checkAndSecurisePostData("hostname");
+					$reserv = FS::$secMgr->checkAndSecurisePostData("reserv");
+					$comment = FS::$secMgr->checkAndSecurisePostData("comment");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
-					if(!$ip || !FS::$secMgr->isIP($ip) || !$mac || !FS::$secMgr->isMacAddr($mac) || !$hostname || !FS::$secMgr->isHostname($hostname) ||
-						$edit && $edit != 1) {
+					if(!$ip || !FS::$secMgr->isIP($ip) || $mac && !FS::$secMgr->isMacAddr($mac) || $hostname && !FS::$secMgr->isHostname($hostname) ||
+						$reserv && $reserv != "on" || $comment && strlen($comment) > 500 || $edit && $edit != 1) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
+
+					// Reservations needs MAC & hostname
+					if($reserv == "on" && (!$mac || !$hostname)) {
+						FS::$iMgr->ajaxEcho("err-reserv-need-fields");
+						return;
+					}
+
+					// Check if modified IP is in a declared subnet
+					$found = false;
+					$netinfos = array();
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
+					while(($data = FS::$dbMgr->Fetch($query)) && $found == false) {
+						$netobj = new FSNetwork();
+						$netobj->setNetAddr($data["netid"]);
+						$netobj->setNetMask($data["netmask"]);
+						if($netobj->isUsableIP($ip)) {
+							$found = true;
+							$netinfos = array($data["netid"],$data["netmask"]);
+						}
+					}
+					
+					if(!$found) {
+						FS::$iMgr->ajaxEcho("err-ip-not-in-declared-subnets");
+						return;
+					}
+
+					if($mac) {
+						// Check if MAC addr is not registered on another IP in the same subnet
+						$netobj = new FSNetwork();
+						$netobj->setNetAddr($netinfos[0]);
+						$netobj->setNetMask($netinfos[1]);
+						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
+						while($data = FS::$dbMgr->Fetch($query)) {
+							if($netobj->isUsableIP($data["ip"])) {
+								FS::$iMgr->ajaxEcho("err-mac-already-used-in-subnet");
+								return;
+							}
+						}
+					}
+
+					// change comment form
+					if($comment) {
+						$comment = preg_replace("#[\n\r]+#","\r",$comment);
+					}
+						
+					FS::$dbMgr->BeginTr();
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip","ip = '".$ip."'");
+					if($mac || $hostname || $comment || $reserv) {
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv","'".$ip."','".$mac."','".$hostname."','".
+							$comment."','".($reserv ? 't':'f')."'");
+					}
+					FS::$dbMgr->CommitTr();
+
+					// Maybe replace only the concerned tr and also the graph ? 
+					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
+					FS::$iMgr->ajaxEcho("Done",$js);
+
+					return;
 			}
 		}
 	};

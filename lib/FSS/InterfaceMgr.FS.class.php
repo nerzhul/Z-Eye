@@ -219,6 +219,7 @@
 			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".(isset($options["width"]) ? $options["width"] : 400).
 				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\" ";
 			if(isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
+			if(isset($options["length"])) $output .= " maxlength=\"".$options["length"]."\"";
 			$output .= ">".$def_value."</textarea>";
 			return $output;
 		}
@@ -424,6 +425,7 @@
 					case "num": $output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options); break;
 					case "pwd": $output .= $this->password($name,$def_value); break;
 					case "color": $output .= $this->colorInput($name,$def_value); break;
+					case "area": $output .= $this->textarea($name, (isset($options["value"]) ? $options["value"] : ""), $options); break;
 					default: break;
 				}
 			}
