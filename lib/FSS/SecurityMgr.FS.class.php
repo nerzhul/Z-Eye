@@ -82,7 +82,7 @@
 		}
 
 		public function hasJS($str) {
-			if(preg_match("#<script>#",$str))
+			if(preg_match("#<(.*)script(.*)>#",$str))
 				return true;
 			else
 				return false;
@@ -239,10 +239,10 @@
 			if(is_array($data_new)) {
 				$count = count($data_new);
 				for($i=0;$i<$count;$i++)
-					$this->SecuriseStringForDB($data_new[$i]);
+					$this->SecuriseString($data_new[$i]);
 			}
 			else
-				$this->SecuriseStringForDB($data_new);
+				$this->SecuriseString($data_new);
 			return $data_new;
 
 		}
@@ -252,10 +252,10 @@
 			if(is_array($data_new)) {
 				$count = count($data_new);
 				for($i=0;$i<$count;$i++)
-					$this->SecuriseStringForDB($data_new[$i]);
+					$this->SecuriseString($data_new[$i]);
 			}
 			else
-				$this->SecuriseStringForDB($data_new);
+				$this->SecuriseString($data_new);
 			return $data_new;
 
 		}
@@ -300,7 +300,7 @@
 			return NULL;
 		}
 
-		public function SecuriseStringForDB(&$str) {
+		public function SecuriseString(&$str) {
 			$str = pg_escape_string($str);
 			if($this->hasJS($str))
 				$str = "";
