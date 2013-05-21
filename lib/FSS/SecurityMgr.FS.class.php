@@ -58,6 +58,22 @@
 			return preg_match('#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#',$str) == true;
 		}
 
+		public function isHostname($str) {
+			// hostname cannot start with - or numeric
+			if(preg_match("#^[0-9-]#",$str))
+				return false;
+
+			// hostname cannot finish with - or has to - consecutive
+			if(preg_match("#[-]$#",$str) || preg_match("#[-]{2,}#",$str))
+				return false;
+
+			// hostname contain only letters, numerics and dashes
+			if(preg_match("#^[a-zA-Z]([a-zA-Z0-9-])+$#",$str))
+				return true;	
+
+			return false;
+		}
+
 		public function isPath($str) {
 			if($str == "/" || preg_match("#^(/(?:(?:(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*)(?:/(?:(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*))*))$#",$str))
 				return true;

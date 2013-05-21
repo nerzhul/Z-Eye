@@ -234,8 +234,8 @@
 						}
 						break;
 				}
-				$output .= "<tr style=\"$style\"><td><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".long2ip($key)."\">".
-					long2ip($key)."</a></td><td>".FS::$iMgr->searchIcon(long2ip($key)).
+				$output .= "<tr style=\"$style\"><td>".FS::$iMgr->opendiv(7,long2ip($key),array("lnkadd" => "ip=".long2ip($key))).
+					"</td><td>".FS::$iMgr->searchIcon(long2ip($key)).
 					"</td><td>".$rstate."</td><td>".
 					"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
 				$output .= $value["host"]."</td><td>";
@@ -576,6 +576,26 @@
 			return $output;
 		}
 
+		private function showIPForm($ip = "") {
+			$mac = ""; $hostname = ""; $reserv = false;
+			if($ip) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname","ip = '".$ip."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$mac = $data["madaddr"];
+					$hostname = $data["hostname"];
+					$reserv = $data["reserv"] == 't';
+				}
+			}
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=11")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("IP-Addr"),"ip",$ip,array("type" => "idxedit", "edit" => $ip != "")).
+				FS::$iMgr->idxLine($this->loc->s("Reserv"),"reserv",$reserv,array("type" => "chk", "value" => $reserv, "tooltip" => "tooltip-ip-reserv")).
+				FS::$iMgr->idxLine($this->loc->s("MAC-Addr"),"mac",$mac,array("value" => $mac)).
+				FS::$iMgr->idxLine($this->loc->s("Hostname"),"hostname",$hostname,array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")).
+				FS::$iMgr->tableSubmit("Save");
+
+			return $output;
+		}
+
 		private function showHistory($filter,$interval = 1) {
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
 			$results = array();
@@ -712,6 +732,12 @@
 						return $this->loc->s("err-bad-datas");
 
 					return $this->showDHCPClusterForm($name);
+				case 7:
+					$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
+					if(!$ip || !FS::$secMgr->isIP($ip))
+						return $this->loc->s("err-bad-datas");
+
+					return $this->showIPForm($ip);
 				default: return;
 			}
 		}
@@ -1172,6 +1198,23 @@
 
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
+				// Add/Edit IP informations
+				case 11:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_ipmgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
+					$ip = FS::$secMgr->checkAndSecurisePostData("ip");
+					$mac = FS::$secMgr->checkAndSecurisePostData("mac");
+					$hostname = FS::$secMgr->checkAndSecurisePostData("hostname");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
+					if(!$ip || !FS::$secMgr->isIP($ip) || !$mac || !FS::$secMgr->isMacAddr($mac) || !$hostname || !FS::$secMgr->isHostname($hostname) ||
+						$edit && $edit != 1) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
 			}
 		}
 	};
