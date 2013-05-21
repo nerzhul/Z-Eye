@@ -24,9 +24,8 @@
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-conn"));
 			$output = "";
-			$err = FS::$secMgr->checkGetData("err");
+			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			if($err) {
-				FS::$secMgr->SecuriseStringForDB($err);
 				switch($err) {
 					case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-user")); break;
 					default: $output .= FS::$iMgr->printError($this->loc->s("err-unk"));	break;

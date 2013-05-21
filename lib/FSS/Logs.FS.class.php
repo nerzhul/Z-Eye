@@ -41,8 +41,8 @@
 
 		// Insert function
 		public static function i($user,$module,$level,$str) {
-			FS::$secMgr->SecuriseStringForDB($str);
-			FS::$secMgr->SecuriseStringForDB($module);
+			FS::$secMgr->SecuriseString($str);
+			FS::$secMgr->SecuriseString($module);
 			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."logs","date,module,level,_user,txt","NOW(),'".$module."','".$level."','".$user."','".$str."'");
 		}
 	};	
