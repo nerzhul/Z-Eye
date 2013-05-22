@@ -25,6 +25,13 @@ import sys,re
 import Logger
 import netdiscoCfg
 
+"""
+* Version nomenclature for DB is:
+* <Z-Eye version><db minor version>
+* Z-Eye version: the current Z-Eye major version except the dot
+* db minor version: a incremental number from 00 to 99 defined by -current modification for next Z-Eye series 
+"""
+
 class ZEyeDBUpgrade():
 	dbVersion = 0
 	nextDBVersion = 1200 
@@ -32,6 +39,7 @@ class ZEyeDBUpgrade():
 
 	def checkAndDoUpgrade(self):
 		self.dbVersion = self.getDBVersion()
+		# if this version is minor than service, we must upgrade
 		if self.dbVersion < self.nextDBVersion:
 			self.doUpgrade()
 
@@ -40,6 +48,7 @@ class ZEyeDBUpgrade():
 
 	def do12Upgrade(self):
 		try:
+			# Special: version 1 is a inited database number
 			if self.dbVersion == 1:
 				self.tryCreateTable("z_eye_dhcp_cluster","clustername varchar(64), dhcpaddr varchar(128), primary key (clustername,dhcpaddr)")
 				self.tryCreateTable("z_eye_dhcp_subnet_v4_declared","netid varchar(16), netmask varchar(16), vlanid int unique, subnet_short_name varchar(32), subnet_desc varchar(128), primary key (netid, netmask)")
@@ -58,9 +67,12 @@ class ZEyeDBUpgrade():
 	def doUpgrade(self):
 		print "DB Upgrade needed, we perform this upgrade for you..."
 		Logger.ZEyeLogger().write("DBUpgrade is needed. Starting...")
+
+		# here: the upgrading process hasn't been done
 		if self.dbVersion == 0:
 			self.initDBVersionTable()
 
+		# Upgrades for Z-Eye 1.2 series 
 		if self.dbVersion <= 1299:
 			self.do12Upgrade()
 
@@ -73,6 +85,7 @@ class ZEyeDBUpgrade():
 			pgcursor.execute("ALTER TABLE %s ADD COLUMN %s %s" % (tablename,columnname,attributes))
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
+			# If column exists, maybe the database is already up-to-date
 			if re.search("column \"%s\" of relation \"%s\" already exists" % (columnname,tablename),"%s" % e):	
 				return
 
@@ -89,6 +102,7 @@ class ZEyeDBUpgrade():
 			pgcursor.execute("grant all on %s to netdisco")
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
+			# If table exists, maybe the database is up-to-date
 			if re.search("relation \"%s\" already exists" % tablename,"%s" % e):	
 				return
 

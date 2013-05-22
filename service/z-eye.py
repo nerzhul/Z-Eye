@@ -54,9 +54,10 @@ if __name__ == "__main__":
         daemon = ZEyeDaemon("/var/run/z-eye.pid")
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
+			print "Z-Eye daemon pre-start checks..."
+			DatabaseUpgrader.ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Starting Z-Eye daemon"
 			Logger.ZEyeLogger().write("Starting Z-Eye daemon")
-			DatabaseUpgrader.ZEyeDBUpgrade().checkAndDoUpgrade()
                         daemon.start()
                 elif 'stop' == sys.argv[1]:
 			print "Stopping Z-Eye daemon"
