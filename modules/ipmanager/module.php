@@ -605,7 +605,7 @@
 
 			$output .= "</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=10&cluster=".$clustername,array("js" => true, "confirm" =>
-				array($this->loc->s("confirm-remove-cluster").$clustername."' ?","Confirm","Cancel"))).
+				array($this->loc->s("confirm-remove-cluster").$clustername."' ?<br />".$this->loc->s("confirm-remove-cluster2"),"Confirm","Cancel"))).
 				"</td></tr>";
 			return $output;
 		}
@@ -1223,7 +1223,10 @@
 						return;
 					}
 
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername = '".$cname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername = '".$cname."'");
+					FS::$dbMgr->CommitTr();
 
 					$js = "";
 					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername");
