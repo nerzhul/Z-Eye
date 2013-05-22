@@ -30,6 +30,7 @@ import PeriodicCmd
 import PortIDCacher
 import SwitchesBackup
 import serviceManager
+import DatabaseUpgrader
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
@@ -55,6 +56,7 @@ if __name__ == "__main__":
                 if 'start' == sys.argv[1]:
 			print "Starting Z-Eye daemon"
 			Logger.ZEyeLogger().write("Starting Z-Eye daemon")
+			DatabaseUpgrader.ZEyeDBUpgrade().checkAndDoUpgrade()
                         daemon.start()
                 elif 'stop' == sys.argv[1]:
 			print "Stopping Z-Eye daemon"
