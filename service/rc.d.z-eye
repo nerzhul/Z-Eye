@@ -16,9 +16,14 @@ load_rc_config $name
 
 : ${z_eye_enable="NO"}
 
+extra_commands="updatedb"
+
 start_cmd=${name}_start
 stop_cmd=${name}_stop
 restart_cmd=${name}_restart
+updatedb_cmd=${name}_updatedb
+
+
 
 command="/usr/local/www/z-eye/service/z-eye.py"
 #command_interpreter="/usr/local/bin/python2.7"
@@ -33,6 +38,10 @@ z_eye_stop() {
 
 z_eye_restart() {
 	$command restart
+}
+
+z_eye_updatedb() {
+	$command updatedb
 }
 
 run_rc_command "$1"

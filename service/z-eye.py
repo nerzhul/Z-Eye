@@ -66,6 +66,10 @@ if __name__ == "__main__":
                 elif 'restart' == sys.argv[1]:
 			print "Restarting Z-Eye daemon"
                         daemon.restart()
+		elif 'updatedb' == sys.argv[1]:
+			print "Upgrading database if needed..."
+			DatabaseUpgrader.ZEyeDBUpgrade().checkAndDoUpgrade()
+			print "Done"
                 else:
 			print "Unknown arg"
 			usage()
