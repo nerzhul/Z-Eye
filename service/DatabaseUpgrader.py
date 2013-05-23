@@ -99,7 +99,7 @@ class ZEyeDBUpgrade():
 		try:
 			pgcursor = self.pgsqlCon.cursor()
 			pgcursor.execute("create table %s (%s)" % (tablename,attributes))
-			pgcursor.execute("grant all on %s to netdisco")
+			pgcursor.execute("grant all on %s to netdisco" % tablename)
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
 			# If table exists, maybe the database is up-to-date
