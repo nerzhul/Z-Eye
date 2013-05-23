@@ -99,7 +99,7 @@ h2 { background-color: #5e0000; margin-left: 5%; font-size: 17px; }
 #menuStack, #hstslide { display:inline-block; }
 
 div#menuStack div.menupopup { display: none; border-radius:0 0 2px 2px;}
-div#menuStack div.userpopup { left: 10px; top: 40px; display: none; border-radius:0 0 2px 2px;}
+div#menuStack div.userpopup { left: 10px; top: 39px; display: none; border-radius:0 0 2px 2px;}
 div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:block; }
 div#menuStack div { font-size: 12px; }
 
