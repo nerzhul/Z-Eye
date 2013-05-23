@@ -56,6 +56,7 @@
 			$output = "<!DOCTYPE html>
 				<html lang=\"".Config::getSysLang()."\">
 				<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
+				<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />
 				<head>
 				<title>".Config::getWebsiteName().(strlen($this->title) > 0 ? " - ".$this->title : "")."</title>";
 				$count = count($this->arr_css);
