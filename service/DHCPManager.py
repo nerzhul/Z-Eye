@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
+# -*- Coding: utf-8 -*-
 """
-* Copyright (C) 2010-2012 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+* Copyright (C) 2010-2012 Loic BLOT, CNRS <http://www.unix-experience.fr/>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -21,6 +20,7 @@
 from pyPgSQL import PgSQL
 import datetime,re,sys,time,thread,threading,subprocess
 from threading import Lock
+from ipcalc import Network
 
 import Logger,netdiscoCfg
 from SSHBroker import ZEyeSSHBroker
@@ -30,6 +30,9 @@ class ZEyeDHCPManager(threading.Thread):
 	startTime = 0
 	threadCounter = 0
 	tc_mutex = Lock()
+	ipList = {}
+	subnetList = {}
+	clusterList = {}
 
 	def __init__(self):
 		""" 1 min between two DHCP updates """
@@ -67,9 +70,14 @@ class ZEyeDHCPManager(threading.Thread):
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT addr,sshuser,sshpwd,reservconfpath,subnetconfpath FROM z_eye_dhcp_servers")
 			pgres = pgcursor.fetchall()
-			for idx in pgres:
-				if len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
-					thread.start_new_thread(self.doConfigDHCP,(idx[0],idx[1],idx[2],idx[3],idx[4]))
+			if pgcursor.rowcount > 0:
+				# Buffer for better performances
+				self.loadIPList(pgcursor)
+				self.loadSubnetList(pgcursor)
+				self.loadClusterList(pgcursor)
+				for idx in pgres:
+					if len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
+						thread.start_new_thread(self.doConfigDHCP,(idx[0],idx[1],idx[2],idx[3],idx[4]))
 		except Exception, e:
 			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
 			sys.exit(1);	
@@ -89,26 +97,27 @@ class ZEyeDHCPManager(threading.Thread):
 
 	def doConfigDHCP(self,addr,user,pwd,reservpath,subnetpath):
 		self.incrThreadNb()
+
+		subnetBuf = ""
+		reservBuf = ""
 		try:
 			# One pgsql connection per thread
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT clustername FROM z_eye_dhcp_cluster WHERE dhcpaddr = '%s'" % addr)
+			pgres = pgcursor.fetchall()
 
 			# No cluster, then no action to do
 			if pgcursor.rowcount == 0:
 				self.decrThreadNb()
 				return
 
-			pgres = pgcursor.fetchall()
-
-			Logger.ZEyeLogger().write("DHCP Manager: sshconn to %s" % addr)
-
 			ssh = ZEyeSSHBroker(addr,user,pwd)
 			if ssh.connect() == False:
 				self.decrThreadNb()
 				return
 
+			# We get the remote OS for some commands
 			remoteOs = ssh.getRemoteOS()
 			if remoteOs != "Linux" and remoteOs != "FreeBSD" and remoteOs != "OpenBSD":
 				Logger.ZEyeLogger().write("DHCP Manager: %s OS (on %s) is not supported" % (remoteOs,addr))
@@ -121,6 +130,7 @@ class ZEyeDHCPManager(threading.Thread):
 			elif remoteOs == "FreeBSD" or remoteOs == "OpenBSD":
 				hashCmd = "md5 -q"
 		
+			# We test file existence. If they doesn't exist, we create it. If creation failed, the DHCP manager cannot use this server
 			if ssh.isRemoteExists(reservpath) == False:
 				ssh.sendCmd("touch %s" % reservpath)
 
@@ -144,11 +154,49 @@ class ZEyeDHCPManager(threading.Thread):
 				Logger.ZEyeLogger().write("DHCP Manager: %s (on %s) is not writable" % ("/tmp/dhcprestart",addr))
 				self.decrThreadNb()
 				return
-		
 			
+			for idx in pgres:
+				if idx[0] in self.clusterList:
+					for subnet in self.clusterList[idx[0]]:
+						netmask = self.subnetList[subnet]
+						subnetBuf += "subnet %s netmask %s { }" % (subnet,netmask)
+						for ip in self.ipList:
+							# If ip in subnet
+							if ip in Network("%s/%s" % (subnet,netmask)):
+								reservBuf += "hostname %s { hardware ethernet %s; fixed-address %s; };\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
+	
+			
+			Logger.ZEyeLogger().write("DHCP Manager debug:\n%s\n%s" % (reservBuf,subnetBuf))
 			ssh.close()
-			
 		except Exception, e:
 			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
 
 		self.decrThreadNb()
+
+	def loadIPList(self,pgcursor):
+		self.ipList = {}
+		pgcursor.execute("SELECT ip,macaddr,hostname FROM z_eye_dhcp_ip WHERE reserv = 't'")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			# We need hostname and mac addr for a reservation
+			if len(idx[1]) > 0 and len(idx[2]) > 0:	
+				self.ipList[idx[0]] = (idx[1],idx[2])
+
+	def loadClusterList(self,pgcursor):
+		self.clusterList = {}
+		pgcursor.execute("SELECT clustername,subnet FROM z_eye_dhcp_subnet_cluster")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] not in self.clusterList:
+				self.clusterList[idx[0]] = []
+			if idx[1] not in self.clusterList[idx[0]]:
+				self.clusterList[idx[0]].append(idx[1])
+
+	def loadSubnetList(self,pgcursor):
+		self.subnetList = {}
+		# We only load netid attached to clusters
+		pgcursor.execute("SELECT netid,netmask FROM z_eye_dhcp_subnet_v4_declared WHERE netid in (SELECT subnet FROM z_eye_dhcp_subnet_cluster)")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			self.subnetList[idx[0]] = idx[1]
+
