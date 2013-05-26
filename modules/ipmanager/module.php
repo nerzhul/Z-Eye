@@ -416,13 +416,18 @@
 
 		private function showDHCPSubnetForm($netid = "") {
 			$netmask = ""; $vlanid = 0; $shortname = ""; $desc = "";
+			$router = ""; $domainname = ""; $dns1 = ""; $dns2 = "";
 			if($netid) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask,vlanid,subnet_desc,subnet_short_name","netid = '".$netid."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask,vlanid,subnet_desc,subnet_short_name,router,dns1,dns2,domainname","netid = '".$netid."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$netmask = $data["netmask"];
 					$vlanid = $data["vlanid"];
 					$shortname = $data["subnet_short_name"];
 					$desc = $data["subnet_desc"];
+					$router = $data["router"];
+					$dns1 = $data["dns1"];
+					$dns2 = $data["dns2"];
+					$domainname = $data["domainname"];
 				}
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7")."<table>".
@@ -450,6 +455,11 @@
 				$output .= FS::$iMgr->selElmt($data["clustername"],$data["clustername"],in_array($data["clustername"],$clusters));
 			}
 			if($found) $output .= "</select></td></tr>";
+
+			$output .= FS::$iMgr->idxLine($this->loc->s("router"),"router",$router,array("length" => 16, "type" => "ip", "tooltip" => "tooltip-router")).
+				FS::$iMgr->idxLine($this->loc->s("domain-name"),"domainname",$domainname,array("length" => 120, "tooltip" => "tooltip-domainname")).
+				FS::$iMgr->idxLine($this->loc->s("DNS")." 1","dns1",$dns1,array("length" => 16, "type" => "ip")).
+				FS::$iMgr->idxLine($this->loc->s("DNS")." 2","dns2",$dns2,array("length" => 16, "type" => "ip"));
 
 			$output .= FS::$iMgr->tableSubmit("Save");
 			return $output;
@@ -1052,11 +1062,17 @@
 					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 					$shortname = FS::$secMgr->checkAndSecurisePostData("shortname");
 					$subnetclusters = FS::$secMgr->checkAndSecurisePostData("subnetclusters");
+					$router = FS::$secMgr->checkAndSecurisePostData("router");
+					$dns1 = FS::$secMgr->checkAndSecurisePostData("dns1");
+					$dns2 = FS::$secMgr->checkAndSecurisePostData("dns2");
+					$domainname = FS::$secMgr->checkAndSecurisePostData("domainname");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$netid || !FS::$secMgr->isIP($netid) || !$netmask || !FS::$secMgr->isMaskAddr($netmask) || !$vlanid || !FS::$secMgr->isNumeric($vlanid) ||
-						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $subnetclusters && !is_array($subnetclusters) 
-						|| $edit && $edit != 1) {
+						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $subnetclusters && !is_array($subnetclusters) ||
+						$router && !FS::$secMgr->isIP($router) || $dns1 && !FS::$secMgr->isIP($dns1) || $dns2 && (!$dns1 || !FS::$secMgr->isIP($dns2)) ||
+						$domainname && !FS::$secMgr->isDNSName($domainname) ||
+						$edit && $edit != 1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas entered when adding Declared subnet");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
@@ -1072,6 +1088,16 @@
 					else {
 						if($exist) {
 							FS::$iMgr->ajaxEcho("err-subnet-already-exists");
+							return;
+						}
+					}
+
+					if($router) {
+						$netobj = new FSNetwork();
+						$netobj->setNetAddr($netid);
+						$netobj->setNetMask($netmask);
+						if(!$netobj->isUsableIP($router)) {
+							FS::$iMgr->ajaxEcho("err-router-not-in-subnet");
 							return;
 						}
 					}
@@ -1096,8 +1122,8 @@
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
 					}
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc","'".$netid."','".$netmask.
-						"','".$vlanid."','".$shortname."','".$desc."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname",
+						"'".$netid."','".$netmask."','".$vlanid."','".$shortname."','".$desc."','".$router."','".$dns1."','".$dns2."','".$domainname."'");
 
 					if($subnetclusters) {
 						for($i=0;$i<count($subnetclusters);$i++) {

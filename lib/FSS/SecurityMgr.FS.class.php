@@ -74,6 +74,21 @@
 			return false;
 		}
 
+		public function isDNSName($str) {
+			$spl = preg_split("#[.]#",$str);
+			$count = count($spl);
+
+			// a DNS name has 2 parts or more
+			if($count < 2)
+				return false;
+
+			// each part must be a hostname
+			for($i=0;$i<$count;$i++)
+				if(!$this->isHostname($spl[$i]))
+					return false;
+			return true;
+		}
+
 		public function isPath($str) {
 			if($str == "/" || preg_match("#^(/(?:(?:(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*)(?:/(?:(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*))*))$#",$str))
 				return true;
