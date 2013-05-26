@@ -33,8 +33,8 @@ import netdiscoCfg
 """
 
 class ZEyeDBUpgrade():
-	dbVersion = 0
-	nextDBVersion = 1200 
+	dbVersion = "0"
+	nextDBVersion = "1201"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -49,7 +49,7 @@ class ZEyeDBUpgrade():
 	def do12Upgrade(self):
 		try:
 			# Special: version 1 is a inited database number
-			if self.dbVersion == 1:
+			if self.dbVersion == "1":
 				self.tryCreateTable("z_eye_dhcp_cluster","clustername varchar(64), dhcpaddr varchar(128), primary key (clustername,dhcpaddr)")
 				self.tryCreateTable("z_eye_dhcp_subnet_v4_declared","netid varchar(16), netmask varchar(16), vlanid int unique, subnet_short_name varchar(32), subnet_desc varchar(128), primary key (netid, netmask)")
 				self.tryAddColumn("z_eye_dhcp_servers","alias","varchar(64)")
@@ -57,6 +57,12 @@ class ZEyeDBUpgrade():
 				self.tryCreateTable("z_eye_dhcp_subnet_cluster","clustername varchar(64) NOT NULL, subnet varchar(16) NOT NULL, PRIMARY KEY (clustername,subnet)")
 				self.tryCreateTable("z_eye_dhcp_ip","ip varchar(16) NOT NULL, macaddr varchar(18), hostname varchar(128), reserv bool, comment varchar(512), PRIMARY KEY(ip)")
 				self.setDBVersion("1200")
+			elif self.dbVersion == "1200":
+				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","router","varchar(16)")
+				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","dns1","varchar(16)")
+				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","dns2","varchar(16)")
+				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","domainname","varchar(128)")
+				self.setDBVersion("1201")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
@@ -69,11 +75,11 @@ class ZEyeDBUpgrade():
 		Logger.ZEyeLogger().write("DBUpgrade is needed. Starting...")
 
 		# here: the upgrading process hasn't been done
-		if self.dbVersion == 0:
+		if self.dbVersion == "0":
 			self.initDBVersionTable()
 
 		# Upgrades for Z-Eye 1.2 series 
-		if self.dbVersion <= 1299:
+		if self.dbVersion <= "1299":
 			self.do12Upgrade()
 
 		print "DB Upgrade done."
@@ -124,7 +130,7 @@ class ZEyeDBUpgrade():
 			pgcursor.execute("CREATE TABLE z_eye_db_version (dbver int NOT NULL)")
 			pgcursor.execute("INSERT INTO z_eye_db_version (dbver) VALUES ('1')")
 			self.pgsqlCon.commit()
-			self.dbVersion = 1
+			self.dbVersion = "1"
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
@@ -139,11 +145,11 @@ class ZEyeDBUpgrade():
 			pgcursor.execute("SELECT count(*) FROM pg_tables WHERE tablename='z_eye_db_version'")
 			pgres = pgcursor.fetchone()
 			if pgres[0] == 0:
-				return 0
+				return "0"
 
 			pgcursor.execute("SELECT dbver FROM z_eye_db_version")
 			pgres = pgcursor.fetchone()
-			return pgres[0]
+			return "%s" % pgres[0]
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

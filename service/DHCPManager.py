@@ -166,6 +166,8 @@ class ZEyeDHCPManager(threading.Thread):
 							reservBuf += "hostname %s { hardware ethernet %s; fixed-address %s; };\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
 	
 			
+			ssh.sendCmd("echo \"%s\" > %s" % (reservBuf,reservpath))
+			ssh.sendCmd("echo \"%s\" > %s" % (subnetBuf,subnetpath))
 			Logger.ZEyeLogger().write("DHCP Manager debug:\n%s\n%s" % (reservBuf,subnetBuf))
 			ssh.close()
 		except Exception, e:
