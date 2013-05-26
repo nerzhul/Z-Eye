@@ -89,7 +89,6 @@ class ZEyeDHCPManager(threading.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
-			Logger.ZEyeLogger().write("DHCP Management waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime
@@ -161,14 +160,33 @@ class ZEyeDHCPManager(threading.Thread):
 						netmask = self.subnetList[subnet][0]
 						subnetIpList = self.subnetList[subnet][1]
 
-						subnetBuf += "subnet %s netmask %s { }" % (subnet,netmask)
+						# Special case for DNS2
+						dns2 = ""
+						if len(self.subnetList[subnet][4]) > 0 and self.subnetList[subnet][4] != self.subnetList[subnet][3]:
+							dns2 = " %s" % self.subnetList[subnet][4]
+
+						subnetBuf += "subnet %s netmask %s {\n\toption routers %s;\n\toption domain-name \"%s\";\n" % (subnet,netmask,self.subnetList[subnet][2],self.subnetList[subnet][5])
+						subnetBuf += "\toption domain-name-servers %s%s;\n}\n" % (self.subnetList[subnet][3],dns2)
 						for ip in subnetIpList:
-							reservBuf += "hostname %s { hardware ethernet %s; fixed-address %s; };\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
+							reservBuf += "host %s {\n\thardware ethernet %s;\n\tfixed-address %s;\n}\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
 	
 			
-			ssh.sendCmd("echo \"%s\" > %s" % (reservBuf,reservpath))
-			ssh.sendCmd("echo \"%s\" > %s" % (subnetBuf,subnetpath))
-			Logger.ZEyeLogger().write("DHCP Manager debug:\n%s\n%s" % (reservBuf,subnetBuf))
+			# check md5 trace to see if subnet file is different
+			tmpmd5 = ssh.sendCmd("cat %s|%s" % (subnetpath,hashCmd))
+			tmpmd52 = subprocess.check_output(["/sbin/md5","-qs","%s\n" % subnetBuf])
+			if tmpmd5 != tmpmd52:
+				ssh.sendCmd("echo '%s' > %s" % (subnetBuf,subnetpath))
+				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
+				Logger.ZEyeLogger().write("DHCP Manager: subnets modified on %s" % addr)
+			
+			# check md5 trace to see if reserv file is different
+			tmpmd5 = ssh.sendCmd("cat %s|%s" % (reservpath,hashCmd))
+			tmpmd52 = subprocess.check_output(["/sbin/md5","-qs","%s\n" % reservBuf])
+			if tmpmd5 != tmpmd52:
+				ssh.sendCmd("echo '%s' > %s" % (reservBuf,reservpath))
+				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
+				Logger.ZEyeLogger().write("DHCP Manager: reservations modified on %s" % addr)
+
 			ssh.close()
 		except Exception, e:
 			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
@@ -191,19 +209,21 @@ class ZEyeDHCPManager(threading.Thread):
 		for idx in pgres:
 			if idx[0] not in self.clusterList:
 				self.clusterList[idx[0]] = []
-			if idx[1] not in self.clusterList[idx[0]]:
+			if idx[1] not in self.clusterList[idx[0]] and idx[1] in self.subnetList:
 				self.clusterList[idx[0]].append(idx[1])
 
 	def loadSubnetList(self,pgcursor):
 		self.subnetList = {}
 		# We only load netid attached to clusters
-		pgcursor.execute("SELECT netid,netmask FROM z_eye_dhcp_subnet_v4_declared WHERE netid in (SELECT subnet FROM z_eye_dhcp_subnet_cluster)")
+		pgcursor.execute("SELECT netid,netmask,router,dns1,dns2,domainname FROM z_eye_dhcp_subnet_v4_declared WHERE netid in (SELECT subnet FROM z_eye_dhcp_subnet_cluster)")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
-			ipList = []
-			for ip in self.ipList:
-				# If ip in subnet we add it to list
-				if ip in Network("%s/%s" % (idx[0],idx[1])):
-					ipList.append(ip)
-			self.subnetList[idx[0]] = (idx[1],ipList)
+			# Those fields are required
+			if len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[5]) > 0:
+				ipList = []
+				for ip in self.ipList:
+					# If ip in subnet we add it to list
+					if ip in Network("%s/%s" % (idx[0],idx[1])):
+						ipList.append(ip)
+				self.subnetList[idx[0]] = (idx[1],ipList,idx[2],idx[3],idx[4],idx[5])
 
