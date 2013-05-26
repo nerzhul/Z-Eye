@@ -1114,6 +1114,10 @@
 								return;
 							}
 						}
+						if(!$router || !$dns1 || !$domainname) {
+							FS::$iMgr->ajaxEcho("err-distrib-subnet-need-infos");
+							return;
+						}
 					}
 					
 
