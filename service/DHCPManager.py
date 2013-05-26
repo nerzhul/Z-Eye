@@ -158,12 +158,12 @@ class ZEyeDHCPManager(threading.Thread):
 			for idx in pgres:
 				if idx[0] in self.clusterList:
 					for subnet in self.clusterList[idx[0]]:
-						netmask = self.subnetList[subnet]
+						netmask = self.subnetList[subnet][0]
+						subnetIpList = self.subnetList[subnet][1]
+
 						subnetBuf += "subnet %s netmask %s { }" % (subnet,netmask)
-						for ip in self.ipList:
-							# If ip in subnet
-							if ip in Network("%s/%s" % (subnet,netmask)):
-								reservBuf += "hostname %s { hardware ethernet %s; fixed-address %s; };\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
+						for ip in subnetIpList:
+							reservBuf += "hostname %s { hardware ethernet %s; fixed-address %s; };\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
 	
 			
 			Logger.ZEyeLogger().write("DHCP Manager debug:\n%s\n%s" % (reservBuf,subnetBuf))
@@ -198,5 +198,10 @@ class ZEyeDHCPManager(threading.Thread):
 		pgcursor.execute("SELECT netid,netmask FROM z_eye_dhcp_subnet_v4_declared WHERE netid in (SELECT subnet FROM z_eye_dhcp_subnet_cluster)")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
-			self.subnetList[idx[0]] = idx[1]
+			ipList = []
+			for ip in self.ipList:
+				# If ip in subnet we add it to list
+				if ip in Network("%s/%s" % (idx[0],idx[1])):
+					ipList.append(ip)
+			self.subnetList[idx[0]] = (idx[1],ipList)
 
