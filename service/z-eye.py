@@ -24,25 +24,27 @@ import sys,time
 import Logger
 
 import Daemon
-import MRTGCfgDiscoverer
-import MRTGDataRefresh
-import PeriodicCmd
-import PortIDCacher
-import SwitchesBackup
-import serviceManager
-import DatabaseUpgrader
+from MRTGCfgDiscoverer import ZEyeMRTGDiscoverer
+from MRTGDataRefresh import ZEyeMRTGDataRefresher
+from PeriodicCmd import ZEyePeriodicCmd
+from PortIDCacher import ZEyeSwitchesPortIDCacher
+from SwitchesBackup import ZEyeSwitchesBackup
+from serviceManager import ZEyeServiceMgr
+from DatabaseUpgrader import ZEyeDBUpgrade
+from DHCPManager import ZEyeDHCPManager
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
-		MRTGCfgDiscoverer.ZEyeMRTGDiscoverer().start()
-		MRTGDataRefresh.ZEyeMRTGDataRefresher().start()
-		PeriodicCmd.ZEyePeriodicCmd(15*60,15,"Netdisco device discovery","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()
-		PeriodicCmd.ZEyePeriodicCmd(5*60,60,"Netdisco device MAC walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -m").start()
-		PeriodicCmd.ZEyePeriodicCmd(5*60,90,"Netdisco device ARP walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -a").start()
-		PeriodicCmd.ZEyePeriodicCmd(15*60,1200,"Netdisco device netbios walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -w").start()
-		PortIDCacher.ZEyeSwitchesPortIDCacher().start()
-		SwitchesBackup.ZEyeSwitchesBackup().start()
-		serviceManager.ZEyeServiceMgr().start()	
+		ZEyeMRTGDiscoverer().start()
+		ZEyeMRTGDataRefresher().start()
+		ZEyePeriodicCmd(15*60,15,"Netdisco device discovery","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()
+		ZEyePeriodicCmd(5*60,60,"Netdisco device MAC walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -m").start()
+		ZEyePeriodicCmd(5*60,90,"Netdisco device ARP walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -a").start()
+		ZEyePeriodicCmd(15*60,1200,"Netdisco device netbios walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -w").start()
+		ZEyeSwitchesPortIDCacher().start()
+		ZEyeSwitchesBackup().start()
+		ZEyeServiceMgr().start()	
+		ZEyeDHCPManager().start()
 		
 		while True:
 			time.sleep(1)
@@ -55,7 +57,7 @@ if __name__ == "__main__":
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
 			print "Z-Eye daemon pre-start checks..."
-			DatabaseUpgrader.ZEyeDBUpgrade().checkAndDoUpgrade()
+			ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Starting Z-Eye daemon"
 			Logger.ZEyeLogger().write("Starting Z-Eye daemon")
                         daemon.start()
@@ -68,7 +70,7 @@ if __name__ == "__main__":
                         daemon.restart()
 		elif 'updatedb' == sys.argv[1]:
 			print "Upgrading database if needed..."
-			DatabaseUpgrader.ZEyeDBUpgrade().checkAndDoUpgrade()
+			ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Done"
                 else:
 			print "Unknown arg"
