@@ -25,6 +25,17 @@ from ipcalc import Network
 import Logger,netdiscoCfg
 from SSHBroker import ZEyeSSHBroker
 
+"""
+* Please note this element support only ISC DHCP daemon at this time. BSD native daemon will be supported later
+* Note: if you use IPManager and Z-Eye DHCP manager you need this line in your crontab:
+*   if [ -r /tmp/dhcprestart ] && [ "$(/bin/cat /tmp/dhcprestart)" -eq "1" ]; then <servicecmd> restart && /bin/rm /tmp/dhcprestart; fi
+* Replace <servicecmd> with your starting cmd
+*   Linux Debian: service isc-dhcp-server restart
+*   Other Linux: service dhcpd restart (to verify)
+*   FreeBSD: service isc-dhcpd restart
+*   OpenBSD: /etc/rc.d/dhcpd restart
+"""
+
 class ZEyeDHCPManager(threading.Thread):
 	sleepingTimer = 0
 	startTime = 0
