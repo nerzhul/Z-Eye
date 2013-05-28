@@ -32,7 +32,8 @@
 					array(3,"mod=".$this->mid,$this->loc->s("icinga-map")),
 					array(2,"mod=".$this->mid,$this->loc->s("net-map")),
 					array(1,"mod=".$this->mid,$this->loc->s("net-map-full")),
-					array(4,"mod=".$this->mid,"Sigma")
+					array(4,"mod=".$this->mid,"Sigma"),
+					array(5,"mod=".$this->mid,"Springy")
 					),$sh);
 			} else {
 				$device = FS::$secMgr->checkAndSecuriseGetData("d");
@@ -46,9 +47,30 @@
 					$output .= $this->showIcingaMap();
 				else if($sh == 4)
 					$output .= $this->showSigmaMap();
+				else if($sh == 5)
+					$output .= $this->showSpringyMap();
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
 			}
+			return $output;
+		}
+
+		private function showSpringyMap() {
+			$output = FS::$iMgr->canvas("springy",1000,1000); 
+			
+			$js = "var graph = new Springy.Graph();";
+			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_nodes","nodename,node_label,node_x,node_y,node_size,node_color");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$js .= "var n".preg_replace("#[-]#",FS::$iMgr->formatHTMLId($data["node_label"]))." = graph.newNode({'label':'".$data["node_label"]."'});";
+			}
+
+			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_edges","edgename,node1,node2,edge_color,edge_size");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$js .= "graph.newEdge(n".preg_replace("#[-]#",FS::$iMgr->formatHTMLId($data["node1"])).",n".preg_replace("#[-]#",FS::$iMgr->formatHTMLId($data["node2"])).");";
+			}
+			$js .= "$('#springy').springy({ graph: graph });";
+			FS::$iMgr->js($js);
+
 			return $output;
 		}
 
@@ -383,7 +405,6 @@
 				"test3" => array("label" => "test3", "links" => array("test2","ttot","test4"), "placed" => false),
 				"test4" => array("label" => "test4", "links" => array("ttot","test3","test6"), "placed" => false),
 				"test5" => array("label" => "test5", "links" => array("ttot","test3","test6"), "placed" => false),
-				"vm1" => array("label" => "vm".$i, "links" => array(), "placed" => false),
 				"test6" => array("label" => "test6", "links" => array(), "placed" => false),
 				"test7" => array("label" => "test7", "links" => array("test11"), "placed" => false),
 				"test8" => array("label" => "test8", "links" => array(), "placed" => false),
@@ -394,7 +415,7 @@
 				"esx2" => array("label" => "esx2", "links" => array("2vm1","2vm2","2vm3","2vm4","2vm5","2vm6","2vm7"), "placed" => false),
 				"test9" => array("label" => "test9", "links" => array(), "placed" => false)
 					);
-					for($i=2;$i<=13;$i++)
+					for($i=1;$i<=13;$i++)
 						$nodelist["vm".$i] = array("label" => "vm".$i, "links" => array(), "placed" => false);
 					for($i=1;$i<=7;$i++)
 						$nodelist["2vm".$i] = array("label" => "2vm".$i, "links" => array(), "placed" => false);
