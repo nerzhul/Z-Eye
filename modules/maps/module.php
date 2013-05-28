@@ -17,8 +17,13 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/../icinga/icingaBroker.api.php");
+
 	final class iMaps extends FSModule{
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->icingaAPI = new icingaBroker();
+		}
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-maps"));
@@ -184,8 +189,51 @@
 		}
 
 		private function showIcingaMap() {
-			$output = FS::$iMgr->imgWithZoom2("cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5",$this->loc->s("icinga-map"),"netmapI");
-			$output .= FS::$iMgr->canvas("springy",1000,1000); 
+			//$output = FS::$iMgr->imgWithZoom2("cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5",$this->loc->s("icinga-map"),"netmapI");
+			/*$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts","state_type"));
+			// Loop hosts
+			foreach($iStates as $host => $hostvalues) {
+				// Loop types
+				foreach($hostvalues as $hos => $hosvalues) {
+					if($hos == "servicestatus") {
+						// Loop sensors
+						foreach($hosvalues as $sensor => $svalues) {
+							$this->totalicinga++;
+							if($svalues["current_state"] > 0) {
+								$outstate = "";
+								$stylestate = "";
+								if($svalues["current_state"] == 1) {
+									$outstate = $this->loc->s("WARN");
+									$stylestate = "color: orange; font-size: 18px;";
+								}
+								else if($svalues["current_state"] == 2) {
+									$outstate = $this->loc->s("CRITICAL");
+									$stylestate = "color: red; font-size: 20px;";
+								}
+									
+								$this->hsicinga++;
+								$problemoutput .= "<tr><td>".$host."</td><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
+									"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>";
+							}
+						}
+					}
+					else if($hos == "hoststatus") {
+						$this->totalicinga++;
+						if($hosvalues["current_state"] > 0) {
+							$this->hsicinga++;
+							$outstate = "";
+							$stylestate = "";
+							if($hosvalues["current_state"] == 1) {
+								$outstate = $this->loc->s("DOWN");
+								$stylestate = "color: red; font-size: 20px;";
+							}
+							$problemoutput .= "<tr><td>".$host."</td><td>".$this->loc->s("Availability")."</td><td style=\"".$stylestate."\">".$outstate.
+								"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>";
+						}
+					}
+				}
+			}*/
+			$output = FS::$iMgr->canvas("springy",1000,1000); 
 			
 			$js = "var graph = new Springy.Graph();";
 			$js2 = "";
@@ -197,11 +245,11 @@
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					// edges after nodes
 					if(!array_key_exists($data["name"],$nodelist)) {
-						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).");";
+						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).",{'directional':false});";
 						array_push($linklist,$data2["parent"]);
 					}
 					else if(!in_array($nodelist[$data["name"]]["links"],$data2["parent"])) {
-						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).");";
+						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).",{'directional':false});";
 						array_push($nodelist[$data["name"]]["links"],$data2["parent"]);
 					}
 				}
@@ -455,5 +503,6 @@
 					return;
 			}
 		}
+		private $icingaAPI;
 	};
 ?>
