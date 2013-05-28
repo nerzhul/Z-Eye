@@ -188,26 +188,29 @@
 			$output .= FS::$iMgr->canvas("springy",1000,1000); 
 			
 			$js = "var graph = new Springy.Graph();";
+			$js2 = "";
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!array_key_exists($data["name"],$nodelist))
 					$linklist = array();
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
+					// edges after nodes
 					if(!array_key_exists($data["name"],$nodelist)) {
-						$js .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).");";
+						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).");";
 						array_push($linklist,$data2["parent"]);
 					}
 					else if(!in_array($nodelist[$data["name"]]["links"],$data2["parent"])) {
-						$js .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).");";
+						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).");";
 						array_push($nodelist[$data["name"]]["links"],$data2["parent"]);
 					}
 				}
 				if(!array_key_exists($data["name"],$nodelist)) {
-					$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["addr"]))." = graph.newNode({'label':'".$data["name"]."'});";
+					$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]))." = graph.newNode({'label':'".$data["addr"]."'});";
 					$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist, "placed" => false);
 				}
 			}
+			$js .= $js2;
 			$js .= "$('#springy').springy({ graph: graph });";
 
 			FS::$iMgr->js($js);
