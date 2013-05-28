@@ -63,7 +63,7 @@
 		private function showSpringyMap() {
 			$output = FS::$iMgr->canvas("springy",1000,1000); 
 			
-			$js = "var graph = new Springy.Graph();";
+			$js = "var graph = new Springy.Graph({'repulsion': 800});";
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_nodes","nodename,node_label,node_x,node_y,node_size,node_color");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["node_label"]))." = graph.newNode({'label':'".$data["node_label"]."'});";
@@ -189,8 +189,12 @@
 		}
 
 		private function showIcingaMap() {
-			//$output = FS::$iMgr->imgWithZoom2("cgi-bin/icinga/statusmap.cgi?host=all&createimage&layout=5",$this->loc->s("icinga-map"),"netmapI");
-			/*$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts","state_type"));
+			// We store problematic hosts for renderer
+			$hostStatusWarn = array();
+			$serviceStatusWarn = array();
+			$hostStatusCrit = array();
+			$serviceStatusCrit = array();
+			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts","state_type"));
 			// Loop hosts
 			foreach($iStates as $host => $hostvalues) {
 				// Loop types
@@ -203,17 +207,15 @@
 								$outstate = "";
 								$stylestate = "";
 								if($svalues["current_state"] == 1) {
-									$outstate = $this->loc->s("WARN");
-									$stylestate = "color: orange; font-size: 18px;";
+									if(!in_array($host,$serviceStatusWarn)) 
+										array_push($serviceStatusWarn,$host);
 								}
 								else if($svalues["current_state"] == 2) {
-									$outstate = $this->loc->s("CRITICAL");
-									$stylestate = "color: red; font-size: 20px;";
+									if(!in_array($host,$serviceStatusCrit)) 
+										array_push($serviceStatusCrit,$host);
 								}
 									
 								$this->hsicinga++;
-								$problemoutput .= "<tr><td>".$host."</td><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
-									"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>";
 							}
 						}
 					}
@@ -224,18 +226,16 @@
 							$outstate = "";
 							$stylestate = "";
 							if($hosvalues["current_state"] == 1) {
-								$outstate = $this->loc->s("DOWN");
-								$stylestate = "color: red; font-size: 20px;";
+								if(!in_array($host,$hostStatusCrit)) 
+									array_push($hostStatusCrit,$host);
 							}
-							$problemoutput .= "<tr><td>".$host."</td><td>".$this->loc->s("Availability")."</td><td style=\"".$stylestate."\">".$outstate.
-								"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>";
 						}
 					}
 				}
-			}*/
-			$output = FS::$iMgr->canvas("springy",1000,1000); 
+			}
+			$output = FS::$iMgr->canvas("springy-icinga",1000,1000); 
 			
-			$js = "var graph = new Springy.Graph();";
+			$js = "var graph = new Springy.Graph({repulsion: 500});";
 			$js2 = "";
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr");
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -254,12 +254,25 @@
 					}
 				}
 				if(!array_key_exists($data["name"],$nodelist)) {
-					$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]))." = graph.newNode({'label':'".$data["addr"]."'});";
+					$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]))." = graph.newNode({'label':'".$data["name"]."'";
+					if(in_array($data["name"],$serviceStatusCrit))
+						$js .= ",'serviceColor': 'red'";
+					else if(in_array($data["name"],$serviceStatusWarn))
+						$js .= ",'serviceColor': 'orange'";
+					else
+						$js .= ",'serviceColor': 'green'";
+					if(in_array($data["name"],$hostStatusCrit))
+						$js .= ",'hostColor': '#660000'";
+					else if(in_array($data["name"],$hostStatusWarn))
+						$js .= ",'hostColor': 'orange'";
+					else
+						$js .= ",'hostColor': '#003300'";
+					$js .= "});";
 					$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist, "placed" => false);
 				}
 			}
 			$js .= $js2;
-			$js .= "$('#springy').springy({ graph: graph });";
+			$js .= "$('#springy-icinga').springy({ graph: graph });";
 
 			FS::$iMgr->js($js);
 			return $output;
