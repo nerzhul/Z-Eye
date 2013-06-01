@@ -194,12 +194,83 @@
 				}
 			}
 
+			$edgeList = array();
 			$query = FS::$dbMgr->Select("device","ip,name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				// Generate all links between this device and others
-				$query2 = FS::$dbMgr->Select("device_port","remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
+				$query2 = FS::$dbMgr->Select("device_port","port,speed,remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["remote_id"])).");";
+					// @TODO: by port this function dedup the links and it's wrong
+					if(array_key_exists($data["name"] && in_array($data2["remote_id"],$edgeList[$data["name"]])) &&
+						array_key_exists($data2["remote_id"] && in_array($data["name"],$edgeList[$data2["remote_id"]]))
+						continue;
+
+					if(!array_key_exists($data["name"],$edgeList))
+						$edgeList[$data["name"]] = array();	
+					if(!array_key_exists($data2["remote_id"],$edgeList))
+						$edgeList[$data2["remote_id"]] = array();	
+					if(!in_array($data2["remote_id"],$edgeList[$data["name"]]))
+						array_push($edgeList[$data["name"]],$data2["remote_id"]);
+					if(!in_array($data["name"],$edgeList[$data2["remote_id"]]))
+						array_push($edgeList[$data2["remote_id"]],$data["name"]);
+
+					$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["remote_id"]));
+					$js3 = "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["remote_id"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]));
+					$outcharge = 0;
+					$incharge = 0;
+					if($pid = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."port_id_cache","pid","device = '".$data["name"]."' AND portname = '".$data2["port"]."'")) {
+						$mrtgfile = file(dirname(__FILE__)."/../../datas/rrd/".$data["ip"]."_".$pid.".log");
+						for($i=1;$i<2;$i++) {
+							$outputbw = 0;
+							$res = preg_split("# #",$mrtgfile[$i]);
+							if(count($res) == 5) {
+								if($data2["speed"] == 0) {
+									$inputbw = 0;
+									$outputbw = 0;
+								} else {
+									$inputbw = $res[1];
+									$outputbw = $res[2];
+									$maxbw = preg_split("# #",$data2["speed"]);
+									if(count($maxbw) == 2) {
+										if($maxbw[1] == "Gbit" || $maxbw[1] == "Gbps")
+											$maxbw = $maxbw[0] * 1000000000;
+										else if($maxbw[1] == "Mbit" || $maxbw[1] == "Mbps")
+											$maxbw = $maxbw[0] * 1000000;
+									}
+									else
+										$maxbw = $maxbw[0];
+									$outcharge = $outputbw / $maxbw;
+									$incharge = $inputbw / $maxbw;
+								}
+							}
+						}
+					}
+					if($outcharge > 0 && $outcharge < 10)
+						$js2 .= ",{'color':'#8C00FF'}";
+					else if($outcharge < 25)
+						$js2 .= ",{'color':'#2020FF'}";
+					else if($outcharge < 40)
+						$js2 .= ",{'color':'#00C0FF'}";
+					else if($outcharge < 55)
+						$js2 .= ",{'color':'#00F000'}";
+					else if($outcharge < 70)
+						$js2 .= ",{'color':'#F0F000'}";
+					else if($outcharge < 85)
+						$js2 .= ",{'color':'#FFC0000'}";
+
+					if($incharge > 0 && $incharge < 10)
+						$js3 .= ",{'color':'#8C00FF'}";
+					else if($incharge < 25)
+						$js3 .= ",{'color':'#2020FF'}";
+					else if($incharge < 40)
+						$js3 .= ",{'color':'#00C0FF'}";
+					else if($incharge < 55)
+						$js3 .= ",{'color':'#00F000'}";
+					else if($incharge < 70)
+						$js3 .= ",{'color':'#F0F000'}";
+					else if($incharge < 85)
+						$js3 .= ",{'color':'#FFC0000'}";
+					$js2 .= ");".$js3.");";
 				}
 
 				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]))." = graph.newNode({'label':'".$data["name"]."'";
