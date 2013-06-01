@@ -415,9 +415,31 @@
 			
 					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-distrib");
 					$found = 0;
+
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment","ip = '".$search."'");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if($found == 0) {
+							$found = 1;
+						}
+						else $locoutput .= FS::$iMgr->hr();
+						if(strlen($data["hostname"]) > 0)
+							$locoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
+						if(strlen($data["macaddr"]) > 0)
+							$locoutput .= $this->loc->s("link-mac-addr").": <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+						if(strlen($data["comment"]) > 0)
+							$locoutput .= $this->loc->s("comment").": ".$data["comment"]."<br />";
+						$this->nbresults++;
+					}
+			
+					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-distrib-z-eye");
+					$found = 0;
 				}
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip","ip ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
+					while($data = FS::$dbMgr->Fetch($query))
+						array_push($this->autoresults["ip"],$data["ip"]);
+
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","ip ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["ip"],$data["ip"]);
 
@@ -736,9 +758,30 @@
 					}
 					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-distrib");
 					$found = 0;
+
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip,hostname,comment","macaddr = '".$search."'");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if($found == 0)
+							$found = 1;
+						else
+							$locoutput .= FS::$iMgr->hr();
+
+						if(strlen($data["hostname"]) > 0)
+							$locoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
+						if(strlen($data["ip"]) > 0)
+							$locoutput .= $this->loc->s("link-ip").": <a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a><br />";
+						if(strlen($data["comment"]) > 0)
+							$locoutput .= $this->loc->s("comment").": ".$data["comment"]."<br />";
+					}
+					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-distrib-z-eye");
+					$found = 0;
 				}
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","macaddr","macaddr ILIKE '".$search."%'",array("order" => "macaddr","limit" => "10","group" => "macaddr"));
+					while($data = FS::$dbMgr->Fetch($query))
+						array_push($this->autoresults["mac"],$data["macaddr"]);
+
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr","macaddr ILIKE '".$search."%'",array("order" => "macaddr","limit" => "10","group" => "macaddr"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["mac"],$data["macaddr"]);
 				}
