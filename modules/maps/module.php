@@ -36,8 +36,8 @@
 				$output .= FS::$iMgr->tabPan(array(
 					array(3,"mod=".$this->mid,$this->loc->s("icinga-map")),
 					array(1,"mod=".$this->mid,$this->loc->s("net-map-full")),
-					array(4,"mod=".$this->mid,"Sigma"),
-					array(5,"mod=".$this->mid,"Springy")
+			//		array(4,"mod=".$this->mid,"Sigma"),
+			//		array(5,"mod=".$this->mid,"Springy")
 					),$sh);
 			} else {
 				if($sh == 1)
@@ -167,9 +167,13 @@
 		}
 
 		private function showNetworkMap() {
-			$output = FS::$iMgr->canvas("springy-map",1000,1000); 
+			$nodeFound = false;
+			$output = "";
+			$tmpoutput = FS::$iMgr->canvas("springy-net",1000,1000); 
+			
 			
 			$js = "var graph = new Springy.Graph({repulsion: 500});";
+			$js .= "$('#springy-net').springy({ graph: graph });";
 			$js2 = "";
 			
 			// Bufferize host states to colorize map
@@ -197,12 +201,15 @@
 			$edgeList = array();
 			$query = FS::$dbMgr->Select("device","ip,name");
 			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$nodeFound)
+					$nodeFound = true;
+
 				// Generate all links between this device and others
 				$query2 = FS::$dbMgr->Select("device_port","port,speed,remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
 					// @TODO: by port this function dedup the links and it's wrong
-					if(array_key_exists($data["name"] && in_array($data2["remote_id"],$edgeList[$data["name"]])) &&
-						array_key_exists($data2["remote_id"] && in_array($data["name"],$edgeList[$data2["remote_id"]]))
+					if(array_key_exists($data["name"],$edgeList) && in_array($data2["remote_id"],$edgeList[$data["name"]]) &&
+						array_key_exists($data2["remote_id"],$edgeList) && in_array($data["name"],$edgeList[$data2["remote_id"]]))
 						continue;
 
 					if(!array_key_exists($data["name"],$edgeList))
@@ -291,9 +298,14 @@
 				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["remote_id"]))." = graph.newNode({'label':'".$data["remote_id"]."'});";
 			} 
 					
-			$js .= $js2;
-			$js .= "$('#springy-map').springy({ graph: graph });";
-			FS::$iMgr->js($js);
+			if($nodeFound) {
+				$js .= $js2;
+				FS::$iMgr->js($js);
+				$output .= $tmpoutput;
+			}
+			else
+				$output .= FS::$iMgr->printError($this->loc->s("err-no-node-found"));
+
 			return $output;
 		}
 
