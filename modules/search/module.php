@@ -123,7 +123,7 @@
 					$this->fetchPlugAutoResults($search);
 					$this->fetchRoomAutoResults($search);
 					
-					$query = FS::$dbMgr->Select("device_vlan","vlan","vlan ILIKE '".$search."%'",array("order" => "vlan","limit" => "10","group" => "vlan"));
+					$query = FS::$dbMgr->Select("device_vlan","vlan","CAST(vlan as TEXT) ILIKE '".$search."%'",array("order" => "vlan","limit" => "10","group" => "vlan"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["vlan"],$data["vlan"]);
 				}
