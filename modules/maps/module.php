@@ -167,11 +167,33 @@
 		}
 
 		private function showNetworkMap() {
-			$output = FS::$iMgr->canvas("springy-icinga",1000,1000); 
+			$output = FS::$iMgr->canvas("springy-map",1000,1000); 
 			
 			$js = "var graph = new Springy.Graph({repulsion: 500});";
 			$js2 = "";
 			
+			// Bufferize host states to colorize map
+			$hostCrit = array();
+			$hostOK = array();
+			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","state_type"));
+
+			// Loop hosts
+			foreach($iStates as $host => $hostvalues) {
+				// Loop types
+				foreach($hostvalues as $hos => $hosvalues) {
+					if($hos == "hoststatus") {
+						if($hosvalues["current_state"] == 1) {
+							if(!in_array($host,$hostCrit)) 
+								array_push($hostCrit,$host);
+						}
+						else {
+							if(!in_array($host,$hostOK)) 
+								array_push($hostOK,$host);
+						}
+					}
+				}
+			}
+
 			$query = FS::$dbMgr->Select("device","ip,name");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				// Generate all links between this device and others
@@ -180,19 +202,26 @@
 					$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["remote_id"])).");";
 				}
 
-				// Generate node list
-				if(!array_key_exists($data["name"],$nodelist)) {
-					$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]))." = graph.newNode({'label':'".$data["name"]."'});";
-				}
+				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]))." = graph.newNode({'label':'".$data["name"]."'";
+				if(in_array($data["name"],$hostCrit))
+					$js .= ",'serviceColor':'red','hostColor':'#660000'";
+				else if(in_array($data["name"],$hostOK))
+					$js .= ",'serviceColor':'green','hostColor':'#003300'";
+
+				$js .= "});";
 			}
 
+			$nodelist = array();
 			$query = FS::$dbMgr->Select("device_port","remote_id","remote_id NOT IN(SELECT name FROM device)");
 			while($data = FS::$dbMgr->Fetch($query)) {
+				if(in_array($data["remote_id"],$nodelist))
+					continue;
+				array_push($nodelist,$data["remote_id"]);
 				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["remote_id"]))." = graph.newNode({'label':'".$data["remote_id"]."'});";
 			} 
 					
 			$js .= $js2;
-			$js .= "$('#springy-icinga').springy({ graph: graph });";
+			$js .= "$('#springy-map').springy({ graph: graph });";
 			FS::$iMgr->js($js);
 			return $output;
 		}
@@ -203,7 +232,7 @@
 			$serviceStatusWarn = array();
 			$hostStatusCrit = array();
 			$serviceStatusCrit = array();
-			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts","state_type"));
+			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","state_type"));
 			// Loop hosts
 			foreach($iStates as $host => $hostvalues) {
 				// Loop types
