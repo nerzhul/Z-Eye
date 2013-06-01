@@ -224,7 +224,7 @@
 			$output .= $output2;
 			$output .= "</select></td></tr>";
 
-			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$address);
+			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$addr);
 
 			$hglist = array();
 			if($name) {

@@ -275,6 +275,8 @@
 			
 			$js = "var graph = new Springy.Graph({repulsion: 500});";
 			$js2 = "";
+
+			$nodelist = array();
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!array_key_exists($data["name"],$nodelist))
