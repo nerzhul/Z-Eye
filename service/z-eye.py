@@ -50,7 +50,7 @@ class ZEyeDaemon(Daemon.Daemon):
 			time.sleep(1)
 
 def usage():
-	print "usage: %s start|stop|restart" % sys.argv[0]
+	print "usage: %s start|stop|restart|updatedb" % sys.argv[0]
 
 if __name__ == "__main__":
         daemon = ZEyeDaemon("/var/run/z-eye.pid")
@@ -72,6 +72,8 @@ if __name__ == "__main__":
 			print "Upgrading database if needed..."
 			ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Done"
+		elif 'status' == sys.argv[1]:
+			daemon.status()
                 else:
 			print "Unknown arg"
 			usage()

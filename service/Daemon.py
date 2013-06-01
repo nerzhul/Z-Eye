@@ -103,6 +103,22 @@ class Daemon:
 	    self.daemonize()
 	    self.run()
 
+    def status(self):
+	    try:
+		pf = file(self.pidfile,'r')
+		pid = int(pf.read().strip())
+		pf.close()
+	    except IOError:
+		pid = None
+   
+	    if pid:
+		try:
+		    os.kill(pid, 0)
+		except OSError:
+		    print "Z-Eye is not running"
+		else:
+		    print "Z-Eye is running as pid %s" % pid
+
     def stop(self):
 	    """
 	    Stop the daemon

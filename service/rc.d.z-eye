@@ -22,6 +22,7 @@ start_cmd=${name}_start
 stop_cmd=${name}_stop
 restart_cmd=${name}_restart
 updatedb_cmd=${name}_updatedb
+status_cmd=${name}_status
 
 
 
@@ -42,6 +43,10 @@ z_eye_restart() {
 
 z_eye_updatedb() {
 	$command updatedb
+}
+
+z_eye_status() {
+	$command status
 }
 
 run_rc_command "$1"
