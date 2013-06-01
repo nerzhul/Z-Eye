@@ -57,13 +57,13 @@ class ZEyeDBUpgrade():
 				self.tryCreateTable("z_eye_dhcp_subnet_cluster","clustername varchar(64) NOT NULL, subnet varchar(16) NOT NULL, PRIMARY KEY (clustername,subnet)")
 				self.tryCreateTable("z_eye_dhcp_ip","ip varchar(16) NOT NULL, macaddr varchar(18), hostname varchar(128), reserv bool, comment varchar(512), PRIMARY KEY(ip)")
 				self.setDBVersion("1200")
-			elif self.dbVersion == "1200":
+			if self.dbVersion == "1200":
 				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","router","varchar(16)")
 				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","dns1","varchar(16)")
 				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","dns2","varchar(16)")
 				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","domainname","varchar(128)")
 				self.setDBVersion("1201")
-			elif self.dbVersion == "1201":
+			if self.dbVersion == "1201":
 				self.tryCreateTable("z_eye_sessions","id varchar(255) NOT NULL, data text NOT NULL, timestamp int NOT NULL, PRIMARY KEY(id)")
 				self.setDBVersion("1202")
 		except PgSQL.Error, e:
