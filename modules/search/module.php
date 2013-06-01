@@ -129,6 +129,31 @@
 				}
 			}
 
+			if(FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
+				if(!$autocomp) {
+					// VLAN on ipmanger
+					$ipmmodid = FS::$iMgr->getModuleIdByPath("ipmanager");
+					$locoutput = "";
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,subnet_short_name","vlanid = '".$search."'");
+					if($data = FS::$dbMgr->Fetch($query)) {
+						if($found == 0)
+							$found = 1;
+						$locoutput .= $this->loc->s("subnet-shortname").": <a href=\"index.php?mod=".$ipmmodid."&sh=2\">".$data["subnet_short_name"]."</a><br />".
+							$this->loc->s("netid").": ".$data["netid"]."<br />".
+							$this->loc->s("netmask").": ".$data["netmask"]."<br />";
+							
+					}
+
+					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-vlan-ipmanager");
+					$found = 0;
+				}
+				else {
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",array("order" => "vlanid","limit" => "10","group" => "vlanid"));
+					while($data = FS::$dbMgr->Fetch($query))
+						array_push($this->autoresults["vlan"],$data["vlanid"]);
+				}
+			}
+
 			if(!$autocomp) {
 				if(strlen($tmpoutput) > 0)
 					$output .= $tmpoutput;
@@ -199,6 +224,22 @@
 						$tmpoutput .= $this->divEncapResults($locoutput,"Ref-desc");
 					}
 					$found = 0;
+
+					// VLAN on ipmanger
+					$ipmmodid = FS::$iMgr->getModuleIdByPath("ipmanager");
+					$locoutput = "";
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid","subnet_short_name = '".$search."'");
+					if($data = FS::$dbMgr->Fetch($query)) {
+						if($found == 0)
+							$found = 1;
+						$locoutput .= $this->loc->s("vlanid").": <a href=\"index.php?mod=".$ipmmodid."&sh=2\">".$data["vlanid"]."</a><br />".
+							$this->loc->s("netid").": ".$data["netid"]."<br />".
+							$this->loc->s("netmask").": ".$data["netmask"]."<br />";
+							
+					}
+
+					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-vlan-ipmanager");
+					$found = 0;
 				}
 				else {
 					$query = FS::$dbMgr->Select("device","name","name ILIKE '".$search."%'",array("order" => "name","limit" => "10","group" => "name"));
@@ -211,6 +252,11 @@
 					$query = FS::$dbMgr->Select("device_port","name","name ILIKE '".$search."%'",array("order" => "name","limit" => "10","group" => "name"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["portname"],$data["name"]);
+
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","subnet_short_name","subnet_short_name ILIKE '".$search."%'",
+						array("order" => "subnet_short_name","limit" => "10","group" => "subnet_short_name"));
+					while($data = FS::$dbMgr->Fetch($query))
+						array_push($this->autoresults["vlan"],$data["subnet_short_name"]);
 				}	
 			}
 
