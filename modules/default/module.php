@@ -354,6 +354,7 @@
                         if($atkfound) $output .= $tmpoutput."</table>";
 			$this->SECscore = 10000-$scannb-2*$atknb;
 			if($this->SECscore < 0) $this->SECscore = 0;
+			FS::$dbMgr->Connect();
 			return $output;
 		}
 

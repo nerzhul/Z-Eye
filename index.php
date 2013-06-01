@@ -28,7 +28,6 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	session_start();
 	require_once(dirname(__FILE__)."/lib/FSS/FS.main.php");
 	require_once(dirname(__FILE__)."/modules/ActionMgr.class.php");
 	require_once(dirname(__FILE__)."/modules/Ajax.class.php");
@@ -36,6 +35,9 @@
 	//$start_time = microtime(true);
 
 	FS::LoadFSModules();
+
+	FS::$sessMgr->Start();
+
 	if(FS::isAJAXCall()) {
 		FS::$ajaxMgr->handle();
 	}
@@ -57,7 +59,6 @@
 		FS::$iMgr->jsinc("/lib/FSS/js/FSS.js");
 		FS::$iMgr->jsinc("/lib/HighCharts/highcharts.min.js");
 		FS::$iMgr->jsinc("/lib/Sigma/sigma.min.js");
-
 
 		echo FS::$iMgr->content();
 		echo FS::$iMgr->renderJS();

@@ -31,8 +31,58 @@
 	class FSSessionMgr {
 		function __construct() {
 			$this->groupBuf = array();
+			session_set_save_handler(
+				array($this, 'shopen'),
+				array($this, 'shclose'),
+				array($this, 'shread'),
+				array($this, 'shwrite'),
+				array($this, 'shdestroy'),
+				array($this, 'shgc')
+			);
 		}
 
+		public function shopen() {
+			$limit = time() - Config::getSessionExpirationTime();
+			return FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
+		}
+
+		public function shclose() {}
+
+		public function shread($id) {
+			FS::$secMgr->SecuriseString($id);
+			if($data = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."sessions","data","id = '".$id."'"))
+				return $data;
+			else
+				return false;
+		}
+
+		public function shwrite($id, $data) {
+			FS::$secMgr->SecuriseString($id);
+			FS::$secMgr->SecuriseString($data);
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
+			FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."sessions","id,data,timestamp","'".$id."','".$data."','".time()."'");
+			return true;
+		}
+
+		public function shdestroy($id) {
+			FS::$secMgr->SecuriseString($id);
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
+			return true;
+		}
+
+		public function shgc($max) {
+			$limit = time() - intval($max);
+			return FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
+		}
+
+		public function Start() {
+			session_start();
+		}
+
+		public function Close() {
+			session_destroy();
+		}
+		
 		public function InitSessionIfNot() {
 
 			if(!isset($_SESSION["uid"]))
@@ -75,10 +125,6 @@
 		public function getUserLevel() { return (isset($_SESSION["ulevel"]) ? $_SESSION["ulevel"] : 0); }
 		public function getUid() { return $_SESSION["uid"]; }
 
-		public function Close() {
-			session_destroy();
-		}
-		
 		public function getUserName() {
 			if($this->getUid())
 				return FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$this->getUid()."'");

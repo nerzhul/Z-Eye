@@ -17,6 +17,7 @@
 		private static $defaultlang = "fr";
 		private static $passwordMinLength = 8;
 		private static $passwordComplexity = true;
+		private static $sessExpirTime = 1800;
 
 		public static function getSysLang() { return Config::$lang; }
 		public static function getSysStylesheet() { return Config::$stylesheet; }
@@ -30,6 +31,7 @@
 		public static function enableMySQL() { return Config::$mysqlen; }
 		public static function enableSNMP() { return Config::$snmpen; }
 		public static function getDefaultLang() { return Config::$defaultlang; }
+		public static function getSessionExpirationTime() { return Config::$sessExpirTime; }
 
 	};
 ?>
