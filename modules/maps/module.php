@@ -35,19 +35,13 @@
 				$output .= FS::$iMgr->h1("title-maps");
 				$output .= FS::$iMgr->tabPan(array(
 					array(3,"mod=".$this->mid,$this->loc->s("icinga-map")),
-					array(2,"mod=".$this->mid,$this->loc->s("net-map")),
 					array(1,"mod=".$this->mid,$this->loc->s("net-map-full")),
 					array(4,"mod=".$this->mid,"Sigma"),
 					array(5,"mod=".$this->mid,"Springy")
 					),$sh);
 			} else {
-				$device = FS::$secMgr->checkAndSecuriseGetData("d");
-				if($device != NULL)
-					$output .= $this->showDeviceWeatherMap($device);
-				else if($sh == 1)
-					$output .= $this->showGeneralFullWeatherMap();
-				else if($sh == 2)
-					$output .= $this->showGeneralLightWeatherMap();
+				if($sh == 1)
+					$output .= $this->showNetworkMap();
 				else if($sh == 3)
 					$output .= $this->showIcingaMap();
 				else if($sh == 4)
@@ -130,10 +124,7 @@
 
 		// This form imports nodes from devices or icinga
 		private function showImportForm() {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
-			$output .= FS::$iMgr->submit("",$this->loc->s("Import-Nodes"))."</form>";
-
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5");
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5");
 			$output .= FS::$iMgr->submit("","Import de test")."</form>";
 			return $output;
 		}
@@ -175,17 +166,35 @@
 			return $output;
 		}
 
-		private function showDeviceWeatherMap($device) {
-			$output = FS::$iMgr->h3($this->loc->s("link-state")." ".$device,true);
-			$output .= FS::$iMgr->img("datas/weathermap/".$device.".png");
-			return $output;	
-		}
-		private function showGeneralLightWeatherMap() {
-			return FS::$iMgr->imgWithZoom2("datas/weathermap/main-nowifi-tiny.svg",$this->loc->s("net-map-full"),"netmapL","datas/weathermap/main-nowifi.png");
-		}
-		
-		private function showGeneralFullWeatherMap() {
-			return FS::$iMgr->imgWithZoom2("datas/weathermap/main-tiny.svg",$this->loc->s("net-map-full"),"netmapF","datas/weathermap/main.png");
+		private function showNetworkMap() {
+			$output = FS::$iMgr->canvas("springy-icinga",1000,1000); 
+			
+			$js = "var graph = new Springy.Graph({repulsion: 500});";
+			$js2 = "";
+			
+			$query = FS::$dbMgr->Select("device","ip,name");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				// Generate all links between this device and others
+				$query2 = FS::$dbMgr->Select("device_port","remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
+				while($data2 = FS::$dbMgr->Fetch($query2)) {
+					$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["remote_id"])).");";
+				}
+
+				// Generate node list
+				if(!array_key_exists($data["name"],$nodelist)) {
+					$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]))." = graph.newNode({'label':'".$data["name"]."'});";
+				}
+			}
+
+			$query = FS::$dbMgr->Select("device_port","remote_id","remote_id NOT IN(SELECT name FROM device)");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["remote_id"]))." = graph.newNode({'label':'".$data["remote_id"]."'});";
+			} 
+					
+			$js .= $js2;
+			$js .= "$('#springy-icinga').springy({ graph: graph });";
+			FS::$iMgr->js($js);
+			return $output;
 		}
 
 		private function showIcingaMap() {
@@ -276,74 +285,6 @@
 
 			FS::$iMgr->js($js);
 			return $output;
-		}
-
-		private function placeNode($node,$nodelist,$pX=NULL,$pY=NULL) {
-			if($pX === NULL)
-				$pX = rand(1,200);
-			if($pY === NULL)
-				$pY = rand(1,200);
-
-			if($nodelist[$node]["placed"] == false && !FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname 
-= 'mainmap' AND nodename = '".$node."'")) {
-				$color = "007308";
-				$linkCount = count($nodelist[$node]["links"]);
-				$totalLinks = $linkCount;
-				$size = round(10 + 1.5*$linkCount);
-				if($size > 20) $size = 20;
-				FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_nodes","mapname,nodename,node_x,node_y,node_label,node_size,node_color",
-					"'mainmap','".$node."','".$pX."','".$pY."','".$nodelist[$node]["label"]."','".$size."','".$color."'");
-				$nodelist[$node]["placed"] = true;
-
-				foreach($nodelist as $node2 => $values) {
-					if($node == $node2 || in_array($node2,$nodelist[$node]["links"]))
-						continue;
-					if(in_array($node,$values["links"]))
-						$totalLinks++;
-				}
-
-				for($i=0;$i<$linkCount;$i++) {
-					$node2 = $nodelist[$node]["links"][$i];
-					if(isset($nodelist[$node2]) && $nodelist[$node2]["placed"] == false) {
-						$dist = 10*$totalLinks+$size;
-						if(count($nodelist[$node2]["links"]) < 2)
-							$dist = round($dist/4);
-						$pX2 = round($pX + $dist * cos(2*$i*pi()/$totalLinks));
-						$pY2 = round($pY + $dist * sin(2*$i*pi()/$totalLinks));
-						$this->placeNode($node2,$nodelist,$pX2,$pY2);
-					}
-
-					// Insert edges
-					if(!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_edges","edge_size","mapname = 'mainmap' AND node1 = '".$node."' AND node2 = '".$nodelist[$node]["links"][$i]."'")) {
-						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_edges","mapname,edgename,node1,node2,edge_color,edge_size",
-							"'mainmap','".rand(1,10000000)."','".$node."','".$nodelist[$node]["links"][$i]."','000000','".rand(1,10)."'");
-					}
-				}
-
-				$cursorid = $totalLinks - $linkCount + 1;
-				foreach($nodelist as $node2 => $values) {
-					if($node == $node2 || in_array($node2,$nodelist[$node]["links"]))
-						continue;
-					if(in_array($node,$values["links"])) {
-						$dist = 10*$totalLinks+$size;
-						if(count($nodelist[$node2]["links"]) < 2)
-							$dist = round($dist/4);
-						$pX2 = round($pX + $dist * cos(2*($totalLinks-$cursorid)*pi()/$totalLinks));
-						$pY2 = round($pY + $dist * sin(2*($totalLinks-$cursorid)*pi()/$totalLinks));
-						$this->placeNode($node2,$nodelist);
-						$cursorid--;
-					}
-				}
-			}
-		}
-
-		private function ImportNodes($nodelist) {
-			if(!is_array($nodelist))
-				return;
-
-			foreach($nodelist as $node => $values) {
-				$this->placeNode($node,$nodelist);
-			}
 		}
 
 		public function getIfaceElmt() {
@@ -447,43 +388,6 @@
 						"'mainmap','".$name."','".$node1."','".$node2."','".$color."','".$size."'");
 					FS::$dbMgr->CommitTr();
 					FS::$iMgr->ajaxEcho("Done");
-					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
-					return;
-				// Import network nodes
-				case 4:
-					$nodelist = array();
-					$query = FS::$dbMgr->Select("device","ip,name");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						$linklist = array();
-						$query2 = FS::$dbMgr->Select("device_port","remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
-						while($data2 = FS::$dbMgr->Fetch($query2))
-							array_push($linklist,$data2["remote_id"]);
-						$nodelist[$data["name"]] = array("label" => $data["name"],"links" => $linklist, "placed" => false);
-					}
-
-					$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if(!array_key_exists($data["name"],$nodelist))
-							$linklist = array();
-						$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
-						while($data2 = FS::$dbMgr->Fetch($query2)) {
-							if(!array_key_exists($data["name"],$nodelist))
-								array_push($linklist,$data2["parent"]);
-							else if(!in_array($nodelist[$data["name"]]["links"],$data2["parent"]))
-								array_push($data2["parent"],$nodelist[$data["name"]]["links"]);
-						}
-						if(!array_key_exists($data["name"],$nodelist))
-							$nodelist[$data["name"]] = array("label" => $data["addr"],"links" => $linklist, "placed" => false);
-					}
-
-					$query = FS::$dbMgr->Select("device_port","remote_id","remote_id NOT IN(SELECT name FROM device)");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if(array_key_exists($data["remote_id"],$nodelist))
-							continue;
-						$nodelist[$data["remote_id"]] = array("label" => $data["remote_id"],"links" => array());
-					} 
-					
-					$this->ImportNodes($nodelist);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
 				// test
