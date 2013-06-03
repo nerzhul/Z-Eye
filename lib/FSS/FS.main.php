@@ -89,7 +89,7 @@
 
 		public static function isActionToDo() {
 			if(isset($_GET["act"]) && strlen($_GET["act"]) > 0 && FS::$secMgr->isNumeric($_GET["act"])) {
-				FS::$secMgr->SecuriseStringForDB($_GET["act"]);
+				FS::$secMgr->SecuriseString($_GET["act"]);
 				return true;
 			}
 			return false;
