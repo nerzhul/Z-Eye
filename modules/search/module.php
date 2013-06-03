@@ -954,18 +954,22 @@
 				if(!isset($devprise[$swname]))
 					$devprise[$swname] = array();
 
-				$devprise[$swname][$data["port"]] = $data["prise"];
+				$devprise[$swname][$data["port"]]["plug"] = $data["prise"];
+				$devprise[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData("device_port","description","name = '".$swname."' AND port = '".$data["port"]."'");
 				$this->nbresults++;
 			}
 			if($found) {
 				$locoutput = "";
 				foreach($devprise as $device => $devport) {
 					$locoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
-					foreach($devport as $port => $prise) {
+					foreach($devport as $port => $values) {
 						$convport = preg_replace("#\/#","-",$port);
-						$locoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-						$locoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ";
-						$locoutput .= "<br /><b>".$this->loc->s("Plug").":</b> ".$prise."</li>";
+						$locoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ".
+							"<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ".
+							"<br /><b>".$this->loc->s("Plug").":</b> ".$values["plug"];
+						if($values["desc"])
+							$locoutput .= "<br /><b>".$this->loc->s("Description").":</b> ".$values["desc"];
+						$locoutput .= "</li>";
 					}
 					$locoutput .= "</ul><br />";
 				}
@@ -996,7 +1000,8 @@
 				if(!isset($devroom[$swname]))
 					$devroom[$swname] = array();
 
-				$devroom[$swname][$data["port"]] = $data["room"];
+				$devroom[$swname][$data["port"]]["room"] = $data["room"];
+				$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData("device_port","description","name = '".$swname."' AND port = '".$data["port"]."'");
 				$this->nbresults++;
 			}
 			if($found) {
@@ -1005,9 +1010,12 @@
 					$locoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
 					foreach($devport as $port => $room) {
 						$convport = preg_replace("#\/#","-",$port);
-						$locoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ";
-						$locoutput .= "<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ";
-						$locoutput .= "<br /><b>".$this->loc->s("Room").":</b> ".$room."</li>";
+						$locoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ".
+							"<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ".
+							"<br /><b>".$this->loc->s("Room").":</b> ".$values["room"];
+						if($values["desc"])
+							$locoutput .= "<br /><b>".$this->loc->s("Description").":</b> ".$values["desc"];
+						$locoutput .= "</li>";
 					}
 					$locoutput .= "</ul><br />";
 				}
