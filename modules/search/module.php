@@ -322,6 +322,31 @@
 						}
 					}
 				}
+				// DNS resolution
+				if(FS::$secMgr->isDNSName($search)) {
+					if(!$autocomp) {
+						$out = shell_exec("/usr/bin/dig ".$search);
+						if($out != NULL) {
+							$locoutput .= preg_replace("#[\n]#","<br />",$out);
+							$tmpoutput .= $this->divEncapResults($locoutput,"title-dns-resolution");
+							$this->nbresults++;
+						}
+					}
+					else {
+						$out = shell_exec("/usr/bin/dig +short ".$search);
+						if($out != NULL) {
+							$found = 0;
+							$spl = preg_split("#[\n]#",$out);
+							for($i=0;$i<count($spl) && !$found;$i++) {
+								if(strlen($spl[$i]) > 0) {
+									$found = 1;
+									array_push($this->autoresults["dnsrecord"],$search);
+								}
+							}
+							$found = 0;
+						}
+					}
+				}
 			}
 
 			if(FS::$sessMgr->hasRight("mrule_switches_read")) {
