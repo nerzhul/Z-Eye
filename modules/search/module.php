@@ -980,7 +980,7 @@
 					$devprise[$swname] = array();
 
 				$devprise[$swname][$data["port"]]["plug"] = $data["prise"];
-				$devprise[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData("device_port","description","name = '".$swname."' AND port = '".$data["port"]."'");
+				$devprise[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData("device_port","name","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 				$this->nbresults++;
 			}
 			if($found) {
@@ -1026,14 +1026,14 @@
 					$devroom[$swname] = array();
 
 				$devroom[$swname][$data["port"]]["room"] = $data["room"];
-				$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData("device_port","description","name = '".$swname."' AND port = '".$data["port"]."'");
+				$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData("device_port","name","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 				$this->nbresults++;
 			}
 			if($found) {
 				$locoutput = "";
 				foreach($devroom as $device => $devport) {
 					$locoutput .= $this->loc->s("Device").": <a href=\"index.php?mod=".$swmodid."&d=".$device."\">".$device."</a><ul>";
-					foreach($devport as $port => $room) {
+					foreach($devport as $port => $values) {
 						$convport = preg_replace("#\/#","-",$port);
 						$locoutput .= "<li><a href=\"index.php?mod=".$swmodid."&d=".$device."#".$convport."\">".$port."</a> ".
 							"<a href=\"index.php?mod=".$swmodid."&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ".
