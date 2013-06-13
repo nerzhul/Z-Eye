@@ -24,7 +24,8 @@
 			parent::__construct($locales);
 			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
-				"prise" => array(), "room" => array(), "vlan" => array());
+				"prise" => array(), "room" => array(), "vlan" => array(),
+				"dhcpcluster" => array());
 			$this->nbresults = 0;
 		}
 
@@ -407,12 +408,34 @@
 			
 					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-hostname");
 					$found = 0;
+	
+					$locoutput = "";
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","group" => "clustername"));
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if($found == 0)
+							$found = 1;
+
+						$locoutput .= "<b>".$this->loc->s("DHCP-cluster")."</b>: ".$data["clustername"]."<br /><b>".$this->loc->s("Members").":</b><br />";
+						$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$data["clustername"]."'");
+						while($data2 = FS::$dbMgr->Fetch($query2)) {
+							$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_server","alias","addr = '".$data["dhcpaddr"]."'");
+							$locoutput .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".($alias ? $alias." (" : "").$data2["dhcpaddr"].($alias ? ")" : "")."<br />";
+						}
+						$locoutput .= FS::$iMgr->hr();
+						$this->nbresults++;
+					}
+					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-cluster");
+					$found = 0;
 				}
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","hostname","hostname ILIKE '%".$search."%'",array("order" => "hostname","limit" => "10","group" => "hostname"));
 					while($data = FS::$dbMgr->Fetch($query))
 						array_push($this->autoresults["dhcphostname"],$data["hostname"]);
 
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","limit" => "10",
+						"group" => "clustername"));
+					while($data = FS::$dbMgr->Fetch($query))
+						array_push($this->autoresults["dhcpcluster"],$data["clustername"]);
 				}
 			}
 			
