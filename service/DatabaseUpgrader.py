@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1203"
+	nextDBVersion = "1204"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -70,6 +70,11 @@ class ZEyeDBUpgrade():
 				self.tryAddColumn("z_eye_dhcp_servers","osname","varchar(64)")
 				self.tryAddColumn("z_eye_dhcp_servers","dhcptype","integer NOT NULL")
 				self.setDBVersion("1203")
+			if self.dbVersion == "1203":
+				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","mleasetime","integer")
+				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","dleasetime","integer")
+				self.setDBVersion("1204")
+			
 			
 		except PgSQL.Error, e:
 			if self.pgsqlCon:

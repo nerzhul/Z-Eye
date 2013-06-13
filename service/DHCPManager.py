@@ -177,6 +177,13 @@ class ZEyeDHCPManager(threading.Thread):
 							dns2 = " %s" % self.subnetList[subnet][4]
 
 						subnetBuf += "subnet %s netmask %s {\n\toption routers %s;\n\toption domain-name \"%s\";\n" % (subnet,netmask,self.subnetList[subnet][2],self.subnetList[subnet][5])
+
+						if self.subnetList[subnet][6] != "" and self.subnetList[subnet][6] != 0:
+							subnetBuf += "\tdefault-lease-time %s;\n" % self.subnetList[subnet][6]
+
+						if self.subnetList[subnet][7] != "" and self.subnetList[subnet][7] != 0:
+							subnetBuf += "\tmax-lease-time %s;\n" % self.subnetList[subnet][7]
+			
 						subnetBuf += "\toption domain-name-servers %s%s;\n}\n" % (self.subnetList[subnet][3],dns2)
 						for ip in subnetIpList:
 							reservBuf += "host %s {\n\thardware ethernet %s;\n\tfixed-address %s;\n}\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
@@ -226,7 +233,7 @@ class ZEyeDHCPManager(threading.Thread):
 	def loadSubnetList(self,pgcursor):
 		self.subnetList = {}
 		# We only load netid attached to clusters
-		pgcursor.execute("SELECT netid,netmask,router,dns1,dns2,domainname FROM z_eye_dhcp_subnet_v4_declared WHERE netid in (SELECT subnet FROM z_eye_dhcp_subnet_cluster)")
+		pgcursor.execute("SELECT netid,netmask,router,dns1,dns2,domainname,dleasetime,mleasetime FROM z_eye_dhcp_subnet_v4_declared WHERE netid in (SELECT subnet FROM z_eye_dhcp_subnet_cluster)")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
 			# Those fields are required
@@ -236,5 +243,5 @@ class ZEyeDHCPManager(threading.Thread):
 					# If ip in subnet we add it to list
 					if ip in Network("%s/%s" % (idx[0],idx[1])):
 						ipList.append(ip)
-				self.subnetList[idx[0]] = (idx[1],ipList,idx[2],idx[3],idx[4],idx[5])
+				self.subnetList[idx[0]] = (idx[1],ipList,idx[2],idx[3],idx[4],idx[5],idx[6],idx[7])
 

@@ -417,8 +417,10 @@
 		private function showDHCPSubnetForm($netid = "") {
 			$netmask = ""; $vlanid = 0; $shortname = ""; $desc = "";
 			$router = ""; $domainname = ""; $dns1 = ""; $dns2 = "";
+			$mleasetime = 0; $dleasetime = 0;
 			if($netid) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask,vlanid,subnet_desc,subnet_short_name,router,dns1,dns2,domainname","netid = '".$netid."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask,vlanid,subnet_desc,subnet_short_name,router,dns1,dns2,domainname,
+					mleasetime,dleasetime","netid = '".$netid."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$netmask = $data["netmask"];
 					$vlanid = $data["vlanid"];
@@ -428,6 +430,8 @@
 					$dns1 = $data["dns1"];
 					$dns2 = $data["dns2"];
 					$domainname = $data["domainname"];
+					$mleasetime = $data["mleasetime"];
+					$dleasetime = $data["dleasetime"];
 				}
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7")."<table>".
@@ -456,12 +460,17 @@
 			}
 			if($found) $output .= "</select></td></tr>";
 
-			$output .= FS::$iMgr->idxLine($this->loc->s("router"),"router",$router,array("length" => 16, "type" => "ip", "tooltip" => "tooltip-router")).
-				FS::$iMgr->idxLine($this->loc->s("domain-name"),"domainname",$domainname,array("length" => 120, "tooltip" => "tooltip-domainname")).
-				FS::$iMgr->idxLine($this->loc->s("DNS")." 1","dns1",$dns1,array("length" => 16, "type" => "ip")).
-				FS::$iMgr->idxLine($this->loc->s("DNS")." 2","dns2",$dns2,array("length" => 16, "type" => "ip"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("router")." (*)","router",$router,array("length" => 16, "type" => "ip", "tooltip" => "tooltip-router")).
+				FS::$iMgr->idxLine($this->loc->s("domain-name")." (*)","domainname",$domainname,array("length" => 120, "tooltip" => "tooltip-domainname")).
+				FS::$iMgr->idxLine($this->loc->s("DNS")." 1 (*)","dns1",$dns1,array("length" => 16, "type" => "ip")).
+				FS::$iMgr->idxLine($this->loc->s("DNS")." 2 (*)","dns2",$dns2,array("length" => 16, "type" => "ip")).
+				FS::$iMgr->idxLine($this->loc->s("max-lease-time")." (**)","mleasetime",$mleasetime,array("length" => 7, "type" => "num", "value" => $mleasetime, "tooltip" => "tooltip-max-lease-time")).
+				FS::$iMgr->idxLine($this->loc->s("default-lease-time")." (**)","dleasetime",$dleasetime,array("length" => 7, "type" => "num", "value" => $dleasetime,
+					"tooltip" => "tooltip-default-lease-time"));
 
-			$output .= FS::$iMgr->tableSubmit("Save");
+			$output .= "<tr><td colspan=\"2\">(*) ".$this->loc->s("required-if-cluster")."</td></tr>".
+				"<tr><td colspan=\"2\">(**) ".$this->loc->s("tip-inherit-if-null")."</td></tr>".
+				FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 
@@ -1044,12 +1053,15 @@
 					$dns1 = FS::$secMgr->checkAndSecurisePostData("dns1");
 					$dns2 = FS::$secMgr->checkAndSecurisePostData("dns2");
 					$domainname = FS::$secMgr->checkAndSecurisePostData("domainname");
+					$mleasetime = FS::$secMgr->checkAndSecurisePostData("mleasetime");
+					$dleasetime = FS::$secMgr->checkAndSecurisePostData("dleasetime");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$netid || !FS::$secMgr->isIP($netid) || !$netmask || !FS::$secMgr->isMaskAddr($netmask) || !$vlanid || !FS::$secMgr->isNumeric($vlanid) ||
 						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $subnetclusters && !is_array($subnetclusters) ||
 						$router && !FS::$secMgr->isIP($router) || $dns1 && !FS::$secMgr->isIP($dns1) || $dns2 && (!$dns1 || !FS::$secMgr->isIP($dns2)) ||
-						$domainname && !FS::$secMgr->isDNSName($domainname) ||
+						$domainname && !FS::$secMgr->isDNSName($domainname) || $mleasetime && (!FS::$secMgr->isNumeric($mleasetime) || $mleasetime < 60) ||
+						$dleasetime && (!FS::$secMgr->isNumeric($dleasetime) || $dleasetime < 30) || 
 						$edit && $edit != 1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas entered when adding Declared subnet");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
@@ -1070,6 +1082,11 @@
 						}
 					}
 
+					if($dleasetime && $mleasetime && $dleasetime > $mleasetime) {
+						FS::$iMgr->ajaxEcho("err-dlease-sup-mlease");
+						return;
+					}
+					
 					if($router) {
 						$netobj = new FSNetwork();
 						$netobj->setNetAddr($netid);
@@ -1104,8 +1121,8 @@
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
 					}
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname",
-						"'".$netid."','".$netmask."','".$vlanid."','".$shortname."','".$desc."','".$router."','".$dns1."','".$dns2."','".$domainname."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname,dleasetime,mleasetime",
+						"'".$netid."','".$netmask."','".$vlanid."','".$shortname."','".$desc."','".$router."','".$dns1."','".$dns2."','".$domainname."','".$dleasetime."','".$mleasetime."'");
 
 					if($subnetclusters) {
 						for($i=0;$i<count($subnetclusters);$i++) {
