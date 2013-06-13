@@ -749,21 +749,6 @@
 			return $output;
 		}
 
-		private function writeConfigToServer($server = NULL) {
-
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,pwd","dhcp = 1");
-		        while($data = FS::$dbMgr->Fetch($query)) {
-				$ssh = new SSH($data["addr"],22);
-                		if(!$ssh->Connect()) {
-		                        return $this->loc->s("error-fail-connect-ssh").$data["addr"];
-		                }
-                		else if(!$ssh->Authenticate($data["login"], $data["pwd"])) {
-                			return "Authentication error for server '".$data["addr"]."' with login '".$data["login"];
-		                }
-			}
-			// @TODO ?
-		}
-
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
