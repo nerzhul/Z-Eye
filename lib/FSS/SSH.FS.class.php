@@ -80,6 +80,12 @@
 			return true;
 		}	
 
+		public function execCmd($cmd) {
+			$stream = ssh2_exec($this->conn, $cmd);
+			stream_set_blocking($stream, true);
+			return stream_get_contents($stream); 
+		}
+
 		public function sendCmd($cmd) {
 			if(!$this->conn || !$this->is_auth || !$this->stdio)
 				return false;
@@ -104,6 +110,11 @@
 			for($i=0;$i<count($output_arr)-2;$i++)
 				$output .= $output_arr[$i];
 			return $output;
+		}
+
+		public function Close() {
+			if($this->conn)
+				close($this->conn);
 		}
 		
 		private $conn;

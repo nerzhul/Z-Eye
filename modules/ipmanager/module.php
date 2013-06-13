@@ -466,9 +466,9 @@
 		}
 
 		private function showDHCPSrvForm($addr = "") {
-			$user = ""; $dhcpdpath = ""; $leasepath = ""; $reservconfpath = ""; $subnetconfpath = ""; $alias = ""; $description = "";
+			$user = ""; $dhcpdpath = ""; $leasepath = ""; $reservconfpath = ""; $subnetconfpath = ""; $alias = ""; $description = ""; $dhcptype = 0;
 			if($addr) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype","addr = '".$addr."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$alias = $data["alias"];
 					$description = $data["description"];
@@ -477,6 +477,7 @@
 					$leasepath = $data["leasespath"];
 					$reservconfpath = $data["reservconfpath"];
 					$subnetconfpath = $data["subnetconfpath"];
+					$dhcptype = $data["dhcptype"];
 				}
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
@@ -486,6 +487,9 @@
 				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",$user,array("length" => 128)).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2","",array("type" => "pwd")).
+				"<tr><td>".$this->loc->s("dhcp-type")." (*)</td><td>".FS::$iMgr->select("dhcptype").
+				FS::$iMgr->selElmt("ISC-DHCP",1,$dhcptype == 1).
+				"</td></tr>".
 				FS::$iMgr->idxLine($this->loc->s("dhcpd-path"),"dhcpdpath",$dhcpdpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
 				FS::$iMgr->idxLine($this->loc->s("lease-path"),"leasepath",$leasepath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
 				FS::$iMgr->idxLine($this->loc->s("reservconf-path"),"reservconfpath",$reservconfpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
@@ -495,13 +499,19 @@
 		}
 
 		private function showDHCPSrvList() {
-			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("ssh-user")."</th>
-				<th>".$this->loc->s("member-of")."<th></th></tr>";
+			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("os-name").
+				"</th><th>".$this->loc->s("dhcp-type")."</th><th>".$this->loc->s("ssh-user")."</th><th>".$this->loc->s("member-of")."<th></th></tr>";
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath,osname,dhcptype");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["alias"]."</td><td>".$data["description"]."</td><td>".
-					$data["sshuser"]."</td><td>";
+					$data["osname"]."</td><td>";
+	
+				switch($data["dhcptype"]) {
+					case 1:	$output .= "ISC-DHCP"; break;
+					default: $output .= $this->loc->s("unknown"); break;
+				}
+				$output .= "</td><td>".$data["sshuser"]."</td><td>";
 
 				$found = false;
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","dhcpaddr = '".$data["addr"]."'");
@@ -741,17 +751,17 @@
 
 		private function writeConfigToServer($server = NULL) {
 
-			$conns = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,pwd","dhcp = 1");
 		        while($data = FS::$dbMgr->Fetch($query)) {
-		                $conn = ssh2_connect($data["addr"],22);
-                		if(!$conn) {
+				$ssh = new SSH($data["addr"],22);
+                		if(!$ssh->Connect()) {
 		                        return $this->loc->s("error-fail-connect-ssh").$data["addr"];
 		                }
-                		else if(!ssh2_auth_password($conn, $data["login"], $data["pwd"])) {
+                		else if(!$ssh->Authenticate($data["login"], $data["pwd"])) {
                 			return "Authentication error for server '".$data["addr"]."' with login '".$data["login"];
 		                }
 			}
+			// @TODO ?
 		}
 
 		public function getIfaceElmt() {
@@ -906,6 +916,7 @@
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("sshpwd2");
                                         $dhcpdpath = FS::$secMgr->checkAndSecurisePostData("dhcpdpath");
                                         $alias = FS::$secMgr->checkAndSecurisePostData("alias");
+                                        $dhcptype = FS::$secMgr->checkAndSecurisePostData("dhcptype");
                                         $desc = FS::$secMgr->checkAndSecurisePostData("description");
                                         $leasepath = FS::$secMgr->checkAndSecurisePostData("leasepath");
 					$reservconfpath = FS::$secMgr->checkAndSecurisePostData("reservconfpath");
@@ -916,6 +927,7 @@
 						$reservconfpath && ($reservconfpath == "" || !FS::$secMgr->isPath($reservconfpath)) ||
 						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath)) ||
 						$alias && !FS::$secMgr->isAlphaNumeric($alias) || $desc && !FS::$secMgr->isSentence($desc) ||
+						!$dhcptype || !FS::$secMgr->isNumeric($dhcptype) ||
 						$edit && $edit != 1
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
@@ -943,54 +955,37 @@
 						}
 
 					}
-					$conn = ssh2_connect($saddr,22);
-                                        if(!$conn) {
+					$ssh = new SSH($saddr,22);
+					
+                                        if(!$ssh->Connect()) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"SSH Connection failed for '".$saddr."'");
 						FS::$iMgr->ajaxEcho("err-ssh-conn-failed");
                                                 return;
                                         }
-					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
+					if(!$ssh->Authenticate($slogin,$spwd)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
 						FS::$iMgr->ajaxEcho("err-ssh-auth-failed");
                                                 return;
                                         }
+
 					/*
 					* We try to read files
 					*/
-					// dhcpd.conf
-					$stream = ssh2_exec($conn,"if [ -r ".$dhcpdpath." ]; then; echo 0; else; echo 1; fi;");
-					$cmdret = "";
-		        	        stream_set_blocking($stream, true);
-	        	        	while ($buf = fread($stream, 4096))
-						$cmdret .= $buf;
-
-					if($cmdret != 0) {
+					if($ssh->execCmd("if [ -r ".$dhcpdpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEcho("err-unable-read")." '".$dhcpdpath."'";
                                                 return;
 					}
 
 					// dhcpd.leases
-					$stream = ssh2_exec($conn,"if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;");
-                                        $cmdret = "";
-                                        stream_set_blocking($stream, true);
-                                        while ($buf = fread($stream, 4096))
-                                                $cmdret .= $buf;
-
-                                        if($cmdret != 0) {
+                                        if($ssh->execCmd("if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;") != 0) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$leasepath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEcho("err-unable-read")." '".$leasepath."'";
                                                 return;
                                         }
 
 					if($reservconfpath && strlen($reservconfpath) > 0) {
-						$stream = ssh2_exec($conn,"if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;");
-        	                                $cmdret = "";
-                	                        stream_set_blocking($stream, true);
-                        	                while ($buf = fread($stream, 4096))
-                                	                $cmdret .= $buf;
-
-                                        	if($cmdret != 0) {
+                                        	if($ssh->execCmd("if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;")!= 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEcho("err-unable-read")." '".$reservconfpath."'";
         	                                        return;
@@ -998,23 +993,20 @@
 					}
 
 					if($subnetconfpath && strlen($subnetconfpath) > 0) {
-						$stream = ssh2_exec($conn,"if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;");
-        	                                $cmdret = "";
-                	                        stream_set_blocking($stream, true);
-                        	                while ($buf = fread($stream, 4096))
-                                	                $cmdret .= $buf;
-
-                                        	if($cmdret != 0) {
+                                        	if($ssh->execCmd("if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEcho("err-unable-read")." '".$subnetconfpath."'";
         	                                        return;
                 	                        }
 					}
 
+					$osname = $ssh->execCmd("uname -srm");
+
 					FS::$dbMgr->BeginTr();
 					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$saddr."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath","'".$saddr."','".$alias."','".$desc.
-						"','".$slogin."','".$spwd."','".$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype,osname",
+						"'".$saddr."','".$alias."','".$desc.
+						"','".$slogin."','".$spwd."','".$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."','".$dhcptype."','".$osname."'");
 					FS::$dbMgr->CommitTr();
 
 					if($edit)
@@ -1048,6 +1040,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_cache","server = '".$addr."'");
 					// Later
 					// FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","server = '".$addr."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_clusters","dhcpaddr = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
 					FS::$dbMgr->CommitTr();
 

@@ -18,7 +18,6 @@
 	*/
 
 	require_once(dirname(__FILE__)."/device.api.php");
-	require_once(dirname(__FILE__)."/../../lib/FSS/SSH.FS.class.php");
 	
 	class CiscoAPI extends DeviceAPI {
 		function CiscoAPI() { $this->vendor = "cisco"; }

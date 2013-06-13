@@ -48,6 +48,7 @@
 					"Remove" => "Remove",
 					"rule-read-datas" => "Read datas",
 					"rule-write-datas" => "Write datas",
+					"unknown" => "unknown",
 				),
 				"fr" => array(
 					"Add" => "Ajouter",
@@ -66,6 +67,7 @@
 					"Remove" => "Supprimer",
 					"rule-read-datas" => "Lire les données",
 					"rule-write-datas" => "Ecrire les données",
+					"unknown" => "inconnu",
 				)
 			);
 		}
