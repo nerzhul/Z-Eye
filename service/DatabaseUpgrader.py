@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1204"
+	nextDBVersion = "1205"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -74,7 +74,17 @@ class ZEyeDBUpgrade():
 				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","mleasetime","integer")
 				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","dleasetime","integer")
 				self.setDBVersion("1204")
-			
+			if self.dbVersion == "1204":
+				self.tryAddColumn("device_port_vlan","vlantype","text")
+				self.tryCreateTable("topology","dev1 inet not null, port1 text not null, dev2 inet not null, port2 text not null")
+				self.tryAddColumn("device_port_ssid","bssid","macaddr")
+				self.tryAddColumn("node","vlan","text default '0'")
+				self.rawRequest("alter table node drop constraint node_pkey")
+				self.rawRequest("alter table node add primary key (mac, switch, port, vlan)")
+				self.tryAddColumn("node_wireless","ssid","text default ''")
+				self.rawRequest("alter table node_wireless drop constraint node_wireless_pkey")
+				self.rawRequest("alter table node_wireless add primary key (mac, ssid)")
+				self.setDBVersion("1205")
 			
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
@@ -97,6 +107,18 @@ class ZEyeDBUpgrade():
 
 		print "DB Upgrade done."
 		Logger.ZEyeLogger().write("DBUpgrade Done.")
+
+	def rawRequest(self,request):
+		try:
+			pgcursor = self.pgsqlCon.cursor()
+			pgcursor.execute("%s" % request)
+			self.pgsqlCon.commit()
+		except PgSQL.Error, e:
+			if self.pgsqlCon:
+				self.pgsqlCon.close()
+                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			print "PgSQL Error: %s" % e
+                        sys.exit(1);
 
 	def tryAddColumn(self,tablename,columnname,attributes):
 		try:
