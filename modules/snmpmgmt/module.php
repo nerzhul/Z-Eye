@@ -95,7 +95,7 @@
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
-				case 1: return showCommunityForm();
+				case 1: return $this->showCommunityForm();
 				case 2:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if(!$name)

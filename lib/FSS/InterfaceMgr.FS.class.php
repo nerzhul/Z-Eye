@@ -103,8 +103,8 @@
 								}
 								if($module->getRulesClass()->canAccessToModule()) {
 									array_push($menus[$menuname],
-										"<div class=\"menuItem\"><a href=\"index.php?mod=".$moduleid."\">".
-										$module->getModuleClass()->getMenuTitle()."</a></div>"
+										"<div class=\"menuItem\" onclick=\"window.location.href='index.php?mod=".$moduleid."'\">".
+										$module->getModuleClass()->getMenuTitle()."</div>"
 									);
 								}
 							}

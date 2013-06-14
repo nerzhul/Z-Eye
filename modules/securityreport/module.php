@@ -40,6 +40,7 @@
 			if(!FS::isAjaxCall())
 				$output .= FS::$iMgr->h1("title-attack-report");
 			$output .= $this->loadAttackGraph();
+			FS::$dbMgr->Connect();
 			return $output;
 		}
 
