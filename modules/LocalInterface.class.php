@@ -99,8 +99,8 @@
 
 		private function showUserForm() {
 			return "<div id=\"menuStack\"><div class=\"userMenu\">".FS::$sessMgr->getUserRealName()." (".FS::$sessMgr->getUserName().")</div><div class=\"userpopup\">".
-			"<div class=\"menuItem\"><a href=\"#\" onclick=\"confirmPopup('".addslashes($this->getLocale("confirm-disconnect"))."','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',
-				'index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1',{});\">".$this->getLocale("Disconnection")."</a></div>".
+			"<div class=\"menuItem\" onclick=\"confirmPopup('".addslashes($this->getLocale("confirm-disconnect"))."','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',
+				'index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1',{});\">".$this->getLocale("Disconnection")."</div>".
 
 			"</div></div>";
 		}
