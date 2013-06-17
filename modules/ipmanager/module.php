@@ -925,6 +925,7 @@
 						$edit && $edit != 1
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
+var_dump($_POST);
 						FS::$iMgr->ajaxEcho("err-bad-datas");
                                                 return;
                                         }

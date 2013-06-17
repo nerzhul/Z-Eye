@@ -158,6 +158,7 @@ class ZEyeDBUpgrade():
 		pgcursor.execute("DELETE FROM z_eye_db_version")
 		pgcursor.execute("INSERT INTO z_eye_db_version (dbver) VALUES ('%s')" % version)
 		self.pgsqlCon.commit()
+		self.dbVersion = version
 
 	def initDBVersionTable(self):
 		try:
