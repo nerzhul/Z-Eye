@@ -376,6 +376,10 @@
 			return $output;
 		}
 
+		private function showDHCPCustomOptsForm($optid=0) {
+
+		}
+
 		private function showSubnetMgmt() {
 			$output = FS::$iMgr->h2("title-declared-subnets");
 	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));

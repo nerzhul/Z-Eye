@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1205"
+	nextDBVersion = "1206"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -85,6 +85,11 @@ class ZEyeDBUpgrade():
 				self.rawRequest("alter table node_wireless drop constraint node_wireless_pkey")
 				self.rawRequest("alter table node_wireless add primary key (mac, ssid)")
 				self.setDBVersion("1205")
+			if self.dbVersion == "1205":
+				self.tryCreateTable("z_eye_dhcp_custom_option","optname varchar(32) NOT NULL, optcode integer NOT NULL, opttype varchar(32) NOT NULL, PRIMARY KEY (optname)")
+				self.tryCreateTable("z_eye_dhcp_option","optid integer, optname varchar(32) NOT NULL, optval varchar(512) NOT NULL, PRIMARY KEY (optid)")
+				self.tryCreateTable("z_eye_dhcp_option_group","optgroup varchar(64), optid integer, PRIMARY KEY (optgroup, optid)")
+				self.setDBVersion("1206")
 			
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
