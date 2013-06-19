@@ -69,9 +69,7 @@ if __name__ == "__main__":
 			print "Restarting Z-Eye daemon"
                         daemon.restart()
 		elif 'updatedb' == sys.argv[1]:
-			print "Upgrading database if needed..."
 			ZEyeDBUpgrade().checkAndDoUpgrade()
-			print "Done"
 		elif 'status' == sys.argv[1]:
 			daemon.status()
                 else:

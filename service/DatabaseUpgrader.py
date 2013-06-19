@@ -42,6 +42,8 @@ class ZEyeDBUpgrade():
 		# if this version is minor than service, we must upgrade
 		if self.dbVersion < self.nextDBVersion:
 			self.doUpgrade()
+		else:
+			print "No upgrade required !"
 
 		if(self.pgsqlCon):
 			self.pgsqlCon.close()
