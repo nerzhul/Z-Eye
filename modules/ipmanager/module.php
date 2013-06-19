@@ -366,7 +366,13 @@
 		private function showDHCPOptsMgmt() {
 			$output = FS::$iMgr->h2("title-dhcp-opts-group");	
 			$output .= FS::$iMgr->h2("title-dhcp-opts");	
-			$output .= FS::$iMgr->h2("title-custom-dhcp-opts").FS::$iMgr->tip("tip-custom-dhcp-opts");
+			$output .= FS::$iMgr->h2("title-custom-dhcp-opts").FS::$iMgr->tip("tip-custom-dhcp-opts")."<br />".
+				FS::$iMgr->opendiv(8,$this->loc->s("create-custom-option"),array("line" => true)).
+				"<div id=\"customoptslist\">";
+
+			$found = 0;
+
+			$output .= "</div>";
 			return $output;
 		}
 
@@ -477,8 +483,8 @@
 				FS::$iMgr->idxLine($this->loc->s("default-lease-time")." (**)","dleasetime",$dleasetime,array("length" => 7, "type" => "num", "value" => $dleasetime,
 					"tooltip" => "tooltip-default-lease-time"));
 
-			$output .= "<tr><td colspan=\"2\">(*) ".FS::$iMgr->tip("required-if-cluster")."<br />".
-				"(**) ".FS::$iMgr->tip("tip-inherit-if-null")."</td></tr>".
+			$output .= "<tr><td colspan=\"2\">".FS::$iMgr->tip("(*) ".$this->loc->s("required-if-cluster")."<br />".
+				"(**) ".$this->loc->s("tip-inherit-if-null"),true)."</td></tr>".
 				FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
@@ -797,6 +803,12 @@
 						return $this->loc->s("err-bad-datas");
 
 					return $this->showIPForm($ip);
+				case 8: return $this->showDHCPCustomOptsForm();
+				case 9:
+					$optid = FS::$secMgr->checkAndSecuriseGetData("optid");
+					if(!$optid)
+						return $this->loc->s("err-bad-datas");
+					return $this->showDHCPCustomOptsForm($optid);
 				default: return;
 			}
 		}
