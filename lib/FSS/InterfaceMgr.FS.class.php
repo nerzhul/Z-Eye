@@ -214,6 +214,10 @@
 			return $output;
 		}
 
+		public function tip($text) {
+			return "<span id=\"tip\">".$this->getLocale($text)."</span>";
+		}
+
 		public function textarea($name, $def_value = "", $options=array()) {
 			$output = "";
 			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";

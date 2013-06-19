@@ -37,6 +37,7 @@
 				$tabs = array(
 					array(1,"mod=".$this->mid,$this->loc->s("Consult")),
 					array(2,"mod=".$this->mid,$this->loc->s("Manage-Subnets")),
+					array(5,"mod=".$this->mid,$this->loc->s("Manage-DHCP-Opts")),
 					array(4,"mod=".$this->mid,$this->loc->s("Advanced-tools"))
 					);
 				
@@ -51,6 +52,7 @@
 					case 2: $output .= $this->showSubnetMgmt(); break;
 					case 3: $output .= $this->showDHCPMgmt(); break;
 					case 4: $output .= $this->showAdvancedTools(); break;
+					case 5: $output .= $this->showDHCPOptsMgmt(); break;
 				}
 			}
 			return $output;
@@ -361,6 +363,13 @@
 			return $output;
 		}
 
+		private function showDHCPOptsMgmt() {
+			$output = FS::$iMgr->h2("title-dhcp-opts-group");	
+			$output .= FS::$iMgr->h2("title-dhcp-opts");	
+			$output .= FS::$iMgr->h2("title-custom-dhcp-opts").FS::$iMgr->tip("tip-custom-dhcp-opts");
+			return $output;
+		}
+
 		private function showSubnetMgmt() {
 			$output = FS::$iMgr->h2("title-declared-subnets");
 	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
@@ -468,8 +477,8 @@
 				FS::$iMgr->idxLine($this->loc->s("default-lease-time")." (**)","dleasetime",$dleasetime,array("length" => 7, "type" => "num", "value" => $dleasetime,
 					"tooltip" => "tooltip-default-lease-time"));
 
-			$output .= "<tr><td colspan=\"2\">(*) ".$this->loc->s("required-if-cluster")."</td></tr>".
-				"<tr><td colspan=\"2\">(**) ".$this->loc->s("tip-inherit-if-null")."</td></tr>".
+			$output .= "<tr><td colspan=\"2\">(*) ".FS::$iMgr->tip("required-if-cluster")."<br />".
+				"(**) ".FS::$iMgr->tip("tip-inherit-if-null")."</td></tr>".
 				FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
@@ -925,6 +934,7 @@
 						$edit && $edit != 1
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
+var_dump($_POST);
 						FS::$iMgr->ajaxEcho("err-bad-datas");
                                                 return;
                                         }
