@@ -370,14 +370,49 @@
 				FS::$iMgr->opendiv(8,$this->loc->s("create-custom-option"),array("line" => true)).
 				"<div id=\"customoptslist\">";
 
-			$found = 0;
+			$found = false;
+			$query = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname,opttype,optcode");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) {
+					$found = 1;
+					$output .= $this->showDHCPOptsTableHead();
+				}
+				$output .= $this->tableDHCPOptEntry($data["optname"],$data["optcode"],$data["opttype"]);
+			}
 
+			if($found) $output .= "</table>";
 			$output .= "</div>";
 			return $output;
 		}
 
-		private function showDHCPCustomOptsForm($optid=0) {
+		private function showDHCPOptsTableHead() {
+			return "<table id=\"dhcpopttable\"><thead id=\"dhcpoptth\"><tr><th>".$this->loc->s("opt-name")."</th><th>".
+				$this->loc->s("opt-code")."</th><th>".$this->loc->s("opt-type")."</th></tr></thead>";
+		}
 
+		private function showDHCPCustomOptsForm($optname="") {
+			$opttype = 0; $optcode = 0;
+			if($optname) {
+				$opttype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","opttype",
+					"optname = '".$optname."'");
+				$optcode = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optcode",
+					"optname = '".$optname."'");
+			}
+
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=12")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("option-name"),"optname",$optname,array("type" => "idxedit", "length" => 32,
+					"edit" => $optname != "")).
+				FS::$iMgr->idxLine($this->loc->s("option-code"),"optcode",$optcode,array("type" => "num", "length" => 3, "size" => 3,
+					"edit" => $optcode != "")).
+				"<tr><td>".$this->loc->s("option-type")."</td><td>".FS::$iMgr->select("opttype").
+				FS::$iMgr->selElmt($this->loc->s("boolean"),"boolean").
+				FS::$iMgr->selElmt($this->loc->s("integer"),"integer").
+				FS::$iMgr->selElmt($this->loc->s("IP-Addr"),"ip").
+				FS::$iMgr->selElmt($this->loc->s("text"),"text").
+				"</td></tr></select>".
+				FS::$iMgr->aeTableSubmit($optname == "");
+
+			return $output;
 		}
 
 		private function showSubnetMgmt() {
@@ -489,7 +524,7 @@
 
 			$output .= "<tr><td colspan=\"2\">".FS::$iMgr->tip("(*) ".$this->loc->s("required-if-cluster")."<br />".
 				"(**) ".$this->loc->s("tip-inherit-if-null"),true)."</td></tr>".
-				FS::$iMgr->tableSubmit("Save");
+				FS::$iMgr->aeTableSubmit($netid == "");
 			return $output;
 		}
 
@@ -522,7 +557,7 @@
 				FS::$iMgr->idxLine($this->loc->s("lease-path"),"leasepath",$leasepath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
 				FS::$iMgr->idxLine($this->loc->s("reservconf-path"),"reservconfpath",$reservconfpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
 				FS::$iMgr->idxLine($this->loc->s("subnetconf-path"),"subnetconfpath",$subnetconfpath,array("length" => 980, "size" => 30, "tooltip" => "tooltip-subnetconfpath")).
-				FS::$iMgr->tableSubmit("Save");
+				FS::$iMgr->aeTableSubmit($addr == "");
 			return $output;
 		}
 
@@ -613,7 +648,7 @@
 			while($data = FS::$dbMgr->Fetch($query))
 				$output .= FS::$iMgr->selElmt($data["addr"].($data["alias"] ? " (".$data["alias"].")" : ""),$data["addr"],in_array($data["addr"],$members));
 
-			$output .= "</select>".FS::$iMgr->tableSubmit("Save");
+			$output .= "</select>".FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
 
@@ -675,7 +710,7 @@
 				FS::$iMgr->idxLine($this->loc->s("MAC-Addr"),"mac",$mac).
 				FS::$iMgr->idxLine($this->loc->s("Hostname"),"hostname",$hostname,array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")).
 				FS::$iMgr->idxLine($this->loc->s("Comment"),"comment","",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment")).
-				FS::$iMgr->tableSubmit("Save");
+				FS::$iMgr->aeTableSubmit($ip == "");
 
 			return $output;
 		}
@@ -809,10 +844,10 @@
 					return $this->showIPForm($ip);
 				case 8: return $this->showDHCPCustomOptsForm();
 				case 9:
-					$optid = FS::$secMgr->checkAndSecuriseGetData("optid");
-					if(!$optid)
+					$optid = FS::$secMgr->checkAndSecuriseGetData("optname");
+					if(!$optname)
 						return $this->loc->s("err-bad-datas");
-					return $this->showDHCPCustomOptsForm($optid);
+					return $this->showDHCPCustomOptsForm($optname);
 				default: return;
 			}
 		}
@@ -1090,7 +1125,7 @@ var_dump($_POST);
 						$dleasetime && (!FS::$secMgr->isNumeric($dleasetime) || $dleasetime < 30) || 
 						$edit && $edit != 1) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas entered when adding Declared subnet");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
@@ -1371,7 +1406,25 @@ var_dump($_POST);
 					// Maybe replace only the concerned tr and also the graph ? 
 					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Add/Edit Custom Option
+				case 12:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+					$optname = FS::$secMgr->checkAndSecurisePostData("optname");
+					$optcode = FS::$secMgr->checkAndSecurisePostData("optcode");
+					$opttype = FS::$secMgr->checkAndSecurisePostData("opttype");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+					if(!$optname || !$optcode || !$opttype || $edit && $edit != 1) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
 
+					return;
+				// Delete Custom Option
+				case 13:
 					return;
 			}
 		}

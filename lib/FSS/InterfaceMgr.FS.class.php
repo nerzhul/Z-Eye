@@ -647,8 +647,14 @@
 			return 0;
 		}
 
+
 		public function ajaxEcho($str,$js="",$raw=false) {
 			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
+		}
+
+		public function ajaxEchoNC($str,$js="",$raw=false) {
+			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js("dontClosePopup(); ".$js) : 
+				$this->js("dontClosePopup();"));
 		}
 
 		protected function getLocale($locid) {
