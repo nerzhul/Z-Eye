@@ -195,10 +195,9 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
 					
-					$js = "hideAndRemove('#".$name."tr');";
-					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
-					if($count == 0)
-						$js .= "$('#snmptable').hide('slow',function() { $('#snmptable').html(''); });";
+					$tMgr = new HTMLTableMgr("snmptable",PGDbConfig::getDbPrefix()."snmp_communities","name");
+					$js = $tMgr->removeLine($name."tr");
+
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				default: break;

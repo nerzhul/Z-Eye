@@ -317,7 +317,7 @@
 
 		private function showSubnetHistory($filter) {
 			$output = FS::$iMgr->js("function historyDateChange() {
-				$('#hstcontent').hide(\"slow\",function() { $('#hstcontent').html(''); 
+				hideAndEmpty('#hstcontent'); 
 				$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
 					$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
 				}); }); }");
@@ -1222,13 +1222,8 @@ var_dump($_POST);
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
 					FS::$dbMgr->CommitTr();
 
-					$js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr');";
-					
-					// Also remove table is no record
-					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid");
-					if($count == 0) {
-						$js .= "$('#declsubnets').hide('slow',function() { $('#declsubnets').html(''); });";
-					}
+					$tMgr = new HTMLTableMgr("declsubnets",PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid");
+					$js = $tMgr->removeLine("ds".FS::$iMgr->formatHTMLId($netid)."tr");
 
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
@@ -1314,13 +1309,9 @@ var_dump($_POST);
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername = '".$cname."'");
 					FS::$dbMgr->CommitTr();
 
-					$js = "";
-					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername");
-					if($count == 0)
-						$js .= "hideAndRemove('#clustertable');";
-					else
-						$js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($cname)."tr');";
-
+					$tMgr = new HTMLTableMgr("clustertable",PGDbConfig::getDbPrefix()."dhcp_cluster","clustername");
+					$js = $tMgr->removeLine("cl".FS::$iMgr->formatHTMLId($cname)."tr");
+					
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Add/Edit IP informations
