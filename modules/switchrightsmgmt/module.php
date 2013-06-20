@@ -815,7 +815,7 @@
 					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"Some fields are missing/wrong for saving switch config");
 						if(FS::isAjaxCall())
-							echo $this->loc->s("err-bad-datas");
+							FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 						return;
@@ -824,7 +824,7 @@
 						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
 							if(FS::isAjaxCall())
-								echo $this->loc->s("err-not-found");
+								FS::$iMgr->ajaxEchoNC("err-not-found");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=4");
 							return;
@@ -834,7 +834,7 @@
 						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
 							if(FS::isAjaxCall())
-								echo $this->loc->s("err-already-exists");
+								FS::$iMgr->ajaxEchoNC("err-already-exists");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=3");
 							return;
@@ -857,7 +857,7 @@
 						if(FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("err-no-rights");
 						else
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
+							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
 						return;
 					}
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");

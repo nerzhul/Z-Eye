@@ -859,7 +859,7 @@
 					$view = FS::$secMgr->checkAndSecurisePostData("view");
 					if(!$filtr || !$view || !FS::$secMgr->isNumeric($view) || $view < 1 || $view > 3) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to filter values");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 					
@@ -879,7 +879,7 @@
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
 					if(!$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
-						FS::$iMgr->ajaxEcho("err-invalid-req");
+						FS::$iMgr->ajaxEchoNC("err-invalid-req");
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when trying to find obsolete datas");
 						return;
 					}
@@ -925,7 +925,7 @@
 					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || $warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
 						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to monitor subnet");
-						FS::$iMgr->ajaxEcho("err-miss-data");
+						FS::$iMgr->ajaxEchoNC("err-miss-data");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid","netid = '".$filtr."'");
@@ -986,11 +986,11 @@
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
 var_dump($_POST);
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
                                                 return;
                                         }
 					if($spwd != $spwd2) {
-						FS::$iMgr->ajaxEcho("err-pwd-not-match");
+						FS::$iMgr->ajaxEchoNC("err-pwd-not-match");
                                                 return;
                                         }
 
@@ -1005,7 +1005,7 @@ var_dump($_POST);
 					else {
 						if($exist) {
 							FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
-							FS::$iMgr->ajaxEcho("err-already-exists");
+							FS::$iMgr->ajaxEchoNC("err-already-exists");
 							return;
 						}
 
@@ -1014,12 +1014,12 @@ var_dump($_POST);
 					
                                         if(!$ssh->Connect()) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"SSH Connection failed for '".$saddr."'");
-						FS::$iMgr->ajaxEcho("err-ssh-conn-failed");
+						FS::$iMgr->ajaxEchoNC("err-ssh-conn-failed");
                                                 return;
                                         }
 					if(!$ssh->Authenticate($slogin,$spwd)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
-						FS::$iMgr->ajaxEcho("err-ssh-auth-failed");
+						FS::$iMgr->ajaxEchoNC("err-ssh-auth-failed");
                                                 return;
                                         }
 
@@ -1028,21 +1028,21 @@ var_dump($_POST);
 					*/
 					if($ssh->execCmd("if [ -r ".$dhcpdpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
-						FS::$iMgr->ajaxEcho("err-unable-read")." '".$dhcpdpath."'";
+						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$dhcpdpath."'";
                                                 return;
 					}
 
 					// dhcpd.leases
                                         if($ssh->execCmd("if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;") != 0) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$leasepath."' on '".$saddr."'");
-						FS::$iMgr->ajaxEcho("err-unable-read")." '".$leasepath."'";
+						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$leasepath."'";
                                                 return;
                                         }
 
 					if($reservconfpath && strlen($reservconfpath) > 0) {
                                         	if($ssh->execCmd("if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;")!= 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
-							FS::$iMgr->ajaxEcho("err-unable-read")." '".$reservconfpath."'";
+							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$reservconfpath."'";
         	                                        return;
                 	                        }
 					}
@@ -1050,7 +1050,7 @@ var_dump($_POST);
 					if($subnetconfpath && strlen($subnetconfpath) > 0) {
                                         	if($ssh->execCmd("if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
                                                 	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
-							FS::$iMgr->ajaxEcho("err-unable-read")." '".$subnetconfpath."'";
+							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$subnetconfpath."'";
         	                                        return;
                 	                        }
 					}
@@ -1138,13 +1138,13 @@ var_dump($_POST);
 					}
 					else {
 						if($exist) {
-							FS::$iMgr->ajaxEcho("err-subnet-already-exists");
+							FS::$iMgr->ajaxEchoNC("err-subnet-already-exists");
 							return;
 						}
 					}
 
 					if($dleasetime && $mleasetime && $dleasetime > $mleasetime) {
-						FS::$iMgr->ajaxEcho("err-dlease-sup-mlease");
+						FS::$iMgr->ajaxEchoNC("err-dlease-sup-mlease");
 						return;
 					}
 					
@@ -1153,25 +1153,25 @@ var_dump($_POST);
 						$netobj->setNetAddr($netid);
 						$netobj->setNetMask($netmask);
 						if(!$netobj->isUsableIP($router)) {
-							FS::$iMgr->ajaxEcho("err-router-not-in-subnet");
+							FS::$iMgr->ajaxEchoNC("err-router-not-in-subnet");
 							return;
 						}
 					}
 
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid != '".$netid."' AND vlanid = '".$vlanid."'")) {
-						FS::$iMgr->ajaxEcho("err-vlan-already-used");
+						FS::$iMgr->ajaxEchoNC("err-vlan-already-used");
 						return;
 					}
 
 					if($subnetclusters) {
 						for($i=0;$i<count($subnetclusters);$i++) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$subnetclusters[$i]."'")) {
-								FS::$iMgr->ajaxEcho("err-cluster-not-exists");
+								FS::$iMgr->ajaxEchoNC("err-cluster-not-exists");
 								return;
 							}
 						}
 						if(!$router || !$dns1 || !$domainname) {
-							FS::$iMgr->ajaxEcho("err-distrib-subnet-need-infos");
+							FS::$iMgr->ajaxEchoNC("err-distrib-subnet-need-infos");
 							return;
 						}
 					}
@@ -1244,9 +1244,9 @@ var_dump($_POST);
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$cname || !$cmembers || !is_array($cmembers) || $edit && $edit != 1) {
 						if(!$cmembers || !is_array($cmembers))
-							FS::$iMgr->ajaxEcho("err-cluster-need-members");
+							FS::$iMgr->ajaxEchoNC("err-cluster-need-members");
 						else
-							FS::$iMgr->ajaxEcho("err-bad-datas");
+							FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
@@ -1259,7 +1259,7 @@ var_dump($_POST);
 					}
 					else {
 						if($exist) {
-							FS::$iMgr->ajaxEcho("err-cluster-already-exists");
+							FS::$iMgr->ajaxEchoNC("err-cluster-already-exists");
 							return;
 						}
 					}
@@ -1267,7 +1267,7 @@ var_dump($_POST);
 					$count = count($cmembers);
 					for($i=0;$i<$count;$i++) {
 						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr = '".$cmembers[$i]."'")) {
-							FS::$iMgr->ajaxEcho("err-dhcpserver-not-exists");
+							FS::$iMgr->ajaxEchoNC("err-dhcpserver-not-exists");
 							return;
 						}
 					}
@@ -1339,13 +1339,13 @@ var_dump($_POST);
 
 					if(!$ip || !FS::$secMgr->isIP($ip) || $mac && !FS::$secMgr->isMacAddr($mac) || $hostname && !FS::$secMgr->isHostname($hostname) ||
 						$reserv && $reserv != "on" || $comment && strlen($comment) > 500 || $edit && $edit != 1) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
 					// Reservations needs MAC & hostname
 					if($reserv == "on" && (!$mac || !$hostname)) {
-						FS::$iMgr->ajaxEcho("err-reserv-need-fields");
+						FS::$iMgr->ajaxEchoNC("err-reserv-need-fields");
 						return;
 					}
 
@@ -1376,7 +1376,7 @@ var_dump($_POST);
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
 						while($data = FS::$dbMgr->Fetch($query)) {
 							if($netobj->isUsableIP($data["ip"])) {
-								FS::$iMgr->ajaxEcho("err-mac-already-used-in-subnet");
+								FS::$iMgr->ajaxEchoNC("err-mac-already-used-in-subnet");
 								return;
 							}
 						}
@@ -1385,7 +1385,7 @@ var_dump($_POST);
 					if($hostname) {
 						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_ip","ip","hostname = '".$hostname."' AND ip != '".$ip."'");
 						if($exist) {
-							FS::$iMgr->ajaxEcho("err-hostname-already-defined");
+							FS::$iMgr->ajaxEchoNC("err-hostname-already-defined");
 							return;
 						}
 					}
@@ -1418,7 +1418,7 @@ var_dump($_POST);
 					$opttype = FS::$secMgr->checkAndSecurisePostData("opttype");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$optname || !$optcode || !$opttype || $edit && $edit != 1) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
