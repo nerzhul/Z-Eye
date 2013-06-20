@@ -29,10 +29,107 @@
         */
 
 	final class HTMLTableMgr {
-		function __construct($tableId,$sqlTable,$sqlAttrId) {
-			$this->tableId = $tableId;
-			$this->sqlTable = $sqlTable;
-			$this->sqlAttrId = $sqlAttrId;
+		/*
+		* All parameters are optionals and contained in an array
+		*/
+		function __construct($options) {
+			if(!isset($options) || !is_array($options))
+				return NULL;
+
+			if(isset($options["tabledivid"]))
+				$this->tableDivId = $options["tabledivid"];	
+			if(isset($options["tableid"]))
+				$this->tableId = $options["tableid"];	
+			if(isset($options["firstlineid"]))
+				$this->firstLineId = $options["firstlineid"];	
+			if(isset($options["sqltable"]))
+				$this->sqlTable = $options["sqltable"];	
+			if(isset($options["sqlattrid"]))
+				$this->sqlAttrId = $options["sqlattrid"];	
+			if(isset($options["attrlist"]))
+				$this->attrList = $options["attrlist"];	
+			if(isset($options["sorted"]))
+				$this->sorted = $options["sorted"];	
+			if(isset($options["odivnb"]))
+				$this->opendivNumber = $options["odivnb"];	
+			if(isset($options["odivlink"]))
+				$this->opendivLink = $options["odivlink"];	
+			if(isset($options["rmcol"]))
+				$this->removeColumn = $options["rmcol"];	
+			if(isset($options["rmconfirm"]))
+				$this->removeConfirm = $options["rmconfirm"];	
+			if(isset($options["rmlink"]))
+				$this->removeLink = $options["rmlink"];	
+		}
+
+		public function render() {
+			$found = false;
+
+			$output = "<div id=\"".$this->tableDivId."\">";
+			$tmpoutput = $this->showHeader();
+			
+			// for optimization we calcule this number here
+			$attrCount = count($this->attrList);
+			$sqlAttrList = ""; 
+			for($i=0;$i<$attrCount;$i++) {
+				if($i != 0)
+					$sqlAttrList .= ",";
+				$sqlAttrList .= $this->attrList[$i][1];
+			}
+
+			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,"",array("order" => $this->sqlAttrId));
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found)
+					$found = true;
+				$tmpoutput .= $this->showLine($data,$attrCount);
+                        }
+                        if($found)
+				$output .= $tmpoutput."</table>".FS::$iMgr->jsSortTable($this->tableId);
+
+                        $output .= "</div>";
+			return $output;
+		}
+
+		private function showLine($sqlDatas,$attrCount) {
+			FS::$iMgr->setJSBuffer(1);
+                        $output = "<tr id=\"tr".FS::$iMgr->formatHTMLId($sqlDatas[$this->sqlAttrId])."at\"><td>".
+				FS::$iMgr->opendiv($this->opendivNumber,$sqlDatas[$this->sqlAttrId],
+					array("lnkadd" => $this->opendivLink.$sqlDatas[$this->sqlAttrId]))."</td>";
+	
+			for($i=1;$i<$attrCount;$i++) {
+				$output .= "<td>";
+				if($this->attrList[$i][2] == "b")
+					$output .= ($sqlDatas[$this->attrList[$i][1]] == 't' ? "X" : "");	
+				else
+					$output .= $sqlDatas[$this->attrList[$i][1]];
+				$output .= "</td>";
+			}
+
+			if($this->removeColumn) {
+                                $output .= "<td>".FS::$iMgr->removeIcon($this->removeLink."=".$sqlDatas[$this->sqlAttrId],
+					array("js" => true, "confirm" =>
+                                        array(FS::$iMgr->getLocale($this->removeConfirm)."'".$sqlDatas[$this->sqlAttrId]."' ?","Confirm","Cancel"))).
+					"</td>";
+			}
+			$output .= "</tr>";
+			return $output;
+		}
+
+		private function showHeader() {
+			FS::$iMgr->setJSBuffer(1);
+			$attrCount = count($this->attrList);
+
+                        $output = "<table id=\"".$this->tableId."\"><thead><tr id=\"".$this->firstLineId."\"><th class=\"headerSortDown\">";
+			
+			for($i=0;$i<$attrCount;$i++) {
+				$output .= FS::$iMgr->getLocale($this->attrList[$i][0])."</th>";
+				if($i < $attrCount-1) 
+					$output .= "<th>";
+			}
+			if($this->removeColumn)
+				$output .= "<th></th>";
+			$output .= "</tr></thead>";
+			return $output;
 		}
 		
 		public function removeLine($id) {
@@ -41,11 +138,25 @@
 			if($count == 0)
 				$output .= "hideAndEmpty('#".$this->tableId."');";
 			else
-				$output .= "hideAndRemove('#".$id."');";
+				$output .= "hideAndRemove('#tr".$id."at');";
 			return $output;
 		}
 
 		private $tableId;
+		private $tableDivId;
+		private $firstLineId;
+		private $sorted;
+		private $attrList;
+
+		// Showing related
+		private $opendivNumber;
+		private $opendivLink;
+
+		// Remove related
+		private $removeColumn;
+		private $removeLink;
+		private $removeConfirm;
+		
 		// SQL related
 		private $sqlTable;
 		private $sqlAttrId;

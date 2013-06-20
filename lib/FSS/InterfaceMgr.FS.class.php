@@ -658,7 +658,7 @@
 				$this->js("dontClosePopup();"));
 		}
 
-		protected function getLocale($locid) {
+		public function getLocale($locid) {
 			if($this->cur_module)
 				return $this->cur_module->getLoc()->s($locid);
 			else {

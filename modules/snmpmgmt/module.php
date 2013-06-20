@@ -46,17 +46,23 @@
 
 			$output .= FS::$iMgr->opendiv(1,$this->loc->s("Add-community"));
 
-			// Div for Ajax modifications
-			$output .= "<div id=\"snmptable\">";
-			$tmpoutput = $this->showSNMPTableHead();
 
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) $found = true;
-				$tmpoutput .= $this->tableCommunityLine($data["name"],$data["ro"] == 't',$data["rw"] == 't');
-			}
-			if($found) $output .= $tmpoutput."</table>".FS::$iMgr->jsSortTable("snmpList");
-			$output .= "</div>";
+			// Div for Ajax modifications
+			$tMgr = new HTMLTableMgr(array(
+				"tabledivid" => "snmptable",
+				"tableid" => "snmpList",
+				"firstlineid" => "snmpthead",
+				"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
+				"sqlattrid" => "name",
+				"attrlist" => array(array("snmp-community","name",""), array("Read","ro","b"), array("Write","rw","b")),
+				"sorted" => true,
+				"odivnb" => 2,
+				"odivlink" => "name=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=2&snmp",
+				"rmconfirm" => "confirm-remove-community"
+				));
+			$output .= $tMgr->render();
 			return $output;
 		}
 
@@ -159,6 +165,8 @@
 
 					$js = "";
 
+					// @TODO: $tMgr = new HTMLTableMgr("snmptable",PGDbConfig::getDbPrefix()."snmp_communities","name");
+
 					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
 					if($count == 1) {
 						$jscontent = $this->showSNMPTableHead()."</table>";
@@ -195,8 +203,11 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
 					
-					$tMgr = new HTMLTableMgr("snmptable",PGDbConfig::getDbPrefix()."snmp_communities","name");
-					$js = $tMgr->removeLine($name."tr");
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "snmptable",
+						"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
+						"sqlattrid" => "name"));
+					$js = $tMgr->removeLine($name);
 
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;

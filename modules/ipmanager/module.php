@@ -1222,7 +1222,10 @@ var_dump($_POST);
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
 					FS::$dbMgr->CommitTr();
 
-					$tMgr = new HTMLTableMgr("declsubnets",PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid");
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "declsubnets",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
+						"sqlattrid" => "netid"));
 					$js = $tMgr->removeLine("ds".FS::$iMgr->formatHTMLId($netid)."tr");
 
 					FS::$iMgr->ajaxEcho("Done",$js);
@@ -1309,7 +1312,10 @@ var_dump($_POST);
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername = '".$cname."'");
 					FS::$dbMgr->CommitTr();
 
-					$tMgr = new HTMLTableMgr("clustertable",PGDbConfig::getDbPrefix()."dhcp_cluster","clustername");
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "clustertable",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_cluster",
+						"sqlattrid" => "clustername"));
 					$js = $tMgr->removeLine("cl".FS::$iMgr->formatHTMLId($cname)."tr");
 					
 					FS::$iMgr->ajaxEcho("Done",$js);
