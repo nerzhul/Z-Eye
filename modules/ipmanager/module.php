@@ -418,6 +418,23 @@
 		private function showSubnetMgmt() {
 			$output = FS::$iMgr->h2("title-declared-subnets");
 	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
+			/* TODO, not good $tMgr = new HTMLTableMgr(array(
+				"tabledivid" => "declsubnets",
+				"tableid" => "declsubnettable",
+				"firstlineid" => "declsubnethead",
+				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
+				"sqlattrid" => "netid",
+				"attrlist" => array(array("netid","netid",""), array("netmask","netmask",""), array("vlanid","vlanid",""),
+					array("Usable","","c"), array("subnet-shortname","subnet_short_name",""),array("subnet-desc","subnet_desc","")),
+				"sorted" => true,
+				"odivnb" => 2,
+				"odivlink" => "name=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=2&snmp",
+				"rmconfirm" => "confirm-remove-community"
+				));
+			$output .= $tMgr->render();
+			*/
 
 			$output .= "<div id=\"declsubnets\">";
 
@@ -446,7 +463,7 @@
 			$net->SetNetAddr($netid);
 			$net->SetNetMask($netmask);
 			$net->CalcCIDR();
-			$output = "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
+			$output = "<tr id=\"tr".FS::$iMgr->formatHTMLId($netid)."at\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
 				"/".$netmask." (/".$net->getCIDR().")</td><td>".$vlanid."</td><td>".
 				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>";
 			
