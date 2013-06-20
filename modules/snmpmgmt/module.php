@@ -165,18 +165,20 @@
 
 					$js = "";
 
-					// @TODO: $tMgr = new HTMLTableMgr("snmptable",PGDbConfig::getDbPrefix()."snmp_communities","name");
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "snmptable",
+						"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
+						"sqlattrid" => "name",
+						"firstlineid" => "snmpthead",
+						"sqlcond" => "name='".$name."'",
+						"rmcol" => true,
+						"rmlink" => "mod=".$this->mid."&act=2&snmp",
+						"rmconfirm" => "confirm-remove-community",
+						"attrlist" => array(array("snmp-community","name",""), array("Read","ro","b"),
+							array("Write","rw","b"))
+					));
+					$js = $tMgr->addLine($name,$edit);
 
-					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
-					if($count == 1) {
-						$jscontent = $this->showSNMPTableHead()."</table>";
-						$js .= "$('#snmptable').html('".addslashes($jscontent)."'); $('#snmptable').show('slow');";
-					}
-
-					if($edit) $js .= "hideAndRemove('#".$name."tr'); setTimeout(function() {";
-					$jscontent = $this->tableCommunityLine($name,$ro == "on",$rw == "on");
-					$js .= "$('".addslashes($jscontent)."').insertAfter('#snmpthead');";
-					if($edit) $js .= "},1000);";	
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				case 2: // Remove SNMP community
@@ -206,7 +208,9 @@
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "snmptable",
 						"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
-						"sqlattrid" => "name"));
+						"sqlattrid" => "name"
+					));
+
 					$js = $tMgr->removeLine($name);
 
 					FS::$iMgr->ajaxEcho("Done",$js);

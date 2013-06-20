@@ -46,6 +46,11 @@
 				$this->sqlTable = $options["sqltable"];	
 			if(isset($options["sqlattrid"]))
 				$this->sqlAttrId = $options["sqlattrid"];	
+			if(isset($options["sqlcond"]))
+				$this->sqlCondition= $options["sqlcond"];	
+			else
+				$this->sqlCondition = "";
+
 			if(isset($options["attrlist"]))
 				$this->attrList = $options["attrlist"];	
 			if(isset($options["sorted"]))
@@ -70,6 +75,7 @@
 			
 			// for optimization we calcule this number here
 			$attrCount = count($this->attrList);
+
 			$sqlAttrList = ""; 
 			for($i=0;$i<$attrCount;$i++) {
 				if($i != 0)
@@ -77,7 +83,7 @@
 				$sqlAttrList .= $this->attrList[$i][1];
 			}
 
-			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,"",array("order" => $this->sqlAttrId));
+			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found)
 					$found = true;
@@ -112,6 +118,35 @@
 					"</td>";
 			}
 			$output .= "</tr>";
+			return $output;
+		}
+
+		public function addLine($idx,$edit) {
+			$output = ""; $jscontent = "";
+
+			$count = FS::$dbMgr->Count($this->sqlTable,$this->sqlAttrId);
+			if($count == 1) {
+				$jscontent = $this->showHeader()."</table>";
+				$output .= "$('#".$this->tableId."').html('".addslashes($jscontent)."'); $('#".$this->tableId."').show('slow');";
+			}
+
+			if($edit) $output .= "hideAndRemove('#tr".$name."at'); setTimeout(function() {";
+
+			$attrCount = count($this->attrList);
+			$sqlAttrList = ""; 
+			for($i=0;$i<$attrCount;$i++) {
+				if($i != 0)
+					$sqlAttrList .= ",";
+				$sqlAttrList .= $this->attrList[$i][1];
+			}
+
+			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+			if($data = FS::$dbMgr->Fetch($query))
+				$jscontent = $this->showLine($data,$attrCount);
+
+			$output .= "$('".addslashes($jscontent)."').insertAfter('#".$this->firstLineId."');";
+			if($edit) $output .= "},1000);";
+
 			return $output;
 		}
 
@@ -160,5 +195,6 @@
 		// SQL related
 		private $sqlTable;
 		private $sqlAttrId;
+		private $sqlCond;
 	};
 ?>
