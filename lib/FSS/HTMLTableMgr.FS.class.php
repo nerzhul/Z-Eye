@@ -114,8 +114,13 @@
 	
 			for($i=1;$i<$attrCount;$i++) {
 				$output .= "<td>";
+				// Boolean 
 				if($this->attrList[$i][2] == "b")
 					$output .= ($sqlDatas[$this->attrList[$i][1]] == 't' ? "X" : "");	
+				// Select values
+				else if($this->attrList[$i][2] == "s")
+					$output .= FS::$iMgr->getLocale($this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]]);
+				// Raw values
 				else
 					$output .= $sqlDatas[$this->attrList[$i][1]];
 				$output .= "</td>";
