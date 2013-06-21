@@ -137,11 +137,12 @@
 			$count = FS::$dbMgr->Count($this->sqlTable,$this->sqlAttrId);
 			if($count == 1) {
 				$jscontent = $this->showHeader()."</table>";
-				$output .= "$('#".$this->tableDivId."').html('".addslashes($jscontent)."'); $('#".$this->tableId."').show('slow');";
+				$output .= "$('#".$this->tableDivId."').html('".addslashes($jscontent)."'); 
+					$('#".$this->tableDivId."').show('slow');";
 			}
 
 			if($edit)
-				$output .= "hideAndRemove('#".$this->trPrefix.$name.$this->trSuffix."'); setTimeout(function() {";
+				$output .= "hideAndRemove('#".$this->trPrefix.$idx.$this->trSuffix."'); setTimeout(function() {";
 
 			$attrCount = count($this->attrList);
 			$sqlAttrList = ""; 
@@ -154,6 +155,8 @@
 			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
 			if($data = FS::$dbMgr->Fetch($query))
 				$jscontent = $this->showLine($data,$attrCount);
+			else
+				$jscontent = "";
 
 			$output .= "$('".addslashes($jscontent)."').insertAfter('#".$this->firstLineId."');";
 
