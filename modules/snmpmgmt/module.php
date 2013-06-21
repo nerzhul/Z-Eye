@@ -60,15 +60,11 @@
 				"odivlink" => "name=",
 				"rmcol" => true,
 				"rmlink" => "mod=".$this->mid."&act=2&snmp",
-				"rmconfirm" => "confirm-remove-community"
-				));
+				"rmconfirm" => "confirm-remove-community",
+				"trpfx" => "sc"
+			));
 			$output .= $tMgr->render();
 			return $output;
-		}
-
-		private function showSNMPTableHead() {
-			FS::$iMgr->setJSBuffer(1);
-			return "<table id=\"snmpList\"><thead><tr id=\"snmpthead\"><th class=\"headerSortDown\">".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Read")."</th><th>".$this->loc->s("Write")."</th><th></th></tr></thead>";
 		}
 
 		private function showCommunityForm($name = "") {
@@ -175,7 +171,8 @@
 						"rmlink" => "mod=".$this->mid."&act=2&snmp",
 						"rmconfirm" => "confirm-remove-community",
 						"attrlist" => array(array("snmp-community","name",""), array("Read","ro","b"),
-							array("Write","rw","b"))
+							array("Write","rw","b")),
+						"trpfx" => "sc"
 					));
 					$js = $tMgr->addLine($name,$edit);
 
@@ -208,7 +205,8 @@
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "snmptable",
 						"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
-						"sqlattrid" => "name"
+						"sqlattrid" => "name",
+						"trpfx" => "sc"
 					));
 
 					$js = $tMgr->removeLine($name);

@@ -65,6 +65,16 @@
 				$this->removeConfirm = $options["rmconfirm"];	
 			if(isset($options["rmlink"]))
 				$this->removeLink = $options["rmlink"];	
+
+			if(isset($options["trpfx"]))
+				$this->trPrefix = $options["trpfx"];	
+			else
+				$this->trPrefix = "";
+
+			if(isset($options["trsfx"]))
+				$this->trSuffix = $options["trsfx"];	
+			else
+				$this->trSuffix = "tr";
 		}
 
 		public function render() {
@@ -98,7 +108,7 @@
 
 		private function showLine($sqlDatas,$attrCount) {
 			FS::$iMgr->setJSBuffer(1);
-                        $output = "<tr id=\"tr".FS::$iMgr->formatHTMLId($sqlDatas[$this->sqlAttrId])."at\"><td>".
+                        $output = "<tr id=\"".$this->trPrefix.FS::$iMgr->formatHTMLId($sqlDatas[$this->sqlAttrId]).$this->trSuffix."\"><td>".
 				FS::$iMgr->opendiv($this->opendivNumber,$sqlDatas[$this->sqlAttrId],
 					array("lnkadd" => $this->opendivLink.$sqlDatas[$this->sqlAttrId]))."</td>";
 	
@@ -127,10 +137,11 @@
 			$count = FS::$dbMgr->Count($this->sqlTable,$this->sqlAttrId);
 			if($count == 1) {
 				$jscontent = $this->showHeader()."</table>";
-				$output .= "$('#".$this->tableId."').html('".addslashes($jscontent)."'); $('#".$this->tableId."').show('slow');";
+				$output .= "$('#".$this->tableDivId."').html('".addslashes($jscontent)."'); $('#".$this->tableId."').show('slow');";
 			}
 
-			if($edit) $output .= "hideAndRemove('#tr".$name."at'); setTimeout(function() {";
+			if($edit)
+				$output .= "hideAndRemove('#".$this->trPrefix.$name.$this->trSuffix."'); setTimeout(function() {";
 
 			$attrCount = count($this->attrList);
 			$sqlAttrList = ""; 
@@ -145,7 +156,9 @@
 				$jscontent = $this->showLine($data,$attrCount);
 
 			$output .= "$('".addslashes($jscontent)."').insertAfter('#".$this->firstLineId."');";
-			if($edit) $output .= "},1000);";
+
+			if($edit)
+				$output .= "},1000);";
 
 			return $output;
 		}
@@ -171,9 +184,9 @@
 			$output = "";
 			$count = FS::$dbMgr->Count($this->sqlTable,$this->sqlAttrId);
 			if($count == 0)
-				$output .= "hideAndEmpty('#".$this->tableId."');";
+				$output .= "hideAndEmpty('#".$this->tableDivId."');";
 			else
-				$output .= "hideAndRemove('#tr".$id."at');";
+				$output .= "hideAndRemove('#".$this->trPrefix.$id.$this->trSuffix."');";
 			return $output;
 		}
 
@@ -186,6 +199,8 @@
 		// Showing related
 		private $opendivNumber;
 		private $opendivLink;
+		private $trPrefix;
+		private $trSuffix;
 
 		// Remove related
 		private $removeColumn;
