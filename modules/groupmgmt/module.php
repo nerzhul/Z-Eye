@@ -119,7 +119,7 @@
 			$output .= FS::$iMgr->h2("title-opts");
 			$output .= $this->loadModuleRuleSets();
                         $output .= "</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>";
-			$moutput .= "</ul></form>";
+			$output .= "</ul></form>";
 			return $output;
 		}
 

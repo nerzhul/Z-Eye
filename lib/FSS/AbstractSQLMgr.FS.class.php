@@ -28,12 +28,11 @@
         * either expressed or implied, of the FreeBSD Project.
         */
 
-	require_once(dirname(__FILE__)."/PgSQLMgr.FS.class.php");
-	require_once(dirname(__FILE__)."/MySQLMgr.FS.class.php");
 	require_once(dirname(__FILE__)."/../../config/pgdb.conf.php");
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
-	class AbstractSQLMgr {
+	class AbstractSQLMgr extends PDO {
 		function __construct() {
+			$this->dbDriver = "";
 			$this->dbName = "";
 			$this->dbPort = "";
 			$this->dbHost = "";
@@ -49,47 +48,105 @@
 		}
 
 		public function Connect() {
-			return $this->dbMgr->Connect();
+			return parent::__construct($this->dbDriver.":dbname=".$this->dbName.";host=".$this->dbHost.";port=".$this->dbPort,$this->dbUser,
+				$this->dbPass);
 		}
 
 		public function Select($table,$fields,$cond = "",$options = array()) {
-			return $this->dbMgr->Select($table,$fields,$cond,$options);
+			$sql = "SELECT ".$fields." FROM ".$table."";
+			if(strlen($cond) > 0)
+				$sql .= " WHERE ".$cond;
+			if(isset($options["group"]) && strlen($options["group"]) > 0)
+				$sql .= " GROUP BY ".$options["group"];
+			if(isset($options["order"]) && strlen($options["order"]) > 0) {
+				$sql .= " ORDER BY ".$options["order"];
+				if(isset($options["ordersens"])) {
+					if($options["ordersens"] == 1)
+						$sql .= " DESC";
+					else if($options["ordersens"] == 2)
+						$sql .= " ASC";
+				}
+			}
+			if(isset($options["limit"]) && $options["limit"] > 0) {
+				if(isset($options["startidx"]) && $options["startidx"] > 0)
+					$sql .= " LIMIT ".$options["startidx"].",".($options["startidx"]+$options["limit"]);
+				else
+					$sql .= " LIMIT ".$options["limit"];
+			}
+			return parent::query($sql);
 		}
 
 		public function GetOneData($table,$field,$cond = "",$options = array()) {
-			return $this->dbMgr->GetOneData($table,$field,$cond,$options);
+			$query = $this->Select($table,$field,$cond,$options);
+			if($data = $query->fetch()) {
+				$splstr = preg_split("#[\.]#",$field);
+				$splstr = preg_replace("#`#","",$splstr);
+				return $data[$splstr[count($splstr)-1]];
+			}
+			return NULL;
 		}
 
 		public function GetMax($table,$field,$cond = "") {
-			return $this->dbMgr->GetMax($table,$field,$cond);
+			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
+			if($data = $query->fetch()) {
+				$splstr = preg_split("#[\.]#",$field);
+				$splstr = preg_replace("#`#","",$splstr);
+				return $data["mx"];
+			}
+			return NULL;
 		}
 
 		public function GetMin($table,$field,$cond = "") {
-			return $this->dbMgr->GetMin($table,$field,$cond);
+			$query = $this->Select($table,"MIN(".$field.") as mn",$cond);
+                        if($data = $query->fetch()) {
+                                 $splstr = preg_split("#[\.]#",$field);
+                                 $splstr = preg_replace("#`#","",$splstr);
+                                 return $data["mn"];
+                        }
+			return NULL;
                 }
 
 		public function Sum($table,$field,$cond = "") {
-			return $this->dbMgr->Sum($table,$field,$cond);
+			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
+			if($data = $query->fetch()) {
+				$splstr = preg_split("#[\.]#",$field);
+				$splstr = preg_replace("#`#","",$splstr);
+				return $data["mx"];
+			}
+			return NULL;
 		}
 
 		public function Count($table,$field,$cond = "") {
-			return $this->dbMgr->Count($table,$field,$cond);
+			$query = $this->Select($table,"COUNT(".$field.") as ct",$cond);
+			if($data = $query->fetch()) {
+				$splstr = preg_split("#[\.]#",$field);
+				$splstr = preg_replace("#`#","",$splstr);
+				return $data["ct"];
+			}
+			return NULL;
 		}
 
 		public function Insert($table,$keys,$values) {
-			return $this->dbMgr->Insert($table,$keys,$values);
+			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";
+			return parent::query($sql);
 		}
 
 		public function Fetch(&$query) {
-			return $this->dbMgr->Fetch($query);
+			return $query->fetch();
 		}
 
 		public function Delete($table,$cond = "") {
-			return $this->dbMgr->Delete($table,$cond);
+			$sql = "DELETE FROM ".$table."";
+			if(strlen($cond) > 0)
+				$sql .= " WHERE ".$cond;
+			return parent::query($sql);
 		}
 
 		public function Update($table,$mods,$cond = "") {
-			return $this->dbMgr->Update($table,$mods,$cond);
+			$sql = "UPDATE ".$table." SET ".$mods."";
+			if(strlen($cond) > 0)
+				$sql .= " WHERE ".$cond;
+			return parent::query($sql);
 		}
 
 		public function setConfig($dbtype,$dbn,$dbport,$dbh,$dbu,$dbp) {
@@ -98,11 +155,12 @@
 				return 1;
 			if($dbtype != "pg" && $dbtype != "my")
 				return 2;
-			if($dbtype == "pg")
-				$this->dbMgr = new FSPostgreSQLMgr();
-			else if($dbtype == "my")
-				$this->dbMgr = new FSMySQLMgr();
-			$this->dbMgr->setConfig($dbn,$dbport,$dbh,$dbu,$dbp);
+			if($dbtype == "pg") {
+				$this->dbDriver = "pgsql";
+			}
+			else if($dbtype == "my") {
+				$this->dbDriver = "mysql";
+			}
                         $this->dbName = $dbn;
                         $this->dbPort = $dbport;
                         $this->dbHost = $dbh;
@@ -113,17 +171,18 @@
                 }
 
 		public function BeginTr() {
-			return $this->dbMgr->BeginTr();
+			return parent::beginTransaction();
 		}
 
 		public function CommitTr() {
-			return $this->dbMgr->CommitTr();
+			return parent::commit();
 		}
 
 		public function RollbackTr() {
-			return $this->dbMgr->RollbackTr();
+			return parent::rollback();
 		}
 
+		private $dbDriver;
 		private $dbName;
 		private $dbPort;
 		private $dbHost;

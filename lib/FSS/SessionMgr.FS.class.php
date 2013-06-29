@@ -43,7 +43,8 @@
 
 		public function shopen() {
 			$limit = time() - Config::getSessionExpirationTime();
-			return FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
+			return true;
 		}
 
 		public function shclose() {}

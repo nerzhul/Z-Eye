@@ -116,11 +116,11 @@
 					
 					$sqlcalc = "(SELECT '".$sql_date."'::timestamp - '".($ec+15)." day'::interval)";
 					$sql = "select atkdate".$fields." from z_eye_attack_stats where atkdate > ".$sqlcalc." ORDER BY atkdate";
-					$query = pg_query($sql);
+					$query = $this->snortDB->query($sql);
 					$labels = $scans = $tse = $ssh = "[";
 					$cursor = 0;
 					$temp1 = $temp2 = $temp3 = $temp4 = 0;
-					while($data = FS::$dbMgr->Fetch($query)) {
+					while($data = $this->snortDB->Fetch($query)) {
 						if($cursor != $ech || $ech == 1) {
 							$cursor++;
 							$temp1 = substr($data["atkdate"],8,2)."/".substr($data["atkdate"],5,2);
