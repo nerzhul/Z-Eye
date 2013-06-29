@@ -616,7 +616,7 @@
 
 		public function redir($link,$js=false) {
 			if($js && FS::isAjaxCall())
-				echo $this->js("window.location.href=\"index.php?".$link."\";");
+				$this->js("window.location.href=\"index.php?".$link."\";");
 			else
 				header("Location: index.php?".$link);
 		}
