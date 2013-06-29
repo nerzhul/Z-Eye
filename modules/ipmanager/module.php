@@ -367,26 +367,31 @@
 			$output = FS::$iMgr->h2("title-dhcp-opts-group");	
 			$output .= FS::$iMgr->h2("title-dhcp-opts");	
 			$output .= FS::$iMgr->h2("title-custom-dhcp-opts").FS::$iMgr->tip("tip-custom-dhcp-opts")."<br />".
-				FS::$iMgr->opendiv(8,$this->loc->s("create-custom-option"),array("line" => true)).
-				"<div id=\"customoptslist\">";
+				FS::$iMgr->opendiv(8,$this->loc->s("create-custom-option"),array("line" => true));
 
-			$found = false;
-			$query = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname,opttype,optcode");
-			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) {
-					$found = 1;
-					$output .= $this->showDHCPOptsTableHead();
-				}
-				$output .= $this->tableDHCPOptEntry($data["optname"],$data["optcode"],$data["opttype"]);
-			}
-
-			if($found) $output .= "</table>";
-			$output .= "</div>";
+			$tMgr = new HTMLTableMgr(array(
+				"tabledivid" => "customoptslist",
+				"tableid" => "dhcpopttable",
+				"firstlineid" => "dhcpoptftr",
+				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
+				"sqlattrid" => "optname",
+				"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
+					array("option-type","opttype","s",array("boolean" => "boolean","integer" => "integer",
+					"ip" => "IP-Addr", "text" => "text"))),
+				"sorted" => true,
+				"odivnb" => 9,
+				"odivlink" => "optname=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=13&optname",
+				"rmconfirm" => "confirm-remove-custom-option",
+				"trpfx" => "dco",
+				));
+			$output .= $tMgr->render();
 			return $output;
 		}
 
 		private function showDHCPOptsTableHead() {
-			return "<table id=\"dhcpopttable\"><thead id=\"dhcpoptth\"><tr><th>".$this->loc->s("opt-name")."</th><th>".
+			return "<table id=\"dhcpopttable\"><thead><tr><th>".$this->loc->s("opt-name")."</th><th>".
 				$this->loc->s("opt-code")."</th><th>".$this->loc->s("opt-type")."</th></tr></thead>";
 		}
 
@@ -402,8 +407,8 @@
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=12")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("option-name"),"optname",$optname,array("type" => "idxedit", "length" => 32,
 					"edit" => $optname != "")).
-				FS::$iMgr->idxLine($this->loc->s("option-code"),"optcode",$optcode,array("type" => "num", "length" => 3, "size" => 3,
-					"edit" => $optcode != "")).
+				FS::$iMgr->idxLine($this->loc->s("option-code"),"optcode","",array("type" => "num", "length" => 3, "size" => 3,
+					"edit" => $optcode != "", "value" => $optcode)).
 				"<tr><td>".$this->loc->s("option-type")."</td><td>".FS::$iMgr->select("opttype").
 				FS::$iMgr->selElmt($this->loc->s("boolean"),"boolean").
 				FS::$iMgr->selElmt($this->loc->s("integer"),"integer").
@@ -418,23 +423,6 @@
 		private function showSubnetMgmt() {
 			$output = FS::$iMgr->h2("title-declared-subnets");
 	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
-			/* TODO, not good $tMgr = new HTMLTableMgr(array(
-				"tabledivid" => "declsubnets",
-				"tableid" => "declsubnettable",
-				"firstlineid" => "declsubnethead",
-				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
-				"sqlattrid" => "netid",
-				"attrlist" => array(array("netid","netid",""), array("netmask","netmask",""), array("vlanid","vlanid",""),
-					array("Usable","","c"), array("subnet-shortname","subnet_short_name",""),array("subnet-desc","subnet_desc","")),
-				"sorted" => true,
-				"odivnb" => 2,
-				"odivlink" => "name=",
-				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=2&snmp",
-				"rmconfirm" => "confirm-remove-community"
-				));
-			$output .= $tMgr->render();
-			*/
 
 			$output .= "<div id=\"declsubnets\">";
 
@@ -463,7 +451,7 @@
 			$net->SetNetAddr($netid);
 			$net->SetNetMask($netmask);
 			$net->CalcCIDR();
-			$output = "<tr id=\"tr".FS::$iMgr->formatHTMLId($netid)."at\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
+			$output = "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
 				"/".$netmask." (/".$net->getCIDR().")</td><td>".$vlanid."</td><td>".
 				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>";
 			
@@ -861,7 +849,7 @@
 					return $this->showIPForm($ip);
 				case 8: return $this->showDHCPCustomOptsForm();
 				case 9:
-					$optid = FS::$secMgr->checkAndSecuriseGetData("optname");
+					$optname = FS::$secMgr->checkAndSecuriseGetData("optname");
 					if(!$optname)
 						return $this->loc->s("err-bad-datas");
 					return $this->showDHCPCustomOptsForm($optname);
@@ -1242,8 +1230,9 @@ var_dump($_POST);
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "declsubnets",
 						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
-						"sqlattrid" => "netid"));
-					$js = $tMgr->removeLine("ds".FS::$iMgr->formatHTMLId($netid)."tr");
+						"sqlattrid" => "netid",
+						"trpfx" => "ds"));
+					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($netid));
 
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
@@ -1332,8 +1321,10 @@ var_dump($_POST);
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "clustertable",
 						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_cluster",
-						"sqlattrid" => "clustername"));
-					$js = $tMgr->removeLine("cl".FS::$iMgr->formatHTMLId($cname)."tr");
+						"sqlattrid" => "clustername",
+						"trpfx" => "cl"
+					));
+					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($cname));
 					
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
@@ -1431,14 +1422,85 @@ var_dump($_POST);
 					$optcode = FS::$secMgr->checkAndSecurisePostData("optcode");
 					$opttype = FS::$secMgr->checkAndSecurisePostData("opttype");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-					if(!$optname || !$optcode || !$opttype || $edit && $edit != 1) {
+					if(!$optname || !FS::$secMgr->isHostname($optname) || !$optcode || !FS::$secMgr->isNumeric($optcode) ||
+						!$opttype || $edit && $edit != 1) {
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname",
+						"optname = '".$optname."'");
+					if($edit) {
+						if(!$exist) {
+							FS::$iMgr->ajaxEcho("err-custom-option-not-exists");
+							return;
+						}
+					}
+					else {
+						if($exist) {
+							FS::$iMgr->ajaxEcho("err-custom-option-already-exists");
+							return;
+						}
+					}
+
+					FS::$dbMgr->BeginTr();
+					if($edit)
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname = '".$optname."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname,optcode,opttype",
+						"'".$optname."','".$optcode."','".$opttype."'");
+					FS::$dbMgr->CommitTr();
+
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "customoptslist",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
+						"sqlattrid" => "optname",
+						"tableid" => "dhcpopttable",
+						"firstlineid" => "dhcpoptftr",
+						"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
+							array("option-type","opttype","s")),
+						"sorted" => true,
+						"odivnb" => 9,
+						"odivlink" => "optname=",
+						"rmcol" => true,
+						"rmlink" => "mod=".$this->mid."&act=13&optname",
+						"rmconfirm" => "confirm-remove-custom-option",
+						"trpfx" => "dco"
+					));
+					$js = $tMgr->addLine($optname,$edit);
+
+					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Delete Custom Option
 				case 13:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+					$optname = FS::$secMgr->checkAndSecuriseGetData("optname");
+					if(!$optname || !FS::$secMgr->isHostname($optname)) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname",
+						"optname = '".$optname."'")) {
+						FS::$iMgr->ajaxEcho("err-custom-option-not-exists");
+						return;
+					}
+
+					FS::$dbMgr->BeginTr();
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optname = '".$optname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname = '".$optname."'");
+					FS::$dbMgr->CommitTr();
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "customoptslist",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
+						"sqlattrid" => "optname",
+						"trpfx" => "dco"
+					));
+					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optname));
+					
+					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 			}
 		}
