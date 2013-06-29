@@ -81,15 +81,15 @@
 					"<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>".
 					"</div><div class=\"left\">";
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection");
-					$output .= $this->h4("Identification",true);
-					$output .= $this->label("uname","Utilisateur");
-					$output .= $this->input("uname","");
-					$output .= $this->label("upwd","Mot de passe");
-					$output .= $this->password("upwd","");
-					$output .= $this->hidden("redir",$_SERVER["REQUEST_URI"]);
-					$output .= $this->submit("conn",$this->getLocale("Connection"));
-					$output .= "</form></div></div></div>";
+				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection").
+					$this->h4("Identification",true).
+					$this->label("loginuname","Utilisateur").
+					$this->input("loginuname","").
+					$this->label("loginupwd","Mot de passe").
+					$this->password("loginupwd","").
+					$this->hidden("redir",$_SERVER["REQUEST_URI"]).
+					$this->submit("conn",$this->getLocale("Connection")).
+					"</form></div></div></div>";
 			}
 
 			$output .= "</div></div>";

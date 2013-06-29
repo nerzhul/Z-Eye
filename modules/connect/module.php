@@ -23,23 +23,7 @@
 		function __construct($locales) { parent::__construct($locales); }
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-conn"));
-			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			if($err) {
-				switch($err) {
-					case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-user")); break;
-					default: $output .= FS::$iMgr->printError($this->loc->s("err-unk"));	break;
-				}
-			}
-			$output .= "<div>".FS::$iMgr->h1("title-conn");
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-			$output .= FS::$iMgr->input("uname",$this->loc->s("Login"));
-			$output .= "<br />";
-			$output .= FS::$iMgr->password("upwd",$this->loc->s("Password"));
-			$output .= "<br />";
-			$output .= FS::$iMgr->submit("",$this->loc->s("Connect"));
-			$output .= "</form></div>";
-			return $output;
+			return "";
 		}
 
 		public function TryConnect($username,$password) {
@@ -136,8 +120,8 @@
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
-					$user = FS::$secMgr->checkAndSecurisePostData("uname");
-					$pwd = FS::$secMgr->checkAndSecurisePostData("upwd");
+					$user = FS::$secMgr->checkAndSecurisePostData("loginuname");
+					$pwd = FS::$secMgr->checkAndSecurisePostData("loginupwd");
 					$this->TryConnect($user,$pwd);
 					return;
 			}
