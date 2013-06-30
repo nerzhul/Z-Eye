@@ -28,9 +28,7 @@
 
 		public function Load() {
 			FS::$iMgr->setTitle("Speed Reporting");
-			$output = "";
-			$output .= $this->showMain();
-			return $output;
+			return $this->showMain();
 		}
 
 		private function showMain() {
@@ -52,10 +50,9 @@
 			$alerts = array();
 
 			$icingabuffer = $this->showIcingaReporting();
+			$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga),$icingabuffer);
 			if($this->hsicinga) {
-					$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga).
-					"<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors"),
-					$icingabuffer);
+				$alerts["icinga"][0] .= "<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors");
 			}
 
 			$netbuffer = $this->showNetworkReporting();
