@@ -288,7 +288,7 @@
 					if($rstate == 3) {
 						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 						$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
-						if($data = pg_fetch_array($query)) {
+						if($data = FS::$dbMgr->Fetch($query)) {
 							$radhost = $data["addr"];
 							$radport = $data["port"];
 							$raddb = $data["dbname"];
@@ -338,7 +338,7 @@
 	$DHCPfound = false;
 	$DHCPconnerr = false;
 	$query = FS::$dbMgr->Select("z_eye_dhcp_servers","addr,sshuser,sshpwd,dhcpdpath,leasespath");
-	while($data = pg_fetch_array($query)) {
+	while($data = FS::$dbMgr->Fetch($query)) {
 		$dhcpdatas = "";
 		if($data["dhcpdpath"] == NULL || $data["dhcpdpath"] == "" || !FS::$secMgr->isPath($data["dhcpdpath"])) {
 			echo "Chemin dhcpd.conf invalide pour le serveur ".$data["addr"].": ".$data["dhcpdpath"]."\n";
@@ -401,4 +401,5 @@
 	$script_time = $end_time - $start_time;
 	echo "[".Config::getWebsiteName()."][DHCP-Sync] done at ".date('d-m-Y G:i:s')." (Execution time: ".$script_time."s)\n";
 
+	FS::UnloadFSModules();
 ?>

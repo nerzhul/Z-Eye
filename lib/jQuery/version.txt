@@ -1,5 +1,5 @@
 jQuery - 1.8.3
-jQueryUI - 1.9.2
+jQueryUI - 1.10.3
 jqzoom - 2.3
 colorpicker - 23/05/2009 - http://www.eyecon.ro/colorpicker/ 
 tablesorter - 2.0.5 - http://tablesorter.com/docs/

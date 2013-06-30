@@ -605,6 +605,23 @@
 			return $output;
 		}
 
+		/*
+		* jQuery accordion generator
+		*/
+		public function accordion($accId,$elements=array()) {
+			$output = "<div id=\"".$accId."\">";
+
+			$count = count($elements);
+			foreach($elements as $key => $values) {
+				$output .= $this->h3($key,true)."<div>".$values."</div>";
+			}
+
+			$output .= "</div>";
+
+			$this->js("$('#".$accId."').accordion({heightStyle: 'content'});");
+			return $output;
+		}
+
 		// Simple methods
 		public function stylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;

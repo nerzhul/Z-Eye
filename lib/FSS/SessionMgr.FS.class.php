@@ -31,6 +31,9 @@
 	class FSSessionMgr {
 		function __construct() {
 			$this->groupBuf = array();
+			$this->secMgr = FS::$secMgr;
+			$this->dbMgr = FS::$dbMgr;
+
 			session_set_save_handler(
 				array($this, 'shopen'),
 				array($this, 'shclose'),
@@ -58,10 +61,10 @@
 		}
 
 		public function shwrite($id, $data) {
-			FS::$secMgr->SecuriseString($id);
-			FS::$secMgr->SecuriseString($data);
-			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
-			FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."sessions","id,data,timestamp","'".$id."','".$data."','".time()."'");
+			$this->secMgr->SecuriseString($id);
+			$this->secMgr->SecuriseString($data);
+			$this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
+			$this->dbMgr->Insert(PgDbConfig::getDbPrefix()."sessions","id,data,timestamp","'".$id."','".$data."','".time()."'");
 			return true;
 		}
 
@@ -193,5 +196,7 @@
 		}
 
 		private $groupBuf;
+		private $secMgr;
+		private $dbMgr;
 	};
 ?>

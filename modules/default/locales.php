@@ -22,6 +22,7 @@
 			parent::__construct();
 			$locales = array(
 				"fr" => array(
+					"alert-on" => "alerte sur",
 					"Attack" => "Attaques",
 					"Availability" => "Disponibilité",
 					"CRITICAL" => "CRITIQUE",
@@ -39,6 +40,7 @@
 					"menu-name" => "Supervision",
 					"menu-title" => "Speed reporting",
 					"out-bw" => "Débit Sortant",
+					"sensors" => "sondes",
 					"Service" => "Service",
 					"Since-icinga-start" => "Depuis le démarrage du processus Icinga",
 					"State" => "Statut",
@@ -49,6 +51,7 @@
 					"WARN" => "ATTENTION",
 				),
 				"en" => array(
+					"alert-on" => "alert on",
 					"Attack" => "Attacks",
 					"Availability" => "Availability",
 					"CRITICAL" => "CRITICAL",
@@ -66,6 +69,7 @@
 					"menu-name" => "Supervision",
 					"menu-title" => "Speed reporting",
 					"out-bw" => "Output bandwidth",
+					"sensors" => "sensors",
 					"Service" => "Service",
 					"Since-icinga-start" => "Depuis le démarrage du processus Icinga",
 					"State" => "State",

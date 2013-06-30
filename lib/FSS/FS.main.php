@@ -80,6 +80,13 @@
 			FS::$log = new FSLogger();
 		}
 
+		public static function UnloadFSModules() {
+			FS::$sessMgr = null;
+			FS::$dbMgr = null;
+			FS::$secMgr = null;
+			FS::$iMgr = null;
+		}
+
 		public static function isAjaxCall() {
 			if(FS::$secMgr->checkAndSecuriseGetData("at"))
 				return true;

@@ -23,6 +23,7 @@
 		function __construct($locales) {
 			parent::__construct($locales);
 			$this->icingaAPI = new icingaBroker();
+			$this->BWtotalscore = 0;
 		}
 
 		public function Load() {
@@ -45,24 +46,37 @@
         			        });
 		        	}, 20000);");
 				$output .= FS::$iMgr->h1("Speed Reporting",true);
+				$output .= "<div id=\"reports\">";
 			}
-			$output .= "<div id=\"reports\">";
-			$tmpoutput = "<div style=\"width: 100%; display: inline-block;\">".$this->showIcingaReporting()."</div>";
-			$tmpoutput .= $this->showNetworkReporting();
-			$tmpoutput .= $this->showSecurityReporting();
-			$output .= "<div style=\"width: 100%; display: inline-block;\"><ul class=\"ulform\"><li>";
-			$output .= FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga,$this->loc->s("state-srv"))."</li><li>";
-			if($this->BWtotalscore != -1)
-				$output .= FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore,$this->loc->s("state-net"))."</li><li>";
-			$output .= FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore,$this->loc->s("state-security"))."</li></ul>";
-			$output .= "</div>";
-			$output .= $tmpoutput;
+	
+			$alerts = array();
+
+			$icingabuffer = $this->showIcingaReporting();
+			if($this->hsicinga) {
+					$alerts["<b>".$this->loc->s("state-srv")."</b> ".FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga).
+					"<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors")
+					] = $icingabuffer;
+			}
+
+			$netbuffer = $this->showNetworkReporting();
+			// Fake score for BW if there is now results
+			if($this->BWtotalscore == -1) {
+				$this->BWtotalscore = 100;
+				$this->BWscore = 100;
+			}
+			$alerts["<b>".$this->loc->s("state-net")."</b> ".FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore)] = $netbuffer;
+
+			$secbuffer = $this->showSecurityReporting();
+			$alerts["<b>".$this->loc->s("state-security")."</b> ".FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore)] = $secbuffer;
+
+			$output .= FS::$iMgr->accordion("alertreport",$alerts);
 			if(!FS::isAjaxCall()) $output .= "</div>";
 
 			return $output;
 		}
 
 		private function showIcingaReporting() {
+			$problems = array();
 			$output = "";	
 			$problemoutput = "<table style=\"width: 95%; font-size: 15px;\"><tr><th>".$this->loc->s("Host")."</th><th>".$this->loc->s("Service")."</th><th>".$this->loc->s("State").
 				"</th><th style=\"width: 10%\">".$this->loc->s("Duration")."</th><th style=\"width: 60%;\">".$this->loc->s("Status-information")."</th></tr>";
@@ -96,8 +110,11 @@
 								}
 									
 								$this->hsicinga++;
-								$problemoutput .= "<tr><td>".$host."</td><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
-									"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>";
+								if(!isset($problems[$host]))
+									$problems[$host] = "<table>";
+								$problems[$host] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
+	                                                        	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
+										
 							}
 						}
 					}
@@ -115,16 +132,19 @@
 								else
 									$timedown = $this->loc->s("Since-icinga-start");
 							}
-							$problemoutput .= "<tr><td>".$host."</td><td>".$this->loc->s("Availability")."</td><td style=\"".$stylestate."\">".$outstate.
-								"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>";
+							if(!isset($problems[$host]))
+								$problems[$host] = "";
+							$problems[$host] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
+	                                                       	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
 						}
 					}
 				}
 			}
 
 			if($this->hsicinga > 0) {
-				$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-icinga").": ".$this->hsicinga."/".$this->totalicinga."</h4>".
-					$problemoutput."</table>";		
+				foreach($problems as $key => $values)
+					$problems[$key] .= "</table>";
+				$output .= FS::$iMgr->accordion("icingapb",$problems)."</table>";		
 			}
 			return $output;
 		}

@@ -68,4 +68,5 @@
 	$end_time = microtime(true);
         $script_time = $end_time - $start_time;
 	echo $script_time; */
+	FS::UnloadFSModules();
 ?>

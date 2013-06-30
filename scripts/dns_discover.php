@@ -50,7 +50,7 @@
 	FS::$dbMgr->Delete("z_eye_dns_zone_record_cache");
 
 	$query = FS::$dbMgr->Select("z_eye_server_list","addr,login,pwd,namedpath,chrootnamed","dns = 1");
-	while($data = pg_fetch_array($query)) {
+	while($data = FS::$dbMgr->Fetch($query)) {
 		$conn = ssh2_connect($data["addr"],22);
 		if(!$conn) {
 			echo "Erreur de connexion au serveur ".$data["addr"]."\n";
@@ -148,5 +148,5 @@
 	
 		
 	echo "[".Config::getWebsiteName()."] DNS Discover done at ".date('d-m-Y G:i:s')."\n";
-
+	FS::UnloadFSModules();
 ?>
