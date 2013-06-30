@@ -53,9 +53,9 @@
 
 			$icingabuffer = $this->showIcingaReporting();
 			if($this->hsicinga) {
-					$alerts["<b>".$this->loc->s("state-srv")."</b> ".FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga).
-					"<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors")
-					] = $icingabuffer;
+					$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga).
+					"<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors"),
+					$icingabuffer);
 			}
 
 			$netbuffer = $this->showNetworkReporting();
@@ -64,10 +64,10 @@
 				$this->BWtotalscore = 100;
 				$this->BWscore = 100;
 			}
-			$alerts["<b>".$this->loc->s("state-net")."</b> ".FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore)] = $netbuffer;
+			$alerts["net"] = array("<b>".$this->loc->s("state-net")."</b> ".FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore),$netbuffer);
 
 			$secbuffer = $this->showSecurityReporting();
-			$alerts["<b>".$this->loc->s("state-security")."</b> ".FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore)] = $secbuffer;
+			$alerts["sec"] = array("<b>".$this->loc->s("state-security")."</b> ".FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore),$secbuffer);
 
 			$output .= FS::$iMgr->accordion("alertreport",$alerts);
 			if(!FS::isAjaxCall()) $output .= "</div>";
@@ -111,8 +111,8 @@
 									
 								$this->hsicinga++;
 								if(!isset($problems[$host]))
-									$problems[$host] = "<table>";
-								$problems[$host] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
+									$problems[$host] = array($host,"<table>");
+								$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
 	                                                        	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
 										
 							}
@@ -133,8 +133,8 @@
 									$timedown = $this->loc->s("Since-icinga-start");
 							}
 							if(!isset($problems[$host]))
-								$problems[$host] = "";
-							$problems[$host] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
+								$problems[$host] = array($host,"");
+							$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
 	                                                       	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
 						}
 					}
@@ -143,9 +143,18 @@
 
 			if($this->hsicinga > 0) {
 				foreach($problems as $key => $values)
-					$problems[$key] .= "</table>";
+					$problems[$key][1] .= "</table>";
 				$output .= FS::$iMgr->accordion("icingapb",$problems)."</table>";		
+				FS::$iMgr->js("$('#accicingah3').css('background-color','#4A0000');");
+				FS::$iMgr->js("$('#accicingah3').css('background-image','linear-gradient(#4A0000, #8A0000)');");
+				FS::$iMgr->js("$('#accicingah3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');");
 			}
+			else {
+				FS::$iMgr->js("$('#accicingah3').css('background-color','#222');");
+				FS::$iMgr->js("$('#accicingah3').css('background-image','linear-gradient(#000, #333)');");
+				FS::$iMgr->js("$('#accicingah3').css('background-image','-webkit-linear-gradient(#000, #333)');");
+			}
+				
 			return $output;
 		}
 
@@ -257,10 +266,18 @@
 			}
 			if($pbfound) $output .= $tmpoutput;
 			$output .= "</table>";
-			if($found)
+			if($found) {
 				$this->BWtotalscore = $total*10;
-			else
+				FS::$iMgr->js("$('#accneth3').css('background-color','#4A0000');");
+				FS::$iMgr->js("$('#accneth3').css('background-image','linear-gradient(#4A0000, #8A0000)');");
+				FS::$iMgr->js("$('#accneth3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');");
+			}
+			else {
 				$this->BWtotalscore = -1;
+				FS::$iMgr->js("$('#accneth3').css('background-color','#008A00');");
+				FS::$iMgr->js("$('#accneth3').css('background-image','linear-gradient(#004A00, #008A00)');");
+				FS::$iMgr->js("$('#accneth3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');");
+			}
 			return $output;
 		}
 
@@ -374,6 +391,17 @@
                         if($atkfound) $output .= $tmpoutput."</table>";
 			$this->SECscore = 10000-$scannb-2*$atknb;
 			if($this->SECscore < 0) $this->SECscore = 0;
+			if($this->SECscore < 10000) {
+				FS::$iMgr->js("$('#accsech3').css('background-color','#4A0000');");
+				FS::$iMgr->js("$('#accsech3').css('background-image','linear-gradient(#4A0000, #8A0000)');");
+				FS::$iMgr->js("$('#accsech3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');");
+			}
+			else {
+				$this->BWtotalscore = -1;
+				FS::$iMgr->js("$('#accsech3').css('background-color','#008A00');");
+				FS::$iMgr->js("$('#accsech3').css('background-image','linear-gradient(#004A00, #008A00)');");
+				FS::$iMgr->js("$('#accsech3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');");
+			}
 			FS::$dbMgr->Connect();
 			return $output;
 		}

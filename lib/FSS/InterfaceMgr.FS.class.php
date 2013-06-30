@@ -171,20 +171,20 @@
 			return "<div id=\"backarrow\"><a href=\"javascript:history.back()\">".FS::$iMgr->img("styles/back.png",32,32)."</a></div>";
 		}
 
-		public function h1($str,$raw=false) {
-			return "<h1>".($raw ? $str : $this->getLocale($str))."</h1>";
+		public function h1($str,$raw=false,$id="") {
+			return "<h1".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h1>";
 		}
 
-		public function h2($str,$raw=false) {
-			return "<h2>".($raw ? $str : $this->getLocale($str))."</h2>";
+		public function h2($str,$raw=false,$id="") {
+			return "<h2".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h2>";
 		}
 
-		public function h3($str,$raw=false) {
-			return "<h3>".($raw ? $str : $this->getLocale($str))."</h3>";
+		public function h3($str,$raw=false,$id="") {
+			return "<h3".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h3>";
 		}
 
-		public function h4($str,$raw=false) {
-			return "<h4>".($raw ? $str : $this->getLocale($str))."</h4>";
+		public function h4($str,$raw=false,$id="") {
+			return "<h4".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h4>";
 		}
 
 		public function hr() { return "<div id=\"hr\"></div>"; }
@@ -613,7 +613,7 @@
 
 			$count = count($elements);
 			foreach($elements as $key => $values) {
-				$output .= $this->h3($key,true)."<div>".$values."</div>";
+				$output .= $this->h3($values[0],true,"acc".$key."h3")."<div id=\"acc".$key."div\">".$values[1]."</div>";
 			}
 
 			$output .= "</div>";
