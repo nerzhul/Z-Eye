@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1206"
+	nextDBVersion = "1207"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -92,6 +92,14 @@ class ZEyeDBUpgrade():
 				self.tryCreateTable("z_eye_dhcp_option","optid integer, optname varchar(32) NOT NULL, optval varchar(512) NOT NULL, PRIMARY KEY (optid)")
 				self.tryCreateTable("z_eye_dhcp_option_group","optgroup varchar(64), optid integer, PRIMARY KEY (optgroup, optid)")
 				self.setDBVersion("1206")
+			if self.dbVersion == "1206":
+				self.tryDropTable("z_eye_dhcp_option")
+				self.tryDropTable("z_eye_dhcp_option_group")
+				self.tryCreateTable("z_eye_dhcp_option","optalias varchar(64) NOT NULL, optname varchar(32) NOT NULL, optval varchar(512) NOT NULL, PRIMARY KEY (optalias)")
+				self.tryCreateTable("z_eye_dhcp_option_group","optgroup varchar(64), optalias varchar(64) NOT NULL, PRIMARY KEY (optgroup, optalias)")
+				self.setDBVersion("1207")
+
+
 			
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
@@ -135,6 +143,22 @@ class ZEyeDBUpgrade():
 		except PgSQL.Error, e:
 			# If column exists, maybe the database is already up-to-date
 			if re.search("column \"%s\" of relation \"%s\" already exists" % (columnname,tablename),"%s" % e):	
+				return
+
+			if self.pgsqlCon:
+				self.pgsqlCon.close()
+                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			print "PgSQL Error: %s" % e
+                        sys.exit(1);
+
+	def tryDropTable(self,tablename):
+		try:
+			pgcursor = self.pgsqlCon.cursor()
+			pgcursor.execute("drop table %s" % tablename)
+			self.pgsqlCon.commit()
+		except PgSQL.Error, e:
+			# If table does not exist, maybe the database is up-to-date
+			if re.search("relation \"%s\" does not exist" % tablename,"%s" % e):	
 				return
 
 			if self.pgsqlCon:

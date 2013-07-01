@@ -365,7 +365,27 @@
 
 		private function showDHCPOptsMgmt() {
 			$output = FS::$iMgr->h2("title-dhcp-opts-group");	
-			$output .= FS::$iMgr->h2("title-dhcp-opts");	
+			$output .= FS::$iMgr->h2("title-dhcp-opts").FS::$iMgr->tip("tip-dhcp-opts")."<br />".
+				FS::$iMgr->opendiv(10,$this->loc->s("create-option"),array("line" => true));
+
+			$tMgr = new HTMLTableMgr(array(
+				"tabledivid" => "doptslist",
+				"tableid" => "dopttable",
+				"firstlineid" => "doptftr",
+				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
+				"sqlattrid" => "optalias",
+				"attrlist" => array(array("option-alias","optalias",""), array("option-name","optname",""),
+					array("option-value","optval","")),
+				"sorted" => true,
+				"odivnb" => 11,
+				"odivlink" => "optalias=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=15&optalias",
+				"rmconfirm" => "confirm-remove-option",
+				"trpfx" => "do",
+				));
+			$output .= $tMgr->render();
+
 			$output .= FS::$iMgr->h2("title-custom-dhcp-opts").FS::$iMgr->tip("tip-custom-dhcp-opts")."<br />".
 				FS::$iMgr->opendiv(8,$this->loc->s("create-custom-option"),array("line" => true));
 
@@ -390,9 +410,30 @@
 			return $output;
 		}
 
-		private function showDHCPOptsTableHead() {
-			return "<table id=\"dhcpopttable\"><thead><tr><th>".$this->loc->s("opt-name")."</th><th>".
-				$this->loc->s("opt-code")."</th><th>".$this->loc->s("opt-type")."</th></tr></thead>";
+		private function showDHCPOptsForm($optalias="") {
+			$optname = ""; $optvalue = "";
+			if($optalias) {
+				$optname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optname",
+					"optalias = '".$optalias."'");
+				$optvalue = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optval",
+					"optalias = '".$optvalue."'");
+			}
+
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=14")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("option-alias"),"optalias",$optalias,array("type" => "idxedit", "length" => 64,
+					"edit" => $optalias != "")).
+				"<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-value")."><td>".$this->loc->s("option-name")."</td><td>".FS::$iMgr->select("optname");
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_custom_option","optcode,optname,opttype");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$output .= FS::$iMgr->selElmt($data["optcode"].": ".$data["optname"]." (".$data["opttype"].")",$data["optname"],$optname == $data["optname"]);
+			}
+
+			$output .= "</select></td></tr>".
+				FS::$iMgr->idxLine($this->loc->s("option-value"),"optval",$optvalue,array("length" => 500, "size" => 40, "value" => $optvalue)).
+				FS::$iMgr->aeTableSubmit($optalias == "");
+
+			return $output;
 		}
 
 		private function showDHCPCustomOptsForm($optname="") {
@@ -853,6 +894,12 @@
 					if(!$optname)
 						return $this->loc->s("err-bad-datas");
 					return $this->showDHCPCustomOptsForm($optname);
+				case 10: return $this->showDHCPOptsForm();
+				case 11:
+					$optalias = FS::$secMgr->checkAndSecuriseGetData("optalias");
+					if(!$optalias)
+						return $this->loc->s("err-bad-datas");
+					return $this->showDHCPOptsForm($optalias);
 				default: return;
 			}
 		}
@@ -1438,7 +1485,7 @@ var_dump($_POST);
 					}
 					else {
 						if($exist) {
-							FS::$iMgr->ajaxEcho("err-custom-option-already-exists");
+							FS::$iMgr->ajaxEchoNC("err-custom-option-already-exists");
 							return;
 						}
 					}
@@ -1490,6 +1537,9 @@ var_dump($_POST);
 					}
 
 					FS::$dbMgr->BeginTr();
+					// We need to remove group options linked to option linked to custom option 
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias IN (SELECT optalias FROM ".
+						PGDbConfig::getDbPrefix()."dhcp_option WHERE optname = '".$optname."')");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optname = '".$optname."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname = '".$optname."'");
 					FS::$dbMgr->CommitTr();
@@ -1500,6 +1550,126 @@ var_dump($_POST);
 						"trpfx" => "dco"
 					));
 					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optname));
+					
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Add option
+				case 14:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+					$optalias = FS::$secMgr->checkAndSecurisePostData("optalias");
+					$optname = FS::$secMgr->checkAndSecurisePostData("optname");
+					$optvalue = FS::$secMgr->checkAndSecurisePostData("optval");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+					if(!$optalias || !FS::$secMgr->isHostname($optalias) || !$optname || !FS::$secMgr->isHostname($optalias) ||
+						!$optvalue) {
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+
+					$opttype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","opttype","optname= '".$optname."'");
+					if(!$opttype) {
+						FS::$iMgr->ajaxEchoNC("err-custom-option-not-exists");
+						return;
+					}
+
+					// @TODO: test option
+					switch($opttype) {
+						case "boolean":
+							if($optvalue != "true" && $optvalue != "false") {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+							break;
+						case "integer":
+							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0) {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+							break;
+						case "ip":
+							if(!FS::$secMgr->isIP($optvalue)) {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+							break;
+						/* useless
+						case text: default: break;
+						*/
+					}
+
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optalias","optalias = '".$optalias."'");
+					if($edit) {
+						if(!$exist) {
+							FS::$iMgr->ajaxEcho("err-option-not-exists");
+							return;
+						}
+					}
+					else {
+						if($exist) {
+							FS::$iMgr->ajaxEchoNC("err-option-already-exists");
+							return;
+						}
+					}
+
+					FS::$dbMgr->BeginTr();
+					if($edit)
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optalias = '".$optalias."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_option","optalias,optname,optval","'".$optalias."','".$optname."','".$optvalue."'");
+					FS::$dbMgr->CommitTr();
+
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "doptslist",
+						"tableid" => "dopttable",
+						"firstlineid" => "doptftr",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
+						"sqlattrid" => "optalias",
+						"attrlist" => array(array("option-alias","optalias",""), array("option-name","optname",""),
+							array("option-value","optval","")),
+						"sorted" => true,
+						"odivnb" => 11,
+						"odivlink" => "optalias=",
+						"rmcol" => true,
+						"rmlink" => "mod=".$this->mid."&act=15&optalias",
+						"rmconfirm" => "confirm-remove-option",
+						"trpfx" => "do",
+					));
+					$js = $tMgr->addLine($optname,$edit);
+
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Remove option
+				case 15:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+					$optalias = FS::$secMgr->checkAndSecuriseGetData("optalias");
+					if(!$optalias || !FS::$secMgr->isHostname($optalias)) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optalias",
+						"optalias = '".$optalias."'")) {
+						FS::$iMgr->ajaxEcho("err-option-not-exists");
+						return;
+					}
+
+					FS::$dbMgr->BeginTr();
+					// We need to remove group options linked to option
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias = '".$optalias."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optalias = '".$optalias."'");
+					FS::$dbMgr->CommitTr();
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "doptslist",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
+						"sqlattrid" => "optalias",
+						"trpfx" => "do"
+					));
+					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optalias));
 					
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
