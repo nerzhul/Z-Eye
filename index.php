@@ -48,7 +48,6 @@
 	else {
 		FS::$sessMgr->InitSessionIfNot();
 		FS::$iMgr->stylesheet("/styles/fss1.css");
-		FS::$iMgr->stylesheet("/styles/jQueryUI.css");
 		FS::$iMgr->jsinc("/lib/jQuery/jQuery.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jQueryUI.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jquery.jqzoom.js");
