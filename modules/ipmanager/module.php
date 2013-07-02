@@ -364,7 +364,10 @@
 		}
 
 		private function showDHCPOptsMgmt() {
-			$output = FS::$iMgr->h2("title-dhcp-opts-group");	
+			$output = FS::$iMgr->h2("title-dhcp-opts-group").FS::$iMgr->tip("tip-dhcp-opt-group")."<br />".
+				FS::$iMgr->opendiv(12,$this->loc->s("create-option-group"),array("line" => true));
+
+
 			$output .= FS::$iMgr->h2("title-dhcp-opts").FS::$iMgr->tip("tip-dhcp-opts")."<br />".
 				FS::$iMgr->opendiv(10,$this->loc->s("create-option"),array("line" => true));
 
@@ -412,6 +415,11 @@
 
 		private function showDHCPOptsForm($optalias="") {
 			$optname = ""; $optvalue = "";
+			$customoptexist = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname");
+			if(!$customoptexist) {
+				return FS::$iMgr->printError($this->loc->s("err-no-dhcp-custom-option"));
+			}
+		
 			if($optalias) {
 				$optname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optname",
 					"optalias = '".$optalias."'");
