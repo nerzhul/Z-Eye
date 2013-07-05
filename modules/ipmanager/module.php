@@ -367,6 +367,23 @@
 			$output = FS::$iMgr->h2("title-dhcp-opts-group").FS::$iMgr->tip("tip-dhcp-opt-group")."<br />".
 				FS::$iMgr->opendiv(12,$this->loc->s("create-option-group"),array("line" => true));
 
+			$tMgr = new HTMLTableMgr(array(
+				"tabledivid" => "dgoptslist",
+				"tableid" => "dgopttable",
+				"firstlineid" => "dgoptftr",
+				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option_group",
+				"sqlattrid" => "optgroup",
+				"attrlist" => array(array("Groupname","optgroup",""), array("options","optalias","")),
+				"sorted" => true,
+				"odivnb" => 13,
+				"odivlink" => "optgroup=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=17&optgroup",
+				"rmconfirm" => "confirm-remove-option",
+				"trpfx" => "do",
+				"multiid" => true,
+				));
+			$output .= $tMgr->render();
 
 			$output .= FS::$iMgr->h2("title-dhcp-opts").FS::$iMgr->tip("tip-dhcp-opts")."<br />".
 				FS::$iMgr->opendiv(10,$this->loc->s("create-option"),array("line" => true));
@@ -412,6 +429,34 @@
 			$output .= $tMgr->render();
 			return $output;
 		}
+
+		private function showDHCPOptsGroupForm($optgroup="") {
+			$options = array();
+			$optexist = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_option","optname");
+			if(!$optexist) {
+				return FS::$iMgr->printError($this->loc->s("err-no-dhcp-option"));
+			}
+
+			if($optgroup) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias","optgroup = '".$optgroup."'");
+				while($data = FS::$dbMgr->Fetch($query)) {
+					array_push($options,$data["optalias"]);
+				}
+			}
+
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=16")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("Groupname"),"optgroup",$optgroup,array("type" => "idxedit", "length" => 64,
+					"edit" => $optgroup != "")).
+				"<tr><td>".$this->loc->s("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions","",NULL,true);
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option","optalias,optname");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$output .= FS::$iMgr->selElmt($data["optalias"]." (".$data["optname"].")",$data["optalias"],in_array($data["optalias"],$options));
+			}
+			$output .= "</td></tr>".
+				FS::$iMgr->aeTableSubmit($optgroup == "");
+			return $output;
+		}	
 
 		private function showDHCPOptsForm($optalias="") {
 			$optname = ""; $optvalue = "";
@@ -908,6 +953,12 @@
 					if(!$optalias)
 						return $this->loc->s("err-bad-datas");
 					return $this->showDHCPOptsForm($optalias);
+				case 12: return $this->showDHCPOptsGroupForm();
+				case 13:
+					$optgroup = FS::$secMgr->checkAndSecuriseGetData("optgroup");
+					if(!$optgroup)
+						return $this->loc->s("err-bad-datas");
+					return $this->showDHCPOptsGroupForm($optgroup);
 				default: return;
 			}
 		}
@@ -1679,6 +1730,110 @@ var_dump($_POST);
 					));
 					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optalias));
 					
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Add/edit option group
+				case 16:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+					$optgroup = FS::$secMgr->checkAndSecurisePostData("optgroup");
+					$options = FS::$secMgr->checkAndSecurisePostData("groupoptions");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+					if(!$optgroup || !FS::$secMgr->isHostname($optgroup) || !$options ||
+						$edit && $edit != 1
+					) {
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$optgroup."'");
+					if($edit) {
+						if(!$exist) {
+							FS::$iMgr->ajaxEcho("err-dhcp-opts-group-not-exists");
+							return;
+						}
+					}
+					else {
+						if($exist) {
+							FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-already-exists");
+							return;
+						}
+					}
+
+					$count = count($options);
+					for($i=0;$i<$count;$i++) {
+						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optalias","optalias = '".$options[$i]."'")) {
+							FS::$iMgr->ajaxEchoNC("err-option-not-exists");
+							return;
+						}
+					}
+
+					FS::$dbMgr->BeginTr();
+					if($edit) {
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup  = '".$optgroup."'");
+					}
+					for($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup,optalias","'".$optgroup."','".$options[$i]."'");
+					}
+					FS::$dbMgr->CommitTr();
+
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "dgoptslist",
+						"tableid" => "dgopttable",
+						"firstlineid" => "dgoptftr",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option_group",
+						"sqlattrid" => "optgroup",
+						"sqlcond" => "optgroup = '".$optgroup."'",
+						"attrlist" => array(array("Groupname","optgroup",""), array("options","optalias","")),
+						"sorted" => true,
+						"odivnb" => 13,
+						"odivlink" => "optgroup=",
+						"rmcol" => true,
+						"rmlink" => "mod=".$this->mid."&act=17&optgroup",
+						"rmconfirm" => "confirm-remove-option",
+						"trpfx" => "do",
+						"multiid" => true,
+						));
+					$js = $tMgr->addLine($optgroup,$edit);
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Remove option group
+				case 17:
+					if(!FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+					$optgroup = FS::$secMgr->checkAndSecuriseGetData("optgroup");
+					if(!$optgroup || !FS::$secMgr->isHostname($optgroup)) {
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$optgroup."'")) {
+						FS::$iMgr->ajaxEcho("err-dhcp-opts-group-not-exists");
+						return;
+					}
+
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup  = '".$optgroup."'");
+					$tMgr = new HTMLTableMgr(array(
+						"tabledivid" => "dgoptslist",
+						"tableid" => "dgopttable",
+						"firstlineid" => "dgoptftr",
+						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option_group",
+						"sqlattrid" => "optgroup",
+						"attrlist" => array(array("Groupname","optgroup",""), array("options","optalias","")),
+						"sorted" => true,
+						"odivnb" => 13,
+						"odivlink" => "optgroup=",
+						"rmcol" => true,
+						"rmlink" => "mod=".$this->mid."&act=17&optgroup",
+						"rmconfirm" => "confirm-remove-option",
+						"trpfx" => "do",
+						"multiid" => true,
+						));
+					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optgroup));
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 			}

@@ -53,6 +53,7 @@
 
 			if(isset($options["attrlist"]))
 				$this->attrList = $options["attrlist"];	
+			// enable sort table JS
 			if(isset($options["sorted"]))
 				$this->sorted = $options["sorted"];	
 			if(isset($options["odivnb"]))
@@ -63,8 +64,14 @@
 				$this->removeColumn = $options["rmcol"];	
 			if(isset($options["rmconfirm"]))
 				$this->removeConfirm = $options["rmconfirm"];	
+			// enable remove link
 			if(isset($options["rmlink"]))
 				$this->removeLink = $options["rmlink"];	
+			// multiple ID, need group in one line
+			if(isset($options["multiid"]))
+				$this->groupMultipleId = $options["multiid"];	
+			else
+				$this->groupMultipleId = false;	
 
 			if(isset($options["trpfx"]))
 				$this->trPrefix = $options["trpfx"];	
@@ -93,16 +100,81 @@
 				$sqlAttrList .= $this->attrList[$i][1];
 			}
 
-			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found)
-					$found = true;
-				$tmpoutput .= $this->showLine($data,$attrCount);
-                        }
+			if($this->groupMultipleId) {
+				// For this type of show we need to bufferize
+				$rowBuf = array();
+				$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+				while($data = FS::$dbMgr->Fetch($query)) {
+					if(!$found)
+						$found = true;
+					// Bufferize entry
+					if(!isset($rowBuf[$data[$this->sqlAttrId]]))
+						$rowBuf[$data[$this->sqlAttrId]] = array();
+
+					// Store values into a buffer
+					$entry = array();
+					for($i=1;$i<$attrCount;$i++)
+						array_push($entry,$data[$this->attrList[$i][1]]);
+					// Write buffer to row buffer
+					array_push($rowBuf[$data[$this->sqlAttrId]],$entry);
+                     		}
+				$tmpoutput .= $this->showLineM($rowBuf,$attrCount);
+			}
+			else {
+				$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+				while($data = FS::$dbMgr->Fetch($query)) {
+					if(!$found)
+						$found = true;
+					$tmpoutput .= $this->showLine($data,$attrCount);
+                     		}
+			}
                         if($found)
 				$output .= $tmpoutput."</table>".FS::$iMgr->jsSortTable($this->tableId);
 
                         $output .= "</div>";
+			return $output;
+		}
+
+		private function showLineM($rowBuf,$attrCount) {
+			FS::$iMgr->setJSBuffer(1);
+			$output = "";
+
+			foreach($rowBuf as $rowIdx => $values) {
+				$output .= "<tr id=\"".$this->trPrefix.FS::$iMgr->formatHTMLId($rowIdx).$this->trSuffix."\"><td>".
+					FS::$iMgr->opendiv($this->opendivNumber,$rowIdx,
+						array("lnkadd" => $this->opendivLink.$rowIdx))."</td>";
+		
+				$valueCount = count($values);
+				// Read attributes
+				for($i=0;$i<$attrCount-1;$i++) {
+					$output .= "<td><ul>";
+
+					// Read values
+					for($j=0;$j<$valueCount;$j++) {
+						$output .= "<li>";
+						// Boolean 
+						if($this->attrList[$i][2] == "b")
+							$output .= ($values[$j][$i] == 't' ? "X" : "");	
+						// Select values
+						else if($this->attrList[$i][2] == "s")
+							$output .= FS::$iMgr->getLocale($this->attrList[$i][3][$values[$j][$i]]);
+						// Raw values
+						else
+							$output .= $values[$j][$i];
+						$output .= "</li>";
+					}
+					$output .= "</ul></td>";
+				}
+
+				if($this->removeColumn) {
+					$output .= "<td>".FS::$iMgr->removeIcon($this->removeLink."=".$rowIdx,
+						array("js" => true, "confirm" =>
+						array(FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?","Confirm","Cancel"))).
+						"</td>";
+				}
+				$output .= "</tr>";
+			}
+
 			return $output;
 		}
 
@@ -158,10 +230,28 @@
 			}
 
 			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
-			if($data = FS::$dbMgr->Fetch($query))
-				$jscontent = $this->showLine($data,$attrCount);
-			else
-				$jscontent = "";
+			if($this->groupMultipleId) {
+				$rowBuf = array();
+				while($data = FS::$dbMgr->Fetch($query)) {
+					// Bufferize entry
+					if(!isset($rowBuf[$data[$this->sqlAttrId]]))
+						$rowBuf[$data[$this->sqlAttrId]] = array();
+
+					// Store values into a buffer
+					$entry = array();
+					for($i=1;$i<$attrCount;$i++)
+						array_push($entry,$data[$this->attrList[$i][1]]);
+					// Write buffer to row buffer
+					array_push($rowBuf[$data[$this->sqlAttrId]],$entry);
+                		}
+				$jscontent = $this->showLineM($rowBuf,$attrCount);
+			}
+			else {
+				if($data = FS::$dbMgr->Fetch($query))
+					$jscontent = $this->showLine($data,$attrCount);
+				else
+					$jscontent = "";
+			}
 
 			$output .= "$('".addslashes($jscontent)."').insertAfter('#".$this->firstLineId."');";
 
@@ -209,6 +299,7 @@
 		private $opendivLink;
 		private $trPrefix;
 		private $trSuffix;
+		private $groupMultipleId;
 
 		// Remove related
 		private $removeColumn;
