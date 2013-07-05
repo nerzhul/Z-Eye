@@ -43,7 +43,7 @@
 					"Consult" => "Consulter",
 					"Contact" => "Contact",
 					"create-custom-option" => "Créer une option personnalisée",
-					"create-option" => "Créer une option",
+					"create-option" => "Définir une option",
 					"create-option-group" => "Créer un groupe d'options",
 					"crit-line" => "Seuil critique",
 					"days" => "jour(s)",
