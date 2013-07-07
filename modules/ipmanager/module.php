@@ -471,7 +471,7 @@
 				$optname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optname",
 					"optalias = '".$optalias."'");
 				$optvalue = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optval",
-					"optalias = '".$optvalue."'");
+					"optalias = '".$optalias."'");
 			}
 
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=14")."<table>".
@@ -506,15 +506,15 @@
 				FS::$iMgr->idxLine($this->loc->s("option-code"),"optcode","",array("type" => "num", "length" => 3, "size" => 3,
 					"edit" => $optcode != "", "value" => $optcode)).
 				"<tr><td>".$this->loc->s("option-type")."</td><td>".FS::$iMgr->select("opttype").
-				FS::$iMgr->selElmt($this->loc->s("boolean"),"boolean").
-				FS::$iMgr->selElmt($this->loc->s("uinteger-8"),"uint8").
-				FS::$iMgr->selElmt($this->loc->s("uinteger-16"),"uint16").
-				FS::$iMgr->selElmt($this->loc->s("uinteger-32"),"uint32").
-				FS::$iMgr->selElmt($this->loc->s("integer-8"),"int8").
-				FS::$iMgr->selElmt($this->loc->s("integer-16"),"int16").
-				FS::$iMgr->selElmt($this->loc->s("integer-32"),"int32").
-				FS::$iMgr->selElmt($this->loc->s("IP-Addr"),"ip").
-				FS::$iMgr->selElmt($this->loc->s("text"),"text").
+				FS::$iMgr->selElmt($this->loc->s("boolean"),		"boolean",	$opttype == "boolean").
+				FS::$iMgr->selElmt($this->loc->s("uinteger-8"),		"uint8",	$opttype == "uint8").
+				FS::$iMgr->selElmt($this->loc->s("uinteger-16"),	"uint16",	$opttype == "uint16").
+				FS::$iMgr->selElmt($this->loc->s("uinteger-32"),	"uint32",	$opttype == "uint32").
+				FS::$iMgr->selElmt($this->loc->s("integer-8"),		"int8",		$opttype == "int8").
+				FS::$iMgr->selElmt($this->loc->s("integer-16"),		"int16",	$opttype == "int16").
+				FS::$iMgr->selElmt($this->loc->s("integer-32"),		"int32",	$opttype == "int32").
+				FS::$iMgr->selElmt($this->loc->s("IP-Addr"),		"ip",		$opttype == "ip").
+				FS::$iMgr->selElmt($this->loc->s("text"),		"text",		$opttype == "text").
 				"</td></tr></select>".
 				FS::$iMgr->aeTableSubmit($optname == "");
 
@@ -1710,7 +1710,6 @@ var_dump($_POST);
 						return;
 					}
 
-					// @TODO: test option
 					switch($opttype) {
 						case "boolean":
 							if($optvalue != "true" && $optvalue != "false") {
@@ -1718,8 +1717,33 @@ var_dump($_POST);
 								return;
 							}
 							break;
-						case "integer-32":
-							if(!FS::$secMgr->isNumeric($optvalue)) {
+						case "uint32":
+							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0 || $optvalue > 4294967295) {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+						case "uint16":
+							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0 || $optvalue > 65535) {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+						case "uint8":
+							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0 || $optvalue > 255) {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+						case "int32":
+							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < -2147483647 || $optvalue > 2147483647) {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+						case "int16":
+							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < -32768 || $optvalue > 32767 ) {
+								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
+								return;
+							}
+						case "int32":
+							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < -256 || $optvalue > 255) {
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
