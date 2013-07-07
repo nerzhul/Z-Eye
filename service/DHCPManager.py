@@ -48,6 +48,7 @@ class ZEyeDHCPManager(threading.Thread):
 	optsList = {}
 	optgroupsList = {}
 	subnetOptgroupsList = {}
+	IPv4OptgroupsList = {}
 
 	def __init__(self):
 		""" 1 min between two DHCP updates """
@@ -94,6 +95,7 @@ class ZEyeDHCPManager(threading.Thread):
 				self.loadOptsList(pgcursor)
 				self.loadOptgroupsList(pgcursor)
 				self.loadSubnetOptions(pgcursor)
+				self.loadIPv4Options(pgcursor)
 				for idx in pgres:
 					if len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
 						thread.start_new_thread(self.doConfigDHCP,(idx[0],idx[1],idx[2],idx[3],idx[4]))
@@ -226,7 +228,15 @@ class ZEyeDHCPManager(threading.Thread):
 			
 						subnetBuf += "\toption domain-name-servers %s%s;\n}\n" % (self.subnetList[subnet][3],dns2)
 						for ip in subnetIpList:
-							reservBuf += "host %s {\n\thardware ethernet %s;\n\tfixed-address %s;\n}\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
+							reservBuf += "host %s {\n\thardware ethernet %s;\n\tfixed-address %s;\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
+							if ip in self.IPv4OptgroupsList:
+								for options in self.IPv4OptgroupsList[ip]:
+									# Text values must have braces and strip ' " ' char
+									if self.customOptsList[options[0]][1] == "text":
+										reservBuf += "\toption %s \"%s\";\n" % (options[0],Util.addslashes(options[1]))
+									else:
+										reservBuf += "\toption %s %s;\n" % (options[0],options[1])
+							reservBuf += "}\n"
 	
 			
 			# check md5 trace to see if subnet file is different
@@ -250,6 +260,24 @@ class ZEyeDHCPManager(threading.Thread):
 			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
 
 		self.decrThreadNb()
+
+	def loadIPv4Options(self,pgcursor):
+		self.IPv4OptgroupsList = {}
+		tmpIPv4OptgroupsList = {}
+		pgcursor.execute("SELECT ipaddr,optgroup FROM z_eye_dhcp_ipv4_optgroups")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] in self.ipList:
+				if idx[0] not in self.IPv4OptgroupsList:
+					self.IPv4OptgroupsList[idx[0]] = []
+					tmpIPv4OptgroupsList[idx[0]] = []
+				if idx[1] not in self.IPv4OptgroupsList[idx[0]]:
+					tmpIPv4OptgroupsList[idx[0]].append(idx[1])
+					
+		for ip in tmpIPv4OptgroupsList:
+			for optionlist in tmpIPv4OptgroupsList[ip]:
+				for optalias in self.optgroupsList[optionlist]:
+					self.IPv4OptgroupsList[ip].append((self.optsList[optalias][0],self.optsList[optalias][1]))
 
 	def loadSubnetOptions(self,pgcursor):
 		self.subnetOptgroupsList = {}

@@ -493,7 +493,7 @@
 		}
 
 		private function showDHCPCustomOptsForm($optname="") {
-			$opttype = 0; $optcode = 0;
+			$opttype = 0; $optcode = 0; $protect = 'f';
 			if($optname) {
 				$opttype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","opttype",
 					"optname = '".$optname."'");
@@ -503,7 +503,7 @@
 					"optname = '".$optname."'");
 			}
 
-			if($protect) {
+			if($protect == 't') {
 				return FS::$iMgr->printError("err-option-code-protected");
 			}
 
@@ -850,8 +850,32 @@
 				FS::$iMgr->idxLine($this->loc->s("Reserv"),"reserv",$reserv,array("type" => "chk", "tooltip" => "tooltip-ip-reserv")).
 				FS::$iMgr->idxLine($this->loc->s("MAC-Addr"),"mac",$mac).
 				FS::$iMgr->idxLine($this->loc->s("Hostname"),"hostname",$hostname,array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")).
-				FS::$iMgr->idxLine($this->loc->s("Comment"),"comment","",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment")).
-				FS::$iMgr->aeTableSubmit($ip == "");
+				FS::$iMgr->idxLine($this->loc->s("Comment"),"comment","",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment"));
+
+			/*
+			* Option groups associated to IP(if there is option groups)
+			*/
+			$optgroups = array();
+			if($ip) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ipv4_optgroups","optgroup","ipaddr = '".$ip."'");
+				while($data = FS::$dbMgr->Fetch($query)) {
+					array_push($optgroups,$data["optgroup"]);
+				}
+			}
+
+			$found = false;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) {
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("ipopts","",NULL,true);
+					$found = true;
+				}
+				$output .= FS::$iMgr->selElmt($data["optgroup"],$data["optgroup"],in_array($data["optgroup"],$optgroups));
+			}
+			if($found) $output .= "</select></td></tr>";
+
+
+			$output .= FS::$iMgr->aeTableSubmit($ip == "");
 
 			return $output;
 		}
@@ -1509,6 +1533,7 @@ var_dump($_POST);
 					$hostname = FS::$secMgr->checkAndSecurisePostData("hostname");
 					$reserv = FS::$secMgr->checkAndSecurisePostData("reserv");
 					$comment = FS::$secMgr->checkAndSecurisePostData("comment");
+					$ipopts = FS::$secMgr->checkAndSecurisePostData("ipopts");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$ip || !FS::$secMgr->isIP($ip) || $mac && !FS::$secMgr->isMacAddr($mac) || $hostname && !FS::$secMgr->isHostname($hostname) ||
@@ -1569,12 +1594,31 @@ var_dump($_POST);
 						$comment = preg_replace("#[\n\r]+#","\r",$comment);
 					}
 						
+					if($ipopts) {
+						$count = count($ipopts);
+						for($i=0;$i<$count;$i++) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$ipopts[$i]."'",array("group" => "optgroup"))) {
+								FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-not-exists");
+								return;
+							}
+						}
+					}
+
 					FS::$dbMgr->BeginTr();
+
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip","ip = '".$ip."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ipv4_optgroups","ipaddr = '".$ip."'");
 					if($mac || $hostname || $comment || $reserv) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv","'".$ip."','".$mac."','".$hostname."','".
 							$comment."','".($reserv ? 't':'f')."'");
 					}
+					if($ipopts) {
+						$count = count($ipopts);
+						for($i=0;$i<$count;$i++) {
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ipv4_optgroups","ipaddr,optgroup","'".$ip."','".$ipopts[$i]."'");
+						}
+					}
+
 					FS::$dbMgr->CommitTr();
 
 					// Maybe replace only the concerned tr and also the graph ? 

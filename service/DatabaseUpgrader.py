@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1211"
+	nextDBVersion = "1212"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -114,6 +114,9 @@ class ZEyeDBUpgrade():
 					('pop-servers','70','ip','t'),('nntp-servers','71','ip','t'),('www-servers','72','ip','t'),('finger-servers','73','ip','t'),('irc-server','74','ip','t'),\
 					('nis-domain','40','text','t'),('nis-servers','41','ip','t'),('root-path','17','text','t'),('extensions-path','18','text','t'),('streettalk-server','75','ip','t')")
 				self.setDBVersion("1211")
+			if self.dbVersion == "1211":
+				self.tryCreateTable("z_eye_dhcp_ipv4_optgroups","ipaddr varchar(16) NOT NULL, optgroup varchar(64) NOT NULL, PRIMARY KEY (ipaddr, optgroup)")
+				self.setDBVersion("1212")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
