@@ -40,6 +40,7 @@
 			$this->dbUser = "";
 			$this->dbLink = NULL;
 			$this->dbType = "";
+			$this->sqlQuery = "";
 		}
 
 		public function initForZEye() {
@@ -73,6 +74,7 @@
 				else
 					$sql .= " LIMIT ".$options["limit"];
 			}
+			$this->sqlQuery = $sql;
 			return parent::query($sql);
 		}
 
@@ -132,6 +134,10 @@
 		}
 
 		public function Fetch(&$query) {
+			if(!$query) {
+				echo FS::$iMgr->printError("Query failed: ".$this->sqlQuery);
+				return NULL;
+			}
 			return $query->fetch();
 		}
 
@@ -139,6 +145,7 @@
 			$sql = "DELETE FROM ".$table."";
 			if(strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
+			$this->sqlQuery = $sql;
 			return parent::query($sql);
 		}
 
@@ -146,6 +153,7 @@
 			$sql = "UPDATE ".$table." SET ".$mods."";
 			if(strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
+			$this->sqlQuery = $sql;
 			return parent::query($sql);
 		}
 
@@ -191,5 +199,8 @@
 		private $dbLink;
 		private $dbType;
 		private $dbMgr;
+
+		// Buffer for debug purposes
+		private $sqlQuery;
 	};
 ?>

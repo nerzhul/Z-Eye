@@ -594,7 +594,9 @@
 				FS::$iMgr->idxLine($this->loc->s("subnet-shortname"),"shortname",$shortname,array("length" => 32, "tooltip" => "tooltip-shortname")).
 				FS::$iMgr->idxLine($this->loc->s("subnet-desc"),"desc",$desc,array("length" => 128, "tooltip" => "tooltip-desc"));
 
-			// Clusters associated to subnet (if there is clusters)
+			/*
+			* Clusters associated to subnet (if there is clusters)
+			*/
 			$clusters = array();
 			if($netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
@@ -608,11 +610,15 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>".$this->loc->s("dhcp-cluster")."</td><td>".FS::$iMgr->select("subnetclusters","",NULL,true);
+					$found = true;
 				}
 				$output .= FS::$iMgr->selElmt($data["clustername"],$data["clustername"],in_array($data["clustername"],$clusters));
 			}
 			if($found) $output .= "</select></td></tr>";
 
+			/*
+			* Misc options, related to classic DHCP subnet mgmt
+			*/
 			$output .= FS::$iMgr->idxLine($this->loc->s("router")." (*)","router",$router,array("length" => 16, "type" => "ip", "tooltip" => "tooltip-router")).
 				FS::$iMgr->idxLine($this->loc->s("domain-name")." (*)","domainname",$domainname,array("length" => 120, "tooltip" => "tooltip-domainname")).
 				FS::$iMgr->idxLine($this->loc->s("DNS")." 1 (*)","dns1",$dns1,array("length" => 16, "type" => "ip")).
@@ -620,6 +626,28 @@
 				FS::$iMgr->idxLine($this->loc->s("max-lease-time")." (**)","mleasetime",$mleasetime,array("length" => 7, "type" => "num", "value" => $mleasetime, "tooltip" => "tooltip-max-lease-time")).
 				FS::$iMgr->idxLine($this->loc->s("default-lease-time")." (**)","dleasetime",$dleasetime,array("length" => 7, "type" => "num", "value" => $dleasetime,
 					"tooltip" => "tooltip-default-lease-time"));
+
+			/*
+			* Option groups associated to subnet (if there is option groups)
+			*/
+			$optgroups = array();
+			if($netid) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup","netid = '".$netid."'");
+				while($data = FS::$dbMgr->Fetch($query)) {
+					array_push($optgroups,$data["optgroup"]);
+				}
+			}
+
+			$found = false;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) {
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("dopts","",NULL,true);
+					$found = true;
+				}
+				$output .= FS::$iMgr->selElmt($data["optgroup"],$data["optgroup"],in_array($data["optgroup"],$optgroups));
+			}
+			if($found) $output .= "</select></td></tr>";
 
 			$output .= "<tr><td colspan=\"2\">".FS::$iMgr->tip("(*) ".$this->loc->s("required-if-cluster")."<br />".
 				"(**) ".$this->loc->s("tip-inherit-if-null"),true)."</td></tr>".
@@ -1227,6 +1255,7 @@ var_dump($_POST);
 					$domainname = FS::$secMgr->checkAndSecurisePostData("domainname");
 					$mleasetime = FS::$secMgr->checkAndSecurisePostData("mleasetime");
 					$dleasetime = FS::$secMgr->checkAndSecurisePostData("dleasetime");
+					$dhcpopts = FS::$secMgr->checkAndSecurisePostData("dopts");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$netid || !FS::$secMgr->isIP($netid) || !$netmask || !FS::$secMgr->isMaskAddr($netmask) || !$vlanid || !FS::$secMgr->isNumeric($vlanid) ||
@@ -1275,7 +1304,8 @@ var_dump($_POST);
 					}
 
 					if($subnetclusters) {
-						for($i=0;$i<count($subnetclusters);$i++) {
+						$count = count($subnetclusters);
+						for($i=0;$i<$count;$i++) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$subnetclusters[$i]."'")) {
 								FS::$iMgr->ajaxEchoNC("err-cluster-not-exists");
 								return;
@@ -1287,18 +1317,36 @@ var_dump($_POST);
 						}
 					}
 					
+					if($dhcpopts) {
+						$count = count($dhcpopts);
+						for($i=0;$i<$count;$i++) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$dhcpopts[$i]."'",array("group" => "optgroup"))) {
+								FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-not-exists");
+								return;
+							}
+						}
+					}
 
 					FS::$dbMgr->BeginTr();
 					if($edit) {
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid = '".$netid."'");
 					}
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname,dleasetime,mleasetime",
 						"'".$netid."','".$netmask."','".$vlanid."','".$shortname."','".$desc."','".$router."','".$dns1."','".$dns2."','".$domainname."','".$dleasetime."','".$mleasetime."'");
 
 					if($subnetclusters) {
-						for($i=0;$i<count($subnetclusters);$i++) {
+						$count = count($subnetclusters);
+						for($i=0;$i<$count;$i++) {
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername,subnet","'".$subnetclusters[$i]."','".$netid."'");
+						}
+					}
+
+					if($dhcpopts) {
+						$count = count($dhcpopts);
+						for($i=0;$i<$count;$i++) {
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid,optgroup","'".$netid."','".$dhcpopts[$i]."'");
 						}
 					}
 
@@ -1331,6 +1379,7 @@ var_dump($_POST);
 					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid = '".$netid."'");
 					FS::$dbMgr->CommitTr();
 
 					$tMgr = new HTMLTableMgr(array(
@@ -1560,6 +1609,7 @@ var_dump($_POST);
 						"tabledivid" => "customoptslist",
 						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
 						"sqlattrid" => "optname",
+						"sqlcond" => "optname = '".$optname."'",
 						"tableid" => "dhcpopttable",
 						"firstlineid" => "dhcpoptftr",
 						"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
@@ -1594,14 +1644,31 @@ var_dump($_POST);
 						FS::$iMgr->ajaxEcho("err-custom-option-not-exists");
 						return;
 					}
+					// We remove option groups link with subnet if the only option is current option
+					$toRemove = array();
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","COUNT(optalias) as ct,optgroup",
+						"optgroup IN(SELECT optgroup FROM ".PGDbConfig::getDbPrefix()."dhcp_option_group WHERE optalias IN (SELECT optalias FROM ".
+						PGDbConfig::getDbPrefix()."dhcp_option WHERE optname = '".$optname."'))",
+						array("group" => "optgroup"));
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if($data["ct"] == 1)
+							array_push($toRemove,$data["optgroup"]);
+					}
 
 					FS::$dbMgr->BeginTr();
+
+					// We need to remove link between option group and subnet if this is the last option
+					$count = count($toRemove);
+					for($i=0;$i<$count;$i++)
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup = '".$toRemove[$i]."'");
+
 					// We need to remove group options linked to option linked to custom option 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias IN (SELECT optalias FROM ".
 						PGDbConfig::getDbPrefix()."dhcp_option WHERE optname = '".$optname."')");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optname = '".$optname."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname = '".$optname."'");
 					FS::$dbMgr->CommitTr();
+
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "customoptslist",
 						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
@@ -1685,6 +1752,7 @@ var_dump($_POST);
 						"firstlineid" => "doptftr",
 						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
 						"sqlattrid" => "optalias",
+						"sqlcond" => "optalias = '".$optalias."'",
 						"attrlist" => array(array("option-alias","optalias",""), array("option-name","optname",""),
 							array("option-value","optval","")),
 						"sorted" => true,
@@ -1717,11 +1785,28 @@ var_dump($_POST);
 						return;
 					}
 
+					// We remove option groups link with subnet if the only option is current option
+					$toRemove = array();
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","COUNT(optalias) as ct,optgroup",
+						"optgroup IN(SELECT optgroup FROM ".PGDbConfig::getDbPrefix()."dhcp_option_group WHERE optalias = '".$optalias."')",
+						array("group" => "optgroup"));
+					while($data = FS::$dbMgr->Fetch($query)) {
+						if($data["ct"] == 1)
+							array_push($toRemove,$data["optgroup"]);
+					}
+
 					FS::$dbMgr->BeginTr();
-					// We need to remove group options linked to option
+
+					// We need to remove link between option group and subnet if this is the last option
+					$count = count($toRemove);
+					for($i=0;$i<$count;$i++)
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup = '".$toRemove[$i]."'");
+
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias = '".$optalias."'");
+					// We need to remove group options linked to option
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optalias = '".$optalias."'");
 					FS::$dbMgr->CommitTr();
+
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "doptslist",
 						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
@@ -1816,7 +1901,11 @@ var_dump($_POST);
 						return;
 					}
 
+					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup  = '".$optgroup."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid = '".$netid."'");
+					FS::$dbMgr->CommitTr();
+
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "dgoptslist",
 						"tableid" => "dgopttable",
