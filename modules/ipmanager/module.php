@@ -416,8 +416,10 @@
 				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
 				"sqlattrid" => "optname",
 				"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
-					array("option-type","opttype","s",array("boolean" => "boolean","integer" => "integer",
-					"ip" => "IP-Addr", "text" => "text"))),
+					array("option-type","opttype","s",array("boolean" => "boolean",
+						"uint8" => "uinteger-8", "uint16" => "uinteger-16", "uint32" => "uinteger-32",
+						"int8" => "integer-8", "int16" => "integer-16", "int32" => "integer-32",
+						"ip" => "IP-Addr", "text" => "text"))),
 				"sorted" => true,
 				"odivnb" => 9,
 				"odivlink" => "optname=",
@@ -505,7 +507,12 @@
 					"edit" => $optcode != "", "value" => $optcode)).
 				"<tr><td>".$this->loc->s("option-type")."</td><td>".FS::$iMgr->select("opttype").
 				FS::$iMgr->selElmt($this->loc->s("boolean"),"boolean").
-				FS::$iMgr->selElmt($this->loc->s("integer"),"integer").
+				FS::$iMgr->selElmt($this->loc->s("uinteger-8"),"uint8").
+				FS::$iMgr->selElmt($this->loc->s("uinteger-16"),"uint16").
+				FS::$iMgr->selElmt($this->loc->s("uinteger-32"),"uint32").
+				FS::$iMgr->selElmt($this->loc->s("integer-8"),"int8").
+				FS::$iMgr->selElmt($this->loc->s("integer-16"),"int16").
+				FS::$iMgr->selElmt($this->loc->s("integer-32"),"int32").
 				FS::$iMgr->selElmt($this->loc->s("IP-Addr"),"ip").
 				FS::$iMgr->selElmt($this->loc->s("text"),"text").
 				"</td></tr></select>".
@@ -1613,7 +1620,9 @@ var_dump($_POST);
 						"tableid" => "dhcpopttable",
 						"firstlineid" => "dhcpoptftr",
 						"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
-							array("option-type","opttype","s",array("boolean" => "boolean","integer" => "integer",
+							array("option-type","opttype","s",array("boolean" => "boolean",
+								"uint8" => "uinteger-8", "uint16" => "uinteger-16", "uint32" => "uinteger-32",
+								"int8" => "integer-8", "int16" => "integer-16", "int32" => "integer-32",
 								"ip" => "IP-Addr", "text" => "text"))),
 						"sorted" => true,
 						"odivnb" => 9,
@@ -1709,8 +1718,8 @@ var_dump($_POST);
 								return;
 							}
 							break;
-						case "integer":
-							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0) {
+						case "integer-32":
+							if(!FS::$secMgr->isNumeric($optvalue)) {
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}

@@ -22,7 +22,7 @@ import datetime,re,sys,time,thread,threading,subprocess
 from threading import Lock
 from ipcalc import Network
 
-import Logger,netdiscoCfg
+import Logger,Util,netdiscoCfg
 from SSHBroker import ZEyeSSHBroker
 
 """
@@ -44,6 +44,10 @@ class ZEyeDHCPManager(threading.Thread):
 	ipList = {}
 	subnetList = {}
 	clusterList = {}
+	customOptsList = {}
+	optsList = {}
+	optgroupsList = {}
+	subnetOptgroupsList = {}
 
 	def __init__(self):
 		""" 1 min between two DHCP updates """
@@ -86,6 +90,10 @@ class ZEyeDHCPManager(threading.Thread):
 				self.loadIPList(pgcursor)
 				self.loadSubnetList(pgcursor)
 				self.loadClusterList(pgcursor)
+				self.loadCustomOptsList(pgcursor)
+				self.loadOptsList(pgcursor)
+				self.loadOptgroupsList(pgcursor)
+				self.loadSubnetOptions(pgcursor)
 				for idx in pgres:
 					if len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
 						thread.start_new_thread(self.doConfigDHCP,(idx[0],idx[1],idx[2],idx[3],idx[4]))
@@ -176,7 +184,35 @@ class ZEyeDHCPManager(threading.Thread):
 						if len(self.subnetList[subnet][4]) > 0 and self.subnetList[subnet][4] != self.subnetList[subnet][3]:
 							dns2 = " %s" % self.subnetList[subnet][4]
 
+						# custom options
+						for cOpt in self.customOptsList:
+							codeType = ""
+							if self.customOptsList[cOpt][1] == "uint8":
+								codeType = "unsigned integer 8"
+							elif self.customOptsList[cOpt][1] == "uint16":
+								codeType = "unsigned integer 16"
+							elif self.customOptsList[cOpt][1] == "uint32":
+								codeType = "unsigned integer 32"
+							elif self.customOptsList[cOpt][1] == "int8":
+								codeType = "integer 8"
+							elif self.customOptsList[cOpt][1] == "int16":
+								codeType = "integer 16"
+							elif self.customOptsList[cOpt][1] == "uint32":
+								codeType = "integer 32"
+							else:
+								codeType = self.customOptsList[cOpt][1]
+							subnetBuf += "option %s code %s = %s;\n" % (cOpt,self.customOptsList[cOpt][0],codeType)
+
 						subnetBuf += "subnet %s netmask %s {\n\toption routers %s;\n\toption domain-name \"%s\";\n" % (subnet,netmask,self.subnetList[subnet][2],self.subnetList[subnet][5])
+
+						# Set options values
+						if subnet in self.subnetOptgroupsList:
+							for options in self.subnetOptgroupsList[subnet]:
+								# Text values must have braces and strip ' " ' char
+								if self.customOptsList[options[0]][1] == "text":
+									subnetBuf += "\toption %s \"%s\";\n" % (options[0],Util.addslashes(options[1]))
+								else:
+									subnetBuf += "\toption %s %s;\n" % (options[0],options[1])
 
 						if self.subnetList[subnet][6] != "" and self.subnetList[subnet][6] != 0:
 							subnetBuf += "\tdefault-lease-time %s;\n" % self.subnetList[subnet][6]
@@ -210,6 +246,48 @@ class ZEyeDHCPManager(threading.Thread):
 			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
 
 		self.decrThreadNb()
+
+	def loadSubnetOptions(self,pgcursor):
+		self.subnetOptgroupsList = {}
+		tmpsubnetOptgroupsList = {}
+		pgcursor.execute("SELECT netid,optgroup FROM z_eye_dhcp_subnet_optgroups")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] in self.subnetList:
+				if idx[0] not in self.subnetOptgroupsList:
+					self.subnetOptgroupsList[idx[0]] = []
+					tmpsubnetOptgroupsList[idx[0]] = []
+				if idx[1] not in self.subnetOptgroupsList[idx[0]]:
+					tmpsubnetOptgroupsList[idx[0]].append(idx[1])
+					
+		for subnet in tmpsubnetOptgroupsList:
+			for optionlist in tmpsubnetOptgroupsList[subnet]:
+				for optalias in self.optgroupsList[optionlist]:
+					self.subnetOptgroupsList[subnet].append((self.optsList[optalias][0],self.optsList[optalias][1]))
+
+	def loadOptgroupsList(self,pgcursor):
+		self.optgroupsList = {}
+		pgcursor.execute("SELECT optgroup,optalias FROM z_eye_dhcp_option_group")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] not in self.optgroupsList:
+				self.optgroupsList[idx[0]] = []
+			if idx[1] not in self.optgroupsList[idx[0]]:
+				self.optgroupsList[idx[0]].append(idx[1])
+
+	def loadOptsList(self,pgcursor):
+		self.optsList = {}
+		pgcursor.execute("SELECT optalias,optname,optval FROM z_eye_dhcp_option")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			self.optsList[idx[0]] = (idx[1],idx[2])
+
+	def loadCustomOptsList(self,pgcursor):
+		self.customOptsList = {}
+		pgcursor.execute("SELECT optname,optcode,opttype FROM z_eye_dhcp_custom_option")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			self.customOptsList[idx[0]] = (idx[1],idx[2])
 
 	def loadIPList(self,pgcursor):
 		self.ipList = {}
