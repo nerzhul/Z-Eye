@@ -504,7 +504,7 @@
 				FS::$iMgr->idxLine($this->loc->s("option-name"),"optname",$optname,array("type" => "idxedit", "length" => 32,
 					"edit" => $optname != "")).
 				FS::$iMgr->idxLine($this->loc->s("option-code"),"optcode","",array("type" => "num", "length" => 3, "size" => 3,
-					"edit" => $optcode != "", "value" => $optcode)).
+					"edit" => $optcode != "", "value" => $optcode, "tooltip" => "tooltip-dhcp-option-code")).
 				"<tr><td>".$this->loc->s("option-type")."</td><td>".FS::$iMgr->select("opttype").
 				FS::$iMgr->selElmt($this->loc->s("boolean"),		"boolean",	$opttype == "boolean").
 				FS::$iMgr->selElmt($this->loc->s("uinteger-8"),		"uint8",	$opttype == "uint8").
@@ -1587,6 +1587,16 @@ var_dump($_POST);
 					if(!$optname || !FS::$secMgr->isHostname($optname) || !$optcode || !FS::$secMgr->isNumeric($optcode) ||
 						!$opttype || $edit && $edit != 1) {
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+
+					if($optcode < 126) {
+						FS::$iMgr->ajaxEchoNC("err-option-code-protected");
+						return;
+					}
+
+					if($optcode > 255) {
+						FS::$iMgr->ajaxEchoNC("err-option-code-lower-255");
 						return;
 					}
 
