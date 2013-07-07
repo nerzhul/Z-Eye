@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1208"
+	nextDBVersion = "1211"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -101,7 +101,19 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1207":
 				self.tryCreateTable("z_eye_dhcp_subnet_optgroups","netid varchar(16) NOT NULL, optgroup varchar(64) NOT NULL, PRIMARY KEY (netid, optgroup)")
 				self.setDBVersion("1208")
-			
+			if self.dbVersion == "1208":
+				self.tryAddColumn("z_eye_dhcp_custom_option","protectrm","bool DEFAULT 'f'")
+				self.setDBVersion("1209")
+			if self.dbVersion == "1209":
+				self.rawRequest("INSERT INTO z_eye_dhcp_custom_option (optname,optcode,opttype,protectrm) VALUES ('time-offset','2','int32','t'),('routers','3','ip','t'),\
+					('time-servers','4','ip','t'),('domain-name-servers','6','ip','t'),('log-servers','7','ip','t'),('lpr-servers','9','ip','t'),('host-name','12','text','t'),\
+					('domain-name','15','text','t'),('broadcast-address','28','ip','t'),('ntp-servers','42','ip','t'),('tftp-server-name','66','text','t'),('bootfile-name','67','text','t')")
+				self.setDBVersion("1210")
+			if self.dbVersion == "1210":
+				self.rawRequest("INSERT INTO z_eye_dhcp_custom_option (optname,optcode,opttype,protectrm) VALUES ('mobile-ip-home-agent','68','ip','t'),('smtp-server','69','ip','t'),\
+					('pop-servers','70','ip','t'),('nntp-servers','71','ip','t'),('www-servers','72','ip','t'),('finger-servers','73','ip','t'),('irc-server','74','ip','t'),\
+					('nis-domain','40','text','t'),('nis-servers','41','ip','t'),('root-path','17','text','t'),('extensions-path','18','text','t'),('streettalk-server','75','ip','t')")
+				self.setDBVersion("1211")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

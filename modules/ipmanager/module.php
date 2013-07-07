@@ -415,6 +415,7 @@
 				"firstlineid" => "dhcpoptftr",
 				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
 				"sqlattrid" => "optname",
+				"sqlcond" => "protectrm = 'f'",
 				"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
 					array("option-type","opttype","s",array("boolean" => "boolean",
 						"uint8" => "uinteger-8", "uint16" => "uinteger-16", "uint32" => "uinteger-32",
@@ -498,6 +499,12 @@
 					"optname = '".$optname."'");
 				$optcode = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optcode",
 					"optname = '".$optname."'");
+				$protect = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","protectrm",
+					"optname = '".$optname."'");
+			}
+
+			if($protect) {
+				return FS::$iMgr->printError("err-option-code-protected");
 			}
 
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=12")."<table>".
@@ -1600,7 +1607,7 @@ var_dump($_POST);
 						return;
 					}
 
-					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname",
+					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","protectrm",
 						"optname = '".$optname."'");
 					if($edit) {
 						if(!$exist) {

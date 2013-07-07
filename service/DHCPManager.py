@@ -186,22 +186,26 @@ class ZEyeDHCPManager(threading.Thread):
 
 						# custom options
 						for cOpt in self.customOptsList:
-							codeType = ""
-							if self.customOptsList[cOpt][1] == "uint8":
-								codeType = "unsigned integer 8"
-							elif self.customOptsList[cOpt][1] == "uint16":
-								codeType = "unsigned integer 16"
-							elif self.customOptsList[cOpt][1] == "uint32":
-								codeType = "unsigned integer 32"
-							elif self.customOptsList[cOpt][1] == "int8":
-								codeType = "integer 8"
-							elif self.customOptsList[cOpt][1] == "int16":
-								codeType = "integer 16"
-							elif self.customOptsList[cOpt][1] == "uint32":
-								codeType = "integer 32"
-							else:
-								codeType = self.customOptsList[cOpt][1]
-							subnetBuf += "option %s code %s = %s;\n" % (cOpt,self.customOptsList[cOpt][0],codeType)
+							# Only real custom options are declared
+							if self.customOptsList[cOpt][2] == False:
+								codeType = ""
+								if self.customOptsList[cOpt][1] == "uint8":
+									codeType = "unsigned integer 8"
+								elif self.customOptsList[cOpt][1] == "uint16":
+									codeType = "unsigned integer 16"
+								elif self.customOptsList[cOpt][1] == "uint32":
+									codeType = "unsigned integer 32"
+								elif self.customOptsList[cOpt][1] == "int8":
+									codeType = "integer 8"
+								elif self.customOptsList[cOpt][1] == "int16":
+									codeType = "integer 16"
+								elif self.customOptsList[cOpt][1] == "uint32":
+									codeType = "integer 32"
+								elif self.customOptsList[cOpt][1] == "ip":
+									codeType = "ip-address"
+								else:
+									codeType = self.customOptsList[cOpt][1]
+								subnetBuf += "option %s code %s = %s;\n" % (cOpt,self.customOptsList[cOpt][0],codeType)
 
 						subnetBuf += "subnet %s netmask %s {\n\toption routers %s;\n\toption domain-name \"%s\";\n" % (subnet,netmask,self.subnetList[subnet][2],self.subnetList[subnet][5])
 
@@ -284,10 +288,10 @@ class ZEyeDHCPManager(threading.Thread):
 
 	def loadCustomOptsList(self,pgcursor):
 		self.customOptsList = {}
-		pgcursor.execute("SELECT optname,optcode,opttype FROM z_eye_dhcp_custom_option")
+		pgcursor.execute("SELECT optname,optcode,opttype,protectrm FROM z_eye_dhcp_custom_option")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
-			self.customOptsList[idx[0]] = (idx[1],idx[2])
+			self.customOptsList[idx[0]] = (idx[1],idx[2],idx[3])
 
 	def loadIPList(self,pgcursor):
 		self.ipList = {}
