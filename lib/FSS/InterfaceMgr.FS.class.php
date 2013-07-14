@@ -153,7 +153,7 @@
 						
 				}
 				else
-					$output .= $this->printError("Vous n'êtes pas accrédité pour l'accès à ce contenu.");
+					$output .= $this->printError($this->loc->s("err-no-rights"));
 			}
 			else
 				$output .= $this->printError($this->getLocale("err-unk-module"));
