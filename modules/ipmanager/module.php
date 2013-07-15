@@ -2352,7 +2352,7 @@
 					}
 
 					FS::$dbMgr->CommitTr();
-					$js = "";
+					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 			}
