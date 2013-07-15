@@ -75,8 +75,6 @@
 			$tmpoutput .= FS::$iMgr->select("f");
 			$formoutput = "";
 
-			// @TODO: see if a subnet is under another subnet
-
 			// We bufferize all netid because of multiple sources
 			$netarray = array();
 
@@ -119,12 +117,15 @@
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 			$netid = ""; $netmask = "";
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
+			$netdeclared = false;
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","netid = '".$filter."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
 				$netid = $data["netid"]; $netmask = $data["netmask"];
+				$netdeclared = true;
 			}
 			if(!$netid) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","netid = '".$filter."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$netid = $data["netid"]; $netmask = $data["netmask"];
 				}
@@ -132,7 +133,14 @@
 
 			$iparray = array();
 			$output = FS::$iMgr->h3("Réseau : ".$netid."/".$netmask,true);
-			$output .= "<center><div id=\"".FS::$iMgr->formatHTMLId($netid)."\"></div></center>";
+
+			// range management
+			if(FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
+				$netdeclared) {
+				$output .= FS::$iMgr->opendiv(14,$this->loc->s("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$data["netid"]));
+			}
+
+			$output .= "<div id=\"".FS::$iMgr->formatHTMLId($netid)."\"></div>";
 
 			$netobj = new FSNetwork();
 			$netobj->setNetAddr($netid);
@@ -156,7 +164,10 @@
 				$iparray[$i]["mac"] = "";
 				$iparray[$i]["host"] = "";
 				$iparray[$i]["ltime"] = "";
-				// 0: unk/free, 1: free, 2: used, 3: reserved (cache), 4: distributed, 5: reserved (Z-Eye)
+				/*
+				* 0: unk/free, 1: free, 2: used, 3: reserved (cache),
+				* 4: distributed, 5: reserved (Z-Eye), 6: distributed (Z-Eye)
+				*/
 				$iparray[$i]["distrib"] = 0;
 				$iparray[$i]["servers"] = array();
 				$iparray[$i]["switch"] = "";
@@ -318,7 +329,33 @@
 			return $output;
 		}
 
+		private function showDHCPRangeForm($subnet) {
+			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt")) {
+				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+			}
+
+			$netmask = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$subnet."'");
+			if(!$netmask) {
+				return FS::$iMgr->printError($this->loc->s("err-subnet-not-exists"));
+			}
+			
+			$output = FS::$iMgr->tip("tip-range").FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=18")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("start-ip"),"startip","",array("type" => "ip", "length" => 16)).
+				FS::$iMgr->idxLine($this->loc->s("end-ip"),"endip","",array("type" => "ip", "length" => 16)).
+				"<tr><td>".$this->loc->s("Action")."</td><td>".FS::$iMgr->select("rangeact").
+				FS::$iMgr->selElmt($this->loc->s("add-to-dynamic-distrib"),1).
+				FS::$iMgr->selElmt($this->loc->s("remove-from-dynamic-distrib"),2).
+				"</select>".FS::$iMgr->hidden("subnet",$subnet)."</td></tr>".
+				FS::$iMgr->aeTableSubmit();
+
+			return $output;
+		}
+
 		private function showSubnetHistory($filter) {
+			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
+				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+			}
+
 			$output = FS::$iMgr->js("function historyDateChange() {
 				hideAndEmpty('#hstcontent'); 
 				$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
@@ -337,6 +374,9 @@
 		}
 
 		private function showSubnetMonitoring($filter) {
+			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
+				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+			}
 			$output = FS::$iMgr->h4("Monitoring",true);
 			$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","warnuse","subnet = '".$filter."'");
 			$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","crituse","subnet = '".$filter."'");
@@ -1074,6 +1114,11 @@
 					if(!$optgroup)
 						return $this->loc->s("err-bad-datas");
 					return $this->showDHCPOptsGroupForm($optgroup);
+				case 14:
+					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
+					if(!$subnet)
+						return $this->loc->s("err-bad-datas");
+					return $this->showDHCPRangeForm($subnet);
 				default: return;
 			}
 		}
@@ -1506,6 +1551,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid = '".$netid."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet = '".$netid."'");
 					FS::$dbMgr->CommitTr();
 
 					$tMgr = new HTMLTableMgr(array(
@@ -2151,6 +2197,148 @@
 						"multiid" => true,
 						));
 					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optgroup));
+					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Ip range management
+				case 18:
+					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+					$startip = FS::$secMgr->checkAndSecurisePostData("startip");
+					$endip = FS::$secMgr->checkAndSecurisePostData("endip");
+					$action = FS::$secMgr->checkAndSecurisePostData("rangeact");
+
+					if(!$subnet || !FS::$secMgr->isIP($subnet) ||
+						!$startip || !FS::$secMgr->isIP($startip) || 
+						!$endip || !FS::$secMgr->isIP($endip) ||
+						!$action) {
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+
+					// Action 1: add / Action 2: delete
+					if($action != 1 && $action != 2) {
+						FS::$iMgr->ajaxEchoNC("err-bad-range-action");
+						return;
+					}
+
+					// Subnet must be declared
+					$netmask = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$subnet."'");
+					if(!$netmask) {
+						FS::$iMgr->ajaxEchoNC("err-subnet-not-exists");
+						return;
+					}
+
+					$netobj = new FSNetwork();
+					$netobj->setNetAddr($subnet);
+					$netobj->setNetMask($netmask);
+
+					// Start IP must be in subnet usable IPs
+					if(ip2long($startip) < $netobj->getFirstUsableIPLong() ||
+						ip2long($startip) > $netobj->getLastUsableIPLong()) {
+						FS::$iMgr->ajaxEchoNC("err-startip-not-in-range");
+						return;
+					}
+
+					// End IP must be in subnet usable IPs
+					if(ip2long($endip) < $netobj->getFirstUsableIPLong() ||
+						ip2long($endip) > $netobj->getLastUsableIPLong()) {
+						FS::$iMgr->ajaxEchoNC("err-endip-not-in-range");
+						return;
+					}
+
+					// Start IP must be <= End IP
+					if(ip2long($startip) > ip2long($endip)) {
+						FS::$iMgr->ajaxEchoNC("err-startip-lower-endip");
+						return;
+					}
+
+					$ipToDynDistribute = array();
+
+					// We load all ranges and make an IP table
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_range","rangestart,rangestop","subnet = '".$subnet."'");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						$start = ip2long($data["rangestart"]);
+						$stop = ip2long($data["rangestop"]);
+						for($i=$start;$i<=$stop;$i++) {
+							$ipToDynDistribute[$i] = 1;
+						}
+					}
+
+					// If Action 1: Now we insert our new range
+					if($action == 1) {
+						for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
+							$ipToDynDistribute[$i] = 1;
+						}
+					}
+					// If Action 2: we clean dynamic IP from ranges 
+					else if($action == 2) {
+						for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
+							$ipToDynDistribute[$i] = 0;
+						}
+					}
+
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","reserv = 't' AND inet(ip) > inet('".$netobj->getFirstUsableIP()."')
+						AND inet(ip) < inet('".$netobj->getLastUsableIP()."')");
+					while($data = FS::$dbMgr->Fetch($query)) {
+						$ipToDynDistribute[ip2long($data["ip"])] = 2;
+					}
+
+					$rangeList = array();
+					$tmpstart = 0;
+					$tmpend = 0;
+
+					ksort($ipToDynDistribute);
+
+					foreach($ipToDynDistribute as $ip => $type) {
+						if($type == 1) {
+							// if no start, we init it
+							if($tmpstart == 0) {
+								$tmpstart = $ip;
+							}
+							// If no end we init it
+							if($tmpend == 0) {
+								$tmpend = $ip;
+							}
+							// If $i is close to $tmpend, we increase range size
+							if($ip == $tmpend+1) {
+								$tmpend = $ip;
+							}
+							// If $i isn't close to tmpend, we store the range and create new range
+							else if($ip > $tmpend+1) {
+								array_push($rangeList,array($tmpstart,$tmpend));
+								$tmpstart = $ip;
+								$tmpend = $ip;
+							}
+						}
+						// If it's not a dynamic distributed IP we reset the buffers
+						else {
+							// If we have a dynamic range, then we store it
+							if($tmpstart != 0 && $tmpend != 0) {
+								array_push($rangeList,array($tmpstart,$tmpend));
+							}
+							$tmpstart = 0;
+							$tmpend = 0;
+						}
+					}
+					// If buffers are not empty, there is a last range
+					if($tmpstart != 0 && $tmpend != 0) {
+						array_push($rangeList,array($tmpstart,$tmpend));
+					}
+
+					FS::$dbMgr->BeginTr();
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet = '".$subnet."'");
+
+					$count = count($rangeList);
+					for($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet,rangestart,rangestop","'".
+							$subnet."','".long2ip($rangeList[$i][0])."','".long2ip($rangeList[$i][1])."'");
+					}
+
+					FS::$dbMgr->CommitTr();
+					$js = "";
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 			}

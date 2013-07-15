@@ -32,6 +32,7 @@
 		function __construct() { 
 			$this->locales = array(
 				"en" => array(
+					"Action" => "Action",
 					"Add" => "Add",
 					"Cancel" => "Cancel",
 					"Confirm" => "Confirm",
@@ -51,6 +52,7 @@
 					"unknown" => "unknown",
 				),
 				"fr" => array(
+					"Action" => "Action",
 					"Add" => "Ajouter",
 					"Cancel" => "Annuler",
 					"Confirm" => "Confirmer",

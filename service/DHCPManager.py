@@ -43,6 +43,7 @@ class ZEyeDHCPManager(threading.Thread):
 	tc_mutex = Lock()
 	ipList = {}
 	subnetList = {}
+	rangeList = {}
 	clusterList = {}
 	clusterMembers = {}
 	clusterOptions = {}
@@ -91,6 +92,7 @@ class ZEyeDHCPManager(threading.Thread):
 			if pgcursor.rowcount > 0:
 				# Buffer for better performances
 				self.loadIPList(pgcursor)
+				self.loadRangeList(pgcursor)
 				self.loadSubnetList(pgcursor)
 				self.loadClusterList(pgcursor)
 				self.loadCustomOptsList(pgcursor)
@@ -177,8 +179,70 @@ class ZEyeDHCPManager(threading.Thread):
 				self.decrThreadNb()
 				return
 			
+			"""
+			This variable enable failover part
+			With ISC DHCP failover can be declared only if used
+			"""
+			showFailover = False
 			for idx in pgres:
 				if idx[0] in self.clusterList:
+					# custom options
+					for cOpt in self.customOptsList:
+						# Only real custom options are declared
+						if self.customOptsList[cOpt][2] == False:
+							codeType = ""
+							if self.customOptsList[cOpt][1] == "uint8":
+								codeType = "unsigned integer 8"
+							elif self.customOptsList[cOpt][1] == "uint16":
+								codeType = "unsigned integer 16"
+							elif self.customOptsList[cOpt][1] == "uint32":
+								codeType = "unsigned integer 32"
+							elif self.customOptsList[cOpt][1] == "int8":
+								codeType = "integer 8"
+							elif self.customOptsList[cOpt][1] == "int16":
+								codeType = "integer 16"
+							elif self.customOptsList[cOpt][1] == "uint32":
+								codeType = "integer 32"
+							elif self.customOptsList[cOpt][1] == "ip":
+								codeType = "ip-address"
+							else:
+								codeType = self.customOptsList[cOpt][1]
+							subnetBuf += "option %s code %s = %s;\n" % (cOpt,self.customOptsList[cOpt][0],codeType)
+
+					if len(subnetBuf) > 0:
+						subnetBuf += "\n"
+
+					# Cluster options 
+					failoverPeerBuf = ""
+					failoverPeerName = ""
+					if idx[0] in self.clusterOptions:
+						# ISC dhcp clusters
+						if self.clusterOptions[idx[0]][0] == 1 or self.clusterOptions[idx[0]][0] == 2:
+							peerAddr = ""
+							"""
+							cluster members has always 2 members on this configuration then,
+							peer is the other record
+							"""
+							for peer in self.clusterMembers[idx[0]]:
+								if peer != addr:
+									peerAddr = peer
+
+							failoverPeerBuf += "failover peer \"cluster-%s\" {" % idx[0].replace(' ','-')
+							failoverPeerName = "cluster-%s" % idx[0].replace(' ','-')
+							# This is for cluster master
+							if addr == self.clusterOptions[idx[0]][1]:
+								failoverPeerBuf += "\n\tprimary;"
+							# This is for cluster slave
+							else:
+								failoverPeerBuf += "\n\tsecondary;"
+
+							failoverPeerBuf += "\n\taddress %s;\n\tport 647;\n\tpeer address %s;\n\tpeer port 647;" % (addr,peerAddr)
+							failoverPeerBuf += "\n\tmax-response-delay 3;\n\tmax-unacked-updates 2;\n\tload balance max seconds 10;"
+							# This is for cluster master
+							if (self.clusterOptions[idx[0]][0] == 1 or self.clusterOptions[idx[0]][0] == 2) and self.clusterOptions[idx[0]][1] == addr:
+								failoverPeerBuf += "\n\tmclt 1800;\n\tsplit 255;"
+							failoverPeerBuf += "\n}\n\n"
+
 					for subnet in self.clusterList[idx[0]]:
 						netmask = self.subnetList[subnet][0]
 						subnetIpList = self.subnetList[subnet][1]
@@ -187,57 +251,6 @@ class ZEyeDHCPManager(threading.Thread):
 						dns2 = ""
 						if len(self.subnetList[subnet][4]) > 0 and self.subnetList[subnet][4] != self.subnetList[subnet][3]:
 							dns2 = " %s" % self.subnetList[subnet][4]
-
-						# custom options
-						for cOpt in self.customOptsList:
-							# Only real custom options are declared
-							if self.customOptsList[cOpt][2] == False:
-								codeType = ""
-								if self.customOptsList[cOpt][1] == "uint8":
-									codeType = "unsigned integer 8"
-								elif self.customOptsList[cOpt][1] == "uint16":
-									codeType = "unsigned integer 16"
-								elif self.customOptsList[cOpt][1] == "uint32":
-									codeType = "unsigned integer 32"
-								elif self.customOptsList[cOpt][1] == "int8":
-									codeType = "integer 8"
-								elif self.customOptsList[cOpt][1] == "int16":
-									codeType = "integer 16"
-								elif self.customOptsList[cOpt][1] == "uint32":
-									codeType = "integer 32"
-								elif self.customOptsList[cOpt][1] == "ip":
-									codeType = "ip-address"
-								else:
-									codeType = self.customOptsList[cOpt][1]
-								subnetBuf += "option %s code %s = %s;\n" % (cOpt,self.customOptsList[cOpt][0],codeType)
-
-						# Cluster options 
-						if idx[0] in self.clusterOptions:
-							# ISC dhcp clusters
-							if self.clusterOptions[idx[0]][0] == 1 or self.clusterOptions[idx[0]][0] == 2:
-								peerAddr = ""
-								"""
-								cluster members has always 2 members on this configuration then,
-								peer is the other record
-								"""
-								for peer in self.clusterMembers[idx[0]]:
-									if peer != addr:
-										peerAddr = peer
-
-								subnetBuf += "\nfailover peer \"cluster-%s\" {" % idx[0].replace(' ','-')
-								# This is for cluster master
-								if addr == self.clusterOptions[idx[0]][1]:
-									subnetBuf += "\n\tprimary;"
-								# This is for cluster slave
-								else:
-									subnetBuf += "\n\tsecondary;"
-
-								subnetBuf += "\n\taddress %s;\n\tport 647;\n\tpeer address %s;\n\tpeer port 647;" % (addr,peerAddr)
-								subnetBuf += "\n\tmax-response-delay 3;\n\tmax-unacked-updates 2;\n\tload balance max seconds 10;"
-								# This is for cluster master
-								if self.clusterOptions[idx[0]][0] == 1:
-									subnetBuf += "\n\tmclt 1800;\n\tsplit 255;"
-								subnetBuf += "\n}\n\n"
 
 						subnetBuf += "subnet %s netmask %s {\n\toption routers %s;\n\toption domain-name \"%s\";\n" % (subnet,netmask,self.subnetList[subnet][2],self.subnetList[subnet][5])
 
@@ -256,7 +269,27 @@ class ZEyeDHCPManager(threading.Thread):
 						if self.subnetList[subnet][7] != "" and self.subnetList[subnet][7] != 0:
 							subnetBuf += "\tmax-lease-time %s;\n" % self.subnetList[subnet][7]
 			
-						subnetBuf += "\toption domain-name-servers %s%s;\n}\n" % (self.subnetList[subnet][3],dns2)
+						subnetBuf += "\toption domain-name-servers %s%s;\n\n" % (self.subnetList[subnet][3],dns2)
+						
+						# Now create pool with failover peer and ranges
+						if subnet in self.rangeList:
+							# Show this part only if we have rangelist
+							if len(self.rangeList[subnet]) > 0:
+								# Start pool brace
+								subnetBuf += "\tpool {\n"
+
+								# Show failover part and enable showFailover variable
+								showFailover = True
+								if len(failoverPeerName) > 0:
+									subnetBuf += "\t\tfailover peer \"%s\";\n\n" % failoverPeerName
+
+								for range in self.rangeList[subnet]:
+									subnetBuf += "\t\trange %s %s;\n" % (range[0],range[1])
+
+								subnetBuf += "\t}\n"
+						subnetBuf += "}\n\n"
+
+
 						for ip in subnetIpList:
 							reservBuf += "host %s {\n\thardware ethernet %s;\n\tfixed-address %s;\n" % (self.ipList[ip][1],self.ipList[ip][0],ip)
 							if ip in self.IPv4OptgroupsList:
@@ -269,6 +302,9 @@ class ZEyeDHCPManager(threading.Thread):
 							reservBuf += "}\n"
 	
 			
+			if showFailover == True:
+				subnetBuf = "%s%s" % (failoverPeerBuf,subnetBuf)
+
 			# check md5 trace to see if subnet file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (subnetpath,hashCmd))
 			tmpmd52 = subprocess.check_output(["/sbin/md5","-qs","%s\n" % subnetBuf])
@@ -359,6 +395,15 @@ class ZEyeDHCPManager(threading.Thread):
 			# We need hostname and mac addr for a reservation
 			if len(idx[1]) > 0 and len(idx[2]) > 0:	
 				self.ipList[idx[0]] = (idx[1],idx[2])
+
+	def loadRangeList(self,pgcursor):
+		self.rangeList = {}
+		pgcursor.execute("SELECT subnet,rangestart,rangestop FROM z_eye_dhcp_subnet_range")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] not in self.rangeList:
+				self.rangeList[idx[0]] = []
+			self.rangeList[idx[0]].append((idx[1],idx[2]))
 
 	def loadClusterList(self,pgcursor):
 		self.clusterList = {}
