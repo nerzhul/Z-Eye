@@ -153,7 +153,7 @@
 						
 				}
 				else
-					$output .= $this->printError($this->loc->s("err-no-rights"));
+					$output .= $this->printError($this->getLocale("err-no-rights"));
 			}
 			else
 				$output .= $this->printError($this->getLocale("err-unk-module"));

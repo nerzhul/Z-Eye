@@ -86,12 +86,6 @@
 					$netarray[$data["netid"]] = $data["netmask"];
 			}
 
-			/*$query = FS::$dbMgr->Select("subnets","net");
-			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!isset($netarray[$data["netid"]]))
-					$netarray[$data["netid"]] = "";
-			}*/
-
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($netarray[$data["netid"]]))
@@ -135,7 +129,7 @@
 					$netid = $data["netid"]; $netmask = $data["netmask"];
 				}
 			}
-			// @TODO: netdisco subnets
+
 			$iparray = array();
 			$output = FS::$iMgr->h3("Réseau : ".$netid."/".$netmask,true);
 			$output .= "<center><div id=\"".FS::$iMgr->formatHTMLId($netid)."\"></div></center>";
@@ -807,21 +801,35 @@
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 			$members = array();
+			$clustermode = 0;
+			$clustermaster = "";
 			if($name) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$name."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					array_push($members,$data["dhcpaddr"]);
 				}
+				$clustermode = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustermode","clustername = '".$name."'");
+				$clustermaster = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","master","clustername = '".$name."'");
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit", "edit" => $name != "")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
 
+			$outputlist2 = "";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias","",array("order" => "addr"));
-			while($data = FS::$dbMgr->Fetch($query))
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["addr"].($data["alias"] ? " (".$data["alias"].")" : ""),$data["addr"],in_array($data["addr"],$members));
+				$outputlist2 .= FS::$iMgr->selElmt($data["addr"].($data["alias"] ? " (".$data["alias"].")" : ""),$data["addr"],$clustermaster == $data["addr"]);
+			}
 
-			$output .= "</select>".FS::$iMgr->aeTableSubmit($name == "");
+			$output .= "</select></td></tr>".
+				"<tr ".FS::$iMgr->tooltip("tooltip-clustermode")."><td>".$this->loc->s("Cluster-mode")."</td><td>".FS::$iMgr->select("clustermode").
+				FS::$iMgr->selElmt($this->loc->s("None"),		0,	$clustermode == "0").
+				FS::$iMgr->selElmt($this->loc->s("Failover"),		1,	$clustermode == "1").
+				FS::$iMgr->selElmt($this->loc->s("Loadbalancing"),	2,	$clustermode == "2")."</select></td></tr>".
+				"<tr ".FS::$iMgr->tooltip("tooltip-clustermaster")."><td>".$this->loc->s("Cluster-master")."</td><td>".FS::$iMgr->select("clustermaster").
+				FS::$iMgr->selElmt($this->loc->s("None"),"none").$outputlist2."</select></td></tr>".
+				FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
 
@@ -1193,20 +1201,42 @@
                                         $leasepath = FS::$secMgr->checkAndSecurisePostData("leasepath");
 					$reservconfpath = FS::$secMgr->checkAndSecurisePostData("reservconfpath");
 					$subnetconfpath = FS::$secMgr->checkAndSecurisePostData("subnetconfpath");
-                                        if($saddr == NULL || $saddr == "" || $slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" ||
-                                                $dhcpdpath == NULL || $dhcpdpath == "" || !FS::$secMgr->isPath($dhcpdpath) ||
-                                                $leasepath == NULL || $leasepath == "" || !FS::$secMgr->isPath($leasepath) ||
-						$reservconfpath && ($reservconfpath == "" || !FS::$secMgr->isPath($reservconfpath)) ||
-						$subnetconfpath && ($subnetconfpath == "" || !FS::$secMgr->isPath($subnetconfpath)) ||
-						$alias && !FS::$secMgr->isAlphaNumeric($alias) || $desc && !FS::$secMgr->isSentence($desc) ||
+                                        if(!$saddr || !$slogin || !$spwd || !$spwd2 ||
+                                                !$dhcpdpath || !$leasepath || !$reservconfpath || !$subnetconfpath ||
+						!$alias || $desc && !FS::$secMgr->isSentence($desc) ||
 						!$dhcptype || !FS::$secMgr->isNumeric($dhcptype) ||
 						$edit && $edit != 1
                                         ) {
                                                 FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
-var_dump($_POST);
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
                                                 return;
                                         }
+
+					if(!FS::$secMgr->isAlphaNumeric($alias)) {
+						FS::$iMgr->ajaxEchoNC("err-dhcpserver-invalid-alias");
+						return;
+					}
+
+					if(!FS::$secMgr->isPath($dhcpdpath)) {
+						FS::$iMgr->ajaxEchoNC("err-dhcpserver-dhcpdpath");
+						return;
+					}
+
+					if(!FS::$secMgr->isPath($leasepath)) {
+						FS::$iMgr->ajaxEchoNC("err-dhcpserver-leasepath");
+						return;
+					}
+
+					if(!FS::$secMgr->isPath($reservconfpath)) {
+						FS::$iMgr->ajaxEchoNC("err-dhcpserver-reservconf");
+						return;
+					}
+
+					if(!FS::$secMgr->isPath($subnetconfpath)) {
+						FS::$iMgr->ajaxEchoNC("err-dhcpserver-subnetconf");
+						return;
+					}
+
 					if($spwd != $spwd2) {
 						FS::$iMgr->ajaxEchoNC("err-pwd-not-match");
                                                 return;
@@ -1308,11 +1338,18 @@ var_dump($_POST);
 						return;
 					}
 
+					if($clustername = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername","master = '".$addr."'")) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"DHCP server is master of cluster '".$clustername."', cannot remove it");
+						FS::$iMgr->ajaxEcho($this->loc->s("err-remove-dhcpserver-master").$clustername.
+							$this->loc->s("err-remove-dhcpserver-master2"),"",true);
+						return;
+					}
+
 					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_history","server = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_cache","server = '".$addr."'");
 					// Later
-					// FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","server = '".$addr."'");
+					//FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","server = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_clusters","dhcpaddr = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
 					FS::$dbMgr->CommitTr();
@@ -1489,8 +1526,11 @@ var_dump($_POST);
 
 					$cname = FS::$secMgr->checkAndSecurisePostData("cname");
 					$cmembers = FS::$secMgr->checkAndSecurisePostData("clustermembers");
+					$cmode = FS::$secMgr->checkAndSecurisePostData("clustermode");
+					$cmaster = FS::$secMgr->checkAndSecurisePostData("clustermaster");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-					if(!$cname || !$cmembers || !is_array($cmembers) || $edit && $edit != 1) {
+					if(!$cname || !$cmembers || !is_array($cmembers) || $cmode === NULL || $cmode < 0 ||
+						$cmode > 2 || !$cmaster || $edit && $edit != 1) {
 						if(!$cmembers || !is_array($cmembers))
 							FS::$iMgr->ajaxEchoNC("err-cluster-need-members");
 						else
@@ -1513,17 +1553,59 @@ var_dump($_POST);
 					}
 
 					$count = count($cmembers);
+
+					/*
+					* ISC DHCP cluster require only 2 DHCP
+					*/
+					if(($cmode == 1 || $cmode == 2) && $count != 2) {
+						FS::$iMgr->ajaxEchoNC("err-clustermode-require-two");
+						return;	
+					}
+
 					for($i=0;$i<$count;$i++) {
-						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","addr","addr = '".$cmembers[$i]."'")) {
+						/*
+						* This variable is called for next test
+						*/
+						$dhcptype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","dhcptype","addr = '".$cmembers[$i]."'");
+						if($dhcptype === NULL) {
 							FS::$iMgr->ajaxEchoNC("err-dhcpserver-not-exists");
 							return;
 						}
+
+						/*
+						* Check if our cluster mode is compatible with DHCP list
+						*/
+						if(($cmode == 1 || $cmode == 2) && $dhcptype != 1) {
+							FS::$iMgr->ajaxEchoNC("err-clustermode-require-iscdhcp");
+							return;
+						}
 					}
-					
+
+					if($cmaster) {
+						/*
+						* For ISC dhcpd cluster, master can't be none
+						*/
+						if(($cmode == 1 || $cmode == 2) && $cmaster == "none") {
+							FS::$iMgr->ajaxEchoNC("err-clustermaster-iscdhcp");
+							return;
+						}
+						/*
+						* Cluster master must be in cluster members
+						*/
+						if($cmaster != "none" && !in_array($cmaster,$cmembers)) {
+							FS::$iMgr->ajaxEchoNC("err-clustermaster-not-in-members");
+							return;
+						}
+					}
+
 					FS::$dbMgr->BeginTr();
-					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername = '".$cname."'");
+					if($edit) {
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername = '".$cname."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername = '".$cname."'");
+					}
 					for($i=0;$i<$count;$i++)
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername,dhcpaddr","'".$cname."','".$cmembers[$i]."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername,clustermode,master","'".$cname."','".$cmode."','".$cmaster."'");
 					FS::$dbMgr->CommitTr();
 
 					$js = "";
@@ -1560,6 +1642,7 @@ var_dump($_POST);
 					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername = '".$cname."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername = '".$cname."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername = '".$cname."'");
 					FS::$dbMgr->CommitTr();
 
 					$tMgr = new HTMLTableMgr(array(
