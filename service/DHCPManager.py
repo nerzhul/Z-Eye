@@ -44,6 +44,8 @@ class ZEyeDHCPManager(threading.Thread):
 	ipList = {}
 	subnetList = {}
 	clusterList = {}
+	clusterMembers = {}
+	clusterOptions = {}
 	customOptsList = {}
 	optsList = {}
 	optgroupsList = {}
@@ -209,6 +211,34 @@ class ZEyeDHCPManager(threading.Thread):
 									codeType = self.customOptsList[cOpt][1]
 								subnetBuf += "option %s code %s = %s;\n" % (cOpt,self.customOptsList[cOpt][0],codeType)
 
+						# Cluster options 
+						if idx[0] in self.clusterOptions:
+							# ISC dhcp clusters
+							if self.clusterOptions[idx[0]][0] == 1 or self.clusterOptions[idx[0]][0] == 2:
+								peerAddr = ""
+								"""
+								cluster members has always 2 members on this configuration then,
+								peer is the other record
+								"""
+								for peer in self.clusterMembers[idx[0]]:
+									if peer != addr:
+										peerAddr = peer
+
+								subnetBuf += "\nfailover peer \"cluster-%s\" {" % idx[0].replace(' ','-')
+								# This is for cluster master
+								if addr == self.clusterOptions[idx[0]][1]:
+									subnetBuf += "\n\tprimary;"
+								# This is for cluster slave
+								else:
+									subnetBuf += "\n\tsecondary;"
+
+								subnetBuf += "\n\taddress %s;\n\tport 647;\n\tpeer address %s;\n\tpeer port 647;" % (addr,peerAddr)
+								subnetBuf += "\n\tmax-response-delay 3;\n\tmax-unacked-updates 2;\n\tload balance max seconds 10;"
+								# This is for cluster master
+								if self.clusterOptions[idx[0]][0] == 1:
+									subnetBuf += "\n\tmclt 1800;\n\tsplit 255;"
+								subnetBuf += "\n}\n\n"
+
 						subnetBuf += "subnet %s netmask %s {\n\toption routers %s;\n\toption domain-name \"%s\";\n" % (subnet,netmask,self.subnetList[subnet][2],self.subnetList[subnet][5])
 
 						# Set options values
@@ -336,7 +366,23 @@ class ZEyeDHCPManager(threading.Thread):
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
 			if idx[0] not in self.clusterList:
+				# Init buffers
 				self.clusterList[idx[0]] = []
+				self.clusterMembers[idx[0]] = []
+				self.clusterOptions[idx[0]] = []
+				# Load cluster options when create the cluster buffer
+				pgcursor.execute("SELECT clustermode,master FROM z_eye_dhcp_cluster_options WHERE clustername = '%s'" % idx[0])
+				pgres2 = pgcursor.fetchone()
+				if pgres2 != None:
+					self.clusterOptions[idx[0]].append(pgres2[0])
+					self.clusterOptions[idx[0]].append(pgres2[1])
+
+				# Load cluster members
+				pgcursor.execute("SELECT dhcpaddr FROM z_eye_dhcp_cluster WHERE clustername = '%s'" % idx[0])
+				pgres2 = pgcursor.fetchall()
+				for idx2 in pgres2:
+					self.clusterMembers[idx[0]].append(idx2[0])
+
 			if idx[1] not in self.clusterList[idx[0]] and idx[1] in self.subnetList:
 				self.clusterList[idx[0]].append(idx[1])
 
