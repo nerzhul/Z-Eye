@@ -685,12 +685,13 @@
 			if($netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
-					array_push($clusters,$data["clustername"]);
+					if(!in_array($data["clustername"],$clusters))
+						array_push($clusters,$data["clustername"]);
 				}
 			}
 
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","",array("order" => "clustername"));
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","",array("order" => "clustername", "group" => "clustername"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>".$this->loc->s("dhcp-cluster")."</td><td>".FS::$iMgr->select("subnetclusters","",NULL,true);
