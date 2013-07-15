@@ -1081,6 +1081,91 @@
 			return $output;
 		}
 
+		private function calculateRanges($subnet,$netobj,$action=0,$startip=0,$endip=0) {
+			$ipToDynDistribute = array();
+			// We load all ranges and make an IP table
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_range","rangestart,rangestop","subnet = '".$subnet."'");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$start = ip2long($data["rangestart"]);
+				$stop = ip2long($data["rangestop"]);
+				for($i=$start;$i<=$stop;$i++) {
+					$ipToDynDistribute[$i] = 1;
+				}
+			}
+
+			// If Action 1: Now we insert our new range
+			if($action == 1) {
+				for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
+					$ipToDynDistribute[$i] = 1;
+				}
+			}
+			// If Action 2: we clean dynamic IP from ranges 
+			else if($action == 2) {
+				for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
+					$ipToDynDistribute[$i] = 0;
+				}
+			}
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","reserv = 't' AND inet(ip) > inet('".$netobj->getFirstUsableIP()."')
+				AND inet(ip) < inet('".$netobj->getLastUsableIP()."')");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$ipToDynDistribute[ip2long($data["ip"])] = 2;
+			}
+
+			$rangeList = array();
+			$tmpstart = 0;
+			$tmpend = 0;
+
+			ksort($ipToDynDistribute);
+
+			foreach($ipToDynDistribute as $ip => $type) {
+				if($type == 1) {
+					// if no start, we init it
+					if($tmpstart == 0) {
+						$tmpstart = $ip;
+					}
+					// If no end we init it
+					if($tmpend == 0) {
+						$tmpend = $ip;
+					}
+					// If $i is close to $tmpend, we increase range size
+					if($ip == $tmpend+1) {
+						$tmpend = $ip;
+					}
+					// If $i isn't close to tmpend, we store the range and create new range
+					else if($ip > $tmpend+1) {
+						array_push($rangeList,array($tmpstart,$tmpend));
+						$tmpstart = $ip;
+						$tmpend = $ip;
+					}
+				}
+				// If it's not a dynamic distributed IP we reset the buffers
+				else {
+					// If we have a dynamic range, then we store it
+					if($tmpstart != 0 && $tmpend != 0) {
+						array_push($rangeList,array($tmpstart,$tmpend));
+					}
+					$tmpstart = 0;
+					$tmpend = 0;
+				}
+			}
+			// If buffers are not empty, there is a last range
+			if($tmpstart != 0 && $tmpend != 0) {
+				array_push($rangeList,array($tmpstart,$tmpend));
+			}
+
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet = '".$subnet."'");
+
+			$count = count($rangeList);
+			for($i=0;$i<$count;$i++) {
+				FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet,rangestart,rangestop","'".
+					$subnet."','".long2ip($rangeList[$i][0])."','".long2ip($rangeList[$i][1])."'");
+			}
+
+			FS::$dbMgr->CommitTr();
+		}
+
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
@@ -1762,11 +1847,12 @@
 						return;
 					}
 
+					$netobj = new FSNetwork();
+					$netobj->setNetAddr($netinfos[0]);
+					$netobj->setNetMask($netinfos[1]);
+
 					if($mac) {
 						// Check if MAC addr is not registered on another IP in the same subnet
-						$netobj = new FSNetwork();
-						$netobj->setNetAddr($netinfos[0]);
-						$netobj->setNetMask($netinfos[1]);
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
 						while($data = FS::$dbMgr->Fetch($query)) {
 							if($netobj->isUsableIP($data["ip"])) {
@@ -1815,6 +1901,8 @@
 					}
 
 					FS::$dbMgr->CommitTr();
+
+					$this->calculateRanges($netinfos[0],$netobj);
 
 					// Maybe replace only the concerned tr and also the graph ? 
 					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
@@ -2270,89 +2358,8 @@
 						return;
 					}
 
-					$ipToDynDistribute = array();
+					$this->calculateRanges($subnet,$netobj,$action,$startip,$endip);
 
-					// We load all ranges and make an IP table
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_range","rangestart,rangestop","subnet = '".$subnet."'");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						$start = ip2long($data["rangestart"]);
-						$stop = ip2long($data["rangestop"]);
-						for($i=$start;$i<=$stop;$i++) {
-							$ipToDynDistribute[$i] = 1;
-						}
-					}
-
-					// If Action 1: Now we insert our new range
-					if($action == 1) {
-						for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
-							$ipToDynDistribute[$i] = 1;
-						}
-					}
-					// If Action 2: we clean dynamic IP from ranges 
-					else if($action == 2) {
-						for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
-							$ipToDynDistribute[$i] = 0;
-						}
-					}
-
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","reserv = 't' AND inet(ip) > inet('".$netobj->getFirstUsableIP()."')
-						AND inet(ip) < inet('".$netobj->getLastUsableIP()."')");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						$ipToDynDistribute[ip2long($data["ip"])] = 2;
-					}
-
-					$rangeList = array();
-					$tmpstart = 0;
-					$tmpend = 0;
-
-					ksort($ipToDynDistribute);
-
-					foreach($ipToDynDistribute as $ip => $type) {
-						if($type == 1) {
-							// if no start, we init it
-							if($tmpstart == 0) {
-								$tmpstart = $ip;
-							}
-							// If no end we init it
-							if($tmpend == 0) {
-								$tmpend = $ip;
-							}
-							// If $i is close to $tmpend, we increase range size
-							if($ip == $tmpend+1) {
-								$tmpend = $ip;
-							}
-							// If $i isn't close to tmpend, we store the range and create new range
-							else if($ip > $tmpend+1) {
-								array_push($rangeList,array($tmpstart,$tmpend));
-								$tmpstart = $ip;
-								$tmpend = $ip;
-							}
-						}
-						// If it's not a dynamic distributed IP we reset the buffers
-						else {
-							// If we have a dynamic range, then we store it
-							if($tmpstart != 0 && $tmpend != 0) {
-								array_push($rangeList,array($tmpstart,$tmpend));
-							}
-							$tmpstart = 0;
-							$tmpend = 0;
-						}
-					}
-					// If buffers are not empty, there is a last range
-					if($tmpstart != 0 && $tmpend != 0) {
-						array_push($rangeList,array($tmpstart,$tmpend));
-					}
-
-					FS::$dbMgr->BeginTr();
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet = '".$subnet."'");
-
-					$count = count($rangeList);
-					for($i=0;$i<$count;$i++) {
-						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet,rangestart,rangestop","'".
-							$subnet."','".long2ip($rangeList[$i][0])."','".long2ip($rangeList[$i][1])."'");
-					}
-
-					FS::$dbMgr->CommitTr();
 					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
