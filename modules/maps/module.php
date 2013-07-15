@@ -188,11 +188,11 @@
 					if($hos == "hoststatus") {
 						if($hosvalues["current_state"] == 1) {
 							if(!in_array($host,$hostCrit)) 
-								array_push($hostCrit,$host);
+								$hostCrit[] = $host;
 						}
 						else {
 							if(!in_array($host,$hostOK)) 
-								array_push($hostOK,$host);
+								$hostOK[] = $host;
 						}
 					}
 				}
@@ -214,12 +214,15 @@
 
 					if(!array_key_exists($data["name"],$edgeList))
 						$edgeList[$data["name"]] = array();	
+
 					if(!array_key_exists($data2["remote_id"],$edgeList))
 						$edgeList[$data2["remote_id"]] = array();	
+
 					if(!in_array($data2["remote_id"],$edgeList[$data["name"]]))
-						array_push($edgeList[$data["name"]],$data2["remote_id"]);
+						$edgeList[$data["name"]][] = $data2["remote_id"];
+
 					if(!in_array($data["name"],$edgeList[$data2["remote_id"]]))
-						array_push($edgeList[$data2["remote_id"]],$data["name"]);
+						$edgeList[$data2["remote_id"]][] = $data["name"];
 
 					$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["remote_id"]));
 					$js3 = "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["remote_id"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"]));
@@ -294,7 +297,7 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(in_array($data["remote_id"],$nodelist))
 					continue;
-				array_push($nodelist,$data["remote_id"]);
+				$nodelist[] = $data["remote_id"];
 				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["remote_id"]))." = graph.newNode({'label':'".$data["remote_id"]."'});";
 			} 
 					
@@ -329,11 +332,11 @@
 								$stylestate = "";
 								if($svalues["current_state"] == 1) {
 									if(!in_array($host,$serviceStatusWarn)) 
-										array_push($serviceStatusWarn,$host);
+										$serviceStatusWarn[] = $host;
 								}
 								else if($svalues["current_state"] == 2) {
 									if(!in_array($host,$serviceStatusCrit)) 
-										array_push($serviceStatusCrit,$host);
+										$serviceStatusCrit[] = $host;
 								}
 									
 								$this->hsicinga++;
@@ -348,7 +351,7 @@
 							$stylestate = "";
 							if($hosvalues["current_state"] == 1) {
 								if(!in_array($host,$hostStatusCrit)) 
-									array_push($hostStatusCrit,$host);
+									$hostStatusCrit[] = $host;
 							}
 						}
 					}
@@ -369,11 +372,11 @@
 					// edges after nodes
 					if(!array_key_exists($data["name"],$nodelist)) {
 						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).",{'directional':false});";
-						array_push($linklist,$data2["parent"]);
+						$linklist[] = $data2["parent"];
 					}
 					else if(!in_array($nodelist[$data["name"]]["links"],$data2["parent"])) {
 						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).",{'directional':false});";
-						array_push($nodelist[$data["name"]]["links"],$data2["parent"]);
+						$nodelist[$data["name"]]["links"][] = $data2["parent"];
 					}
 				}
 				if(!array_key_exists($data["name"],$nodelist)) {

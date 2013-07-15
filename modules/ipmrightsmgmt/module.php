@@ -96,7 +96,7 @@
 				switch($ruleidx) {
 					case "read": case "servermgmt": case "advancedtools": case "optionsmgmt":
 					case "optionsgrpmgmt": case "subnetmgmt": case "rangemgmt": case "ipmgmt":
-						array_push($rules[$ruleidx],$data2[$idx]);
+						$rules[$ruleidx][] = $data2[$idx];
 						break;
 				}
 			}

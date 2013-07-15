@@ -79,7 +79,7 @@
 					$outresults = array();
 					foreach($this->autoresults as $key => $values) {
 						for($i=0;$i<count($values);$i++) {
-							array_push($outresults,$values[$i]);
+							$outresults[] = $values[$i];
 						}
 					}
 					$outresults = array_unique($outresults);
@@ -126,7 +126,7 @@
 					
 					$query = FS::$dbMgr->Select("device_vlan","vlan","CAST(vlan as TEXT) ILIKE '".$search."%'",array("order" => "vlan","limit" => "10","group" => "vlan"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["vlan"],$data["vlan"]);
+						$this->autoresults["vlan"][] = $data["vlan"];
 				}
 			}
 
@@ -151,7 +151,7 @@
 				else {
 					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",array("order" => "vlanid","limit" => "10","group" => "vlanid"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["vlan"],$data["vlanid"]);
+						$this->autoresults["vlan"][] = $data["vlanid"];
 				}
 			}
 
@@ -245,19 +245,19 @@
 				else {
 					$query = FS::$dbMgr->Select("device","name","name ILIKE '".$search."%'",array("order" => "name","limit" => "10","group" => "name"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["device"],$data["name"]);
+						$this->autoresults["device"][] = $data["name"];
 
 					$this->fetchPlugAutoResults($search);
 					$this->fetchRoomAutoResults($search);
 
 					$query = FS::$dbMgr->Select("device_port","name","name ILIKE '".$search."%'",array("order" => "name","limit" => "10","group" => "name"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["portname"],$data["name"]);
+						$this->autoresults["portname"][] = $data["name"];
 
 					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","subnet_short_name","subnet_short_name ILIKE '".$search."%'",
 						array("order" => "subnet_short_name","limit" => "10","group" => "subnet_short_name"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["vlan"],$data["subnet_short_name"]);
+						$this->autoresults["vlan"][] = $data["subnet_short_name"];
 				}	
 			}
 
@@ -314,12 +314,12 @@
 							$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,zonename","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."%'",
 								array("order" => "record,zonename","limit" => "10"));
 							while($data = FS::$dbMgr->Fetch($query))
-								array_push($this->autoresults["dnsrecord"],$data["record"].".".$data["zonename"]);
+								$this->autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
 						}
 						else if($count == 1) {
 							$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,zonename","record ILIKE '".$hostname."%'",array("order" => "record,zonename","limit" => "10"));
 							while($data = FS::$dbMgr->Fetch($query))
-								array_push($this->autoresults["dnsrecord"],$data["record"].".".$data["zonename"]);
+								$this->autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
 						}
 					}
 				}
@@ -341,7 +341,7 @@
 							for($i=0;$i<count($spl) && !$found;$i++) {
 								if(strlen($spl[$i]) > 0) {
 									$found = 1;
-									array_push($this->autoresults["dnsrecord"],$search);
+									$this->autoresults["dnsrecord"][] = $search;
 								}
 							}
 							$found = 0;
@@ -377,12 +377,12 @@
 					$query = FS::$dbMgr->Select("node_nbt","domain","domain ILIKE '%".$search."%'",
 						array("order" => "domain","limit" => "10","group" => "domain"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["nbdomain"],$data["domain"]);
+						$this->autoresults["nbdomain"][] = $data["domain"];
 
 					$query = FS::$dbMgr->Select("node_nbt","nbname","nbname ILIKE '%".$search."%'",
 						array("order" => "nbname","limit" => "10","group" => "nbname"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["nbname"],$data["nbname"]);
+						$this->autoresults["nbname"][] = $data["nbname"];
 				}
 			}
 
@@ -430,12 +430,12 @@
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","hostname","hostname ILIKE '%".$search."%'",array("order" => "hostname","limit" => "10","group" => "hostname"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["dhcphostname"],$data["hostname"]);
+						$this->autoresults["dhcphostname"][] = $data["hostname"];
 
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","limit" => "10",
 						"group" => "clustername"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["dhcpcluster"],$data["clustername"]);
+						$this->autoresults["dhcpcluster"][] = $data["clustername"];
 				}
 			}
 			
@@ -484,7 +484,7 @@
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","recval","recval ILIKE '".$search."%'",array("order" => "recval","limit" => "10","group" => "recval"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["dnsrecord"],$data["recval"]);
+						$this->autoresults["dnsrecord"][] = $data["recval"];
 				}
 			}
 
@@ -531,11 +531,11 @@
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip","ip ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["ip"],$data["ip"]);
+						$this->autoresults["ip"][] = $data["ip"];
 
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","ip ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["ip"],$data["ip"]);
+						$this->autoresults["ip"][] = $data["ip"];
 
 				}
 			}
@@ -614,15 +614,15 @@
 				else {
 					$query = FS::$dbMgr->Select("node_ip","ip","host(ip) ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["ip"],$data["ip"]);
+						$this->autoresults["ip"][] = $data["ip"];
 
 					$query = FS::$dbMgr->Select("node_nbt","ip","host(ip) ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["ip"],$data["ip"]);
+						$this->autoresults["ip"][] = $data["ip"];
 
 					$query = FS::$dbMgr->Select("device","ip","host(ip) ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["ip"],$data["ip"]);
+						$this->autoresults["ip"][] = $data["ip"];
 				}
 			}
 
@@ -873,11 +873,11 @@
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","macaddr","macaddr ILIKE '".$search."%'",array("order" => "macaddr","limit" => "10","group" => "macaddr"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["mac"],$data["macaddr"]);
+						$this->autoresults["mac"][] = $data["macaddr"];
 
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr","macaddr ILIKE '".$search."%'",array("order" => "macaddr","limit" => "10","group" => "macaddr"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["mac"],$data["macaddr"]);
+						$this->autoresults["mac"][] = $data["macaddr"];
 				}
 			}
 
@@ -938,15 +938,15 @@
 				else {
 					$query = FS::$dbMgr->Select("node_ip","mac","text(mac) ILIKE '".$search."%'",array("order" => "mac","limit" => "10","group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["mac"],$data["mac"]);
+						$this->autoresults["mac"][] = $data["mac"];
 
 					$query = FS::$dbMgr->Select("node","mac","text(mac) ILIKE '".$search."%'",array("order" => "mac","limit" => "10","group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["mac"],$data["mac"]);
+						$this->autoresults["mac"][] = $data["mac"];
 
 					$query = FS::$dbMgr->Select("node_nbt","mac","text(mac) ILIKE '".$search."%'",array("order" => "mac","limit" => "10","group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["mac"],$data["mac"]);
+						$this->autoresults["mac"][] = $data["mac"];
 				}
 			}
 	
@@ -974,7 +974,7 @@
 				else {
 					$query = FS::$dbMgr->Select("device","mac","text(mac) ILIKE '".$search."%'",array("order" => "mac","limit" => "10","group" => "mac"));
 					while($data = FS::$dbMgr->Fetch($query))
-						array_push($this->autoresults["mac"],$data["mac"]);
+						$this->autoresults["mac"][] = $data["mac"];
 				}
 			}
 			if(!$autocomp) {
@@ -1029,7 +1029,7 @@
 		private function fetchPlugAutoResults($search) {	
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","prise","prise ILIKE '".$search."%'",array("order" => "prise","limit" => "10","group" => "prise"));
 			while($data = FS::$dbMgr->Fetch($query))
-				array_push($this->autoresults["prise"],$data["prise"]);
+				$this->autoresults["prise"][] = $data["prise"];
 		}
 
 		// Room number
@@ -1075,7 +1075,7 @@
 		private function fetchRoomAutoResults($search) {
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","room","room ILIKE '".$search."%'",array("order" => "room","limit" => "10","group" => "room"));
 			while($data = FS::$dbMgr->Fetch($query))
-				array_push($this->autoresults["room"],$data["room"]);
+				$this->autoresults["room"][] = $data["room"];
 		}
 
 		private function divEncapResults($output,$title,$minwidth=false) {

@@ -54,7 +54,7 @@
 			$rules = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
 			while($data = FS::$dbMgr->Fetch($query))
-				array_push($rules,$data["rulename"]);
+				$rules[] = $data["rulename"];
 			$output .= $this->loadModuleRuleSets($rules);
 			$output .= FS::$iMgr->hidden("gid",$gid);
 			$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";

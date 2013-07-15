@@ -42,21 +42,21 @@
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-icinga");
 				$panElmts = array();
-				//array_push($panElmts,array(1,"mod=".$this->mid,$this->loc->s("General")));
+				//$panElmts[] = array(1,"mod=".$this->mid,$this->loc->s("General"));
 				if(FS::$sessMgr->hasRight("mrule_icinga_host_write"))
-					array_push($panElmts,array(2,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts")));
+					$panElmts[] = array(2,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts"));
 				if(FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-					array_push($panElmts,array(3,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups")));
+					$panElmts[] = array(3,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups"));
 				if(FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
-					array_push($panElmts,array(4,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services")));
+					$panElmts[] = array(4,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services"));
 				if(FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
-					array_push($panElmts,array(5,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods")));
+					$panElmts[] = array(5,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods"));
 				if(FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
-					array_push($panElmts,array(6,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts")));
+					$panElmts[] = array(6,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts"));
 				if(FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-					array_push($panElmts,array(7,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups")));
+					$panElmts[] = array(7,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups"));
 				if(FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
-					array_push($panElmts,array(8,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands")));
+					$panElmts[] = array(8,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands"));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				return $output;
 			}
@@ -122,7 +122,7 @@
 				$parentlist = array();
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_host_parents","parent","name = '".$data["name"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					array_push($parentlist,$data2["parent"]);
+					$parentlist[] = $data2["parent"];
 				}
 				
 				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
@@ -189,7 +189,7 @@
 				$parentlist = array();
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_host_parents","parent","name = '".$name."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
-					array_push($parentlist,$data["parent"]);
+					$parentlist[] = $data["parent"];
 				}
 			}
 
@@ -230,7 +230,7 @@
 			if($name) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name","host = '".$name."' AND hosttype = '1'");
 				while($data = FS::$dbMgr->Fetch($query))
-					array_push($hglist,$data["name"]);
+					$hglist[] = $data["name"];
 			}
 
 			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups",false,$hglist,"",true)."</td></tr>";
@@ -331,7 +331,7 @@
 			if($name) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","name = '".$name."'");
 				while($data = FS::$dbMgr->Fetch($query))
-					array_push($hostlist,$data["hosttype"]."$".$data["host"]);
+					$hostlist[] = $data["hosttype"]."$".$data["host"];
 			}	
 
 			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members",true,$hostlist,$name)."</td></tr>";
@@ -705,7 +705,7 @@
 				$contacts = array();
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
 				while($data2 = FS::$dbMgr->Fetch($query2)) {
-					array_push($contacts,$data2["member"]);
+					$contacts[] = $data2["member"];
 				}
 
 				$output .= "<tr id=\"ctg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
@@ -739,7 +739,7 @@
 				$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'");
                         	$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
                         	while($data = FS::$dbMgr->Fetch($query2)) {
-                	                array_push($contacts,$data2["member"]);
+                	                $contacts[] = $data2["member"];
              	        	}
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");

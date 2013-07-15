@@ -46,7 +46,7 @@
 			// Create 2 JS buffers
 			$this->js_buffer = array();
 			for($i=0;$i<2;$i++)
-				array_push($this->js_buffer,"");
+				$this->js_buffer[] = "";
 			$this->js_buffer_idx = 0;
 		}
 
@@ -102,10 +102,9 @@
 									$menus[$menuname] = array();
 								}
 								if($module->getRulesClass()->canAccessToModule()) {
-									array_push($menus[$menuname],
+									$menus[$menuname][] = 
 										"<div class=\"menuItem\" onclick=\"window.location.href='index.php?mod=".$moduleid."'\">".
-										$module->getModuleClass()->getMenuTitle()."</div>"
-									);
+										$module->getModuleClass()->getMenuTitle()."</div>";
 								}
 							}
 						}

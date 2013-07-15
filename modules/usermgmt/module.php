@@ -390,7 +390,7 @@
 									FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=2");
 									return;
 								}
-								array_push($groups,$value);
+								$groups[] = $value;
 						   }
 					}
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","uid = '".$uid."'");

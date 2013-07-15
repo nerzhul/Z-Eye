@@ -219,10 +219,16 @@
 							if($curzone != "") $dnsoutput .= "</table>";
 							$dnsoutput .= FS::$iMgr->h3("Zone: ".$filter,true)."<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
 						}
-						if(!isset($dnsrecords[$data["record"]])) $dnsrecords[$data["record"]] = array();
-						if(!isset($dnsrecords[$data["record"]][$data["rectype"]])) $dnsrecords[$data["record"]][$data["rectype"]] = array();
-						if(!isset($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]])) $dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]] = array();
-						array_push($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]],$data["server"]);
+						if(!isset($dnsrecords[$data["record"]])) 
+							$dnsrecords[$data["record"]] = array();
+
+						if(!isset($dnsrecords[$data["record"]][$data["rectype"]]))
+							$dnsrecords[$data["record"]][$data["rectype"]] = array();
+
+						if(!isset($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]]))
+							$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]] = array();
+
+						$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]][] = $data["server"];
 					}
 					foreach($dnsrecords as $recordname => $records) {
 						foreach($records as $recordtype => $records2) {

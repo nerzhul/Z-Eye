@@ -103,7 +103,8 @@
 						fwrite($this->stdio," ");
 					else if(preg_match("/^(.+)[#]$/",$line))
 						$promptfind = true;
-					else array_push($output_arr,$line);
+					else
+						$output_arr[] = $line;
 				}
 			}
 

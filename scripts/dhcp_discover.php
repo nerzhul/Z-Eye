@@ -143,7 +143,7 @@
 					$subnet = preg_split("# #",$subnet[0]);
 					$net = $subnet[1];
 					$mask = $subnet[3];
-					array_push($subnet_list,array($net,$mask));
+					$subnet_list[] = array($net,$mask);
 				}
 				else if(preg_match("#host(.*)#",$resline[$j],$reserv_host)){
 					$reserv_host = preg_split("# #",$reserv_host[0]);

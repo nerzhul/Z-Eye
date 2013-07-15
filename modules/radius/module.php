@@ -404,11 +404,15 @@
 				$groups=array();
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
 				while($data = $radSQLMgr->Fetch($query)) {
-						if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
+					if(!in_array($data["groupname"],$groups)) {
+						$groups[] = $data["groupname"];
+					}
 				}
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
 				while($data = $radSQLMgr->Fetch($query)) {
-						if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
+					if(!in_array($data["groupname"],$groups)) {
+						$groups[] = $data["groupname"];
+					}
 				}
 				$count = count($groups);
 				for($i=0;$i<$count;$i++) {
@@ -938,11 +942,15 @@
 			$groups=array();
 			$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
 			while($data = $radSQLMgr->Fetch($query)) {
-				if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
+				if(!in_array($data["groupname"],$groups)) {
+					$groups[] = $data["groupname"];
+				}
 			}
 			$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
 			while($data = $radSQLMgr->Fetch($query)) {
-				if(!in_array($data["groupname"],$groups)) array_push($groups,$data["groupname"]);
+				if(!in_array($data["groupname"],$groups)) {
+					$groups[] = $data["groupname"];
+				}
 			}
 			$count = count($groups);
 			for($i=0;$i<$count;$i++) {

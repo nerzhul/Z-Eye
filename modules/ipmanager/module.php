@@ -36,16 +36,16 @@
 				$output .= FS::$iMgr->h1("title-ip-management");
 				$tabs = array();
 				if(FS::$sessMgr->hasRight("mrule_ipmmgmt_read"))
-					array_push($tabs,array(1,"mod=".$this->mid,$this->loc->s("Consult")));
+					$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("Consult"));
 				if(FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt"))
-					array_push($tabs,array(2,"mod=".$this->mid,$this->loc->s("Manage-Subnets")));
+					$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("Manage-Subnets"));
 				if(FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt") ||
 					FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt"))
-					array_push($tabs,array(5,"mod=".$this->mid,$this->loc->s("Manage-DHCP-Opts")));
+					$tabs[] = array(5,"mod=".$this->mid,$this->loc->s("Manage-DHCP-Opts"));
 				if(FS::$sessMgr->hasRight("mrule_ipmmgmt_advancedtools"))
-					array_push($tabs,array(4,"mod=".$this->mid,$this->loc->s("Advanced-tools")));
+					$tabs[] = array(4,"mod=".$this->mid,$this->loc->s("Advanced-tools"));
 				if(FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt"))
-					array_push($tabs,array(3,"mod=".$this->mid,$this->loc->s("Manage-Servers")));
+					$tabs[] = array(3,"mod=".$this->mid,$this->loc->s("Manage-Servers"));
 
 				$output .= FS::$iMgr->tabPan($tabs,$sh);
 			}	
@@ -197,7 +197,7 @@
 					$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
 				}
 				// List servers where the data is
-				array_push($iparray[ip2long($data2["ip"])]["servers"],$data2["server"]);
+				$iparray[ip2long($data2["ip"])]["servers"][] = $data2["server"];
 				if(strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
 					$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
 					$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
@@ -507,7 +507,7 @@
 			if($optgroup) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias","optgroup = '".$optgroup."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
-					array_push($options,$data["optalias"]);
+					$options[] = $data["optalias"];
 				}
 			}
 
@@ -686,7 +686,7 @@
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!in_array($data["clustername"],$clusters))
-						array_push($clusters,$data["clustername"]);
+						$clusters[] = $data["clustername"];
 				}
 			}
 
@@ -719,7 +719,7 @@
 			if($netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup","netid = '".$netid."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
-					array_push($optgroups,$data["optgroup"]);
+					$optgroups[] = $data["optgroup"];
 				}
 			}
 
@@ -861,7 +861,7 @@
 			if($name) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$name."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
-					array_push($members,$data["dhcpaddr"]);
+					$members[] = $data["dhcpaddr"];
 				}
 				$clustermode = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustermode","clustername = '".$name."'");
 				$clustermaster = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","master","clustername = '".$name."'");
@@ -898,7 +898,8 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!isset($clusters[$data["clustername"]]))
 					$clusters[$data["clustername"]] = array();
-				array_push($clusters[$data["clustername"]],$data["dhcpaddr"]);
+
+				$clusters[$data["clustername"]][] = $data["dhcpaddr"];
 			}
 
 			foreach($clusters as $clustername => $dhcplist) {
@@ -960,7 +961,7 @@
 			if($ip) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ipv4_optgroups","optgroup","ipaddr = '".$ip."'");
 				while($data = FS::$dbMgr->Fetch($query)) {
-					array_push($optgroups,$data["optgroup"]);
+					$optgroups[] = $data["optgroup"];
 				}
 			}
 
@@ -1134,7 +1135,7 @@
 					}
 					// If $i isn't close to tmpend, we store the range and create new range
 					else if($ip > $tmpend+1) {
-						array_push($rangeList,array($tmpstart,$tmpend));
+						$rangeList[] = array($tmpstart,$tmpend);
 						$tmpstart = $ip;
 						$tmpend = $ip;
 					}
@@ -1143,7 +1144,7 @@
 				else {
 					// If we have a dynamic range, then we store it
 					if($tmpstart != 0 && $tmpend != 0) {
-						array_push($rangeList,array($tmpstart,$tmpend));
+						$rangeList[] = array($tmpstart,$tmpend);
 					}
 					$tmpstart = 0;
 					$tmpend = 0;
@@ -1151,7 +1152,7 @@
 			}
 			// If buffers are not empty, there is a last range
 			if($tmpstart != 0 && $tmpend != 0) {
-				array_push($rangeList,array($tmpstart,$tmpend));
+				$rangeList[] = array($tmpstart,$tmpend);
 			}
 
 			FS::$dbMgr->BeginTr();
@@ -2005,7 +2006,7 @@
 						array("group" => "optgroup"));
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($data["ct"] == 1)
-							array_push($toRemove,$data["optgroup"]);
+							$toRemove[] = $data["optgroup"];
 					}
 
 					FS::$dbMgr->BeginTr();
@@ -2169,7 +2170,7 @@
 						array("group" => "optgroup"));
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($data["ct"] == 1)
-							array_push($toRemove,$data["optgroup"]);
+							$toRemove[] = $data["optgroup"];
 					}
 
 					FS::$dbMgr->BeginTr();

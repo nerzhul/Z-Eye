@@ -115,8 +115,12 @@
 			$rwarr = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if($data["ro"] = 't') array_push($roarr,$data["name"]);
-				if($data["rw"] = 't') array_push($rwarr,$data["name"]);
+				if($data["ro"] = 't') {
+					$roarr[] = $data["name"];
+				}
+				if($data["rw"] = 't') {
+					$rwarr[] = $data["name"];
+				}
 			}
 			$snmpro = "";
 			$snmprw = "";

@@ -114,9 +114,9 @@
 					// Store values into a buffer
 					$entry = array();
 					for($i=1;$i<$attrCount;$i++)
-						array_push($entry,$data[$this->attrList[$i][1]]);
+						$entry[] = $data[$this->attrList[$i][1]];
 					// Write buffer to row buffer
-					array_push($rowBuf[$data[$this->sqlAttrId]],$entry);
+					$rowBuf[$data[$this->sqlAttrId]][] = $entry;
                      		}
 				$tmpoutput .= $this->showLineM($rowBuf,$attrCount);
 			}
@@ -240,9 +240,9 @@
 					// Store values into a buffer
 					$entry = array();
 					for($i=1;$i<$attrCount;$i++)
-						array_push($entry,$data[$this->attrList[$i][1]]);
+						$entry[] = $data[$this->attrList[$i][1]];
 					// Write buffer to row buffer
-					array_push($rowBuf[$data[$this->sqlAttrId]],$entry);
+					$rowBuf[$data[$this->sqlAttrId]][] = $entry;
                 		}
 				$jscontent = $this->showLineM($rowBuf,$attrCount);
 			}

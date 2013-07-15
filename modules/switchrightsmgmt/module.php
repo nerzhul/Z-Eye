@@ -262,7 +262,7 @@
 					case "portmod_portsec": case "portmod_cdp": case "portmod_voicevlan":
 					case "portmod_dhcpsnooping": case "dhcpsnmgmt":
 						if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)
-							array_push($rules[$ruleidx],$data2[$idx]);
+							$rules[$ruleidx][] = $data2[$idx];
 						break;
 				}
 			}
@@ -423,7 +423,7 @@
 					case "read": case "readportstats": case "readswdetails": case "readswmodules": 
 					case "readswvlans": case "sshportinfos": case "sshshowstart": case "sshshowrun":
 						if($ro == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)) {
-							array_push($rules[$ruleidx],$data2[$idx]);
+							$rules[$ruleidx][] = $data2[$idx];
 						}
 						break;
 					// Write rules
@@ -431,7 +431,7 @@
 					case "retagvlan": case "sshpwd": case "portmod_portsec": case "portmod_cdp":
 					case "portmod_voicevlan": case "portmod_dhcpsnooping": case "dhcpsnmgmt":
 						if($rw == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter))
-							array_push($rules[$ruleidx],$data2[$idx]);
+							$rules[$ruleidx][] = $data2[$idx];
 						break;
 				}
 			}
@@ -549,8 +549,8 @@
 					$panElmts = array(array(1,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp")));
 					// Show only if there is devices
 					if(FS::$dbMgr->Count("device","ip") > 0)
-						array_push($panElmts,array(2,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch")));
-					array_push($panElmts,array(3,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-device-backup")));
+						$panElmts[] = array(2,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch"));
+					$panElmts[] = array(3,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-device-backup"));
 					$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				}
 			}

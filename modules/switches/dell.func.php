@@ -138,23 +138,23 @@
 					continue;
 				$pid = $pid[1];
 				if($vlanFltr == NULL || !FS::$secMgr->isNumeric($vlanFltr) || $vlanFltr < 1 || $vlanFltr > 4096)
-					array_push($plist,$pname);
+					$plist[] = $pname;
 				else {
 					$this->setPortId($pid);
 					$portmode = $this->getSwitchportMode();
 					if($portmode == 1) {
 						$nvlan = $this->getSwitchTrunkNativeVlan();
 						if(!in_array($pname,$plist) && $vlanFltr == $nvlan)
-							array_push($plist,$pname);
+							$plist[] = $pname;
 
 						$vllist = $this->getSwitchportTrunkVlans();
 						if(!in_array($pname,$plist) && in_array($vlanFltr,$vllist))
-							array_push($plist,$pname);
+							$plist[] = $pname;
 					}
 					else if($portmode == 2) {
 						$pvlan = $this->getSwitchAccessVLAN();
 						if(!in_array($pname,$plist) && $vlanFltr == $pvlan)
-							array_push($plist,$pname);
+							$plist[] = $pname;
 					}
 				}
 			}
