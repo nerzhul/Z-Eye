@@ -137,7 +137,7 @@
 			// range management
 			if(FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
 				$netdeclared) {
-				$output .= FS::$iMgr->opendiv(14,$this->loc->s("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$data["netid"]));
+				$output .= FS::$iMgr->opendiv(14,$this->loc->s("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$netid));
 			}
 
 			$output .= "<div id=\"".FS::$iMgr->formatHTMLId($netid)."\"></div>";
@@ -159,7 +159,7 @@
 			$iplist = "";
 			// Initiate network IPs
 			$lastip = $netobj->getLastUsableIPLong();
-			for($i=($netobj->getFirstUsableIPLong());$i<$lastip;$i++) {
+			for($i=($netobj->getFirstUsableIPLong());$i<=$lastip;$i++) {
 				$iparray[$i] = array();
 				$iparray[$i]["mac"] = "";
 				$iparray[$i]["host"] = "";
@@ -178,6 +178,14 @@
 				$iplist .= "'".long2ip($i)."'";
 			}
 
+			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_range","rangestart,rangestop","subnet = '".$netid."'");
+			while($data2 = FS::$dbMgr->Fetch($query2)) {
+				$start = ip2long($data2["rangestart"]);
+				$end = ip2long($data2["rangestop"]);
+				for($i=$start;$i<=$end;$i++) {
+					$iparray[$i]["distrib"] = 6;
+				}
+			}
 			// Fetch datas
 			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$netid."'");
 			while($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -224,6 +232,7 @@
 				}
 			}
 
+
 			$used = 0;
 			$reserv = 0;
 			$free = 0;
@@ -264,6 +273,11 @@
 						$rstate = $this->loc->s("Reserved-by-ipmanager");
 						$style = "background-color: #FFFF80;";
 						$reserv++;
+						break;
+					case 6:
+						$rstate = $this->loc->s("Distributed-by-ipmanager");
+						$style = "background-color: #BFFBFF;";
+						$distrib++;
 						break;
 					default: {
 							$rstate = $this->loc->s("Free");
