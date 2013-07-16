@@ -28,7 +28,6 @@
 		}
 
 		private function showMain() {
-			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 
@@ -48,7 +47,7 @@
 			}
 			else {
 				switch($sh) {
-					case 1: $output .= $this->showZoneMgmt($addr); break;
+					case 1: $output .= $this->showZoneMgmt(); break;
 					// case 2: break;
 					case 3: $output .= $this->showAdvancedTools(); break;
 				}
@@ -67,14 +66,6 @@
 				if($exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","addr","dns = '1'"))
 					$output .= FS::$iMgr->opendiv(2,$this->loc->s("modify-servers"));
 			}
-			if(!$addr) {
-				$output .= $this->showStats();
-			}
-			return $output;
-		}
-
-		private function showStats() {
-			$output = "";
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 
