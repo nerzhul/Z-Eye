@@ -23,9 +23,12 @@
 			$locales = array(
 				"fr" => array(
 					"add-server" => "Ajouter un serveur",
+					"Advanced-tools" => "Outils avancés",
 					"Alone" => "Orphelin",
 					"confirm-remove-dnssrc" => "Êtes vous sûr de vouloir supprimer la source de données suivante: ",
 					"chroot-path" => "Chroot Path",
+					"DNSSec-Mgmt" => "Gestion DNSSec",
+					"DNS-zones" => "Zones DNS",
 					"edit-server" => "Edition du serveur",
 					"err-bad-login" => "Login au serveur incorrect",
 					"err-bad-server" => "Aucun serveur enregistré avec ces coordonnées",
@@ -69,9 +72,12 @@
 				),
 				"en" => array(
 					"add-server" => "Add server",
+					"Advanced-tools" => "Advanced tools",
 					"Alone" => "Alone",
 					"confirm-remove-dnssrc" => "Are you sure to want to remove this DNS data source ",
 					"chroot-path" => "Chroot Path",
+					"DNSSec-Mgmt" => "DNSSec management",
+					"DNS-zones" => "DNS zones",
 					"edit-server" => "Server edit",
 					"err-bad-login" => "Bad server login",
 					"err-bad-server" => "No server found with this datas",
