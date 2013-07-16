@@ -236,7 +236,8 @@
 				if(!isset($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]]))
 					$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]] = array();
 
-				$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]][] = $data["server"];
+				if(!in_array($data["server"],$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]]))
+					$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]][] = $data["server"];
 			}
 			foreach($dnsrecords as $recordname => $records) {
 				foreach($records as $recordtype => $records2) {
