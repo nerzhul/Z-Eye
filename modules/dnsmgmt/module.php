@@ -48,10 +48,15 @@
 			else {
 				switch($sh) {
 					case 1: $output .= $this->showZoneMgmt(); break;
-					// case 2: break;
+					case 2: $output .= $this->showDNSSecMgmt(); break;
 					case 3: $output .= $this->showAdvancedTools(); break;
 				}
 			}
+			return $output;
+		}
+
+		private function showDNSSecMgmt() {
+			$output = "";
 			return $output;
 		}
 

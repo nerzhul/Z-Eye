@@ -240,7 +240,11 @@ class ZEyeDHCPManager(threading.Thread):
 							failoverPeerBuf += "\n\tmax-response-delay 3;\n\tmax-unacked-updates 2;\n\tload balance max seconds 10;"
 							# This is for cluster master
 							if (self.clusterOptions[idx[0]][0] == 1 or self.clusterOptions[idx[0]][0] == 2) and self.clusterOptions[idx[0]][1] == addr:
-								failoverPeerBuf += "\n\tmclt 1800;\n\tsplit 255;"
+								if self.clusterOptions[idx[0]][0] == 2:
+									failoverPeerBuf += "\n\tmclt 1800;\n\tsplit 127;"
+								else:
+									failoverPeerBuf += "\n\tmclt 1800;\n\tsplit 255;"
+
 							failoverPeerBuf += "\n}\n\n"
 
 					for subnet in self.clusterList[idx[0]]:
