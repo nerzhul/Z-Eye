@@ -75,12 +75,8 @@
 
 		private function showStats() {
 			$output = "";
-			$formoutput = "";
-			$dnsoutput = "";
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
-			$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
-			$formoutput .= FS::$iMgr->select("f");
 
 			$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
 			if($shA == NULL) $shA = 1;
@@ -106,6 +102,9 @@
 			$shother = FS::$secMgr->checkAndSecuriseGetData("sother");
 			if($shother == NULL) $shother = 1;
 
+			$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1").
+				FS::$iMgr->select("f");
+
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","",array("order" => "zonename"));
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -113,66 +112,64 @@
 				$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
 			}
 			if($found) {
-				$output .= $formoutput;
-				$output .= "</select><br />";
-				$output .= FS::$iMgr->check("sa",array("check" => $shA))."A ";
-				$output .= FS::$iMgr->check("saaaa",array("check" => $shAAAA))."AAAA ";
-				$output .= FS::$iMgr->check("scname",array("check" => $shCNAME))."CNAME ";
-				$output .= FS::$iMgr->check("sns",array("check" => $shNS))."NS ";
-				$output .= FS::$iMgr->check("ssrv",array("check" => $shSRV))."SRV ";
-				$output .= FS::$iMgr->check("stxt",array("check" => $shTXT))."TXT ";
-				$output .= FS::$iMgr->check("sptr",array("check" => $shPTR))."PTR ";
-				$output .= FS::$iMgr->check("sother",array("check" => $shother)).$this->loc->s("Others")." ";
-				$output .= "<br />";
-				$output .= FS::$iMgr->submit("",$this->loc->s("Filter"));
-				$output .= "</form>";
+				$output .= $formoutput.
+					"</select><br />".
+					FS::$iMgr->check("sa",array("check" => $shA))."A ".
+					FS::$iMgr->check("saaaa",array("check" => $shAAAA))."AAAA ".
+					FS::$iMgr->check("scname",array("check" => $shCNAME))."CNAME ".
+					FS::$iMgr->check("sns",array("check" => $shNS))."NS ".
+					FS::$iMgr->check("ssrv",array("check" => $shSRV))."SRV ".
+					FS::$iMgr->check("stxt",array("check" => $shTXT))."TXT ".
+					FS::$iMgr->check("sptr",array("check" => $shPTR))."PTR ".
+					FS::$iMgr->check("sother",array("check" => $shother)).$this->loc->s("Others").
+					"<br />".
+					FS::$iMgr->submit("",$this->loc->s("Filter")).
+					"</form><div id=\"recordlist\"></div>";
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("no-data-found"));
 			}
 
-			$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
-			if($shA == NULL) $shA = true;
-			else if($shA > 0) $shA = true;
+			return $output;
+		}
+
+		private function showRecords($dnszone) {
+			$output = "";
+
+			$shA = FS::$secMgr->checkAndSecurisePostData("sa");
+			if($shA == "on") $shA = true;
 			else $shA = false;
 			
-			$shAAAA = FS::$secMgr->checkAndSecuriseGetData("saaaa");
-			if($shAAAA == NULL) $shAAAA = true;
-			else if($shAAAA > 0) $shAAAA = true;
+			$shAAAA = FS::$secMgr->checkAndSecurisePostData("saaaa");
+			if($shAAAA == "on") $shAAAA = true;
 			else $shAAAA = false;
 			
-			$shNS = FS::$secMgr->checkAndSecuriseGetData("sns");
-			if($shNS == NULL) $shNS = true;
-			else if($shNS > 0) $shNS = true;
+			$shNS = FS::$secMgr->checkAndSecurisePostData("sns");
+			if($shNS == "on") $shNS = true;
 			else $shNS = false;
 			
-			$shCNAME = FS::$secMgr->checkAndSecuriseGetData("scname");
-			if($shCNAME == NULL) $shCNAME = true;
-			else if($shCNAME > 0) $shCNAME = true;
+			$shCNAME = FS::$secMgr->checkAndSecurisePostData("scname");
+			if($shCNAME == "on") $shCNAME = true;
 			else $shCNAME = false;
 			
-			$shSRV = FS::$secMgr->checkAndSecuriseGetData("ssrv");
-			if($shSRV == NULL) $shSRV = true;
+			$shSRV = FS::$secMgr->checkAndSecurisePostData("ssrv");
+			if($shSRV == "on") $shSRV = true;
 			else if($shSRV > 0) $shSRV = true;
 			else $shSRV = false;
 			
-			$shPTR = FS::$secMgr->checkAndSecuriseGetData("sptr");
-			if($shPTR == NULL) $shPTR = true;
-			else if($shPTR > 0) $shPTR = true;
+			$shPTR = FS::$secMgr->checkAndSecurisePostData("sptr");
+			if($shPTR == "on") $shPTR = true;
 			else $shPTR = false;
 			
-			$shTXT = FS::$secMgr->checkAndSecuriseGetData("stxt");
-			if($shTXT == NULL) $shTXT = true;
-			else if($shTXT > 0) $shTXT = true;
+			$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
+			if($shTXT == "on") $shTXT = true;
 			else $shTXT = false;
 			
-			$shother = FS::$secMgr->checkAndSecuriseGetData("sother");
-			if($shother == NULL) $shother = true;
-			else if($shother > 0) $shother = true;
+			$shother = FS::$secMgr->checkAndSecurisePostData("sother");
+			if($shother == "on") $shother = true;
 			else $shother = false;
 			
-			if(!$filter) {
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-zone"));
+			if(!$dnszone) {
 				return $output;
 			}
 			
@@ -219,15 +216,15 @@
 				if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 			}
 			
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server",($filter != NULL ? "zonename = '".$filter."'" : "").$rectypef,
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server",($dnszone!= NULL ? "zonename = '".$dnszone."'" : "").$rectypef,
 				array("order" => "zonename,record","ordersens" => 2));
 			$curzone = "";
 			$dnsrecords = array();
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if($curzone != $data["zonename"]) {
 					$curzone = $data["zonename"];
-					if($curzone != "") $dnsoutput .= "</table>";
-					$dnsoutput .= FS::$iMgr->h3("Zone: ".$filter,true)."<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
+					if($curzone != "") $output .= "</table>";
+					$output .= FS::$iMgr->h3("Zone: ".$dnszone,true)."<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
 						$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
 				}
 				if(!isset($dnsrecords[$data["record"]])) 
@@ -255,26 +252,30 @@
 								$style = "background-color: #FF8888;"; break;
 							default: $style = ""; break;
 						}
-						$dnsoutput .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
+						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
 						if($recordtype == "A")
-							$dnsoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$recordval."\">".$recordval."</a>";
+							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$recordval."\">".$recordval."</a>";
 						else
-							$dnsoutput .= $recordval;
-						$dnsoutput .= "</td><td>";
+							$output .= $recordval;
+						$output .= "</td><td>";
 						$count = count($servers);
 						for($i=0;$i<$count;$i++) {
-							$dnsoutput .= $servers[$i];
-							if($i != count($servers)) $dnsoutput .= "<br />";
+							$output .= $servers[$i];
+							if($i != count($servers)) $output .= "<br />";
 						}
-						$dnsoutput .= "</td></tr>";
+						$output .= "</td></tr>";
 					}
 				}
 			}
 
-			if(strlen($dnsoutput) > 0) {
-				$output .= $dnsoutput."</table>";
+			if(strlen($output) > 0) {
+				$output .= "</table>";
 				FS::$iMgr->jsSortTable("dnsRecords");
 			}
+			else {
+				$output = FS::$iMgr->printError($this->loc->s("err-no-records"));
+			}
+			return $output;
 		}
 
 		private function showAdvancedTools() {
@@ -385,7 +386,7 @@
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
-					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
+					$dnszone = FS::$secMgr->checkAndSecurisePostData("f");
 					$shA = FS::$secMgr->checkAndSecurisePostData("sa");
 					$shAAAA = FS::$secMgr->checkAndSecurisePostData("saaaa");
 					$shNS = FS::$secMgr->checkAndSecurisePostData("sns");
@@ -395,35 +396,13 @@
 					$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
 					$shother = FS::$secMgr->checkAndSecurisePostData("sother");
 
-					if($filtr == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Some filtering values are wrong");
-						FS::$iMgr->redir("mod=".$this->mid);
+					if($dnszone == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
+						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Getting zone: Some values are wrong");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
 					}
 					else {
-						if($shA == "on") $shA = 1;
-						else $shA = 0;
-
-						if($shAAAA == "on") $shAAAA = 1;
-						else $shAAAA = 0;
-
-						if($shNS == "on") $shNS = 1;
-						else $shNS = 0;
-
-						if($shCNAME == "on") $shCNAME = 1;
-						else $shCNAME = 0;
-
-						if($shSRV == "on") $shSRV = 1;
-						else $shSRV = 0;
-
-						if($shPTR == "on") $shPTR = 1;
-						else $shPTR = 0;
-
-						if($shTXT == "on") $shTXT = 1;
-						else $shTXT = 0;
-
-						if($shother == "on") $shother = 1;
-						else $shother = 0;
-						FS::$iMgr->redir("mod=".$this->mid.($filtr != NULL ? "&f=".$filtr : "")."&sa=".$shA."&saaaa=".$shAAAA."&sns=".$shNS."&scname=".$shCNAME."&ssrv=".$shSRV."&sptr=".$shPTR."&stxt=".$shTXT."&sother=".$shother);
+						FS::$iMgr->js("$('#recordlist').html('".addslashes($this->showRecords($dnszone))."');");
+						FS::$iMgr->ajaxEcho("Done");
 					}
 					return;
 				case 2:
