@@ -216,14 +216,13 @@
 				if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 			}
 			
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server",($dnszone!= NULL ? "zonename = '".$dnszone."'" : "").$rectypef,
-				array("order" => "zonename,record","ordersens" => 2));
-			$curzone = "";
+			$first = true;
 			$dnsrecords = array();
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server","zonename = '".$dnszone."'".$rectypef,
+				array("order" => "zonename,record","ordersens" => 2));
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if($curzone != $data["zonename"]) {
-					$curzone = $data["zonename"];
-					if($curzone != "") $output .= "</table>";
+				if($first) {
+					$first = false;
 					$output .= FS::$iMgr->h3("Zone: ".$dnszone,true)."<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
 						$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
 				}
@@ -271,7 +270,6 @@
 
 			if(strlen($output) > 0) {
 				$output .= "</table>";
-				FS::$iMgr->jsSortTable("dnsRecords");
 			}
 			else {
 				$output = FS::$iMgr->printError($this->loc->s("err-no-records"));
@@ -403,7 +401,7 @@
 					}
 					else {
 						FS::$iMgr->js("$('#recordlist').html('".addslashes($this->showRecords($dnszone))."');");
-						FS::$iMgr->ajaxEcho("Done");
+						FS::$iMgr->ajaxEcho("Done".FS::$iMgr->jsSortTable("dnsRecords"));
 					}
 					return;
 				case 2:
