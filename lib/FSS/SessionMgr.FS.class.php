@@ -187,11 +187,15 @@
 			$groups = $this->getGroups();
 			$count = count($groups);
 			for($i=0;$i<$count;$i++) {
-				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = '".$rulename."' AND gid = '".$groups[$i]."'") == "on")
+				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = '".
+					$rulename."' AND gid = '".$groups[$i]."'") == "on") {
 					return true;
+				}
 			}
-			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = '".$rulename."' AND uid = '".$this->getUid()."'") == "on")
+			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = '".
+				$rulename."' AND uid = '".$this->getUid()."'") == "on") {
 				return true;
+			}
 			return false;
 		}
 

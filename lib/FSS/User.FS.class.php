@@ -38,7 +38,8 @@
 		}
 
 		public function LoadFromDB($uid) {
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","username, ulevel, subname, name, mail, join_date,last_conn, last_ip","uid = '".$uid."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","username,ulevel,subname,name,mail,join_date,last_conn,last_ip",
+				"uid = '".$uid."'");
 			if($data = pg_fetch_array($query)) {
 				$this->id = $uid;
 				$this->username = $data["username"];
@@ -56,7 +57,8 @@
 			if($uid) $id = $uid;
 			else $id = FS::$dbMgr->GetMax(PGDbConfig::getDbPrefix()."users","uid")+1;
 			$this->id = $uid;
-			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."users","uid, username, ulevel, subname, name, mail, join_date, last_ip, sha_pwd, last_conn","'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW()");
+			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."users","uid,username,ulevel,subname,name,mail,join_date,last_ip,sha_pwd,last_conn",
+				"'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW()");
 		}
 
 		public function SaveToDB() {
