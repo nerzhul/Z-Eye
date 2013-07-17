@@ -29,12 +29,13 @@
 
 		private function showMain() {
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
+			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 			$output = "";
 
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-dns");
 
-				if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+				if($addr && FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 					$output .= $this->CreateOrEditServer(false);
 				}
 				else {
@@ -638,6 +639,12 @@
 					else {
 						if($exist) {
 							FS::$iMgr->ajaxEcho("err-tsig-key-already-exists");
+							return;
+						}
+						$exist = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dns_tsig","keyalias","keyid = '".$keyid.
+							"' AND keyalgo = '".$keyalgo."' AND keyvalue = '".$keyvalue."'");
+						if($exist) {
+							FS::$iMgr->ajaxEcho("err-tsig-key-exactly-same");
 							return;
 						}
 					}
