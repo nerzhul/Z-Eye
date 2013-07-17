@@ -50,9 +50,11 @@
 			$alerts = array();
 
 			$icingabuffer = $this->showIcingaReporting();
-			$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga),$icingabuffer);
+			$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".
+				FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga),$icingabuffer);
 			if($this->hsicinga) {
-				$alerts["icinga"][0] .= "<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors");
+				$alerts["icinga"][0] .= "<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".
+					$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors");
 			}
 
 			$netbuffer = $this->showNetworkReporting();
@@ -61,10 +63,12 @@
 				$this->BWtotalscore = 100;
 				$this->BWscore = 100;
 			}
-			$alerts["net"] = array("<b>".$this->loc->s("state-net")."</b> ".FS::$iMgr->progress("nhealth",$this->BWscore,$this->BWtotalscore),$netbuffer);
+			$alerts["net"] = array("<b>".$this->loc->s("state-net")."</b> ".FS::$iMgr->progress("nhealth",
+				$this->BWscore,$this->BWtotalscore),$netbuffer);
 
 			$secbuffer = $this->showSecurityReporting();
-			$alerts["sec"] = array("<b>".$this->loc->s("state-security")."</b> ".FS::$iMgr->progress("sechealth",$this->SECscore,$this->SECtotalscore),$secbuffer);
+			$alerts["sec"] = array("<b>".$this->loc->s("state-security")."</b> ".FS::$iMgr->progress("sechealth",
+				$this->SECscore,$this->SECtotalscore),$secbuffer);
 
 			$output .= FS::$iMgr->accordion("alertreport",$alerts);
 			if(!FS::isAjaxCall()) $output .= "</div>";
@@ -75,9 +79,14 @@
 		private function showIcingaReporting() {
 			$problems = array();
 			$output = "";	
-			$problemoutput = "<table style=\"width: 95%; font-size: 15px;\"><tr><th>".$this->loc->s("Host")."</th><th>".$this->loc->s("Service")."</th><th>".$this->loc->s("State").
-				"</th><th style=\"width: 10%\">".$this->loc->s("Duration")."</th><th style=\"width: 60%;\">".$this->loc->s("Status-information")."</th></tr>";
-			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts","state_type","last_time_ok","last_time_up"));
+			$problemoutput = "<table style=\"width: 95%; font-size: 15px;\"><tr><th>".$this->loc->s("Host").
+				"</th><th>".$this->loc->s("Service")."</th><th>".$this->loc->s("State").
+				"</th><th style=\"width: 10%\">".$this->loc->s("Duration")."</th><th style=\"width: 60%;\">".
+				$this->loc->s("Status-information")."</th></tr>";
+
+			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts",
+				"state_type","last_time_ok","last_time_up"));
+
 			// Loop hosts
 			foreach($iStates as $host => $hostvalues) {
 				// Loop types
@@ -182,11 +191,17 @@
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) {
 					$found = 1;
-					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-net")."</h4><table><tr><th>".$this->loc->s("Link")."</th><th>".$this->loc->s("inc-bw")."</th><th>".$this->loc->s("out-bw")."</th></tr>";
+					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".
+						$this->loc->s("err-net")."</h4><table><tr><th>".$this->loc->s("Link")."</th><th>".
+						$this->loc->s("inc-bw")."</th><th>".$this->loc->s("out-bw")."</th></tr>";
 				}
 				$total++;
+
 				$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$data["device"]."'");
-				$pid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_id_cache","pid","device = '".$data["device"]."' AND portname = '".$data["port"]."'");
+
+				$pid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_id_cache","pid","device = '".
+					$data["device"]."' AND portname = '".$data["port"]."'");
+
 				$tmpoutput .= "<tr style=\"font-size: 12px;\"><td>".$data["description"]."</td>";
 				$incharge = 0;
 				$outcharge = 0;
@@ -258,7 +273,8 @@
 				}
 				if($outcolor == "red" || $outcolor == "orange") {
 					$pbfound = 1;
-					$tmpoutput .= "<td style=\"background-color: ".$incolor.";\">".$inputbw."</td><td style=\"background-color: ".$outcolor.";\">".$outputbw."</td></tr>";
+					$tmpoutput .= "<td style=\"background-color: ".$incolor.";\">".$inputbw.
+						"</td><td style=\"background-color: ".$outcolor.";\">".$outputbw."</td></tr>";
 				}
 			}
 			if($pbfound) $output .= $tmpoutput;
@@ -310,10 +326,21 @@
                         while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$atkfound) $atkfound = 1;
                                 if(preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
-					if(!isset($attacklist[$data["ip_src"]])) $attacklist[$data["ip_src"]] = array();
-					if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
-					if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
-					else $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+					if(!isset($attacklist[$data["ip_src"]])) {
+						$attacklist[$data["ip_src"]] = array();
+					}
+
+					if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
+					}
+
+					if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
+					}
+					else {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+					}
+
 					if(!isset($sigarray[$data["ip_src"]])) {
                                                 $sigarray[$data["ip_src"]]=array();
                                                 $sigarray[$data["ip_src"]]["scan"]=0;
@@ -323,11 +350,23 @@
                                                 $sigarray[$data["ip_src"]]["atk"]++;
 					$atknb++;
 				}
-                                else if(preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) || preg_match("#Open Port#",$data["sig_name"]) || preg_match("#MISC MS Terminal server#",$data["sig_name"])) {
-					if(!isset($attacklist[$data["ip_src"]])) $attacklist[$data["ip_src"]] = array();
-                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
-                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
-                                        else $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+                                else if(preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) || 
+					preg_match("#Open Port#",$data["sig_name"]) || preg_match("#MISC MS Terminal server#",$data["sig_name"])) {
+					if(!isset($attacklist[$data["ip_src"]])) {
+						$attacklist[$data["ip_src"]] = array();
+					}
+
+                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
+					}
+
+                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
+					}
+                                        else {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+					}
+
                                         if(!isset($sigarray[$data["ip_src"]])) {
                                                 $sigarray[$data["ip_src"]]=array();
 						$sigarray[$data["ip_src"]]["scan"]=0;
@@ -338,10 +377,21 @@
 					$atknb++;
                                 }
                                 else if(!preg_match("#ICMP PING NMAP#",$data["sig_name"])) {
-					if(!isset($attacklist[$data["ip_src"]])) $attacklist[$data["ip_src"]] = array();
-                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
-                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
-                                        else $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+					if(!isset($attacklist[$data["ip_src"]])) {
+						$attacklist[$data["ip_src"]] = array();
+					}
+
+                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
+					}
+
+                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
+					}
+                                        else {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+					}
+
 					if(!isset($sigarray[$data["ip_src"]])) {
                                                 $sigarray[$data["ip_src"]]=array();
                                                 $sigarray[$data["ip_src"]]["scan"]=0;
@@ -352,10 +402,21 @@
 					$atknb++;
 				}
 				else {
-					if(!isset($attacklist[$data["ip_src"]])) $attacklist[$data["ip_src"]] = array();
-                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
-                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
-                                        else $attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+					if(!isset($attacklist[$data["ip_src"]])) {
+						$attacklist[$data["ip_src"]] = array();
+					}
+
+                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
+					}
+
+                                        if(!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
+					}
+                                        else {
+						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+					}
+
 					$scannb++;
 					if(!isset($sigarray[$data["ip_src"]])) {
                                                 $sigarray[$data["ip_src"]]=array();
@@ -372,16 +433,20 @@
 				if($value["scan"] > 30 || $value["atk"] > 25) {
 					if($menace == 0) {
 						$menace = 1;
-						$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".$this->loc->s("err-detect-atk")."</h4>";
+						$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".
+							$this->loc->s("err-detect-atk")."</h4>";
 					}
-					$output .= "<span style=\"font-size:15px;\">".$this->loc->s("ipaddr").": ".long2ip($key)." (Scans ".$value["scan"]." ".$this->loc->s("Attack")." ".$value["atk"].")</span><br />";
+					$output .= "<span style=\"font-size:15px;\">".$this->loc->s("ipaddr").": ".long2ip($key).
+						" (Scans ".$value["scan"]." ".$this->loc->s("Attack")." ".$value["atk"].")</span><br />";
 				}
 			}
 			ksort($attacklist);
 			foreach($attacklist as $src => $valsrc) {
 				foreach($valsrc as $dst => $valdst) {
-					foreach($valdst as $atktype => $value)
-						$tmpoutput .= "<tr><td>".long2ip($src)."</td><td>".long2ip($dst)."</td><td>".substr($atktype,0,35).(strlen($atktype) > 35 ? " ..." : "")." (".$value.")</td></tr>";
+					foreach($valdst as $atktype => $value) {
+						$tmpoutput .= "<tr><td>".long2ip($src)."</td><td>".long2ip($dst)."</td><td>".
+							substr($atktype,0,35).(strlen($atktype) > 35 ? " ..." : "")." (".$value.")</td></tr>";
+					}
 				}
 			}
 

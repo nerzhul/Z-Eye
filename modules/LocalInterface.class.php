@@ -54,7 +54,8 @@
 		}
 
 		private function copyrightContainer() {
-			return "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS - Copyright 2010-".date('Y').", All rights Reserved</center></div>";
+			return "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS - Copyright 2010-".date('Y')
+				.", All rights Reserved</center></div>";
 		}
 
 		protected function showConnForm() {
@@ -98,19 +99,24 @@
 		}
 
 		private function showUserForm() {
-			return "<div id=\"menuStack\"><div class=\"userMenu\">".FS::$sessMgr->getUserRealName()." (".FS::$sessMgr->getUserName().")</div><div class=\"userpopup\">".
-			"<div class=\"menuItem\" onclick=\"confirmPopup('".addslashes($this->getLocale("confirm-disconnect"))."','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',
-				'index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1',{});\">".$this->getLocale("Disconnection")."</div>".
-
-			"</div></div>";
+			return "<div id=\"menuStack\">".
+				"<div class=\"userMenu\">".FS::$sessMgr->getUserRealName().
+				" (".FS::$sessMgr->getUserName().")".
+				"</div><div class=\"userpopup\">".
+				"<div class=\"menuItem\" onclick=\"confirmPopup('".addslashes($this->getLocale("confirm-disconnect")).
+				"','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',
+				'index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1',{});\">".
+				$this->getLocale("Disconnection").
+				"</div></div></div>";
 		}
 
 		protected function showSearchForm() {
 			return "<div id=\"menuStack\"><div id=\"search\">".
 				$this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1)).
                         	$this->hidden("mod",$this->getModuleIdByPath("search")).
-				$this->autoComplete("s",array("size" => 30,"length" => 60))." <button class=\"searchButton\" type=\"submit\"><img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>".
-				"</div></div>";
+				$this->autoComplete("s",array("size" => 30,"length" => 60))." <button class=\"searchButton\" type=\"submit\">".
+					"<img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>".
+					"</div></div>";
 		}
 
 		public function showModule() {
