@@ -168,6 +168,9 @@
 						// Select values
 						else if($this->attrList[$i][2] == "s")
 							$output .= FS::$iMgr->getLocale($this->attrList[$i][3][$values[$j][$i]]);
+						// Select values (raw mode)
+						else if($this->attrList[$i][2] == "sr")
+							$output .= $this->attrList[$i][3][$values[$j][$i]];
 						// Raw values
 						else
 							$output .= $values[$j][$i];
@@ -202,6 +205,8 @@
 				// Select values
 				else if($this->attrList[$i][2] == "s")
 					$output .= FS::$iMgr->getLocale($this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]]);
+				else if($this->attrList[$i][2] == "sr")
+					$output .= $this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]];
 				// Raw values
 				else
 					$output .= $sqlDatas[$this->attrList[$i][1]];

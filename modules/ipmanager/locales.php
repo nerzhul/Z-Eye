@@ -301,7 +301,7 @@
 					"err-dhcpserver-not-exists" => "No DHCP server with this name found",
 					"err-dhcpserver-reservconf" => "Reservations config file doesn't use an acceptable form",
 					"err-dhcpserver-subnetconf" => "Subnets config file doesn't use an acceptable form",
-					"err-dhcp-option-not-exists" => "This DHCP option doesn't exists",
+					"err-dhcp-option-not-exists" => "This DHCP option doesn't exist",
 					"err-dhcp-opts-group-already-exists" => "No DHCP option group with this name exists",
 					"err-dhcp-opts-group-not-exists" => "This DHCP option group doesn't exist",
 					"err-distrib-subnet-need-infos" => "Subnet distribution need the following informations: gateway, dns1 and domainname",
