@@ -52,7 +52,7 @@
 				"tabledivid" => "snmptable",
 				"tableid" => "snmpList",
 				"firstlineid" => "snmpthead",
-				"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
+				"sqltable" => "snmp_communities",
 				"sqlattrid" => "name",
 				"attrlist" => array(array("snmp-community","name",""), array("Read","ro","b"), array("Write","rw","b")),
 				"sorted" => true,
@@ -163,7 +163,7 @@
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "snmptable",
-						"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
+						"sqltable" => "snmp_communities",
 						"sqlattrid" => "name",
 						"firstlineid" => "snmpthead",
 						"sqlcond" => "name='".$name."'",
@@ -204,7 +204,7 @@
 					
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "snmptable",
-						"sqltable" => PGDbConfig::getDbPrefix()."snmp_communities",
+						"sqltable" => "snmp_communities",
 						"sqlattrid" => "name",
 						"trpfx" => "sc"
 					));

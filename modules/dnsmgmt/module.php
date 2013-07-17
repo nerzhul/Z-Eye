@@ -56,8 +56,28 @@
 		}
 
 		private function showDNSSecMgmt() {
-			$output = "";
+			$output = FS::$iMgr->opendiv(3,$this->loc->s("define-tsig-key"),array("line" => true));
+			$tMgr = new HTMLTableMgr(array(
+				"tabledivid" => "tsiglist",
+				"tableid" => "tsigtable",
+				"firstlineid" => "tsigftr",
+				"sqltable" => "dns_tsig",
+				"sqlattrid" => "keyalias",
+				"attrlist" => array(array("key-alias","keyalias",""), array("key-id","keyid",""),
+					array("algorithm","keyalgo",""),array("Value","keyvalue","")),
+				"sorted" => true,
+				"odivnb" => 4,
+				"odivlink" => "alias=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=6&alias",
+				"rmconfirm" => "confirm-remove-tsig",
+				"trpfx" => "tsigk",
+			));
+			$output .= $tMgr->render();
 			return $output;
+		}
+
+		private function showTSIGForm($keyalias = "") {
 		}
 
 		private function showZoneMgmt($addr) {
@@ -374,6 +394,12 @@
 			switch($el) {
 				case 1: return $this->CreateOrEditServer(true);
 				case 2: return $this->showServerList();
+				case 3: return $this->showTSIGForm();
+				case 4:
+					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
+					if(!$alias)
+						return $this->loc->s("err-bad-datas");
+					return $this->showTSIGForm($alias);
 				default: return;
 			}
 		}
@@ -578,6 +604,12 @@
 					FS::$iMgr->redir("mod=".$this->mid);
 					return;
 				}
+				// Add/Edit TSIG key
+				case 5:
+					return;
+				// Remove TSIG key
+				case 6:
+					return;
 			}
 		}
 	};

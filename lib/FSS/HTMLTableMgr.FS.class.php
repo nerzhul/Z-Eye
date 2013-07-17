@@ -42,10 +42,18 @@
 				$this->tableId = $options["tableid"];	
 			if(isset($options["firstlineid"]))
 				$this->firstLineId = $options["firstlineid"];	
+
 			if(isset($options["sqltable"]))
 				$this->sqlTable = $options["sqltable"];	
+
+			if(isset($options["prefixsqltable"]))
+				$this->prefixSQLTable = $options["prefixsqltable"];	
+			else
+				$this->prefixSQLTable = true;
+
 			if(isset($options["sqlattrid"]))
 				$this->sqlAttrId = $options["sqlattrid"];	
+
 			if(isset($options["sqlcond"]))
 				$this->sqlCondition= $options["sqlcond"];	
 			else
@@ -103,7 +111,8 @@
 			if($this->groupMultipleId) {
 				// For this type of show we need to bufferize
 				$rowBuf = array();
-				$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+					$this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found)
 						$found = true;
@@ -121,7 +130,8 @@
 				$tmpoutput .= $this->showLineM($rowBuf,$attrCount);
 			}
 			else {
-				$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+					$this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if(!$found)
 						$found = true;
@@ -211,7 +221,8 @@
 		public function addLine($idx,$edit) {
 			$output = ""; $jscontent = "";
 
-			$count = FS::$dbMgr->Count($this->sqlTable,$this->sqlAttrId);
+			$count = FS::$dbMgr->Count(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+				$this->sqlTable,$this->sqlAttrId);
 			if($count == 1) {
 				$jscontent = $this->showHeader()."</table>";
 				$output .= "$('#".$this->tableDivId."').html('".addslashes($jscontent)."'); 
@@ -229,7 +240,8 @@
 				$sqlAttrList .= $this->attrList[$i][1];
 			}
 
-			$query = FS::$dbMgr->Select($this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+			$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+				$this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
 			if($this->groupMultipleId) {
 				$rowBuf = array();
 				while($data = FS::$dbMgr->Fetch($query)) {
@@ -280,7 +292,8 @@
 		
 		public function removeLine($id) {
 			$output = "";
-			$count = FS::$dbMgr->Count($this->sqlTable,$this->sqlAttrId);
+			$count = FS::$dbMgr->Count(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+				$this->sqlTable,$this->sqlAttrId);
 			if($count == 0)
 				$output .= "hideAndEmpty('#".$this->tableDivId."');";
 			else
@@ -308,6 +321,7 @@
 		
 		// SQL related
 		private $sqlTable;
+		private $prefixSQLTable;
 		private $sqlAttrId;
 		private $sqlCond;
 	};

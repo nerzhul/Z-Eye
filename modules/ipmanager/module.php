@@ -435,7 +435,7 @@
 				"tabledivid" => "dgoptslist",
 				"tableid" => "dgopttable",
 				"firstlineid" => "dgoptftr",
-				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option_group",
+				"sqltable" => "dhcp_option_group",
 				"sqlattrid" => "optgroup",
 				"attrlist" => array(array("Groupname","optgroup",""), array("options","optalias","")),
 				"sorted" => true,
@@ -456,7 +456,7 @@
 				"tabledivid" => "doptslist",
 				"tableid" => "dopttable",
 				"firstlineid" => "doptftr",
-				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
+				"sqltable" => "dhcp_option",
 				"sqlattrid" => "optalias",
 				"attrlist" => array(array("option-alias","optalias",""), array("option-name","optname",""),
 					array("option-value","optval","")),
@@ -477,7 +477,7 @@
 				"tabledivid" => "customoptslist",
 				"tableid" => "dhcpopttable",
 				"firstlineid" => "dhcpoptftr",
-				"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
+				"sqltable" => "dhcp_custom_option",
 				"sqlattrid" => "optname",
 				"sqlcond" => "protectrm = 'f'",
 				"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
@@ -1657,7 +1657,7 @@
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "declsubnets",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
+						"sqltable" => "dhcp_subnet_v4_declared",
 						"sqlattrid" => "netid",
 						"trpfx" => "ds"));
 					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($netid));
@@ -1794,7 +1794,7 @@
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "clustertable",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_cluster",
+						"sqltable" => "dhcp_cluster",
 						"sqlattrid" => "clustername",
 						"trpfx" => "cl"
 					));
@@ -1959,7 +1959,7 @@
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "customoptslist",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
+						"sqltable" => "dhcp_custom_option",
 						"sqlattrid" => "optname",
 						"sqlcond" => "optname = '".$optname."'",
 						"tableid" => "dhcpopttable",
@@ -2025,7 +2025,7 @@
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "customoptslist",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_custom_option",
+						"sqltable" => "dhcp_custom_option",
 						"sqlattrid" => "optname",
 						"trpfx" => "dco"
 					));
@@ -2128,7 +2128,7 @@
 						"tabledivid" => "doptslist",
 						"tableid" => "dopttable",
 						"firstlineid" => "doptftr",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
+						"sqltable" => "dhcp_option",
 						"sqlattrid" => "optalias",
 						"sqlcond" => "optalias = '".$optalias."'",
 						"attrlist" => array(array("option-alias","optalias",""), array("option-name","optname",""),
@@ -2187,7 +2187,7 @@
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "doptslist",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option",
+						"sqltable" => "dhcp_option",
 						"sqlattrid" => "optalias",
 						"trpfx" => "do"
 					));
@@ -2246,7 +2246,7 @@
 						"tabledivid" => "dgoptslist",
 						"tableid" => "dgopttable",
 						"firstlineid" => "dgoptftr",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option_group",
+						"sqltable" => "dhcp_option_group",
 						"sqlattrid" => "optgroup",
 						"sqlcond" => "optgroup = '".$optgroup."'",
 						"attrlist" => array(array("Groupname","optgroup",""), array("options","optalias","")),
@@ -2288,7 +2288,7 @@
 						"tabledivid" => "dgoptslist",
 						"tableid" => "dgopttable",
 						"firstlineid" => "dgoptftr",
-						"sqltable" => PGDbConfig::getDbPrefix()."dhcp_option_group",
+						"sqltable" => "dhcp_option_group",
 						"sqlattrid" => "optgroup",
 						"attrlist" => array(array("Groupname","optgroup",""), array("options","optalias","")),
 						"sorted" => true,
