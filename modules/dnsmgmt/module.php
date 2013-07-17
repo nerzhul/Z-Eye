@@ -80,6 +80,10 @@
 		private function showTSIGForm($keyalias = "") {
 			$keyid = ""; $keyval = ""; $keyalgo = "";
 			if($keyalias) {
+				if($data = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dns_tsig","keyid,keyalgo,keyvalue",
+					"keyalias = '".$keyalias."'")) {
+
+				}
 			}
 		}
 

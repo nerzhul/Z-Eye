@@ -83,7 +83,7 @@
 			// Force this limit
 			$options["limit"] = 1;
 
-			$query = $this->Select($table,$field,$cond,$options);
+			$query = $this->Select($table,$fields,$cond,$options);
 			if($data = $query->fetch()) {
 				return $data;
 			}

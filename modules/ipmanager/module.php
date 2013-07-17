@@ -533,10 +533,14 @@
 			}
 		
 			if($optalias) {
-				$optname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optname",
-					"optalias = '".$optalias."'");
-				$optvalue = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optval",
-					"optalias = '".$optalias."'");
+				if($data = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dhcp_option","optname,optval",
+					"optalias = '".$optalias."'")) {
+					$optname = $data["optname"];
+					$optvalue = $data["optval"];
+				}
+				else {
+					return FS::$iMgr->printError($this->loc->s("err-dhcp-option-not-exists"));
+				}
 			}
 
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=14")."<table>".
