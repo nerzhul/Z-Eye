@@ -391,18 +391,26 @@
 			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
-			$output = FS::$iMgr->h4("Monitoring",true);
-			$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","warnuse","subnet = '".$filter."'");
-			$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","crituse","subnet = '".$filter."'");
-			$maxage = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","maxage","subnet = '".$filter."'");
-			$enmon = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","enmon","subnet = '".$filter."'");
-			$eniphistory = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","eniphistory","subnet = '".$filter."'");
-			$contact = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_monitoring","contact","subnet = '".$filter."'");
 
-			$output .= "<div id=\"monsubnetres\"></div>".
+			$wlimit = 0; $climit = 0;
+			$maxage = 0; $enmod = false; $contact = ""; $eniphistory = false;
+
+			if($data = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dhcp_monitoring",
+				"warnuse,crituse,maxage,enmon,eniphistory,contact","subnet = '".$filter."'")) {
+				$wlimit = $data["warnuse"];
+				$climit = $data["crituse"];
+				$maxage = $data["maxage"];
+				$enmon = $data["enmon"];
+				$eniphistory = $data["eniphistory"];
+				$contact = $data["contact"];
+			}
+
+			$output = "<div id=\"monsubnetres\"></div>".
 				FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&f=".$filter."&act=3").
-				"<ul class=\"ulform\"><li>".FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',"label" => $this->loc->s("En-IP-history")))."</li>
-				<li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>".
+				"<ul class=\"ulform\"><li>".
+				FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',
+					"label" => $this->loc->s("En-IP-history"))).
+				"</li><li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>".
 				FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => "tooltip-%use"))."</li><li>".
 				FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => "tooltip-%use"))."</li><li>".
 				FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => "tooltip-max-age"))."</li><li>".
