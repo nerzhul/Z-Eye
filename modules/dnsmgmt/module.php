@@ -78,6 +78,9 @@
 		}
 
 		private function showTSIGForm($keyalias = "") {
+			$keyid = ""; $keyval = ""; $keyalgo = "";
+			if($keyalias) {
+			}
 		}
 
 		private function showZoneMgmt($addr) {

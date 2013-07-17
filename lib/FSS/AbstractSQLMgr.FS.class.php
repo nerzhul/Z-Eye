@@ -78,7 +78,23 @@
 			return parent::query($sql);
 		}
 
+		public function GetOneEntry($table,$fields,$cond = "",$options = array()) {
+	
+			// Force this limit
+			$options["limit"] = 1;
+
+			$query = $this->Select($table,$field,$cond,$options);
+			if($data = $query->fetch()) {
+				return $data;
+			}
+			return NULL;
+		}
+
 		public function GetOneData($table,$field,$cond = "",$options = array()) {
+
+			// Force this limit
+			$options["limit"] = 1;
+
 			$query = $this->Select($table,$field,$cond,$options);
 			if($data = $query->fetch()) {
 				$splstr = preg_split("#[\.]#",$field);
