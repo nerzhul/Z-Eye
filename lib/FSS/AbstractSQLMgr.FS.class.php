@@ -55,21 +55,21 @@
 
 		public function Select($table,$fields,$cond = "",$options = array()) {
 			$sql = "SELECT ".$fields." FROM ".$table."";
-			if(strlen($cond) > 0)
+			if (strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
-			if(isset($options["group"]) && strlen($options["group"]) > 0)
+			if (isset($options["group"]) && strlen($options["group"]) > 0)
 				$sql .= " GROUP BY ".$options["group"];
-			if(isset($options["order"]) && strlen($options["order"]) > 0) {
+			if (isset($options["order"]) && strlen($options["order"]) > 0) {
 				$sql .= " ORDER BY ".$options["order"];
-				if(isset($options["ordersens"])) {
-					if($options["ordersens"] == 1)
+				if (isset($options["ordersens"])) {
+					if ($options["ordersens"] == 1)
 						$sql .= " DESC";
-					else if($options["ordersens"] == 2)
+					else if ($options["ordersens"] == 2)
 						$sql .= " ASC";
 				}
 			}
-			if(isset($options["limit"]) && $options["limit"] > 0) {
-				if(isset($options["startidx"]) && $options["startidx"] > 0)
+			if (isset($options["limit"]) && $options["limit"] > 0) {
+				if (isset($options["startidx"]) && $options["startidx"] > 0)
 					$sql .= " LIMIT ".$options["startidx"].",".($options["startidx"]+$options["limit"]);
 				else
 					$sql .= " LIMIT ".$options["limit"];
@@ -84,7 +84,7 @@
 			$options["limit"] = 1;
 
 			$query = $this->Select($table,$fields,$cond,$options);
-			if($data = $query->fetch()) {
+			if ($data = $query->fetch()) {
 				return $data;
 			}
 			return NULL;
@@ -96,7 +96,7 @@
 			$options["limit"] = 1;
 
 			$query = $this->Select($table,$field,$cond,$options);
-			if($data = $query->fetch()) {
+			if ($data = $query->fetch()) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data[$splstr[count($splstr)-1]];
@@ -106,7 +106,7 @@
 
 		public function GetMax($table,$field,$cond = "") {
 			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
-			if($data = $query->fetch()) {
+			if ($data = $query->fetch()) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data["mx"];
@@ -116,7 +116,7 @@
 
 		public function GetMin($table,$field,$cond = "") {
 			$query = $this->Select($table,"MIN(".$field.") as mn",$cond);
-                        if($data = $query->fetch()) {
+                        if ($data = $query->fetch()) {
                                  $splstr = preg_split("#[\.]#",$field);
                                  $splstr = preg_replace("#`#","",$splstr);
                                  return $data["mn"];
@@ -126,7 +126,7 @@
 
 		public function Sum($table,$field,$cond = "") {
 			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
-			if($data = $query->fetch()) {
+			if ($data = $query->fetch()) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data["mx"];
@@ -136,7 +136,7 @@
 
 		public function Count($table,$field,$cond = "") {
 			$query = $this->Select($table,"COUNT(".$field.") as ct",$cond);
-			if($data = $query->fetch()) {
+			if ($data = $query->fetch()) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data["ct"];
@@ -150,7 +150,7 @@
 		}
 
 		public function Fetch(&$query) {
-			if(!$query) {
+			if (!$query) {
 				echo FS::$iMgr->printError("Query failed: ".$this->sqlQuery);
 				return NULL;
 			}
@@ -159,7 +159,7 @@
 
 		public function Delete($table,$cond = "") {
 			$sql = "DELETE FROM ".$table."";
-			if(strlen($cond) > 0)
+			if (strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			$this->sqlQuery = $sql;
 			return parent::query($sql);
@@ -167,22 +167,22 @@
 
 		public function Update($table,$mods,$cond = "") {
 			$sql = "UPDATE ".$table." SET ".$mods."";
-			if(strlen($cond) > 0)
+			if (strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			$this->sqlQuery = $sql;
 			return parent::query($sql);
 		}
 
 		public function setConfig($dbtype,$dbn,$dbport,$dbh,$dbu,$dbp) {
-			if($dbn == $this->dbName && $dbport == $this->dbPort && $dbh == $this->dbHost && $dbu == $this->dbUser
+			if ($dbn == $this->dbName && $dbport == $this->dbPort && $dbh == $this->dbHost && $dbu == $this->dbUser
 				&& $this->dbLink && $this->dbType == $dbtype)
 				return 1;
-			if($dbtype != "pg" && $dbtype != "my")
+			if ($dbtype != "pg" && $dbtype != "my")
 				return 2;
-			if($dbtype == "pg") {
+			if ($dbtype == "pg") {
 				$this->dbDriver = "pgsql";
 			}
-			else if($dbtype == "my") {
+			else if ($dbtype == "my") {
 				$this->dbDriver = "mysql";
 			}
                         $this->dbName = $dbn;

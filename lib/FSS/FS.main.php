@@ -41,7 +41,7 @@
 	require_once(dirname(__FILE__)."/SessionMgr".CLASS_EXT);
 	require_once(dirname(__FILE__)."/Module".CLASS_EXT);
 
-	if(Config::enableSNMP())
+	if (Config::enableSNMP())
 		require_once(dirname(__FILE__)."/SNMP".CLASS_EXT);
 
 	class FS {
@@ -72,7 +72,7 @@
 			FS::$ajaxMgr = new AjaxManager();
 
 			// Load SNMP Mgr
-			if(Config::enableSNMP()) {
+			if (Config::enableSNMP()) {
 				FS::$snmpMgr = new SNMPMgr();
 			}
 
@@ -88,14 +88,14 @@
 		}
 
 		public static function isAjaxCall() {
-			if(FS::$secMgr->checkAndSecuriseGetData("at"))
+			if (FS::$secMgr->checkAndSecuriseGetData("at"))
 				return true;
 
 			return false;
 		}
 
 		public static function isActionToDo() {
-			if(isset($_GET["act"]) && strlen($_GET["act"]) > 0 && FS::$secMgr->isNumeric($_GET["act"])) {
+			if (isset($_GET["act"]) && strlen($_GET["act"]) > 0 && FS::$secMgr->isNumeric($_GET["act"])) {
 				FS::$secMgr->SecuriseString($_GET["act"]);
 				return true;
 			}

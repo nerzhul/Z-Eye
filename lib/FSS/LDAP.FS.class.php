@@ -37,16 +37,16 @@
 		public function Connect($user="",$pass="") {
 			$URI = ($this->ssl ? "ldaps://" : "ldap://").$this->server;
 			$conn = @ldap_connect($URI,$this->port);
-			if($conn){
+			if ($conn){
 				@ldap_set_option($conn, LDAP_OPT_PROTOCOL_VERSION, 3);
 				@ldap_set_option($conn, LDAP_OPT_REFERRALS, 0);
-				if($user == "")
+				if ($user == "")
 					$bindServerLDAP = @ldap_bind($conn);
-				else if($pass == "")
+				else if ($pass == "")
 					$bindServerLDAP = @ldap_bind($conn,$user);
 				else
 					$bindServerLDAP = @ldap_bind($conn,$user,$pass);
-				if(!$bindServerLDAP)
+				if (!$bindServerLDAP)
 					return false;
 				$this->connection = $conn;
 				return true;
@@ -54,45 +54,45 @@
 			return false;
 		}
 		public function RootConnect() {
-			if(!$this->Connect($this->rootDN,$this->rootpwd))
+			if (!$this->Connect($this->rootDN,$this->rootpwd))
 				return false;
 			return true;
 		}
 
 		public function Authenticate($user,$pwd) {
-			if(!$this->RootConnect())
+			if (!$this->RootConnect())
 				return false;
 			$result = $this->getOneEntry($this->uidAttr."=".$user);
 			$this->Disconnect();
-			if(!$result)
+			if (!$result)
 				return false;
 			$result = $this->Connect($result["dn"],$pwd);
-			if(!$result)
+			if (!$result)
 				return false;
 			return true;
 		}
 
 		public function Disconnect() {
-			if($this->isConnected)
+			if ($this->isConnected)
 				ldap_close($conn);
 		}
 
 		public function getOneEntry($query) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: getOneEntry fail");
 			$res = $this->getEntries($query);
-			if(count($res))
+			if (count($res))
 				return $res[0];
 			return NULL;
 		}
 
 		public function getEntries($query) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: getEntries fail");
 			else {
 				$filter = ($this->filter != "" ? "(&".$this->filter."(".$query."))" : $query);
 				$result = @ldap_search($this->connection, $this->baseDN, $filter);
-				if(!$result)
+				if (!$result)
 					return null;
 				$cleaned = $this->cleanEntries(ldap_get_entries($this->connection, $result));
 				return $cleaned;
@@ -107,16 +107,19 @@
 			foreach ($entries as $key => $attributes) {
 				unset ($entries [$key]['count']);
 
-				for ($i = 0; array_key_exists ($i, $entries [$key]); $i++)
+				for ($i=0;array_key_exists($i, $entries[$key]);$i++) {
 					unset ($entries [$key][$i]);
+				}
 
 				// for each attribute on the entry
 				foreach ($entries[$key] as $attName => $attValue) {
 					if (is_array ($entries[$key][$attName])) {
-					       if ($entries[$key][$attName]['count'] > 1)
+					       if ($entries[$key][$attName]['count'] > 1) {
 						      unset ($entries [$key][$attName]['count']);
-					       else
-						      $entries [$key][$attName] = $entries [$key][$attName][0];
+						}
+						else {
+							$entries [$key][$attName] = $entries [$key][$attName][0];
+						}
 					}
 				}
 			}
@@ -125,7 +128,7 @@
 		}
 
 		public function getCount($query) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: getCount fail");
 			else {
 				$result = ldap_search($this->connection, $this->baseDN, $query);
@@ -134,17 +137,17 @@
 		}
 
 		public function addEntry($dn,$attributes) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: addEntry fail");
-			if(!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
+			if (!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
 				return false;
 			return ldap_add($this->connection,$dn,$attributes);
 		}
 
 		public function modifyEntry($dn,$attributes) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: addEntry fail");
-			if(!is_array($attributes)/* || !FS::$secMgr->isLDAPDN($dn)*/)
+			if (!is_array($attributes)/* || !FS::$secMgr->isLDAPDN($dn)*/)
 				return false;
 
 			$entryName = preg_split("#[,]#",$dn);
@@ -158,17 +161,17 @@
 			$infosRemove = array();
 
 			// Compare our entries with stored entries and generate a diff/add table
-			foreach($attributes as $key => $values) {
-				if($key == "dn")
+			foreach ($attributes as $key => $values) {
+				if ($key == "dn")
 					continue;
-				if(!is_array($values)) {
+				if (!is_array($values)) {
 					// If there is old datas
-					if(isset($res[$key])) {
+					if (isset($res[$key])) {
 						// If old is array we replace
-						if(is_array($res[$key]))
+						if (is_array($res[$key]))
 							$infosRepl[$key] = $values;
 						// else we replace if different
-						else if($values != $res[$key])
+						else if ($values != $res[$key])
 							$infosRepl[$key] = $values;
 					}
 					// If not, we replace
@@ -177,9 +180,9 @@
 				}
 				else {
 					// If old datas and array, we compare array
-					if(isset($res[$key]) && is_array($res[$key])) {
+					if (isset($res[$key]) && is_array($res[$key])) {
 						// if differences, we must replace attributes
-						if(count(array_diff($values,$res[$key])) > 0)
+						if (count(array_diff($values,$res[$key])) > 0)
 							$infosRepl[$key] = $values;
 					}
 					// If not, we replace
@@ -188,47 +191,47 @@
 				}
 			}
 			// Compare stored entries with our entries and generate a diff/remove table
-			foreach($res as $key => $values) {
+			foreach ($res as $key => $values) {
 				// Refuse to add DN and entry type to removal informations
-				if(!isset($attributes[$key]) && $key != "dn" && $key != $entryType)
+				if (!isset($attributes[$key]) && $key != "dn" && $key != $entryType)
 					$infosRemove[$key] = array();
 			}
 			// Remove useless attributes is there is something to remove
-			if(count($infosRemove) > 0) {
-				if(!$this->modDelete($dn,$infosRemove))
+			if (count($infosRemove) > 0) {
+				if (!$this->modDelete($dn,$infosRemove))
 					return false;
 			}
 			return $this->modReplace($dn,$infosRepl);
 		}
 
 		public function removeEntry($dn) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: removeEntry fail");
-			/*if(!FS::$secMgr->isLDAPDN($dn))
+			/*if (!FS::$secMgr->isLDAPDN($dn))
 				return false;*/
 			return ldap_delete($this->connection,$dn);
 		}
 
 		public function modAdd($dn,$attributes) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: modAdd fail");
-			if(!is_array($attributes)/* || !FS::$secMgr->isLDAPDN($dn)*/)
+			if (!is_array($attributes)/* || !FS::$secMgr->isLDAPDN($dn)*/)
 				return false;
 			return ldap_mod_add($this->connection,$dn,$attributes);
 		}
 
 		public function modReplace($dn,$attributes) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: modReplace fail");
-			if(!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
+			if (!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
 				return false;
 			return ldap_mod_replace($this->connection,$dn,$attributes);
 		}
 
 		public function modDelete($dn,$attributes) {
-			if(!$this->connection)
+			if (!$this->connection)
 				die("LDAP Not Connected: modDelete fail");
-			if(!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
+			if (!is_array($attributes) /*|| !FS::$secMgr->isLDAPDN($dn)*/)
 				return false;
 			return ldap_mod_del($this->connection,$dn,$attributes);
 		}

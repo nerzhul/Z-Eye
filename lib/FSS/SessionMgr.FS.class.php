@@ -54,7 +54,7 @@
 
 		public function shread($id) {
 			FS::$secMgr->SecuriseString($id);
-			if($data = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."sessions","data","id = '".$id."'"))
+			if ($data = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."sessions","data","id = '".$id."'"))
 				return $data;
 			else
 				return false;
@@ -89,15 +89,15 @@
 		
 		public function InitSessionIfNot() {
 
-			if(!isset($_SESSION["uid"]))
+			if (!isset($_SESSION["uid"]))
 				$_SESSION["uid"] = 0;
 
-			if(!isset($_SESSION["ulevel"]))
+			if (!isset($_SESSION["ulevel"]))
 				$_SESSION["ulevel"] = 0;
 		}
 
 		public function isConnected() {
-			if(isset($_SESSION["uid"]) && $_SESSION["uid"] > 0)
+			if (isset($_SESSION["uid"]) && $_SESSION["uid"] > 0)
 				return true;
 		}
 
@@ -105,7 +105,7 @@
 			$IP = "0.0.0.0";
 			if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
 				$IP = $_SERVER['HTTP_X_FORWARDED_FOR'] ;
-			else if(isset($_SERVER['HTTP_CLIENT_IP']))
+			else if (isset($_SERVER['HTTP_CLIENT_IP']))
 				$IP = $_SERVER['HTTP_CLIENT_IP'] ;
 			else
 				$IP = $_SERVER['REMOTE_ADDR'] ;
@@ -130,13 +130,13 @@
 		public function getUid() { return $_SESSION["uid"]; }
 
 		public function getUserName() {
-			if($this->getUid())
+			if ($this->getUid())
 				return FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$this->getUid()."'");
 			return NULL;
 		}
 
 		public function getUserRealName() {
-			if($this->getUid()) {
+			if ($this->getUid()) {
 				$name = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","name","uid = '".$this->getUid()."'");
 				$surname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","subname","uid = '".$this->getUid()."'");
 				return $surname." ".$name;
@@ -145,7 +145,7 @@
 		}
 
 		public function getGroups() {
-			if(is_array($this->groupBuf) && count($this->groupBuf) > 0)
+			if (is_array($this->groupBuf) && count($this->groupBuf) > 0)
 				return $this->groupBuf;
 
 			$this->groupBuf = array();
@@ -169,30 +169,30 @@
 
 		public function isInGroup($gname) {
 			$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
-			if(in_array($gid,$this->getGroups()))
+			if (in_array($gid,$this->getGroups()))
 				return true;
 			return false;
 		}
 
 		public function isInGIDGroup($gid) {
-			if(in_array($gid,$this->getGroups()))
+			if (in_array($gid,$this->getGroups()))
 				return true;
 			return false;
 		}
 
 		public function hasRight($rulename) {
-			if($this->getUid() == 1 || $this->isInGIDGroup(1))
+			if ($this->getUid() == 1 || $this->isInGIDGroup(1))
 				return true;
 
 			$groups = $this->getGroups();
 			$count = count($groups);
-			for($i=0;$i<$count;$i++) {
-				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = '".
+			for ($i=0;$i<$count;$i++) {
+				if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = '".
 					$rulename."' AND gid = '".$groups[$i]."'") == "on") {
 					return true;
 				}
 			}
-			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = '".
+			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = '".
 				$rulename."' AND uid = '".$this->getUid()."'") == "on") {
 				return true;
 			}

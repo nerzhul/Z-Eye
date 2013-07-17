@@ -393,7 +393,7 @@
 			}
 
 			$wlimit = 0; $climit = 0;
-			$maxage = 0; $enmod = false; $contact = ""; $eniphistory = false;
+			$maxage = 0; $enmon = false; $contact = ""; $eniphistory = false;
 
 			if($data = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dhcp_monitoring",
 				"warnuse,crituse,maxage,enmon,eniphistory,contact","subnet = '".$filter."'")) {
@@ -1306,7 +1306,8 @@
 					$contact = FS::$secMgr->checkAndSecurisePostData("contact");
 					$enmon = FS::$secMgr->checkAndSecurisePostData("enmon");
 					$eniphistory = FS::$secMgr->checkAndSecurisePostData("eniphistory");
-					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || $warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
+					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || 
+						$warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
 						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
 						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to monitor subnet");
 						FS::$iMgr->ajaxEcho("err-miss-data");

@@ -43,10 +43,12 @@
 			$this->arr_css = array();
 			$this->arr_js = array();
 			$this->title = "";
+
 			// Create 2 JS buffers
 			$this->js_buffer = array();
-			for($i=0;$i<2;$i++)
+			for ($i=0;$i<2;$i++) {
 				$this->js_buffer[] = "";
+			}
 			$this->js_buffer_idx = 0;
 		}
 
@@ -59,16 +61,22 @@
 				<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />
 				<head>
 				<title>".Config::getWebsiteName().(strlen($this->title) > 0 ? " - ".$this->title : "")."</title>";
+
 				$count = count($this->arr_css);
-				for($i=0;$i<$count;$i++)
+				for ($i=0;$i<$count;$i++) {
 					$output .= "<link rel=\"stylesheet\" href=\"".$this->arr_css[$i]."\" type=\"text/css\" />";
-				if(Config::hasFavicon())
+				}
+
+				if (Config::hasFavicon()) {
 					$output .= "<link rel=\"shortcut icon\" href=\"/styles/images/favicon.png\" />";
+				}
+
 				$count = count($this->arr_js);
-				for($i=0;$i<$count;$i++)
+				for ($i=0;$i<$count;$i++) {
 					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
-				$output .= "</head>
-				<body>";
+				}
+
+				$output .= "</head><body>";
 			return $output;
 		}
 
@@ -89,19 +97,19 @@
 			$dir = opendir(dirname(__FILE__)."/../../modules/");
 			while($elem = readdir($dir)) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
-				if(is_dir($dirpath)) {
+				if (is_dir($dirpath)) {
 					$moduleid++;
 					$dir2 = opendir($dirpath);
 					while($elem2 = readdir($dir2)) {
-						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php") {
+						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php") {
 							$path = $elem;
 							require(dirname(__FILE__)."/../../modules/".$path."/main.php");
 							$menuname = $module->getMenu();
-							if($menuname && $module->getRulesClass()->canAccessToModule()) {
-								if(!isset($menus[$menuname])) {
+							if ($menuname && $module->getRulesClass()->canAccessToModule()) {
+								if (!isset($menus[$menuname])) {
 									$menus[$menuname] = array();
 								}
-								if($module->getRulesClass()->canAccessToModule()) {
+								if ($module->getRulesClass()->canAccessToModule()) {
 									$menus[$menuname][] = 
 										"<div class=\"menuItem\" onclick=\"window.location.href='index.php?mod=".$moduleid."'\">".
 										$module->getModuleClass()->getMenuTitle()."</div>";
@@ -112,10 +120,13 @@
 				}
 			}
 
-			foreach($menus as $menuname => $elemts) {
+			foreach ($menus as $menuname => $elemts) {
 				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$menuname."</div><div class=\"menupopup\">";
-				for($i=0;$i<count($elemts);$i++)
+
+				for ($i=0;$i<count($elemts);$i++) {
 					$output .= $elemts[$i];
+				}
+
 				$output .= "</div></div>";
 			}
 			return $output;
@@ -129,20 +140,20 @@
 			$moduleid = 0;
 			while(($elem = readdir($dir)) && $found == false) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
-				if(is_dir($dirpath)) $moduleid++;
-				if(is_dir($dirpath) && $moduleid == $id) {
+				if (is_dir($dirpath)) $moduleid++;
+				if (is_dir($dirpath) && $moduleid == $id) {
 					$dir2 = opendir($dirpath);
 					while(($elem2 = readdir($dir2)) && $found == false) {
-						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php")
 							$found = true;
 							$path = $elem;
 					}
 				}
 			}
-			if($found == true) {
+			if ($found == true) {
 				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
 
-				if($module->getRulesClass()->canAccessToModule()) {
+				if ($module->getRulesClass()->canAccessToModule()) {
 					$this->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($id);
 					switch($act) {
@@ -189,7 +200,7 @@
 		public function hr() { return "<div id=\"hr\"></div>"; }
 
 		public function js($js) {
-			if(!isset($this->js_buffer[$this->js_buffer_idx])) $this->js_buffer[$this->js_buffer_idx] = "";
+			if (!isset($this->js_buffer[$this->js_buffer_idx])) $this->js_buffer[$this->js_buffer_idx] = "";
 			$this->js_buffer[$this->js_buffer_idx] .= $js;
 		}
 
@@ -198,7 +209,7 @@
 		}
 
 		public function renderJS() {
-			if(strlen($this->js_buffer[$this->js_buffer_idx]) > 0)
+			if (strlen($this->js_buffer[$this->js_buffer_idx]) > 0)
                         	return "<script type=\"text/javascript\">".$this->js_buffer[$this->js_buffer_idx]."</script>";
 			return "";
 		}
@@ -219,11 +230,11 @@
 
 		public function textarea($name, $def_value = "", $options=array()) {
 			$output = "";
-			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
+			if (isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".(isset($options["width"]) ? $options["width"] : 400).
 				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\" ";
-			if(isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
-			if(isset($options["length"])) $output .= " maxlength=\"".$options["length"]."\"";
+			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
+			if (isset($options["length"])) $output .= " maxlength=\"".$options["length"]."\"";
 			$output .= ">".$def_value."</textarea>";
 			return $output;
 		}
@@ -237,9 +248,9 @@
 
 		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
-			if($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
+			if ($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" ";
-			if($tooltip)
+			if ($tooltip)
 				$output .= $this->tooltip($tooltip);
 			$output .= "/>";
 			return $output;
@@ -247,25 +258,25 @@
 
 		public function numInput($name, $def_value = "", $options = array()) {
 			$output = "";
-		        if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
+		        if (isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ";
-			if(isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
+			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
 			$output .= " />";
 			return $output;
 		}
 
 		public function IPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
-                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP(this);\" ";
-			if($tooltip) $output .= $this->tooltip($tooltip);
+			if ($tooltip) $output .= $this->tooltip($tooltip);
 			$output .= " />";
 			return $output;
 		}
 
 		public function MacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
-                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMAC(this);\" />";
 			return $output;
 		}
@@ -289,7 +300,7 @@
 		}
 
 		public function slider($slidername, $name, $min, $max, $options = array()) {
-			if(isset($options["hidden"]))
+			if (isset($options["hidden"]))
 				$output = FS::$iMgr->hidden($name,(isset($options["value"]) ? $options["value"] : 0));
 			else
 				$output = FS::$iMgr->input($name,(isset($options["value"]) ? $options["value"] : 0));
@@ -299,16 +310,16 @@
 					min: ".$min.",
 					max:".$max.",";
 
-			if(isset($options["value"])) $js .= "value: ".$options["value"].",";
+			if (isset($options["value"])) $js .= "value: ".$options["value"].",";
 
 			$js .= "slide: function(event,ui) { $('#".$name."').val(".(isset($options["valoverride"]) ? $options["valoverride"] : "ui.value").");";
-			if(isset($options["hidden"])) $js.= "$('#".$name."label').html(ui.value);";
+			if (isset($options["hidden"])) $js.= "$('#".$name."label').html(ui.value);";
 			$js.= "}
 				});
                         });";
 			$output .= $this->js($js).
 				"<div id=\"".$slidername."\" ".(isset($options["width"]) ? "style=\"width: ".$options["width"]."\" " : "")."></div>";
-			if(isset($options["hidden"])) $output .= "<br /><span id=\"".$name."label\">".
+			if (isset($options["hidden"])) $output .= "<br /><span id=\"".$name."label\">".
 				(isset($options["value"]) ? $options["value"] : 0)."</span> ".$options["hidden"]."<br />";
 			return $output;
 		}
@@ -319,18 +330,18 @@
 
 		public function password($name, $def_value = "", $label=NULL) {
 			$output = "";
-                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<input type=\"password\" name=\"".$name."\" value=\"".$def_value."\" />";
 			return $output;
 		}
 
 		public function calendar($name, $def_value, $label=NULL) {
 			$output = "";
-                        if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
                         $output .= "<input type=\"textbox\" value=\"".$def_value."\" name=\"".$name."\" id=\"".$name."\" size=\"20\" />";
 			$js = "$('#".$name."').datepicker($.datepicker.regional['fr']);
 				$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
-			if($def_value)
+			if ($def_value)
 				$js .= "$('#".$name."').datepicker('setDate','".$def_value."');";
 			$output .= $this->js($js);
 			return $output;
@@ -338,12 +349,12 @@
 
 		public function hourlist($hname,$mname,$hselect=0,$mselect=0) {
 			$output = $this->select($hname);
-			for($i=0;$i<24;$i++) {
+			for ($i=0;$i<24;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
 				$output .= $this->selElmt($txt,$i,$hselect == $i);
 			}
 			$output .= "</select> h ".$this->select($mname);
-			for($i=0;$i<60;$i++) {
+			for ($i=0;$i<60;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
                                 $output .= $this->selElmt($txt,$i,$mselect == $i);
                         }
@@ -354,7 +365,7 @@
 
 		public function submit($name, $value, $options = array()) {
 			$output = "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" ";
-			if(isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
+			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
 			$output .= " />";
 			return $output;
 		}
@@ -370,26 +381,29 @@
 		public function radio($name, $value, $checked = false, $label=NULL) {
 			$output = "";
 			$output .= "<input id=\"".$name."\" type=\"radio\" value=\"".$value."\" name=\"".$name."\"";
-			if($checked) $output .= " checked=\"checked\"";
+			if ($checked) $output .= " checked=\"checked\"";
 			$output .= "> ".($label ? $label : "");
 			return $output;
 		}
 		
 		public function radioList($name,$values, $labels, $checkid = NULL) {
-			if(!is_array($values)) return "";
+			if (!is_array($values)) return "";
 			$output = "";
+
 			$count = count($values);
-			for($i=0;$i<$count;$i++)
+			for ($i=0;$i<$count;$i++) {
 				$output .= $this->radio($name,$values[$i],$checkid == $values[$i] ? true : false, $labels[$i])."<br />";
+			}
+
 			return $output;
 		}
 
 		public function form($link,$options=array()) {
 			$output = "<form action=\"".$link."\" ";
-			if(isset($options["id"]) && strlen($options["id"]) > 0)
+			if (isset($options["id"]) && strlen($options["id"]) > 0)
 				$output .= "id=\"".$options["id"]."\" ";
 			$output .= "method=\"".((isset($options["get"]) && $options["get"]) ? "GET" : "POST")."\"";
-			if(isset($options["js"]))
+			if (isset($options["js"]))
 				$output .= " onsubmit=\"return ".$options["js"].";\" ";
 			$output .= ">";
 			return $output;
@@ -403,22 +417,22 @@
 
 		public function idxLine($label,$name,$def_value = "", $options = array()) {
 			$output = "<tr ";
-			if(isset($options["tooltip"])) {
+			if (isset($options["tooltip"])) {
 				$output .= $this->tooltip($options["tooltip"]);
 				unset($options["tooltip"]);
 			}
 			$output .= "><td>".$label."</td><td class=\"ctrel\">";
-			if(isset($options["type"])) {
+			if (isset($options["type"])) {
 				switch($options["type"]) {
 					case "idxedit": 
-						if($options["edit"])
+						if ($options["edit"])
 							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
 						else
 							$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
                                         			(isset($options["label"]) ? $options["label"] : NULL));
 						break;
 					case "idxipedit":
-						if($options["edit"])
+						if ($options["edit"])
 							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
 						else
 							$output .= $this->IPInput($name,$def_value);
@@ -441,7 +455,7 @@
 		}
 
 		public function idxIdLine($label,$name,$value = "",$options = array()) {
-			if($value)
+			if ($value)
 				return "<tr><td>".$this->cur_module->getLoc()->s($label)."</td><td>".$value."</td></tr>".FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
 			else
 				return $this->idxLine($this->cur_module->getLoc()->s($label),$name,"",$options);
@@ -452,19 +466,19 @@
 		}
 
 		public function ruleLines($idx,$rulelist,$rules = array()) {
-			$count = count($rules);
-			if($count == 0)
-				return "";
-
 			$output = "";
-			for($i=0;$i<$count;$i++)
+
+			$count = count($rules);
+			for ($i=0;$i<$count;$i++) {
 				$output .= $this->ruleLine($rules[$i][0],$rules[$i][1],$rulelist,$i == 0 ? $idx : "");
+			}
+
 			return $output;
 		}
 
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\" class=\"ctrel\">";
-			if(isset($options["js"]))
+			if (isset($options["js"]))
 				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label),$options["js"]);
 			else
 				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label));
@@ -474,7 +488,7 @@
 
 		// Helper for tabled Add/Submit forms
 		public function aeTableSubmit($add = true, $options = array()) {
-			if($add)
+			if ($add)
 				return $this->tableSubmit("Add",$options);
 			else
 				return $this->tableSubmit("Save",$options);
@@ -490,7 +504,7 @@
 
 		public function progress($name,$value,$max=100,$label=NULL) {
 			$output = "";
-			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$output .= "<progress id=\"".$name."\" value=\"".$value."\" max=\"".$max."\"></progress><span id=\"".$name."val\"></span>";
 			$output .= $this->js("eltBar = document.getElementById(\"".$name."\");
 				eltPct = document.getElementById(\"".$name."val\");
@@ -500,25 +514,25 @@
 
 		public function select($name,$js = "",$label=NULL, $multival=false, $options=array()) {
 			$output = "";
-			if($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+			if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
 			$selId = preg_replace("#\[|\]#","",$name);
 			$output .= "<select name=\"".$name.($multival ? "[]" : "")."\" id=\"".$selId."\"";
-			if(strlen($js) > 0)
+			if (strlen($js) > 0)
 				$output .= " onchange=\"javascript:".$js.";\" ";
-			if($multival)
+			if ($multival)
 				$output .= " multiple=\"multiple\" ";
-			if(isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]))
+			if (isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]))
 				$output .= " size=\"".$options["size"]."\" ";
-			if(isset($options["style"]))
+			if (isset($options["style"]))
 				$output .= " style=\"".$style."\" ";
-			if(isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
+			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
 			$output .= ">";
 			return $output;
 		}
 
 		public function selElmt($name,$value,$selected = false) {
 			$output = "<option value=\"".$value."\"";
-			if($selected)
+			if ($selected)
 				$output .= " selected=\"selected\"";
 			$output .= ">".$name."</option>";
 			return $output;
@@ -535,22 +549,22 @@
 
 		public function check($name,$options = array()) {
 			$output = "";
-			if(isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
+			if (isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
 			$output .= "<input type=\"checkbox\" name=\"".$name."\" id=\"".$name."\" ";
-			if(isset($options["check"]) && $options["check"])
+			if (isset($options["check"]) && $options["check"])
 				$output .= "checked ";
-			if(isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
+			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
 			$output .= " />";
 			return $output;
 		}
 
 		public function img($path,$sizeX = 0,$sizeY = 0, $id = "") {
 			$output = "<img src=\"".$path."\" ";
-			if($sizeX != 0)
+			if ($sizeX != 0)
 				$output .= "width=\"".$sizeX."\" ";
-			if($sizeY != 0)
+			if ($sizeY != 0)
 				$output .= "height=\"".$sizeY."\" ";
-			if(strlen($id) > 0)
+			if (strlen($id) > 0)
 				$output .= "id=\"".$id."\" ";
 			$output .= "style=\"border: none;\"/>";	
 			return $output;
@@ -578,9 +592,12 @@
 
 		public function tabPan($elmts = array(),$cursh) {
 			$output = "<div id=\"contenttabs\"><ul>";
+
 			$count = count($elmts);
-			for($i=0;$i<$count;$i++)
+			for ($i=0;$i<$count;$i++) {
 				$output .= $this->tabPanElmt($elmts[$i][0],$elmts[$i][1],$elmts[$i][2],$cursh);	
+			}
+
 			$output .= "</ul></div>";
 			FS::$iMgr->js("$('#contenttabs').tabs({cache: false,
 				ajaxOptions: { error: function(xhr,status,index,anchor) {
@@ -598,7 +615,7 @@
 			$output = "<a href=\"#\" onclick=\"formPopup('".$this->cur_module->getModuleId()."','".$callid."','".
 				(isset($options["lnkadd"]) ? $options["lnkadd"] : "")."'";
 			$output .= ");\">".$text1."</a>";
-			if(isset($options["line"]) && $options["line"])
+			if (isset($options["line"]) && $options["line"])
 				$output .= "<br />";
 
 			return $output;
@@ -611,7 +628,7 @@
 			$output = "<div id=\"".$accId."\">";
 
 			$count = count($elements);
-			foreach($elements as $key => $values) {
+			foreach ($elements as $key => $values) {
 				$output .= $this->h3($values[0],true,"acc".$key."h3")."<div id=\"acc".$key."div\">".$values[1]."</div>";
 			}
 
@@ -631,7 +648,7 @@
 		}
 
 		public function redir($link,$js=false) {
-			if($js && FS::isAjaxCall())
+			if ($js && FS::isAjaxCall())
 				$this->js("window.location.href=\"index.php?".$link."\";");
 			else
 				header("Location: index.php?".$link);
@@ -651,11 +668,11 @@
 			$found = false;
 			while(($elem = readdir($dir)) && $found == false) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
-				if(is_dir($dirpath)) $moduleid++;
-				if(is_dir($dirpath) && $elem == $path) {
+				if (is_dir($dirpath)) $moduleid++;
+				if (is_dir($dirpath) && $elem == $path) {
 					$dir2 = opendir($dirpath);
 					while(($elem2 = readdir($dir2)) && $found == false) {
-						if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php")
 							return $moduleid;
 					}
 				}
@@ -674,7 +691,7 @@
 		}
 
 		public function getLocale($locid) {
-			if($this->cur_module)
+			if ($this->cur_module)
 				return $this->cur_module->getLoc()->s($locid);
 			else {
 				$loc = new FSLocales();

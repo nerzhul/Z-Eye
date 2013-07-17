@@ -39,16 +39,16 @@
 
 		public function Connect() {
 			$this->conn = ssh2_connect($this->addr,$this->port);
-			if(!$this->conn)
+			if (!$this->conn)
 				return false;
 			return true;
 		}
 
 		public function Authenticate($user,$pwd) {
-			if(!$this->conn)
+			if (!$this->conn)
 				return false;
 
-			if(!ssh2_auth_password($this->conn, $user, $pwd))
+			if (!ssh2_auth_password($this->conn, $user, $pwd))
 				return false;
 
 			$this->is_auth = true;
@@ -56,7 +56,7 @@
 		}
 
 		public function OpenShell() {
-			if(!$this->conn || !$this->is_auth)
+			if (!$this->conn || !$this->is_auth)
 				return false;
 
 			$this->stdio = @ssh2_shell($this->conn,"xterm");
@@ -64,7 +64,7 @@
 		}
 
 		public function tryPrivileged($cmd,$pwd,$failmsg) {
-			if(!$this->conn || !$this->is_auth || !$this->stdio)
+			if (!$this->conn || !$this->is_auth || !$this->stdio)
 				return false;
 
 			fwrite($this->stdio,$cmd."\n");
@@ -74,7 +74,7 @@
 			fwrite($this->stdio,$pwd."\n");
 			usleep(250000);
 			while($line = fgets($this->stdio)) {
-				if($line == $failmsg)
+				if ($line == $failmsg)
 					return false;
 			}
 			return true;
@@ -87,7 +87,7 @@
 		}
 
 		public function sendCmd($cmd) {
-			if(!$this->conn || !$this->is_auth || !$this->stdio)
+			if (!$this->conn || !$this->is_auth || !$this->stdio)
 				return false;
 
 			$output = "";
@@ -99,22 +99,24 @@
 
 			while(!$promptfind) {
 				while($line = fgets($this->stdio)) {
-					if(preg_match("# --More-- #",$line))
+					if (preg_match("# --More-- #",$line))
 						fwrite($this->stdio," ");
-					else if(preg_match("/^(.+)[#]$/",$line))
+					else if (preg_match("/^(.+)[#]$/",$line))
 						$promptfind = true;
 					else
 						$output_arr[] = $line;
 				}
 			}
 
-			for($i=0;$i<count($output_arr)-2;$i++)
+			for ($i=0;$i<count($output_arr)-2;$i++) {
 				$output .= $output_arr[$i];
+			}
+
 			return $output;
 		}
 
 		public function Close() {
-			if($this->conn)
+			if ($this->conn)
 				close($this->conn);
 		}
 		
