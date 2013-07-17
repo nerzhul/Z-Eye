@@ -648,13 +648,17 @@
 							return;
 						}
 					}
+					
+					if(!FS::$secMgr->isHostname($keyid)) {
+						FS::$iMgr->ajaxEcho("err-tsig-key-id-invalid");
+						return;
+					}
 
 					if($keyalgo < 1 || $keyalgo > 3) {
 						FS::$iMgr->ajaxecho("err-tsig-key-algo-invalid");
 						return;
 					}
 
-					// @ TODO test TSIG ?
 					FS::$dbMgr->BeginTr();
 					if($edit) {
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dns_tsig","keyalias = '".$keyalias."'");
