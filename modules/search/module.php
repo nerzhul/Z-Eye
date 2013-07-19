@@ -573,6 +573,7 @@
 			$output = "";
 
 			if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+				$locoutput = "";
 
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,osname,dhcptype",
 					"description ILIKE '%".$search."%' or alias ILIKE '%".$search."%'");
