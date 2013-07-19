@@ -18,7 +18,10 @@
 	*/
 	
 	final class iSwitchRightsMgmt extends FSModule {
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "switchrightsmgmt";
+		}
 		
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-switchrightsmgmt"));
@@ -801,7 +804,7 @@
 					return;
 				case 3: // add or edit backup server
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"User don't have rights to add/edit server '".$saddr."' from switches backup");
+						$this->log(2,"User don't have rights to add/edit server '".$saddr."' from switches backup");
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
 						return;
 					}
@@ -813,7 +816,7 @@
 					$spath = FS::$secMgr->checkAndSecurisePostData("spath");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"Some fields are missing/wrong for saving switch config");
+						$this->log(2,"Some fields are missing/wrong for saving switch config");
 						if(FS::isAjaxCall())
 							FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						else
@@ -822,7 +825,7 @@
 					}
 					if($edit) {
 						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
+							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
 							if(FS::isAjaxCall())
 								FS::$iMgr->ajaxEchoNC("err-not-found");
 							else
@@ -832,7 +835,7 @@
 					}
 					else {
 						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",1,"Server '".$saddr."' already exists for saving switch config");
+							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
 							if(FS::isAjaxCall())
 								FS::$iMgr->ajaxEchoNC("err-already-exists");
 							else
@@ -842,18 +845,18 @@
 					}
 
 					if($edit) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Edit server '".$saddr."' (type ".$stype.") for saving switch config");
+						$this->log(0,"Edit server '".$saddr."' (type ".$stype.") for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}
 					else
-						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Added server '".$saddr."' (type ".$stype.") for saving switch config");
+						$this->log(0,"Added server '".$saddr."' (type ".$stype.") for saving switch config");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login,pwd","'".$saddr."','".$stype."','".$spath."','".$slogin."','".$spwd."'");
 					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 
 					return;
 				case 4: // remove backup server
 					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",2,"User don't have rights to remove server '".$saddr."' from switches backup");
+						$this->log("User don't have rights to remove server '".$saddr."' from switches backup");
 						if(FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("err-no-rights");
 						else
@@ -863,7 +866,7 @@
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
 					if($saddr && $stype) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"switchmgmt",0,"Delete server '".$saddr."' for saving switch config");
+						$this->log(0,"Delete server '".$saddr."' for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 						if(FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."');");
