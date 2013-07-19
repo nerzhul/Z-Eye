@@ -33,7 +33,6 @@
 			$this->locales = $locales;
 			$this->menu = "";
 			$this->menupriority = 0;
-			$this->modulename = "";
 		}
 		
 		public function handlePostDatas() {}
@@ -48,12 +47,6 @@
 		public function getMenu() { return $this->menu; }
 		public function getMenuPriority() { return $this->menupriority; }
 
-		protected function log($level,$str,$user=NULL) {
-			if ($user === NULL) {
-				$user = FS::$sessMgr->getUserName();
-			}
-			FS::$log->i($user,$this->modulename,$level,$str);
-		}
 
 		protected $moduleclass;
 		protected $mid;
@@ -61,7 +54,6 @@
 		protected $locales;
 		protected $menu;
 		protected $menupriority;
-		protected $modulename;
 	};
 
 ?>

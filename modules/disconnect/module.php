@@ -18,7 +18,10 @@
 	*/
 	
 	final class iDisconnect extends FSModule{
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "disconnect"; 
+		}
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("Disconnect"));
@@ -32,7 +35,7 @@
 			$act = FS::$secMgr->checkAndSecuriseGetData("act");
 			switch($act) {
 				case 1: if(FS::$sessMgr->getUid()) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"disconnect",1,"User disconnected");
+						$this->log(1,"User disconnected");
 						FS::$sessMgr->Close(); 
 					}
 					break;

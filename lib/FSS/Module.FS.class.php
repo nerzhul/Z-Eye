@@ -29,7 +29,10 @@
         */
 
 	abstract class FSModule {
-		function __construct($locales) { $this->loc = $locales; }
+		function __construct($locales) {
+			$this->loc = $locales;
+			$this->modulename = "";
+		}
 
 		public function Load() { FS::$iMgr->printError("Unknown module !"); }
 		public function setModuleId($id) { $this->mid = $id; }
@@ -37,7 +40,15 @@
 		public function getMenuTitle() { return $this->loc->s("menu-title"); }
 		public function getLoc() { return $this->loc; }
 
+		protected function log($level,$str,$user=NULL) {
+			if ($user === NULL) {
+				$user = FS::$sessMgr->getUserName();
+			}
+			FS::$log->i($user,$this->modulename,$level,$str);
+		}
+
 		protected $mid;
 		protected $loc;
+		protected $modulename;
 	}
 ?>

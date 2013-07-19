@@ -20,7 +20,11 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
 	final class iConnect extends FSModule{
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "connect";
+		}
+
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-conn"));
 			return "";
@@ -59,7 +63,7 @@
 				$result = $ldapMgr->GetOneEntry($ldapident."=".$username);
 				if(!$result) {
 					FS::$iMgr->redir("mod=".$this->mid."&err=1");
-					FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Unknown user)");
+					$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
 					return;
 				}
 
@@ -75,7 +79,7 @@
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$this->connectUser($data["uid"],$data["ulevel"]);
-					FS::$log->i("None","connect",0,"Login success for user '".$username."'");
+					$this->log(0,"Login success for user '".$username."'","None");
 					FS::$iMgr->redir($url,true);
 					return;
 				}
@@ -84,7 +88,7 @@
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
 					if($data = FS::$dbMgr->Fetch($query)) { 
 						$this->connectUser($data["uid"],$data["ulevel"]);
-						FS::$log->i("None","connect",0,"Login success for user '".$username."'");
+						$this->log(0,"Login success for user '".$username."'","None");
 						FS::$iMgr->redir($url,true);
 						return;
 					}
@@ -94,17 +98,17 @@
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if($data["sha_pwd"] != $encryptPwd) {
-						FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Bad password)");
+						$this->log(1,"Login failed for user '".$username."' (Bad password)","None");
 						FS::$iMgr->ajaxEcho("err-bad-user");
 						return;
 					}
 					$this->connectUser($data["uid"],$data["ulevel"]);
-					FS::$log->i("None","connect",0,"Login success for user '".$username."'");
+					$this->log(0,"Login success for user '".$username."'","None");
 					FS::$iMgr->redir($url,true);
 					return;
 				}
 			}
-			FS::$log->i("None","connect",1,"Login failed for user '".$username."' (Unknown user)");
+			$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
 			FS::$iMgr->ajaxEcho("err-bad-user");
 		}
 		
