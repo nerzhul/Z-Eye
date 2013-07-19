@@ -27,7 +27,7 @@
 			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array(),
-				"dhcpcluster" => array());
+				"dhcpcluster" => array(), "dhcpoptions" => array());
 			$this->nbresults = 0;
 		}
 
@@ -411,36 +411,20 @@
 					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-hostname");
 					$found = 0;
 					
-					if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
-						$locoutput = "";
-						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","group" => "clustername"));
-						while($data = FS::$dbMgr->Fetch($query)) {
-							if($found == 0)
-								$found = 1;
 
-							$locoutput .= "<b>".$this->loc->s("DHCP-cluster")."</b>: ".$data["clustername"]."<br /><b>".$this->loc->s("Members").":</b><br />";
+					$tmpoutput .= $this->showDHCPClusters($search);
 
-							$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$data["clustername"]."'");
-							while($data2 = FS::$dbMgr->Fetch($query2)) {
-								$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","alias","addr = '".$data2["dhcpaddr"]."'");
-								$locoutput .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".($alias ? $alias." (" : "").$data2["dhcpaddr"].($alias ? ")" : "")."<br />";
-							}
-							$locoutput .= FS::$iMgr->hr();
-							$this->nbresults++;
-						}
-						if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-cluster");
-						$found = 0;
-					}
+					$tmpoutput .= $this->showDHCPOptions($search);
 				}
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","hostname","hostname ILIKE '%".$search."%'",array("order" => "hostname","limit" => "10","group" => "hostname"));
 					while($data = FS::$dbMgr->Fetch($query))
 						$this->autoresults["dhcphostname"][] = $data["hostname"];
 
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","limit" => "10",
-						"group" => "clustername"));
-					while($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["dhcpcluster"][] = $data["clustername"];
+
+					$this->fetchDHCPClustersAutoResults($search);
+
+					$this->fetchDHCPOptionsAutoResults($search);
 				}
 			}
 			
@@ -450,6 +434,149 @@
 
 				return $output;
 			}
+		}
+
+		private function showDHCPOptions($search) {
+			$found = false;
+			$output = "";
+
+			if(FS::$sessMgr->hasRight("mrule_ipmanager_optionsmgmt")) {
+				// Custom DHCP options
+				$locoutput = "";
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_custom_option","optcode,opttype,optname",
+					"optname ILIKE '%".$search."%' AND protectrm = 'f'",array("order" => "optname", "group" => "optname"));
+				while($data = FS::$dbMgr->Fetch($query)) {
+					if(!$found)
+						$found = true;
+
+					$locoutput .= "<b>".$this->loc->s("option-name")."</b>: ".$data["optname"]."<br />".
+						"<b>".$this->loc->s("option-code")."</b>: ".$data["optcode"]."<br />".
+						"<b>".$this->loc->s("option-type")."</b>: ".$data["opttype"]."<br />".
+						FS::$iMgr->hr();
+					$this->nbresults++;
+				}
+
+				if($found) {
+					$output .= $this->divEncapResults($locoutput,"title-dhcp-custom-options");
+					$found = false;
+				}
+
+				// DHCP options
+				$locoutput = "";
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option","optalias,optname,optval",
+					"optalias ILIKE '%".$search."%'",array("order" => "optalias", "group" => "optalias"));
+				while($data = FS::$dbMgr->Fetch($query)) {
+					if(!$found)
+						$found = true;
+
+					$locoutput .= "<b>".$this->loc->s("option-alias")."</b>: ".$data["optalias"]."<br />".
+						"<b>".$this->loc->s("option-name")."</b>: ".$data["optname"]."<br />".
+						"<b>".$this->loc->s("option-value")."</b>: ".$data["optval"]."<br />".
+						FS::$iMgr->hr();
+					$this->nbresults++;
+				}
+
+				if($found) {
+					$output .= $this->divEncapResults($locoutput,"title-dhcp-options");
+					$found = false;
+				}
+
+				// DHCP option groups
+				$locoutput = "";
+				$optgroups = array();
+
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup,optalias",
+					"optgroup ILIKE '%".$search."%'",array("order" => "optgroup"));
+				while($data = FS::$dbMgr->Fetch($query)) {
+					if(!$found)
+						$found = true;
+					if(!isset($optgroups[$data["optgroup"]])) {
+						$optgroups[$data["optgroup"]] = array();
+					}
+					$optgroups[$data["optgroup"]][] = $data["optalias"];
+				}
+
+				if($found) {
+					foreach($optgroups as $gname => $members) {
+						$locoutput .= "<b>".$this->loc->s("option-group")."</b>: ".$gname."<br />".
+							"<b>".$this->loc->s("Members")."</b>: <ul>";
+
+						$count = count($members);
+						for($i=0;$i<$count;$i++) {
+							$locoutput .= "<li>".$members[$i]."</li>";
+						}
+							
+						$locoutput .= "</ul>".FS::$iMgr->hr();
+						$this->nbresults++;
+					}
+
+					$output .= $this->divEncapResults($locoutput,"title-dhcp-option-groups");
+				}
+			}
+			return $output;
+		}
+
+		private function fetchDHCPOptionsAutoResults($search) {
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname","optname ILIKE '%".$search."%'",array("order" => "optname","limit" => "10",
+				"group" => "optname"));
+			while($data = FS::$dbMgr->Fetch($query))
+				$this->autoresults["dhcpoptions"][] = $data["optname"];
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option","optalias","optalias ILIKE '%".$search."%'",array("order" => "optalias","limit" => "10",
+				"group" => "optalias"));
+			while($data = FS::$dbMgr->Fetch($query))
+				$this->autoresults["dhcpoptions"][] = $data["optalias"];
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup ILIKE '%".$search."%'",array("order" => "optgroup","limit" => "10",
+				"group" => "optgroup"));
+			while($data = FS::$dbMgr->Fetch($query))
+				$this->autoresults["dhcpoptions"][] = $data["optgroup"];
+		}
+
+		private function showDHCPClusters($search) {
+			$found = false;
+			$output = "";
+
+			if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+				$clusters = array();
+				$locoutput = "";
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername,dhcpaddr",
+					"clustername ILIKE '%".$search."%'",array("order" => "clustername"));
+				while($data = FS::$dbMgr->Fetch($query)) {
+					if(!$found)
+						$found = true;
+
+					if(!isset($clusters[$data["clustername"]])) {
+						$clusters[$data["clustername"]] = array();
+					}
+
+					$clusters[$data["clustername"]][] = $data["dhcpaddr"];
+				}
+
+				if($found) {
+					foreach($clusters as $cname => $members) {
+						$locoutput .= "<b>".$this->loc->s("DHCP-cluster")."</b>: ".$cname."<br /><b>".
+							$this->loc->s("Members").":</b><ul>";
+
+						$count = count($members);
+						for($i=0;$i<$count;$i++) {
+							$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","alias","addr = '".$members[$i]."'");
+							$locoutput .= "<li>".($alias ? $alias." (" : "").$members[$i].($alias ? ")" : "")."</li>";
+						}
+						$locoutput .= "</ul>".FS::$iMgr->hr();
+						$this->nbresults++;
+					}
+					$output .= $this->divEncapResults($locoutput,"title-dhcp-cluster");
+				}
+			}
+			return $output;
+		}
+
+		private function fetchDHCPClustersAutoResults($search) {
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","limit" => "10",
+				"group" => "clustername"));
+			while($data = FS::$dbMgr->Fetch($query))
+				$this->autoresults["dhcpcluster"][] = $data["clustername"];
 		}
 
 		private function showIPAddrResults($search,$autocomp=false) {
