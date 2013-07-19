@@ -392,46 +392,54 @@
 			if($trunk == 1) {
 				$vlanlist = FS::$secMgr->checkAndSecurisePostData("vllist");
 
-				$this->setSwitchAccessVLAN(1);
+				if($this->getSwitchAccessVLAN() != 1)
+					$this->setSwitchAccessVLAN(1);
+
 				$logvals["accessvlan"]["dst"] = 1;
 				// mab disable
-				if($mabst != -1) {
+				if($mabst != -1 && $mabst != 2) {
 					$this->setSwitchportMABEnable(2);
 					$logvals["mabst"]["dst"] = 2;
 				}
-				if($failvlan != -1) {
+				if($failvlan != -1 && $failvlan != 0) {
 					$this->setSwitchportAuthFailVLAN(0);
 					$logvals["failvlan"]["dst"] = 0;
 				}
-				if($norespvlan != -1) {
+				if($norespvlan != -1 && $norespvlan != 0) {
 					$this->setSwitchportAuthNoRespVLAN(0);
 					$logvals["norespvlan"]["dst"] = 0;
 				}
-				if($deadvlan != -1) {
+				if($deadvlan != -1 && $deadvlan != 0) {
 					$this->setSwitchportAuthDeadVLAN(0);
 					$logvals["deadvlan"]["dst"] = 0;
 				}
-				if($controlmode != -1) {
+				if($controlmode != -1 && $controlmode != 3) {
 					$this->setSwitchportControlMode(3);
 					$logvals["controlmode"]["dst"] = 3;
 				}
 				// dot1x disable
-				if($authhostmode != -1) {
+				if($authhostmode != -1 && $authhostmode != 1) {
 					$this->setSwitchportAuthHostMode(1);
 					$logvals["authhostmode"]["dst"] = 1;
 				}
 
 				// set settings
-				if($this->setSwitchTrunkEncap(4) != 0) {
-					FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
-					return;
+				if($this->getSwitchTrunkEncap() != 4) {
+					if($this->setSwitchTrunkEncap(4) != 0) {
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+						return;
+					}
+					$logvals["trunkencap"]["dst"] = 4;
 				}
-				$logvals["trunkencap"]["dst"] = 4;
-				if($this->setSwitchportMode($trunk) != 0) {
-					FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
-					return;
+
+				if($this->getSwitchportMode() != $trunk) {
+					if($this->setSwitchportMode($trunk) != 0) {
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+						return;
+					}
+					$logvals["mode"]["dst"] = $trunk;
 				}
-				$logvals["mode"]["dst"] = $trunk;
+
 				if(in_array("all",$vlanlist)) {
 					if($this->setSwitchNoTrunkVlan() != 0) {
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
@@ -445,58 +453,74 @@
 					}
 				}
 				$logvals["trunkvlan"]["dst"] = $vlanlist;
-				if($this->setSwitchTrunkNativeVlan($nvlan) != 0) {
-					FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
-					return;
+
+
+				if($this->getSwitchTrunkNativeVlan() != $nvlan) {
+					if($this->setSwitchTrunkNativeVlan($nvlan) != 0) {
+						FS::$iMgr->redir("mod=".$this->mid."&d=".$this->device."&p=".$port."&err=2");
+						return;
+					}
+					$logvals["nativevlan"]["dst"] = $nvlan;
 				}
-				$logvals["nativevlan"]["dst"] = $nvlan;
+
 			} else if($trunk == 2) {
-				$this->setSwitchTrunkNativeVlan(1);
-				$logvals["nativevlan"]["dst"] = 1;
+				if($this->getSwitchTrunkNativeVlan() != 1) {
+					$this->setSwitchTrunkNativeVlan(1);
+					$logvals["nativevlan"]["dst"] = 1;
+				}
+
 				$this->setSwitchNoTrunkVlan();
 				$logvals["trunkvlan"]["dst"] = "";
 				// mab disable
-				if($mabst != -1) {
+				if($mabst != -1 && $mabst != 2) {
 					$this->setSwitchportMABEnable(2);
 					$logvals["mabst"]["dst"] = 2;
 				}
-				if($failvlan != -1) {
+				if($failvlan != -1 && $failvlan != 0) {
 					$this->setSwitchportAuthFailVLAN(0);
 					$logvals["failvlan"]["dst"] = 0;
 				}
-				if($norespvlan != -1) {
+				if($norespvlan != -1 && $norespvlan != 0) {
 					$this->setSwitchportAuthNoRespVLAN(0);
 					$logvals["norespvlan"]["dst"] = 0;
 				}
-				if($deadvlan != -1) {
+				if($deadvlan != -1 && $deadvlan != 0) {
 					$this->setSwitchportAuthDeadVLAN(0);
 					$logvals["deadvlan"]["dst"] = 0;
 				}
-				if($controlmode != -1) {
+				if($controlmode != -1 && $controlmode != 3) {
 					$this->setSwitchportControlMode(3);
 					$logvals["controlmode"]["dst"] = 3;
 				}
 				// dot1x disable
-				if($authhostmode != -1) {
+				if($authhostmode != -1 && $authhostmode != 1) {
 					$this->setSwitchportAuthHostMode(1);
 					$logvals["authhostmode"]["dst"] = 1;
 				}
 				// set settings
-				if($this->setSwitchportMode($trunk) != 0) {
-					echo "Fail to set Switchport mode";
-					return;
+				if($this->getSwitchportMode() != $trunk) {
+					if($this->setSwitchportMode($trunk) != 0) {
+						echo "Fail to set Switchport mode";
+						return;
+					}
+					$logvals["mode"]["dst"] = $trunk;
 				}
-				$logvals["mode"]["dst"] = $trunk;
-				if($this->setSwitchTrunkEncap(5) != 0) {
-					echo "Fail to set Switchport Trunk encapsulated VLANs";
-					return;
+
+				if($this->getSwitchTrunkEncap() != 5) {
+					if($this->setSwitchTrunkEncap(5) != 0) {
+						echo "Fail to set Switchport Trunk encapsulated VLANs";
+						return;
+					}
+					$logvals["trunkencap"]["dst"] = 5;
 				}
-				$logvals["trunkencap"]["dst"] = 5;
-				if($this->setSwitchAccessVLAN($nvlan) != 0) {
-					echo "Fail to set Switchport Access Vlan";
-					return;
+
+				if($this->getSwitchAccessVLAN() != $nvlan) {
+					if($this->setSwitchAccessVLAN($nvlan) != 0) {
+						echo "Fail to set Switchport Access Vlan";
+						return;
+					}
+					$logvals["accessvlan"]["dst"] = $nvlan;
 				}
-				$logvals["accessvlan"]["dst"] = $nvlan;
 
 			} else if($trunk == 3) {
 				$dot1xhostmode = FS::$secMgr->checkAndSecurisePostData("dot1xhostmode");
@@ -508,22 +532,35 @@
 					return;
 				}
 				// switchport mode access & no vlan assigned
-				$this->setSwitchTrunkNativeVlan(1);
-				$logvals["nativevlan"]["dst"] = 1;
+				if($this->getSwitchTrunkNativeVlan() != 1) {
+					$this->setSwitchTrunkNativeVlan(1);
+					$logvals["nativevlan"]["dst"] = 1;
+				}
+
 				$this->setSwitchNoTrunkVlan();
 				$logvals["trunkvlan"]["dst"] = "";
-				$this->setSwitchportMode(2);
-				$logvals["mode"]["dst"] = 2;
-				$this->setSwitchTrunkEncap(5);
-				$logvals["trunkencap"]["dst"] = 5;
-				$this->setSwitchAccessVLAN(1);
-				$logvals["accessvlan"]["dst"] = 1;
+
+				if($this->getSwitchportMode() != 2) {
+					$this->setSwitchportMode(2);
+					$logvals["mode"]["dst"] = 2;
+				}
+
+				if($this->getSwitchTrunkEncap() != 5) {
+					$this->setSwitchTrunkEncap(5);
+					$logvals["trunkencap"]["dst"] = 5;
+				}
+
+				if($this->getSwitchAccessVLAN() != 1) {
+					$this->setSwitchAccessVLAN(1);
+					$logvals["accessvlan"]["dst"] = 1;
+				}
 
 				// enable mab
-				if($mabst != -1) {
+				if($mabst != -1 && $mabst != 1) {
 					$this->setSwitchportMABEnable(1);
 					$logvals["mabst"]["dst"] = 1;
 				}
+
 				$mabtype = $this->getSwitchportMABType();
 				if($mabtype != -1) {
 					$logvals["mabtype"]["src"] = $mabtype;
@@ -531,26 +568,31 @@
 					$this->setSwitchMABType($mabeap == "on" ? 2 : 1);
 					$logvals["mabtype"]["dst"] = ($mabeap == "on" ? 2 : 1);
 				}
-				if($failvlan != -1) {
+
+				if($failvlan != -1 && $failvlan != $nvlan) {
 					// enable authfail & noresp vlans
 					$this->setSwitchportAuthFailVLAN($nvlan);
 					$logvals["failvlan"]["dst"] = $nvlan;
 				}
-				if($norespvlan != -1) {
+
+				if($norespvlan != -1 && $norespvlan != $noresp) {
 					$this->setSwitchportAuthNoRespVLAN($noresp);
 					$logvals["norespvlan"]["dst"] = $noresp;
 				}
-				if($deadvlan != -1) {
+
+				if($deadvlan != -1 && $deadvlan != $dead) {
 					$this->setSwitchportAuthDeadVLAN($dead);
 					$logvals["deadvlan"]["dst"] = $dead;
 				}
-				if($controlmode != -1) {
+
+				if($controlmode != -1 && $controlmode != 2) {
 					// authentication port-control auto
 					$this->setSwitchportControlMode(2);
 					$logvals["controlmode"]["dst"] = 2;
 				}
+
 				// Host Mode for Authentication
-				if($authhostmode != -1) {
+				if($authhostmode != -1 && $authhostmode != $dot1xhostmode) {
 					$this->setSwitchportAuthHostMode($dot1xhostmode);
 					$logvals["authhostmode"]["dst"] = $dot1xhostmode;
 				}
