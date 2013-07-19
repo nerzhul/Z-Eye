@@ -32,28 +32,23 @@
 
 		private function showMain() {
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
-			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 			$output = "";
 
 			if(!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-dns");
 
-				if($addr && FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-					$output .= $this->CreateOrEditServer(false);
-				}
-				else {
-					
-					$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("DNS-zones"));
-					$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("DNSSec-Mgmt"));
-					$tabs[] = array(3,"mod=".$this->mid,$this->loc->s("Advanced-tools"));
-					$output .= FS::$iMgr->tabPan($tabs,$sh);
-				}
+				$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("DNS-zones"));
+				$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("DNSSec-Mgmt"));
+				$tabs[] = array(4,"mod=".$this->mid,$this->loc->s("Server-Mgmt"));
+				$tabs[] = array(3,"mod=".$this->mid,$this->loc->s("Advanced-tools"));
+				$output .= FS::$iMgr->tabPan($tabs,$sh);
 			}
 			else {
 				switch($sh) {
 					case 1: $output .= $this->showZoneMgmt(); break;
 					case 2: $output .= $this->showDNSSecMgmt(); break;
 					case 3: $output .= $this->showAdvancedTools(); break;
+					case 4: $output .= $this->showServerList(); break;
 				}
 			}
 			return $output;
@@ -114,11 +109,8 @@
 			if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 				$output .= $this->showCreateEditErr();
 
-				$output .= FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("line" => true));
 
 				$found = false;
-				if($exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","addr","dns = '1'"))
-					$output .= FS::$iMgr->opendiv(2,$this->loc->s("modify-servers"));
 			}
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
@@ -331,20 +323,14 @@
 			return $output;
 		}
 
-		private function CreateOrEditServer($create) {
+		private function CreateOrEditServer($addr = "") {
 			$output = "";
 			$saddr = "";
 			$slogin = "";
 			$dns = 0;
 			$namedpath = "";
 			$chrootnamed = "";
-			if(!$create) {
-				$output = FS::$iMgr->h2("edit-server");
-				$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-				if(!$addr || $addr == "") {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
-					return $output;
-				}
+			if($addr) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
@@ -359,32 +345,23 @@
 				}
 			}
 			
-			if(!$create) {
-				$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
-				$output .= $this->showCreateEditErr();	
-			}
-			
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
-			
-			$output .= "<table>";
-			if($create)
-				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
-			else {
-				$output .= "<tr><td>".$this->loc->s("ip-addr-dns")."</td><td>".$saddr."</td></tr>";
-				$output .= FS::$iMgr->hidden("saddr",$saddr).FS::$iMgr->hidden("edit","1");
-			}
-			$output .= FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin);
-			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-chroot"));
-			$output .= FS::$iMgr->tableSubmit("Save");
+			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3").
+				"<table>".
+				FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$addr,array("type" => "idxedit", "value" => $addr,
+				"length" => "128","edit" => $addr != "")).
+				FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin).
+				FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights")).
+				FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-chroot")).
+				FS::$iMgr->aeTableSubmit($addr != "");
 			
 			return $output;
 		}
 
 		private function showServerList() {
-			$output = "";
+			$output = FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("line" => true));
+
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -394,11 +371,12 @@
 					"</th><th></th></tr>";
 				}
 
-				$output .= "<tr id=\"".preg_replace("#[.]#","-",$data["addr"])."tr\"><td><a href=\"index.php?mod=".$this->mid."&addr=".$data["addr"]."\">".$data["addr"];
-				$output .= "</td><td>".$data["login"]."</td><td>";
-				$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"],array("js" => true,
-					"confirm" => array($this->loc->s("confirm-remove-dnssrc")."'".$data["addr"]."' ?","Confirm","Cancel")));
-				$output .= "</td></tr>";
+				$output .= "<tr id=\"".preg_replace("#[.]#","-",$data["addr"])."tr\"><td>".
+					FS::$iMgr->opendiv(2,$data["addr"],array("lnkadd" => "addr=".$data["addr"])).
+					"</td><td>".$data["login"]."</td><td>".
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-dnssrc")."'".$data["addr"]."' ?","Confirm","Cancel")));
+					"</td></tr>";
 			}
 			if($found) {
 				$output .= "</table>";
@@ -421,13 +399,21 @@
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
-				case 1: return $this->CreateOrEditServer(true);
-				case 2: return $this->showServerList();
+				case 1: return $this->CreateOrEditServer();
+				case 2:
+					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+					if(!$addr) {
+						return $this->loc->s("err-bad-datas");
+					}
+
+					return $this->CreateOrEditServer($addr);
 				case 3: return $this->showTSIGForm();
 				case 4:
 					$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
-					if(!$keyalias)
+					if(!$keyalias) {
 						return $this->loc->s("err-bad-datas");
+					}
+
 					return $this->showTSIGForm($keyalias);
 				default: return;
 			}
@@ -606,10 +592,7 @@
 						$this->log(0,"Removing server '".$srv."' from database");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$srv."'");
 					}
-					if(FS::isAjaxCall())
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr');");
-					else
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr');");
 					return;
 				}
 				// Add/Edit TSIG key
