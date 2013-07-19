@@ -1260,7 +1260,6 @@
 						$js .= "$('#netHCr').html('');";
 
 					FS::$iMgr->ajaxEcho("Done",$js);
-					//FS::$iMgr->redir("mod=".$this->mid."&sh=11&f=".$filtr);
 					return;
 				case 2:
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
@@ -1295,12 +1294,13 @@
 						}
 						
 						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".addslashes($output)."');");
-						$this->log(0,"User find obsolete datas :<br />".$logbuffer);
+						$this->log(0,"User find obsolete datas");
 					}
 					else
 						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".addslashes(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
 					
 					return;
+				// Monitor DHCP subnet
 				case 3:
 					$filtr = FS::$secMgr->checkAndSecuriseGetData("f");
 					$warn = FS::$secMgr->checkAndSecurisePostData("wlimit");
@@ -1376,45 +1376,51 @@
 
 					if(!FS::$secMgr->isAlphaNumeric($alias)) {
 						FS::$iMgr->ajaxEchoNC("err-dhcpserver-invalid-alias");
+						$this->loc->s(1,"Add/edit DHCP server: invalid alias");
 						return;
 					}
 
 					if(!FS::$secMgr->isPath($dhcpdpath)) {
 						FS::$iMgr->ajaxEchoNC("err-dhcpserver-dhcpdpath");
+						$this->loc->s(1,"Add/edit DHCP server: invalid dhcpd path");
 						return;
 					}
 
 					if(!FS::$secMgr->isPath($leasepath)) {
 						FS::$iMgr->ajaxEchoNC("err-dhcpserver-leasepath");
+						$this->loc->s(1,"Add/edit DHCP server: invalid lease path");
 						return;
 					}
 
 					if(!FS::$secMgr->isPath($reservconfpath)) {
 						FS::$iMgr->ajaxEchoNC("err-dhcpserver-reservconf");
+						$this->loc->s(1,"Add/edit DHCP server: invalid reservconf path");
 						return;
 					}
 
 					if(!FS::$secMgr->isPath($subnetconfpath)) {
 						FS::$iMgr->ajaxEchoNC("err-dhcpserver-subnetconf");
+						$this->loc->s(1,"Add/edit DHCP server: invalid subnetconf path");
 						return;
 					}
 
 					if($spwd != $spwd2) {
 						FS::$iMgr->ajaxEchoNC("err-pwd-not-match");
+						$this->loc->s(1,"Add/edit DHCP server: passwords don't match");
                                                 return;
                                         }
 
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr ='".$saddr."'");
 					if($edit) {
 						if(!$exist) {
-							$this->log(1,"Unable to edit server '".$saddr."': not exists");
 							FS::$iMgr->ajaxEcho("err-not-exists");
+							$this->loc->s(2,"Add/edit DHCP server: server '".$saddr."' doesn't exist");
 							return;
 						}
 					}
 					else {
 						if($exist) {
-							$this->log(1,"Unable to add server '".$saddr."': already exists");
+							$this->loc->s(1,"Add/edit DHCP server: server '".$saddr."' already exists");
 							FS::$iMgr->ajaxEchoNC("err-already-exists");
 							return;
 						}
@@ -1423,12 +1429,12 @@
 					$ssh = new SSH($saddr,22);
 					
                                         if(!$ssh->Connect()) {
-						$this->log(1,"SSH Connection failed for '".$saddr."'");
+						$this->loc->s(1,"Add/edit DHCP server: ssh connection failed to '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-ssh-conn-failed");
                                                 return;
                                         }
 					if(!$ssh->Authenticate($slogin,$spwd)) {
-						$this->log(2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
+						$this->loc->s(1,"Add/edit DHCP server: ssh connection failed for '".$slogin."'@'".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-ssh-auth-failed");
                                                 return;
                                         }
@@ -1437,21 +1443,21 @@
 					* We try to read files
 					*/
 					if($ssh->execCmd("if [ -r ".$dhcpdpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-						$this->log(1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
+						$this->log(1,"Add/edit DHCP server: Unable to read file '".$dhcpdpath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$dhcpdpath."'";
                                                 return;
 					}
 
 					// dhcpd.leases
                                         if($ssh->execCmd("if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-                                                $this->logt(1,"Unable to read file '".$leasepath."' on '".$saddr."'");
+                                                $this->logt(1,"Add/edit DHCP server: Unable to read file '".$leasepath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$leasepath."'";
                                                 return;
                                         }
 
 					if($reservconfpath && strlen($reservconfpath) > 0) {
                                         	if($ssh->execCmd("if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;")!= 0) {
-                                                	$this->log(1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
+                                                	$this->log(1,"Add/edit DHCP server: Unable to read file '".$reservconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$reservconfpath."'";
         	                                        return;
                 	                        }
@@ -1459,7 +1465,7 @@
 
 					if($subnetconfpath && strlen($subnetconfpath) > 0) {
                                         	if($ssh->execCmd("if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-                                                	$this->log(1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
+                                                	$this->log(1,"Add/edit DHCP server: Unable to read file '".$subnetconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$subnetconfpath."'";
         	                                        return;
                 	                        }
@@ -1475,33 +1481,35 @@
 					FS::$dbMgr->CommitTr();
 
 					if($edit)
-						$this->log(0,"Edited DHCP server '".$saddr."' (login: '".$slogin."')");
+						$this->log(0,"Add/edit DHCP server: Edited DHCP server '".$saddr."' (login: '".$slogin."')");
 					else
-						$this->log(0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
+						$this->log(0,"Add/edit DHCP server: Added DHCP server '".$saddr."' (login: '".$slogin."')");
+
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				// Delete DHCP Server
 				case 6:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+						$this->log(2,"Delete DHCP server: User don't have rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
-						$this->log(2,"No DHCP server specified to remove");
+						$this->log(2,"Delete DHCP server: No DHCP server specified");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr = '".$addr."'")) {
-						$this->log(2,"Unknown DHCP server specified to remove");
+						$this->log(2,"Delete DHCP server: Unknown DHCP server specified");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if($clustername = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername","master = '".$addr."'")) {
-						$this->log(1,"DHCP server is master of cluster '".$clustername."', cannot remove it");
+						$this->log(1,"Delete DHCP server: DHCP server is master of cluster '".$clustername."', cannot remove it");
 						FS::$iMgr->ajaxEcho($this->loc->s("err-remove-dhcpserver-master").$clustername.
 							$this->loc->s("err-remove-dhcpserver-master2"),"",true);
 						return;
@@ -1518,10 +1526,12 @@
 
 					FS::$iMgr->ajaxEcho("Done");
 					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
+					$this->log(0,"Delete DHCP server: server '".$addr."' removed");
                                         return;
 				// Add DHCP subnet
 				case 7:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
+						$this->log(2,"Add/Edit subnet: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -1547,7 +1557,7 @@
 						$domainname && !FS::$secMgr->isDNSName($domainname) || $mleasetime && (!FS::$secMgr->isNumeric($mleasetime) || $mleasetime < 60) ||
 						$dleasetime && (!FS::$secMgr->isNumeric($dleasetime) || $dleasetime < 30) || 
 						$edit && $edit != 1) {
-						$this->log(2,"Bad datas entered when adding Declared subnet");
+						$this->log(2,"Add/Edit subnet: Bad datas");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
@@ -1555,18 +1565,21 @@
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$netid."'");
 					if($edit) {
 						if(!$exist) {
+							$this->log(2,"Add/Edit subnet: subnet '".$netid."' doesn't exist");
 							FS::$iMgr->ajaxEcho("err-subnet-not-exists");
 							return;
 						}
 					}
 					else {
 						if($exist) {
+							$this->log(1,"Add/Edit subnet: subnet '".$netid."' already exists");
 							FS::$iMgr->ajaxEchoNC("err-subnet-already-exists");
 							return;
 						}
 					}
 
 					if($dleasetime && $mleasetime && $dleasetime > $mleasetime) {
+						$this->log(1,"Add/Edit subnet: default lease time > max lease time");
 						FS::$iMgr->ajaxEchoNC("err-dlease-sup-mlease");
 						return;
 					}
@@ -1576,12 +1589,14 @@
 						$netobj->setNetAddr($netid);
 						$netobj->setNetMask($netmask);
 						if(!$netobj->isUsableIP($router)) {
+							$this->log(1,"Add/Edit subnet: router '".$router."' not in subnet '".$netid."/".$netmask."'");
 							FS::$iMgr->ajaxEchoNC("err-router-not-in-subnet");
 							return;
 						}
 					}
 
 					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid != '".$netid."' AND vlanid = '".$vlanid."'")) {
+						$this->log(1,"Add/Edit subnet: vlan '".$vlanid."' already used");
 						FS::$iMgr->ajaxEchoNC("err-vlan-already-used");
 						return;
 					}
@@ -1590,11 +1605,13 @@
 						$count = count($subnetclusters);
 						for($i=0;$i<$count;$i++) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$subnetclusters[$i]."'")) {
+								$this->log(2,"Add/Edit subnet: cluster '".$subnetclusters[$i]."' doesn't exist");
 								FS::$iMgr->ajaxEchoNC("err-cluster-not-exists");
 								return;
 							}
 						}
 						if(!$router || !$dns1 || !$domainname) {
+							$this->log(1,"Add/Edit subnet: distribute needs routeur, dns and domain name");
 							FS::$iMgr->ajaxEchoNC("err-distrib-subnet-need-infos");
 							return;
 						}
@@ -1604,6 +1621,7 @@
 						$count = count($dhcpopts);
 						for($i=0;$i<$count;$i++) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$dhcpopts[$i]."'",array("group" => "optgroup"))) {
+								$this->log(2,"Add/Edit subnet: option group '".$dhcpopts[$i]."' doesn't exist");
 								FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-not-exists");
 								return;
 							}
@@ -1643,23 +1661,35 @@
 						$js .= "$('#declsubnets').html('".addslashes($jscontent)."'); $('#declsubnets').show('slow');";
 					}
 
-					if($edit) $js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr'); setTimeout(function(){";
+					if($edit) {
+						$js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr'); setTimeout(function(){";
+					}
 					$jscontent = $this->tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid);
 					$js .= "$('".addslashes($jscontent)."').insertAfter('#declsubnethead');";
-					if($edit) $js .= "},1200);";
+					if($edit) {
+						$js .= "},1200);";
+					}
+
+					if($edit) {
+						$this->log(0,"Add/Edit subnet: subnet '".$netid."' edited");
+					}
+					else {
+						$this->log(0,"Add/Edit subnet: subnet '".$netid."' added");
+					}
 
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Remove DHCP subnet
 				case 8:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
+						$this->log(2,"Remove subnet: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 
 					$netid = FS::$secMgr->checkAndSecuriseGetData("netid");
 					if(!$netid || !FS::$secMgr->isIP($netid)) {
-						$this->log(2,"Bad datas given when deleting Declared subnet");
+						$this->log(2,"Remove subnet: Bad datas given");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
@@ -1678,11 +1708,13 @@
 						"trpfx" => "ds"));
 					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($netid));
 
+					$this->log(0,"Remove subnet: subnet '".$netid."' removed");
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Add/Edit cluster
 				case 9:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+						$this->log(2,"Add/Edit cluster: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -1694,22 +1726,28 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$cname || !$cmembers || !is_array($cmembers) || $cmode === NULL || $cmode < 0 ||
 						$cmode > 2 || !$cmaster || $edit && $edit != 1) {
-						if(!$cmembers || !is_array($cmembers))
+						if(!$cmembers || !is_array($cmembers)) {
+							$this->log(1,"Add/Edit cluster: cluster need some members");
 							FS::$iMgr->ajaxEchoNC("err-cluster-need-members");
-						else
+						}
+						else {
+							$this->log(2,"Add/Edit cluster: bad datas given");
 							FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						}
 						return;
 					}
 
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$cname."'");
 					if($edit) {
 						if(!$exist) {
+							$this->log(2,"Add/Edit cluster: cluster '".$cname."' doesn't exist");
 							FS::$iMgr->ajaxEcho("err-cluster-not-exists");
 							return;
 						}
 					}
 					else {
 						if($exist) {
+							$this->log(1,"Add/Edit cluster: cluster '".$cname."' already exists");
 							FS::$iMgr->ajaxEchoNC("err-cluster-already-exists");
 							return;
 						}
@@ -1721,6 +1759,7 @@
 					* ISC DHCP cluster require only 2 DHCP
 					*/
 					if(($cmode == 1 || $cmode == 2) && $count != 2) {
+						$this->log(1,"Add/Edit cluster: selected mode require two members");
 						FS::$iMgr->ajaxEchoNC("err-clustermode-require-two");
 						return;	
 					}
@@ -1731,6 +1770,7 @@
 						*/
 						$dhcptype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","dhcptype","addr = '".$cmembers[$i]."'");
 						if($dhcptype === NULL) {
+							$this->log(2,"Add/Edit cluster: dhcp server doesn't exist");
 							FS::$iMgr->ajaxEchoNC("err-dhcpserver-not-exists");
 							return;
 						}
@@ -1739,6 +1779,7 @@
 						* Check if our cluster mode is compatible with DHCP list
 						*/
 						if(($cmode == 1 || $cmode == 2) && $dhcptype != 1) {
+							$this->log(1,"Add/Edit cluster: selected mode require isc dhcpd");
 							FS::$iMgr->ajaxEchoNC("err-clustermode-require-iscdhcp");
 							return;
 						}
@@ -1749,6 +1790,7 @@
 						* For ISC dhcpd cluster, master can't be none
 						*/
 						if(($cmode == 1 || $cmode == 2) && $cmaster == "none") {
+							$this->log(1,"Add/Edit cluster: selected mode require a master");
 							FS::$iMgr->ajaxEchoNC("err-clustermaster-iscdhcp");
 							return;
 						}
@@ -1756,6 +1798,7 @@
 						* Cluster master must be in cluster members
 						*/
 						if($cmaster != "none" && !in_array($cmaster,$cmembers)) {
+							$this->log(1,"Add/Edit cluster: selected master is not in members");
 							FS::$iMgr->ajaxEchoNC("err-clustermaster-not-in-members");
 							return;
 						}
@@ -1777,27 +1820,41 @@
 						$jscontent = $this->showTableHeadCluster()."</table>".FS::$iMgr->jsSortTable("clustertable");
 						$js .= "$('#clusterdiv').html('".addslashes($jscontent)."'); $('#clusterdiv').show('slow');";
 					}
-					if($edit) $js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($cname)."tr'); setTimeout(function() {";
+					if($edit) {
+						$js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($cname)."tr'); setTimeout(function() {";
+					}
 					$jscontent = $this->showDHCPClusterTableEntry($cname,$cmembers);
 					$js .= "$('".addslashes($jscontent)."').insertAfter('#clusterth');";
-					if($edit) $js .= "},1200);";
+					if($edit) {
+						$js .= "},1200);";
+					}
+
+					if($edit) {
+						$this->log(0,"Add/Edit cluster: edited cluster '".$cname."'");
+					}
+					else {
+						$this->log(0,"Add/Edit cluster: added cluster '".$cname."'");
+					}
 
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Remove cluster
 				case 10:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+						$this->log(2,"Remove cluster: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 
 					$cname = FS::$secMgr->checkAndSecuriseGetData("cluster");
 					if(!$cname) {
+						$this->log(2,"Remove cluster: bad datas given");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$cname."'")) {
+						$this->log(2,"Remove cluster: cluster '".$cname."' doesn't exist");
 						FS::$iMgr->ajaxEcho("err-cluster-not-exists");
 						return;
 					}
@@ -1816,11 +1873,13 @@
 					));
 					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($cname));
 					
+					$this->log(0,"Remove cluster: cluster '".$cname."' removed");
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Add/Edit IP informations
 				case 11:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+						$this->log(2,"Edit IP informations: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -1835,12 +1894,14 @@
 
 					if(!$ip || !FS::$secMgr->isIP($ip) || $mac && !FS::$secMgr->isMacAddr($mac) || $hostname && !FS::$secMgr->isHostname($hostname) ||
 						$reserv && $reserv != "on" || $comment && strlen($comment) > 500 || $edit && $edit != 1) {
+						$this->log(2,"Edit IP informations: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
 					// Reservations needs MAC & hostname
 					if($reserv == "on" && (!$mac || !$hostname)) {
+						$this->log(1,"Edit IP informations: reservation need mac address and hostname");
 						FS::$iMgr->ajaxEchoNC("err-reserv-need-fields");
 						return;
 					}
@@ -1860,6 +1921,7 @@
 					}
 					
 					if(!$found) {
+						$this->log(2,"Edit IP informations: IP isn't in a declared subnet");
 						FS::$iMgr->ajaxEcho("err-ip-not-in-declared-subnets");
 						return;
 					}
@@ -1873,6 +1935,7 @@
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
 						while($data = FS::$dbMgr->Fetch($query)) {
 							if($netobj->isUsableIP($data["ip"])) {
+								$this->loc(1,"Edit IP informations: mac addr '".$mac."' already used in this subnet");
 								FS::$iMgr->ajaxEchoNC("err-mac-already-used-in-subnet");
 								return;
 							}
@@ -1882,6 +1945,7 @@
 					if($hostname) {
 						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_ip","ip","hostname = '".$hostname."' AND ip != '".$ip."'");
 						if($exist) {
+							$this->log(1,"Edit IP informations: hostname '".$hostname."' already used");
 							FS::$iMgr->ajaxEchoNC("err-hostname-already-defined");
 							return;
 						}
@@ -1896,6 +1960,7 @@
 						$count = count($ipopts);
 						for($i=0;$i<$count;$i++) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$ipopts[$i]."'",array("group" => "optgroup"))) {
+								$this->log(2,"Edit IP informations: dhcp option group '".$opopts[$i]."' doesn't exist");
 								FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-not-exists");
 								return;
 							}
@@ -1921,6 +1986,7 @@
 
 					$this->calculateRanges($netinfos[0],$netobj);
 
+					$this->log(0,"Edit IP informations: informations edited for IP '".$ip."'");
 					// Maybe replace only the concerned tr and also the graph ? 
 					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
@@ -1928,6 +1994,7 @@
 				// Add/Edit Custom Option
 				case 12:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+						$this->log(2,"Add/Edit custom option: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -1937,16 +2004,19 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$optname || !FS::$secMgr->isHostname($optname) || !$optcode || !FS::$secMgr->isNumeric($optcode) ||
 						!$opttype || $edit && $edit != 1) {
+						$this->log(2,"Add/Edit custom option: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
 					if($optcode < 126) {
+						$this->log(1,"Add/Edit custom option: option code '".$optcode."' protected");
 						FS::$iMgr->ajaxEchoNC("err-option-code-protected");
 						return;
 					}
 
 					if($optcode > 255) {
+						$this->log(1,"Add/Edit custom option: option code '".$optcode."' is to high");
 						FS::$iMgr->ajaxEchoNC("err-option-code-lower-255");
 						return;
 					}
@@ -1955,12 +2025,14 @@
 						"optname = '".$optname."'");
 					if($edit) {
 						if(!$exist) {
+							$this->log(2,"Add/Edit custom option: option '".$optname."' doesn't exist");
 							FS::$iMgr->ajaxEcho("err-custom-option-not-exists");
 							return;
 						}
 					}
 					else {
 						if($exist) {
+							$this->log(1,"Add/Edit custom option: option '".$optname."' already exists");
 							FS::$iMgr->ajaxEchoNC("err-custom-option-already-exists");
 							return;
 						}
@@ -1972,6 +2044,13 @@
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname,optcode,opttype",
 						"'".$optname."','".$optcode."','".$opttype."'");
 					FS::$dbMgr->CommitTr();
+
+					if($edit) {
+						$this->log(0,"Add/Edit custom option: option '".$optname."' edited");
+					}
+					else {
+						$this->log(0,"Add/Edit custom option: option '".$optname."' added");
+					}
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "customoptslist",
@@ -2000,17 +2079,20 @@
 				// Delete Custom Option
 				case 13:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+						$this->log(2,"Delete custom option: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 					$optname = FS::$secMgr->checkAndSecuriseGetData("optname");
 					if(!$optname || !FS::$secMgr->isHostname($optname)) {
+						$this->log(2,"Delete custom option: bad datas given");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname",
 						"optname = '".$optname."'")) {
+						$this->log(2,"Delete custom option: custom option '".$optname."' doesn't exist");
 						FS::$iMgr->ajaxEcho("err-custom-option-not-exists");
 						return;
 					}
@@ -2039,6 +2121,8 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_custom_option","optname = '".$optname."'");
 					FS::$dbMgr->CommitTr();
 
+					$this->log(0,"Delete custom option: option '".$optname."' removed");
+
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "customoptslist",
 						"sqltable" => "dhcp_custom_option",
@@ -2052,6 +2136,7 @@
 				// Add option
 				case 14:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+						$this->log(2,"Add/Edit option: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -2061,12 +2146,14 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if(!$optalias || !FS::$secMgr->isHostname($optalias) || !$optname || !FS::$secMgr->isHostname($optalias) ||
 						!$optvalue) {
+						$this->log(2,"Add/Edit option: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
 					$opttype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_custom_option","opttype","optname= '".$optname."'");
 					if(!$opttype) {
+						$this->log(2,"Add/Edit option: custom option '".$optname."' doesn't exist");
 						FS::$iMgr->ajaxEchoNC("err-custom-option-not-exists");
 						return;
 					}
@@ -2074,43 +2161,51 @@
 					switch($opttype) {
 						case "boolean":
 							if($optvalue != "true" && $optvalue != "false") {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
 							break;
 						case "uint32":
 							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0 || $optvalue > 4294967295) {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
 						case "uint16":
 							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0 || $optvalue > 65535) {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
 						case "uint8":
 							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < 0 || $optvalue > 255) {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
 						case "int32":
 							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < -2147483647 || $optvalue > 2147483647) {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
 						case "int16":
 							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < -32768 || $optvalue > 32767 ) {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
 						case "int32":
 							if(!FS::$secMgr->isNumeric($optvalue) || $optvalue < -256 || $optvalue > 255) {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
 							break;
 						case "ip":
 							if(!FS::$secMgr->isIP($optvalue)) {
+								$this->log(1,"Add/Edit option: option value invalid");
 								FS::$iMgr->ajaxEchoNC("err-option-value-invalid");
 								return;
 							}
@@ -2123,22 +2218,27 @@
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optalias","optalias = '".$optalias."'");
 					if($edit) {
 						if(!$exist) {
+							$this->log(2,"Add/Edit option: option '".$optalias."' doesn't exist");
 							FS::$iMgr->ajaxEcho("err-option-not-exists");
 							return;
 						}
 					}
 					else {
 						if($exist) {
+							$this->log(1,"Add/Edit option: option '".$optalias."' already exists");
 							FS::$iMgr->ajaxEchoNC("err-option-already-exists");
 							return;
 						}
 					}
 
 					FS::$dbMgr->BeginTr();
-					if($edit)
+					if($edit) {
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optalias = '".$optalias."'");
+					}
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_option","optalias,optname,optval","'".$optalias."','".$optname."','".$optvalue."'");
 					FS::$dbMgr->CommitTr();
+
+					$this->log(0,"Add/Edit option: option '".$optalias."' ".($edit ? "edited" : "added"));
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "doptslist",
@@ -2164,17 +2264,20 @@
 				// Remove option
 				case 15:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+						$this->log(2,"Remove option: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 					$optalias = FS::$secMgr->checkAndSecuriseGetData("optalias");
 					if(!$optalias || !FS::$secMgr->isHostname($optalias)) {
+						$this->log(2,"Remove option: bad datas given");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optalias",
 						"optalias = '".$optalias."'")) {
+						$this->log(2,"Remove option: option '".$optalias."' doesn't exist");
 						FS::$iMgr->ajaxEcho("err-option-not-exists");
 						return;
 					}
@@ -2201,6 +2304,8 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optalias = '".$optalias."'");
 					FS::$dbMgr->CommitTr();
 
+					$this->log(0,"Remove option: option '".$optalias."' removed");
+
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "doptslist",
 						"sqltable" => "dhcp_option",
@@ -2214,6 +2319,7 @@
 				// Add/edit option group
 				case 16:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt")) {
+						$this->log(2,"Add/Edit option group: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -2223,6 +2329,7 @@
 					if(!$optgroup || !FS::$secMgr->isHostname($optgroup) || !$options ||
 						$edit && $edit != 1
 					) {
+						$this->log(2,"Add/Edit option group: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
@@ -2230,12 +2337,14 @@
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$optgroup."'");
 					if($edit) {
 						if(!$exist) {
+							$this->log(2,"Add/Edit option group: option group '".$optgroup."' doesn't exist");
 							FS::$iMgr->ajaxEcho("err-dhcp-opts-group-not-exists");
 							return;
 						}
 					}
 					else {
 						if($exist) {
+							$this->log(1,"Add/Edit option group: option group '".$optgroup."' already exists");
 							FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-already-exists");
 							return;
 						}
@@ -2257,6 +2366,8 @@
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup,optalias","'".$optgroup."','".$options[$i]."'");
 					}
 					FS::$dbMgr->CommitTr();
+
+					$this->log(0,"Add/Edit option group: option group '".$optgroup."' ".($edit ? "edited" : "added"));
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "dgoptslist",
@@ -2281,16 +2392,19 @@
 				// Remove option group
 				case 17:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt")) {
+						$this->log(2,"Remove option group: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 					$optgroup = FS::$secMgr->checkAndSecuriseGetData("optgroup");
 					if(!$optgroup || !FS::$secMgr->isHostname($optgroup)) {
+						$this->log(2,"Remove option group: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$optgroup."'")) {
+						$this->log(2,"Remove option group: option group '".$optgroup."' doesn't exists");
 						FS::$iMgr->ajaxEcho("err-dhcp-opts-group-not-exists");
 						return;
 					}
@@ -2299,6 +2413,8 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup  = '".$optgroup."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid = '".$netid."'");
 					FS::$dbMgr->CommitTr();
+
+					$this->log(0,"Remove option group: option group '".$optgroup."' removed");
 
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "dgoptslist",
@@ -2322,6 +2438,7 @@
 				// Ip range management
 				case 18:
 					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt")) {
+						$this->log(2,"IP range management: no rights");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -2334,12 +2451,14 @@
 						!$startip || !FS::$secMgr->isIP($startip) || 
 						!$endip || !FS::$secMgr->isIP($endip) ||
 						!$action) {
+						$this->log(2,"IP range management: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 
 					// Action 1: add / Action 2: delete
 					if($action != 1 && $action != 2) {
+						$this->log(2,"IP range management: bad action given '".$action."'");
 						FS::$iMgr->ajaxEchoNC("err-bad-range-action");
 						return;
 					}
@@ -2347,6 +2466,7 @@
 					// Subnet must be declared
 					$netmask = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$subnet."'");
 					if(!$netmask) {
+						$this->log(2,"IP range management: subnet '".$subnet."' doesn't exist");
 						FS::$iMgr->ajaxEchoNC("err-subnet-not-exists");
 						return;
 					}
@@ -2358,6 +2478,7 @@
 					// Start IP must be in subnet usable IPs
 					if(ip2long($startip) < $netobj->getFirstUsableIPLong() ||
 						ip2long($startip) > $netobj->getLastUsableIPLong()) {
+						$this->log(1,"IP range management: starting IP is not in subnet");
 						FS::$iMgr->ajaxEchoNC("err-startip-not-in-range");
 						return;
 					}
@@ -2365,17 +2486,22 @@
 					// End IP must be in subnet usable IPs
 					if(ip2long($endip) < $netobj->getFirstUsableIPLong() ||
 						ip2long($endip) > $netobj->getLastUsableIPLong()) {
+						$this->log(1,"IP range management: ending IP is not in subnet");
 						FS::$iMgr->ajaxEchoNC("err-endip-not-in-range");
 						return;
 					}
 
 					// Start IP must be <= End IP
 					if(ip2long($startip) > ip2long($endip)) {
+						$this->log(1,"IP range management: starting IP is greater than ending IP");
 						FS::$iMgr->ajaxEchoNC("err-startip-lower-endip");
 						return;
 					}
 
 					$this->calculateRanges($subnet,$netobj,$action,$startip,$endip);
+
+					$this->log(0,"IP range management: range modified. action '".$action."' / startIP: '".$startip.
+						"' / endIP: '".$endip."'");
 
 					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
