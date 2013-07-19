@@ -18,7 +18,10 @@
 	*/
 	
 	final class iIPMRightsMgmt extends FSModule {
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "ipmrightsmgmt";
+		}
 		
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-ipmrightsmgmt"));
@@ -266,7 +269,8 @@
 
 		public function handlePostDatas($act) {
 			switch($act) {
-				case 1: // Add group right for SNMP/IP community 
+				// Add/Edit global user/group right
+				case 1:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					$global = FS::$secMgr->checkAndSecurisePostData("global");
@@ -274,6 +278,7 @@
 
 					if((!$gid && !$uid) || (!$global) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
+						$this->log(2,"Bad datas when add global rights");
 						return;
 					}
 
@@ -283,40 +288,48 @@
 						if($gid) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Add/edit global group right: Group gid '".$gid."' not found");
 								return;
 							}
 							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_ipmmgmt_".
 								$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
 								FS::$iMgr->ajaxEcho("err-already-exist");
+								$this->log(1,"Add/edit global group right: the rule for right '".$right."' already exists");
 								return;
 							}
 							FS::$dbMgr->BeginTr();
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_ipmmgmt_".$right."' AND gid = '".$gid."'");
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','mrule_ipmmgmt_".$right."','on'");
 							FS::$dbMgr->CommitTr();
+
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","global",$gname,$gid,$right,"1");
 							$js .= $this->jsUserGroupSelect($right,"glbl","gid");
 							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchgrpr_".FS::$iMgr->formatHTMLId("gglbl-".$right)."');";
+							$this->log(0,"global right '".$right."' for group '".$gid."' added/edited");
 						}
 						else if($uid) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Add/edit global user right: user with uid '".$uid."' doesn't exists");
 								return;
 							}
 							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_ipmmgmt_ip_".
 								$right."' AND uid = '".$uid."' AND ruleval = 'on'")) {
 								FS::$iMgr->ajaxEcho("err-already-exist");
+								$this->log(1,"Add/edit global user right: the rule for right '".$right."' already exists");
 								return;
 							}
 							FS::$dbMgr->BeginTr();
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename = 'mrule_ipmmgmt_".$right."' AND uid = '".$uid."'");
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","'".$uid."','mrule_ipmmgmt_".$right."','on'");
 							FS::$dbMgr->CommitTr();
+
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","global",$username,$uid,$right,"1");
 							$js .= $this->jsUserGroupSelect($right,"glbl","uid");
 							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchusrr_".FS::$iMgr->formatHTMLId("uglbl-".$right)."');";
+							$this->log(0,"global right '".$right."' for user '".$uid."' added/edited");
 						}
 					}
 
@@ -331,6 +344,7 @@
 
 					if((!$uid && !$gid) || (!$global) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
+						$this->log(2,"Bad datas when remove global right");
 						return;
 					}
 
@@ -339,17 +353,21 @@
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_ipmmgmt_".
 								$right."' AND gid = '".$gid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Unable to remove global right '".$right."' for gid '".$gid."': right doesn't exist");
 								return;
 							}
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_ipmmgmt_".$right."' AND gid = '".$gid."'");
+							$this->log(0,"global right '".$right."' for gid '".$gid."' removed");
 						}
 						else if($uid) {
 							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_ipmmgmt_".
 								$right."' AND uid = '".$uid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Unable to remove global right '".$right."' for uid '".$uid."': right doesn't exist");
 								return;
 							}
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename = 'mrule_ipmmgmt_".$right."' AND uid = '".$uid."'");
+							$this->log(0,"global right '".$right."' for uid '".$uid."' removed");
 						}
 					}
 					if($gid) {

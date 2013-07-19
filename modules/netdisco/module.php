@@ -20,7 +20,10 @@
 	require_once(dirname(__FILE__)."/netdiscoCfg.api.php");
 	
 	final class iNetdisco extends FSModule {
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "netdisco";
+		}
 		
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-netdisco"));
@@ -108,15 +111,15 @@
 					$fnode = FS::$secMgr->checkAndSecurisePostData("fnode");
 					if(checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
 						if(writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) != 0) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"menumgmt",2,"Fail to write netdisco configuration");
+							$this->log(2,"Fail to write netdisco configuration");
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 							return;
 						}
-						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",0,"Netdisco configuration changed");
+						$this->log(0,"Netdisco configuration changed");
 						FS::$iMgr->redir("mod=".$this->mid."&err=-1");
 						return;
 					}
-					FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Bad netdisco configuration");
+					$this->log(2,"Bad netdisco configuration");
 					FS::$iMgr->redir("mod=".$this->mid."&err=1");
 					return;
 				default: break;

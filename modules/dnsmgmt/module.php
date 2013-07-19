@@ -20,7 +20,10 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 
 	final class iDNSManager extends FSModule{
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "dnsmgmt";
+		}
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-dns"));
@@ -444,7 +447,7 @@
 					$shother = FS::$secMgr->checkAndSecurisePostData("sother");
 
 					if($dnszone == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Getting zone: Some values are wrong");
+						$this->log(2,"Getting zone: Some values are wrong");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 					}
 					else {
@@ -456,8 +459,8 @@
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
 					if(!$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
-						echo FS::$iMgr->printError($this->loc->s("err-invalid-req"));
-						FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",2,"Invalid data when searching obsolete datas");
+						FS::$iMgr->ajaxEcho("err-invalid-req");
+						$this->log(2,"Invalid data when searching obsolete datas");
 						return;
 					}
 
@@ -533,7 +536,7 @@
 					FS::$iMgr->js($js);
 
 					FS::$iMgr->ajaxEcho("Done");
-					FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",0,"search old records for DNS zones");
+					$this->log(0,"search old records for DNS zones");
 					return;
 				// Add/Edit DNS server
 				case 3:
@@ -546,7 +549,7 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to add/edit server");
+						$this->log(2,"User don't have rights to add/edit server");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -555,7 +558,7 @@
 						!$namedpath || !FS::$secMgr->isPath($namedpath) ||
 							(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
 						) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"Some datas are invalid or wrong for add server");
+						$this->log(2,"Some datas are invalid or wrong for add server");
 						FS::$iMgr->ajaxEcho("err-miss-bad-fields");
 						return;
 					}
@@ -571,7 +574,7 @@
 				
 					if($edit) {	
 						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
+							$this->log(1,"Unable to add server '".$saddr."': already exists");
 							FS::$iMgr->ajaxEcho("err-bad-server");
 							return;
 						}
@@ -580,27 +583,27 @@
 					}
 					else {
 						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",1,"Unable to add server '".$saddr."': already exists");
+							$this->log(1,"Unable to add server '".$saddr."': already exists");
 							FS::$iMgr->ajaxEcho("err-server-exist");
 							return;
 						}
 					}
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."server_list","addr,login,pwd,dns,namedpath,chrootnamed",
 					"'".$saddr."','".$slogin."','".$spwd."','1','".$namedpath."','".$chrootnamed."'");
-					FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Added server '".$saddr."' options: dns checking");
+					$this->log(0,"Added server '".$saddr."' options: dns checking");
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				// Delete DNS server
 				case 4: { 
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
+						$this->log(2,"User don't have rights to remove server");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 					
 					$srv = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if($srv) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",0,"Removing server '".$srv."' from database");
+						$this->log(0,"Removing server '".$srv."' from database");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$srv."'");
 					}
 					if(FS::isAjaxCall())
@@ -612,7 +615,7 @@
 				// Add/Edit TSIG key
 				case 5:
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
+						$this->log(2,"User don't have rights to remove server");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -692,7 +695,7 @@
 				// Remove TSIG key
 				case 6:
 					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"servermgmt",2,"User don't have rights to remove server");
+						$this->log(2,"User don't have rights to remove server");
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}

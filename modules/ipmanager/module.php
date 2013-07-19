@@ -20,7 +20,10 @@
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 
 	final class iIPManager extends FSModule{
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "ipmanager";
+		}
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-ip-management"));
@@ -1242,7 +1245,7 @@
 					$filtr = FS::$secMgr->checkAndSecurisePostData("f");
 					$view = FS::$secMgr->checkAndSecurisePostData("view");
 					if(!$filtr || !$view || !FS::$secMgr->isNumeric($view) || $view < 1 || $view > 3) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to filter values");
+						$this->log(2,"Some datas are missing when try to filter values");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
@@ -1264,7 +1267,7 @@
 					if(!$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
 						FS::$iMgr->ajaxEchoNC("err-invalid-req");
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when trying to find obsolete datas");
+						$this->log(2,"Some datas are missing when trying to find obsolete datas");
 						return;
 					}
 
@@ -1292,7 +1295,7 @@
 						}
 						
 						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".addslashes($output)."');");
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User find obsolete datas :<br />".$logbuffer);
+						$this->log(0,"User find obsolete datas :<br />".$logbuffer);
 					}
 					else
 						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".addslashes(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
@@ -1309,7 +1312,7 @@
 					if(!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || 
 						$warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
 						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are missing when try to monitor subnet");
+						$this->log(2,"Some datas are missing when try to monitor subnet");
 						FS::$iMgr->ajaxEcho("err-miss-data");
 						return;
 					}
@@ -1318,7 +1321,7 @@
 						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid = '".$filtr."'");
 
 					if(!$exist) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"User try to monitor inexistant subnet '".$filtr."'");
+						$this->log(2,"User try to monitor inexistant subnet '".$filtr."'");
 						FS::$iMgr->ajaxEcho("err-bad-subnet");
 						return;
 					}
@@ -1329,7 +1332,7 @@
 						($enmon == "on" ? "1" : "0")."','".$maxage."','".($eniphistory == "on" ? "t" : "f")."'");
 					FS::$dbMgr->CommitTr();
 
-					FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
+					$this->log(0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
 					FS::$iMgr->ajaxEcho("modif-record");
 					return;
 				case 4:
@@ -1366,7 +1369,7 @@
 						!$dhcptype || !FS::$secMgr->isNumeric($dhcptype) ||
 						$edit && $edit != 1
                                         ) {
-                                                FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Some datas are invalid or wrong for add server");
+                                                $this->log(2,"Some datas are invalid or wrong for add server");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
                                                 return;
                                         }
@@ -1404,14 +1407,14 @@
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr ='".$saddr."'");
 					if($edit) {
 						if(!$exist) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to edit server '".$saddr."': not exists");
+							$this->log(1,"Unable to edit server '".$saddr."': not exists");
 							FS::$iMgr->ajaxEcho("err-not-exists");
 							return;
 						}
 					}
 					else {
 						if($exist) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to add server '".$saddr."': already exists");
+							$this->log(1,"Unable to add server '".$saddr."': already exists");
 							FS::$iMgr->ajaxEchoNC("err-already-exists");
 							return;
 						}
@@ -1420,12 +1423,12 @@
 					$ssh = new SSH($saddr,22);
 					
                                         if(!$ssh->Connect()) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"SSH Connection failed for '".$saddr."'");
+						$this->log(1,"SSH Connection failed for '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-ssh-conn-failed");
                                                 return;
                                         }
 					if(!$ssh->Authenticate($slogin,$spwd)) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
+						$this->log(2,"SSH Auth failed for '".$slogin."'@'".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-ssh-auth-failed");
                                                 return;
                                         }
@@ -1434,21 +1437,21 @@
 					* We try to read files
 					*/
 					if($ssh->execCmd("if [ -r ".$dhcpdpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
+						$this->log(1,"Unable to read file '".$dhcpdpath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$dhcpdpath."'";
                                                 return;
 					}
 
 					// dhcpd.leases
                                         if($ssh->execCmd("if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-                                                FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$leasepath."' on '".$saddr."'");
+                                                $this->logt(1,"Unable to read file '".$leasepath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$leasepath."'";
                                                 return;
                                         }
 
 					if($reservconfpath && strlen($reservconfpath) > 0) {
                                         	if($ssh->execCmd("if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;")!= 0) {
-                                                	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
+                                                	$this->log(1,"Unable to read file '".$reservconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$reservconfpath."'";
         	                                        return;
                 	                        }
@@ -1456,7 +1459,7 @@
 
 					if($subnetconfpath && strlen($subnetconfpath) > 0) {
                                         	if($ssh->execCmd("if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-                                                	FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
+                                                	$this->log(1,"Unable to read file '".$subnetconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$subnetconfpath."'";
         	                                        return;
                 	                        }
@@ -1472,9 +1475,9 @@
 					FS::$dbMgr->CommitTr();
 
 					if($edit)
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Edited DHCP server '".$saddr."' (login: '".$slogin."')");
+						$this->log(0,"Edited DHCP server '".$saddr."' (login: '".$slogin."')");
 					else
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
+						$this->log(0,"Added DHCP server '".$saddr."' (login: '".$slogin."')");
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				// Delete DHCP Server
@@ -1486,19 +1489,19 @@
 
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"No DHCP server specified to remove");
+						$this->log(2,"No DHCP server specified to remove");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","sshuser","addr = '".$addr."'")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Unknown DHCP server specified to remove");
+						$this->log(2,"Unknown DHCP server specified to remove");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					if($clustername = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername","master = '".$addr."'")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",1,"DHCP server is master of cluster '".$clustername."', cannot remove it");
+						$this->log(1,"DHCP server is master of cluster '".$clustername."', cannot remove it");
 						FS::$iMgr->ajaxEcho($this->loc->s("err-remove-dhcpserver-master").$clustername.
 							$this->loc->s("err-remove-dhcpserver-master2"),"",true);
 						return;
@@ -1544,7 +1547,7 @@
 						$domainname && !FS::$secMgr->isDNSName($domainname) || $mleasetime && (!FS::$secMgr->isNumeric($mleasetime) || $mleasetime < 60) ||
 						$dleasetime && (!FS::$secMgr->isNumeric($dleasetime) || $dleasetime < 30) || 
 						$edit && $edit != 1) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas entered when adding Declared subnet");
+						$this->log(2,"Bad datas entered when adding Declared subnet");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
@@ -1656,7 +1659,7 @@
 
 					$netid = FS::$secMgr->checkAndSecuriseGetData("netid");
 					if(!$netid || !FS::$secMgr->isIP($netid)) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"ipmanager",2,"Bad datas given when deleting Declared subnet");
+						$this->log(2,"Bad datas given when deleting Declared subnet");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}

@@ -22,6 +22,8 @@
 	final class iSearch extends FSModule {
 		function __construct($locales) { 
 			parent::__construct($locales);
+			$this->modulename = "search";
+
 			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array(),
@@ -63,7 +65,7 @@
 					else
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 				}
-				FS::$log->i(FS::$sessMgr->getUserName(),"search",0,"searching '".$search."'");
+				$this->log(0,"searching '".$search."'");
 			}
 			else {
 				if(preg_match('#^([0-9A-F]{2}:)#i',$search) || preg_match('#([0-9A-F]{2}-)#i',$search))
