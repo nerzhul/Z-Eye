@@ -410,24 +410,27 @@
 			
 					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-hostname");
 					$found = 0;
-	
-					$locoutput = "";
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","group" => "clustername"));
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if($found == 0)
-							$found = 1;
+					
+					if(FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
+						$locoutput = "";
+						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","group" => "clustername"));
+						while($data = FS::$dbMgr->Fetch($query)) {
+							if($found == 0)
+								$found = 1;
 
-						$locoutput .= "<b>".$this->loc->s("DHCP-cluster")."</b>: ".$data["clustername"]."<br /><b>".$this->loc->s("Members").":</b><br />";
-						$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$data["clustername"]."'");
-						while($data2 = FS::$dbMgr->Fetch($query2)) {
-							$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_server","alias","addr = '".$data["dhcpaddr"]."'");
-							$locoutput .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".($alias ? $alias." (" : "").$data2["dhcpaddr"].($alias ? ")" : "")."<br />";
+							$locoutput .= "<b>".$this->loc->s("DHCP-cluster")."</b>: ".$data["clustername"]."<br /><b>".$this->loc->s("Members").":</b><br />";
+
+							$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$data["clustername"]."'");
+							while($data2 = FS::$dbMgr->Fetch($query2)) {
+								$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_servers","alias","addr = '".$data2["dhcpaddr"]."'");
+								$locoutput .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".($alias ? $alias." (" : "").$data2["dhcpaddr"].($alias ? ")" : "")."<br />";
+							}
+							$locoutput .= FS::$iMgr->hr();
+							$this->nbresults++;
 						}
-						$locoutput .= FS::$iMgr->hr();
-						$this->nbresults++;
+						if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-cluster");
+						$found = 0;
 					}
-					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-cluster");
-					$found = 0;
 				}
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","hostname","hostname ILIKE '%".$search."%'",array("order" => "hostname","limit" => "10","group" => "hostname"));
@@ -499,11 +502,15 @@
 							$found = 1;
 						}
 						else $locoutput .= FS::$iMgr->hr();
-						if(strlen($data["hostname"]) > 0)
-							$locoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
-						if(strlen($data["macaddr"]) > 0)
-							$locoutput .= $this->loc->s("link-mac-addr").": <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
-						$locoutput .= $this->loc->s("attribution-type").": ".($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
+						if(strlen($data["hostname"]) > 0) {
+							$locoutput .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+						}
+
+						if(strlen($data["macaddr"]) > 0) {
+							$locoutput .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+						}
+
+						$locoutput .= "<b>".$this->loc->s("attribution-type")."</b>: ".($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
 						if($data["distributed"] != 3 && $data["distributed"] != 4)
 							$locoutput .= $this->loc->s("Validity")." : ".$data["leasetime"];
 						$this->nbresults++;
@@ -512,18 +519,34 @@
 					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-distrib");
 					$found = 0;
 
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment","ip = '".$search."'");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment,reserv","ip = '".$search."'");
 					while($data = FS::$dbMgr->Fetch($query)) {
 						if($found == 0) {
 							$found = 1;
 						}
-						else $locoutput .= FS::$iMgr->hr();
-						if(strlen($data["hostname"]) > 0)
-							$locoutput .= $this->loc->s("dhcp-hostname").": ".$data["hostname"]."<br />";
-						if(strlen($data["macaddr"]) > 0)
-							$locoutput .= $this->loc->s("link-mac-addr").": <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
-						if(strlen($data["comment"]) > 0)
-							$locoutput .= $this->loc->s("comment").": ".$data["comment"]."<br />";
+						else {
+							$locoutput .= FS::$iMgr->hr();
+						}
+
+						if(strlen($data["hostname"]) > 0) {
+							$locoutput .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+						}
+
+						if(strlen($data["macaddr"]) > 0) {
+							$locoutput .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+						}
+
+						if(strlen($data["comment"]) > 0) {
+							$locoutput .= "<b>".$this->loc->s("comment")."</b>: ".$data["comment"]."<br />";
+						}
+
+						if($data["reserv"] == 't') {
+							$locoutput .= "<b>".$this->loc->s("active-reserv")."</b><br />";
+						}
+						else {
+							$locoutput .= $this->loc->s("inactive-reserv")."<br />";
+						}
+
 						$this->nbresults++;
 					}
 			
