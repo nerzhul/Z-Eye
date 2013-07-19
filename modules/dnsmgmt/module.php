@@ -533,7 +533,7 @@
 					FS::$iMgr->js($js);
 
 					FS::$iMgr->ajaxEcho("Done");
-					FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",3,"search old records for DNS zones");
+					FS::$log->i(FS::$sessMgr->getUserName(),"dnsmgmt",0,"search old records for DNS zones");
 					return;
 				// Add/Edit DNS server
 				case 3:
