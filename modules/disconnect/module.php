@@ -35,7 +35,7 @@
 			$act = FS::$secMgr->checkAndSecuriseGetData("act");
 			switch($act) {
 				case 1: if(FS::$sessMgr->getUid()) {
-						$this->log(1,"User disconnected");
+						$this->log(0,"User disconnected");
 						FS::$sessMgr->Close(); 
 					}
 					break;
