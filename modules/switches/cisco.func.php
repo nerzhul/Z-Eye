@@ -114,7 +114,7 @@
 			$duplex = FS::$secMgr->checkAndSecurisePostData("duplex");
 			if($duplex && FS::$secMgr->isNumeric($duplex)) {
 				if($duplex < 1 || $duplex > 4) {
-					FS::$log->i(FS::$sessMgr->getUserName(),"switches",2,"Some fields are wrong: duplex (plug edit)");
+					$this->log(2,"Some fields are wrong: duplex (plug edit)");
 					FS::$iMgr->ajaxEcho("Duplex field is wrong (".$duplex.")");
 					return;
 				}

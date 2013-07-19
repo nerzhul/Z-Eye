@@ -20,7 +20,10 @@
 	require_once(dirname(__FILE__)."/../netdisco/netdiscoCfg.api.php");
 	
 	final class iSNMPMgmt extends FSModule {
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct($locales) {
+			parent::__construct($locales);
+			$this->modulename = "snmpmgmt";
+		}
 		
 		public function Load() {
 			$output = "";
@@ -117,7 +120,7 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if(!$name || $ro && $ro != "on" || $rw && $rw != "on" || $edit && $edit != 1) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Adding data");
+						$this->log(2,"Invalid Adding data");
 						FS::$iMgr->ajaxEchoNC("err-invalid-data");
 						return;
 					}
@@ -125,14 +128,14 @@
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'");
 					if($edit) {
 						if(!$exist) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' not exists");
+							$this->log(1,"Community '".$name."' not exists");
 							FS::$iMgr->ajaxEcho("err-not-exist");
 							return;
 						}
 					}
 					else {
 						if($exist) {
-							FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",1,"Community '".$name."' already in DB");
+							$this->log(1,"Community '".$name."' already in DB");
 							FS::$iMgr->ajaxEchoNC("err-already-exist");
 							return;
 						}
@@ -146,7 +149,7 @@
 
 					$netdiscoCfg = readNetdiscoConf();
 					if(!is_array($netdiscoCfg)) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
+						$this->log(2,"Reading error on netdisco.conf");
 						FS::$iMgr->ajaxEchoNC("err-read-netdisco");
 						return;
 					}
@@ -181,19 +184,19 @@
 				case 2: // Remove SNMP community
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
 					if(!$name) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Invalid Deleting data");
+						$this->log(2,"Invalid Deleting data");
 						FS::$iMgr->ajaxEcho("err-invalid-data");
 						return;
 					}
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Community '".$name."' not in DB");
+						$this->log(2,"Community '".$name."' not in DB");
 						FS::$iMgr->ajaxEcho("err-not-exist");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if(!is_array($netdiscoCfg)) {
-						FS::$log->i(FS::$sessMgr->getUserName(),"netdisco",2,"Reading error on netdisco.conf");
+						$this->log(2,"Reading error on netdisco.conf");
 						FS::$iMgr->ajaxEcho("err-read-fail");
 						return;
 					}
