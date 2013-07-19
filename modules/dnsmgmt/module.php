@@ -348,7 +348,7 @@
 			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3").
 				"<table>".
 				FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$addr,array("type" => "idxedit", "value" => $addr,
-				"length" => "128","edit" => $addr != "")).
+				"length" => "128", "edit" => $addr != "")).
 				FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin).
 				FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd")).
 				FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd")).

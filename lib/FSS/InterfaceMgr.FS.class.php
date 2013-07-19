@@ -425,14 +425,14 @@
 			if (isset($options["type"])) {
 				switch($options["type"]) {
 					case "idxedit": 
-						if ($options["edit"])
+						if (isset($options["edit"]) && $options["edit"])
 							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
 						else
 							$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
                                         			(isset($options["label"]) ? $options["label"] : NULL));
 						break;
 					case "idxipedit":
-						if ($options["edit"])
+						if (isset($options["edit"]) && $options["edit"])
 							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
 						else
 							$output .= $this->IPInput($name,$def_value);
