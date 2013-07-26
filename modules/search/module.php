@@ -27,7 +27,7 @@
 			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array(),
-				"dhcpcluster" => array(), "dhcpserver" => array(), "dhcpoptions" => array());
+				"dhcpcluster" => array(), "dhcpserver" => array(), "dhcpoptions" => array(), "dhcpsubnet" => array());
 			$this->nbresults = 0;
 		}
 
@@ -134,8 +134,9 @@
 
 			if(FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
 				if(!$autocomp) {
-					// VLAN on ipmanger
 					$ipmmodid = FS::$iMgr->getModuleIdByPath("ipmanager");
+
+					// VLAN on ipmanger
 					$locoutput = "";
 					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,subnet_short_name","vlanid = '".$search."'");
 					if($data = FS::$dbMgr->Fetch($query)) {
@@ -151,9 +152,18 @@
 					$found = 0;
 				}
 				else {
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",array("order" => "vlanid","limit" => "10","group" => "vlanid"));
-					while($data = FS::$dbMgr->Fetch($query))
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
+						"vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",
+						array("order" => "vlanid","limit" => "10","group" => "vlanid"));
+
+					while($data = FS::$dbMgr->Fetch($query)) {
 						$this->autoresults["vlan"][] = $data["vlanid"];
+					}
+
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
+						"netid","CAST(netid as TEXT) ILIKE '".$search."%'",array("order" => "netid","limit" => "10","group" => "netid"));
+					while($data = FS::$dbMgr->Fetch($query))
+						$this->autoresults["dhcpsubnet"][] = $data["netid"];
 				}
 			}
 
@@ -770,6 +780,23 @@
 					$found = 0;
 
 					$tmpoutput .= $this->showDHCPServers($search);
+
+					// subnet on ipmanger
+					$ipmmodid = FS::$iMgr->getModuleIdByPath("ipmanager");
+					$locoutput = "";
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name","netid = '".$search."'");
+					if($data = FS::$dbMgr->Fetch($query)) {
+						if($found == 0)
+							$found = 1;
+						$locoutput .= "<b>".$this->loc->s("subnet-shortname")."</b>: <a href=\"index.php?mod=".$ipmmodid."&sh=2\">".$data["subnet_short_name"]."</a><br />".
+							"<b>".$this->loc->s("netid")."</b>: ".$data["netid"]."<br />".
+							"<b>".$this->loc->s("netmask")."</b>: ".$data["netmask"]."<br />".
+							"<b>".$this->loc->s("vlanid")."</b>: ".$data["vlanid"]."<br />";
+							
+					}
+
+					if($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-subnet-ipmanager");
+					$found = 0;
 				}
 				else {
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip","ip ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
@@ -781,6 +808,11 @@
 						$this->autoresults["ip"][] = $data["ip"];
 
 					$this->fetchDHCPServersAutoResults($search);
+
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
+						"netid","CAST(netid as TEXT) ILIKE '".$search."%'",array("order" => "netid","limit" => "10","group" => "netid"));
+					while($data = FS::$dbMgr->Fetch($query))
+						$this->autoresults["dhcpsubnet"][] = $data["netid"];
 
 				}
 			}
