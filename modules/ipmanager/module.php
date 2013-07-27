@@ -98,13 +98,11 @@
 				$formoutput .= FS::$iMgr->selElmt($netid."/".$netmask,$netid,$filter == $netid);
 			}
 
-			$tmpoutput .= $formoutput;
-			$tmpoutput .= "</select> ";
-			$tmpoutput .= FS::$iMgr->select("view").FS::$iMgr->selElmt($this->loc->s("Stats"),1).FS::$iMgr->selElmt($this->loc->s("History"),2).
-				FS::$iMgr->selElmt($this->loc->s("Monitoring"),3)."</select> ";
-			
-			$tmpoutput .= FS::$iMgr->submit("","Consulter");
-			$tmpoutput .= "</form><br />";
+			$tmpoutput .= $formoutput."</select>".
+				FS::$iMgr->select("view").FS::$iMgr->selElmt($this->loc->s("Stats"),1).
+				FS::$iMgr->selElmt($this->loc->s("History"),2).
+				FS::$iMgr->selElmt($this->loc->s("Monitoring"),3)."</select> ".
+				FS::$iMgr->submit("","Consulter")."</form><br />";
 
 			if(count($netarray) == 0)
 				return FS::$iMgr->printError($this->loc->s("no-net-found"));
@@ -138,7 +136,9 @@
 			$output = FS::$iMgr->h3("Réseau : ".$netid."/".$netmask,true);
 
 			// range management
-			if(FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
+			$subnetu = preg_replace("#[.]#","_",$filter);
+			if((FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") ||
+				FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) &&
 				$netdeclared) {
 				$output .= FS::$iMgr->opendiv(14,$this->loc->s("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$netid));
 			}
@@ -347,7 +347,9 @@
 		}
 
 		private function showDHCPRangeForm($subnet) {
-			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt")) {
+			$subnetu = preg_replace("#[.]#","_",$subnet);
+			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
+				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 
@@ -369,7 +371,9 @@
 		}
 
 		private function showSubnetHistory($filter) {
-			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
+			$subnetu = preg_replace("#[.]#","_",$filter);
+			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_history") &&
+				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_history")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 
@@ -391,7 +395,9 @@
 		}
 
 		private function showSubnetMonitoring($filter) {
-			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
+			$subnetu = preg_replace("#[.]#","_",$filter);
+			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmon") &&
+				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_subnetmon")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 
@@ -998,7 +1004,9 @@
 		}
 
 		private function showHistory($filter,$interval = 1) {
-			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+			$subnetu = preg_replace("#[.]#","_",$filter);
+			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_history") &&
+				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_history")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
@@ -1302,6 +1310,10 @@
 					return;
 				// Monitor DHCP subnet
 				case 3:
+					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmon")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
 					$filtr = FS::$secMgr->checkAndSecuriseGetData("f");
 					$warn = FS::$secMgr->checkAndSecurisePostData("wlimit");
 					$crit = FS::$secMgr->checkAndSecurisePostData("climit");
@@ -1316,6 +1328,15 @@
 						FS::$iMgr->ajaxEcho("err-miss-data");
 						return;
 					}
+
+					// Also here because we have subnet
+					$subnetu = preg_replace("#[.]#","_",$filtr);
+					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmon") && 
+						!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_subnetmon")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid","netid = '".$filtr."'");
 					if(!$exist) 
 						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid = '".$filtr."'");
@@ -1346,7 +1367,7 @@
 					return;
 				// Add/Edit DHCP server
 				case 5:
-					if(!FS::$sessMgr->hasRight("mrule_ipmgmt_servermgmt")) {
+					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
 						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
@@ -1926,6 +1947,15 @@
 						return;
 					}
 
+					$subnetu = preg_replace("#[.]#","_",$netinfos[0]);
+					// Another test here because we have subnet
+					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt") &&
+						!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_ipmgmt")) {
+						$this->log(2,"Edit IP informations: no rights");
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
 					$netobj = new FSNetwork();
 					$netobj->setNetAddr($netinfos[0]);
 					$netobj->setNetMask($netinfos[1]);
@@ -2453,6 +2483,15 @@
 						!$action) {
 						$this->log(2,"IP range management: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+
+					// Another test here because we have subnet
+					$subnetu = preg_replace("#[.]#","_",$subnet);
+					if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
+						!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) {
+						$this->log(2,"IP range management: no rights");
+						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 

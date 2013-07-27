@@ -22,7 +22,7 @@
 			parent::__construct();
 			$locales = array(
 				"fr" => array(
-					"alert-on" => "alerte sur",
+					"alert-on" => "alerte(s) sur",
 					"Attack" => "Attaques",
 					"Availability" => "Disponibilité",
 					"CRITICAL" => "CRITIQUE",
@@ -51,7 +51,7 @@
 					"WARN" => "ATTENTION",
 				),
 				"en" => array(
-					"alert-on" => "alert on",
+					"alert-on" => "alert(s) on",
 					"Attack" => "Attacks",
 					"Availability" => "Availability",
 					"CRITICAL" => "CRITICAL",

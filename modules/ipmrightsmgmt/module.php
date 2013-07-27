@@ -30,9 +30,32 @@
 			return $output;
 		}
 
+		private function showSubnetForm() {
+			$output = "";
+			$tmpoutput = "";
 
-		private function showGlobalRights() {
-			// IP for ajax filtering
+			$found = false;
+
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","",
+				array("order" => "netid"));
+			while($data = FS::$dbMgr->Fetch($query)) {
+				if(!$found) {
+					$found = true;
+				}
+				$tmpoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"]);
+			}
+
+			if($found) {
+				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3").
+					FS::$iMgr->select("subnet").$tmpoutput."</select><br />".
+					FS::$iMgr->Submit("","Filter")."</form>".
+					"<div id=\"subnetrights\"></div>";
+			}
+
+			return $output;
+		}
+
+		private function showSubnetRights($subnet) {
 			$output = "";	
 			$found = false;
 
@@ -41,8 +64,45 @@
 			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>".$this->loc->s("Right")."</th><th>".
 				$this->loc->s("Users")."</th></tr>";
 
-			$grprules = $this->initGlobalRules();
-			$usrrules = $this->initGlobalRules();
+			$grprules = $this->initSubnetRules();
+			$usrrules = $this->initSubnetRules();
+			// Groups
+			$first = true;
+			$grprules = $this->loadSubnetRules($grprules,1,$subnet,"");
+			foreach($grprules as $key => $values) {
+				if($first) $first = false;
+				$grpoutput .= "<tr><td>".$this->getRightForKey($key);
+				$grpoutput .= "</td><td>";
+				$grpoutput .= $this->showSubnetGroups($key,$values,$subnet);
+				$grpoutput .= "</td></tr>";
+			}
+			$output .= $grpoutput."</table>";
+
+			// Users			
+			$usrrules = $this->loadSubnetRules($usrrules,2,$subnet,"");
+			$first = true;
+			foreach($usrrules as $key => $values) {
+				if($first) $first = false;
+				$usroutput .= "<tr><td>".$this->getRightForKey($key);
+				$usroutput .= "</td><td>";
+				$usroutput .= $this->showSubnetUsers($key,$values,$subnet);
+				$usroutput .= "</td></tr>";
+			}
+			$output .= $usroutput."</table>";
+			return $output;
+		}
+
+		private function showGlobalRights() {
+			$output = "";	
+			$found = false;
+
+			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>".$this->loc->s("Right")."</th><th>".
+				$this->loc->s("Groups")."</th></tr>";
+			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>".$this->loc->s("Right")."</th><th>".
+				$this->loc->s("Users")."</th></tr>";
+
+			$grprules = $this->initRules();
+			$usrrules = $this->initRules();
 			// Groups
 			$first = true;
 			$grprules = $this->loadGlobalRules($grprules,1);
@@ -69,13 +129,52 @@
 			return $output;
 		}
 
-		private function initGlobalRules($rulefilter = "") {
+		private function initSubnetRules($rulefilter = "") {
 			$rules = array();
-			$rulelist = array("read","servermgmt","advancedtools","optionsmgmt", 
+			$rulelist = array("history","rangemgmt","ipmgmt");
+			for($i=0;$i<count($rulelist);$i++) {
+				if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
+					$rules[$rulelist[$i]] = array();
+			}
+			return $rules;
+		}
+
+
+		private function initRules($rulefilter = "") {
+			$rules = array();
+			$rulelist = array("read","history","servermgmt","advancedtools","optionsmgmt", 
 				"optionsgrpmgmt","subnetmgmt","rangemgmt","ipmgmt");
 			for($i=0;$i<count($rulelist);$i++) {
 				if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
 					$rules[$rulelist[$i]] = array();
+			}
+			return $rules;
+		}
+
+		private function loadSubnetRules($rules,$type,$subnet,$rulefilter="") {
+			$subnet = preg_replace("#[.]#","_",$subnet);
+			$idx = "";
+			if($type == 1) {
+				$idx = "gid";
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_ipmmgmt_".
+					$subnet."_".($rulefilter ? $rulefilter : "%")."'");
+			}
+			else if($type == 2) {
+				$idx = "uid";	
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_ipmmgmt_".
+					$subnet."_".($rulefilter ? $rulefilter : "%")."'");
+			}
+			else {
+				return NULL;
+			}
+
+			while($data2 = FS::$dbMgr->Fetch($query2)) {
+				$ruleidx = preg_replace("#mrule_ipmmgmt_".$subnet."_#","",$data2["rulename"]);
+				switch($ruleidx) {
+					case "rangemgmt": case "ipmgmt": case "history":
+						$rules[$ruleidx][] = $data2[$idx];
+						break;
+				}
 			}
 			return $rules;
 		}
@@ -92,18 +191,39 @@
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_ipmmgmt_".
 					($rulefilter ? $rulefilter : "%")."'");
 			}
-			else
+			else {
 				return NULL;
+			}
+
 			while($data2 = FS::$dbMgr->Fetch($query2)) {
 				$ruleidx = preg_replace("#mrule_ipmmgmt_#","",$data2["rulename"]);
 				switch($ruleidx) {
 					case "read": case "servermgmt": case "advancedtools": case "optionsmgmt":
 					case "optionsgrpmgmt": case "subnetmgmt": case "rangemgmt": case "ipmgmt":
+					case "history":
 						$rules[$ruleidx][] = $data2[$idx];
 						break;
 				}
 			}
 			return $rules;
+		}
+
+		private function showSubnetUsers($right,$values,$subnet) { 
+			$output = "";
+
+			$count = count($values);
+			if($count) {
+				for($i=0;$i<count($values);$i++) {
+					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
+					$output .= $this->showRemoveSpan("u","subnet",$username,$values[$i],$right,$subnet);
+				}
+			}
+			$output .= "<span id=\"anchusrr_".FS::$iMgr->formatHTMLId("u".$subnet."l-".$right)."\" style=\"display:none;\"></span>";
+			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1").
+				FS::$iMgr->hidden("subnet",$subnet).FS::$iMgr->hidden("right",$right).
+				"<span id=\"lu".FS::$iMgr->formatHTMLId($right.$subnet)."\">";
+			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
+			return $output;
 		}
 
 		private function showGlobalUsers($right,$values) { 
@@ -120,6 +240,24 @@
 			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
 			$tmpoutput .= FS::$iMgr->hidden("global",1).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."glbl\">";
 			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
+			return $output;
+		}
+
+		private function showSubnetGroups($right,$values,$subnet) { 
+			$output = "";
+
+			$count = count($values);
+			if($count) {
+				for($i=0;$i<count($values);$i++) {
+					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
+					$output .= $this->showRemoveSpan("g","subnet",$gname,$values[$i],$right,$subnet);
+				}
+			}
+			$output .= "<span id=\"anchgrpr_".FS::$iMgr->formatHTMLId("g".$subnet."-".$right)."\" style=\"display:none;\"></span>";
+			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1").
+				FS::$iMgr->hidden("subnet",$subnet).FS::$iMgr->hidden("right",$right).
+				"<span id=\"lg".FS::$iMgr->formatHTMLId($right.$subnet)."\">";
+			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
 			return $output;
 		}
 
@@ -146,9 +284,16 @@
 		*/
 		private function showRemoveSpan($type,$type2,$name,$id,$right,$value2) {
 			$confirm = ($type == "g" ? $this->loc->s("confirm-remove-groupright") : $this->loc->s("confirm-remove-userright"));
-			$output = "<span id=\"".$type.$id.$right.$type2."\">".$name." ".
-				FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&".$type."id=".$id."&".$type2."=".$value2."&right=".$right,
-					array("js" => true, "confirm" => array($confirm."'".$name."' ?","Confirm","Cancel")))."<br /></span>";
+			if($type2 == "subnet") {
+				$output = "<span id=\"".FS::$iMgr->formatHTMLId($type.$id.$right.$value2)."\">".$name." ".
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&".$type."id=".$id."&".$type2."=".$value2."&right=".$right,
+						array("js" => true, "confirm" => array($confirm."'".$name."' ?","Confirm","Cancel")))."<br /></span>";
+			}
+			else {
+				$output = "<span id=\"".$type.$id.$right.$type2."\">".$name." ".
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&".$type."id=".$id."&".$type2."=".$value2."&right=".$right,
+						array("js" => true, "confirm" => array($confirm."'".$name."' ?","Confirm","Cancel")))."<br /></span>";
+			}
 
 			return $output;
 		}
@@ -212,13 +357,21 @@
 				else {
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 					$output = FS::$iMgr->h1("title-ipmrightsmgmt");
-					$panElmts = array(array(1,"mod=".$this->mid,$this->loc->s("title-globalrights")));
+					$panElmts = array(
+						array(1,"mod=".$this->mid,$this->loc->s("title-globalrights")),
+						array(2,"mod=".$this->mid,$this->loc->s("title-bysubnet"))
+					);
 					// Show only if there is devices
 					$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				}
 			}
-			else if($sh == 1)
+			else if($sh == 1) {
 				$output .= $this->showGlobalRights();
+			}
+			else if($sh == 2) {
+				$output .= $this->showSubnetForm();
+			}
+
 			return $output;
 		}
 
@@ -232,6 +385,7 @@
 				case "subnetmgmt": return $this->loc->s("right-subnetmgmt");
 				case "rangemgmt": return $this->loc->s("right-rangemgmt");
 				case "ipmgmt": return $this->loc->s("right-ipmgmt");
+				case "history": return $this->loc->s("right-history");
 				default: return FS::$iMgr->printError($this->loc->s("err-not-found"));
 			}
 		}
@@ -240,22 +394,55 @@
 		* $type snmp/ip
 		* $id uid/gid
 		*/
-		private function jsUserGroupSelect($right,$type,$id) {
-			$rules = $this->initGlobalRules($right);
-			if($id == "uid") {
-				$rules = $this->loadGlobalRules($rules,2,$right);
+		private function jsUserGroupSelect($right,$type,$id,$value="") {
+			$rules = NULL;
+			if($type == "glbl") {
+				$rules = $this->initRules($right);
+				if($id == "uid") {
+					$rules = $this->loadGlobalRules($rules,2,$right);
+				}
+				else if($id == "gid") {
+					$rules = $this->loadGlobalRules($rules,1,$right);
+				}
+				else {
+					return "";
+				}
 			}
-			else if($id == "gid") {
-				$rules = $this->loadGlobalRules($rules,1,$right);
+			else if($type == "subnet") {
+				$rules = $this->initSubnetRules($right);
+				if($id == "uid") {
+					$rules = $this->loadSubnetRules($rules,2,$value,$right);
+				}
+				else if($id == "gid") {
+					$rules = $this->loadSubnetRules($rules,1,$value,$right);
+				}
+				else {
+					return "";
+				}
 			}
-			else 
+			else {
 				return "";
+			}
+
 			$js = "";
 			foreach($rules as $key => $values) {
-				if($id == "uid")
-					$js .= "$('#lu".$right.$type."').html('".$this->userSelect("uid",$values)."');";
-				else if($id == "gid")
-					$js .= "$('#lg".$right.$type."').html('".$this->groupSelect("gid",$values)."');";
+				if($type == "glbl") {
+					if($id == "uid") {
+						$js .= "$('#lu".$right.$type."').html('".$this->userSelect("uid",$values)."');";
+					}
+					else if($id == "gid") {
+						$js .= "$('#lg".$right.$type."').html('".$this->groupSelect("gid",$values)."');";
+					}
+				}
+				else if($type == "subnet") {
+					if($id == "uid") {
+						$js .= "$('#lu".FS::$iMgr->formatHTMLId($right.$value)."').html('".$this->userSelect("uid",$values)."');";
+					}
+					else if($id == "gid") {
+						$js .= "$('#lg".FS::$iMgr->formatHTMLId($right.$value)."').html('".$this->groupSelect("gid",$values)."');";
+					}
+
+				}
 			}
 			return $js;
 		}
@@ -271,14 +458,20 @@
 			switch($act) {
 				// Add/Edit global user/group right
 				case 1:
+					if(!FS::$sessMgr->hasRight("mrule_ipmrightsmgmt_read")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					$global = FS::$secMgr->checkAndSecurisePostData("global");
+					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 					$right = FS::$secMgr->checkAndSecurisePostData("right");
 
-					if((!$gid && !$uid) || (!$global) || !$right) {
+					if((!$gid && !$uid) || (!$global && !$subnet) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
-						$this->log(2,"Bad datas when add global rights");
+						$this->log(2,"Bad datas when add global/subnet rights");
 						return;
 					}
 
@@ -314,7 +507,7 @@
 								$this->log(2,"Add/edit global user right: user with uid '".$uid."' doesn't exists");
 								return;
 							}
-							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_ipmmgmt_ip_".
+							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_ipmmgmt_".
 								$right."' AND uid = '".$uid."' AND ruleval = 'on'")) {
 								FS::$iMgr->ajaxEcho("err-already-exist");
 								$this->log(1,"Add/edit global user right: the rule for right '".$right."' already exists");
@@ -332,17 +525,80 @@
 							$this->log(0,"global right '".$right."' for user '".$uid."' added/edited");
 						}
 					}
+					else if($subnet) {
+						$subnets = preg_replace("#[.]#","_",$subnet);
+						if($gid) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'")) {
+								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Add/edit subnet group right: Group gid '".$gid."' not found");
+								return;
+							}
+							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval",
+								"rulename = 'mrule_ipmmgmt_".$subnets."_".
+								$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
+								FS::$iMgr->ajaxEcho("err-already-exist");
+								$this->log(1,"Add/edit subnet group right: the rule for right '".$right."' already exists");
+								return;
+							}
+							FS::$dbMgr->BeginTr();
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules",
+								"rulename = 'mrule_ipmmgmt_".$subnets."_".$right."' AND gid = '".$gid."'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval",
+								"'".$gid."','mrule_ipmmgmt_".$subnets."_".$right."','on'");
+							FS::$dbMgr->CommitTr();
+
+							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
+							$jscontent = $this->showRemoveSpan("g","subnet",$gname,$gid,$right,$subnet);
+							$js .= $this->jsUserGroupSelect($right,"subnet","gid",$subnet);
+							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchgrpr_".
+								FS::$iMgr->formatHTMLId("g".FS::$iMgr->FormatHTMLId($subnet)."-".$right)."');";
+							$this->log(0,"subnet right '".$right."' for group '".$gid."' and subnet '".$subnet."' added/edited");
+						}
+						else if($uid) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'")) {
+								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Add/edit subnet user right: user with uid '".$uid."' doesn't exists");
+								return;
+							}
+							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval",
+								"rulename = 'mrule_ipmmgmt_".$subnets."_".
+								$right."' AND uid = '".$uid."' AND ruleval = 'on'")) {
+								FS::$iMgr->ajaxEcho("err-already-exist");
+								$this->log(1,"Add/edit subnet user right: the rule for right '".$right."' already exists");
+								return;
+							}
+							FS::$dbMgr->BeginTr();
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules",
+								"rulename = 'mrule_ipmmgmt_".$subnets."_".$right."' AND uid = '".$uid."'");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval",
+								"'".$uid."','mrule_ipmmgmt_".$subnets."_".$right."','on'");
+							FS::$dbMgr->CommitTr();
+
+							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
+							$jscontent = $this->showRemoveSpan("u","subnet",$username,$uid,$right,$subnet);
+							$js .= $this->jsUserGroupSelect($right,"subnet","uid",$subnet);
+							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchusrr_".
+								FS::$iMgr->formatHTMLId("u".FS::$iMgr->formatHTMLId($subnet)."l-".$right)."');";
+							$this->log(0,"subnet right '".$right."' for user '".$uid."' and subnet '".$subnet."' added/edited");
+						}
+					}
 
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
-				// Remove group/user for global rights
+				// Remove group/user for global/subnet rights
 				case 2:
+					if(!FS::$sessMgr->hasRight("mrule_ipmrightsmgmt_read")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
 					$gid = FS::$secMgr->checkAndSecuriseGetData("gid");
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					$global = FS::$secMgr->checkAndSecuriseGetData("global");
+					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
 					$right = FS::$secMgr->checkAndSecuriseGetData("right");
 
-					if((!$uid && !$gid) || (!$global) || !$right) {
+					if((!$uid && !$gid) || (!$global && !$subnet) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						$this->log(2,"Bad datas when remove global right");
 						return;
@@ -370,10 +626,40 @@
 							$this->log(0,"global right '".$right."' for uid '".$uid."' removed");
 						}
 					}
+					else if($subnet) {
+						$subnets = preg_replace("#[.]#","_",$subnet);
+
+						if($gid) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_ipmmgmt_".
+								$subnets."_".$right."' AND gid = '".$gid."'")) {
+								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Unable to remove subnet right '".$right."' for gid '".$gid."': right doesn't exist");
+								return;
+							}
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules",
+								"rulename = 'mrule_ipmmgmt_".$subnets."_".$right."' AND gid = '".$gid."'");
+							$this->log(0,"subnet right '".$right."' for gid '".$gid."' and subnet .'".$subnet."' removed");
+						}
+						else if($uid) {
+							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_ipmmgmt_".
+								$subnets."_".$right."' AND uid = '".$uid."'")) {
+								FS::$iMgr->ajaxEcho("err-not-found");
+								$this->log(2,"Unable to remove subnet right '".$right."' for uid '".$uid."': right doesn't exist");
+								return;
+							}
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules",
+								"rulename = 'mrule_ipmmgmt_".$subnets."_".$right."' AND uid = '".$uid."'");
+							$this->log(0,"subnet right '".$right."' for uid '".$uid."' AND subnet '".$subnet."' removed");
+						}
+					}
 					if($gid) {
 						if($global) {
 							$js = $this->jsUserGroupSelect($right,"glbl","gid");
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."global');".$js);
+						}
+						else if($subnet) {
+							$js = $this->jsUserGroupSelect($right,"subnet","gid",$subnet);
+							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".FS::$iMgr->formatHTMLId($gid.$right.$subnet)."');".$js);
 						}
 					}
 					else if($uid) {
@@ -381,7 +667,28 @@
 							$js = $this->jsUserGroupSelect($right,"glbl","uid");
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."global');".$js); 
 						}
+						else if($subnet) {
+							$js = $this->jsUserGroupSelect($right,"subnet","uid",$subnet);
+							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".FS::$iMgr->formatHTMLId($uid.$right.$subnet)."');".$js); 
+						}
 					}
+					return;
+				// Filtering
+				case 3:
+					if(!FS::$sessMgr->hasRight("mrule_ipmrightsmgmt_read")) {
+						FS::$iMgr->ajaxEcho("err-no-rights");
+						return;
+					}
+
+					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+
+					if(!$subnet || !FS::$secMgr->isIP($subnet)) {
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+					
+					$js = "$('#subnetrights').html('".addslashes($this->showSubnetRights($subnet))."');";
+					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				default: break;
 			}
