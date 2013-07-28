@@ -43,6 +43,9 @@ class ZEyeSSHBroker():
 			self.sshConn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 			self.sshConn.connect(self.sshHost, username=self.sshUser, password=self.sshPwd)
 			return True 
+		except paramiko.AuthenticationException, e:
+			Logger.ZEyeLogger().write("SSH Authentication failure (host %s, user %s, password %s)" % (self.sshHost,self.sshUser,self.sshPwd))
+			return False
 		except Exception, e:
 			Logger.ZEyeLogger().write("SSH Exception (host %s, user %s): %s" % (self.sshHost,self.sshUser,e))
 			return False
