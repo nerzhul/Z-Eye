@@ -23,7 +23,16 @@
 	
 	$snmpro = array();
 	$snmprw = array();
-	$snmpdbrecord = array();
+
+	function loadSNMPCommunities(&$snmpro,&$snmprw) {
+		$query = FS::$dbMgr->Select("z_eye_snmp_communities","name,ro,rw");
+		while($data = FS::$dbMgr->Fetch($query)) {
+			if($data["ro"] == 't')
+				$snmpro[] = $data["name"];
+			if($data["rw"] == 't')
+				$snmprw[] = $data["name"];
+		}
+	}
 
 	function makeSNMPCache($snmpro,$snmprw) {
 		$snmpdbrecord = array();
@@ -66,7 +75,7 @@
 	echo "[".Config::getWebsiteName()."][SNMP-Caching] started at ".date('d-m-Y G:i:s')."\n";
 	$start_time = microtime(true);
 
-	loadNetdiscoCommunities($snmpro,$snmprw);
+	loadSNMPCommunities($snmpro,$snmprw);
 	makeSNMPCache($snmpro,$snmprw);
 
 	$end_time = microtime(true);
