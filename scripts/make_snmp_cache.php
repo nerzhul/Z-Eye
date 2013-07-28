@@ -34,21 +34,21 @@
 
 			$foundro = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmpro","device = '".$data["name"]."'");
 			$foundrw = FS::$dbMgr->GetOneData("z_eye_snmp_cache","snmprw","device = '".$data["name"]."'");
-			if($foundro && checkSnmp($data["ip"],$foundro) == 0)
+			if($foundro && checkSNMP($data["ip"],$foundro) == 0)
 				$devro = $foundro;
-			if($foundrw && checkSnmp($data["ip"],$foundrw) == 0)
+			if($foundrw && checkSNMP($data["ip"],$foundrw) == 0)
 				$devrw = $foundrw;
 
 			if(strlen($devro) == 0) {
-				for($i=0;$i<count($snmpro);$i++) {
-					if(checkSnmp($data["ip"],$snmpro[$i]) == 0)
+				for($i=0;$i<count($snmpro) && strlen($devro) == 0;$i++) {
+					if(checkSNMP($data["ip"],$snmpro[$i]) == 0)
 						$devro = $snmpro[$i];
 				}
 			}
 
 			if(strlen($devrw) == 0) {
-				for($i=0;$i<count($snmprw);$i++) {
-					if(checkSnmp($data["ip"],$snmprw[$i]) == 0)
+				for($i=0;$i<count($snmprw) && strlen($devrw) == 0;$i++) {
+					if(checkSNMP($data["ip"],$snmprw[$i]) == 0)
 						$devrw = $snmprw[$i];
 				}
 			}
