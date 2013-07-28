@@ -52,8 +52,9 @@
 			$icingabuffer = $this->showIcingaReporting();
 			$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".
 				FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga),$icingabuffer);
-			if($this->hsicinga) {
-				$alerts["icinga"][0] .= "<br /><span style=\"color: red;\">".($this->hsicinga)."</span> ".
+
+			if($this->hsicinga > 0) {
+				$alerts["icinga"][0] .= "<br />".($this->hsicinga)." ".
 					$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors");
 			}
 
@@ -79,10 +80,6 @@
 		private function showIcingaReporting() {
 			$problems = array();
 			$output = "";	
-			$pbhead = "<table style=\"width: 95%; font-size: 15px;\"><tr><th>".$this->loc->s("Service").
-				"</th><th>".$this->loc->s("State").
-				"</th><th style=\"width: 10%\">".$this->loc->s("Duration")."</th><th style=\"width: 60%;\">".
-				$this->loc->s("Status-information")."</th></tr>";
 
 			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts",
 				"state_type","last_time_ok","last_time_up"));
@@ -99,22 +96,38 @@
 								$outstate = "";
 								$stylestate = "";
 								$timedown = $this->loc->s("Since-icinga-start");
+
+								// Initialize host error array
+								if(!isset($problems[$host])) {
+									/*
+									* Fields:
+									* 1: label for accordion
+									* 2: accordion buffer for this entry
+									* 3: warning count
+									* 4: critical count
+									*/
+									$problems[$host] = array($host,"",0,0);
+								}
+
 								if($svalues["current_state"] == 1) {
 									$outstate = $this->loc->s("WARN");
 									$stylestate = "color: orange; font-size: 18px;";
 									if($svalues["last_time_ok"])
 										$timedown = $this->timeInterval($svalues["last_time_ok"]);
+									$problems[$host][2]++;
+									$this->warnicinga++;
 								}
 								else if($svalues["current_state"] == 2) {
 									$outstate = $this->loc->s("CRITICAL");
 									$stylestate = "color: red; font-size: 20px;";
 									if($svalues["last_time_ok"])
 										$timedown = $this->timeInterval($svalues["last_time_ok"]);
+
+									$problems[$host][3]++;
+									$this->criticinga++;
 								}
 									
 								$this->hsicinga++;
-								if(!isset($problems[$host]))
-									$problems[$host] = array($host,"");
 								$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
 	                                                        	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
 										
@@ -128,14 +141,28 @@
 							$outstate = "";
 							$stylestate = "";
 							$timedown = $this->loc->s("Since-icinga-start");
+
+							// Initialize host error array
+							if(!isset($problems[$host])) {
+								/*
+								* Fields:
+								* 1: label for accordion
+								* 2: accordion buffer for this entry
+								* 3: warning count
+								* 4: critical count
+								*/
+								$problems[$host] = array($host,"",0,0);
+							}
+
 							if($hosvalues["current_state"] == 1) {
 								$outstate = $this->loc->s("DOWN");
 								$stylestate = "color: red; font-size: 20px;";
 								if($hosvalues["last_time_up"])
 									$timedown = $this->timeInterval($hosvalues["last_time_up"]);
+
+								$problems[$host][3]++;
+								$this->criticinga++;
 							}
-							if(!isset($problems[$host]))
-								$problems[$host] = array($host,"");
 							$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
 	                                                       	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
 						}
@@ -144,17 +171,48 @@
 			}
 
 			if($this->hsicinga > 0) {
-				foreach($problems as $key => $values)
-					$problems[$key][1] = $pbhead.$problems[$key][1]."</table>";
+				foreach($problems as $key => $values) {
+					// Rewrite label
+					$problems[$key][0] .= ": ".($problems[$key][2]+$problems[$key][3])." ".$this->loc->s("alert-s")." (";
+
+					if($problems[$key][2] > 0) {
+						$problems[$key][0] .= $problems[$key][2]." ".$this->loc->s("warning-s");
+					}
+
+					if($problems[$key][3] > 0) {
+						if($problems[$key][2] > 0) {
+							$problems[$key][0] .= " / ";
+						}
+						$problems[$key][0] .= $problems[$key][3]." ".$this->loc->s("critical-s");
+					}
+					$problems[$key][0] .= ")";
+
+					// Write proper table
+					$problems[$key][1] = "<table>".$problems[$key][1]."</table>";
+				}
+
 				$output .= FS::$iMgr->accordion("icingapb",$problems)."</table>";		
-				FS::$iMgr->js("$('#accicingah3').css('background-color','#4A0000');");
-				FS::$iMgr->js("$('#accicingah3').css('background-image','linear-gradient(#4A0000, #8A0000)');");
-				FS::$iMgr->js("$('#accicingah3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');");
+
+				$js = "";
+
+				if(($this->hsicinga / $this->totalicinga) > 15.0 || $this->criticinga > 0) {
+					$js = 	"$('#accicingah3').css('background-color','#4A0000');".
+						"$('#accicingah3').css('background-image','linear-gradient(#4A0000, #8A0000)');".
+						"$('#accicingah3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');";
+				}
+				else {
+					$js = 	"$('#accicingah3').css('background-color','#ff8e00');".
+						"$('#accicingah3').css('background-image','linear-gradient(#ff4e00, #ff8e00)');".
+						"$('#accicingah3').css('background-image','-webkit-linear-gradient(#ff4e00, #ff8e00)');";
+				}
+
+				FS::$iMgr->js($js);
 			}
 			else {
-				FS::$iMgr->js("$('#accicingah3').css('background-color','#222');");
-				FS::$iMgr->js("$('#accicingah3').css('background-image','linear-gradient(#000, #333)');");
-				FS::$iMgr->js("$('#accicingah3').css('background-image','-webkit-linear-gradient(#000, #333)');");
+				$js = 	"$('#accicingah3').css('background-color','#222');".
+					"$('#accicingah3').css('background-image','linear-gradient(#000, #333)');".
+					"$('#accicingah3').css('background-image','-webkit-linear-gradient(#000, #333)');";
+				FS::$iMgr->js($js);
 			}
 				
 			return $output;
@@ -466,6 +524,9 @@
 
 		private $totalicinga;
 		private $hsicinga;
+		private $warnicinga;
+		private $criticinga;
+
 		private $BWtotalscore;
 		private $BWscore;
 		private $SECtotalscore;

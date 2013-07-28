@@ -23,9 +23,11 @@
 			$locales = array(
 				"fr" => array(
 					"alert-on" => "alerte(s) sur",
+					"alert-s" => "alerte(s)",
 					"Attack" => "Attaques",
 					"Availability" => "Disponibilité",
 					"CRITICAL" => "CRITIQUE",
+					"critical-s" => "critique(s)",
 					"DOWN" => "INJOIGNABLE",
 					"Duration" => "Durée",
 					"err-detect-atk" => "Menace détectée !",
@@ -49,12 +51,15 @@
 					"state-srv" => "Etat des services",
 					"Status-information" => "Informations de statut",
 					"WARN" => "ATTENTION",
+					"warning-s" => "avertissement(s)",
 				),
 				"en" => array(
 					"alert-on" => "alert(s) on",
+					"alert-s" => "alert(s)",
 					"Attack" => "Attacks",
 					"Availability" => "Availability",
 					"CRITICAL" => "CRITICAL",
+					"critical-s" => "critical(s)",
 					"DOWN" => "DOWN",
 					"Duration" => "Duration",
 					"err-detect-atk" => "Threat detected !",
@@ -78,6 +83,7 @@
 					"state-srv" => "Services state",
 					"Status-information" => "Status information",
 					"WARN" => "WARNING",
+					"warning-s" => "warning(s)",
 				)
 			);
 			$this->concat($locales);
