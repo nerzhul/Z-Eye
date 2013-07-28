@@ -79,8 +79,8 @@
 		private function showIcingaReporting() {
 			$problems = array();
 			$output = "";	
-			$problemoutput = "<table style=\"width: 95%; font-size: 15px;\"><tr><th>".$this->loc->s("Host").
-				"</th><th>".$this->loc->s("Service")."</th><th>".$this->loc->s("State").
+			$pbhead = "<table style=\"width: 95%; font-size: 15px;\"><tr><th>".$this->loc->s("Service").
+				"</th><th>".$this->loc->s("State").
 				"</th><th style=\"width: 10%\">".$this->loc->s("Duration")."</th><th style=\"width: 60%;\">".
 				$this->loc->s("Status-information")."</th></tr>";
 
@@ -98,26 +98,23 @@
 							if($svalues["current_state"] > 0) {
 								$outstate = "";
 								$stylestate = "";
+								$timedown = $this->loc->s("Since-icinga-start");
 								if($svalues["current_state"] == 1) {
 									$outstate = $this->loc->s("WARN");
 									$stylestate = "color: orange; font-size: 18px;";
 									if($svalues["last_time_ok"])
 										$timedown = $this->timeInterval($svalues["last_time_ok"]);
-									else
-										$timedown = $this->loc->s("Since-icinga-start");
 								}
 								else if($svalues["current_state"] == 2) {
 									$outstate = $this->loc->s("CRITICAL");
 									$stylestate = "color: red; font-size: 20px;";
 									if($svalues["last_time_ok"])
 										$timedown = $this->timeInterval($svalues["last_time_ok"]);
-									else
-										$timedown = $this->loc->s("Since-icinga-start");
 								}
 									
 								$this->hsicinga++;
 								if(!isset($problems[$host]))
-									$problems[$host] = array($host,"<table>");
+									$problems[$host] = array($host,"");
 								$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
 	                                                        	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
 										
@@ -130,13 +127,12 @@
 							$this->hsicinga++;
 							$outstate = "";
 							$stylestate = "";
+							$timedown = $this->loc->s("Since-icinga-start");
 							if($hosvalues["current_state"] == 1) {
 								$outstate = $this->loc->s("DOWN");
 								$stylestate = "color: red; font-size: 20px;";
 								if($hosvalues["last_time_up"])
 									$timedown = $this->timeInterval($hosvalues["last_time_up"]);
-								else
-									$timedown = $this->loc->s("Since-icinga-start");
 							}
 							if(!isset($problems[$host]))
 								$problems[$host] = array($host,"");
@@ -149,7 +145,7 @@
 
 			if($this->hsicinga > 0) {
 				foreach($problems as $key => $values)
-					$problems[$key][1] .= "</table>";
+					$problems[$key][1] = $pbhead.$problems[$key][1]."</table>";
 				$output .= FS::$iMgr->accordion("icingapb",$problems)."</table>";		
 				FS::$iMgr->js("$('#accicingah3').css('background-color','#4A0000');");
 				FS::$iMgr->js("$('#accicingah3').css('background-image','linear-gradient(#4A0000, #8A0000)');");
