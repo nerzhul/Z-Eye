@@ -70,7 +70,7 @@ class ZEyeDBUpgrade():
 				self.setDBVersion("1202")
 			if self.dbVersion == "1202":
 				self.tryAddColumn("z_eye_dhcp_servers","osname","varchar(64)")
-				self.tryAddColumn("z_eye_dhcp_servers","dhcptype","integer NOT NULL")
+				self.tryAddColumn("z_eye_dhcp_servers","dhcptype","integer NOT NULL DEFAULT '0'")
 				self.setDBVersion("1203")
 			if self.dbVersion == "1203":
 				self.tryAddColumn("z_eye_dhcp_subnet_v4_declared","mleasetime","integer")

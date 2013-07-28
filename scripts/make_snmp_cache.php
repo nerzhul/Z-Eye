@@ -26,8 +26,9 @@
 	$snmpdbrecord = array();
 
 	function makeSNMPCache($snmpro,$snmprw) {
+		$snmpdbrecord = array();
 		$query = FS::$dbMgr->Select("device","ip,name");
-		while($data = pg_fetch_array($query)) {
+		while($data = FS::$dbMgr->Fetch($query)) {
 			$devro = "";
 			$devrw = "";
 
