@@ -54,8 +54,10 @@
 
 		public function shread($id) {
 			FS::$secMgr->SecuriseString($id);
-			if ($data = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."sessions","data","id = '".$id."'"))
+			if ($data = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."sessions","data","id = '".$id."'")) {
+				FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."sessions","timestamp = '".time()."'","id = '".$id."'");
 				return $data;
+			}
 			else
 				return false;
 		}
