@@ -84,6 +84,13 @@
 			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts",
 				"state_type","last_time_ok","last_time_up"));
 
+			if($iStates === null) {
+				$js = 	"$('#accicingah3').css('background-color','#4A0000');".
+					"$('#accicingah3').css('background-image','linear-gradient(#4A0000, #8A0000)');".
+					"$('#accicingah3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');";
+				FS::$iMgr->js($js);
+				return $this->loc->s("err-icinga-off");
+			}
 			// Loop hosts
 			foreach($iStates as $host => $hostvalues) {
 				// Loop types
