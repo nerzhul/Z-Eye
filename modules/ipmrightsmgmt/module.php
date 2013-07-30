@@ -47,7 +47,7 @@
 
 			if($found) {
 				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3").
-					FS::$iMgr->select("subnet").$tmpoutput."</select><br />".
+					FS::$iMgr->select("subnet").$tmpoutput."</select> ".
 					FS::$iMgr->Submit("","Filter")."</form>".
 					"<div id=\"subnetrights\"></div>";
 			}
