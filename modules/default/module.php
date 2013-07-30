@@ -256,7 +256,6 @@
 				$pid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_id_cache","pid","device = '".
 					$data["device"]."' AND portname = '".$data["port"]."'");
 
-				$tmpoutput .= "<tr style=\"font-size: 12px;\"><td>".$data["description"]."</td>";
 				$incharge = 0;
 				$outcharge = 0;
 				$mrtgfile = file(dirname(__FILE__)."/../../datas/rrd/".$dip."_".$pid.".log");
@@ -327,8 +326,10 @@
 				}
 				if($outcolor == "red" || $outcolor == "orange") {
 					$pbfound = 1;
-					$tmpoutput .= "<td style=\"background-color: ".$incolor.";\">".$inputbw.
+					$tmpoutput .= "<tr style=\"font-size: 12px;\"><td>".$data["description"]."</td>".
+						"<td style=\"background-color: ".$incolor.";\">".$inputbw.
 						"</td><td style=\"background-color: ".$outcolor.";\">".$outputbw."</td></tr>";
+					echo dirname(__FILE__)."/../../datas/rrd/".$dip."_".$pid.".log";
 				}
 			}
 			if($pbfound) $output .= $tmpoutput;
