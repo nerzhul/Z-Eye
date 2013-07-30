@@ -34,9 +34,7 @@
 
 	//$start_time = microtime(true);
 
-	if(!FS::LoadFSModules()) {
-		exit(1);
-	}
+	FS::LoadFSModules();
 
 	FS::$sessMgr->Start();
 
@@ -69,5 +67,6 @@
 	$end_time = microtime(true);
         $script_time = $end_time - $start_time;
 	echo $script_time; */
+
 	FS::UnloadFSModules();
 ?>

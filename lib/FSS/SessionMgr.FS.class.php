@@ -65,6 +65,9 @@
 		public function shwrite($id, $data) {
 			$this->secMgr->SecuriseString($id);
 			$this->secMgr->SecuriseString($data);
+
+			// Connect is required 
+			$this->dbMgr->Connect();
 			$this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
 			$this->dbMgr->Insert(PgDbConfig::getDbPrefix()."sessions","id,data,timestamp","'".$id."','".$data."','".time()."'");
 			return true;
@@ -72,13 +75,19 @@
 
 		public function shdestroy($id) {
 			FS::$secMgr->SecuriseString($id);
-			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
+
+			// Connect is required 
+			$this->dbMgr->Connect();
+			$this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
 			return true;
 		}
 
 		public function shgc($max) {
 			$limit = time() - intval($max);
-			return FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
+
+			// Connect is required 
+			$this->dbMgr->Connect();
+			return $this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
 		}
 
 		public function Start() {

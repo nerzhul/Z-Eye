@@ -168,6 +168,7 @@
 			if (strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			$this->sqlQuery = $sql;
+
 			return $this->PDO->query($sql);
 		}
 
@@ -220,7 +221,6 @@
 		private $dbUser;
 		private $dbLink;
 		private $dbType;
-		private $dbMgr;
 
 		private $PDO;
 
