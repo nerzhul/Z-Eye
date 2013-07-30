@@ -542,7 +542,10 @@ preprocessor http_inspect_server: server default \\\n
 
 					$tmppgconn = new AbstractSQLMgr();
 					$tmppgconn->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd);
-					$tmppgconn->Connect();
+					if(!$tmppgconn->Connect()) {
+						$this->log(1,"Connection failed for ".$dbuser." on ".$dbname."@".$dbhost." lanlist: ".$lanlist);
+						echo $this->loc->s("fail-snort-conf-wr");
+					}
 
 					FS::$dbMgr->Connect();
 

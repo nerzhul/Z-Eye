@@ -30,6 +30,7 @@
 
 	require_once(dirname(__FILE__)."/../../config/pgdb.conf.php");
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
+
 	class AbstractSQLMgr extends PDO {
 		function __construct() {
 			$this->dbDriver = "";
@@ -38,19 +39,24 @@
 			$this->dbHost = "";
 			$this->dbPass = "";
 			$this->dbUser = "";
-			$this->dbLink = NULL;
+			$this->dbLink = null;
 			$this->dbType = "";
 			$this->sqlQuery = "";
+			$this->PDO = null;
 		}
 
+		function __destruct() {
+			$this->PDO = null;
+		}
 		public function initForZEye() {
 			$this->setConfig("pg",PGDbConfig::getDbName(),PGDbConfig::getDbPort(),PGDbConfig::getDbHost(),PGDbConfig::getDbUser(),
                         	PGDbConfig::getDbPwd());
 		}
 
 		public function Connect() {
-			return parent::__construct($this->dbDriver.":dbname=".$this->dbName.";host=".$this->dbHost.";port=".$this->dbPort,$this->dbUser,
+			$this->PDO = new PDO($this->dbDriver.":dbname=".$this->dbName.";host=".$this->dbHost.";port=".$this->dbPort,$this->dbUser,
 				$this->dbPass);
+			return $this->PDO;
 		}
 
 		public function Select($table,$fields,$cond = "",$options = array()) {
@@ -75,7 +81,7 @@
 					$sql .= " LIMIT ".$options["limit"];
 			}
 			$this->sqlQuery = $sql;
-			return parent::query($sql);
+			return $this->PDO->query($sql);
 		}
 
 		public function GetOneEntry($table,$fields,$cond = "",$options = array()) {
@@ -146,7 +152,7 @@
 
 		public function Insert($table,$keys,$values) {
 			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";
-			return parent::query($sql);
+			return $this->PDO->query($sql);
 		}
 
 		public function Fetch(&$query) {
@@ -162,7 +168,7 @@
 			if (strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			$this->sqlQuery = $sql;
-			return parent::query($sql);
+			return $this->PDO->query($sql);
 		}
 
 		public function Update($table,$mods,$cond = "") {
@@ -170,7 +176,7 @@
 			if (strlen($cond) > 0)
 				$sql .= " WHERE ".$cond;
 			$this->sqlQuery = $sql;
-			return parent::query($sql);
+			return $this->PDO->query($sql);
 		}
 
 		public function setConfig($dbtype,$dbn,$dbport,$dbh,$dbu,$dbp) {
@@ -195,15 +201,15 @@
                 }
 
 		public function BeginTr() {
-			return parent::beginTransaction();
+			return $this->PDO->beginTransaction();
 		}
 
 		public function CommitTr() {
-			return parent::commit();
+			return $this->PDO->commit();
 		}
 
 		public function RollbackTr() {
-			return parent::rollback();
+			return $this->PDO->rollback();
 		}
 
 		private $dbDriver;
@@ -215,6 +221,8 @@
 		private $dbLink;
 		private $dbType;
 		private $dbMgr;
+
+		private $PDO;
 
 		// Buffer for debug purposes
 		private $sqlQuery;

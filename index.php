@@ -34,7 +34,9 @@
 
 	//$start_time = microtime(true);
 
-	FS::LoadFSModules();
+	if(!FS::LoadFSModules()) {
+		exit(1);
+	}
 
 	FS::$sessMgr->Start();
 

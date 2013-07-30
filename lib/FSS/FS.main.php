@@ -49,9 +49,16 @@
 
 		public static function LoadFSModules() {
 			// AbstractSQL connector
-			FS::$dbMgr = new AbstractSQLMgr();
-			FS::$dbMgr->initForZEye();
-			FS::$dbMgr->Connect();
+			try {
+				FS::$dbMgr = new AbstractSQLMgr();
+				FS::$dbMgr->initForZEye();
+				FS::$dbMgr->Connect();
+			}
+			catch (Exception $e) {
+				echo "Exception for FS::dbMgr: ".$e->getMessage();
+				FS::$dbMgr = null;
+				return false;
+			}
 
 			// Load Security Manager
 			FS::$secMgr = new FSSecurityMgr();
@@ -78,6 +85,7 @@
 
 			// Load logger
 			FS::$log = new FSLogger();
+			return true;
 		}
 
 		public static function UnloadFSModules() {
