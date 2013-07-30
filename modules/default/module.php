@@ -329,7 +329,6 @@
 					$tmpoutput .= "<tr style=\"font-size: 12px;\"><td>".$data["description"]."</td>".
 						"<td style=\"background-color: ".$incolor.";\">".$inputbw.
 						"</td><td style=\"background-color: ".$outcolor.";\">".$outputbw."</td></tr>";
-					echo dirname(__FILE__)."/../../datas/rrd/".$dip."_".$pid.".log";
 				}
 			}
 			if($pbfound) $output .= $tmpoutput;
