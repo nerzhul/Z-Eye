@@ -617,8 +617,7 @@
 			if(!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
-			$output = FS::$iMgr->h2("title-declared-subnets");
-	                $output .= FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
+	                $output = FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
 
 			$output .= "<div id=\"declsubnets\">";
 
