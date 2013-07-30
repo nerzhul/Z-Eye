@@ -116,7 +116,7 @@
 					
 					$sqlcalc = "(SELECT '".$sql_date."'::timestamp - '".($ec+15)." day'::interval)";
 					$sql = "select atkdate".$fields." from z_eye_attack_stats where atkdate > ".$sqlcalc." ORDER BY atkdate";
-					$query = $this->snortDB->query($sql);
+					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate".$fields,"atkdate > ".$sqlcalc,array("order" => "atkdate"));
 					$labels = $scans = $tse = $ssh = "[";
 					$cursor = 0;
 					$temp1 = $temp2 = $temp3 = $temp4 = 0;
