@@ -213,6 +213,10 @@
 			return $this->PDO->rollback();
 		}
 
+		public function isPDOOK() {
+			return ($this->PDO != null);
+		}
+
 		private $dbDriver;
 		private $dbName;
 		private $dbPort;

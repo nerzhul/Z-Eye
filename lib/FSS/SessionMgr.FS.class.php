@@ -46,7 +46,9 @@
 
 		public function shopen() {
 			$limit = time() - Config::getSessionExpirationTime();
-			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
+
+			$this->connectDBIfNot();
+			$this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
 			return true;
 		}
 
@@ -54,6 +56,8 @@
 
 		public function shread($id) {
 			FS::$secMgr->SecuriseString($id);
+
+			$this->connectDBIfNot();
 			if ($data = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."sessions","data","id = '".$id."'")) {
 				FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."sessions","timestamp = '".time()."'","id = '".$id."'");
 				return $data;
@@ -67,9 +71,12 @@
 			$this->secMgr->SecuriseString($data);
 
 			// Connect is required 
-			$this->dbMgr->Connect();
+			$this->connectDBIfNot();
+
+			$this->dbMgr->BeginTr();
 			$this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
 			$this->dbMgr->Insert(PgDbConfig::getDbPrefix()."sessions","id,data,timestamp","'".$id."','".$data."','".time()."'");
+			$this->dbMgr->CommitTr();
 			return true;
 		}
 
@@ -77,7 +84,7 @@
 			FS::$secMgr->SecuriseString($id);
 
 			// Connect is required 
-			$this->dbMgr->Connect();
+			$this->connectDBIfNot();
 			$this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
 			return true;
 		}
@@ -86,7 +93,7 @@
 			$limit = time() - intval($max);
 
 			// Connect is required 
-			$this->dbMgr->Connect();
+			$this->connectDBIfNot();
 			return $this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
 		}
 
@@ -96,6 +103,17 @@
 
 		public function Close() {
 			session_destroy();
+		}
+
+		private function connectDBIfNot() {
+			if (!$this->dbMgr) {
+				$this->dbMgr = new AbstractSQLMgr();
+                	        $this->dbMgr->initForZEye();
+			}
+
+			if (!$this->dbMgr->isPDOOK()) {
+                		$this->dbMgr->Connect();
+			}
 		}
 		
 		public function InitSessionIfNot() {
