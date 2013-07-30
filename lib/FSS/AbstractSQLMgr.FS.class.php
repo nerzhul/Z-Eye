@@ -31,7 +31,7 @@
 	require_once(dirname(__FILE__)."/../../config/pgdb.conf.php");
 	require_once(dirname(__FILE__)."/../../config/global.conf.php");
 
-	class AbstractSQLMgr extends PDO {
+	class AbstractSQLMgr {
 		function __construct() {
 			$this->dbDriver = "";
 			$this->dbName = "";
