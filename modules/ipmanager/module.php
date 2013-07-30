@@ -381,7 +381,7 @@
 				hideAndEmpty('#hstcontent'); 
 				$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
 					$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
-				}); }); }");
+				}); };");
 
 			$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
