@@ -153,7 +153,7 @@
 		}
 
 		private function showHostForm($name = "") {
-			$dname = ""; $icon = ""; $alias = ""; $address = ""; $parentlist = array();
+			$dname = ""; $icon = ""; $alias = ""; $addr = ""; $parentlist = array();
 			$checkcmd = "check-host-alive"; $checkperiod = ""; $checkintval = 3; $retcheckintval = 1; $maxcheck = 10;
 			$eventhdlen = true; $flapen = true; $failpreden = true; $perfdata = true; $retstatus = true; $retnonstatus = true;
 			$notifen = true; $notifperiod = ""; $notifintval = 0; $ctg = "";
