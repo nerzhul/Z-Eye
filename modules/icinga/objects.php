@@ -17,6 +17,161 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	final class icingaCtg extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_contactgroups";
+			$this->readRight = "mrule_icinga_ctg_write";
+			$this->writeRight = "mrule_icinga_ctg_write";
+		}
+
+		protected function Load($name = "") {
+			$this->name = $name;
+			$this->alias = "";
+			$this->contacts = array();
+			if($name) {
+				$this->alias = FS::$dbMgr->GetOneData($this->sqlTable,"name",
+					"name = '".$name."'");
+
+                        	$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member",
+					"name = '".$name."'");
+                        	while($data = FS::$dbMgr->Fetch($query)) {
+                	                $this->contacts[] = $data["member"];
+             	        	}
+			}
+		}
+
+		protected function removeFromDB($name) {
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$ctgname."'");
+			FS::$dbMgr->Delete($this->sqlTable,"name = '".$ctgname."'");
+			FS::$dbMgr->CommitTr();
+		}
+
+		public function showForm($name = "") {
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
+			$this->Load($name);
+
+			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10").
+				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				FS::$iMgr->idxIdLine("Name","name",$this->name,array("length" => 60, "size" => 30)).
+				FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$this->alias,array("length" => 60, "size" => 30));
+
+			$countElmt = 0;
+			$output2 = "";
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'",array("order" => "name"));
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$countElmt++;
+				$output2 .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$this->contacts));
+			}
+			if($countElmt/4 < 4) $countElmt = 16;
+
+			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".
+				FS::$iMgr->select("cts","",NULL,true,array("size" => round($countElmt/4))).
+				$output2."</select></td></tr>".
+				FS::$iMgr->aeTableSubmit($this->name == "");
+			return $output;
+		}
+
+		public function Modify() {
+			if(!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$name = FS::$secMgr->getPost("name","w");
+			$alias = FS::$secMgr->checkAndSecurisePostData("alias");
+			$cts = FS::$secMgr->checkAndSecurisePostData("cts");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
+			if(!$name || !$alias || !$cts || $cts == "") {
+				echo FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+			
+			// ctg exists
+			if($edit) {
+				if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
+					echo FS::$iMgr->ajaxEcho("err-data-not-exist");
+					return;
+				}
+			}
+			else {
+				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
+					FS::$iMgr->ajaxEcho("err-data-exist");
+					return;
+				}
+			}
+
+			// some members don't exist
+			$count = count($cts);
+			for($i=0;$i<$count;$i++) {
+				if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$cts[$i]."'")) {
+					FS::$iMgr->ajaxEcho("err-bad-data");
+					return;
+				}
+			}
+
+			FS::$dbMgr->BeginTr();
+			if($edit) {
+				FS::$dbMgr->Delete($this->sqlTable,"name = '".$name."'");
+				FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$name."'");
+			}
+			// Add it
+			FS::$dbMgr->Insert($this->sqlTable,"name,alias","'".$name."','".$alias."'");
+			for($i=0;$i<$count;$i++) {
+				FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
+			}
+			FS::$dbMgr->CommitTr();
+
+			$icingaAPI = new icingaBroker();
+			if(!$icingaAPI->writeConfiguration()) {
+				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				return;
+			}
+			FS::$iMgr->redir("mod=".$this->mid."&sh=7",true);
+		}
+
+		public function Remove() {
+			if(!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			// @TODO forbid remove when used (service, service_group)
+			$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
+			if(!$ctgname) {
+				FS::$iMgr->ajaxEchoNC("err-bad-data");
+				return;
+			}
+
+			if(!FS::$dbMgr->GetOneData($this->sqlTable,"alias","name = '".$ctgname."'")) {
+					FS::$iMgr->ajaxEchoNC("err-bad-data");
+				return;
+			}
+
+			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","contactgroup = '".$ctgname."'")) {
+				FS::$iMgr->ajaxEchoNC("err-ctg-used");
+				return;
+			}
+
+			$this->removeFromDB($ctgname);
+
+			$icingaAPI = new icingaBroker();
+			if(!$icingaAPI->writeConfiguration()) {
+				FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
+				return;
+			}
+			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ctg_".preg_replace("#[. ]#","-",$ctgname)."');");
+		}
+
+		private $name;
+		private $alias;
+		private $contacts;
+	};
+
 	final class icingaHost extends FSMObj {
 		function __construct() {
 			parent::__construct();

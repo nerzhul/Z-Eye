@@ -620,35 +620,6 @@
 			return $output;
 		}
 
-		private function showContactgroupForm($name = "") {
-			$alias = "";
-			$contacts = array();
-			if($name) {
-				$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'");
-                        	$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
-                        	while($data = FS::$dbMgr->Fetch($query2)) {
-                	                $contacts[] = $data2["member"];
-             	        	}
-			}
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias,array("length" => 60, "size" => 30));
-			$countElmt = 0;
-			$output2 = "";
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name","template = 'f'",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				$countElmt++;
-				$output2 .= FS::$iMgr->selElmt($data["name"],$data["name"],in_array($data["name"],$contacts));
-			}
-			if($countElmt/4 < 4) $countElmt = 16;
-			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".FS::$iMgr->select("cts","",NULL,true,array("size" => round($countElmt/4)));
-			$output .= $output2;
-			$output .= "</select></td></tr>";
-			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			return $output;
-		}
-
 		private function showCommandTab() {
 			if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
@@ -822,10 +793,8 @@
 					else
 						return FS::$iMgr->printError($this->loc->s("err-no-contact"));
 				case 8:
-					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-						return $this->loc->s("err-no-rights");
-
-					return $this->showContactgroupForm();
+					$ctg = new icingaCtg();
+					return $ctg->showForm();
 				case 9: return $this->showCommandForm();
 				case 10:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
@@ -868,14 +837,13 @@
 
 					return $this->showContactForm($name);
 				case 15:
-					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-						return $this->loc->s("err-no-rights");
-
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if(!$name)
+					if(!$name) {
 						return $this->loc->s("err-bad-datas");
+					}
 
-					return $this->showContactgroupForm($name);
+					$ctg = new icingaCtg();
+					return $ctg->showForm($name);
 				case 16:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
 						return $this->loc->s("err-no-rights");
@@ -1228,92 +1196,13 @@
 					return;
 				// Add/Edit contact group
 				case 10:
-					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-						echo $this->loc->s("err-no-right");
-						return;
-					} 
-
-					$name = FS::$secMgr->getPost("name","w");
-					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
-					$cts = FS::$secMgr->checkAndSecurisePostData("cts");
-					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-
-					if(!$name || !$alias || !$cts || $cts == "") {
-						echo $this->loc->s("err-bad-data");
-						return;
-					}
-					
-					// ctg exists
-					if($edit) {
-						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
-							echo $this->loc->s("err-data-not-exist");
-							return;
-						}
-					}
-					else {
-						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
-							echo $this->loc->s("err-data-exist");
-							return;
-						}
-					}
-
-					// some members don't exist
-					$count = count($cts);
-					for($i=0;$i<$count;$i++) {
-						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$cts[$i]."'")) {
-							echo $this->loc->s("err-bad-data");
-							return;
-						}
-					}
-
-					if($edit) {
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroups","name = '".$name."'");
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$name."'");
-					}
-					// Add it
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","'".$name."','".$alias."'");
-					for($i=0;$i<$count;$i++) {
-						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","'".$name."','".$cts[$i]."'");
-					}
-
-					if(!$this->icingaAPI->writeConfiguration()) {
-						echo $this->loc->s("err-fail-writecfg");
-						return;
-					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=7",true);
+					$ctg = new icingaCtg();
+					$ctg->Modify();
 					return;
 				// Delete contact group
 				case 12:
-					if(!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-						FS::$iMgr->ajaxEcho("err-no-right");
-						return;
-					} 
-
-					// @TODO forbid remove when used (service, service_group)
-					$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
-					if(!$ctgname) {
-						FS::$iMgr->ajaxEchoNC("err-bad-data");
-						return;
-					}
-
-					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$ctgname."'")) {
-							FS::$iMgr->ajaxEchoNC("err-bad-data");
-						return;
-					}
-
-					if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","contactgroup = '".$ctgname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-ctg-used");
-						return;
-					}
-
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$ctgname."'");
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroups","name = '".$ctgname."'");
-
-					if(!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
-						return;
-					}
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ctg_".preg_replace("#[. ]#","-",$ctgname)."');");
+					$ctg = new icingaCtg();
+					$ctg->Remove();
 					return;
 				// Add/Edit host
 				case 13:
