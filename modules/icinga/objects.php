@@ -21,6 +21,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_hosts";
+			$this->readRight = "mrule_icinga_host_write";
+			$this->writeRight = "mrule_icinga_host_write";
 		}
 
 		protected function Load($name = "") {
@@ -70,7 +72,21 @@
 			}
 		}
 
+		protected function removeFromDB($name) {
+			// Remove host and links with parents and hostgroups
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","name = '".$name."'");
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","parent = '".$name."'");
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
+			FS::$dbMgr->Delete($this->sqlTable,"name = '".$name."'");
+			FS::$dbMgr->CommitTr();
+		}
+
 		public function showForm($name = "") {
+			if (!$this->canRead()) {
+				return $this->loc->s("err-no-right");
+			}
+
 			$this->Load($name);
 
 			FS::$iMgr->setJSBuffer(1);
@@ -142,6 +158,172 @@
 			// statusmap image
 			$output .= FS::$iMgr->aeTableSubmit($this->name == "");
 			return $output;
+		}
+
+		public function Modify() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$name = FS::$secMgr->checkAndSecurisePostData("name");
+			$alias = FS::$secMgr->checkAndSecurisePostData("alias");
+			$dname = FS::$secMgr->checkAndSecurisePostData("dname");
+			$parent = FS::$secMgr->checkAndSecurisePostData("parent");
+			$hg = FS::$secMgr->checkAndSecurisePostData("hostgroups");
+			$icon = FS::$secMgr->checkAndSecurisePostData("icon");
+			$addr = FS::$secMgr->checkAndSecurisePostData("addr");
+			$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
+			$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
+			$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+			$ctg = FS::$secMgr->getPost("ctg","w");
+			if(!$name || (!FS::$secMgr->isDNSName($name) && !FS::$secMgr->isHostname($name)) || 
+				!$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
+				 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon) || $edit && $edit != 1) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+		
+			// Checks
+			$tpl = FS::$secMgr->checkAndSecurisePostData("istemplate");
+			$hostoptd = FS::$secMgr->checkAndSecurisePostData("hostoptd");
+			$hostoptu = FS::$secMgr->checkAndSecurisePostData("hostoptu");
+			$hostoptr = FS::$secMgr->checkAndSecurisePostData("hostoptr");
+			$hostoptf = FS::$secMgr->checkAndSecurisePostData("hostoptf");
+			$hostopts = FS::$secMgr->checkAndSecurisePostData("hostopts");
+			$eventhdlen = FS::$secMgr->checkAndSecurisePostData("eventhdlen");
+			$flapen = FS::$secMgr->checkAndSecurisePostData("flapen");
+			$failpreden = FS::$secMgr->checkAndSecurisePostData("failpreden");
+			$perfdata = FS::$secMgr->checkAndSecurisePostData("perfdata");
+			$retstatus = FS::$secMgr->checkAndSecurisePostData("retstatus");
+			$retnonstatus = FS::$secMgr->checkAndSecurisePostData("retnonstatus");
+			$notifen = FS::$secMgr->checkAndSecurisePostData("notifen");
+			
+			// Numerics
+			$checkintval = FS::$secMgr->getPost("checkintval","n+");
+			$retcheckintval = FS::$secMgr->getPost("retcheckintval","n+");
+			$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
+			$notifintval = FS::$secMgr->getPost("notifintval","n+=");
+
+			if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+			
+			// Now verify datas
+			if($edit) {
+				if(!FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$name."'")) {
+					FS::$iMgr->ajaxEcho("err-data-not-exist");
+					return;
+				}
+			}
+			else {
+				if(FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$name."'")) {
+					FS::$iMgr->ajaxEchoNC("err-data-exist");
+					return;
+				}
+			}
+			
+			if($parent && !in_array("none",$parent)) {
+				$count = count($parent);
+				for($i=0;$i<$count;$i++) {
+					if(!FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$parent[$i]."'")) {
+						FS::$iMgr->ajaxEcho("err-bad-data");
+						return;
+					}
+				}
+			}
+			
+			if($hg && is_array($hg)) {
+				$count = count($hg);
+				for($i=0;$i<$count;$i++) {
+					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$hg[$i]."'")) {
+						FS::$iMgr->ajaxEcho("err-bad-data");
+						return;
+					}
+				}
+			}
+
+			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$checkcommand."'")) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+			
+			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$checkperiod."'")) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+
+			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$notifperiod."'")) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+
+			FS::$dbMgr->BeginTr();
+			if($edit) {
+				FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hosts","name = '".$name."'");
+			}
+			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
+				failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid",
+				"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
+				($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
+				$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
+				($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".($icon ? $icon : 0)."'");
+
+			if($edit) {
+				FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","name = '".$name."'");
+			}
+			if($parent && !in_array("none",$parent)) {
+				$count = count($parent);
+				for($i=0;$i<$count;$i++)
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_host_parents","name,parent","'".$name."','".$parent[$i]."'");
+			}
+
+			if($edit) {
+				FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = '1'");
+			}
+			if($hg && is_array($hg)) {
+				$count = count($hg);
+				for($i=0;$i<$count;$i++)
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","'".$hg[$i]."','".$name."','1'");
+			}
+			FS::$dbMgr->CommitTr();
+			
+			$icingaAPI = new icingaBroker();
+			if(!$icingaAPI->writeConfiguration()) {
+				echo $this->loc->s("err-fail-writecfg");
+				return;
+			}
+			FS::$iMgr->redir("mod=".$this->mid."&sh=2",true);
+		}
+
+		public function Remove() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$name = FS::$secMgr->checkAndSecuriseGetData("host");
+			if(!$name) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+
+			// Not exists
+			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","addr","name = '".$name."'")) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+
+			$this->removeFromDB($name);
+
+			$icingaAPI = new icingaBroker();
+			if(!$icingaAPI->writeConfiguration()) {
+				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				return;
+			}
+			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#h_".preg_replace("#[. ]#","-",$name)."');");
 		}
 
 		private $name;

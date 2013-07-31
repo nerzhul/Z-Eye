@@ -33,13 +33,29 @@
 			$this->loc = FS::$iMgr->getLocales();
 			$this->mod = FS::$iMgr->getCurModule();
 			$this->mid = $this->mod->getModuleId();
+			$this->readRight = "";
+			$this->writeRight = "";
 		}
 
 		protected function Load($id = "") {}
+		protected function removeFromDB($id) {}
+
+		protected function Modify() {}
+		protected function Remove() {}
+
+		protected function canRead() {
+			return FS::$sessMgr->hasRight($this->readRight);
+		}
+
+		protected function canWrite() {
+			return FS::$sessMgr->hasRight($this->writeRight);
+		}
 
 		protected $loc;
 		protected $mod;
 		protected $mid;
 		protected $sqlTable;
+		protected $readRight;
+		protected $writeRight;
 	};
 ?>

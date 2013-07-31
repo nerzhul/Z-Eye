@@ -684,7 +684,7 @@
 
 
 		public function ajaxEcho($str,$js="",$raw=false) {
-			echo ($raw ? $str : $this->getLocale()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
+			echo ($raw ? $str : $this->getLocale($str)).(strlen($js) > 0 ? $this->js($js) : "");
 		}
 
 		public function ajaxEchoNC($str,$js="",$raw=false) {
