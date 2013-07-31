@@ -18,6 +18,7 @@
 	*/
 
 	require_once(dirname(__FILE__)."/icingaBroker.api.php");
+	require_once(dirname(__FILE__)."/objects.php");
 
 	final class iIcinga extends FSModule {
 		function __construct($locales) {
@@ -84,8 +85,9 @@
 		}
 
 		private function showHostsTab() {
-			if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) 
+			if(!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
 			
 			$output = "";
 			
@@ -149,120 +151,6 @@
 				$output .= "</table>";
 				FS::$iMgr->jsSortTable("thostList");
 			}
-			return $output;
-		}
-
-		private function showHostForm($name = "") {
-			$dname = ""; $icon = ""; $alias = ""; $addr = ""; $parentlist = array();
-			$checkcmd = "check-host-alive"; $checkperiod = ""; $checkintval = 3; $retcheckintval = 1; $maxcheck = 10;
-			$eventhdlen = true; $flapen = true; $failpreden = true; $perfdata = true; $retstatus = true; $retnonstatus = true;
-			$notifen = true; $notifperiod = ""; $notifintval = 0; $ctg = "";
-			$hostoptd = true; $hostoptu = true; $hostoptr = true; $hostoptf = true; $hostopts = true;
-			if($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","dname,alias,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$name."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
-					$dname = $data["dname"];
-					$alias = $data["alias"];
-					$addr = $data["addr"];
-					$icon = $data["iconid"];
-					$checkcmd = $data["alivecommand"];
-					$checkperiod = $data["checkperiod"];
-					$checkintval = $data["checkinterval"];
-					$retcheckintval = $data["retrycheckinterval"];
-					$maxcheck = $data["maxcheck"];
-					$eventhdlen = ($data["eventhdlen"] == 't');	
-					$flapen = ($data["flapen"] == 't');	
-					$failpreden = ($data["failpreden"] == 't');	
-					$perfdata = ($data["perfdata"] == 't');	
-					$retstatus = ($data["retstatus"] == 't');	
-					$retnonstatus = ($data["retnonstatus"] == 't');	
-					$notifen = ($data["notifen"] == 't');	
-					$notifperiod = $data["notifperiod"];
-					$notifintval = $data["notifintval"];
-					$ctg = $data["contactgroup"];	
-					$hostoptd = $data["hostoptd"];
-					$hostoptu = $data["hostoptu"];
-					$hostoptr = $data["hostoptr"];
-					$hostoptf = $data["hostoptf"];
-					$hostopts = $data["hostopts"];
-				}
-				$parentlist = array();
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_host_parents","parent","name = '".$name."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
-					$parentlist[] = $data["parent"];
-				}
-			}
-
-			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=13");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
-			//$output .= template list
-			$output .= FS::$iMgr->idxIdLine("Name","name",$name);
-			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$alias);
-			$output .= FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname",$dname);
-			$output .= "<tr><td>".$this->loc->s("Icon")."</td><td>";
-			$output .= FS::$iMgr->select("icon");
-			$output .= FS::$iMgr->selElmt("Aucun","",($icon == ""));
-
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_icons","name","id",array($icon));
-
-			$output .= "</select></td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Parent")."</td><td>";
-
-			$output2 = FS::$iMgr->selElmt($this->loc->s("None"),"none",(count($parentlist) == 0));
-			$countElmt = 0;
-
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				$countElmt++;
-				$output2 .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"],in_array($data["name"],$parentlist));
-			}
-
-			if($countElmt/4 < 4) $countElmt = 16;
-			$output .= FS::$iMgr->select("parent","",NULL,true,array("size" => round($countElmt/4)));
-			$output .= $output2;
-			$output .= "</select></td></tr>";
-
-			$output .= FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$addr);
-
-			$hglist = array();
-			if($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name","host = '".$name."' AND hosttype = '1'");
-				while($data = FS::$dbMgr->Fetch($query))
-					$hglist[] = $data["name"];
-			}
-
-			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups",false,$hglist,"",true)."</td></tr>";
-
-			// Checks
-			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand",$checkcmd)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod",$checkperiod)."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval","",array("value" => $checkintval, "type" => "num"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval","",array("value" => $retcheckintval, "type" => "num"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck","",array("value" => $maxcheck, "type" => "num"));
-
-			// Global
-			$output .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",$eventhdlen,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",$flapen,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",$failpreden,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",$perfdata,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",$retstatus,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",$retnonstatus,array("type" => "chk"));
-
-			// Notifications
-			$output .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",$notifen,array("type" => "chk"));
-			$output .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod",$notifperiod)."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval","",array("value" => $notifintval, "type" => "num"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",$hostoptd,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",$hostoptu,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",$hostoptr,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",$hostoptf,array("type" => "chk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",$hostopts,array("type" => "chk"));
-			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$ctg)."</td></tr>";
-			// icon image
-			// statusmap image
-			$output .= FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
 
@@ -825,21 +713,21 @@
 			return $output;
 		}
 
-		private function getTimePeriodList($name,$select = "") {
+		public function getTimePeriodList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
 			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name",array($select),array("order" => "alias"));
 			$output .= "</select>";
 			return $output;
 		}
 
-		private function genCommandList($name,$tocheck = NULL) {
+		public function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
 			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name","name",array($tocheck),array("order" => "name"));
 			$output .= "</select>";
 			return $output;
 		}
 		
-		private function genContactGroupsList($name,$select = "") {
+		public function genContactGroupsList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -859,7 +747,7 @@
 			return $output;
 		}
 		
-		private function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "",$grouponly = false) {
+		public function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "",$grouponly = false) {
 			$hostlist = array();
 			if(!$grouponly) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'");
@@ -900,7 +788,9 @@
 			switch($el) {
 				case 1: return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
 				case 2: return FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
-				case 3: return $this->showHostForm();
+				case 3: 
+					$host = new icingaHost();
+					return $host->showForm();
 				case 4:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
 						return $this->loc->s("err-no-rights");
@@ -939,7 +829,8 @@
 				case 9: return $this->showCommandForm();
 				case 10:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					return $this->showHostForm($name);
+					$host = new icingaHost();
+					return $host->showForm($name);
 				case 11:
 					if(!FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
 						return $this->loc->s("err-no-rights");

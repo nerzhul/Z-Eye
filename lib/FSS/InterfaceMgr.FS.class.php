@@ -456,9 +456,9 @@
 
 		public function idxIdLine($label,$name,$value = "",$options = array()) {
 			if ($value)
-				return "<tr><td>".$this->cur_module->getLoc()->s($label)."</td><td>".$value."</td></tr>".FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
+				return "<tr><td>".$this->getLocale($label)."</td><td>".$value."</td></tr>".FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
 			else
-				return $this->idxLine($this->cur_module->getLoc()->s($label),$name,"",$options);
+				return $this->idxLine($this->getLocale($label),$name,"",$options);
 		}
 
 		public function ruleLine($label,$rulename,$rulelist,$idx = "") {
@@ -478,10 +478,12 @@
 
 		public function tableSubmit($label,$options = array()) {
 			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\" class=\"ctrel\">";
-			if (isset($options["js"]))
-				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label),$options["js"]);
-			else
-				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$this->cur_module->getLoc()->s($label));
+			if (isset($options["js"])) {
+				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label),$options["js"]);
+			}
+			else {
+				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label));
+			}
 			$output .= "</th></tr></table></form>";
 			return $output;
 		}
@@ -601,7 +603,7 @@
 			$output .= "</ul></div>";
 			FS::$iMgr->js("$('#contenttabs').tabs({cache: false,
 				ajaxOptions: { error: function(xhr,status,index,anchor) {
-                        		$(anchor.hash).html(\"".$this->cur_module->getLoc()->s("fail-tab")."\");
+                        		$(anchor.hash).html(\"".$this->getLocale("fail-tab")."\");
 				}},
 				beforeLoad: function(event,ui) { $(ui.panel).html('<span class=\"loader\"></span>');}
 			});");
@@ -682,22 +684,29 @@
 
 
 		public function ajaxEcho($str,$js="",$raw=false) {
-			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
+			echo ($raw ? $str : $this->getLocale()->s($str)).(strlen($js) > 0 ? $this->js($js) : "");
 		}
 
 		public function ajaxEchoNC($str,$js="",$raw=false) {
-			echo ($raw ? $str : $this->cur_module->getLoc()->s($str)).(strlen($js) > 0 ? $this->js("dontClosePopup(); ".$js) : 
+			echo ($raw ? $str : $this->getLocale($str)).(strlen($js) > 0 ? $this->js("dontClosePopup(); ".$js) : 
 				$this->js("dontClosePopup();"));
 		}
 
 		public function getLocale($locid) {
-			if ($this->cur_module)
-				return $this->cur_module->getLoc()->s($locid);
-			else {
-				$loc = new FSLocales();
-				return $loc->s($locid);
-			}	
+			return $this->getLocales()->s($locid);
 		}
+
+		public function getLocales() {
+			if ($this->cur_module) {
+				return $this->cur_module->getLoc();
+			}
+			else {
+				return new FSLocales();
+			}
+		}
+
+		public function getCurModule() { return $this->cur_module; }
+
 		public function setCurrentModule($module) { $this->cur_module = $module; }
 		public function setTitle($title) { $this->title = $title; }
 
