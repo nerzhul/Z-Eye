@@ -136,6 +136,16 @@ class ZEyeDBUpgrade():
 			print "PgSQL Error: %s" % e
                         sys.exit(1);
 
+	def do13Upgrade(self):
+		try:
+			self.setDBVersion(self.dbVersion)
+		except PgSQL.Error, e:
+			if self.pgsqlCon:
+				self.pgsqlCon.close()
+                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			print "PgSQL Error: %s" % e
+                        sys.exit(1);
+
 	def doUpgrade(self):
 		print "DB Upgrade needed, we perform this upgrade for you..."
 		Logger.ZEyeLogger().write("DBUpgrade is needed. Starting...")
@@ -147,6 +157,10 @@ class ZEyeDBUpgrade():
 		# Upgrades for Z-Eye 1.2 series 
 		if self.dbVersion <= "1299":
 			self.do12Upgrade()
+
+		# Upgrades for Z-Eye 1.3 series
+		if self.dbVersion <= "1399":
+			self.do13Upgrade()
 
 		print "DB Upgrade done."
 		Logger.ZEyeLogger().write("DBUpgrade Done.")
