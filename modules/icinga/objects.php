@@ -43,8 +43,8 @@
 
 		protected function removeFromDB($name) {
 			FS::$dbMgr->BeginTr();
-			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$ctgname."'");
-			FS::$dbMgr->Delete($this->sqlTable,"name = '".$ctgname."'");
+			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name = '".$name."'");
+			FS::$dbMgr->Delete($this->sqlTable,"name = '".$name."'");
 			FS::$dbMgr->CommitTr();
 		}
 
@@ -282,7 +282,7 @@
 					$hglist[] = $data["name"];
 			}
 
-			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->mod->getHostOrGroupList("hostgroups",false,$hglist,"",true)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->mod->getHostOrGroupList("hostgroups",true,$hglist,"",true)."</td></tr>";
 
 			// Checks
 			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->mod->genCommandList("checkcommand",$this->checkcmd)."</td></tr>".
