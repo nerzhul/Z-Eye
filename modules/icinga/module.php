@@ -233,7 +233,7 @@
 					$hglist[] = $data["name"];
 			}
 
-			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups",false,$hglist,"",true)."</td></tr>";
+			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->getHostOrGroupList("hostgroups",true,$hglist,"",true)."</td></tr>";
 
 			// Checks
 			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->genCommandList("checkcommand",$checkcmd)."</td></tr>";
