@@ -1782,9 +1782,10 @@
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."' AND port = '".$port."'");
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."port_monitor","device,port,climit,wlimit,description","'".$device."','".$port."','".$climit."','".$wlimit."','".$desc."'");
 						}
-						else
+						else {
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."' AND port = '".$port."'");
-						$this->log(0,"Port monitoring for device '".$device."' and port '".$dport."' edited. Enabled: ".($enmod == "on" ? "yes" : "no").
+						}
+						$this->log(0,"Port monitoring for device '".$device."' and port '".$dport."' edited. Enabled: ".($enmon == "on" ? "yes" : "no").
 							" wlimit: ".$wlimit." climit: ".$climit." desc: '".$desc."'");
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
 						return;
