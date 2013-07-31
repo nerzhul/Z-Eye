@@ -737,9 +737,9 @@
 			$contacts = array();
 			if($name) {
 				$alias = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'");
-                        	$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$data["name"]."'");
-                        	while($data = FS::$dbMgr->Fetch($query2)) {
-                	                $contacts[] = $data2["member"];
+                        	$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member","name = '".$name."'");
+                        	while($data = FS::$dbMgr->Fetch($query)) {
+                	                $contacts[] = $data["member"];
              	        	}
 			}
 			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10");
