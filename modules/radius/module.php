@@ -973,7 +973,7 @@
 
 			$radSQLMgr = new AbstractSQLMgr();
 			if($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$raddb,$radport,$radhost,$this->raddbinfos["login"],$this->raddbinfos["pwd"]) == 0) {
-				if($radSQLMgr->Connect() != 0)
+				if($radSQLMgr->Connect() == NULL)
 					return NULL; 
 			}
 			return $radSQLMgr;
@@ -1744,11 +1744,8 @@
 					$testDBMgr->setConfig($sdbtype,$sdbname,$sport,$saddr,$slogin,$spwd);
 
 					$conn = $testDBMgr->Connect();
-					if($conn != 0) {
-						if(FS::isAjaxCall())
-							echo $this->loc->s("err-bad-server");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=7");
+					if($conn == NULL) {
+						FS::$iMgr->ajaxEchoNC("err-bad-server");
 						return;
 					}
 					FS::$dbMgr->Connect();
