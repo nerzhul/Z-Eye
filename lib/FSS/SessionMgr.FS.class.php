@@ -179,7 +179,7 @@
 
 			$this->groupBuf = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$this->getUid()."'");
-			while($data = pg_fetch_array($query)) {
+			while($data = FS::$dbMgr->Fetch($query)) {
 				$this->groupBuf[] = $data["gid"];
 			}
 			$this->groupBuf = array_unique($this->groupBuf);
