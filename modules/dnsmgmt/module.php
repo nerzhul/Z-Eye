@@ -253,7 +253,7 @@
 						}
 						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
 						if($recordtype == "A" || $recordtype == "AAAA")
-							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&search=".$recordval."\">".$recordval."</a>";
+							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$recordval."\">".$recordval."</a>";
 						else
 							$output .= $recordval;
 						$output .= "</td><td>";

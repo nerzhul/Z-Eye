@@ -697,7 +697,12 @@
 							$curserver = $data["server"];
 							$locoutput .= FS::$iMgr->h4($data["server"],true);
 						}
-						$locoutput .= $data["record"].".".$data["zonename"].FS::$iMgr->hr();
+						if($data["record"] == "@") {
+							$locoutput .= $data["zonename"].FS::$iMgr->hr();
+						}
+						else {
+							$locoutput .= $data["record"].".".$data["zonename"].FS::$iMgr->hr();
+						}
 						// Resolve with DIG to search what the DNS thinks
 						if($data["server"]) {
 							$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
