@@ -17,6 +17,22 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	final class dnsServer extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_tsig";
+			$this->readRight = "mrule_dnsmgmt_read";
+			$this->writeRight = "mrule_dnsmgmt_write";
+			$this->errNotExists = "err-server-not-exists";
+			$this->errAlreadyExists = "err-server-already-exists";
+		}
+
+		private $addr;
+		private $sshUser;
+		private $chrootPath;
+		private $namedPath;
+	};
+
 	final class dnsTSIGKey extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -27,9 +43,7 @@
 			$this->errAlreadyExists = "err-tsig-key-already-exists";
 
 			$this->tMgr = new HTMLTableMgr(array(
-				"tabledivid" => "tsiglist",
-				"tableid" => "tsigtable",
-				"firstlineid" => "tsigftr",
+				"htmgrid" => "tsig",
 				"sqltable" => "dns_tsig",
 				"sqlattrid" => "keyalias",
 				"attrlist" => array(array("key-alias","keyalias",""), array("key-id","keyid",""),
@@ -41,7 +55,6 @@
 				"rmcol" => true,
 				"rmlink" => "mod=".$this->mid."&act=6&keyalias",
 				"rmconfirm" => "confirm-remove-tsig",
-				"trpfx" => "tsigk",
 			));
 		}
 
@@ -174,7 +187,7 @@
 
 			$this->removeFromDB($keyalias);
 
-			$js = $this->tMgr->removeLine(FS::$iMgr->formatHTMLId($keyalias));
+			$js = $this->tMgr->removeLine($keyalias);
 			FS::$iMgr->ajaxEcho("Done",$js);
 		}
 

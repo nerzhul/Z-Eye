@@ -1726,7 +1726,7 @@
 						"sqltable" => "dhcp_subnet_v4_declared",
 						"sqlattrid" => "netid",
 						"trpfx" => "ds"));
-					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($netid));
+					$js = $tMgr->removeLine($netid);
 
 					$this->log(0,"Remove subnet: subnet '".$netid."' removed");
 					FS::$iMgr->ajaxEcho("Done",$js);
@@ -1891,7 +1891,7 @@
 						"sqlattrid" => "clustername",
 						"trpfx" => "cl"
 					));
-					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($cname));
+					$js = $tMgr->removeLine($cname);
 					
 					$this->log(0,"Remove cluster: cluster '".$cname."' removed");
 					FS::$iMgr->ajaxEcho("Done",$js);
@@ -2085,7 +2085,6 @@
 						"tabledivid" => "customoptslist",
 						"sqltable" => "dhcp_custom_option",
 						"sqlattrid" => "optname",
-						"sqlcond" => "optname = '".$optname."'",
 						"tableid" => "dhcpopttable",
 						"firstlineid" => "dhcpoptftr",
 						"attrlist" => array(array("option-name","optname",""), array("option-code","optcode",""),
@@ -2158,7 +2157,7 @@
 						"sqlattrid" => "optname",
 						"trpfx" => "dco"
 					));
-					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optname));
+					$js = $tMgr->removeLine($optname);
 					
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
@@ -2275,7 +2274,6 @@
 						"firstlineid" => "doptftr",
 						"sqltable" => "dhcp_option",
 						"sqlattrid" => "optalias",
-						"sqlcond" => "optalias = '".$optalias."'",
 						"attrlist" => array(array("option-alias","optalias",""), array("option-name","optname",""),
 							array("option-value","optval","")),
 						"sorted" => true,
@@ -2341,7 +2339,7 @@
 						"sqlattrid" => "optalias",
 						"trpfx" => "do"
 					));
-					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optalias));
+					$js = $tMgr->removeLine($optalias);
 					
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
@@ -2404,7 +2402,6 @@
 						"firstlineid" => "dgoptftr",
 						"sqltable" => "dhcp_option_group",
 						"sqlattrid" => "optgroup",
-						"sqlcond" => "optgroup = '".$optgroup."'",
 						"attrlist" => array(array("Groupname","optgroup",""), array("options","optalias","")),
 						"sorted" => true,
 						"odivnb" => 13,
@@ -2461,7 +2458,7 @@
 						"trpfx" => "do",
 						"multiid" => true,
 						));
-					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($optgroup));
+					$js = $tMgr->removeLine($optgroup);
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Ip range management

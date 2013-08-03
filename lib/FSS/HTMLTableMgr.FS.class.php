@@ -36,12 +36,29 @@
 			if (!isset($options) || !is_array($options))
 				return NULL;
 
-			if (isset($options["tabledivid"]))
-				$this->tableDivId = $options["tabledivid"];	
-			if (isset($options["tableid"]))
-				$this->tableId = $options["tableid"];	
-			if (isset($options["firstlineid"]))
-				$this->firstLineId = $options["firstlineid"];	
+			if (isset($options["htmgrid"])) {
+				$this->tableDivId = $options["htmgrid"]."list";
+				$this->tableId = $options["htmgrid"]."table";
+				$this->firstLineId = $options["htmgrid"]."ftr";
+				$this->trPrefix = $options["htmgrid"]."tr-";
+				$this->trSuffix = "-tr";
+			}
+			else {
+				if (isset($options["tabledivid"]))
+					$this->tableDivId = $options["tabledivid"];	
+				if (isset($options["tableid"]))
+					$this->tableId = $options["tableid"];	
+				if (isset($options["firstlineid"]))
+					$this->firstLineId = $options["firstlineid"];	
+				if (isset($options["trpfx"]))
+					$this->trPrefix = $options["trpfx"];	
+				else
+					$this->trPrefix = "";
+				if (isset($options["trsfx"]))
+					$this->trSuffix = $options["trsfx"];	
+				else
+					$this->trSuffix = "tr";
+			}
 
 			if (isset($options["sqltable"]))
 				$this->sqlTable = $options["sqltable"];	
@@ -64,10 +81,12 @@
 			// enable sort table JS
 			if (isset($options["sorted"]))
 				$this->sorted = $options["sorted"];	
+
 			if (isset($options["odivnb"]))
 				$this->opendivNumber = $options["odivnb"];	
 			if (isset($options["odivlink"]))
 				$this->opendivLink = $options["odivlink"];	
+
 			if (isset($options["rmcol"]))
 				$this->removeColumn = $options["rmcol"];	
 			if (isset($options["rmconfirm"]))
@@ -81,15 +100,7 @@
 			else
 				$this->groupMultipleId = false;	
 
-			if (isset($options["trpfx"]))
-				$this->trPrefix = $options["trpfx"];	
-			else
-				$this->trPrefix = "";
 
-			if (isset($options["trsfx"]))
-				$this->trSuffix = $options["trsfx"];	
-			else
-				$this->trSuffix = "tr";
 		}
 
 		public function render() {
@@ -238,8 +249,10 @@
 					$('#".$this->tableDivId."').show('slow');";
 			}
 
-			if ($edit)
-				$output .= "hideAndRemove('#".$this->trPrefix.$idx.$this->trSuffix."'); setTimeout(function() {";
+			if ($edit) {
+				$output .= "hideAndRemove('#".FS::$iMgr->formatHTMLId($this->trPrefix.$idx.$this->trSuffix).
+					"'); setTimeout(function() {";
+			}
 
 			$attrCount = count($this->attrList);
 			$sqlAttrList = ""; 
@@ -249,8 +262,14 @@
 				$sqlAttrList .= $this->attrList[$i][1];
 			}
 
-			$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
-				$this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+			if ($edit) {
+				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+					$this->sqlTable,$sqlAttrList,$this->sqlAttrId."='".$idx."'",array("order" => $this->sqlAttrId));
+			}
+			else {
+				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+					$this->sqlTable,$sqlAttrList,"",array("order" => $this->sqlAttrId));
+			}
 			if ($this->groupMultipleId) {
 				$rowBuf = array();
 				while($data = FS::$dbMgr->Fetch($query)) {
@@ -308,7 +327,7 @@
 			if ($count == 0)
 				$output .= "hideAndEmpty('#".$this->tableDivId."');";
 			else
-				$output .= "hideAndRemove('#".$this->trPrefix.$id.$this->trSuffix."');";
+				$output .= "hideAndRemove('#".FS::$iMgr->formatHTMLId($this->trPrefix.$id.$this->trSuffix)."');";
 			return $output;
 		}
 
@@ -334,6 +353,6 @@
 		private $sqlTable;
 		private $prefixSQLTable;
 		private $sqlAttrId;
-		private $sqlCond;
+		private $sqlCondition;
 	};
 ?>
