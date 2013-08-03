@@ -111,7 +111,7 @@
 								}
 								if ($module->getRulesClass()->canAccessToModule()) {
 									$menus[$menuname][] = 
-										"<div class=\"menuItem\" onclick=\"window.location.href='index.php?mod=".$moduleid."'\">".
+										"<div class=\"menuItem\" onclick=\"loadInterface('&mod=".$moduleid."');\">".
 										$module->getModuleClass()->getMenuTitle()."</div>";
 								}
 							}
