@@ -29,12 +29,14 @@ import netdiscoCfg
 class ZEyeSwitchesPortIDCacher(threading.Thread):
 	tc_mutex = Lock()
 	threadCounter = 0
-	defaultSNMPRO = "public"
 	max_threads = 30
+	SNMPcc = None
 
-	def __init__(self):
+	def __init__(self,SNMPcc):
                 """ 1 hour between two refresh """
                 self.sleepingTimer = 60*60
+		self.SNMPcc = SNMPcc
+
                 threading.Thread.__init__(self)
 
 
@@ -112,6 +114,10 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 		self.decrThreadNb()
 
 	def launchCachingProcess(self):
+		while self.SNMPcc.isRunning == True:
+			Logger.ZEyeLogger().write("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds")
+			time.sleep(10)
+
 		starttime = datetime.datetime.now()
 		Logger.ZEyeLogger().write("Port ID caching started")
 		try:
@@ -124,25 +130,23 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
 					while self.getThreadNb() >= self.max_threads:
 						time.sleep(1)
 
-					pgcursor.execute("SELECT snmpro FROM z_eye_snmp_cache where device = '%s'" % idx[1])
-					pgres2 = pgcursor.fetchone()
-			
 					devip = idx[0]
 					devname = idx[1]
 					vendor = idx[2]
-					if pgres2:
-						devcom = pgres2[0]
+
+					devcom = self.SNMPcc.getReadCommunity(devname)
+					if devcom == None:
+						Logger.ZEyeLogger().write("Port-ID-Caching: No read community found for %s" % devname)
 					else:
-						devcom = self.defaultSNMPRO
-					thread.start_new_thread(self.fetchSNMPInfos,(devip,devname,devcom,vendor))
+						thread.start_new_thread(self.fetchSNMPInfos,(devip,devname,devcom,vendor))
 				""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 				time.sleep(1)
 			except StandardError, e:
-				Logger.ZEyeLogger().write("Port ID Caching: FATAL %s" % e)
+				Logger.ZEyeLogger().write("Port-ID-Caching: FATAL %s" % e)
 				
 		except PgSQL.Error, e:
-			Logger.ZEyeLogger().write("Port ID Caching: Pgsql Error %s" % e)
-			sys.exit(1);	
+			Logger.ZEyeLogger().write("Port-ID-Caching: Pgsql Error %s" % e)
+			return
 
 		finally:
 

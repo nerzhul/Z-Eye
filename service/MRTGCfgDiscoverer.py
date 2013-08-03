@@ -27,14 +27,16 @@ import netdiscoCfg
 
 class ZEyeMRTGDiscoverer(threading.Thread):
 	sleepingTimer = 0
-	defaultSNMPRO = "public"
 	startTime = 0
 	threadCounter = 0
 	tc_mutex = Lock()
+	SNMPcc = None
 
-	def __init__(self):
+	def __init__(self,SNMPcc):
 		""" 30 mins between two discover """
 		self.sleepingTimer = 30*60
+		self.SNMPcc = SNMPcc
+
 		threading.Thread.__init__(self)
 
 	def run(self):
@@ -61,6 +63,10 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 		return val
 
 	def launchCfgGenerator(self):
+		while self.SNMPcc.isRunning == True:
+			Logger.ZEyeLogger().write("MRTG-Config-Discovery: SNMP community caching is running, waiting 10 seconds")
+			time.sleep(10)
+
 		Logger.ZEyeLogger().write("MRTG configuration discovery started")
 		starttime = datetime.datetime.now()
 		try:
@@ -70,17 +76,15 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 			try:
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
-					pgcursor2 = pgsqlCon.cursor()
-					pgcursor2.execute("SELECT snmpro FROM z_eye_snmp_cache where device = '%s'" % idx[1])
-					pgres2 = pgcursor2.fetchone()
-			
 					devip = idx[0]
 					devname = idx[1]
-					if pgres2:
-						devcom = pgres2[0]
+					devcom = self.SNMPcc.getReadCommunity(devname)
+
+					# Only launch process if SNMP cache is ok
+					if devcom == None:
+						Logger.ZEyeLogger().write("MRTG-Config-Discovery: No read community found for %s" % devname)
 					else:
-						devcom = self.defaultSNMPRO
-					thread.start_new_thread(self.fetchMRTGInfos,(devip,devname,devcom))
+						thread.start_new_thread(self.fetchMRTGInfos,(devip,devname,devcom))
 			except StandardError, e:
 				Logger.ZEyeLogger().write("MRTG-Config-Discovery: FATAL %s" % e)
 				return

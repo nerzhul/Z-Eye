@@ -32,7 +32,6 @@ from SNMPBroker import ZEyeSNMPBroker
 
 class ZEyeSwitchesBackup(threading.Thread):
 	sleepingTimer = 0
-	defaultSNMPRW = "private"
 	startTime = 0
 	threadCounter = 0
 	tc_mutex = Lock()
@@ -85,14 +84,11 @@ class ZEyeSwitchesBackup(threading.Thread):
 					pgcursor2.execute("SELECT ip,name FROM device ORDER BY ip")
 					pgres2 = pgcursor2.fetchall()
 					for idx2 in pgres2:
-						pgcursor3.execute("SELECT snmprw FROM z_eye_snmp_cache where device = '%s'" % idx2[1])
-						pgres3 = pgcursor3.fetchone()
-				
 						devip = idx2[0]
 						devname = idx2[1]
 
 						# Improve perfs, ask to community cacher
-						devcom = self.SNMPcc.getReadCommunity(devname)
+						devcom = self.SNMPcc.getWriteCommunity(devname)
 
 						# If no community found in cache dont try to backup
 						if devcom == None:

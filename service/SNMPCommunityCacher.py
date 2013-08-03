@@ -26,6 +26,12 @@ import Logger
 import netdiscoCfg
 from SNMPBroker import ZEyeSNMPBroker
 
+"""
+SNMP Community Cacher is important. It make a SNMP community cache for DB
+but also for Z-Eye web interface.
+SNMP cache is used by some other modules to not use DB and improve perfs
+"""
+
 class ZEyeSNMPCommCacher(threading.Thread):
 	sleepingTimer = 0
 	startTime = 0
