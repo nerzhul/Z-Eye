@@ -151,7 +151,8 @@ class ZEyeSNMPCommCacher(threading.Thread):
 					
 		except Exception, e:
 			Logger.ZEyeLogger().write("SNMP-Communities-Caching: FATAL %s" % e)
-		self.decrThreadNb()
+		finally:
+			self.decrThreadNb()
 
 	def loadSNMPCommunities(self):
 		self.snmpro = []

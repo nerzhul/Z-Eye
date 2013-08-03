@@ -328,8 +328,8 @@ class ZEyeDHCPManager(threading.Thread):
 			ssh.close()
 		except Exception, e:
 			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
-
-		self.decrThreadNb()
+		finally:
+			self.decrThreadNb()
 
 	def loadIPv4Options(self,pgcursor):
 		self.IPv4OptgroupsList = {}

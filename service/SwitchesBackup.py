@@ -142,8 +142,8 @@ class ZEyeSwitchesBackup(threading.Thread):
 				copyState = SNMPB.snmpget(devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.%d" % rand)
 		except Exception, e:
 			Logger.ZEyeLogger().write("Switches-backup: FATAL %s" % e)
-
-		self.decrThreadNb()
+		finally:
+			self.decrThreadNb()
 
 	def doAuthBackup(self,ip,devname,devcom,addr,path,login,pwd):
 		self.incrThreadNb()
@@ -163,5 +163,5 @@ class ZEyeSwitchesBackup(threading.Thread):
 			SNMPB.snmpset(devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.%d" % rand,rfc1902.Integer(1))
 		except Exception, e:
 			Logger.ZEyeLogger().write("Switches-backup: FATAL %s" % e)
-
-		self.decrThreadNb()
+		finally:
+			self.decrThreadNb()

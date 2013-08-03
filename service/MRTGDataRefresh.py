@@ -67,8 +67,8 @@ class ZEyeMRTGDataRefresher(threading.Thread):
 			subprocess.check_output(["/usr/local/bin/perl", "/usr/local/bin/mrtg", "%s" % filename])
 		except Exception, e:
 			Logger.ZEyeLogger().write("MRTG Data Refresher: FATAL %s" % e)
-		
-		self.decrThreadNb()
+		finally:
+			self.decrThreadNb()
 
 	def launchRefreshProcess(self):
 		try:

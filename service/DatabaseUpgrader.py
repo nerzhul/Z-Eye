@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1300"
+	nextDBVersion = "1302"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -142,6 +142,13 @@ class ZEyeDBUpgrade():
 				self.tryCreateTable("z_eye_dns_servers","addr varchar(16) NOT NULL, sshuser varchar(64) NOT NULL, sshpwd varchar(64),namedpath varchar(256),chrootpath varchar(256), PRIMARY KEY (addr)")
 				self.tryDropTable("z_eye_server_list")
 				self.setDBVersion("1300")
+			if self.dbVersion == "1300":
+				self.tryDropTable("z_eye_dns_zone_cache")
+				self.tryCreateTable("z_eye_dns_zone_cache","zonename varchar(192) NOT NULL, zonetype int NOT NULL, server varchar(256) NOT NULL, PRIMARY KEY(zonename,server)")
+				self.setDBVersion("1301")
+			if self.dbVersion == "1301":
+				self.tryAddColumn("z_eye_dns_zone_record_cache","ttl","int")
+				self.setDBVersion("1302")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

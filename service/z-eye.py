@@ -33,6 +33,7 @@ from serviceManager import ZEyeServiceMgr
 from DatabaseUpgrader import ZEyeDBUpgrade
 from DHCPManager import ZEyeDHCPManager
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
+import ZEyeDNS
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
@@ -48,7 +49,9 @@ class ZEyeDaemon(Daemon.Daemon):
 		ZEyeSwitchesPortIDCacher(SNMPcc).start()
 		ZEyeSwitchesBackup(SNMPcc).start()
 		ZEyeServiceMgr().start()	
+
 		ZEyeDHCPManager().start()
+		ZEyeDNS.RecordCollector().start()
 		
 		while True:
 			time.sleep(1)

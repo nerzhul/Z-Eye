@@ -100,7 +100,7 @@
 				FS::$iMgr->select("f");
 
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","",array("order" => "zonename"));
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","",array("order" => "zonename","group" => "zonename"));
 			while($data = FS::$dbMgr->Fetch($query)) {
 				if(!$found) $found = true;
 				$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
@@ -247,8 +247,8 @@
 							default: $style = ""; break;
 						}
 						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
-						if($recordtype == "A")
-							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&node=".$recordval."\">".$recordval."</a>";
+						if($recordtype == "A" || $recordtype == "AAAA")
+							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&search=".$recordval."\">".$recordval."</a>";
 						else
 							$output .= $recordval;
 						$output .= "</td><td>";

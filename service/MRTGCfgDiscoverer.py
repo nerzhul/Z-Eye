@@ -117,4 +117,5 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 			cfgfile.close()
 		except Exception, e:
 			Logger.ZEyeLogger().write("MRTG-Config-Discovery: FATAL %s" % e)
-		self.decrThreadNb()
+		finally:
+			self.decrThreadNb()
