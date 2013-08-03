@@ -131,7 +131,6 @@
 		}
 
 		public function Disconnect() {
-			echo "1";
 			if(FS::$sessMgr->getUid()) {
 				$this->log(0,"User disconnected");
 				FS::$sessMgr->Close(); 
