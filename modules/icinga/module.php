@@ -207,7 +207,7 @@
 		}
 		
 		private function showHostgroupForm($name = "") {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=19");
+			$output = FS::$iMgr->cbkForm("19");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			// Global
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
@@ -314,7 +314,7 @@
 				}
 			}
 			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=16");
+			$output = FS::$iMgr->cbkForm("16");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 			//$output .= template list
@@ -446,7 +446,7 @@
 			}
 
 			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
+			$output = FS::$iMgr->cbkForm("4");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
@@ -536,7 +536,7 @@
 			}
 
 			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7");
+			$output = FS::$iMgr->cbkForm("7");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",$template,array("type" => "chk"));
 			//$output .= template list
@@ -675,7 +675,7 @@
 				$value = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$name."'");
 			}
 	
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
+			$output = FS::$iMgr->cbkForm("1");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
 			$output .= FS::$iMgr->idxLine($this->loc->s("Command"),"cmd",$value,array("length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));

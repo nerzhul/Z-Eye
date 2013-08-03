@@ -96,7 +96,7 @@
 			$shother = FS::$secMgr->checkAndSecuriseGetData("sother");
 			if($shother == NULL) $shother = 1;
 
-			$formoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1").
+			$formoutput = FS::$iMgr->cbkForm("1").
 				FS::$iMgr->select("f");
 
 			$found = false;
@@ -273,7 +273,7 @@
 
 		private function showAdvancedTools() {
 			$output = FS::$iMgr->h3("title-old-records").
-				FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=2").
+				FS::$iMgr->cbkForm("2").
 				"Intervalle (jours) ".FS::$iMgr->numInput("ival")."<br />".
 				FS::$iMgr->submit("search",$this->loc->s("Search")).
 				"</form><div id=\"obsres\"></div>";
@@ -302,7 +302,7 @@
 				}
 			}
 			
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3").
+			$output .= FS::$iMgr->cbkForm("3").
 				"<table>".
 				FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$addr,array("type" => "idxedit", "value" => $addr,
 				"length" => "128", "edit" => $addr != "")).

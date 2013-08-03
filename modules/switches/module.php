@@ -122,7 +122,7 @@
 					if($data = FS::$dbMgr->Fetch($query)) {
 						if($portid != -1 && (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
 							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write"))) {
-							$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9");
+							$output .= FS::$iMgr->cbkForm("9");
 							$output .= FS::$iMgr->hidden("portid",$portid);
 							$output .= FS::$iMgr->hidden("sw",$device);
 							$output .= FS::$iMgr->hidden("port",$port);
@@ -1113,7 +1113,7 @@
 						}
 						else
 							$output .= "<span style=\"color: red;\">".$this->loc->s("Disabled")."</span>";
-						$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=22&d=".$device);
+						$output .= FS::$iMgr->cbkForm("22&d=".$device);
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";	
 						$output .= FS::$iMgr->idxLine($this->loc->s("User"),"sshuser",$sshuser);
 						$output .= FS::$iMgr->idxLine($this->loc->s("SSH-pwd"),"sshpwd","",array("type" => "pwd"));
@@ -1238,7 +1238,7 @@
 			}
 
 			private function showDeviceDiscovery() {
-				$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=18");
+				$output = FS::$iMgr->cbkForm("18");
 				$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
 				$output .= "</li><li>".FS::$iMgr->Submit("",$this->loc->s("Discover"))."</li>";
 				$output .= "</ul></form>";
@@ -1353,13 +1353,13 @@
 				$output = "";
 				if(FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
 					// Write all devices button
-					$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=20");
+					$output .= FS::$iMgr->cbkForm("20");
 					$output .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
 				}
 				if(FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
 					$rightsok = true;
 					// Backup all devices button
-					$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=21");
+					$output .= FS::$iMgr->cbkForm("21");
 					$output .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
 				}
 				return $output;

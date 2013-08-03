@@ -46,7 +46,7 @@
 			}
 
 			if($found) {
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3").
+				$output .= FS::$iMgr->cbkForm("3").
 					FS::$iMgr->select("subnet").$tmpoutput."</select> ".
 					FS::$iMgr->Submit("","Filter")."</form>".
 					"<div id=\"subnetrights\"></div>";
@@ -219,7 +219,7 @@
 				}
 			}
 			$output .= "<span id=\"anchusrr_".FS::$iMgr->formatHTMLId("u".$subnet."l-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1").
+			$tmpoutput = FS::$iMgr->cbkForm("1").
 				FS::$iMgr->hidden("subnet",$subnet).FS::$iMgr->hidden("right",$right).
 				"<span id=\"lu".FS::$iMgr->formatHTMLId($right.$subnet)."\">";
 			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
@@ -237,7 +237,7 @@
 				}
 			}
 			$output .= "<span id=\"anchusrr_".FS::$iMgr->formatHTMLId("uglbl-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput = FS::$iMgr->cbkForm("1");
 			$tmpoutput .= FS::$iMgr->hidden("global",1).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."glbl\">";
 			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
 			return $output;
@@ -254,7 +254,7 @@
 				}
 			}
 			$output .= "<span id=\"anchgrpr_".FS::$iMgr->formatHTMLId("g".$subnet."-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1").
+			$tmpoutput = FS::$iMgr->cbkForm("1").
 				FS::$iMgr->hidden("subnet",$subnet).FS::$iMgr->hidden("right",$right).
 				"<span id=\"lg".FS::$iMgr->formatHTMLId($right.$subnet)."\">";
 			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
@@ -272,7 +272,7 @@
 				}
 			}
 			$output .= "<span id=\"anchgrpr_".FS::$iMgr->formatHTMLId("gglbl-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput = FS::$iMgr->cbkForm("1");
 			$tmpoutput .= FS::$iMgr->hidden("global","1").FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."glbl\">";
 			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
 			return $output;

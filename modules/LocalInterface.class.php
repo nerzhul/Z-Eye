@@ -82,7 +82,7 @@
 					"<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>".
 					"</div><div class=\"left\">";
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection").
+				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection",true).
 					$this->h4("Identification",true).
 					$this->label("loginuname","Utilisateur").
 					$this->input("loginuname","").

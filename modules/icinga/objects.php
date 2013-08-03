@@ -54,7 +54,7 @@
 			}
 			$this->Load($name);
 
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=10").
+			$output = FS::$iMgr->cbkForm("10").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
 				FS::$iMgr->idxIdLine("Name","name",$this->name,array("length" => 60, "size" => 30)).
 				FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",$this->alias,array("length" => 60, "size" => 30));
@@ -245,7 +245,7 @@
 			$this->Load($name);
 
 			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=13").
+			$output = FS::$iMgr->cbkForm("13").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
 				FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",false,array("type" => "chk"));
 			//$output .= template list

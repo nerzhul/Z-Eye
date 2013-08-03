@@ -74,7 +74,7 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 
 			$netfound = false;
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
+			$tmpoutput = FS::$iMgr->cbkForm("1");
 			$tmpoutput .= FS::$iMgr->select("f");
 			$formoutput = "";
 
@@ -358,7 +358,7 @@
 				return FS::$iMgr->printError($this->loc->s("err-subnet-not-exists"));
 			}
 			
-			$output = FS::$iMgr->tip("tip-range").FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=18")."<table>".
+			$output = FS::$iMgr->tip("tip-range").FS::$iMgr->cbkForm("18")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("start-ip"),"startip","",array("type" => "ip", "length" => 16)).
 				FS::$iMgr->idxLine($this->loc->s("end-ip"),"endip","",array("type" => "ip", "length" => 16)).
 				"<tr><td>".$this->loc->s("Action")."</td><td>".FS::$iMgr->select("rangeact").
@@ -415,7 +415,7 @@
 			}
 
 			$output = "<div id=\"monsubnetres\"></div>".
-				FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&f=".$filter."&act=3").
+				FS::$iMgr->cbkForm("3&f=".$filter).
 				"<ul class=\"ulform\"><li>".
 				FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',
 					"label" => $this->loc->s("En-IP-history"))).
@@ -433,7 +433,7 @@
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 			$output = FS::$iMgr->h4("title-search-old");
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=2");
+			$output .= FS::$iMgr->cbkForm("2");
 			$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
 			$output .= FS::$iMgr->submit("",$this->loc->s("Search"));
 			$output .= "</form><div id=\"obsres\"></div>";
@@ -528,7 +528,7 @@
 				}
 			}
 
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=16")."<table>".
+			$output = FS::$iMgr->cbkForm("16")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Groupname"),"optgroup",$optgroup,array("type" => "idxedit", "length" => 64,
 					"edit" => $optgroup != "")).
 				"<tr><td>".$this->loc->s("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions","",NULL,true);
@@ -560,7 +560,7 @@
 				}
 			}
 
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=14")."<table>".
+			$output = FS::$iMgr->cbkForm("14")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("option-alias"),"optalias",$optalias,array("type" => "idxedit", "length" => 64,
 					"edit" => $optalias != "")).
 				"<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-value")."><td>".$this->loc->s("option-name")."</td><td>".FS::$iMgr->select("optname");
@@ -592,7 +592,7 @@
 				return FS::$iMgr->printError("err-option-code-protected");
 			}
 
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=12")."<table>".
+			$output = FS::$iMgr->cbkForm("12")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("option-name"),"optname",$optname,array("type" => "idxedit", "length" => 32,
 					"edit" => $optname != "")).
 				FS::$iMgr->idxLine($this->loc->s("option-code"),"optcode","",array("type" => "num", "length" => 3, "size" => 3,
@@ -691,7 +691,7 @@
 					$dleasetime = $data["dleasetime"];
 				}
 			}
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=7")."<table>".
+			$output = FS::$iMgr->cbkForm("7")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("netid"),"netid",$netid,array("type" => "idxipedit", "length" => 16, "edit" => $netid != "")).
 				FS::$iMgr->idxLine($this->loc->s("netmask"),"netmask",$netmask,array("length" => 16, "type" => "ip")).
 				FS::$iMgr->idxLine($this->loc->s("vlanid"),"vlanid",$vlanid,array("length" => 4, "type" => "num", "value" => $vlanid, "tooltip" => "tooltip-vlanid")).
@@ -778,7 +778,7 @@
 					$dhcptype = $data["dhcptype"];
 				}
 			}
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5").$this->loc->s("note-needed")."<table>".
+			$output = FS::$iMgr->cbkForm("5").$this->loc->s("note-needed")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",$addr,array("type" => "idxedit", "length" => 128, "edit" => $addr != "")).
 				FS::$iMgr->idxLine($this->loc->s("server-alias"),"alias",$alias,array("length" => 64, "tooltip" => "tooltip-dhcp-alias")).
 				FS::$iMgr->idxLine($this->loc->s("server-desc"),"description",$description,array("length" => 128, "tooltip" => "tooltip-dhcp-desc")).
@@ -886,7 +886,7 @@
 				$clustermode = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustermode","clustername = '".$name."'");
 				$clustermaster = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","master","clustername = '".$name."'");
 			}
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=9")."<table>".
+			$output = FS::$iMgr->cbkForm("9")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit", "edit" => $name != "")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
 
@@ -967,7 +967,7 @@
 					$reserv = $data["reserv"] == 't';
 				}
 			}
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=11")."<table>".
+			$output = FS::$iMgr->cbkForm("11")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("IP-Addr"),"ip",$ip,array("type" => "idxedit", "edit" => $ip != "")).
 				FS::$iMgr->idxLine($this->loc->s("Reserv"),"reserv",$reserv,array("type" => "chk", "tooltip" => "tooltip-ip-reserv")).
 				FS::$iMgr->idxLine($this->loc->s("MAC-Addr"),"mac",$mac).

@@ -188,7 +188,7 @@
 				}
 			}
 
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=13");
+			$output .= FS::$iMgr->cbkForm("13");
 
 			if(!$create) {
 				$output .= FS::$iMgr->hidden("saddr",$saddr);

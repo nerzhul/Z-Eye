@@ -72,7 +72,7 @@
 
 		private function showCommunityForm($name = "") {
 			$ro = ""; $rw = "";
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1")."<table>";
+			$output = FS::$iMgr->cbkForm("1")."<table>";
 			if($name)  {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","ro,rw","name = '".$name."'");
 				if($data = FS::$dbMgr->Fetch($query)) {

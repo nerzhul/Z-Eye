@@ -409,9 +409,13 @@
 			return $output;
 		}
 
-		public function cbkForm($link, $textid = "Modification") {
-			$output = "<form action=\"".$link."\" method=\"POST\" onsubmit=\"return callbackForm('".$link."',this,";
-			$output .= "{'snotif':'".addslashes($this->getLocale($textid))."'});\" >";
+		public function cbkForm($link, $textid = "Modification",$raw = false) {
+			if($raw == false) {
+				$link = "index.php?mod=".$this->cur_module->getModuleId()."&act=".$link;
+			}
+			$output = "<form action=\"".$link.
+				"\" method=\"POST\" onsubmit=\"return callbackForm('".$link."',this,".
+				"{'snotif':'".addslashes($this->getLocale($textid))."'});\" >";
 			return $output;
 		}
 

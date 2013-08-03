@@ -124,13 +124,13 @@
 
 		// This form imports nodes from devices or icinga
 		private function showImportForm() {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5");
+			$output = FS::$iMgr->cbkForm("5");
 			$output .= FS::$iMgr->submit("","Import de test")."</form>";
 			return $output;
 		}
 		
 		private function showNodeForm($name = "") {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1");
+			$output = FS::$iMgr->cbkForm("1");
 			$output .= "<table>";
 			$output .= FS::$iMgr->idxIdLine("Name","nname",$name,array("length" => 60));
 			$output .= FS::$iMgr->idxLine("Label","nlabel","",array("length" => 60));
@@ -144,7 +144,7 @@
 		}
 
 		private function showEdgeForm($name = "") {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
+			$output = FS::$iMgr->cbkForm("3");
 			$output .= "<table>";
 			$output .= FS::$iMgr->idxIdLine("Name","ename",$name,array("length" => 60));
 			$output .= "<tr><td>".$this->loc->s("Source-node")."</td><td>".$this->showNodeList("node1",NULL)."</td></tr>";

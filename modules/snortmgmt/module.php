@@ -74,7 +74,7 @@
 				$dnsenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dnsenable'");
 				$dnslist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dnslist'");
 				if(!$dnsenable) $dnsenable = 0;
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"dnsenable",$dnsenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-dns"),"dnslist",array("value" => $dnslist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -97,7 +97,7 @@
 				if(!$popenable) $popenable = 0;
 				if(!$popports) $popports = "109,110,995";
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("en-smtp-sensor"),"ensmtp",$smtpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-smtp"),"smtplist",array("value" => $smtplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -117,7 +117,7 @@
 				if(!$httpenable) $httpenable = 0;
 				if(!$httpports) $httpports = "80,443";
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enhttp",$httpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-http"),"httplist",array("value" => $httplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -134,7 +134,7 @@
 				$oracleports = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'oracleports'");
 				if(!$oracleenable) $oracleenable = 0;
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensql",$sqlenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sql"),"sqllist",array("value" => $sqllist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -157,7 +157,7 @@
 				$tselist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'tselist'");
 				if(!$tseenable) $tseenable = 0;
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("en-telnet-sensor"),"entelnet",$telnetenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-telnet"),"telnetlist",array("value" => $telnetlist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -175,7 +175,7 @@
 				if(!$ftpenable) $ftpenable = 0;
 				if(!$ftpports) $ftpports = "21";
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"enftp",$ftpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-ftp"),"ftplist",array("value" => $ftplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -187,7 +187,7 @@
 				$snmplist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'snmplist'");
 				if(!$snmpenable) $snmpenable = 0;
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensnmp",$snmpenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-snmp"),"snmplist",array("value" => $snmplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -199,7 +199,7 @@
 				$sipports = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'sipports'");
 				if(!$sipenable) $sipenable = 0;
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"),"ensip",$sipenable,array("type" => "chk"));
 				$output .= FS::$iMgr->tabledTextArea($this->loc->s("srv-sip"),"siplist",array("value" => $siplist, "width" => 250, "height" => 100, "tooltip" => "tooltip-ipv4"));
@@ -215,7 +215,7 @@
 				$weh = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'report_wehour'");
 				$wem = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'report_wemin'");
 
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=".$sh);
+				$output .= FS::$iMgr->cbkForm($sh);
 				$output .= "<table>";
 				$output .= "<tr><th colspan=\"2\">".$this->loc->s("title-nightreport")."</th></tr>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Activate"), "nightreport", $nightreport == 1 ? true : false,array("type" => "chk"));

@@ -83,7 +83,7 @@
 				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
 			}
 
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5")."<table>".
+			$output = FS::$iMgr->cbkForm("5")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("key-alias"),"keyalias",$this->name,array("type" => "idxedit", "length" => 64,
 					"edit" => $this->name != "")).
 				FS::$iMgr->idxLine($this->loc->s("key-id"),"keyid",$this->keyid,array("length" => 32, "value" => $this->keyid)).

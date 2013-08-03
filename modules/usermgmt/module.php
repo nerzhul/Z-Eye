@@ -169,7 +169,7 @@
 		}
 
 		private function showUserImportForm() {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=6");
+			$output = FS::$iMgr->cbkForm("6");
 			$output .= "<table>";
 			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"username","");
 
@@ -195,7 +195,7 @@
 		}
 
 		private function showDirectoryForm($addr = "") {
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=4");
+			$output = FS::$iMgr->cbkForm("4");
 
 			$port = 389; $ssl = false; $dn = ""; $rootdn = ""; $ldapname = ""; $ldapsurname = ""; $ldapmail = "";
 			$ldapuid = ""; $ldapfilter = "(objectclass=*)";

@@ -88,7 +88,7 @@
 					$('#tohide2').fadeIn();
 					$('#tohide3').fadeIn();
 				}};");
-			$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=3");
+			$output .= FS::$iMgr->cbkForm("3");
 			$output .= "<table>";
 			if($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
@@ -283,7 +283,7 @@
 				}
 			}
 			$output .= "<span id=\"anchipusrr_".FS::$iMgr->formatHTMLId("u".$ip."-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
+			$tmpoutput = FS::$iMgr->cbkForm("1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."ip\">";
 			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
 			return $output;
@@ -300,7 +300,7 @@
 				}
 			}
 			$output .= "<span id=\"anchipgrpr_".FS::$iMgr->formatHTMLId("g".$ip."-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterIP ? "&filter=".$filterIP : ""));
+			$tmpoutput = FS::$iMgr->cbkForm("1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."ip\">";
 			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
 			return $output;
@@ -465,7 +465,7 @@
 				}
 			}
 			$output .= "<span id=\"anchsnmpgrpr_".FS::$iMgr->formatHTMLId("g".$snmp."-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
+			$tmpoutput = FS::$iMgr->cbkForm("1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."snmp\">";
 			$tmpoutput .= $this->groupSelect("gid",$values);
 			$output .= $tmpoutput."</span></form>";
@@ -483,7 +483,7 @@
 				}
 			}
 			$output .= "<span id=\"anchsnmpusrr_".FS::$iMgr->formatHTMLId("u".$snmp."-".$right)."\" style=\"display:none;\"></span>";
-			$tmpoutput = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=1".($filterSNMP ? "&filter=".$filterSNMP : ""));
+			$tmpoutput = FS::$iMgr->cbkForm("1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."snmp\">";
 			$tmpoutput .= $this->userSelect("uid",$values);
 			$output .= $tmpoutput."</span></form>";
