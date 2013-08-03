@@ -102,8 +102,13 @@
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","",array("order" => "zonename","group" => "zonename"));
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) $found = true;
-				$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"] ? true : false));
+				// Skip hint zone
+				if ($data["zonename"] != ".") {
+					if(!$found) {
+						$found = true;
+					}
+					$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"]));
+				}
 			}
 			if($found) {
 				$output .= $formoutput.

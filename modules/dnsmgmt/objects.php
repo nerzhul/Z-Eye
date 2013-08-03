@@ -76,11 +76,12 @@
 			$this->sshUser = ""; $this->namedPath = ""; $this->chrootPath = "";
 
 			if($this->addr) {
-				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath,tsig","addr = '".$addr."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$this->sshUser = $data["sshuser"];
 					$this->namedPath = $data["namedpath"];
-					$chrootPath = $data["chrootpath"];
+					$this->chrootPath = $data["chrootpath"];
+					$this->TSIGKey = $data["tsig"];
 					return true;
 				}
 				else {
@@ -119,12 +120,12 @@
 				return;
 			}
 
-			$conn = ssh2_connect($saddr,22);
-			if(!$conn) {
+			$ssh = new SSH($saddr);
+			if(!$ssh->Connect()) {
 				FS::$iMgr->ajaxEcho("err-unable-conn");
 				return;
 			}
-			if(!ssh2_auth_password($conn,$slogin,$spwd)) {
+			if(!$ssh->Authenticate($slogin,$spwd)) {
 				FS::$iMgr->ajaxEcho("err-bad-login");
 				return;
 			}
@@ -190,6 +191,7 @@
 		private $sshUser;
 		private $chrootPath;
 		private $namedPath;
+		private $TSIGKey;
 	};
 
 	final class dnsTSIGKey extends FSMObj {
