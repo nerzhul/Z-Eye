@@ -32,9 +32,11 @@ from SwitchesBackup import ZEyeSwitchesBackup
 from serviceManager import ZEyeServiceMgr
 from DatabaseUpgrader import ZEyeDBUpgrade
 from DHCPManager import ZEyeDHCPManager
+from SNMPCommunityCacher import ZEyeSNMPCommCacher
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
+		ZEyeSNMPCommCacher().start()
 		ZEyeMRTGDiscoverer().start()
 		ZEyeMRTGDataRefresher().start()
 		ZEyePeriodicCmd(15*60,15,"Netdisco device discovery","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()

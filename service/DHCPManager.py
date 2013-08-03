@@ -59,7 +59,7 @@ class ZEyeDHCPManager(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
-		Logger.ZEyeLogger().write("Z-Eye DHCP Manager launched")
+		Logger.ZEyeLogger().write("DHCP Manager launched")
 		while True:
 			self.launchDHCPManagement()
 			time.sleep(self.sleepingTimer)
