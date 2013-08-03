@@ -36,14 +36,16 @@ class ZEyeSwitchesBackup(threading.Thread):
 	startTime = 0
 	threadCounter = 0
 	tc_mutex = Lock()
+	SNMPcc = None
 
-	def __init__(self):
+	def __init__(self,SNMPcc):
 		""" 24 hours between two backups """
 		self.sleepingTimer = 24*60*60
+		self.SNMPcc = SNMPcc
 		threading.Thread.__init__(self)
 
 	def run(self):
-		Logger.ZEyeLogger().write("Z-Eye Switch backup process launched")
+		Logger.ZEyeLogger().write("Switch backup process launched")
 		while True:
 			self.launchBackup()
 			time.sleep(self.sleepingTimer)
@@ -66,6 +68,10 @@ class ZEyeSwitchesBackup(threading.Thread):
 		return val
 
 	def launchBackup(self):
+		while self.SNMPcc.isRunning == True:
+			Logger.ZEyeLogger().write("Switches-backup: SNMP community caching is running, waiting 10 seconds")
+			time.sleep(10)
+
 		Logger.ZEyeLogger().write("Switches backup started")
 		starttime = datetime.datetime.now()
 		try:
@@ -79,21 +85,24 @@ class ZEyeSwitchesBackup(threading.Thread):
 					pgcursor2.execute("SELECT ip,name FROM device ORDER BY ip")
 					pgres2 = pgcursor2.fetchall()
 					for idx2 in pgres2:
-						pgcursor3 = pgsqlCon.cursor()
 						pgcursor3.execute("SELECT snmprw FROM z_eye_snmp_cache where device = '%s'" % idx2[1])
 						pgres3 = pgcursor3.fetchone()
 				
 						devip = idx2[0]
 						devname = idx2[1]
-						if pgres3:
-							devcom = pgres3[0]
+
+						# Improve perfs, ask to community cacher
+						devcom = self.SNMPcc.getReadCommunity(devname)
+
+						# If no community found in cache dont try to backup
+						if devcom == None:
+							Logger.ZEyeLogger().write("Switches-backup: No write community found for %s" % devname)
 						else:
-							devcom = self.defaultSNMPRW
-						# save type = 1 (TFTP)
-						if idx[0] == 1:
-							thread.start_new_thread(self.doBackup,(devip,devname,devcom,idx[1],"%sconf-%s" % (idx[2], devname)))
-						elif idx[0] == 2 or idx[0] == 4 or idx[0] == 5:
-							thread.start_new_thread(self.doAuthBackup,(devip,devname,devcom,idx[1],"%sconf-%s" % (idx[2], devname),idx[3],idx[4]))
+							# save type = 1 (TFTP)
+							if idx[0] == 1:
+								thread.start_new_thread(self.doBackup,(devip,devname,devcom,idx[1],"%sconf-%s" % (idx[2], devname)))
+							elif idx[0] == 2 or idx[0] == 4 or idx[0] == 5:
+								thread.start_new_thread(self.doAuthBackup,(devip,devname,devcom,idx[1],"%sconf-%s" % (idx[2], devname),idx[3],idx[4]))
 			except StandardError, e:
 				Logger.ZEyeLogger().write("Switches-backup: FATAL %s" % e)
 				return

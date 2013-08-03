@@ -76,6 +76,7 @@ class ZEyeSNMPCommCacher(threading.Thread):
 	def launchSNMPCaching(self):
 		Logger.ZEyeLogger().write("SNMP communities caching started")
 		starttime = datetime.datetime.now()
+		self.isRunning = True
 		try:
 			self.pgcon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			self.pgcursor = self.pgcon.cursor()
@@ -106,6 +107,7 @@ class ZEyeSNMPCommCacher(threading.Thread):
 			if self.pgcon:
 				self.pgcon.close()
 
+		self.isRunning = False
 		totaltime = datetime.datetime.now() - starttime
 		Logger.ZEyeLogger().write("SNMP communities caching done (time: %s)" % totaltime)
 
@@ -167,3 +169,15 @@ class ZEyeSNMPCommCacher(threading.Thread):
 		for dev in self.deviceCommunities:
 			self.pgcursor.execute("INSERT INTO z_eye_snmp_cache(device,snmpro,snmprw) VALUES (%s,%s,%s)",(dev,self.deviceCommunities[dev][0],self.deviceCommunities[dev][1]))
 		self.pgcon.commit()
+
+	def getReadCommunity(self,name):
+		if name in self.deviceCommunities:
+			return self.deviceCommunities[name][0]
+		else:
+			return None
+
+	def getWriteCommunity(self,name):
+		if name in self.deviceCommunities:
+			return self.deviceCommunities[name][1]
+		else:
+			return None

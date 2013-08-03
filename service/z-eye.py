@@ -36,7 +36,8 @@ from SNMPCommunityCacher import ZEyeSNMPCommCacher
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
-		ZEyeSNMPCommCacher().start()
+		SNMPcc = ZEyeSNMPCommCacher()
+		SNMPcc.start()
 		ZEyeMRTGDiscoverer().start()
 		ZEyeMRTGDataRefresher().start()
 		ZEyePeriodicCmd(15*60,15,"Netdisco device discovery","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()
@@ -44,7 +45,7 @@ class ZEyeDaemon(Daemon.Daemon):
 		ZEyePeriodicCmd(5*60,90,"Netdisco device ARP walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -a").start()
 		ZEyePeriodicCmd(15*60,1200,"Netdisco device netbios walk","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -w").start()
 		ZEyeSwitchesPortIDCacher().start()
-		ZEyeSwitchesBackup().start()
+		ZEyeSwitchesBackup(SNMPcc).start()
 		ZEyeServiceMgr().start()	
 		ZEyeDHCPManager().start()
 		
