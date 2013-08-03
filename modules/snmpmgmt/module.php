@@ -170,6 +170,8 @@
 						"sqlattrid" => "name",
 						"firstlineid" => "snmpthead",
 						"sqlcond" => "name='".$name."'",
+						"odivnb" => 2,
+						"odivlink" => "name=",
 						"rmcol" => true,
 						"rmlink" => "mod=".$this->mid."&act=2&snmp",
 						"rmconfirm" => "confirm-remove-community",
