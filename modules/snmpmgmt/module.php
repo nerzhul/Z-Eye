@@ -169,6 +169,7 @@
 						"sqltable" => "snmp_communities",
 						"sqlattrid" => "name",
 						"firstlineid" => "snmpthead",
+						"sqlcond" => "name='".$name."'",
 						"odivnb" => 2,
 						"odivlink" => "name=",
 						"rmcol" => true,
