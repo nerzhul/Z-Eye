@@ -165,5 +165,5 @@ class ZEyeSNMPCommCacher(threading.Thread):
 	def registerCommunities(self):
 		self.pgcursor.execute("DELETE FROM z_eye_snmp_cache")
 		for dev in self.deviceCommunities:
-			self.pgcursor.execute("INSERT INTO z_eye_snmp_cache(device,snmpro,snmprw) VALUES ('%s','%s','%s')",(dev,dev[0],dev[1]))
+			self.pgcursor.execute("INSERT INTO z_eye_snmp_cache(device,snmpro,snmprw) VALUES (%s,%s,%s)",(dev,self.deviceCommunities[dev][0],self.deviceCommunities[dev][1]))
 		self.pgcon.commit()
