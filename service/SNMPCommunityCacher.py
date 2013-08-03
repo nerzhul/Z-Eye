@@ -30,6 +30,7 @@ class ZEyeSNMPCommCacher(threading.Thread):
 	sleepingTimer = 0
 	startTime = 0
 	threadCounter = 0
+	isRunning = False
 
 	pgcon = None
 	pgcursor = None
