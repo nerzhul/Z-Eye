@@ -262,14 +262,8 @@
 				$sqlAttrList .= $this->attrList[$i][1];
 			}
 
-			if ($edit) {
-				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
-					$this->sqlTable,$sqlAttrList,$this->sqlAttrId."='".$idx."'",array("order" => $this->sqlAttrId));
-			}
-			else {
-				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
-					$this->sqlTable,$sqlAttrList,"",array("order" => $this->sqlAttrId));
-			}
+			$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
+				$this->sqlTable,$sqlAttrList,$this->sqlAttrId."='".$idx."'",array("order" => $this->sqlAttrId));
 			if ($this->groupMultipleId) {
 				$rowBuf = array();
 				while($data = FS::$dbMgr->Fetch($query)) {

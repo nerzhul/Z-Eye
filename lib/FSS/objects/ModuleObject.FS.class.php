@@ -54,10 +54,21 @@
 			return FS::$sessMgr->hasRight($this->writeRight);
 		}
 
+		protected function exists($id) {
+			if (FS::$dbMgr->GetOneData($this->sqlTable,$this->sqlAttrId,$this->sqlAttrId." = '".$id."'")) {
+				return true;
+			}
+			return false;
+		}
+
 		protected $loc;
 		protected $mod;
 		protected $mid;
+
+		// SQL
 		protected $sqlTable;
+		protected $sqlAttrId;
+
 		protected $readRight;
 		protected $writeRight;
 

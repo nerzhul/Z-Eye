@@ -22,6 +22,7 @@
 			parent::__construct();
 			$locales = array(
 				"fr" => array(
+					"Addr" => "Adresse",
 					"add-server" => "Ajouter un serveur",
 					"Advanced-tools" => "Outils avancés",
 					"algorithm" => "Algorithme",
@@ -33,7 +34,7 @@
 					"DNSSec-Mgmt" => "Gestion DNSSec",
 					"DNS-zones" => "Zones DNS",
 					"edit-server" => "Edition du serveur",
-					"err-bad-login" => "Login au serveur incorrect",
+					"err-bad-login" => "Echec de l'identification sur le serveur",
 					"err-invalid-db" => "Aucune base de données avec ces informations en base",
 					"err-invalid-req" => "Requête invalide !",
 					"err-miss-bad-fields" => "Certains champs sont invalides ou vides",
@@ -55,7 +56,7 @@
 					"ip-addr-dns" => "Adresse IP/DNS",
 					"key-alias" => "Alias de la clef",
 					"key-id" => "ID de la clef",
-					"Login" => "Login",
+					"Login" => "Identifiant",
 					"menu-name" => "Supervision",
 					"menu-title" => "Supervision DNS",
 					"Modification" => "Modification",
@@ -83,6 +84,7 @@
 					"Value" => "Valeur",
 				),
 				"en" => array(
+					"Addr" => "Address",
 					"add-server" => "Add server",
 					"Advanced-tools" => "Advanced tools",
 					"algorithm" => "Algorithm",

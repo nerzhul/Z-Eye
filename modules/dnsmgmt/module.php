@@ -280,64 +280,9 @@
 			return $output;
 		}
 
-		private function CreateOrEditServer($addr = "") {
-			$output = "";
-			$saddr = "";
-			$slogin = "";
-			$dns = 0;
-			$namedpath = "";
-			$chrootnamed = "";
-			if($addr) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","login,dns,chrootnamed,namedpath","addr = '".$addr."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
-					$saddr = $addr;
-					$slogin = $data["login"];
-					$dns = $data["dns"];
-					$namedpath = $data["namedpath"];
-					$chrootnamed = $data["chrootnamed"];
-				}
-				else {
-					$output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !");
-					return $output;
-				}
-			}
-			
-			$output .= FS::$iMgr->cbkForm("3").
-				"<table>".
-				FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$addr,array("type" => "idxedit", "value" => $addr,
-				"length" => "128", "edit" => $addr != "")).
-				FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$slogin).
-				FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd")).
-				FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd")).
-				FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$namedpath,array("tooltip" => "tooltip-rights")).
-				FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$chrootnamed,array("tooltip" => "tooltip-chroot")).
-				FS::$iMgr->aeTableSubmit($addr != "");
-			
-			return $output;
-		}
-
 		private function showServerList() {
-			$output = FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("line" => true));
-
-			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."server_list","addr,login,dns","dns = '1'");
-			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) {
-					$found = true;
-					$output .= "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Login").
-					"</th><th></th></tr>";
-				}
-
-				$output .= "<tr id=\"".preg_replace("#[.]#","-",$data["addr"])."tr\"><td>".
-					FS::$iMgr->opendiv(2,$data["addr"],array("lnkadd" => "addr=".$data["addr"])).
-					"</td><td>".$data["login"]."</td><td>".
-					FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&srv=".$data["addr"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-dnssrc")."'".$data["addr"]."' ?","Confirm","Cancel")));
-					"</td></tr>";
-			}
-			if($found) {
-				$output .= "</table>";
-			}
+			$server = new dnsServer();
+			$output = $server->renderAll();
 			return $output;
 		}
 
@@ -346,9 +291,6 @@
 			switch($err) {
 				case 1: return FS::$iMgr->printError($this->loc->s("err-miss-bad-fields"));
 				case 2: return FS::$iMgr->printError($this->loc->s("err-unable-conn"));
-				case 3: return FS::$iMgr->printError($this->loc->s("err-bad-login")); 
-				case 4: return FS::$iMgr->printError($this->loc->s("err-server-exist")); 
-				case 5: return FS::$iMgr->printError($this->loc->s("err-bad-server")); 
 				case 99: return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
 		}
@@ -356,14 +298,17 @@
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
-				case 1: return $this->CreateOrEditServer();
+				case 1: 
+					$server = new dnsServer();
+					return $server->showForm();
 				case 2:
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if(!$addr) {
 						return $this->loc->s("err-bad-datas");
 					}
 
-					return $this->CreateOrEditServer($addr);
+					$server = new dnsServer();
+					return $server->showForm($addr);
 				case 3: 
 					$dnsTSIG = new dnsTSIGKey();
 					return $dnsTSIG->showForm();
@@ -486,75 +431,14 @@
 					return;
 				// Add/Edit DNS server
 				case 3:
-					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
-					$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
-					$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
-					$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
-					$namedpath = FS::$secMgr->checkAndSecurisePostData("namedpath");
-					$chrootnamed = FS::$secMgr->checkAndSecurisePostData("chrootnamed");
-					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-
-					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						$this->log(2,"User don't have rights to add/edit server");
-						FS::$iMgr->ajaxEcho("err-no-rights");
-						return;
-					}
-
-					if(!$saddr || !$slogin || !$spwd || !$spwd2 || $spwd != $spwd2 ||
-						!$namedpath || !FS::$secMgr->isPath($namedpath) ||
-							(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
-						) {
-						$this->log(2,"Some datas are invalid or wrong for add server");
-						FS::$iMgr->ajaxEcho("err-miss-bad-fields");
-						return;
-					}
-					$conn = ssh2_connect($saddr,22);
-					if(!$conn) {
-						FS::$iMgr->ajaxEcho("err-unable-conn");
-						return;
-					}
-					if(!ssh2_auth_password($conn,$slogin,$spwd)) {
-						FS::$iMgr->ajaxEcho("err-bad-login");
-						return;
-					}
-				
-					if($edit) {	
-						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
-							$this->log(1,"Unable to add server '".$saddr."': already exists");
-							FS::$iMgr->ajaxEcho("err-bad-server");
-							return;
-						}
-
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$saddr."'");
-					}
-					else {
-						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."server_list","login","addr ='".$saddr."'")) {
-							$this->log(1,"Unable to add server '".$saddr."': already exists");
-							FS::$iMgr->ajaxEcho("err-server-exist");
-							return;
-						}
-					}
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."server_list","addr,login,pwd,dns,namedpath,chrootnamed",
-					"'".$saddr."','".$slogin."','".$spwd."','1','".$namedpath."','".$chrootnamed."'");
-					$this->log(0,"Added server '".$saddr."' options: dns checking");
-					FS::$iMgr->redir("mod=".$this->mid,true);
+					$server = new dnsServer();
+					$server->Modify();
 					return;
 				// Delete DNS server
-				case 4: { 
-					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						$this->log(2,"User don't have rights to remove server");
-						FS::$iMgr->ajaxEcho("err-no-rights");
-						return;
-					}
-					
-					$srv = FS::$secMgr->checkAndSecuriseGetData("srv");
-					if($srv) {
-						$this->log(0,"Removing server '".$srv."' from database");
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."server_list","addr = '".$srv."'");
-					}
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$srv)."tr');");
+				case 4: 
+					$server = new dnsServer();
+					$server->Remove();
 					return;
-				}
 				// Add/Edit TSIG key
 				case 5:
 					$tsig = new dnsTSIGKey();

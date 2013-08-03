@@ -20,13 +20,172 @@
 	final class dnsServer extends FSMObj {
 		function __construct() {
 			parent::__construct();
-			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_tsig";
+			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_servers";
+			$this->sqlAttrId = "addr";
 			$this->readRight = "mrule_dnsmgmt_read";
 			$this->writeRight = "mrule_dnsmgmt_write";
 			$this->errNotExists = "err-server-not-exists";
 			$this->errAlreadyExists = "err-server-already-exists";
+
+			$this->tMgr = new HTMLTableMgr(array(
+				"htmgrid" => "dnssrv",
+				"sqltable" => "dns_servers",
+				"sqlattrid" => "addr",
+				"attrlist" => array(array("Addr","addr",""), array("Login","sshuser","")),
+				"sorted" => true,
+				"odivnb" => 1,
+				"odivlink" => "addr=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=4&addr",
+				"rmconfirm" => "confirm-remove-tsig",
+			));
 		}
 
+		public function renderAll() {
+			$output = FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("line" => true));
+			$output .= $this->tMgr->render();
+			return $output;
+		}
+
+		public function showForm($addr = "") { 
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
+
+
+			if (!$this->Load($addr)) {
+				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+			}
+
+			
+			$output = FS::$iMgr->cbkForm("3")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$this->addr,array("type" => "idxedit", "value" => $this->addr,
+					"length" => "128", "edit" => $this->addr != "")).
+				FS::$iMgr->idxLine($this->loc->s("ssh-user"),"slogin",$this->sshUser).
+				FS::$iMgr->idxLine($this->loc->s("Password"),"spwd","",array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2","",array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("named-conf-path"),"namedpath",$this->namedPath,array("tooltip" => "tooltip-rights")).
+				FS::$iMgr->idxLine($this->loc->s("chroot-path"),"chrootnamed",$this->chrootPath,array("tooltip" => "tooltip-chroot")).
+				FS::$iMgr->aeTableSubmit($addr != "");
+			
+			return $output;
+		}
+
+		protected function Load($addr = "") {
+			$this->addr = $addr;
+			$this->sshUser = ""; $this->namedPath = ""; $this->chrootPath = "";
+
+			if($this->addr) {
+				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath","addr = '".$addr."'");
+				if($data = FS::$dbMgr->Fetch($query)) {
+					$this->sshUser = $data["sshuser"];
+					$this->namedPath = $data["namedpath"];
+					$chrootPath = $data["chrootpath"];
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		protected function removeFromDB($name) {
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete($this->sqlTable,"addr = '".$name."'");
+			FS::$dbMgr->CommitTr();
+		}
+
+		public function Modify() {
+			if(!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
+			$slogin = FS::$secMgr->checkAndSecurisePostData("slogin");
+			$spwd = FS::$secMgr->checkAndSecurisePostData("spwd");
+			$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
+			$namedpath = FS::$secMgr->checkAndSecurisePostData("namedpath");
+			$chrootnamed = FS::$secMgr->checkAndSecurisePostData("chrootnamed");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
+			if(!$saddr || !$slogin || !$spwd || !$spwd2 || $spwd != $spwd2 ||
+				!$namedpath || !FS::$secMgr->isPath($namedpath) ||
+					(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
+				) {
+				$this->log(2,"Some datas are invalid or wrong for add server");
+				FS::$iMgr->ajaxEcho("err-miss-bad-fields");
+				return;
+			}
+
+			$conn = ssh2_connect($saddr,22);
+			if(!$conn) {
+				FS::$iMgr->ajaxEcho("err-unable-conn");
+				return;
+			}
+			if(!ssh2_auth_password($conn,$slogin,$spwd)) {
+				FS::$iMgr->ajaxEcho("err-bad-login");
+				return;
+			}
+		
+			$exists = $this->exists($saddr);
+			if($edit) {	
+				if(!$exists) {
+					$this->log(1,"Unable to add server '".$saddr."': already exists");
+					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					return;
+				}
+
+			}
+			else {
+				if($exists) {
+					$this->log(1,"Unable to add server '".$saddr."': already exists");
+					FS::$iMgr->ajaxEcho($this->errNotExists);
+					return;
+				}
+			}
+
+			FS::$dbMgr->BeginTr();
+
+			if ($edit) {
+				FS::$dbMgr->Delete($this->sqlTable,"addr = '".$saddr."'");
+			}
+			FS::$dbMgr->Insert($this->sqlTable,"addr,sshuser,sshpwd,namedpath,chrootpath",
+				"'".$saddr."','".$slogin."','".$spwd."','".$namedpath."','".$chrootnamed."'");
+
+			FS::$dbMgr->CommitTr();
+
+			//$this->log(0,"Added server '".$saddr."'");
+
+			$js = $this->tMgr->addLine($saddr,$edit);
+			FS::$iMgr->ajaxEcho("Done",$js);
+		}
+
+		public function Remove() {
+			if(!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
+			
+			if (!$addr) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+
+			if (!$this->exists($addr)) {
+				FS::$iMgr->ajaxEcho($this->errNotExists);
+				return;
+			}
+			
+			$this->removeFromDB($addr);
+			//$this->log(0,"Removing server '".$addr."'");
+
+			$js = $this->tMgr->removeLine($addr);
+			FS::$iMgr->ajaxEcho("Done",$js);
+		}
 		private $addr;
 		private $sshUser;
 		private $chrootPath;
@@ -37,6 +196,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_tsig";
+			$this->sqlAttrId = "keyalias";
 			$this->readRight = "mrule_dnsmgmt_read";
 			$this->writeRight = "mrule_dnsmgmt_write";
 			$this->errNotExists = "err-tsig-key-not-exists";
@@ -127,7 +287,7 @@
 				return;
 			}
 
-			$exist = FS::$dbMgr->GetOneData($this->sqlTable,"keyalias","keyalias = '".$keyalias."'");
+			$exist = $this->exists($keyalias);
 			if($edit) {
 				if(!$exist) {
 					FS::$iMgr->ajaxEcho($this->errNotExists);
@@ -180,7 +340,7 @@
 				return;
 			}
 			
-			if(!FS::$dbMgr->GetOneData($this->sqlTable,"keyalias","keyalias = '".$keyalias."'")) {
+			if(!$this->exists($keyalias)) {
 				FS::$iMgr->ajaxEcho($this->errNotExists);
 				return;
 			}
