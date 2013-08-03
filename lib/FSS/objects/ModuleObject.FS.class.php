@@ -37,6 +37,9 @@
 			$this->writeRight = "";
 		}
 
+		public function renderAll() { return ""; }
+		public function showForm() { return ""; }
+
 		protected function Load($id = "") {}
 		protected function removeFromDB($id) {}
 
@@ -57,5 +60,12 @@
 		protected $sqlTable;
 		protected $readRight;
 		protected $writeRight;
+
+		// HTMLtableMgr
+		protected $tMgr;
+
+		// Error messages
+		protected $errNotExists;
+		protected $errAlreadyExists;
 	};
 ?>

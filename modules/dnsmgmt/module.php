@@ -18,6 +18,7 @@
 	*/
 
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
+	require_once(dirname(__FILE__)."/objects.php");
 
 	final class iDNSManager extends FSModule{
 		function __construct($locales) {
@@ -55,52 +56,8 @@
 		}
 
 		private function showDNSSecMgmt() {
-			$output = FS::$iMgr->opendiv(3,$this->loc->s("define-tsig-key"),array("line" => true));
-			$tMgr = new HTMLTableMgr(array(
-				"tabledivid" => "tsiglist",
-				"tableid" => "tsigtable",
-				"firstlineid" => "tsigftr",
-				"sqltable" => "dns_tsig",
-				"sqlattrid" => "keyalias",
-				"attrlist" => array(array("key-alias","keyalias",""), array("key-id","keyid",""),
-					array("algorithm","keyalgo","sr",array(1 => "HMAC-MD5", 2 => "HMAC-SHA1", 3 => "HMAC-SHA256")),
-					array("Value","keyvalue","")),
-				"sorted" => true,
-				"odivnb" => 4,
-				"odivlink" => "keyalias=",
-				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=6&keyalias",
-				"rmconfirm" => "confirm-remove-tsig",
-				"trpfx" => "tsigk",
-			));
-			$output .= $tMgr->render();
-			return $output;
-		}
-
-		private function showTSIGForm($keyalias = "") {
-			$keyid = ""; $keyvalue = ""; $keyalgo = "";
-			if($keyalias) {
-				if($data = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dns_tsig","keyid,keyalgo,keyvalue",
-					"keyalias = '".$keyalias."'")) {
-					$keyid = $data["keyid"];
-					$keyalgo = $data["keyalgo"];
-					$keyvalue = $data["keyvalue"];
-				}
-				else {
-					return $this->loc->s("err-tsig-key-not-exists");
-				}
-			}
-
-			$output = FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&act=5")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("key-alias"),"keyalias",$keyalias,array("type" => "idxedit", "length" => 64,
-					"edit" => $keyalias != "")).
-				FS::$iMgr->idxLine($this->loc->s("key-id"),"keyid",$keyid,array("length" => 32, "value" => $keyid)).
-				"<tr><td>".$this->loc->s("algorithm")."</td><td>".FS::$iMgr->select("keyalgo").
-					FS::$iMgr->selElmt("HMAC-MD5",1,$keyalgo == 1).FS::$iMgr->selElmt("HMAC-SHA1",2,$keyalgo == 2).
-					FS::$iMgr->selElmt("HMAC-SHA256",3,$keyalgo == 3)."</select>".
-				FS::$iMgr->idxLine($this->loc->s("Value"),"keyvalue",$keyvalue,array("length" => 128, "size" => 30, "value" => $keyvalue)).
-				FS::$iMgr->aeTableSubmit($keyalias == "");
-
+			$dnsTSIG = new dnsTSIGKey();
+			$output = $dnsTSIG->renderAll();
 			return $output;
 		}
 
@@ -407,14 +364,17 @@
 					}
 
 					return $this->CreateOrEditServer($addr);
-				case 3: return $this->showTSIGForm();
+				case 3: 
+					$dnsTSIG = new dnsTSIGKey();
+					return $dnsTSIG->showForm();
 				case 4:
 					$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
 					if(!$keyalias) {
 						return $this->loc->s("err-bad-datas");
 					}
 
-					return $this->showTSIGForm($keyalias);
+					$dnsTSIG = new dnsTSIGKey();
+					return $dnsTSIG->showForm($keyalias);
 				default: return;
 			}
 		}
@@ -597,127 +557,13 @@
 				}
 				// Add/Edit TSIG key
 				case 5:
-					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						$this->log(2,"User don't have rights to remove server");
-						FS::$iMgr->ajaxEcho("err-no-rights");
-						return;
-					}
-					
-					$keyalias = FS::$secMgr->checkAndSecurisePostData("keyalias");
-					$keyid = FS::$secMgr->checkAndSecurisePostData("keyid");
-					$keyalgo = FS::$secMgr->checkAndSecurisePostData("keyalgo");
-					$keyvalue = FS::$secMgr->checkAndSecurisePostData("keyvalue");
-					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-
-					if(!$keyalias || !$keyid || !$keyalgo || !FS::$secMgr->isNumeric($keyalgo) || !$keyvalue ||
-						$edit && $edit != 1) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
-						return;
-					}
-
-					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_tsig","keyalias","keyalias = '".$keyalias."'");
-					if($edit) {
-						if(!$exist) {
-							FS::$iMgr->ajaxEcho("err-tsig-key-not-exists");
-							return;
-						}
-					}
-					else {
-						if($exist) {
-							FS::$iMgr->ajaxEcho("err-tsig-key-already-exists");
-							return;
-						}
-						$exist = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dns_tsig","keyalias","keyid = '".$keyid.
-							"' AND keyalgo = '".$keyalgo."' AND keyvalue = '".$keyvalue."'");
-						if($exist) {
-							FS::$iMgr->ajaxEcho("err-tsig-key-exactly-same");
-							return;
-						}
-					}
-					
-					if(!FS::$secMgr->isHostname($keyid)) {
-						FS::$iMgr->ajaxEcho("err-tsig-key-id-invalid");
-						return;
-					}
-
-					if($keyalgo < 1 || $keyalgo > 3) {
-						FS::$iMgr->ajaxecho("err-tsig-key-algo-invalid");
-						return;
-					}
-
-					FS::$dbMgr->BeginTr();
-					if($edit) {
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dns_tsig","keyalias = '".$keyalias."'");
-					}
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dns_tsig","keyalias,keyid,keyalgo,keyvalue","'".$keyalias."','".
-						$keyid."','".$keyalgo."','".$keyvalue."'");
-					FS::$dbMgr->CommitTr();
-
-					$tMgr = new HTMLTableMgr(array(
-						"tabledivid" => "tsiglist",
-						"tableid" => "tsigtable",
-						"firstlineid" => "tsigftr",
-						"sqltable" => "dns_tsig",
-						"sqlattrid" => "keyalias",
-						"sqlcond" => "keyalias = '".$keyalias."'",
-						"attrlist" => array(array("key-alias","keyalias",""), array("key-id","keyid",""),
-							array("algorithm","keyalgo","sr",array("1" => "HMAC-MD5", "2" => "HMAC-SHA1", "3" => "HMAC-SHA256")),
-							array("Value","keyvalue","")),
-						"sorted" => true,
-						"odivnb" => 4,
-						"odivlink" => "keyalias=",
-						"rmcol" => true,
-						"rmlink" => "mod=".$this->mid."&act=6&keyalias",
-						"rmconfirm" => "confirm-remove-tsig",
-						"trpfx" => "tsigk",
-					));
-
-					$js = $tMgr->addLine($keyalias,$edit);
-					FS::$iMgr->ajaxEcho("Done",$js);
+					$tsig = new dnsTSIGKey();
+					$tsig->Modify();
 					return;
 				// Remove TSIG key
 				case 6:
-					if(!FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-						$this->log(2,"User don't have rights to remove server");
-						FS::$iMgr->ajaxEcho("err-no-rights");
-						return;
-					}
-
-					$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
-					if(!$keyalias) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
-						return;
-					}
-					
-					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_tsig","keyalias","keyalias = '".$keyalias."'")) {
-						FS::$iMgr->ajaxEcho("err-tsig-key-not-exists");
-						return;
-					}
-
-					$tMgr = new HTMLTableMgr(array(
-						"tabledivid" => "tsiglist",
-						"tableid" => "tsigtable",
-						"firstlineid" => "tsigftr",
-						"sqltable" => "dns_tsig",
-						"sqlattrid" => "keyalias",
-						"attrlist" => array(array("key-alias","keyalias",""), array("key-id","keyid",""),
-							array("algorithm","keyalgo","sr",array("1" => "HMAC-MD5", "2" => "HMAC-SHA1", "3" => "HMAC-SHA256")),
-							array("Value","keyvalue","")),
-						"sorted" => true,
-						"odivnb" => 4,
-						"odivlink" => "keyalias=",
-						"rmcol" => true,
-						"rmlink" => "mod=".$this->mid."&act=6&keyalias",
-						"rmconfirm" => "confirm-remove-tsig",
-						"trpfx" => "tsigk",
-					));
-
-					FS::$dbMgr->BeginTr();
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dns_tsig","keyalias = '".$keyalias."'");
-					FS::$dbMgr->CommitTr();
-
-					$js = $tMgr->removeLine(FS::$iMgr->formatHTMLId($keyalias));
-					FS::$iMgr->ajaxEcho("Done",$js);
+					$tsig = new dnsTSIGKey();
+					$tsig->Remove();
 					return;
 			}
 		}
