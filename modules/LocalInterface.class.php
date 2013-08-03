@@ -27,10 +27,10 @@
 		}
 
 		public function content() {
-			$lockinstall = file_get_contents(dirname(__FILE__)."/../config/LOCK");
+			$installlocked = file_get_contents(dirname(__FILE__)."/../config/LOCK");
 
 			$output = $this->header().$this->popupContainer();
-			if($lockinstall) {
+			if($installlocked) {
 				$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
 				$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
 			}
@@ -39,8 +39,9 @@
 			$output .= "<div id=\"main\">";
 			$output .= $this->showModule();
 			$output .= "</div>";
-			if($lockinstall)
-				$output .= $this->showConnForm();
+			if($installlocked) {
+				$output .= $this->showWindowHead();
+			}
 			$output .= $this->notifContainer().$this->copyrightContainer();
 			return $output;
 		}
@@ -58,7 +59,7 @@
 				.", All rights Reserved</center></div>";
 		}
 
-		protected function showConnForm() {
+		public function showWindowHead() {
 			$output = "<div id=\"logform\"><div id=\"menupanel\">";
 			if($this->showRetMenu) {
 				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\" onclick=\"javascript:history.back()\">Retour</div></div>";
@@ -66,8 +67,8 @@
                         $output .= $this->loadMenus();
 
 			if(FS::$sessMgr->isConnected()) {
-				$output .= $this->showUserForm();
-				$output .= $this->showSearchForm();
+				$output .= $this->showUserForm().
+					$this->showSearchForm();
 			}
 
 			if(!FS::$sessMgr->isConnected()) {
@@ -105,7 +106,7 @@
 				"</div><div class=\"userpopup\">".
 				"<div class=\"menuItem\" onclick=\"confirmPopup('".addslashes($this->getLocale("confirm-disconnect")).
 				"','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',
-				'index.php?mod=".$this->getModuleIdByPath("disconnect")."&act=1',{});\">".
+				'index.php?mod=".$this->getModuleIdByPath("connect")."&act=2',{});\">".
 				$this->getLocale("Disconnection").
 				"</div></div></div>";
 		}
@@ -121,8 +122,8 @@
 
 		public function showModule() {
 			$output = "";
-			$lockinstall = file_get_contents(dirname(__FILE__)."/../config/LOCK");
-			if(!$lockinstall)
+			$installlocked = file_get_contents(dirname(__FILE__)."/../config/LOCK");
+			if(!$installlocked)
 				return $this->loadModule($this->getModuleIdByPath("install"));
 				
 			$module = FS::$secMgr->checkAndSecuriseGetData("mod");

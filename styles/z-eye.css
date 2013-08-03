@@ -363,10 +363,10 @@ canvas { display: inline-block; }
 #logform {
 	position: fixed;
 	top: 0;
+	right: 0;
 	width: 100%;
 	z-index: 950;
 	text-align: center;
-	margin-left: -8px;
 	margin-right: auto;
 	opacity: 0.97;
 	color: white;

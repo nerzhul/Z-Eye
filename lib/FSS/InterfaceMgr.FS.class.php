@@ -134,7 +134,6 @@
 
 		public function loadModule($id,$act=1) {
 			$output = "";
-
 			$dir = opendir(dirname(__FILE__)."/../../modules/");
 			$found = false;
 			$moduleid = 0;
@@ -152,7 +151,6 @@
 			}
 			if ($found == true) {
 				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
-
 				if ($module->getRulesClass()->canAccessToModule()) {
 					$this->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($id);

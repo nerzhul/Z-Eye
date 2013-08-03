@@ -56,7 +56,12 @@
 					require_once(dirname(__FILE__)."/".$mod_path."/main.php");
 
 					if(!$module->getRulesClass()->canAccessToModule()) {
-						header("Location: index.php");
+						if(FS::isAjaxCall()) {
+							FS::$iMgr->ajaxEcho("err-no-rights");
+						}
+						else {
+							header("Location: index.php");
+						}
 						return;
 					}
 

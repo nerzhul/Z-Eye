@@ -25,9 +25,7 @@
 		}
 
 		public function canAccessToModule() {
-			if(!FS::$sessMgr->isConnected())
-				return true;
-			return false;
+			return true;
 		}
 	};
 ?>

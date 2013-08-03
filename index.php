@@ -38,7 +38,7 @@
 
 	FS::$sessMgr->Start();
 
-	if(FS::isAJAXCall()) {
+	if(FS::isAJAXCallNoHack()) {
 		FS::$ajaxMgr->handle();
 	}
 	else if(FS::isActionToDo()) {

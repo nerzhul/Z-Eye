@@ -29,10 +29,13 @@
 			switch($type) {
 				case 1: // menu
 					$mod = FS::$secMgr->checkAndSecuriseGetData("mid");
-					echo FS::$iMgr->LoadMenu($mod);
+					echo FS::$iMgr->showWindowHead();
 					break;
 				case 2: // module
 					$mod = FS::$secMgr->checkAndSecuriseGetData("mod");
+					if($mod == 0) {
+						$mod = FS::$iMgr->getModuleIdByPath("default");
+					}
 					echo FS::$iMgr->loadModule($mod);
 					echo FS::$iMgr->renderJS();
 					break;

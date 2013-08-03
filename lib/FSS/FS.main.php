@@ -97,9 +97,17 @@
 		}
 
 		public static function isAjaxCall() {
-			if (FS::$secMgr->checkAndSecuriseGetData("at"))
+			// at-conn is a hack for special connection case
+			if (FS::$secMgr->checkAndSecuriseGetData("at") &&
+				!(FS::$secMgr->checkAndSecuriseGetData("at-conn") == 1))
 				return true;
 
+			return false;
+		}
+
+		public static function isAjaxCallNoHack() {
+			if (FS::$secMgr->checkAndSecuriseGetData("at"))
+				return true;
 			return false;
 		}
 

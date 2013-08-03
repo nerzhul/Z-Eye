@@ -62,7 +62,7 @@
 				$ldapMgr->RootConnect();
 				$result = $ldapMgr->GetOneEntry($ldapident."=".$username);
 				if(!$result) {
-					FS::$iMgr->redir("mod=".$this->mid."&err=1");
+					FS::$iMgr->ajaxEcho("err-bad-user");
 					$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
 					return;
 				}
@@ -104,7 +104,8 @@
 					}
 					$this->connectUser($data["uid"],$data["ulevel"]);
 					$this->log(0,"Login success for user '".$username."'","None");
-					FS::$iMgr->redir($url,true);
+					//FS::$iMgr->redir($url,true);
+					$this->reloadInterface($url);
 					return;
 				}
 			}
@@ -121,12 +122,34 @@
 			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
 		}
 
+		public function reloadInterface($url) {
+			if($url) {
+				$url = "&".$url;
+			}
+			$js = "loadWindowHead();loadMainContainer('".$url."');";
+			FS::$iMgr->ajaxEcho("Done",$js);
+		}
+
+		public function Disconnect() {
+			echo "1";
+			if(FS::$sessMgr->getUid()) {
+				$this->log(0,"User disconnected");
+				FS::$sessMgr->Close(); 
+
+				$js = "loadWindowHead();loadMainContainer('');unlockScreen(true);";
+				FS::$iMgr->ajaxEcho("Done",$js);
+			}
+		}
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
 					$user = FS::$secMgr->checkAndSecurisePostData("loginuname");
 					$pwd = FS::$secMgr->checkAndSecurisePostData("loginupwd");
 					$this->TryConnect($user,$pwd);
+					return;
+				case 2:
+					$this->Disconnect();
 					return;
 			}
 		}
