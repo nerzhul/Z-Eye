@@ -164,7 +164,7 @@
 								$this->criticinga++;
 							}
 							$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
-	                                                       	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
+	                                                       	"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>"; 
 						}
 					}
 				}
