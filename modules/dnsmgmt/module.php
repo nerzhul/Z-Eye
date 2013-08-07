@@ -40,6 +40,7 @@
 
 				$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("DNS-zones"));
 				$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("DNSSec-Mgmt"));
+				$tabs[] = array(5,"mod=".$this->mid,$this->loc->s("ACL-Mgmt"));
 				$tabs[] = array(4,"mod=".$this->mid,$this->loc->s("Server-Mgmt"));
 				$tabs[] = array(3,"mod=".$this->mid,$this->loc->s("Advanced-tools"));
 				$output .= FS::$iMgr->tabPan($tabs,$sh);
@@ -50,6 +51,7 @@
 					case 2: $output .= $this->showDNSSecMgmt(); break;
 					case 3: $output .= $this->showAdvancedTools(); break;
 					case 4: $output .= $this->showServerList(); break;
+					case 5: $output .= $this->showACLList(); break;
 				}
 			}
 			return $output;
@@ -285,10 +287,14 @@
 			return $output;
 		}
 
+		private function showACLList() {
+			$acl = new dnsACL();
+			return $acl->renderAll();
+		}
+
 		private function showServerList() {
 			$server = new dnsServer();
-			$output = $server->renderAll();
-			return $output;
+			return $server->renderAll();
 		}
 
 		private function showCreateEditErr() {
@@ -325,6 +331,17 @@
 
 					$dnsTSIG = new dnsTSIGKey();
 					return $dnsTSIG->showForm($keyalias);
+				case 5:
+					$dnsACL = new dnsACL();
+					return $dnsACL->showForm();
+				case 6:
+					$aclname = FS::$secMgr->checkAndSecuriseGetData("aclname");
+					if (!$aclname) {
+						return $this->loc->s("err-bad-datas");
+					}
+
+					$dnsACL = new dnsACL();
+					return $dnsACL->showForm($aclname);
 				default: return;
 			}
 		}
@@ -453,6 +470,16 @@
 				case 6:
 					$tsig = new dnsTSIGKey();
 					$tsig->Remove();
+					return;
+				// Add/Edit ACL
+				case 7:
+					$acl = new dnsACL();
+					$acl->Modify();
+					return;
+				// Remove ACL
+				case 8:
+					$acl = new dnsAcl();
+					$acl->Remove();
 					return;
 			}
 		}

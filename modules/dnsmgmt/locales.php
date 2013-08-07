@@ -22,7 +22,9 @@
 			parent::__construct();
 			$locales = array(
 				"fr" => array(
+					"ACL-Mgmt" => "Gestion des ACLs",
 					"Addr" => "Adresse",
+					"add-acl" => "Ajouter une ACL",
 					"add-server" => "Ajouter un serveur",
 					"Advanced-tools" => "Outils avancés",
 					"algorithm" => "Algorithme",
@@ -84,7 +86,9 @@
 					"Value" => "Valeur",
 				),
 				"en" => array(
+					"ACL-Mgmt" => "ACL Management",
 					"Addr" => "Address",
+					"add-acl" => "Add ACL",
 					"add-server" => "Add server",
 					"Advanced-tools" => "Advanced tools",
 					"algorithm" => "Algorithm",

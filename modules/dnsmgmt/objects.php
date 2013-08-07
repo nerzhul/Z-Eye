@@ -17,6 +17,119 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	final class dnsACL extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_acls";
+			$this->sqlAttrId = "aclname";
+			$this->readRight = "mrule_dnsmgmt_acl_read";
+			$this->writeRight = "mrule_dnsmgmt_acl_write";
+			$this->errNotExists = "err-acl-not-exists";
+			$this->errAlreadyExists = "err-acl-already-exists";
+
+			$this->tMgr = new HTMLTableMgr(array(
+				"htmgrid" => "dnsacl",
+				"sqltable" => "dns_acls",
+				"sqlattrid" => "aclname",
+				"attrlist" => array(array("ACL","aclname",""), array("Desc","description","")),
+				"sorted" => true,
+				"odivnb" => 6,
+				"odivlink" => "aclname=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=8&aclname",
+				"rmconfirm" => "confirm-remove-acl",
+			));
+		}
+
+		public function renderAll() {
+			$output = FS::$iMgr->opendiv(5,$this->loc->s("add-acl"),array("line" => true));
+			$output .= $this->tMgr->render();
+			return $output;
+		}
+
+		public function showForm($aclid = "") { 
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
+
+			if (!$this->Load($name)) {
+				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+			}
+		}
+		protected function Load($name = "") {
+			$this->aclname = $name;
+			$this->description = "";
+			$this->ips = array();
+			$this->networks = array();
+			$this->tsigs = array();
+			$this->acls = array();
+			$this->dnsnames = array();
+
+			if ($this->aclname) {
+				if ($desc = FS::$dbMgr->GetOneData($this->sqlTable,"description","aclname = '".$this->aclname."'")) {
+					$this->description = $desc;
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_ip","ip","aclname = '".$aclname."'");
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$this->ips[] = $data["ip"];
+					}
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_network","netid","aclname = '".$aclname."'");
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$this->networks[] = $data["netid"];
+					}
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_tsig","keyalias","aclname = '".$aclname."'");
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$this->tsigs[] = $data["keyalias"];
+					}
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_acl","aclchild","aclname = '".$aclname."'");
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$this->acls[] = $data["aclchild"];
+					}
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_dnsname","dnsname","aclname = '".$aclname."'");
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$this->dnsnames[] = $data["dnsname"];
+					}
+				}
+				else {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		protected function removeFromDB($aclname) {
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete($this->sqlTable,"aclname = '".$aclname."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_ip","aclname = '".$aclname."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_network","aclname = '".$aclname."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_tsig","aclname = '".$aclname."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_acl","aclname = '".$aclname."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_dnsname","aclname = '".$aclname."'");
+			FS::$dbMgr->CommitTr();
+		}
+
+		public function Modify() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+		}
+
+		public function Remove() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+		}
+
+		private $aclname;
+		private $description;
+		private $ips;
+		private $networks;
+		private $tsigs;
+		private $acls;
+		private $dnsnames;
+	};
+
 	final class dnsServer extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -37,7 +150,7 @@
 				"odivlink" => "addr=",
 				"rmcol" => true,
 				"rmlink" => "mod=".$this->mid."&act=4&addr",
-				"rmconfirm" => "confirm-remove-tsig",
+				"rmconfirm" => "confirm-remove-server",
 			));
 		}
 
@@ -51,7 +164,6 @@
 			if (!$this->canRead()) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			}
-
 
 			if (!$this->Load($addr)) {
 				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
@@ -75,14 +187,13 @@
 			$this->addr = $addr;
 			$this->sshUser = ""; $this->namedPath = ""; $this->chrootPath = "";
 
-			if($this->addr) {
+			if ($this->addr) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath,tsig","addr = '".$addr."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
+				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->sshUser = $data["sshuser"];
 					$this->namedPath = $data["namedpath"];
 					$this->chrootPath = $data["chrootpath"];
 					$this->TSIGKey = $data["tsig"];
-					return true;
 				}
 				else {
 					return false;
@@ -98,7 +209,7 @@
 		}
 
 		public function Modify() {
-			if(!$this->canWrite()) {
+			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			} 
@@ -111,7 +222,7 @@
 			$chrootnamed = FS::$secMgr->checkAndSecurisePostData("chrootnamed");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
-			if(!$saddr || !$slogin || !$spwd || !$spwd2 || $spwd != $spwd2 ||
+			if (!$saddr || !$slogin || !$spwd || !$spwd2 || $spwd != $spwd2 ||
 				!$namedpath || !FS::$secMgr->isPath($namedpath) ||
 					(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
 				) {
@@ -121,18 +232,18 @@
 			}
 
 			$ssh = new SSH($saddr);
-			if(!$ssh->Connect()) {
+			if (!$ssh->Connect()) {
 				FS::$iMgr->ajaxEcho("err-unable-conn");
 				return;
 			}
-			if(!$ssh->Authenticate($slogin,$spwd)) {
+			if (!$ssh->Authenticate($slogin,$spwd)) {
 				FS::$iMgr->ajaxEcho("err-bad-login");
 				return;
 			}
 		
 			$exists = $this->exists($saddr);
-			if($edit) {	
-				if(!$exists) {
+			if ($edit) {	
+				if (!$exists) {
 					$this->log(1,"Unable to add server '".$saddr."': already exists");
 					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
 					return;
@@ -140,7 +251,7 @@
 
 			}
 			else {
-				if($exists) {
+				if ($exists) {
 					$this->log(1,"Unable to add server '".$saddr."': already exists");
 					FS::$iMgr->ajaxEcho($this->errNotExists);
 					return;
@@ -164,7 +275,7 @@
 		}
 
 		public function Remove() {
-			if(!$this->canWrite()) {
+			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			} 
@@ -224,8 +335,8 @@
 			$this->name = $name;
 			$this->keyid = ""; $this->keyvalue = ""; $this->keyalgo = "";
 
-			if($this->name) {
-				if($data = FS::$dbMgr->GetOneEntry($this->sqlTable,"keyid,keyalgo,keyvalue",
+			if ($this->name) {
+				if ($data = FS::$dbMgr->GetOneEntry($this->sqlTable,"keyid,keyalgo,keyvalue",
 					"keyalias = '".$name."'")) {
 					$this->keyid = $data["keyid"];
 					$this->keyalgo = $data["keyalgo"];
@@ -240,6 +351,7 @@
 		protected function removeFromDB($name) {
 			FS::$dbMgr->BeginTr();
 			FS::$dbMgr->Delete($this->sqlTable,"keyalias = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_tsig","keyalias = '".$aclname."'");
 			FS::$dbMgr->CommitTr();
 		}
 
@@ -272,7 +384,7 @@
 		}
 
 		public function Modify() {
-			if(!$this->canWrite()) {
+			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			} 
@@ -283,44 +395,44 @@
 			$keyvalue = FS::$secMgr->checkAndSecurisePostData("keyvalue");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
-			if(!$keyalias || !$keyid || !$keyalgo || !FS::$secMgr->isNumeric($keyalgo) || !$keyvalue ||
+			if (!$keyalias || !$keyid || !$keyalgo || !FS::$secMgr->isNumeric($keyalgo) || !$keyvalue ||
 				$edit && $edit != 1) {
 				FS::$iMgr->ajaxEcho("err-bad-datas");
 				return;
 			}
 
 			$exist = $this->exists($keyalias);
-			if($edit) {
-				if(!$exist) {
+			if ($edit) {
+				if (!$exist) {
 					FS::$iMgr->ajaxEcho($this->errNotExists);
 					return;
 				}
 			}
 			else {
-				if($exist) {
+				if ($exist) {
 					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
 					return;
 				}
 				$exist = FS::$dbMgr->GetOneEntry($this->sqlTable,"keyalias","keyid = '".$keyid.
 					"' AND keyalgo = '".$keyalgo."' AND keyvalue = '".$keyvalue."'");
-				if($exist) {
+				if ($exist) {
 					FS::$iMgr->ajaxEcho("err-tsig-key-exactly-same");
 					return;
 				}
 			}
 			
-			if(!FS::$secMgr->isHostname($keyid)) {
+			if (!FS::$secMgr->isHostname($keyid)) {
 				FS::$iMgr->ajaxEcho("err-tsig-key-id-invalid");
 				return;
 			}
 
-			if($keyalgo < 1 || $keyalgo > 3) {
+			if ($keyalgo < 1 || $keyalgo > 3) {
 				FS::$iMgr->ajaxecho("err-tsig-key-algo-invalid");
 				return;
 			}
 
 			FS::$dbMgr->BeginTr();
-			if($edit) {
+			if ($edit) {
 				FS::$dbMgr->Delete($this->sqlTable,"keyalias = '".$keyalias."'");
 			}
 			FS::$dbMgr->Insert($this->sqlTable,"keyalias,keyid,keyalgo,keyvalue","'".$keyalias."','".
@@ -332,17 +444,17 @@
 		}
 
 		public function Remove() {
-			if(!$this->canWrite()) {
+			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			} 
 			$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
-			if(!$keyalias) {
+			if (!$keyalias) {
 				FS::$iMgr->ajaxEcho("err-bad-datas");
 				return;
 			}
 			
-			if(!$this->exists($keyalias)) {
+			if (!$this->exists($keyalias)) {
 				FS::$iMgr->ajaxEcho($this->errNotExists);
 				return;
 			}

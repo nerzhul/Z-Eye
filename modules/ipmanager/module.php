@@ -1653,6 +1653,7 @@
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid = '".$netid."'");
+						FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_network","netid = '".$aclname."'");
 					}
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname,dleasetime,mleasetime",
 						"'".$netid."','".$netmask."','".$vlanid."','".$shortname."','".$desc."','".$router."','".$dns1."','".$dns2."','".$domainname."','".$dleasetime."','".$mleasetime."'");
