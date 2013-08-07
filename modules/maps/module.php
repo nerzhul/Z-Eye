@@ -59,12 +59,12 @@
 			
 			$js = "var graph = new Springy.Graph({'repulsion': 800});";
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_nodes","nodename,node_label,node_x,node_y,node_size,node_color");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$js .= "var n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["node_label"]))." = graph.newNode({'label':'".$data["node_label"]."'});";
 			}
 
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_edges","edgename,node1,node2,edge_color,edge_size");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$js .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["node1"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["node2"])).");";
 			}
 			$js .= "$('#springy').springy({ graph: graph });";
@@ -85,13 +85,13 @@
 				});";
 
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_nodes","nodename,node_label,node_x,node_y,node_size,node_color");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$js .= "sigInst.addNode('n".$data["nodename"]."',{ 'x': ".$data["node_x"].", 'y': ".$data["node_y"].", 'label': '".$data["node_label"]."',
 					'size': ".$data["node_size"].", 'color': '#".$data["node_color"]."' });";
 			}
 			
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_edges","edgename,node1,node2,edge_color,edge_size");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$js .= "sigInst.addEdge('e".$data["edgename"]."','n".$data["node1"]."','n".$data["node2"]."',{'color': '#".$data["edge_color"]."',
 					'size': '".$data["edge_size"]."'});";
 			}
@@ -159,7 +159,7 @@
 		private function showNodeList($name,$label,$selected = "") {
 			$output = FS::$iMgr->select($name,"",$label);
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_nodes","nodename,node_label","mapname = 'mainmap'");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["node_label"]." (".$data["nodename"].")",$data["nodename"],$selected == $data["nodename"]);
 			}
 			$output .= "</select>";
@@ -182,9 +182,9 @@
 			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","state_type"));
 
 			// Loop hosts
-			foreach($iStates as $host => $hostvalues) {
+			foreach ($iStates as $host => $hostvalues) {
 				// Loop types
-				foreach($hostvalues as $hos => $hosvalues) {
+				foreach ($hostvalues as $hos => $hosvalues) {
 					if ($hos == "hoststatus") {
 						if ($hosvalues["current_state"] == 1) {
 							if (!in_array($host,$hostCrit)) 
@@ -200,13 +200,13 @@
 
 			$edgeList = array();
 			$query = FS::$dbMgr->Select("device","ip,name");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$nodeFound)
 					$nodeFound = true;
 
 				// Generate all links between this device and others
 				$query2 = FS::$dbMgr->Select("device_port","port,speed,remote_id","remote_id != '' AND ip = '".$data["ip"]."'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
+				while ($data2 = FS::$dbMgr->Fetch($query2)) {
 					// @TODO: by port this function dedup the links and it's wrong
 					if (array_key_exists($data["name"],$edgeList) && in_array($data2["remote_id"],$edgeList[$data["name"]]) &&
 						array_key_exists($data2["remote_id"],$edgeList) && in_array($data["name"],$edgeList[$data2["remote_id"]]))
@@ -230,7 +230,7 @@
 					$incharge = 0;
 					if ($pid = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."port_id_cache","pid","device = '".$data["name"]."' AND portname = '".$data2["port"]."'")) {
 						$mrtgfile = file(dirname(__FILE__)."/../../datas/rrd/".$data["ip"]."_".$pid.".log");
-						for($i=1;$i<2;$i++) {
+						for ($i=1;$i<2;$i++) {
 							$outputbw = 0;
 							$res = preg_split("# #",$mrtgfile[$i]);
 							if (count($res) == 5) {
@@ -294,7 +294,7 @@
 
 			$nodelist = array();
 			$query = FS::$dbMgr->Select("device_port","remote_id","remote_id NOT IN(SELECT name FROM device)");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (in_array($data["remote_id"],$nodelist))
 					continue;
 				$nodelist[] = $data["remote_id"];
@@ -320,12 +320,12 @@
 			$serviceStatusCrit = array();
 			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","state_type"));
 			// Loop hosts
-			foreach($iStates as $host => $hostvalues) {
+			foreach ($iStates as $host => $hostvalues) {
 				// Loop types
-				foreach($hostvalues as $hos => $hosvalues) {
+				foreach ($hostvalues as $hos => $hosvalues) {
 					if ($hos == "servicestatus") {
 						// Loop sensors
-						foreach($hosvalues as $sensor => $svalues) {
+						foreach ($hosvalues as $sensor => $svalues) {
 							$this->totalicinga++;
 							if ($svalues["current_state"] > 0) {
 								$outstate = "";
@@ -364,11 +364,11 @@
 
 			$nodelist = array();
 			$query = FS::$dbMgr->Select("z_eye_icinga_hosts","name,addr");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!array_key_exists($data["name"],$nodelist))
 					$linklist = array();
 				$query2 = FS::$dbMgr->Select("z_eye_icinga_host_parents","parent","name = '".$data["name"]."'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
+				while ($data2 = FS::$dbMgr->Fetch($query2)) {
 					// edges after nodes
 					if (!array_key_exists($data["name"],$nodelist)) {
 						$js2 .= "graph.newEdge(n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data["name"])).",n".preg_replace("#[-]#","",FS::$iMgr->formatHTMLId($data2["parent"])).",{'directional':false});";
@@ -527,9 +527,9 @@
 				"esx2" => array("label" => "esx2", "links" => array("2vm1","2vm2","2vm3","2vm4","2vm5","2vm6","2vm7"), "placed" => false),
 				"test9" => array("label" => "test9", "links" => array(), "placed" => false)
 					);
-					for($i=1;$i<=13;$i++)
+					for ($i=1;$i<=13;$i++)
 						$nodelist["vm".$i] = array("label" => "vm".$i, "links" => array(), "placed" => false);
-					for($i=1;$i<=7;$i++)
+					for ($i=1;$i<=7;$i++)
 						$nodelist["2vm".$i] = array("label" => "2vm".$i, "links" => array(), "placed" => false);
 
 					$this->ImportNodes($nodelist);

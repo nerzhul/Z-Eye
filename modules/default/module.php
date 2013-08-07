@@ -85,12 +85,12 @@
 				"state_type","last_time_ok","last_time_up"));
 
 			// Loop hosts
-			foreach($iStates as $host => $hostvalues) {
+			foreach ($iStates as $host => $hostvalues) {
 				// Loop types
-				foreach($hostvalues as $hos => $hosvalues) {
+				foreach ($hostvalues as $hos => $hosvalues) {
 					if ($hos == "servicestatus") {
 						// Loop sensors
-						foreach($hosvalues as $sensor => $svalues) {
+						foreach ($hosvalues as $sensor => $svalues) {
 							$this->totalicinga++;
 							if ($svalues["current_state"] > 0) {
 								$outstate = "";
@@ -171,7 +171,7 @@
 			}
 
 			if ($this->hsicinga > 0) {
-				foreach($problems as $key => $values) {
+				foreach ($problems as $key => $values) {
 					// Rewrite label
 					$problems[$key][0] .= ": ".($problems[$key][2]+$problems[$key][3])." ".$this->loc->s("alert-s")." (";
 
@@ -242,7 +242,7 @@
 			$this->BWscore = 0;
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."port_monitor","device,port,climit,wlimit,description");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = 1;
 					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".
@@ -377,7 +377,7 @@
 			$attacklist=array();
 			$scannb = 0;
 			$atknb = 0;
-                        while($data = FS::$dbMgr->Fetch($query)) {
+                        while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$atkfound) $atkfound = 1;
                                 if (preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
 					if (!isset($attacklist[$data["ip_src"]])) {
@@ -483,7 +483,7 @@
                         }
 
 			$menace = 0;
-			foreach($sigarray as $key => $value) {
+			foreach ($sigarray as $key => $value) {
 				if ($value["scan"] > 30 || $value["atk"] > 25) {
 					if ($menace == 0) {
 						$menace = 1;
@@ -495,9 +495,9 @@
 				}
 			}
 			ksort($attacklist);
-			foreach($attacklist as $src => $valsrc) {
-				foreach($valsrc as $dst => $valdst) {
-					foreach($valdst as $atktype => $value) {
+			foreach ($attacklist as $src => $valsrc) {
+				foreach ($valsrc as $dst => $valdst) {
+					foreach ($valdst as $atktype => $value) {
 						$tmpoutput .= "<tr><td>".long2ip($src)."</td><td>".long2ip($dst)."</td><td>".
 							substr($atktype,0,35).(strlen($atktype) > 35 ? " ..." : "")." (".$value.")</td></tr>";
 					}

@@ -82,19 +82,19 @@
 			$netarray = array();
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!isset($netarray[$data["netid"]]))
 					$netarray[$data["netid"]] = $data["netmask"];
 			}
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!isset($netarray[$data["netid"]]))
 					$netarray[$data["netid"]] = $data["netmask"];
 			}
 			
 			ksort($netarray);
-			foreach($netarray as $netid => $netmask) {
+			foreach ($netarray as $netid => $netmask) {
 				$formoutput .= FS::$iMgr->selElmt($netid."/".$netmask,$netid,$filter == $netid);
 			}
 
@@ -155,14 +155,14 @@
 			$switchlist = array();
 
 			$query2 = FS::$dbMgr->Select("device","ip,name");
-			while($data2 = FS::$dbMgr->Fetch($query2))
+			while ($data2 = FS::$dbMgr->Fetch($query2))
 				$switchlist[$data2["ip"]] = $data2["name"];
 
 			// for Z-Eye ipmanager request. Not the better idea, i think 
 			$iplist = "";
 			// Initiate network IPs
 			$lastip = $netobj->getLastUsableIPLong();
-			for($i=($netobj->getFirstUsableIPLong());$i<=$lastip;$i++) {
+			for ($i=($netobj->getFirstUsableIPLong());$i<=$lastip;$i++) {
 				$iparray[$i] = array();
 				$iparray[$i]["mac"] = "";
 				$iparray[$i]["host"] = "";
@@ -182,16 +182,16 @@
 			}
 
 			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_range","rangestart,rangestop","subnet = '".$netid."'");
-			while($data2 = FS::$dbMgr->Fetch($query2)) {
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				$start = ip2long($data2["rangestart"]);
 				$end = ip2long($data2["rangestop"]);
-				for($i=$start;$i<=$end;$i++) {
+				for ($i=$start;$i<=$end;$i++) {
 					$iparray[$i]["distrib"] = 6;
 				}
 			}
 			// Fetch datas
 			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,server","netid = '".$netid."'");
-			while($data2 = FS::$dbMgr->Fetch($query2)) {
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				// If it's reserved on a host don't override status
 				if ($iparray[ip2long($data2["ip"])]["distrib"] != 3) {
 					$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
@@ -214,7 +214,7 @@
 			}
 
 			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv","ip IN (".$iplist.")");
-			while($data2 = FS::$dbMgr->Fetch($query2)) {
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
 				$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
 				$iparray[ip2long($data2["ip"])]["comment"] = preg_replace("#[\r\n]#","<br />",$data2["comment"]);
@@ -248,7 +248,7 @@
 				$output .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
 			$output .= "Fin du bail</th><th>Serveurs</th></tr></thead>";
 
-			foreach($iparray as $key => $value) {
+			foreach ($iparray as $key => $value) {
 				$rstate = "";
 				$style = "";
 				switch($value["distrib"]) {
@@ -315,7 +315,7 @@
 				}
 				$output .= $value["ltime"]."</td><td>";
 				$count = count($value["servers"]);
-				for($i=0;$i<$count;$i++) {
+				for ($i=0;$i<$count;$i++) {
 					if ($i > 0) $output .= "<br />";
 					$output .= $value["servers"][$i];
 				}
@@ -523,7 +523,7 @@
 
 			if ($optgroup) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias","optgroup = '".$optgroup."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					$options[] = $data["optalias"];
 				}
 			}
@@ -534,7 +534,7 @@
 				"<tr><td>".$this->loc->s("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions","",NULL,true);
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option","optalias,optname");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["optalias"]." (".$data["optname"].")",$data["optalias"],in_array($data["optalias"],$options));
 			}
 			$output .= "</td></tr>".
@@ -566,7 +566,7 @@
 				"<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-value")."><td>".$this->loc->s("option-name")."</td><td>".FS::$iMgr->select("optname");
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_custom_option","optcode,optname,opttype");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["optcode"].": ".$data["optname"]." (".$data["opttype"].")",$data["optname"],$optname == $data["optname"]);
 			}
 
@@ -623,7 +623,7 @@
 
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_desc,subnet_short_name");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = 1;
 					$output .= $this->showDeclaredNetTableHead();
@@ -652,7 +652,7 @@
 			
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found)
 					$found = true;
 				else
@@ -704,7 +704,7 @@
 			$clusters = array();
 			if ($netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!in_array($data["clustername"],$clusters))
 						$clusters[] = $data["clustername"];
 				}
@@ -712,7 +712,7 @@
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","",array("order" => "clustername", "group" => "clustername"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>".$this->loc->s("dhcp-cluster")."</td><td>".FS::$iMgr->select("subnetclusters","",NULL,true);
 					$found = true;
@@ -738,14 +738,14 @@
 			$optgroups = array();
 			if ($netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup","netid = '".$netid."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					$optgroups[] = $data["optgroup"];
 				}
 			}
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("dopts","",NULL,true);
 					$found = true;
@@ -804,7 +804,7 @@
 				"</th><th>".$this->loc->s("dhcp-type")."</th><th>".$this->loc->s("ssh-user")."</th><th>".$this->loc->s("member-of")."<th></th></tr>";
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath,osname,dhcptype");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["alias"]."</td><td>".$data["description"]."</td><td>".
 					$data["osname"]."</td><td>";
 	
@@ -816,7 +816,7 @@
 
 				$found = false;
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","dhcpaddr = '".$data["addr"]."'");
-				while($data2 = FS::$dbMgr->Fetch($query2)) {
+				while ($data2 = FS::$dbMgr->Fetch($query2)) {
 					if (!$found)
 						$found = true;
 					else
@@ -880,7 +880,7 @@
 			$clustermaster = "";
 			if ($name) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr","clustername = '".$name."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					$members[] = $data["dhcpaddr"];
 				}
 				$clustermode = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustermode","clustername = '".$name."'");
@@ -892,7 +892,7 @@
 
 			$outputlist2 = "";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias","",array("order" => "addr"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["addr"].($data["alias"] ? " (".$data["alias"].")" : ""),$data["addr"],in_array($data["addr"],$members));
 				$outputlist2 .= FS::$iMgr->selElmt($data["addr"].($data["alias"] ? " (".$data["alias"].")" : ""),$data["addr"],$clustermaster == $data["addr"]);
 			}
@@ -915,14 +915,14 @@
 			$output = $this->showTableHeadCluster();
 			$clusters = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername,dhcpaddr");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!isset($clusters[$data["clustername"]]))
 					$clusters[$data["clustername"]] = array();
 
 				$clusters[$data["clustername"]][] = $data["dhcpaddr"];
 			}
 
-			foreach($clusters as $clustername => $dhcplist) {
+			foreach ($clusters as $clustername => $dhcplist) {
 				$output .= $this->showDHCPClusterTableEntry($clustername,$dhcplist);
 			}
 
@@ -938,7 +938,7 @@
 			$output = "<tr id=\"cl".FS::$iMgr->formatHTMLId($clustername)."tr\"><td>".FS::$iMgr->opendiv(6,$clustername,array("lnkadd" => "name=".$clustername))."</td><td>";
 
 			$found = false;
-			for($i=0;$i<count($members);$i++) {
+			for ($i=0;$i<count($members);$i++) {
 				if (!$found)
 					$found = true;
 				else
@@ -980,14 +980,14 @@
 			$optgroups = array();
 			if ($ip) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ipv4_optgroups","optgroup","ipaddr = '".$ip."'");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					$optgroups[] = $data["optgroup"];
 				}
 			}
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("ipopts","",NULL,true);
 					$found = true;
@@ -1013,7 +1013,7 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate",
 				"collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'",
 				array("order" => "collecteddate","ordersens" => 2));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!isset($results[$data["collecteddate"]])) $results[$data["collecteddate"]] = array();
 				$results[$data["collecteddate"]]["baux"] = $data["ipactive"];
 				$results[$data["collecteddate"]]["reserv"] = $data["ipreserved"];
@@ -1032,7 +1032,7 @@
 			end($results);
 			$lastres = key($results);
 			$totalvals = 0;
-			foreach($results as $date => $values) {
+			foreach ($results as $date => $values) {
 				if ($labels == "") {
 					// Bufferize vals
                                         $bauxval = (isset($values["baux"]) ? $values["baux"] : 0);
@@ -1108,30 +1108,30 @@
 			$ipToDynDistribute = array();
 			// We load all ranges and make an IP table
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_range","rangestart,rangestop","subnet = '".$subnet."'");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$start = ip2long($data["rangestart"]);
 				$stop = ip2long($data["rangestop"]);
-				for($i=$start;$i<=$stop;$i++) {
+				for ($i=$start;$i<=$stop;$i++) {
 					$ipToDynDistribute[$i] = 1;
 				}
 			}
 
 			// If Action 1: Now we insert our new range
 			if ($action == 1) {
-				for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
+				for ($i=ip2long($startip);$i<=ip2long($endip);$i++) {
 					$ipToDynDistribute[$i] = 1;
 				}
 			}
 			// If Action 2: we clean dynamic IP from ranges 
 			else if ($action == 2) {
-				for($i=ip2long($startip);$i<=ip2long($endip);$i++) {
+				for ($i=ip2long($startip);$i<=ip2long($endip);$i++) {
 					$ipToDynDistribute[$i] = 0;
 				}
 			}
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","reserv = 't' AND inet(ip) > inet('".$netobj->getFirstUsableIP()."')
 				AND inet(ip) < inet('".$netobj->getLastUsableIP()."')");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$ipToDynDistribute[ip2long($data["ip"])] = 2;
 			}
 
@@ -1141,7 +1141,7 @@
 
 			ksort($ipToDynDistribute);
 
-			foreach($ipToDynDistribute as $ip => $type) {
+			foreach ($ipToDynDistribute as $ip => $type) {
 				if ($type == 1) {
 					// if no start, we init it
 					if ($tmpstart == 0) {
@@ -1181,7 +1181,7 @@
 			FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet = '".$subnet."'");
 
 			$count = count($rangeList);
-			for($i=0;$i<$count;$i++) {
+			for ($i=0;$i<$count;$i++) {
 				FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_range","subnet,rangestart,rangestop","'".
 					$subnet."','".long2ip($rangeList[$i][0])."','".long2ip($rangeList[$i][1])."'");
 			}
@@ -1281,7 +1281,7 @@
 					$obsoletes = array();
 					$found = false;
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip,macaddr,hostname","distributed = 3");
-					while($data = FS::$dbMgr->Fetch($query)) {
+					while ($data = FS::$dbMgr->Fetch($query)) {
 						$ltime = FS::$dbMgr->GetOneData("node","time_last","mac = '".$data["macaddr"]."'",array("order" => "time_last","ordersens" => 1,"limit" => 1));
 						if ($ltime) {
 							if (strtotime($ltime) < strtotime("-".$interval." day",strtotime(date("y-m-d H:i:s")))) {
@@ -1295,7 +1295,7 @@
 					if ($found) {
 						$output = FS::$iMgr->h4("title-old-record");
 						$logbuffer = "";
-						foreach($obsoletes as $key => $value) {
+						foreach ($obsoletes as $key => $value) {
 							$logbuffer .= $value;
 							$output .= $value;
 						}
@@ -1623,7 +1623,7 @@
 
 					if ($subnetclusters) {
 						$count = count($subnetclusters);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","clustername = '".$subnetclusters[$i]."'")) {
 								$this->log(2,"Add/Edit subnet: cluster '".$subnetclusters[$i]."' doesn't exist");
 								FS::$iMgr->ajaxEchoNC("err-cluster-not-exists");
@@ -1639,7 +1639,7 @@
 					
 					if ($dhcpopts) {
 						$count = count($dhcpopts);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$dhcpopts[$i]."'",array("group" => "optgroup"))) {
 								$this->log(2,"Add/Edit subnet: option group '".$dhcpopts[$i]."' doesn't exist");
 								FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-not-exists");
@@ -1660,14 +1660,14 @@
 
 					if ($subnetclusters) {
 						$count = count($subnetclusters);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername,subnet","'".$subnetclusters[$i]."','".$netid."'");
 						}
 					}
 
 					if ($dhcpopts) {
 						$count = count($dhcpopts);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid,optgroup","'".$netid."','".$dhcpopts[$i]."'");
 						}
 					}
@@ -1785,7 +1785,7 @@
 						return;	
 					}
 
-					for($i=0;$i<$count;$i++) {
+					for ($i=0;$i<$count;$i++) {
 						/*
 						* This variable is called for next test
 						*/
@@ -1830,7 +1830,7 @@
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername = '".$cname."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername = '".$cname."'");
 					}
-					for($i=0;$i<$count;$i++)
+					for ($i=0;$i<$count;$i++)
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername,dhcpaddr","'".$cname."','".$cmembers[$i]."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername,clustermode,master","'".$cname."','".$cmode."','".$cmaster."'");
 					FS::$dbMgr->CommitTr();
@@ -1931,7 +1931,7 @@
 					$found = false;
 					$netinfos = array();
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
-					while(($data = FS::$dbMgr->Fetch($query)) && $found == false) {
+					while (($data = FS::$dbMgr->Fetch($query)) && $found == false) {
 						$netobj = new FSNetwork();
 						$netobj->setNetAddr($data["netid"]);
 						$netobj->setNetMask($data["netmask"]);
@@ -1963,7 +1963,7 @@
 					if ($mac) {
 						// Check if MAC addr is not registered on another IP in the same subnet
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
-						while($data = FS::$dbMgr->Fetch($query)) {
+						while ($data = FS::$dbMgr->Fetch($query)) {
 							if ($netobj->isUsableIP($data["ip"])) {
 								$this->loc(1,"Edit IP informations: mac addr '".$mac."' already used in this subnet");
 								FS::$iMgr->ajaxEchoNC("err-mac-already-used-in-subnet");
@@ -1988,7 +1988,7 @@
 						
 					if ($ipopts) {
 						$count = count($ipopts);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","optgroup = '".$ipopts[$i]."'",array("group" => "optgroup"))) {
 								$this->log(2,"Edit IP informations: dhcp option group '".$opopts[$i]."' doesn't exist");
 								FS::$iMgr->ajaxEchoNC("err-dhcp-opts-group-not-exists");
@@ -2007,7 +2007,7 @@
 					}
 					if ($ipopts) {
 						$count = count($ipopts);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ipv4_optgroups","ipaddr,optgroup","'".$ip."','".$ipopts[$i]."'");
 						}
 					}
@@ -2131,7 +2131,7 @@
 						"optgroup IN(SELECT optgroup FROM ".PGDbConfig::getDbPrefix()."dhcp_option_group WHERE optalias IN (SELECT optalias FROM ".
 						PGDbConfig::getDbPrefix()."dhcp_option WHERE optname = '".$optname."'))",
 						array("group" => "optgroup"));
-					while($data = FS::$dbMgr->Fetch($query)) {
+					while ($data = FS::$dbMgr->Fetch($query)) {
 						if ($data["ct"] == 1)
 							$toRemove[] = $data["optgroup"];
 					}
@@ -2140,7 +2140,7 @@
 
 					// We need to remove link between option group and subnet if this is the last option
 					$count = count($toRemove);
-					for($i=0;$i<$count;$i++)
+					for ($i=0;$i<$count;$i++)
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup = '".$toRemove[$i]."'");
 
 					// We need to remove group options linked to option linked to custom option 
@@ -2315,7 +2315,7 @@
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","COUNT(optalias) as ct,optgroup",
 						"optgroup IN(SELECT optgroup FROM ".PGDbConfig::getDbPrefix()."dhcp_option_group WHERE optalias = '".$optalias."')",
 						array("group" => "optgroup"));
-					while($data = FS::$dbMgr->Fetch($query)) {
+					while ($data = FS::$dbMgr->Fetch($query)) {
 						if ($data["ct"] == 1)
 							$toRemove[] = $data["optgroup"];
 					}
@@ -2324,7 +2324,7 @@
 
 					// We need to remove link between option group and subnet if this is the last option
 					$count = count($toRemove);
-					for($i=0;$i<$count;$i++)
+					for ($i=0;$i<$count;$i++)
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup = '".$toRemove[$i]."'");
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias = '".$optalias."'");
@@ -2379,7 +2379,7 @@
 					}
 
 					$count = count($options);
-					for($i=0;$i<$count;$i++) {
+					for ($i=0;$i<$count;$i++) {
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_option","optalias","optalias = '".$options[$i]."'")) {
 							FS::$iMgr->ajaxEchoNC("err-option-not-exists");
 							return;
@@ -2390,7 +2390,7 @@
 					if ($edit) {
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup  = '".$optgroup."'");
 					}
-					for($i=0;$i<$count;$i++) {
+					for ($i=0;$i<$count;$i++) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup,optalias","'".$optgroup."','".$options[$i]."'");
 					}
 					FS::$dbMgr->CommitTr();

@@ -38,7 +38,7 @@
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask","",
 				array("order" => "netid"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
 				}
@@ -69,7 +69,7 @@
 			// Groups
 			$first = true;
 			$grprules = $this->loadSubnetRules($grprules,1,$subnet,"");
-			foreach($grprules as $key => $values) {
+			foreach ($grprules as $key => $values) {
 				if ($first) $first = false;
 				$grpoutput .= "<tr><td>".$this->getRightForKey($key);
 				$grpoutput .= "</td><td>";
@@ -81,7 +81,7 @@
 			// Users			
 			$usrrules = $this->loadSubnetRules($usrrules,2,$subnet,"");
 			$first = true;
-			foreach($usrrules as $key => $values) {
+			foreach ($usrrules as $key => $values) {
 				if ($first) $first = false;
 				$usroutput .= "<tr><td>".$this->getRightForKey($key);
 				$usroutput .= "</td><td>";
@@ -106,7 +106,7 @@
 			// Groups
 			$first = true;
 			$grprules = $this->loadGlobalRules($grprules,1);
-			foreach($grprules as $key => $values) {
+			foreach ($grprules as $key => $values) {
 				if ($first) $first = false;
 				$grpoutput .= "<tr><td>".$this->getRightForKey($key);
 				$grpoutput .= "</td><td>";
@@ -118,7 +118,7 @@
 			// Users			
 			$usrrules = $this->loadGlobalRules($usrrules,2);
 			$first = true;
-			foreach($usrrules as $key => $values) {
+			foreach ($usrrules as $key => $values) {
 				if ($first) $first = false;
 				$usroutput .= "<tr><td>".$this->getRightForKey($key);
 				$usroutput .= "</td><td>";
@@ -132,7 +132,7 @@
 		private function initSubnetRules($rulefilter = "") {
 			$rules = array();
 			$rulelist = array("history","rangemgmt","ipmgmt");
-			for($i=0;$i<count($rulelist);$i++) {
+			for ($i=0;$i<count($rulelist);$i++) {
 				if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
 					$rules[$rulelist[$i]] = array();
 			}
@@ -144,7 +144,7 @@
 			$rules = array();
 			$rulelist = array("read","history","servermgmt","advancedtools","optionsmgmt", 
 				"optionsgrpmgmt","subnetmgmt","rangemgmt","ipmgmt");
-			for($i=0;$i<count($rulelist);$i++) {
+			for ($i=0;$i<count($rulelist);$i++) {
 				if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
 					$rules[$rulelist[$i]] = array();
 			}
@@ -168,7 +168,7 @@
 				return NULL;
 			}
 
-			while($data2 = FS::$dbMgr->Fetch($query2)) {
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				$ruleidx = preg_replace("#mrule_ipmmgmt_".$subnet."_#","",$data2["rulename"]);
 				switch($ruleidx) {
 					case "rangemgmt": case "ipmgmt": case "history":
@@ -195,7 +195,7 @@
 				return NULL;
 			}
 
-			while($data2 = FS::$dbMgr->Fetch($query2)) {
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				$ruleidx = preg_replace("#mrule_ipmmgmt_#","",$data2["rulename"]);
 				switch($ruleidx) {
 					case "read": case "servermgmt": case "advancedtools": case "optionsmgmt":
@@ -213,7 +213,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("u","subnet",$username,$values[$i],$right,$subnet);
 				}
@@ -231,7 +231,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("u","global",$username,$values[$i],$right,"1");
 				}
@@ -248,7 +248,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("g","subnet",$gname,$values[$i],$right,$subnet);
 				}
@@ -266,7 +266,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("g","global",$gname,$values[$i],$right,"1");
 				}
@@ -302,7 +302,7 @@
 			$output = FS::$iMgr->select($sname);
 			$users = $this->getUsers();
 			$found = false;
-			foreach($users as $uid => $username) {
+			foreach ($users as $uid => $username) {
 				if (!in_array($uid,$values)) {
 					if (!$found) $found = true;
 					$output .= FS::$iMgr->selElmt($username,$uid);
@@ -317,7 +317,7 @@
 			$output = FS::$iMgr->select($sname);
 			$groups = $this->getUserGroups();
 			$found = false;
-			foreach($groups as $gid => $gname) {
+			foreach ($groups as $gid => $gname) {
 				if (!in_array($gid,$values)) {
 					if (!$found) $found = true;
 					$output .= FS::$iMgr->selElmt($gname,$gid);
@@ -331,7 +331,7 @@
 		private function getUserGroups() {
 			$groups = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$groups[$data["gid"]] = $data["gname"];
 			}
 			return $groups;
@@ -340,7 +340,7 @@
 		private function getUsers() {
 			$groups = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$users[$data["uid"]] = $data["username"];
 			}
 			return $users;
@@ -425,7 +425,7 @@
 			}
 
 			$js = "";
-			foreach($rules as $key => $values) {
+			foreach ($rules as $key => $values) {
 				if ($type == "glbl") {
 					if ($id == "uid") {
 						$js .= "$('#lu".$right.$type."').html('".$this->userSelect("uid",$values)."');";

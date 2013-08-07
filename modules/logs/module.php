@@ -48,7 +48,7 @@
 			$output = "";
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","date,module,level,_user,txt",$filter,array("order" => "date","ordersens" => 1));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
 					$output .= "<table id=\"tlogList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
@@ -93,13 +93,13 @@
 				$output .= FS::$iMgr->select("uf","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","_user","",array("order" => "_user","ordersens" => 2,"group" => "_user"));
-				while($data = FS::$dbMgr->Fetch($query))
+				while ($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["_user"],$data["_user"]);
 
 				$output .= "</select>".FS::$iMgr->select("af","filterAppLogs()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","module","",array("order" => "module","ordersens" => 2,"group" => "module"));
-				while($data = FS::$dbMgr->Fetch($query))
+				while ($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["module"],$data["module"]);
 				
 				$output .= "</select>".FS::$iMgr->select("lf","filterAppLogs()");
@@ -119,7 +119,7 @@
 				$linecount = 30;
 				$fileoutput = "";
 				$line = "";
-				while(ftell($fp) > 0 && $linecount > 0) {
+				while (ftell($fp) > 0 && $linecount > 0) {
 					$chr = fgetc($fp);
 					if ($chr == "\n") {
 						$fileoutput .= $line."<br />";

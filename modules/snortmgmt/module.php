@@ -583,7 +583,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$srvlist);
 					$count = count($srvs);
 					if (strlen($srvlist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for DNS sensors configuration (CIDR)");
 								if (FS::isAjaxCall())
@@ -633,7 +633,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$smtplist);
 					$count = count($srvs);
 					if (strlen($smtplist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for Mail sensors configuration (SMTP not a CIDR)");
 								if (FS::isAjaxCall())
@@ -649,7 +649,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$smtpports);
 					$count = count($ports);
 					if (strlen($smtpports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for Mail sensors configuration (smtp port = ".$ports[$i].")");
 								if (FS::isAjaxCall())
@@ -665,7 +665,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$imaplist);
 					$count = count($srvs);
 					if (strlen($imaplist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for Mail sensors configuration (IMAP not a CIDR)");
 								if (FS::isAjaxCall())
@@ -681,7 +681,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$imapports);
 					$count = count($ports);
 					if (strlen($imapports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for Mail sensors configuration (imap port = ".$ports[$i].")");
 								if (FS::isAjaxCall())
@@ -697,7 +697,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$poplist);
 					$count = count($srvs);
 					if (strlen($poplist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for Mail sensors configuration (POP not a CIDR)");
 								if (FS::isAjaxCall())
@@ -713,7 +713,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$popports);
 					$count = count($ports);
 					if (strlen($popports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for Mail sensors configuration (pop port = ".$ports[$i].")");
 								if (FS::isAjaxCall())
@@ -768,7 +768,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$srvlist);
 					$count = count($srvs);
 					if (strlen($srvlist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for HTTP sensors configuration (not a CIDR)");
 								if (FS::isAjaxCall())
@@ -784,7 +784,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$httpports);
 					$count = count($ports);
 					if (strlen($httpports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for HTTP (port = ".$ports[$i].")");
 								if (FS::isAjaxCall())
@@ -832,7 +832,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$sqllist);
 					$count = count($srvs);
 					if (strlen($sqllist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for SQL sensors configuration (SQL not a CIDR)");
 								if (FS::isAjaxCall())
@@ -848,7 +848,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$oraclelist);
 					$count = count($srvs);
 					if (strlen($oraclelist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for SQL sensors configuration (Oracle not a CIDR)");
 								if (FS::isAjaxCall())
@@ -864,7 +864,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$oracleports);
 					$count = count($ports);
 					if (strlen($oracleports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for SQL sensors configuration (Oracle port = ".$ports[$i].")");
 								if (FS::isAjaxCall())
@@ -918,7 +918,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$telnetlist);
 					$count = count($srvs);
 					if (strlen($telnetlist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for Remote access sensors configuration (telnet not a CIDR)");
 								if (FS::isAjaxCall())
@@ -934,7 +934,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$sshlist);
 					$count = count($srvs);
 					if (strlen($sshlist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for Remote access sensors configuration (SSH not a CIDR)");
 								if (FS::isAjaxCall())
@@ -950,7 +950,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$sshports);
 					$count = count($ports);
 					if (strlen($sshports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for Remote access sensors configuration (SSH port = ".$ports[$i].")");
 								if (FS::isAjaxCall())
@@ -966,7 +966,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$tselist);
 					$count = count($srvs);
 					if (strlen($tselist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log("Some fields are wrong for Remote access sensors configuration (TSE not a CIDR)");
 								if (FS::isAjaxCall())
@@ -1027,7 +1027,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$srvlist);
 					$count = count($srvs);
 					if (strlen($srvlist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for FTP sensors configuration (not a CIDR)");
 								if (FS::isAjaxCall())
@@ -1043,7 +1043,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$ftpports);
 					$count = count($ports);
 					if (strlen($ftpports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for FTP sensors configuration (port = ".$ports[$i].")");
 								if (FS::isAjaxCall())
@@ -1091,7 +1091,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$srvlist);
 					$count = count($srvs);
 					if (strlen($srvlist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for SNMP sensors configuration (not a CIDR)");
 								if (FS::isAjaxCall())
@@ -1138,7 +1138,7 @@ preprocessor http_inspect_server: server default \\\n
 					$srvs = preg_split("#[,]#",$srvlist);
 					$count = count($srvs);
 					if (strlen($srvlist) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isIPorCIDR($srvs[$i])) {
 								$this->log(1,"Some fields are wrong for SIP sensors configuration (not a CIDR)");
 								if (FS::isAjaxCall())	
@@ -1154,7 +1154,7 @@ preprocessor http_inspect_server: server default \\\n
 					$ports = preg_split("#[,]#",$sipports);
 					$count = count($ports);
 					if (strlen($sipports) > 0 && $count > 0) {
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if ($ports[$i]<1||$ports[$i]>65535) {
 								$this->log(1,"Some fields are wrong for SIP sensors configuration (port = ".$ports[$i].")");
 								if (FS::isAjaxCall())	

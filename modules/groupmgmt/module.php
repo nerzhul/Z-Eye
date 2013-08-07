@@ -56,7 +56,7 @@
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
 			$rules = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
-			while($data = FS::$dbMgr->Fetch($query))
+			while ($data = FS::$dbMgr->Fetch($query))
 				$rules[] = $data["rulename"];
 			$output .= $this->loadModuleRuleSets($rules);
 			$output .= FS::$iMgr->hidden("gid",$gid);
@@ -69,7 +69,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname,description");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = 1;
 					$tmpoutput .= "<table id=\"groupList\"><thead><tr><th class=\"headerSortDown\">GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr></thead>";
@@ -90,11 +90,11 @@
 			$output = "";
 			$dir = opendir(dirname(__FILE__)."/../");
 			$found = 0;
-			while($elem = readdir($dir)) {
+			while ($elem = readdir($dir)) {
 				$dirpath = dirname(__FILE__)."/../".$elem;
 				if (is_dir($dirpath) && $elem != ".." && $elem != ".") {
 					$dir2 = opendir($dirpath);
-					while($elem2 = readdir($dir2)) {
+					while ($elem2 = readdir($dir2)) {
 						if (is_file($dirpath."/".$elem2) && $elem2 == "rules.php") {
 							require($dirpath."/main.php");
 
@@ -153,12 +153,12 @@
 					$gid = FS::$dbMgr->GetMax(PGDbConfig::getDbPrefix()."groups","gid")+1;
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."groups","gid,gname","'".$gid."','".$gname."'");
 					$rules = array();
-					foreach($_POST as $key => $value) {
+					foreach ($_POST as $key => $value) {
 						   if (preg_match("#^mrule_#",$key)) {
 									$rules[$key] = $value;
 						   }
 					}
-					foreach($rules as $key => $value) {
+					foreach ($rules as $key => $value) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					$this->log(0,"New group '".$gname."' added");
@@ -203,13 +203,13 @@
 						return;
 					}
 					$rules = array();
-					foreach($_POST as $key => $value) {
+					foreach ($_POST as $key => $value) {
 						   if (preg_match("#^mrule_#",$key)) {
 							$rules[$key] = $value;
 						   }
 					}
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","gid = '".$gid."'");
-					foreach($rules as $key => $value) {
+					foreach ($rules as $key => $value) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					$this->log(0,"Group Id '".$gid."' edited");

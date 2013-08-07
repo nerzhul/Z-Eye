@@ -65,7 +65,7 @@
 			}
 			$grpidx = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
 				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
@@ -99,7 +99,7 @@
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,mail,last_ip,join_date,last_conn,name,subname,sha_pwd");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = 1;
 					$tmpoutput .= "<table id=\"userList\"><thead id=\"userthead\"><tr><th class=\"headerSortDown\">UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
@@ -123,7 +123,7 @@
 				$found = 0;
 				$tmpoutput = "";
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr,port,dn,rootdn,filter");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = 1;
 						$tmpoutput .= "<table id=\"ldapList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
@@ -146,7 +146,7 @@
 			$output = "<tr id=\"u".$uid."tr\"><td>".$uid."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$username."\">".$username."</a></td><td>".
 				($localuser ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$data["gid"]."'");
 				$output .= $gname."<br />";
 			}
@@ -176,7 +176,7 @@
 			$countElmt = 0;
 			$tmpoutput = "";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$countElmt++;
 				$tmpoutput .= FS::$iMgr->selElmt($data["gname"],$data["gid"]);
 			}
@@ -267,7 +267,7 @@
 				return;
 			}
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$ldapMgr = new LDAP();
 				$ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
 				$ldapMgr->RootConnect();
@@ -276,7 +276,7 @@
 					$grpcount = 0;
 					if ($groups && is_array($groups)) {
 						$grpcount = count($groups);
-						for($i=0;$i<$grpcount;$i++) {
+						for ($i=0;$i<$grpcount;$i++) {
 							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gid = '".$groups[$i]."'")) {
 								$this->log(2,"Group '".$groups[$i]."' doesn't exists");
 								FS::$iMgr->ajaxEchoNC("err-group-not-exists");
@@ -298,7 +298,7 @@
 					$user->Create();
 
 					$uid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");
-					for($i=0;$i<$grpcount;$i++)
+					for ($i=0;$i<$grpcount;$i++)
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_group","uid,gid","'".$uid."','".$groups[$i]."'");
 					$jscontent = "";
 					$js = "$('".$jscontent."').addAfter('#userthead');";
@@ -385,7 +385,7 @@
 					}
 
 					$groups = array();
-					foreach($_POST as $key => $value) {
+					foreach ($_POST as $key => $value) {
 						   if (preg_match("#^ugroup#",$key)) {
 								$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$value."'");
 								if (!$exist) {
@@ -399,7 +399,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","uid = '".$uid."'");
 					$groups = array_unique($groups);
 					$count = count($groups);
-					for($i=0;$i<$count;$i++)
+					for ($i=0;$i<$count;$i++)
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_group","uid,gid","'".$uid."','".$groups[$i]."'");
 					$this->log(0,"User ".$uid." edited");
 					FS::$iMgr->redir("mod=".$this->mid);

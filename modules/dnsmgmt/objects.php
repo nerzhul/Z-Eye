@@ -47,12 +47,12 @@
 			return $output;
 		}
 
-		public function showForm($aclid = "") { 
+		public function showForm($aclname = "") { 
 			if (!$this->canRead()) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			}
 
-			if (!$this->Load($name)) {
+			if (!$this->Load($aclname)) {
 				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
 			}
 		}

@@ -40,7 +40,7 @@
 			$ldapmail = "";
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
-			while(!$found && ($data = FS::$dbMgr->Fetch($query))) {
+			while (!$found && ($data = FS::$dbMgr->Fetch($query))) {
 				$tmpldapMgr = new LDAP();
 				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
 				if ($tmpldapMgr->Authenticate($username, $password)) {

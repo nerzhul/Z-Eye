@@ -130,7 +130,7 @@
 				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th></th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($found == false) $found = true;
 				$tmpoutput .= "<tr id=\"b".preg_replace("#[. ]#","-",$data["addr"]).$data["type"]."\"><td>
 					<a href=\"index.php?mod=".$this->mid."&bck=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"]."</td><td>";
@@ -173,12 +173,12 @@
 			else $filteri = ""; 
 
 			$query = FS::$dbMgr->Select("device","ip,name","","name");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$formoutput .=  FS::$iMgr->selElmt($data["name"],$data["ip"],$filter == $data["ip"]);
 			}
 
 			$query = FS::$dbMgr->Select("device","ip,name",$filteri ? "ip = '".$filteri."'" : "",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) $found = true;
 				// Init array for device
 				$grprules = $this->initIPRules();
@@ -186,7 +186,7 @@
 				// Groups
 				$first = true;
 				$grprules = $this->loadIPRules($grprules,1,$data["ip"]);
-				foreach($grprules as $key => $values) {
+				foreach ($grprules as $key => $values) {
 					$grpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if ($first) $first = false;
 					$grpoutput .= $this->getRightForKey($key);
@@ -197,7 +197,7 @@
 				// Users			
 				$usrrules = $this->loadIPRules($usrrules,2,$data["ip"]);
 				$first = true;
-				foreach($usrrules as $key => $values) {
+				foreach ($usrrules as $key => $values) {
 					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if ($first) $first = false;
 					$usroutput .= $this->getRightForKey($key);
@@ -235,7 +235,7 @@
 				"write","writeportmon","restorestartupcfg","exportcfg","retagvlan",
 				"sshpwd","sshportinfos","sshshowstart","sshshowrun","portmod_portsec",
 				"portmod_cdp","portmod_voicevlan","portmod_dhcpsnooping","dhcpsnmgmt");
-			for($i=0;$i<count($rulelist);$i++) {
+			for ($i=0;$i<count($rulelist);$i++) {
 				if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
 					$rules[$rulelist[$i]] = array();
 			}
@@ -254,7 +254,7 @@
 			}
 			else
 				return NULL;
-			while($data2 = FS::$dbMgr->Fetch($query2)) {
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				$ruleidx = preg_replace("#mrule_switchmgmt_ip_".$ip."_#","",$data2["rulename"]);
 				switch($ruleidx) {
 					case "read": case "readportstats": case "readswdetails": case "readswmodules":
@@ -277,7 +277,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("u","ip",$username,$values[$i],$right,$ip);
 				}
@@ -294,7 +294,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("g","ip",$gname,$values[$i],$right,$ip);
 				}
@@ -325,19 +325,19 @@
 			else $filterc = ""; 
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$formoutput .= FS::$iMgr->selElmt($data["name"],$data["name"],$filter == $data["name"]);
 			}
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw",($filterc ? "name = '".$filterc."'" : ""),array("order" => "name"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) $found = true;
 				// Init SNMP rights
 				$grprules = $this->initSNMPRules($data["ro"],$data["rw"]);
 				$usrrules = $this->initSNMPRules($data["ro"],$data["rw"]);
 				$first = true;
 				$grprules = $this->loadSNMPRules($grprules,1,$data["name"],$data["ro"],$data["rw"]);
-				foreach($grprules as $key => $values) {
+				foreach ($grprules as $key => $values) {
 					$grpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if ($first) $first = false;
 					$grpoutput .= $this->getRightForKey($key);
@@ -348,7 +348,7 @@
 				// Users
 				$usrrules = $this->loadSNMPRules($usrrules,2,$data["name"],$data["ro"],$data["rw"]);
 				$first = true;
-				foreach($usrrules as $key => $values) {
+				foreach ($usrrules as $key => $values) {
 					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
 					if ($first) $first = false;
 					$usroutput .= $this->getRightForKey($key);
@@ -393,13 +393,13 @@
 				"sshpwd","portmod_portsec","portmod_cdp","portmod_voicevlan","portmod_dhcpsnooping",
 				"dhcpsnmgmt");
 			if ($ro == 't') {
-				for($i=0;$i<count($rorules);$i++) {
+				for ($i=0;$i<count($rorules);$i++) {
 					if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rorules[$i])
 						$rules[$rorules[$i]] = array();
 				}
 			}
 			if ($rw == 't') {
-				for($i=0;$i<count($rwrules);$i++) {
+				for ($i=0;$i<count($rwrules);$i++) {
 					if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rwrules[$i])
 						$rules[$rwrules[$i]] = array();
 				}
@@ -419,7 +419,7 @@
 			}
 			else
 				return NULL;
-			while($data2 = FS::$dbMgr->Fetch($query2)) {
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				$ruleidx = preg_replace("#mrule_switchmgmt_snmp_".$name."_#","",$data2["rulename"]);
 				switch($ruleidx) {
 					// Read rules
@@ -459,7 +459,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("g","snmp",$gname,$values[$i],$right,$snmp);
 				}
@@ -477,7 +477,7 @@
 
 			$count = count($values);
 			if ($count) {
-				for($i=0;$i<count($values);$i++) {
+				for ($i=0;$i<count($values);$i++) {
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("u","snmp",$username,$values[$i],$right,$snmp);
 				}
@@ -494,7 +494,7 @@
 			$output = FS::$iMgr->select($sname);
 			$users = $this->getUsers();
 			$found = false;
-			foreach($users as $uid => $username) {
+			foreach ($users as $uid => $username) {
 				if (!in_array($uid,$values)) {
 					if (!$found) $found = true;
 					$output .= FS::$iMgr->selElmt($username,$uid);
@@ -509,7 +509,7 @@
 			$output = FS::$iMgr->select($sname);
 			$groups = $this->getUserGroups();
 			$found = false;
-			foreach($groups as $gid => $gname) {
+			foreach ($groups as $gid => $gname) {
 				if (!in_array($gid,$values)) {
 					if (!$found) $found = true;
 					$output .= FS::$iMgr->selElmt($gname,$gid);
@@ -523,7 +523,7 @@
 		private function getUserGroups() {
 			$groups = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$groups[$data["gid"]] = $data["gname"];
 			}
 			return $groups;
@@ -532,7 +532,7 @@
 		private function getUsers() {
 			$groups = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$users[$data["uid"]] = $data["username"];
 			}
 			return $users;
@@ -606,7 +606,7 @@
 				$rules = $this->loadSNMPRules($rules,$id == "gid" ? 1 : 2,$snmpip,'t','t',$right);
 			}
 			$js = "";
-			foreach($rules as $key => $values) {
+			foreach ($rules as $key => $values) {
 				if ($id == "uid")
 					$js .= "$('#lu".$right.$type."').html('".$this->userSelect("uid",$values)."');";
 				else if ($id == "gid")

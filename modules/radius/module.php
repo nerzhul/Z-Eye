@@ -100,7 +100,7 @@
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,login,dbtype");
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($found == false) $found = true;
 			$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dbname"].$data["addr"].$data["port"])."\"><td>
 				<a href=\"index.php?mod=".$this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
@@ -236,7 +236,7 @@
 			if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
 				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,radalias");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == 0) $found = 1;
 					$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
 					$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$radpath,$rad == $radpath);
@@ -247,7 +247,7 @@
 			else {
 				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname");
-	               	        while($data = FS::$dbMgr->Fetch($query)) {
+	               	        while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == 0) $found = 1;
 					$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
 					$tmpoutput .= FS::$iMgr->selElmt($radpath,$radpath,$rad == $radpath);
@@ -359,7 +359,7 @@
 				$output .= FS::$iMgr->select("ug","filterRadiusDatas()");
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Group")."--","",true);
 				$query = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"distinct groupname");
-				while($data = $radSQLMgr->Fetch($query))
+				while ($data = $radSQLMgr->Fetch($query))
 						$output .= FS::$iMgr->selElmt($data["groupname"],$data["groupname"]);
 
 				$output .= "</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterRadiusDatas()");
@@ -376,14 +376,14 @@
 
 				$groups=array();
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					$rcount = $radSQLMgr->Count($this->raddbinfos["tradusrgrp"],"distinct username","groupname = '".$data["groupname"]."'");
 					if (!isset($groups[$data["groupname"]]))
 						$groups[$data["groupname"]] = $rcount;
 				}
 
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					$rcount = $radSQLMgr->Count($this->raddbinfos["tradusrgrp"],"distinct username","groupname = '".$data["groupname"]."'");
 					if (!isset($groups[$data["groupname"]]))
 							$groups[$data["groupname"]] = $rcount;
@@ -392,7 +392,7 @@
                			 }
 				if (count($groups) > 0) {
 					$output .= "<table id=\"radgrp\" style=\"width:30%;\"><tr><th>".$this->loc->s("Group")."</th><th style=\"width:30%\">".$this->loc->s("User-nb")."</th></tr>";
-					foreach($groups as $key => $value)
+					foreach ($groups as $key => $value)
 						$output .= "<tr><td id=\"dragtd\" draggable=\"true\">".$key."</td><td>".$value."</td></tr>";
 					$output .= "</table>";
 				}
@@ -405,19 +405,19 @@
 				$grouplist= FS::$iMgr->selElmt("","none");
 				$groups=array();
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					if (!in_array($data["groupname"],$groups)) {
 						$groups[] = $data["groupname"];
 					}
 				}
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					if (!in_array($data["groupname"],$groups)) {
 						$groups[] = $data["groupname"];
 					}
 				}
 				$count = count($groups);
-				for($i=0;$i<$count;$i++) {
+				for ($i=0;$i<$count;$i++) {
 					$grouplist .= FS::$iMgr->selElmt($groups[$i],$groups[$i]);
 				}
 
@@ -463,7 +463,7 @@
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
 				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("subnet","","Subnet DHCP");
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
-				while($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) $found = 1;
 						$formoutput .= FS::$iMgr->selElmt($data["netid"]."/".$data["netmask"],$data["netid"]);
 				}
@@ -473,19 +473,19 @@
 
 					$groups=array();
 					$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
-					while($data = $radSQLMgr->Fetch($query)) {
+					while ($data = $radSQLMgr->Fetch($query)) {
 						if (!isset($groups[$data["groupname"]]))
 							$groups[$data["groupname"]] = 1;
 					}
 
 					$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
-					while($data = $radSQLMgr->Fetch($query)) {
+					while ($data = $radSQLMgr->Fetch($query)) {
 						if (!isset($groups[$data["groupname"]]))
 							$groups[$data["groupname"]] = 1;
 					}
 					if (count($groups) > 0) {
 						$found = 1;
-						foreach($groups as $key => $value)
+						foreach ($groups as $key => $value)
 						$formoutput .= FS::$iMgr->selElmt($key,$key);
 					}
 					$formoutput .= "</select></li><li>".FS::$iMgr->submit("",$this->loc->s("Add"))."</li></ul></form>";
@@ -495,7 +495,7 @@
 					$found = 0;
 					$tmpoutput = "";
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_dhcp_import","dhcpsubnet,groupname","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
-					while($data = FS::$dbMgr->Fetch($query)) {
+					while ($data = FS::$dbMgr->Fetch($query)) {
 						if ($found == 0) {
 							$found = 1;
 							$tmpoutput .= FS::$iMgr->h3("title-auto-import2")."<table><tr><th>".$this->loc->s("DHCP-zone")."</th><th>".
@@ -738,7 +738,7 @@
 				});");
 			$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"id,username,value","attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')".($ug ? " AND username IN (SELECT username FROM radusergroup WHERE groupname = '".$ug."')" : ""));
 			$expirationbuffer = array();
-			while($data = $radSQLMgr->Fetch($query)) {
+			while ($data = $radSQLMgr->Fetch($query)) {
 				if (!$found && (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]) 
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]))) {
 					$found = true;
@@ -746,7 +746,7 @@
 						Mot de passe</th><th>Groupes</th><th>Date d'expiration</th></tr></thead>";
 					if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
 						$query2 = $radSQLMgr->Select(PGDbConfig::getDbPrefix()."radusers","username,expiration","expiration > 0");
-						while($data2 = $radSQLMgr->Fetch($query2)) {
+						while ($data2 = $radSQLMgr->Fetch($query2)) {
 							if (!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
 						}
 					}
@@ -756,7 +756,7 @@
 					$tmpoutput .= "<tr><td>".$data["id"]."</td><td id=\"dragtd\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"]."\">".$data["username"]."</a></td><td>".$data["value"]."</td><td>";
 					$query2 = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"groupname","username = '".$data["username"]."'");
 					$found2 = 0;
-					while($data2 = $radSQLMgr->Fetch($query2)) {
+					while ($data2 = $radSQLMgr->Fetch($query2)) {
 						if ($found2 == 0) $found2 = 1;
 						else $tmpoutput .= "<br />";
 						$tmpoutput .= $data2["groupname"];
@@ -843,14 +843,14 @@
 				}
 				$query = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"groupname","username = '".$radentry."'");
 				$grpidx = 0;
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					$formoutput .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Profil")).
 					$this->addGroupList($radSQLMgr,$data["groupname"])."</select> <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 					$grpidx++;
 				}
 				$attridx = 0;
 				$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"attribute,op,value","username = '".$radentry."' AND attribute <> 'Cleartext-Password'");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					if (!($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept")) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 						FS::$iMgr->select("attrop".$attridx).
@@ -862,7 +862,7 @@
 					}
 				}
 				$query = $radSQLMgr->Select($this->raddbinfos["tradreply"],"attribute,op,value","username = '".$radentry."'");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 						FS::$iMgr->select("attrop".$attridx).
 						$raddbCondSelect($data["op"]).
@@ -911,7 +911,7 @@
                 		$formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);
 				$attridx = 0;
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"attribute,op,value","groupname = '".$radentry."'");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					 $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 					 FS::$iMgr->select("attrop".$attridx).
 					$this->raddbCondSelector($data["op"]).
@@ -922,7 +922,7 @@
 				}
 
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"attribute,op,value","groupname = '".$radentry."'");
-				while($data = $radSQLMgr->Fetch($query)) {
+				while ($data = $radSQLMgr->Fetch($query)) {
 					$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Attribut")." Op ".
 					FS::$iMgr->select("attrop".$attridx).
 					$this->raddbCondSelector($data["op"]).
@@ -943,19 +943,19 @@
 			$output = "";
 			$groups=array();
 			$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
-			while($data = $radSQLMgr->Fetch($query)) {
+			while ($data = $radSQLMgr->Fetch($query)) {
 				if (!in_array($data["groupname"],$groups)) {
 					$groups[] = $data["groupname"];
 				}
 			}
 			$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
-			while($data = $radSQLMgr->Fetch($query)) {
+			while ($data = $radSQLMgr->Fetch($query)) {
 				if (!in_array($data["groupname"],$groups)) {
 					$groups[] = $data["groupname"];
 				}
 			}
 			$count = count($groups);
-			for($i=0;$i<$count;$i++) {
+			for ($i=0;$i<$count;$i++) {
 				$output .= FS::$iMgr->selElmt($groups[$i],$groups[$i],($groups[$i] == $selectEntry ? true : false));
 			}
 			return $output;
@@ -1099,7 +1099,7 @@
 							$value = "Accept";
 						}
 						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username."','".$attr."',':=','".$value."'");
-						foreach($_POST as $key => $value) {
+						foreach ($_POST as $key => $value) {
 						if (preg_match("#^ugroup#",$key)) {
 								$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$value."'");
 								if (!$groupfound)
@@ -1112,7 +1112,7 @@
 							}
 						}
 						$attrTab = array();
-						foreach($_POST as $key => $value) {
+						foreach ($_POST as $key => $value) {
 								if (preg_match("#attrval#",$key)) {
 										$key = preg_replace("#attrval#","",$key);
 										if (!isset($attrTab[$key])) $attrTab[$key] = array();
@@ -1134,7 +1134,7 @@
 										$attrTab[$key]["target"] = $value;
 								}
 						}
-						foreach($attrTab as $attrKey => $attrEntry) {
+						foreach ($attrTab as $attrKey => $attrEntry) {
 								if ($attrEntry["target"] == "2") {
 									$radSQLMgr->Insert($this->raddbinfos["tradreply"],"id,username,attribute,op,value","'','".$username.
 										"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
@@ -1197,7 +1197,7 @@
 						return;
 					}
 					$attrTab = array();
-					foreach($_POST as $key => $value) {
+					foreach ($_POST as $key => $value) {
 						if (preg_match("#attrval#",$key)) {
 							$key = preg_replace("#attrval#","",$key);
 							if (!isset($attrTab[$key])) $attrTab[$key] = array();
@@ -1219,7 +1219,7 @@
                                                         $attrTab[$key]["target"] = $value;
 						}
 					}
-					foreach($attrTab as $attrKey => $attrValue) {
+					foreach ($attrTab as $attrKey => $attrValue) {
 						if ($attrValue["target"] == "2") {
 							$radSQLMgr->Insert($this->raddbinfos["tradgrprep"],"id,groupname,attribute,op,value","'','".$groupname.
 							"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
@@ -1336,7 +1336,7 @@
 						$userlist = array_filter($userlist);
 						$fmtuserlist = array();
 						$count = count($userlist);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							$tmp = preg_split("#[,]#",$userlist[$i]);
 							if (count($tmp) != 2 || preg_match("#[ ]#",$tmp[0])) {
 								$this->log(2,"Some datas are invalid for mass import");
@@ -1346,7 +1346,7 @@
 							$fmtuserlist[$tmp[0]] = $tmp[1];
 						}
 						$userfound = 0;
-						foreach($fmtuserlist as $user => $upwd) {
+						foreach ($fmtuserlist as $user => $upwd) {
 							switch($pwdtype) {
 								case 1: $attr = "Cleartext-Password"; $value = $upwd; break;
 								case 2: $attr = "User-Password"; $value = $upwd; break;
@@ -1386,7 +1386,7 @@
 						$userlist = array_filter($userlist);
 						// Match & format mac addr
 						$count = count($userlist);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isMacAddr($userlist[$i]) && !preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) && !preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
 								$this->log(2,"Bad fields for Mass import (MAC addr)");
 								FS::$iMgr->redir("mod=".$this->mid."&sh=3&h=".$radhost."&p=".$radport."&r=".$raddb."&err=2");
@@ -1399,7 +1399,7 @@
 						$userlist = array_unique($userlist);
 						$userfound = 0;
 						$count = count($userlist);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							if (!$radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$userlist[$i]."'"))
 								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$userlist[$i]."','Auth-Type',':=','Accept'");
 							else $userfound = 1;
@@ -1651,7 +1651,7 @@
 
 					$pdf = new PDFgen();
 					$pdf->SetTitle($this->loc->s("Account").": ".($valid == 1 ? $this->loc->s("Permanent") : $this->loc->s("Temporary")));
-					for($i=0;$i<$nbacct;$i++) {
+					for ($i=0;$i<$nbacct;$i++) {
 						$password = FS::$secMgr->genRandStr(8);
 						if ($typegen == 2) {
 							$username = $prefix.($i+1);
