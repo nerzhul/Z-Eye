@@ -48,17 +48,17 @@
 			$spwd = "";
 			$spath = "";
 			$output = "";
-			if(!$create) {
+			if (!$create) {
 				FS::$iMgr->showReturnMenu(true);
 				$output = FS::$iMgr->h2("title-edit-backup-switch-server");
 				$addr = FS::$secMgr->checkAndSecuriseGetData("bck");
 				$type = FS::$secMgr->checkAndSecuriseGetData("type");
-				if(!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
+				if (!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
 					return $output;
 				}
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
+				if ($data = FS::$dbMgr->Fetch($query)) {
 					$saddr = $addr;
 					$slogin = $data["login"];
 					$spwd = $data["pwd"];
@@ -75,22 +75,22 @@
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
 				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
-				case 3: if($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
+				case 3: if ($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
 			}
 
 			$output .= FS::$iMgr->js("function arangeform() {
-				if(document.getElementsByName('stype')[0].value == 1) {
+				if (document.getElementsByName('stype')[0].value == 1) {
 					$('#tohide1').fadeOut();
 					$('#tohide2').fadeOut();
 					$('#tohide3').fadeOut();
-				} else if(document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {
+				} else if (document.getElementsByName('stype')[0].value == 2 || document.getElementsByName('stype')[0].value == 4 || document.getElementsByName('stype')[0].value == 5) {
 					$('#tohide1').fadeIn();
 					$('#tohide2').fadeIn();
 					$('#tohide3').fadeIn();
 				}};");
 			$output .= FS::$iMgr->cbkForm("3");
 			$output .= "<table>";
-			if($create) {
+			if ($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
 				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
 				$output .= FS::$iMgr->select("stype","arangeform();");
@@ -131,7 +131,7 @@
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if($found == false) $found = true;
+				if ($found == false) $found = true;
 				$tmpoutput .= "<tr id=\"b".preg_replace("#[. ]#","-",$data["addr"]).$data["type"]."\"><td>
 					<a href=\"index.php?mod=".$this->mid."&bck=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"]."</td><td>";
 				$bcktype = "";
@@ -146,7 +146,7 @@
 					"confirm" => array($this->loc->s("confirm-remove-backupsrv")."'".$data["addr"]." (".$bcktype.")' ?","Confirm","Cancel")));
 				$tmpoutput .= "</center></td></tr>";
 			}
-			if($found)
+			if ($found)
 				$output .= $tmpoutput."</table>";
 			else
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-backup-found")." !");
@@ -167,9 +167,9 @@
 			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
-			if($ip && $ip != "NULL0")
+			if ($ip && $ip != "NULL0")
 				$filteri = $ip;
-			else if($filter) $filteri = $filter;
+			else if ($filter) $filteri = $filter;
 			else $filteri = ""; 
 
 			$query = FS::$dbMgr->Select("device","ip,name","","name");
@@ -179,7 +179,7 @@
 
 			$query = FS::$dbMgr->Select("device","ip,name",$filteri ? "ip = '".$filteri."'" : "",array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) $found = true;
+				if (!$found) $found = true;
 				// Init array for device
 				$grprules = $this->initIPRules();
 				$usrrules = $this->initIPRules();
@@ -188,7 +188,7 @@
 				$grprules = $this->loadIPRules($grprules,1,$data["ip"]);
 				foreach($grprules as $key => $values) {
 					$grpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
-					if($first) $first = false;
+					if ($first) $first = false;
 					$grpoutput .= $this->getRightForKey($key);
 					$grpoutput .= "</td><td>";
 					$grpoutput .= $this->showIPGroups($data["ip"],$key,$values,$filteri);
@@ -199,15 +199,15 @@
 				$first = true;
 				foreach($usrrules as $key => $values) {
 					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
-					if($first) $first = false;
+					if ($first) $first = false;
 					$usroutput .= $this->getRightForKey($key);
 					$usroutput .= "</td><td>";
 					$usroutput .= $this->showIPUsers($data["ip"],$key,$values,$filteri);
 					$usroutput .= "</td></tr>";
 				}
 			}
-			if($found) {
-				if($ip == "") {
+			if ($found) {
+				if ($ip == "") {
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=2",array("id" => "swfform"));
 					$output .= FS::$iMgr->select("ip","filterSw()");
 					$output .= $formoutput;
@@ -223,7 +223,7 @@
 				}
 				$output .= $grpoutput."</table>";
 				$output .= $usroutput."</table>";
-				if($ip == "")
+				if ($ip == "")
 					$output .= "</div>";
 			}
 			return $output;
@@ -236,7 +236,7 @@
 				"sshpwd","sshportinfos","sshshowstart","sshshowrun","portmod_portsec",
 				"portmod_cdp","portmod_voicevlan","portmod_dhcpsnooping","dhcpsnmgmt");
 			for($i=0;$i<count($rulelist);$i++) {
-				if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
+				if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulelist[$i] == $rulefilter)
 					$rules[$rulelist[$i]] = array();
 			}
 			return $rules;
@@ -244,11 +244,11 @@
 
 		private function loadIPRules($rules,$type,$ip,$rulefilter = "") {
 			$idx = "";
-			if($type == 1) {
+			if ($type == 1) {
 				$idx = "gid";
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_ip_".$ip."_%'");
 			}
-			else if($type == 2) {
+			else if ($type == 2) {
 				$idx = "uid";	
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_ip_".$ip."_%'");
 			}
@@ -264,7 +264,7 @@
 					case "sshpwd": case "sshportinfos": case "sshshowstart": case "sshshowrun":
 					case "portmod_portsec": case "portmod_cdp": case "portmod_voicevlan":
 					case "portmod_dhcpsnooping": case "dhcpsnmgmt":
-						if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)
+						if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)
 							$rules[$ruleidx][] = $data2[$idx];
 						break;
 				}
@@ -276,7 +276,7 @@
 			$output = "";
 
 			$count = count($values);
-			if($count) {
+			if ($count) {
 				for($i=0;$i<count($values);$i++) {
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("u","ip",$username,$values[$i],$right,$ip);
@@ -293,7 +293,7 @@
 			$output = "";
 
 			$count = count($values);
-			if($count) {
+			if ($count) {
 				for($i=0;$i<count($values);$i++) {
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("g","ip",$gname,$values[$i],$right,$ip);
@@ -319,9 +319,9 @@
 				$this->loc->s("Users")."</th></tr>";
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
-			if($community && $community != "NULL0")
+			if ($community && $community != "NULL0")
 				$filterc = $community;
-			else if($filter) $filterc = $filter;
+			else if ($filter) $filterc = $filter;
 			else $filterc = ""; 
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","",array("order" => "name"));
@@ -331,7 +331,7 @@
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw",($filterc ? "name = '".$filterc."'" : ""),array("order" => "name"));
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) $found = true;
+				if (!$found) $found = true;
 				// Init SNMP rights
 				$grprules = $this->initSNMPRules($data["ro"],$data["rw"]);
 				$usrrules = $this->initSNMPRules($data["ro"],$data["rw"]);
@@ -339,7 +339,7 @@
 				$grprules = $this->loadSNMPRules($grprules,1,$data["name"],$data["ro"],$data["rw"]);
 				foreach($grprules as $key => $values) {
 					$grpoutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
-					if($first) $first = false;
+					if ($first) $first = false;
 					$grpoutput .= $this->getRightForKey($key);
 					$grpoutput .= "</td><td>";
 					$grpoutput .= $this->showSNMPGroups($data["name"],$key,$values,$filterc);
@@ -350,15 +350,15 @@
 				$first = true;
 				foreach($usrrules as $key => $values) {
 					$usroutput .= "<tr><td>".($first ? $data["name"] : "")."</td><td>";
-					if($first) $first = false;
+					if ($first) $first = false;
 					$usroutput .= $this->getRightForKey($key);
 					$usroutput .= "</td><td>";
 					$usroutput .= $this->showSNMPUsers($data["name"],$key,$values,$filterc);
 					$usroutput .= "</td></tr>";
 				}			
 			}
-			if($found) {
-				if($community == "") {
+			if ($found) {
+				if ($community == "") {
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=1",array("id" => "snmpfform"));
 					$output .= FS::$iMgr->select("snmp","filterSNMP()");
 					$output .= $formoutput;
@@ -375,7 +375,7 @@
 				}
 				$output .= FS::$iMgr->h1("group-rights").$grpoutput."</table>";
 				$output .= FS::$iMgr->h1("user-rights").$usroutput."</table>";
-				if($community == "")
+				if ($community == "")
 					$output .= "</div>";
 			}
 			else {
@@ -392,15 +392,15 @@
 			$rwrules = array("write","writeportmon","restorestartupcfg","exportcfg","retagvlan",
 				"sshpwd","portmod_portsec","portmod_cdp","portmod_voicevlan","portmod_dhcpsnooping",
 				"dhcpsnmgmt");
-			if($ro == 't') {
+			if ($ro == 't') {
 				for($i=0;$i<count($rorules);$i++) {
-					if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rorules[$i])
+					if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rorules[$i])
 						$rules[$rorules[$i]] = array();
 				}
 			}
-			if($rw == 't') {
+			if ($rw == 't') {
 				for($i=0;$i<count($rwrules);$i++) {
-					if(strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rwrules[$i])
+					if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rwrules[$i])
 						$rules[$rwrules[$i]] = array();
 				}
 			}
@@ -409,11 +409,11 @@
 
 		private function loadSNMPRules($rules,$type,$name,$ro,$rw,$rulefilter = "") {
 			$idx = "";
-			if($type == 1) { 
+			if ($type == 1) { 
 				$idx = "gid";
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 			}
-			else if($type == 2) {
+			else if ($type == 2) {
 				$idx = "uid";
 				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_rules","uid,rulename,ruleval","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 			}
@@ -425,7 +425,7 @@
 					// Read rules
 					case "read": case "readportstats": case "readswdetails": case "readswmodules": 
 					case "readswvlans": case "sshportinfos": case "sshshowstart": case "sshshowrun":
-						if($ro == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)) {
+						if ($ro == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter)) {
 							$rules[$ruleidx][] = $data2[$idx];
 						}
 						break;
@@ -433,7 +433,7 @@
 					case "write": case "writeportmon": case "restorestartupcfg": case "exportcfg":
 					case "retagvlan": case "sshpwd": case "portmod_portsec": case "portmod_cdp":
 					case "portmod_voicevlan": case "portmod_dhcpsnooping": case "dhcpsnmgmt":
-						if($rw == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter))
+						if ($rw == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter))
 							$rules[$ruleidx][] = $data2[$idx];
 						break;
 				}
@@ -458,7 +458,7 @@
 			$output = "";
 
 			$count = count($values);
-			if($count) {
+			if ($count) {
 				for($i=0;$i<count($values);$i++) {
 					$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("g","snmp",$gname,$values[$i],$right,$snmp);
@@ -476,7 +476,7 @@
 			$output = "";
 
 			$count = count($values);
-			if($count) {
+			if ($count) {
 				for($i=0;$i<count($values);$i++) {
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$values[$i]."'");
 					$output .= $this->showRemoveSpan("u","snmp",$username,$values[$i],$right,$snmp);
@@ -495,13 +495,13 @@
 			$users = $this->getUsers();
 			$found = false;
 			foreach($users as $uid => $username) {
-				if(!in_array($uid,$values)) {
-					if(!$found) $found = true;
+				if (!in_array($uid,$values)) {
+					if (!$found) $found = true;
 					$output .= FS::$iMgr->selElmt($username,$uid);
 				}
 			}
 			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
-			if(!$found) return "";
+			if (!$found) return "";
 			else return $output;
 		}
 
@@ -510,13 +510,13 @@
 			$groups = $this->getUserGroups();
 			$found = false;
 			foreach($groups as $gid => $gname) {
-				if(!in_array($gid,$values)) {
-					if(!$found) $found = true;
+				if (!in_array($gid,$values)) {
+					if (!$found) $found = true;
 					$output .= FS::$iMgr->selElmt($gname,$gid);
 				}
 			}
 			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
-			if(!$found) return "";
+			if (!$found) return "";
 			else return $output;
 		}
 
@@ -541,27 +541,27 @@
 		private function showMain() {
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
-			if(!FS::isAjaxCall()) {
+			if (!FS::isAjaxCall()) {
 				$backupfound = FS::$secMgr->checkAndSecuriseGetData("bck");
 				$typefound = FS::$secMgr->checkAndSecuriseGetData("type");
-				if($backupfound && $typefound)
+				if ($backupfound && $typefound)
 					$output .= $this->addOrEditBackupServer();
 				else {
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 					$output = FS::$iMgr->h1("title-switchrightsmgmt");
 					$panElmts = array(array(1,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp")));
 					// Show only if there is devices
-					if(FS::$dbMgr->Count("device","ip") > 0)
+					if (FS::$dbMgr->Count("device","ip") > 0)
 						$panElmts[] = array(2,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch"));
 					$panElmts[] = array(3,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-device-backup"));
 					$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				}
 			}
-			else if($sh == 1)
+			else if ($sh == 1)
 				$output .= $this->showBySNMPCommunity();	
-			else if($sh == 2)
+			else if ($sh == 2)
 				$output .= $this->showBySwitch();
-			else if($sh == 3)
+			else if ($sh == 3)
 				$output .= $this->showBackupTab();
 			return $output;
 		}
@@ -597,7 +597,7 @@
 		*/
 		private function jsUserGroupSelect($right,$type,$id,$snmpip) {
 			$rules = "";
-			if($type == "ip") {
+			if ($type == "ip") {
 				$rules = $this->initIPRules($right);
 				$rules = $this->loadIPRules($rules,$id == "gid" ? 1 : 2,$snmpip,$right);
 			}
@@ -607,9 +607,9 @@
 			}
 			$js = "";
 			foreach($rules as $key => $values) {
-				if($id == "uid")
+				if ($id == "uid")
 					$js .= "$('#lu".$right.$type."').html('".$this->userSelect("uid",$values)."');";
-				else if($id == "gid")
+				else if ($id == "gid")
 					$js .= "$('#lg".$right.$type."').html('".$this->groupSelect("gid",$values)."');";
 			}
 			return $js;
@@ -633,16 +633,16 @@
 					$right = FS::$secMgr->checkAndSecurisePostData("right");
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 
-					if((!$gid && !$uid) || (!$snmp && !$ip) || !$right) {
+					if ((!$gid && !$uid) || (!$snmp && !$ip) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
 					$js = "";
 
-					if($snmp) {
-						if($gid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'") ||
+					if ($snmp) {
+						if ($gid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'") ||
 								$right == "read" && 
 									!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
 								$right == "write" && 
@@ -650,7 +650,7 @@
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
 							}
-							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+							if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
 								FS::$iMgr->ajaxEcho("err-already-exist");
 								return;
@@ -664,8 +664,8 @@
 							$js .= $this->jsUserGroupSelect($right,"snmp","gid",$snmp);
 							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchsnmpgrpr_".FS::$iMgr->formatHTMLId("g".$snmp."-".$right)."');";
 						}
-						else if($uid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'") ||
+						else if ($uid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'") ||
 								$right == "read" && 
 									!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$snmp."' and ro = 't'") ||
 								$right == "write" && 
@@ -673,7 +673,7 @@
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
 							}
-							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+							if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."' AND ruleval = 'on'")) {
 								FS::$iMgr->ajaxEcho("err-already-exist");
 								return;
@@ -688,14 +688,14 @@
 							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchsnmpusrr_".FS::$iMgr->formatHTMLId("u".$snmp."-".$right)."');";
 						}
 					}
-					else if($ip) {
-						if($gid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'") ||
+					else if ($ip) {
+						if ($gid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'") ||
 								!FS::$dbMgr->GetOneData("device","name","ip = '".$ip."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
 							}
-							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+							if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 								$ip."_".$right."' AND gid = '".$gid."' AND ruleval = 'on'")) {
 								FS::$iMgr->ajaxEcho("err-already-exist");
 								return;
@@ -709,13 +709,13 @@
 							$js .= $this->jsUserGroupSelect($right,"ip","gid",$ip);
 							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchipgrpr_".FS::$iMgr->formatHTMLId("g".$ip."-".$right)."');";
 						}
-						else if($uid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'") ||
+						else if ($uid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'") ||
 								!FS::$dbMgr->GetOneData("device","name","ip = '".$ip."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
 							}
-							if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+							if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 								$ip."_".$right."' AND uid = '".$uid."' AND ruleval = 'on'")) {
 								FS::$iMgr->ajaxEcho("err-already-exist");
 								return;
@@ -741,22 +741,22 @@
 					$right = FS::$secMgr->checkAndSecuriseGetData("right");
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 
-					if((!$uid && !$gid) || (!$ip && !$snmp) || !$right) {
+					if ((!$uid && !$gid) || (!$ip && !$snmp) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 
-					if($snmp) {
-						if($gid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+					if ($snmp) {
+						if ($gid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND gid = '".$gid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
 							}
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND gid = '".$gid."'");
 						}
-						else if($uid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
+						else if ($uid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_snmp_".
 								$snmp."_".$right."' AND uid = '".$uid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
@@ -764,16 +764,16 @@
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename = 'mrule_switchmgmt_snmp_".$snmp."_".$right."' AND uid = '".$uid."'");
 						}
 					}
-					else if($ip) {
-						if($gid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+					else if ($ip) {
+						if ($gid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 								$ip."_".$right."' AND gid = '".$gid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
 							}
 						}
-						else if($uid) {
-							if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
+						else if ($uid) {
+							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = 'mrule_switchmgmt_ip_".
 								$ip."_".$right."' AND uid = '".$uid."'")) {
 								FS::$iMgr->ajaxEcho("err-not-found");
 								return;
@@ -781,29 +781,29 @@
 						}
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename = 'mrule_switchmgmt_ip_".$ip."_".$right."' AND gid = '".$gid."'");
 					}
-					if($gid) {
-						if($snmp) {
+					if ($gid) {
+						if ($snmp) {
 							$js = $this->jsUserGroupSelect($right,"snmp","gid",$snmp);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."snmp');".$js);
 						}
-						else if($ip) {
+						else if ($ip) {
 							$js = $this->jsUserGroupSelect($right,"ip","gid",$ip);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."ip');".$js);
 						}
 					}
-					else if($uid) {
-						if($snmp) {
+					else if ($uid) {
+						if ($snmp) {
 							$js = $this->jsUserGroupSelect($right,"snmp","uid",$snmp);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."snmp');".$js);
 						}
-						else if($ip) {
+						else if ($ip) {
 							$js = $this->jsUserGroupSelect($right,"ip","uid",$ip);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."ip');".$js); 
 						}
 					}
 					return;
 				case 3: // add or edit backup server
-					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
+					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
 						$this->log(2,"User don't have rights to add/edit server '".$saddr."' from switches backup");
 						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
 						return;
@@ -815,18 +815,18 @@
 					$stype = FS::$secMgr->checkAndSecurisePostData("stype");
 					$spath = FS::$secMgr->checkAndSecurisePostData("spath");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-					if($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
+					if ($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
 						$this->log(2,"Some fields are missing/wrong for saving switch config");
-						if(FS::isAjaxCall())
+						if (FS::isAjaxCall())
 							FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
 						return;
 					}
-					if($edit) {
-						if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+					if ($edit) {
+						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
-							if(FS::isAjaxCall())
+							if (FS::isAjaxCall())
 								FS::$iMgr->ajaxEchoNC("err-not-found");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=4");
@@ -834,9 +834,9 @@
 						}
 					}
 					else {
-						if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
+						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
-							if(FS::isAjaxCall())
+							if (FS::isAjaxCall())
 								FS::$iMgr->ajaxEchoNC("err-already-exists");
 							else
 								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=3");
@@ -844,7 +844,7 @@
 						}
 					}
 
-					if($edit) {
+					if ($edit) {
 						$this->log(0,"Edit server '".$saddr."' (type ".$stype.") for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
 					}
@@ -855,9 +855,9 @@
 
 					return;
 				case 4: // remove backup server
-					if(!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
+					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
 						$this->log("User don't have rights to remove server '".$saddr."' from switches backup");
-						if(FS::isAjaxCall())
+						if (FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("err-no-rights");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
@@ -865,15 +865,15 @@
 					}
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					$stype = FS::$secMgr->checkAndSecuriseGetData("type");
-					if($saddr && $stype) {
+					if ($saddr && $stype) {
 						$this->log(0,"Delete server '".$saddr."' for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
-						if(FS::isAjaxCall())
+						if (FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."');");
 						else FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					}
 					else {
-						if(FS::isAjaxCall())
+						if (FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("err-bad-datas");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");

@@ -73,9 +73,9 @@
 		private function showCommunityForm($name = "") {
 			$ro = ""; $rw = "";
 			$output = FS::$iMgr->cbkForm("1")."<table>";
-			if($name)  {
+			if ($name)  {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","ro,rw","name = '".$name."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
+				if ($data = FS::$dbMgr->Fetch($query)) {
 					$ro = $data["ro"] == 't';
 					$rw = $data["rw"] == 't';
 				}
@@ -103,7 +103,7 @@
 				case 1: return $this->showCommunityForm();
 				case 2:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if(!$name)
+					if (!$name)
 						return $this->loc->s("err-bad-datas");
 
 					return $this->showCommunityForm($name);
@@ -119,22 +119,22 @@
 					$rw = FS::$secMgr->checkAndSecurisePostData("rw");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
-					if(!$name || $ro && $ro != "on" || $rw && $rw != "on" || $edit && $edit != 1) {
+					if (!$name || $ro && $ro != "on" || $rw && $rw != "on" || $edit && $edit != 1) {
 						$this->log(2,"Invalid Adding data");
 						FS::$iMgr->ajaxEchoNC("err-invalid-data");
 						return;
 					}
 
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'");
-					if($edit) {
-						if(!$exist) {
+					if ($edit) {
+						if (!$exist) {
 							$this->log(1,"Community '".$name."' not exists");
 							FS::$iMgr->ajaxEcho("err-not-exist");
 							return;
 						}
 					}
 					else {
-						if($exist) {
+						if ($exist) {
 							$this->log(1,"Community '".$name."' already in DB");
 							FS::$iMgr->ajaxEchoNC("err-already-exist");
 							return;
@@ -142,20 +142,20 @@
 					}
 
 					// User must choose read and/or write
-					if($ro != "on" && $rw != "on") {
+					if ($ro != "on" && $rw != "on") {
 						FS::$iMgr->ajaxEchoNC("err-readorwrite");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
-					if(!is_array($netdiscoCfg)) {
+					if (!is_array($netdiscoCfg)) {
 						$this->log(2,"Reading error on netdisco.conf");
 						FS::$iMgr->ajaxEchoNC("err-read-netdisco");
 						return;
 					}
 					
 					FS::$dbMgr->BeginTr();
-					if($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
+					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","'".$name."','".($ro == "on" ? 't' : 'f')."','".
 						($rw == "on" ? 't' : 'f')."'");
 					FS::$dbMgr->CommitTr();
@@ -169,7 +169,6 @@
 						"sqltable" => "snmp_communities",
 						"sqlattrid" => "name",
 						"firstlineid" => "snmpthead",
-						"sqlcond" => "name='".$name."'",
 						"odivnb" => 2,
 						"odivlink" => "name=",
 						"rmcol" => true,
@@ -185,19 +184,19 @@
 					return;
 				case 2: // Remove SNMP community
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
-					if(!$name) {
+					if (!$name) {
 						$this->log(2,"Invalid Deleting data");
 						FS::$iMgr->ajaxEcho("err-invalid-data");
 						return;
 					}
-					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
+					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						$this->log(2,"Community '".$name."' not in DB");
 						FS::$iMgr->ajaxEcho("err-not-exist");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
-					if(!is_array($netdiscoCfg)) {
+					if (!is_array($netdiscoCfg)) {
 						$this->log(2,"Reading error on netdisco.conf");
 						FS::$iMgr->ajaxEcho("err-read-fail");
 						return;

@@ -25,19 +25,19 @@
 
 			// Load snort keys for db config
 			$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
-			if($dbname == "") $dbname = "snort";
+			if ($dbname == "") $dbname = "snort";
 			$dbhost = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbhost'");
-			if($dbhost == "") $dbhost = "localhost";
+			if ($dbhost == "") $dbhost = "localhost";
 			$dbuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbuser'");
-			if($dbuser == "") $dbuser = "snort";
+			if ($dbuser == "") $dbuser = "snort";
 			$dbpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbpwd'");
-			if($dbpwd == "") $dbpwd = "snort";
+			if ($dbpwd == "") $dbpwd = "snort";
 
 			$this->snortDB = new AbstractSQLMgr();
 			$this->snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd);
 			$this->snortDB->Connect();
 			$output = "";
-			if(!FS::isAjaxCall())
+			if (!FS::isAjaxCall())
 				$output .= FS::$iMgr->h1("title-attack-report");
 			$output .= $this->loadAttackGraph();
 			FS::$dbMgr->Connect();
@@ -48,31 +48,31 @@
 			$output = "";
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
-			if($ech == NULL) $ech = 7;
+			if ($ech == NULL) $ech = 7;
 			
 			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
-			if(!FS::$secMgr->isNumeric($ec)) $ec = 365;
-			if($ec == NULL) $ec = 365;
+			if (!FS::$secMgr->isNumeric($ec)) $ec = 365;
+			if ($ec == NULL) $ec = 365;
 			
 			$shscan = FS::$secMgr->checkAndSecuriseGetData("sc");
-			if($shscan == NULL) $shscan = true;
-			else if($shscan > 0) $shscan = true;
+			if ($shscan == NULL) $shscan = true;
+			else if ($shscan > 0) $shscan = true;
 			else $shscan = false;
 			
 			$shtse = FS::$secMgr->checkAndSecuriseGetData("tse");
-			if($shtse == NULL) $shtse = true;
-			else if($shtse > 0) $shtse = true;
+			if ($shtse == NULL) $shtse = true;
+			else if ($shtse > 0) $shtse = true;
 			else $shtse = false;
 			
 			$shssh = FS::$secMgr->checkAndSecuriseGetData("ssh");
-			if($shssh == NULL) $shssh = true;
-			else if($shssh > 0) $shssh = true;
+			if ($shssh == NULL) $shssh = true;
+			else if ($shssh > 0) $shssh = true;
 			else $shssh = false;
 			
 			$topmax = FS::$secMgr->checkAndSecuriseGetData("max");
-			if($topmax == NULL || !FS::$secMgr->isNumeric($topmax) || $topmax < 1) $topmax = 10;
+			if ($topmax == NULL || !FS::$secMgr->isNumeric($topmax) || $topmax < 1) $topmax = 10;
 			
-			if(!FS::isAjaxCall()) {
+			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->tabPan(array(
 					array(1,"mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
 					array(5,"mod=".$this->mid."&max=".$topmax,$this->loc->s("Last-logs")),
@@ -81,7 +81,7 @@
 					array(4,"mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$showmodule);
 			}
 			else {
-				if(!$showmodule || $showmodule == 1) {
+				if (!$showmodule || $showmodule == 1) {
 					$output .= FS::$iMgr->h3("title-z-eye-report");
 					$totalips = $this->snortDB->Count(PGDbConfig::getDbPrefix()."collected_ips","ip");
 					$totalscan = $this->snortDB->Sum(PGDbConfig::getDbPrefix()."collected_ips","scans");
@@ -121,7 +121,7 @@
 					$cursor = 0;
 					$temp1 = $temp2 = $temp3 = $temp4 = 0;
 					while($data = $this->snortDB->Fetch($query)) {
-						if($cursor != $ech || $ech == 1) {
+						if ($cursor != $ech || $ech == 1) {
 							$cursor++;
 							$temp1 = substr($data["atkdate"],8,2)."/".substr($data["atkdate"],5,2);
 							$temp2 += $data["scans"];
@@ -129,7 +129,7 @@
 							$temp4 += $data["ssh"];
 						}
 
-						if($cursor == $ech) {
+						if ($cursor == $ech) {
 							$labels .= "'".$temp1."',";
 							$scans .= $temp2.",";
 							$tse .= $temp3.",";
@@ -157,7 +157,7 @@
 							});
 						})(jQuery);");
 				}
-				else if($showmodule == 2) {
+				else if ($showmodule == 2) {
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
@@ -169,24 +169,24 @@
 					
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,scans","",array("order" => "scans","ordersens" => 1,"limit" => $topmax));
 					while($data = $this->snortDB->Fetch($query)) {
-						if($found == 0) $found = 1;
+						if ($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["scans"]."</td></tr>";
 					}
-					if($found)
+					if ($found)
 						$output .= $tmpoutput."</table>";
 						
 					$found = 0;
 					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>Date</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,scans","",array("order" => "scans","ordersens" => 1,"limit" => $topmax));
 					while($data = $this->snortDB->Fetch($query)) {
-						if($found == 0) $found = 1;
+						if ($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["scans"]."</td></tr>";
 					}
-					if($found)
+					if ($found)
 						$output .= $tmpoutput."</table>";
 				}
-				else if($showmodule == 3) {
+				else if ($showmodule == 3) {
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
@@ -198,24 +198,24 @@
 					
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,tse","",array("order" => "tse","ordersens" => 1,"limit" => $topmax));
 					while($data = $this->snortDB->Fetch($query)) {
-						if($found == 0) $found = 1;
+						if ($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["tse"]."</td></tr>";
 					}
-					if($found)
+					if ($found)
 						$output .= $tmpoutput."</table>";
 						
 					$found = 0;
 					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>".$this->loc->s("Date")."<th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,tse","",array("order" => "tse","ordersens" => 1,"limit" => $topmax));
 					while($data = $this->snortDB->Fetch($query)) {
-						if($found == 0) $found = 1;
+						if ($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["tse"]."</td></tr>";
 					}
-					if($found)
+					if ($found)
 						$output .= $tmpoutput."</table>";
 				}
-				else if($showmodule == 4) {
+				else if ($showmodule == 4) {
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
@@ -227,36 +227,36 @@
 					
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,ssh","",array("order" => "ssh","ordersens" => 1,"limit" => $topmax));
 					while($data = $this->snortDB->Fetch($query)) {
-						if($found == 0) $found = 1;
+						if ($found == 0) $found = 1;
 						$tmpoutput .= "<tr><td>".$data["ip"]."</td><td>".$data["last_date"]."</td><td>".$data["ssh"]."</td></tr>";
 					}
-					if($found)
+					if ($found)
 						$output .= $tmpoutput."</table>";
 						
 					$found = 0;
 					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,ssh","",array("order" => "ssh","ordersens" => 1,"limit" => $topmax));
 					while($data = $this->snortDB->Fetch($query)) {
-						if($found == 0) $found = 1;
+						if ($found == 0) $found = 1;
 						$date = preg_split("# #",$data["atkdate"]);
 						$tmpoutput .= "<tr><td>".$date[0]."</td><td>".$data["ssh"]."</td></tr>";
 					}
-					if($found)
+					if ($found)
 						$output .= $tmpoutput."</table>";
 				}
-				else if($showmodule == 5) {
+				else if ($showmodule == 5) {
 					$found = false;
 					$output .= FS::$iMgr->h3("last-100");
 					$query = $this->snortDB->Select("acid_event","sig_name,timestamp,ip_src,ip_dst,ip_proto,layer4_sport,layer4_dport","",array("order" => "timestamp","ordersens" => 1,"limit" => 100));
 					while($data = $this->snortDB->Fetch($query)) {
-						if(!$found) {
+						if (!$found) {
 							$found = true;
 							$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Source")."</th><th>".$this->loc->s("Destination")."</th><th>".$this->loc->s("Alert")."</th></tr>";
 						}
 						$output .= "<tr><td>".$data["timestamp"]."</td><td>".long2ip($data["ip_src"]).":".$data["layer4_sport"]."</td><td>".long2ip($data["ip_dst"]).":".$data["layer4_dport"].
 							"</td><td>".$data["sig_name"]."</td></tr>";
 					}
-					if($found) $output .= "</table>";
+					if ($found) $output .= "</table>";
 					else $output .= FS::$iMgr->printError($this->loc->s("No-alert-found"));
 				}
 			}

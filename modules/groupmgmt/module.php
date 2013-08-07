@@ -34,10 +34,10 @@
 				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
 				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-not-exist")); break;
 			}
-			if(!FS::isAjaxCall()) {
+			if (!FS::isAjaxCall()) {
 				$gname = FS::$secMgr->checkAndSecuriseGetData("g");
 				$output = FS::$iMgr->h1("title-mgmt");
-				if($gname)
+				if ($gname)
 					$output .= $this->editGroup($gname);
 				else
 					$output .= $this->showMain();
@@ -47,7 +47,7 @@
 
 		private function editGroup($gname) {
 			$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
-			if(!$gid) {
+			if (!$gid) {
 				return FS::$iMgr->printError($this->loc->s("err-not-exist"));
 			}
 
@@ -70,7 +70,7 @@
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname,description");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) {
+				if (!$found) {
 					$found = 1;
 					$tmpoutput .= "<table id=\"groupList\"><thead><tr><th class=\"headerSortDown\">GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr></thead>";
 				}
@@ -79,7 +79,7 @@
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gname=".$data["gname"],array("js" => true, 
 						"confirm" => array($this->loc->s("confirm-removegrp")."'".$data["gname"]."' ?","Confirm","Cancel")))."</td></tr>";
 			}
-			if($found) {
+			if ($found) {
 				$output .= $tmpoutput."</table>";
 				FS::$iMgr->jsSortTable("groupList");
 			}
@@ -92,15 +92,15 @@
 			$found = 0;
 			while($elem = readdir($dir)) {
 				$dirpath = dirname(__FILE__)."/../".$elem;
-				if(is_dir($dirpath) && $elem != ".." && $elem != ".") {
+				if (is_dir($dirpath) && $elem != ".." && $elem != ".") {
 					$dir2 = opendir($dirpath);
 					while($elem2 = readdir($dir2)) {
-						if(is_file($dirpath."/".$elem2) && $elem2 == "rules.php") {
+						if (is_file($dirpath."/".$elem2) && $elem2 == "rules.php") {
 							require($dirpath."/main.php");
 
 							$tmpoutput = $module->getRulesClass()->showMgmtInterface($activerules);
-							if(strlen($tmpoutput) > 0) {
-								if($found == 0) {
+							if (strlen($tmpoutput) > 0) {
+								if ($found == 0) {
 									$found = 1;
 									$output .= "<table id=\"ruleList\"><thead><tr><th>Module</th><th>".$this->loc->s("Rule")."</th></tr></thead>";
 								}
@@ -110,7 +110,7 @@
 					}
 				}
 			}
-			if($found) {
+			if ($found) {
 				$output .= "</table>";
 			}
 			return $output;
@@ -139,13 +139,13 @@
 				case 1:
 					// @TODO description field
 					$gname = FS::$secMgr->checkAndSecurisePostData("gname");
-					if(!$gname) {
+					if (!$gname) {
 						$this->log(2,"Some datas are missing when try to create group");
 						FS::$iMgr->redir("mod=".$this->mid."&err=2");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
-					if($exist) {
+					if ($exist) {
 						FS::$iMgr->redir("mod=".$this->mid."&err=1");
 						$this->log(1,"The group ".$gname." already exists");
 						return;
@@ -154,7 +154,7 @@
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."groups","gid,gname","'".$gid."','".$gname."'");
 					$rules = array();
 					foreach($_POST as $key => $value) {
-						   if(preg_match("#^mrule_#",$key)) {
+						   if (preg_match("#^mrule_#",$key)) {
 									$rules[$key] = $value;
 						   }
 					}
@@ -167,8 +167,8 @@
 				// Remove group
 				case 2:
 					$gname = FS::$secMgr->checkAndSecuriseGetData("gname");
-					if(!$gname) {
-						if(FS::isAjaxCall())
+					if (!$gname) {
+						if (FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("err-bad-data");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
@@ -176,8 +176,8 @@
 						return;
 					}
 					$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
-					if(!$gid) {
-						if(FS::isAjaxCall())
+					if (!$gid) {
+						if (FS::isAjaxCall())
 							FS::$iMgr->ajaxEcho("err-not-exist");
 						else
 							FS::$iMgr->redir("mod=".$this->mid."&err=1");
@@ -190,21 +190,21 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","gid = '".$gid."'");
 					FS::$dbMgr->CommitTr();
 					$this->log(0,"Group '".$gname."' removed");
-					if(FS::isAjaxCall())
+					if (FS::isAjaxCall())
 						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#gr".$gid."tr');");
 					else
 						FS::$iMgr->redir("mod=".$this->mid);
                                         return;
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
-					if(!$gid) {
+					if (!$gid) {
 						FS::$iMgr->redir("mod=".$this->mid."&err=3");
 						$this->log(2,"Some datas are missing when try to edit group");
 						return;
 					}
 					$rules = array();
 					foreach($_POST as $key => $value) {
-						   if(preg_match("#^mrule_#",$key)) {
+						   if (preg_match("#^mrule_#",$key)) {
 							$rules[$key] = $value;
 						   }
 					}

@@ -23,7 +23,7 @@
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-master-install"));
 			$output = "";
-			if(!FS::isAjaxCall())
+			if (!FS::isAjaxCall())
 				$output .= $this->showMain();
 			else
 				$output .= $this->showInstaller();
@@ -34,14 +34,14 @@
 			$output = FS::$iMgr->h1("title-master-install")."<div id=\"installer\">";
 			// For future, maybe we could resume install
 			$pwdset = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","sha_pwd","username = 'admin'");
-			if(!$pwdset) {
+			if (!$pwdset) {
 				$output .= $this->showInstaller();
 				return $output."</div>";
 			}
 			// If installer has finished but no lock found
 			else {
 				$file = fopen(dirname(__FILE__)."/../../config/LOCK","w");
-				if(file_exists(dirname(__FILE__)."/../../config/LOCK") && !$file) {
+				if (file_exists(dirname(__FILE__)."/../../config/LOCK") && !$file) {
 					$output .= FS::$iMgr->printError($this->lock->s("err-lock-write"));
 					return $output."</div>";
 				}
@@ -56,7 +56,7 @@
 		}
 
 		private function showInstaller() {
-			if(!FS::isAjaxCall()) $step = 0; 
+			if (!FS::isAjaxCall()) $step = 0; 
 			else $step = FS::$secMgr->checkAndSecuriseGetData("step");
 			$output = "";
 
@@ -80,15 +80,15 @@
 						};
 						function sendAdmCfg() {
 						$.post('index.php?mod=".$this->mid."&act=1',$('#admcfg').serialize(), function(data) {
-							if(data == 0) loadStep2();
-							else if(data == 1) { ".$this->showNotification($this->loc->s("err-fields-missing"),5000)." } 
-							else if(data == 2) { ".$this->showNotification($this->loc->s("err-username-invalid"),5000)." } 
-							else if(data == 3) { ".$this->showNotification($this->loc->s("err-mail-invalid"),5000)." } 
-							else if(data == 4) { ".$this->showNotification($this->loc->s("err-pwd-match"),5000)." } 
-							else if(data == 5) { ".$this->showNotification($this->loc->s("err-mail-match"),5000)." } 
-							else if(data == 6) { ".$this->showNotification($this->loc->s("err-pwd-too-weak"),5000)." } 
-							else if(data == 7) { ".$this->showNotification($this->loc->s("err-surname-invalid"),5000)." } 
-							else if(data == 8) { ".$this->showNotification($this->loc->s("err-name-invalid"),5000)." } 
+							if (data == 0) loadStep2();
+							else if (data == 1) { ".$this->showNotification($this->loc->s("err-fields-missing"),5000)." } 
+							else if (data == 2) { ".$this->showNotification($this->loc->s("err-username-invalid"),5000)." } 
+							else if (data == 3) { ".$this->showNotification($this->loc->s("err-mail-invalid"),5000)." } 
+							else if (data == 4) { ".$this->showNotification($this->loc->s("err-pwd-match"),5000)." } 
+							else if (data == 5) { ".$this->showNotification($this->loc->s("err-mail-match"),5000)." } 
+							else if (data == 6) { ".$this->showNotification($this->loc->s("err-pwd-too-weak"),5000)." } 
+							else if (data == 7) { ".$this->showNotification($this->loc->s("err-surname-invalid"),5000)." } 
+							else if (data == 8) { ".$this->showNotification($this->loc->s("err-name-invalid"),5000)." } 
 							else { ".$this->showNotification($this->loc->s("err-unhandled-answer"),5000)." }
 						});
 					return false;}");
@@ -129,42 +129,42 @@
 					$surname = FS::$secMgr->checkAndSecurisePostData("surname");
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 
-					if(!$username || !$pwd || !$pwd2 || !$mail || !$mail2 || !$surname || !$name) {
+					if (!$username || !$pwd || !$pwd2 || !$mail || !$mail2 || !$surname || !$name) {
 						echo "1";
 						return;
 					}
 
-					if($pwd != $pwd2) {
+					if ($pwd != $pwd2) {
 						echo "4";
 						return;
 					}
 
-					if($mail != $mail2) {
+					if ($mail != $mail2) {
 						echo "5";
 						return;
 					}
 
-					if(!FS::$secMgr->isAlphabetic($username)) {
+					if (!FS::$secMgr->isAlphabetic($username)) {
 						echo "2";
 						return;
 					}
 
-					if(!FS::$secMgr->isPersonName($surname)) {
+					if (!FS::$secMgr->isPersonName($surname)) {
 						echo "7";
 						return;
 					}
 
-					if(!FS::$secMgr->isPersonName($name)) {
+					if (!FS::$secMgr->isPersonName($name)) {
 						echo "8";
 						return;
 					}
 
-					if(!FS::$secMgr->isMail($mail)) {
+					if (!FS::$secMgr->isMail($mail)) {
 						echo "3";
 						return;
 					}
 
-					if(!FS::$secMgr->isStrongPwd($pwd)) {
+					if (!FS::$secMgr->isStrongPwd($pwd)) {
 						echo "6";
 						return;
 					}

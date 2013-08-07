@@ -34,14 +34,14 @@
 			$lfilter = FS::$secMgr->checkAndSecurisePostData("lf");
 			
 			$filter = "";
-			if($ufilter)
+			if ($ufilter)
 				$filter .= "_user = '".$ufilter."'";
-			if($appfilter) {
-				if(strlen($filter) > 0) $filter .= " AND ";
+			if ($appfilter) {
+				if (strlen($filter) > 0) $filter .= " AND ";
 				$filter .= "module = '".$appfilter."'";
 			}
-			if($lfilter != NULL) {
-				if(strlen($filter) > 0) $filter .= " AND ";
+			if ($lfilter != NULL) {
+				if (strlen($filter) > 0) $filter .= " AND ";
 				$filter .= "level = '".$lfilter."'";
 			}
 			
@@ -49,7 +49,7 @@
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","date,module,level,_user,txt",$filter,array("order" => "date","ordersens" => 1));
 			while($data = FS::$dbMgr->Fetch($query)) {
-				if(!$found) {
+				if (!$found) {
 					$found = true;
 					$output .= "<table id=\"tlogList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
 						<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr></thead>";
@@ -65,7 +65,7 @@
 				$output .= $lineoutput."</td><td>".$data["_user"]."</td><td>".preg_replace("#[\n]#","<br />",$data["txt"])."</td></tr>";
 			}
 			
-			if($found) {
+			if ($found) {
 				$output .= "</table>";
 				FS::$iMgr->jsSortTable("tlogList");
 			}
@@ -76,12 +76,12 @@
 		private function showLogs() {
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
-			if(!FS::isAjaxCall()) {
+			if (!FS::isAjaxCall()) {
 				$panElmts = array(array(1,"mod=".$this->mid,$this->loc->s("webapp")),
 					array(2,"mod=".$this->mid,$this->loc->s("Service")));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			}
-			else if(!$sh || $sh == 1) {
+			else if (!$sh || $sh == 1) {
 				$output = FS::$iMgr->js("function filterAppLogs() {
 					$('#logd').fadeOut();
 					$.post('index.php?mod=".$this->mid."&act=1', $('#logf').serialize(), function(data) {
@@ -112,7 +112,7 @@
 				$output .= "</form>";
 				$output .= "<div id=\"logd\">".$this->getApplicationLogs()."</div>";
 			}
-			else if($sh == 2) {
+			else if ($sh == 2) {
 				$output = "<pre>";
 				$fp = fopen("/var/log/z-eye.log","r");
 				fseek($fp,-(sizeof('a')), SEEK_END);
@@ -121,7 +121,7 @@
 				$line = "";
 				while(ftell($fp) > 0 && $linecount > 0) {
 					$chr = fgetc($fp);
-					if($chr == "\n") {
+					if ($chr == "\n") {
 						$fileoutput .= $line."<br />";
 						$line = "";
 						$linecount--;

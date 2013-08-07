@@ -35,7 +35,7 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 
-			if(!FS::isAjaxCall()) {
+			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-dns");
 
 				$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("DNS-zones"));
@@ -65,7 +65,7 @@
 
 		private function showZoneMgmt() {
 			$output = "";
-			if(FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 				$output .= $this->showCreateEditErr();
 
 
@@ -75,44 +75,44 @@
 			$filter = FS::$secMgr->checkAndSecuriseGetData("f");
 
 			$shA = FS::$secMgr->checkAndSecuriseGetData("sa");
-			if($shA == NULL) $shA = 1;
+			if ($shA == NULL) $shA = 1;
 
 			$shAAAA = FS::$secMgr->checkAndSecuriseGetData("saaaa");
-			if($shAAAA == NULL) $shAAAA = 1;
+			if ($shAAAA == NULL) $shAAAA = 1;
 
 			$shNS = FS::$secMgr->checkAndSecuriseGetData("sns");
-			if($shNS == NULL) $shNS = 1;
+			if ($shNS == NULL) $shNS = 1;
 
 			$shCNAME = FS::$secMgr->checkAndSecuriseGetData("scname");
-			if($shCNAME == NULL) $shCNAME = 1;
+			if ($shCNAME == NULL) $shCNAME = 1;
 
 			$shSRV = FS::$secMgr->checkAndSecuriseGetData("ssrv");
-			if($shSRV == NULL) $shSRV = 1;
+			if ($shSRV == NULL) $shSRV = 1;
 			
 			$shPTR = FS::$secMgr->checkAndSecuriseGetData("sptr");
-			if($shPTR == NULL) $shPTR = 1;
+			if ($shPTR == NULL) $shPTR = 1;
 			
 			$shTXT = FS::$secMgr->checkAndSecuriseGetData("stxt");
-			if($shTXT == NULL) $shTXT = 1;
+			if ($shTXT == NULL) $shTXT = 1;
 
 			$shother = FS::$secMgr->checkAndSecuriseGetData("sother");
-			if($shother == NULL) $shother = 1;
+			if ($shother == NULL) $shother = 1;
 
 			$formoutput = FS::$iMgr->cbkForm("1").
 				FS::$iMgr->select("f");
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_cache","zonename","",array("order" => "zonename","group" => "zonename"));
-			while($data = FS::$dbMgr->Fetch($query)) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				// Skip hint zone
 				if ($data["zonename"] != ".") {
-					if(!$found) {
+					if (!$found) {
 						$found = true;
 					}
 					$formoutput .= FS::$iMgr->selElmt($data["zonename"],$data["zonename"],($filter == $data["zonename"]));
 				}
 			}
-			if($found) {
+			if ($found) {
 				$output .= $formoutput.
 					"</select><br />".
 					FS::$iMgr->check("sa",array("check" => $shA))."A ".
@@ -138,110 +138,110 @@
 			$output = "";
 
 			$shA = FS::$secMgr->checkAndSecurisePostData("sa");
-			if($shA == "on") $shA = true;
+			if ($shA == "on") $shA = true;
 			else $shA = false;
 			
 			$shAAAA = FS::$secMgr->checkAndSecurisePostData("saaaa");
-			if($shAAAA == "on") $shAAAA = true;
+			if ($shAAAA == "on") $shAAAA = true;
 			else $shAAAA = false;
 			
 			$shNS = FS::$secMgr->checkAndSecurisePostData("sns");
-			if($shNS == "on") $shNS = true;
+			if ($shNS == "on") $shNS = true;
 			else $shNS = false;
 			
 			$shCNAME = FS::$secMgr->checkAndSecurisePostData("scname");
-			if($shCNAME == "on") $shCNAME = true;
+			if ($shCNAME == "on") $shCNAME = true;
 			else $shCNAME = false;
 			
 			$shSRV = FS::$secMgr->checkAndSecurisePostData("ssrv");
-			if($shSRV == "on") $shSRV = true;
-			else if($shSRV > 0) $shSRV = true;
+			if ($shSRV == "on") $shSRV = true;
+			else if ($shSRV > 0) $shSRV = true;
 			else $shSRV = false;
 			
 			$shPTR = FS::$secMgr->checkAndSecurisePostData("sptr");
-			if($shPTR == "on") $shPTR = true;
+			if ($shPTR == "on") $shPTR = true;
 			else $shPTR = false;
 			
 			$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
-			if($shTXT == "on") $shTXT = true;
+			if ($shTXT == "on") $shTXT = true;
 			else $shTXT = false;
 			
 			$shother = FS::$secMgr->checkAndSecurisePostData("sother");
-			if($shother == "on") $shother = true;
+			if ($shother == "on") $shother = true;
 			else $shother = false;
 			
-			if(!$dnszone) {
+			if (!$dnszone) {
 				return $output;
 			}
 			
 			$rectypef = "";
-			if(!$shA || !$shAAAA || !$shNS || !$shCNAME || !$shPTR || !$shSRV || !$shTXT || !$shother) {
+			if (!$shA || !$shAAAA || !$shNS || !$shCNAME || !$shPTR || !$shSRV || !$shTXT || !$shother) {
 				$rectypef .= " AND rectype IN (";
 				$found = false;
-				if($shA) {
+				if ($shA) {
 					$rectypef .= "'A'";
 					$found = true;
 				}
-				if($shAAAA) {
-					if($found) $rectypef .= ",";
+				if ($shAAAA) {
+					if ($found) $rectypef .= ",";
 					else $found = true;
 					$rectypef .= "'AAAA'";
 				}
-				if($shNS) {
-					if($found) $rectypef .= ",";
+				if ($shNS) {
+					if ($found) $rectypef .= ",";
 					else $found = true;
 					$rectypef .= "'NS'";
 				}
-				if($shCNAME) {
-					if($found) $rectypef .= ",";
+				if ($shCNAME) {
+					if ($found) $rectypef .= ",";
 					else $found = true;
 					$rectypef .= "'CNAME'";
 				}
-				if($shPTR) {
-					if($found) $rectypef .= ",";
+				if ($shPTR) {
+					if ($found) $rectypef .= ",";
 					else $found = true;
 					$rectypef .= "'PTR'";
 				}
-				if($shSRV) {
-					if($found) $rectypef .= ",";
+				if ($shSRV) {
+					if ($found) $rectypef .= ",";
 					else $found = true;
 					$rectypef .= "'SRV'";
 				}
-				if($shTXT) {
-					if($found) $rectypef .= ",";
+				if ($shTXT) {
+					if ($found) $rectypef .= ",";
 					else $found = true;
 					$rectypef .= "'TXT'";
 				}
 				
 				$rectypef .= ")";
-				if($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
+				if ($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 			}
 			
 			$first = true;
 			$dnsrecords = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server","zonename = '".$dnszone."'".$rectypef,
 				array("order" => "zonename,record","ordersens" => 2));
-			while($data = FS::$dbMgr->Fetch($query)) {
-				if($first) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
+				if ($first) {
 					$first = false;
 					$output .= FS::$iMgr->h3("Zone: ".$dnszone,true)."<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
 						$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
 				}
-				if(!isset($dnsrecords[$data["record"]])) 
+				if (!isset($dnsrecords[$data["record"]])) 
 					$dnsrecords[$data["record"]] = array();
 
-				if(!isset($dnsrecords[$data["record"]][$data["rectype"]]))
+				if (!isset($dnsrecords[$data["record"]][$data["rectype"]]))
 					$dnsrecords[$data["record"]][$data["rectype"]] = array();
 
-				if(!isset($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]]))
+				if (!isset($dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]]))
 					$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]] = array();
 
-				if(!in_array($data["server"],$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]]))
+				if (!in_array($data["server"],$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]]))
 					$dnsrecords[$data["record"]][$data["rectype"]][$data["recval"]][] = $data["server"];
 			}
-			foreach($dnsrecords as $recordname => $records) {
-				foreach($records as $recordtype => $records2) {
-					foreach($records2 as $recordval => $servers) {
+			foreach ($dnsrecords as $recordname => $records) {
+				foreach ($records as $recordtype => $records2) {
+					foreach ($records2 as $recordval => $servers) {
 						switch($recordtype) {
 							case "A": case "AAAA":
 								$style = "background-color: #FFFF80;"; break;
@@ -254,22 +254,22 @@
 							default: $style = ""; break;
 						}
 						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
-						if($recordtype == "A" || $recordtype == "AAAA")
+						if ($recordtype == "A" || $recordtype == "AAAA")
 							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$recordval."\">".$recordval."</a>";
 						else
 							$output .= $recordval;
 						$output .= "</td><td>";
 						$count = count($servers);
-						for($i=0;$i<$count;$i++) {
+						for ($i=0;$i<$count;$i++) {
 							$output .= $servers[$i];
-							if($i != count($servers)) $output .= "<br />";
+							if ($i != count($servers)) $output .= "<br />";
 						}
 						$output .= "</td></tr>";
 					}
 				}
 			}
 
-			if(strlen($output) > 0) {
+			if (strlen($output) > 0) {
 				$output .= "</table>";
 			}
 			else {
@@ -314,7 +314,7 @@
 					return $server->showForm();
 				case 2:
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-					if(!$addr) {
+					if (!$addr) {
 						return $this->loc->s("err-bad-datas");
 					}
 
@@ -325,7 +325,7 @@
 					return $dnsTSIG->showForm();
 				case 4:
 					$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
-					if(!$keyalias) {
+					if (!$keyalias) {
 						return $this->loc->s("err-bad-datas");
 					}
 
@@ -359,7 +359,7 @@
 					$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
 					$shother = FS::$secMgr->checkAndSecurisePostData("sother");
 
-					if($dnszone == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
+					if ($dnszone == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
 						$this->log(2,"Getting zone: Some values are wrong");
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 					}
@@ -370,7 +370,7 @@
 					return;
 				case 2:
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
-					if(!$interval || !FS::$secMgr->isNumeric($interval) ||
+					if (!$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
 						FS::$iMgr->ajaxEcho("err-invalid-req");
 						$this->log(2,"Invalid data when searching obsolete datas");
@@ -383,17 +383,17 @@
 					$obsoletes = array();
 					// Search deprecated records
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,recval,zonename","rectype = 'A'");
-					while($data = FS::$dbMgr->Fetch($query)) {
-						if($data["recval"] == "")
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						if ($data["recval"] == "")
 							continue;
 
 						$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$data["recval"]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'",
 							array("order" => "time_last","ordersens" => 1));
-						while($data2 = FS::$dbMgr->Fetch($query2)) {
+						while ($data2 = FS::$dbMgr->Fetch($query2)) {
 							$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'",
 								array("order" => "time_last","ordersens" => 1));
-							if(!$foundrecent) {
-								if(!$found) $found = true;
+							if (!$foundrecent) {
+								if (!$found) $found = true;
 								$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search").
 									"&s=".$data["record"].".".$data["zonename"]."\">".$data["record"].".".$data["zonename"]."</a> / ".$data["recval"]."<br />";
 							}
@@ -401,9 +401,9 @@
 					}
 
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,recval,zonename","rectype = 'CNAME'");
-					while($data = FS::$dbMgr->Fetch($query)) {
+					while ($data = FS::$dbMgr->Fetch($query)) {
 						$toquery = "";
-						if($data["recval"][strlen($data["recval"])-1] == ".") {
+						if ($data["recval"][strlen($data["recval"])-1] == ".") {
 							$toquery = $data["recval"];
 							$toquery[strlen($toquery)-1] = '';
 						}
@@ -412,22 +412,22 @@
 						$out = array();
 						# pipe spaces are very important
 						exec("/usr/bin/dig +short -t A ".$toquery." | grep -ve \"^;\" | grep -ve \"^$\" | grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
-						if(count($out) == 0 || $out == "") {
+						if (count($out) == 0 || $out == "") {
 							$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].
 								".".$data["zonename"]."\">".$data["record"].".".$data["zonename"]."</a> / ".$this->loc->s("Alone")."<br />";
 						}
 						else {
 							$count = count($out);
-							for($i=0;$i<$count;$i++) {
-								if($out[$i] == "")
+							for ($i=0;$i<$count;$i++) {
+								if ($out[$i] == "")
 									continue;
 								$query2 = FS::$dbMgr->Select("node_ip","mac,time_last","ip = '".$out[$i]."' AND active = 't' AND time_last < NOW() - INTERVAL '".$interval." day'",
 									array("order" => "time_last","ordersens" => 1));
-								while($data2 = FS::$dbMgr->Fetch($query2)) {
+								while ($data2 = FS::$dbMgr->Fetch($query2)) {
 									$foundrecent = FS::$dbMgr->GetOneData("node","switch","mac = '".$data2["mac"]."' AND time_last > NOW() - INTERVAL '".$interval." day'",
 										array("order" => "time_last","ordersens" => 1));
-									if(!$foundrecent) {
-										if(!$found) $found = true;
+									if (!$foundrecent) {
+										if (!$found) $found = true;
 										$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search").
 										"&s=".$data["record"].".".$data["zonename"]."\">".$data["record"].".".$data["zonename"]."</a> / ".$out[$i]."<br />";
 									}
@@ -436,9 +436,9 @@
 						}
 					}
 					$output = "";
-					if($found) {
+					if ($found) {
 						$output = FS::$iMgr->h3("found-records").$output;
-						foreach($obsoletes as $key => $value)
+						foreach ($obsoletes as $key => $value)
 							$output .= $value;
 					}
 					else {

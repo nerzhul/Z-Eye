@@ -43,7 +43,7 @@
 			while(!$found && ($data = FS::$dbMgr->Fetch($query))) {
 				$tmpldapMgr = new LDAP();
 				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
-				if($tmpldapMgr->Authenticate($username, $password)) {
+				if ($tmpldapMgr->Authenticate($username, $password)) {
 					$ldapok = true;
 					$ldapident = $data["ldapuid"];
 					$ldapsurname = $data["ldapsurname"];
@@ -55,13 +55,13 @@
 			}
 
 			$url = FS::$secMgr->checkAndSecurisePostData("redir");
-			if($url == NULL || $url == "index.php") $url = "m-0.html";
+			if ($url == NULL || $url == "index.php") $url = "m-0.html";
 			$url = preg_replace("#^/index\.php\?#","",$url);
 
-			if($ldapok) {
+			if ($ldapok) {
 				$ldapMgr->RootConnect();
 				$result = $ldapMgr->GetOneEntry($ldapident."=".$username);
-				if(!$result) {
+				if (!$result) {
 					FS::$iMgr->ajaxEcho("err-bad-user");
 					$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
 					return;
@@ -77,7 +77,7 @@
 				$user->setUserLevel(4);
 				$user->setMail($mail);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
+				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->connectUser($data["uid"],$data["ulevel"]);
 					$this->log(0,"Login success for user '".$username."'","None");
 					FS::$iMgr->redir($url,true);
@@ -86,7 +86,7 @@
 				else {
 					$user->Create();
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-					if($data = FS::$dbMgr->Fetch($query)) { 
+					if ($data = FS::$dbMgr->Fetch($query)) { 
 						$this->connectUser($data["uid"],$data["ulevel"]);
 						$this->log(0,"Login success for user '".$username."'","None");
 						FS::$iMgr->redir($url,true);
@@ -95,9 +95,9 @@
 				}
 			} else {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
-				if($data = FS::$dbMgr->Fetch($query)) {
+				if ($data = FS::$dbMgr->Fetch($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
-					if($data["sha_pwd"] != $encryptPwd) {
+					if ($data["sha_pwd"] != $encryptPwd) {
 						$this->log(1,"Login failed for user '".$username."' (Bad password)","None");
 						FS::$iMgr->ajaxEcho("err-bad-user");
 						return;
@@ -115,7 +115,7 @@
 		
 		private function connectUser($uid,$ulevel) {
 			$langs = preg_split("#[;]#",$_SERVER["HTTP_ACCEPT_LANGUAGE"]);
-			if(count($langs) > 0)
+			if (count($langs) > 0)
 				$_SESSION["lang"] = $langs[0];
 			$_SESSION["uid"] = $uid;
 			$_SESSION["ulevel"] = $ulevel;
@@ -123,7 +123,7 @@
 		}
 
 		public function reloadInterface($url) {
-			if($url) {
+			if ($url) {
 				$url = "&".$url;
 			}
 			$js = "loadWindowHead();loadMainContainer('".$url."');";
@@ -131,7 +131,7 @@
 		}
 
 		public function Disconnect() {
-			if(FS::$sessMgr->getUid()) {
+			if (FS::$sessMgr->getUid()) {
 				$this->log(0,"User disconnected");
 				FS::$sessMgr->Close(); 
 

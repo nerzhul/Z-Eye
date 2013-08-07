@@ -60,14 +60,14 @@
 			$snmpver = 2;
 
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
-			if($count < 1) {
+			if ($count < 1) {
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
 					"<br /><br /><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2\">".$this->loc->s("Go")."</a>");
 				return $output;
 			} 
 
 			$netdiscoCfg = readNetdiscoConf();
-			if(!is_array($netdiscoCfg)) {
+			if (!is_array($netdiscoCfg)) {
 				$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
 				return $output;
 			}
@@ -109,8 +109,8 @@
 					$snmptry = FS::$secMgr->checkAndSecurisePostData("snmptry");
 					$snmpver = FS::$secMgr->checkAndSecurisePostData("snmpver");
 					$fnode = FS::$secMgr->checkAndSecurisePostData("fnode");
-					if(checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
-						if(writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) != 0) {
+					if (checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
+						if (writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) != 0) {
 							$this->log(2,"Fail to write netdisco configuration");
 							FS::$iMgr->redir("mod=".$this->mid."&err=2");
 							return;
