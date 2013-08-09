@@ -449,6 +449,8 @@
 					case "pwd": $output .= $this->password($name,$value); break;
 					case "color": $output .= $this->colorInput($name,$value); break;
 					case "area": $output .= $this->textarea($name,$value, $options); break;
+					// Raw type, to normalize all non idxLine entries
+					case "raw": $output .= $value; break;
 					default: break;
 				}
 			}
@@ -456,6 +458,17 @@
 				$output .= $this->input($name,$value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
 					(isset($options["label"]) ? $options["label"] : NULL));
 			$output .= "</td></tr>";
+			return $output;
+		}
+
+		public function idxLines($lines = array()) {
+			$output = "";
+			$lCount = count($lines);
+
+			for ($i=0;$i<$lCount;$i++) {
+				$opts = (isset($lines[$i][2]) ? $lines[$i][2] : array());
+				$output .= $this->idxLine($lines[$i][0],$lines[$i][1],$opts);
+			}
 			return $output;
 		}
 

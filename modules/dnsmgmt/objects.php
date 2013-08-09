@@ -57,14 +57,16 @@
 			}
 
 			$output = FS::$iMgr->cbkForm("7")."<table>".
-				FS::$iMgr->idxLine("acl-name","aclname",array("type" => "idxedit", "value" => $this->aclname,
-					"length" => "32", "edit" => $this->aclname != "")).
-				FS::$iMgr->idxLine("Description","description",array("value" => $this->description));
+				FS::$iMgr->idxLines(array(
+					array("acl-name","aclname",array("type" => "idxedit", "value" => $this->aclname,
+						"length" => "32", "edit" => $this->aclname != "")),
+					array("Description","description",array("value" => $this->description))
+				));
 
 			$acllist = $this->getSelect(array("name" => "acllist", "multi" => true,
 				"exclude" => $this->aclname));
 			if ($acllist != NULL) {
-				$output .= "<tr><td>".$this->loc->s("acls-to-include")."</td><td>".$acllist."</td></tr>";
+				$output .= FS::$iMgr->idxLine("acls-to-include","",array("type" => "raw", "value" => $acllist));
 			}
 
 			$output .= FS::$iMgr->aeTableSubmit($this->aclname != "");
@@ -202,13 +204,15 @@
 
 			
 			$output = FS::$iMgr->cbkForm("3")."<table>".
-				FS::$iMgr->idxLine("ip-addr-dns","saddr",array("type" => "idxedit", "value" => $this->addr,
-					"length" => "128", "edit" => $this->addr != "")).
-				FS::$iMgr->idxLine("ssh-user","slogin",array("value" => $this->sshUser)).
-				FS::$iMgr->idxLine("Password","spwd",array("type" => "pwd")).
-				FS::$iMgr->idxLine("Password-repeat","spwd2",array("type" => "pwd")).
-				FS::$iMgr->idxLine("named-conf-path","namedpath",array("value" => $this->namedPath,"tooltip" => "tooltip-rights")).
-				FS::$iMgr->idxLine("chroot-path","chrootnamed",array("value" => $this->chrootPath,"tooltip" => "tooltip-chroot")).
+				FS::$iMgr->idxLines(array(
+					array("ip-addr-dns","saddr",array("type" => "idxedit", "value" => $this->addr,
+						"length" => "128", "edit" => $this->addr != "")),
+					array("ssh-user","slogin",array("value" => $this->sshUser)),
+					array("Password","spwd",array("type" => "pwd")),
+					array("Password-repeat","spwd2",array("type" => "pwd")),
+					array("named-conf-path","namedpath",array("value" => $this->namedPath,"tooltip" => "tooltip-rights")),
+					array("chroot-path","chrootnamed",array("value" => $this->chrootPath,"tooltip" => "tooltip-chroot"))
+				)).
 				FS::$iMgr->aeTableSubmit($addr != "");
 			
 			return $output;
@@ -402,13 +406,15 @@
 			}
 
 			$output = FS::$iMgr->cbkForm("5")."<table>".
-				FS::$iMgr->idxLine("key-alias","keyalias",array("value" => $this->name, "type" => "idxedit", "length" => 64,
-					"edit" => $this->name != "")).
-				FS::$iMgr->idxLine("key-id","keyid",array("length" => 32, "value" => $this->keyid)).
-				"<tr><td>".$this->loc->s("algorithm")."</td><td>".FS::$iMgr->select("keyalgo").
-					FS::$iMgr->selElmt("HMAC-MD5",1,$this->keyalgo == 1).FS::$iMgr->selElmt("HMAC-SHA1",2,$this->keyalgo == 2).
-					FS::$iMgr->selElmt("HMAC-SHA256",3,$this->keyalgo == 3)."</select>".
-				FS::$iMgr->idxLine("Value","keyvalue",array("length" => 128, "size" => 30, "value" => $this->keyvalue)).
+				FS::$iMgr->idxLines(array(
+					array("key-alias","keyalias",array("value" => $this->name, "type" => "idxedit", "length" => 64,
+						"edit" => $this->name != "")),
+					array("key-id","keyid",array("length" => 32, "value" => $this->keyid)),
+					array("algorithm","",array("type" => "raw", "value" => FS::$iMgr->select("keyalgo").
+						FS::$iMgr->selElmt("HMAC-MD5",1,$this->keyalgo == 1).FS::$iMgr->selElmt("HMAC-SHA1",2,$this->keyalgo == 2).
+						FS::$iMgr->selElmt("HMAC-SHA256",3,$this->keyalgo == 3)."</select>")),
+					array("Value","keyvalue",array("length" => 128, "size" => 30, "value" => $this->keyvalue))
+				)).
 				FS::$iMgr->aeTableSubmit($this->name == "");
 
 			return $output;

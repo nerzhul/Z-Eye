@@ -247,18 +247,17 @@
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("13").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
-				FS::$iMgr->idxLine("is-template","istemplate",array("value" => false,"type" => "chk"));
-			//$output .= template list
 			$output .= FS::$iMgr->idxIdLine("Name","name",$this->name).
-				FS::$iMgr->idxLine("Alias","alias",array("value" => $this->alias)).
-				FS::$iMgr->idxLine("DisplayName","dname",array("value" => $this->dname)).
-
-				"<tr><td>".$this->loc->s("Icon")."</td><td>".
-				FS::$iMgr->select("icon").
-				FS::$iMgr->selElmt("Aucun","",($this->icon == "")).
-				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_icons","id",array("labelfield" => "name","selected" => array($this->icon))).
-				"</select></td></tr>".
-
+				FS::$iMgr->idxLines(array(
+					array("is-template","istemplate",array("value" => false,"type" => "chk")),
+					array("Alias","alias",array("value" => $this->alias)),
+					array("DisplayName","dname",array("value" => $this->dname)),
+					array("Icon","",array("type" => "raw", "value" => 
+						FS::$iMgr->select("icon").
+						FS::$iMgr->selElmt("Aucun","",($this->icon == "")).
+						FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_icons","id",
+						array("labelfield" => "name","selected" => array($this->icon)))."</select>"))
+				)).
 				"<tr><td>".$this->loc->s("Parent")."</td><td>";
 
 			$output2 = FS::$iMgr->selElmt($this->loc->s("None"),"none",(count($this->parentlist) == 0));
@@ -282,33 +281,35 @@
 					$hglist[] = $data["name"];
 			}
 
-			$output .= "<tr><td>".$this->loc->s("Hostgroups")."</td><td>".$this->mod->getHostOrGroupList("hostgroups",true,$hglist,"",true)."</td></tr>";
+			$output .= FS::$iMgr->idxLines(array(
+				array("Hostgroups","",array("type" => "raw", "value" => $this->mod->getHostOrGroupList("hostgroups",true,$hglist,"",true))),
 
 			// Checks
-			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->mod->genCommandList("checkcommand",$this->checkcmd)."</td></tr>".
-				"<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->mod->getTimePeriodList("checkperiod",$this->checkperiod)."</td></tr>".
-				FS::$iMgr->idxLine("check-interval","checkintval",array("value" => $this->checkintval, "type" => "num")).
-				FS::$iMgr->idxLine("retry-check-interval","retcheckintval",array("value" => $this->retcheckintval, "type" => "num")).
-				FS::$iMgr->idxLine("max-check","maxcheck",array("value" => $this->maxcheck, "type" => "num"));
+				array("alivecommand","",array("type" => "raw", "value" => $this->mod->genCommandList("checkcommand",$this->checkcmd))),
+				array("checkperiod","",array("type" => "raw", "value" => $this->mod->getTimePeriodList("checkperiod",$this->checkperiod))),
+				array("check-interval","checkintval",array("value" => $this->checkintval, "type" => "num")),
+				array("retry-check-interval","retcheckintval",array("value" => $this->retcheckintval, "type" => "num")),
+				array("max-check","maxcheck",array("value" => $this->maxcheck, "type" => "num")),
 
 			// Global
-			$output .= FS::$iMgr->idxLine("eventhdl-en","eventhdlen",array("value" => $this->eventhdlen,"type" => "chk")).
-				FS::$iMgr->idxLine("flap-en","flapen",array("value" => $this->flapen,"type" => "chk")).
-				FS::$iMgr->idxLine("failpredict-en","failpreden",array("value" => $this->failpreden,"type" => "chk")).
-				FS::$iMgr->idxLine("perfdata","perfdata",array("value" => $this->perfdata,"type" => "chk")).
-				FS::$iMgr->idxLine("retainstatus","retstatus",array("value" => $this->retstatus,"type" => "chk")).
-				FS::$iMgr->idxLine("retainnonstatus","retnonstatus",array("value" => $this->retnonstatus,"type" => "chk"));
+				array("eventhdl-en","eventhdlen",array("value" => $this->eventhdlen,"type" => "chk")),
+				array("flap-en","flapen",array("value" => $this->flapen,"type" => "chk")),
+				array("failpredict-en","failpreden",array("value" => $this->failpreden,"type" => "chk")),
+				array("perfdata","perfdata",array("value" => $this->perfdata,"type" => "chk")),
+				array("retainstatus","retstatus",array("value" => $this->retstatus,"type" => "chk")),
+				array("retainnonstatus","retnonstatus",array("value" => $this->retnonstatus,"type" => "chk")),
 
 			// Notifications
-			$output .= FS::$iMgr->idxLine("notif-en","notifen",array("value" => $this->notifen,"type" => "chk")).
-			"<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->mod->getTimePeriodList("notifperiod",$this->notifperiod)."</td></tr>".
-				FS::$iMgr->idxLine("notif-interval","notifintval",array("value" => $this->notifintval, "type" => "num")).
-				FS::$iMgr->idxLine("hostoptdown","hostoptd",array("value" => $this->hostoptd,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptunreach","hostoptu",array("value" => $this->hostoptu,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptrec","hostoptr",array("value" => $this->hostoptr,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptflap","hostoptf",array("value" => $this->hostoptf,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptsched","hostopts",array("value" => $this->hostopts,"type" => "chk")).
-				"<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->mod->genContactGroupsList("ctg",$this->ctg)."</td></tr>";
+				array("notif-en","notifen",array("value" => $this->notifen,"type" => "chk")),
+				array("notifperiod","",array("type" => "raw", "value" => $this->mod->getTimePeriodList("notifperiod",$this->notifperiod))),
+				array("notif-interval","notifintval",array("value" => $this->notifintval, "type" => "num")),
+				array("hostoptdown","hostoptd",array("value" => $this->hostoptd,"type" => "chk")),
+				array("hostoptunreach","hostoptu",array("value" => $this->hostoptu,"type" => "chk")),
+				array("hostoptrec","hostoptr",array("value" => $this->hostoptr,"type" => "chk")),
+				array("hostoptflap","hostoptf",array("value" => $this->hostoptf,"type" => "chk")),
+				array("hostoptsched","hostopts",array("value" => $this->hostopts,"type" => "chk")),
+				array("Contactgroups","",array("type" => "raw", "value" => $this->mod->genContactGroupsList("ctg",$this->ctg)))
+			));
 			// icon image
 			// statusmap image
 			$output .= FS::$iMgr->aeTableSubmit($this->name == "");
