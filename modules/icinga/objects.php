@@ -57,7 +57,7 @@
 			$output = FS::$iMgr->cbkForm("10").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
 				FS::$iMgr->idxIdLine("Name","name",$this->name,array("length" => 60, "size" => 30)).
-				FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",array("value" => $this->alias,"length" => 60, "size" => 30));
+				FS::$iMgr->idxLine("Alias","alias",array("value" => $this->alias,"length" => 60, "size" => 30));
 
 			$countElmt = 0;
 			$output2 = "";
@@ -247,11 +247,11 @@
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("13").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
-				FS::$iMgr->idxLine($this->loc->s("is-template"),"istemplate",array("value" => false,"type" => "chk"));
+				FS::$iMgr->idxLine("is-template","istemplate",array("value" => false,"type" => "chk"));
 			//$output .= template list
 			$output .= FS::$iMgr->idxIdLine("Name","name",$this->name).
-				FS::$iMgr->idxLine($this->loc->s("Alias"),"alias",array("value" => $this->alias)).
-				FS::$iMgr->idxLine($this->loc->s("DisplayName"),"dname",array("value" => $this->dname)).
+				FS::$iMgr->idxLine("Alias","alias",array("value" => $this->alias)).
+				FS::$iMgr->idxLine("DisplayName","dname",array("value" => $this->dname)).
 
 				"<tr><td>".$this->loc->s("Icon")."</td><td>".
 				FS::$iMgr->select("icon").
@@ -273,7 +273,7 @@
 			if($countElmt/4 < 4) $countElmt = 16;
 			$output .= FS::$iMgr->select("parent",array("multi" => true, "size" => round($countElmt/4))).
 				$output2."</select></td></tr>".
-				FS::$iMgr->idxLine($this->loc->s("Address"),"addr",array("value" => $this->addr));
+				FS::$iMgr->idxLine("Address","addr",array("value" => $this->addr));
 
 			$hglist = array();
 			if($name) {
@@ -287,27 +287,27 @@
 			// Checks
 			$output .= "<tr><td>".$this->loc->s("alivecommand")."</td><td>".$this->mod->genCommandList("checkcommand",$this->checkcmd)."</td></tr>".
 				"<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->mod->getTimePeriodList("checkperiod",$this->checkperiod)."</td></tr>".
-				FS::$iMgr->idxLine($this->loc->s("check-interval"),"checkintval",array("value" => $this->checkintval, "type" => "num")).
-				FS::$iMgr->idxLine($this->loc->s("retry-check-interval"),"retcheckintval",array("value" => $this->retcheckintval, "type" => "num")).
-				FS::$iMgr->idxLine($this->loc->s("max-check"),"maxcheck",array("value" => $this->maxcheck, "type" => "num"));
+				FS::$iMgr->idxLine("check-interval","checkintval",array("value" => $this->checkintval, "type" => "num")).
+				FS::$iMgr->idxLine("retry-check-interval","retcheckintval",array("value" => $this->retcheckintval, "type" => "num")).
+				FS::$iMgr->idxLine("max-check","maxcheck",array("value" => $this->maxcheck, "type" => "num"));
 
 			// Global
-			$output .= FS::$iMgr->idxLine($this->loc->s("eventhdl-en"),"eventhdlen",array("value" => $this->eventhdlen,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("flap-en"),"flapen",array("value" => $this->flapen,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("failpredict-en"),"failpreden",array("value" => $this->failpreden,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("perfdata"),"perfdata",array("value" => $this->perfdata,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("retainstatus"),"retstatus",array("value" => $this->retstatus,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("retainnonstatus"),"retnonstatus",array("value" => $this->retnonstatus,"type" => "chk"));
+			$output .= FS::$iMgr->idxLine("eventhdl-en","eventhdlen",array("value" => $this->eventhdlen,"type" => "chk")).
+				FS::$iMgr->idxLine("flap-en","flapen",array("value" => $this->flapen,"type" => "chk")).
+				FS::$iMgr->idxLine("failpredict-en","failpreden",array("value" => $this->failpreden,"type" => "chk")).
+				FS::$iMgr->idxLine("perfdata","perfdata",array("value" => $this->perfdata,"type" => "chk")).
+				FS::$iMgr->idxLine("retainstatus","retstatus",array("value" => $this->retstatus,"type" => "chk")).
+				FS::$iMgr->idxLine("retainnonstatus","retnonstatus",array("value" => $this->retnonstatus,"type" => "chk"));
 
 			// Notifications
-			$output .= FS::$iMgr->idxLine($this->loc->s("notif-en"),"notifen",array("value" => $this->notifen,"type" => "chk")).
+			$output .= FS::$iMgr->idxLine("notif-en","notifen",array("value" => $this->notifen,"type" => "chk")).
 			"<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->mod->getTimePeriodList("notifperiod",$this->notifperiod)."</td></tr>".
-				FS::$iMgr->idxLine($this->loc->s("notif-interval"),"notifintval",array("value" => $this->notifintval, "type" => "num")).
-				FS::$iMgr->idxLine($this->loc->s("hostoptdown"),"hostoptd",array("value" => $this->hostoptd,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("hostoptunreach"),"hostoptu",array("value" => $this->hostoptu,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("hostoptrec"),"hostoptr",array("value" => $this->hostoptr,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("hostoptflap"),"hostoptf",array("value" => $this->hostoptf,"type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("hostoptsched"),"hostopts",array("value" => $this->hostopts,"type" => "chk")).
+				FS::$iMgr->idxLine("notif-interval","notifintval",array("value" => $this->notifintval, "type" => "num")).
+				FS::$iMgr->idxLine("hostoptdown","hostoptd",array("value" => $this->hostoptd,"type" => "chk")).
+				FS::$iMgr->idxLine("hostoptunreach","hostoptu",array("value" => $this->hostoptu,"type" => "chk")).
+				FS::$iMgr->idxLine("hostoptrec","hostoptr",array("value" => $this->hostoptr,"type" => "chk")).
+				FS::$iMgr->idxLine("hostoptflap","hostoptf",array("value" => $this->hostoptf,"type" => "chk")).
+				FS::$iMgr->idxLine("hostoptsched","hostopts",array("value" => $this->hostopts,"type" => "chk")).
 				"<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->mod->genContactGroupsList("ctg",$this->ctg)."</td></tr>";
 			// icon image
 			// statusmap image

@@ -94,13 +94,13 @@
 					return false;}");
 					$output .= FS::$iMgr->h2("title-admin-set");
 					$output .= $this->loc->s("text-admin-set")."<br /><br />".FS::$iMgr->form("",array("id" => "admcfg","js" => "false"))."<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-					$output .= FS::$iMgr->idxLine($this->loc->s("Username"),"username");
-					$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name");
-					$output .= FS::$iMgr->idxLine($this->loc->s("Surname"),"surname");
-					$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"pwd",array("type" => "pwd"));
-					$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"pwd2",array("type" => "pwd"));
-					$output .= FS::$iMgr->idxLine($this->loc->s("Mail"),"mail");
-					$output .= FS::$iMgr->idxLine($this->loc->s("Mail-repeat"),"mail2");
+					$output .= FS::$iMgr->idxLine("Username","username");
+					$output .= FS::$iMgr->idxLine("Name","name");
+					$output .= FS::$iMgr->idxLine("Surname","surname");
+					$output .= FS::$iMgr->idxLine("Password","pwd",array("type" => "pwd"));
+					$output .= FS::$iMgr->idxLine("Password-repeat","pwd2",array("type" => "pwd"));
+					$output .= FS::$iMgr->idxLine("Mail","mail");
+					$output .= FS::$iMgr->idxLine("Mail-repeat","mail2");
 					$output .= FS::$iMgr->tableSubmit("Send",array("js" => "sendAdmCfg();"));
 					break;	
 				case 2:

@@ -359,11 +359,11 @@
 			}
 			
 			$output = FS::$iMgr->tip("tip-range").FS::$iMgr->cbkForm("18")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("start-ip"),"startip",array("type" => "ip", "length" => 16)).
-				FS::$iMgr->idxLine($this->loc->s("end-ip"),"endip",array("type" => "ip", "length" => 16)).
+				FS::$iMgr->idxLine("start-ip","startip",array("type" => "ip", "length" => 16)).
+				FS::$iMgr->idxLine("end-ip","endip",array("type" => "ip", "length" => 16)).
 				"<tr><td>".$this->loc->s("Action")."</td><td>".FS::$iMgr->select("rangeact").
-				FS::$iMgr->selElmt($this->loc->s("add-to-dynamic-distrib"),1).
-				FS::$iMgr->selElmt($this->loc->s("remove-from-dynamic-distrib"),2).
+				FS::$iMgr->selElmt("add-to-dynamic-distrib",1).
+				FS::$iMgr->selElmt("remove-from-dynamic-distrib",2).
 				"</select>".FS::$iMgr->hidden("subnet",$subnet)."</td></tr>".
 				FS::$iMgr->aeTableSubmit();
 
@@ -529,7 +529,7 @@
 			}
 
 			$output = FS::$iMgr->cbkForm("16")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("Groupname"),"optgroup",array("value" => $optgroup,"type" => "idxedit", "length" => 64,
+				FS::$iMgr->idxLine("Groupname","optgroup",array("value" => $optgroup,"type" => "idxedit", "length" => 64,
 					"edit" => $optgroup != "")).
 				"<tr><td>".$this->loc->s("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions",array("multi" => true));
 
@@ -561,7 +561,7 @@
 			}
 
 			$output = FS::$iMgr->cbkForm("14")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("option-alias"),"optalias",array("value" => $optalias,"type" => "idxedit", "length" => 64,
+				FS::$iMgr->idxLine("option-alias","optalias",array("value" => $optalias,"type" => "idxedit", "length" => 64,
 					"edit" => $optalias != "")).
 				"<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-value")."><td>".$this->loc->s("option-name")."</td><td>".FS::$iMgr->select("optname");
 
@@ -571,7 +571,7 @@
 			}
 
 			$output .= "</select></td></tr>".
-				FS::$iMgr->idxLine($this->loc->s("option-value"),"optval",array("length" => 500, "size" => 40, "value" => $optvalue)).
+				FS::$iMgr->idxLine("option-value","optval",array("length" => 500, "size" => 40, "value" => $optvalue)).
 				FS::$iMgr->aeTableSubmit($optalias == "");
 
 			return $output;
@@ -593,9 +593,9 @@
 			}
 
 			$output = FS::$iMgr->cbkForm("12")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("option-name"),"optname",array("value" => $optname,"type" => "idxedit", "length" => 32,
+				FS::$iMgr->idxLine("option-name","optname",array("value" => $optname,"type" => "idxedit", "length" => 32,
 					"edit" => $optname != "")).
-				FS::$iMgr->idxLine($this->loc->s("option-code"),"optcode",array("type" => "num", "length" => 3, "size" => 3,
+				FS::$iMgr->idxLine("option-code","optcode",array("type" => "num", "length" => 3, "size" => 3,
 					"edit" => $optcode != "", "value" => $optcode, "tooltip" => "tooltip-dhcp-option-code")).
 				"<tr><td>".$this->loc->s("option-type")."</td><td>".FS::$iMgr->select("opttype").
 				FS::$iMgr->selElmt($this->loc->s("boolean"),		"boolean",	$opttype == "boolean").
@@ -692,11 +692,11 @@
 				}
 			}
 			$output = FS::$iMgr->cbkForm("7")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("netid"),"netid",array("value" => $netid,"type" => "idxipedit", "length" => 16, "edit" => $netid != "")).
-				FS::$iMgr->idxLine($this->loc->s("netmask"),"netmask",array("value" => $netmask,"length" => 16, "type" => "ip")).
-				FS::$iMgr->idxLine($this->loc->s("vlanid"),"vlanid",array("value" => $vlanid,"length" => 4, "type" => "num", "tooltip" => "tooltip-vlanid")).
-				FS::$iMgr->idxLine($this->loc->s("subnet-shortname"),"shortname",array("value" => $shortname,"length" => 32, "tooltip" => "tooltip-shortname")).
-				FS::$iMgr->idxLine($this->loc->s("subnet-desc"),"desc",array("value" => $desc,"length" => 128, "tooltip" => "tooltip-desc"));
+				FS::$iMgr->idxLine("netid","netid",array("value" => $netid,"type" => "idxipedit", "length" => 16, "edit" => $netid != "")).
+				FS::$iMgr->idxLine("netmask","netmask",array("value" => $netmask,"length" => 16, "type" => "ip")).
+				FS::$iMgr->idxLine("vlanid","vlanid",array("value" => $vlanid,"length" => 4, "type" => "num", "tooltip" => "tooltip-vlanid")).
+				FS::$iMgr->idxLine("subnet-shortname","shortname",array("value" => $shortname,"length" => 32, "tooltip" => "tooltip-shortname")).
+				FS::$iMgr->idxLine("subnet-desc","desc",array("value" => $desc,"length" => 128, "tooltip" => "tooltip-desc"));
 
 			/*
 			* Clusters associated to subnet (if there is clusters)
@@ -725,12 +725,18 @@
 			/*
 			* Misc options, related to classic DHCP subnet mgmt
 			*/
-			$output .= FS::$iMgr->idxLine($this->loc->s("router")." (*)","router",array("value" => $router,"length" => 16, "type" => "ip", "tooltip" => "tooltip-router")).
-				FS::$iMgr->idxLine($this->loc->s("domain-name")." (*)","domainname",array("value" => $domainname,"length" => 120, "tooltip" => "tooltip-domainname")).
-				FS::$iMgr->idxLine($this->loc->s("DNS")." 1 (*)","dns1",array("value" => $dns1,"length" => 16, "type" => "ip")).
-				FS::$iMgr->idxLine($this->loc->s("DNS")." 2 (*)","dns2",array("value" => $dns2,"length" => 16, "type" => "ip")).
-				FS::$iMgr->idxLine($this->loc->s("max-lease-time")." (**)","mleasetime",array("value" => $mleasetime,"length" => 7, "type" => "num","tooltip" => "tooltip-max-lease-time")).
-				FS::$iMgr->idxLine($this->loc->s("default-lease-time")." (**)","dleasetime",array("length" => 7, "type" => "num", "value" => $dleasetime,
+			$output .= FS::$iMgr->idxLine($this->loc->s("router")." (*)","router",
+				array("value" => $router,"length" => 16, "type" => "ip", "tooltip" => "tooltip-router", "rawlabel" => true)).
+				FS::$iMgr->idxLine($this->loc->s("domain-name")." (*)","domainname",
+					array("value" => $domainname,"length" => 120, "tooltip" => "tooltip-domainname", "rawlabel" => true)).
+				FS::$iMgr->idxLine($this->loc->s("DNS")." 1 (*)","dns1",
+					array("value" => $dns1,"length" => 16, "type" => "ip", "rawlabel" => true)).
+				FS::$iMgr->idxLine($this->loc->s("DNS")." 2 (*)","dns2",
+					array("value" => $dns2,"length" => 16, "type" => "ip", "rawlabel" => true)).
+				FS::$iMgr->idxLine($this->loc->s("max-lease-time")." (**)","mleasetime",
+					array("value" => $mleasetime,"length" => 7, "type" => "num","tooltip" => "tooltip-max-lease-time", "rawlabel" => true)).
+				FS::$iMgr->idxLine($this->loc->s("default-lease-time")." (**)","dleasetime",
+					array("length" => 7, "type" => "num", "value" => $dleasetime, "rawlabel" => true,
 					"tooltip" => "tooltip-default-lease-time"));
 
 			/*
@@ -780,22 +786,24 @@
 				}
 			}
 			$output = FS::$iMgr->cbkForm("5").$this->loc->s("note-needed")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",array("value" => $addr,"type" => "idxedit", "length" => 128, "edit" => $addr != "")).
-				FS::$iMgr->idxLine($this->loc->s("server-alias"),"alias",array("value" => $alias,"length" => 64, "tooltip" => "tooltip-dhcp-alias")).
-				FS::$iMgr->idxLine($this->loc->s("server-desc"),"description",array("value" => $description,"length" => 128, "tooltip" => "tooltip-dhcp-desc")).
-				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",array("value" => $user,"length" => 128)).
-				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd",array("type" => "pwd")).
-				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2",array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",
+					array("value" => $addr,"type" => "idxedit", "length" => 128, "edit" => $addr != "","rawlabel" => true)).
+				FS::$iMgr->idxLine("server-alias","alias",array("value" => $alias,"length" => 64, "tooltip" => "tooltip-dhcp-alias")).
+				FS::$iMgr->idxLine("server-desc","description",array("value" => $description,"length" => 128, "tooltip" => "tooltip-dhcp-desc")).
+				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",
+					array("value" => $user,"length" => 128,"rawlabel" => true)).
+				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd",array("type" => "pwd","rawlabel" => true)).
+				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2",array("type" => "pwd","rawlabel" => true)).
 				"<tr><td>".$this->loc->s("dhcp-type")." (*)</td><td>".FS::$iMgr->select("dhcptype").
 				FS::$iMgr->selElmt("ISC-DHCP",1,$dhcptype == 1).
 				"</td></tr>".
-				FS::$iMgr->idxLine($this->loc->s("dhcpd-path"),"dhcpdpath",
+				FS::$iMgr->idxLine("dhcpd-path","dhcpdpath",
 					array("value" => $dhcpdpath,"length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
-				FS::$iMgr->idxLine($this->loc->s("lease-path"),"leasepath",
+				FS::$iMgr->idxLine("lease-path","leasepath",
 					array("value" => $leasepath,"length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
-				FS::$iMgr->idxLine($this->loc->s("reservconf-path"),"reservconfpath",
+				FS::$iMgr->idxLine("reservconf-path","reservconfpath",
 					array("value" => $reservconfpath,"length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
-				FS::$iMgr->idxLine($this->loc->s("subnetconf-path"),"subnetconfpath",
+				FS::$iMgr->idxLine("subnetconf-path","subnetconfpath",
 					array("value" => $subnetconfpath,"length" => 980, "size" => 30, "tooltip" => "tooltip-subnetconfpath")).
 				FS::$iMgr->aeTableSubmit($addr == "");
 			return $output;
@@ -892,7 +900,7 @@
 				$clustermaster = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","master","clustername = '".$name."'");
 			}
 			$output = FS::$iMgr->cbkForm("9")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",array("value" => $name,"type" => "idxedit", "edit" => $name != "")).
+				FS::$iMgr->idxLine("Cluster-name","cname",array("value" => $name,"type" => "idxedit", "edit" => $name != "")).
 				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers",array("multi" => true));
 
 			$outputlist2 = "";
@@ -973,11 +981,11 @@
 				}
 			}
 			$output = FS::$iMgr->cbkForm("11")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("IP-Addr"),"ip",array("value" => $ip,"type" => "idxedit", "edit" => $ip != "")).
-				FS::$iMgr->idxLine($this->loc->s("Reserv"),"reserv",array("value" => $reserv,"type" => "chk", "tooltip" => "tooltip-ip-reserv")).
-				FS::$iMgr->idxLine($this->loc->s("MAC-Addr"),"mac",array("value" => $mac)).
-				FS::$iMgr->idxLine($this->loc->s("Hostname"),"hostname",array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")).
-				FS::$iMgr->idxLine($this->loc->s("Comment"),"comment",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment"));
+				FS::$iMgr->idxLine("IP-Addr","ip",array("value" => $ip,"type" => "idxedit", "edit" => $ip != "")).
+				FS::$iMgr->idxLine("Reserv","reserv",array("value" => $reserv,"type" => "chk", "tooltip" => "tooltip-ip-reserv")).
+				FS::$iMgr->idxLine("MAC-Addr","mac",array("value" => $mac)).
+				FS::$iMgr->idxLine("Hostname","hostname",array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")).
+				FS::$iMgr->idxLine("Comment","comment",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment"));
 
 			/*
 			* Option groups associated to IP(if there is option groups)

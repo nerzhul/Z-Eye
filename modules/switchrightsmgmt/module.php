@@ -91,7 +91,7 @@
 			$output .= FS::$iMgr->cbkForm("3");
 			$output .= "<table>";
 			if ($create) {
-				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",array("value" => $saddr, "type" => "ip"));
+				$output .= FS::$iMgr->idxLine("ip-addr","saddr",array("value" => $saddr, "type" => "ip"));
 				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
 				$output .= FS::$iMgr->select("stype",array("js" => "arangeform();"));
 				$output .= FS::$iMgr->selElmt("TFTP",1);
@@ -118,7 +118,7 @@
 			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("User")."</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
 			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
 			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("server-path"),"spath",array("value" => $spath));
+			$output .= FS::$iMgr->idxLine("server-path","spath",array("value" => $spath));
 			$output .= FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}

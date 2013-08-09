@@ -28,7 +28,7 @@
 
 		public function showStateOpts() {
 			$state = $this->getPortState();
-			return FS::$iMgr->idxLine($this->loc->s("Shutdown"),"shut",$state == 2 ? true : false, array("type" => "chk", "tooltip" => "tooltip-shut"));
+			return FS::$iMgr->idxLine("Shutdown","shut",array("value" => ($state == 2),"type" => "chk", "tooltip" => "tooltip-shut"));
 		}
 
 		public function handleState($logvals) {
@@ -625,14 +625,14 @@
 				// DHCP snooping options
 				$dhcpsntrust = $this->getPortDHCPSnoopingTrust();
 				if($dhcpsntrust != NULL) {
-					$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-trust-enable"),"dhcpsntrusten",
-						$dhcpsntrust == 1 ? true : false,
-						array("type" => "chk", "tooltip" => "dhcp-snooping-trust-tooltip"))."</td></tr>";
+					$output .= FS::$iMgr->idxLine("dhcp-snooping-trust-enable","dhcpsntrusten",
+						array("value" => ($dhcpsntrust == 1),
+							"type" => "chk", "tooltip" => "dhcp-snooping-trust-tooltip"))."</td></tr>";
 				}
 
 				$dhcpsnrate = $this->getPortDHCPSnoopingRate();
 				if($dhcpsntrust != NULL) {
-					$output .= FS::$iMgr->idxLine($this->loc->s("dhcp-snooping-rate"),"dhcpsnrate","",
+					$output .= FS::$iMgr->idxLine("dhcp-snooping-rate","dhcpsnrate",
 						array("type" => "num", "value" => $dhcpsnrate, "size" => 4, "length" => 4, 
 							"tooltip" => "dhcp-snooping-rate-tooltip"));
 				}
@@ -672,7 +672,7 @@
 				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_cdp")) {
 				$cdp = $this->getPortCDPEnable();
 				if($cdp != NULL) {
-					$output .= FS::$iMgr->idxLine($this->loc->s("cdp-enable"),"cdpen",$cdp == 1 ? true : false,array("type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
+					$output .= FS::$iMgr->idxLine("cdp-enable","cdpen",array("value" => ($cdp == 1),"type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
 				}
 			}
 			return $output;
@@ -694,7 +694,7 @@
 		}
 
 		public function showSaveCfg() {
-			return FS::$iMgr->idxLine($this->loc->s("Save-switch"),"wr",false,array("type" => "chk", "tooltip" => "tooltip-saveone"));
+			return FS::$iMgr->idxLine("Save-switch","wr",array("value" => false, "type" => "chk", "tooltip" => "tooltip-saveone"));
 		}
 
 		public function handleSaveCfg() {

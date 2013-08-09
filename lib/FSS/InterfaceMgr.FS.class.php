@@ -417,8 +417,10 @@
 			return $output;
 		}
 
-		public function idxLine($label,$name,$options = array()) {
+		public function idxLine($text,$name,$options = array()) {
 			$value = (isset($options["value"]) ? $options["value"] : "");
+			$label = ((isset($options["rawlabel"]) && $options["rawlabel"] == true) ? $text : $this->getLocale($text));
+
 			$output = "<tr ";
 			if (isset($options["tooltip"])) {
 				$output .= $this->tooltip($options["tooltip"]);

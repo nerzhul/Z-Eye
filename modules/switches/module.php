@@ -128,12 +128,12 @@
 							$output .= FS::$iMgr->hidden("port",$port);
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
-						$output .= FS::$iMgr->idxLine($this->loc->s("Description"),"desc",array("value" => $data["name"],"tooltip" => "tooltip-desc"));
+						$output .= FS::$iMgr->idxLine("Description","desc",array("value" => $data["name"],"tooltip" => "tooltip-desc"));
 
 						$prise = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
 						$room = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","room","ip = '".$dip."' AND port = '".$port."'");
-						$output .= FS::$iMgr->idxLine($this->loc->s("Room"),"room",array("value" => $room,"tooltip" => "tooltip-room"));
-						$output .= FS::$iMgr->idxLine($this->loc->s("Plug"),"prise",array("value" => $prise,"tooltip" => "tooltip-plug"));
+						$output .= FS::$iMgr->idxLine("Room","room",array("value" => $room,"tooltip" => "tooltip-room"));
+						$output .= FS::$iMgr->idxLine("Plug","prise",array("value" => $prise,"tooltip" => "tooltip-plug"));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = $this->devapi->getPortMtu();
 						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
@@ -1115,11 +1115,11 @@
 							$output .= "<span style=\"color: red;\">".$this->loc->s("Disabled")."</span>";
 						$output .= FS::$iMgr->cbkForm("22&d=".$device);
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";	
-						$output .= FS::$iMgr->idxLine($this->loc->s("User"),"sshuser",array("value" => $sshuser));
-						$output .= FS::$iMgr->idxLine($this->loc->s("SSH-pwd"),"sshpwd",array("type" => "pwd"));
-						$output .= FS::$iMgr->idxLine($this->loc->s("SSH-pwd-repeat"),"sshpwd2",array("type" => "pwd"));
-						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd"),"enablepwd",array("type" => "pwd"));
-						$output .= FS::$iMgr->idxLine($this->loc->s("enable-pwd-repeat"),"enablepwd2",array("type" => "pwd"));
+						$output .= FS::$iMgr->idxLine("User","sshuser",array("value" => $sshuser));
+						$output .= FS::$iMgr->idxLine("SSH-pwd","sshpwd",array("type" => "pwd"));
+						$output .= FS::$iMgr->idxLine("SSH-pwd-repeat","sshpwd2",array("type" => "pwd"));
+						$output .= FS::$iMgr->idxLine("enable-pwd","enablepwd",array("type" => "pwd"));
+						$output .= FS::$iMgr->idxLine("enable-pwd-repeat","enablepwd2",array("type" => "pwd"));
 						$output .= FS::$iMgr->tableSubmit("Save");
 					}
 					else if ($showmodule == 8) {

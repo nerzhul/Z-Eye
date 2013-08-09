@@ -199,11 +199,11 @@
 
 			$output .= "<table>";
 			if ($create) {
-				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",array("value" => $saddr));
-				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
+				$output .= FS::$iMgr->idxLine("ip-addr-dns","saddr",array("value" => $saddr));
+				$output .= FS::$iMgr->idxLine("Port","sport",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
 				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td class=\"ctrel\">".FS::$iMgr->select("sdbtype").
 					FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>";
-				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",array("value" => $sdbname,"tooltip" => "tooltip-dbname"));
+				$output .= FS::$iMgr->idxLine("db-name","sdbname",array("value" => $sdbname,"tooltip" => "tooltip-dbname"));
 			}
 			else {
 				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
@@ -215,17 +215,17 @@
 				}
 				$output .= "</td></tr><tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
 			}
-			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"slogin",array("value" => $slogin,"tooltip" => "tooltip-user"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"spwd",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"spwd2",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Alias"),"salias",array("value" => $salias,"tooltip" => "tooltip-alias"));
+			$output .= FS::$iMgr->idxLine("User","slogin",array("value" => $slogin,"tooltip" => "tooltip-user"));
+			$output .= FS::$iMgr->idxLine("Password","spwd",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine("Password-repeat","spwd2",array("type" => "pwd"));
+			$output .= FS::$iMgr->idxLine("Alias","salias",array("value" => $salias,"tooltip" => "tooltip-alias"));
 			$output .= "<th colspan=2>".$this->loc->s("Tables")."</th>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("table-radcheck"),"tradcheck",array("value" => $tradcheck,"tooltip" => "tooltip-radcheck"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("table-radreply"),"tradreply",array("value" => $tradreply,"tooltip" => "tooltip-radreply"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("table-radgrpchk"),"tradgrpchk",array("value" => $tradgrpchk,"tooltip" => "tooltip-radgrpchk"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("table-radgrprep"),"tradgrprep",array("value" => $tradgrprep,"tooltip" => "tooltip-radgrprep"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("table-radusrgrp"),"tradusrgrp",array("value" => $tradusrgrp,"tooltip" => "tooltip-radusrgrp"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("table-radacct"),"tradacct",array("value" => $tradacct,"tooltip" => "tooltip-radacct"));
+			$output .= FS::$iMgr->idxLine("table-radcheck","tradcheck",array("value" => $tradcheck,"tooltip" => "tooltip-radcheck"));
+			$output .= FS::$iMgr->idxLine("table-radreply","tradreply",array("value" => $tradreply,"tooltip" => "tooltip-radreply"));
+			$output .= FS::$iMgr->idxLine("table-radgrpchk","tradgrpchk",array("value" => $tradgrpchk,"tooltip" => "tooltip-radgrpchk"));
+			$output .= FS::$iMgr->idxLine("table-radgrprep","tradgrprep",array("value" => $tradgrprep,"tooltip" => "tooltip-radgrprep"));
+			$output .= FS::$iMgr->idxLine("table-radusrgrp","tradusrgrp",array("value" => $tradusrgrp,"tooltip" => "tooltip-radusrgrp"));
+			$output .= FS::$iMgr->idxLine("table-radacct","tradacct",array("value" => $tradacct,"tooltip" => "tooltip-radacct"));
 			$output .= FS::$iMgr->tableSubmit("Save");
 
 			return $output;
@@ -274,9 +274,9 @@
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname");
-				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname");
-				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname",array("rawlabel" => true));
+				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname",array("rawlabel" => true));
+				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername",array("rawlabel" => true));
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".
 					FS::$iMgr->radioList("validity",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
@@ -305,7 +305,7 @@
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
 					FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
-		                $output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4, "length" => 4, "type" => "num"));
+		                $output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct",array("rawlabel" => true, "size" => 4, "length" => 4, "type" => "num"));
 	        	        $output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil2").FS::$iMgr->selElmt("","none").
 					$this->addGroupList($radSQLMgr)."</select></td></tr>";
 		                $output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
@@ -533,10 +533,10 @@
 				$radexpdate = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_options","optval",
 					"optkey = 'rad_expiration_date_field' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 
-				$output .= FS::$iMgr->idxLine($this->loc->s("enable-autoclean"),"cleanradsqlenable", array("value" => ($radexpenable == 1),"type" => "chk"));
-				$output .= FS::$iMgr->idxLine($this->loc->s("SQL-table"),"cleanradsqltable",array("value" => $radexptable,"tooltip" => "tooltip-ac-sqltable"));
-				$output .= FS::$iMgr->idxLine($this->loc->s("user-field"),"cleanradsqluserfield",array("value" => $radexpuser,"tooltip" => "tooltip-ac-sqluserfield"));
-				$output .= FS::$iMgr->idxLine($this->loc->s("expiration-field"),"cleanradsqlexpfield",array("value" => $radexpdate,"tooltip" => "tooltip-ac-sqlexpirationfield"));
+				$output .= FS::$iMgr->idxLine("enable-autoclean","cleanradsqlenable", array("value" => ($radexpenable == 1),"type" => "chk"));
+				$output .= FS::$iMgr->idxLine("SQL-table","cleanradsqltable",array("value" => $radexptable,"tooltip" => "tooltip-ac-sqltable"));
+				$output .= FS::$iMgr->idxLine("user-field","cleanradsqluserfield",array("value" => $radexpuser,"tooltip" => "tooltip-ac-sqluserfield"));
+				$output .= FS::$iMgr->idxLine("expiration-field","cleanradsqlexpfield",array("value" => $radexpdate,"tooltip" => "tooltip-ac-sqlexpirationfield"));
 				$output .= FS::$iMgr->tableSubmit("Save");
 			}
 			else if ($sh == 6) {
@@ -547,9 +547,9 @@
 				$output .= "<div id=\"adduserres\"></div>";
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=10",array("id" => "adduser"));
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>Valeur</th></tr>";
-				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname");
-				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname");
-				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername");
+				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname",array("rawlabel" => true));
+				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname",array("rawlabel" => true));
+				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername",array("rawlabel" => true));
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".
 					FS::$iMgr->select("profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity",array(1,2),array("Toujours valide","Période"),1);
@@ -577,7 +577,7 @@
 				$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 				FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
-				$output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4,"length" => 4, "type" => "num"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4,"length" => 4, "type" => "num","rawlabel" => true));
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".
 					FS::$iMgr->select("profil2").FS::$iMgr->selElmt("","none").
 					$this->addGroupList($radSQLMgr)."</select></td></tr>";

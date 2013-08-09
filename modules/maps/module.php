@@ -133,11 +133,11 @@
 			$output = FS::$iMgr->cbkForm("1");
 			$output .= "<table>";
 			$output .= FS::$iMgr->idxIdLine("Name","nname",$name,array("length" => 60));
-			$output .= FS::$iMgr->idxLine("Label","nlabel",array("length" => 60));
-			$output .= FS::$iMgr->idxLine($this->loc->s("PositionX"),"nposx",array("type" => "num", "length" => 4, "size" => 4));
-			$output .= FS::$iMgr->idxLine($this->loc->s("PositionY"),"nposy",array("type" => "num", "length" => 4, "size" => 4));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Size"),"nsize",array("type" => "num", "length" => 2, "size" => 2));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Color"),"ncolor",array("value" => "000000","type" => "color", "length" => 6, "size" => 6));
+			$output .= FS::$iMgr->idxLine("Label","nlabel",array("length" => 60,"rawlabel" => true));
+			$output .= FS::$iMgr->idxLine("PositionX","nposx",array("type" => "num", "length" => 4, "size" => 4));
+			$output .= FS::$iMgr->idxLine("PositionY","nposy",array("type" => "num", "length" => 4, "size" => 4));
+			$output .= FS::$iMgr->idxLine("Size","nsize",array("type" => "num", "length" => 2, "size" => 2));
+			$output .= FS::$iMgr->idxLine("Color","ncolor",array("value" => "000000","type" => "color", "length" => 6, "size" => 6));
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 
@@ -149,9 +149,9 @@
 			$output .= FS::$iMgr->idxIdLine("Name","ename",$name,array("length" => 60));
 			$output .= "<tr><td>".$this->loc->s("Source-node")."</td><td>".$this->showNodeList("node1",NULL)."</td></tr>";
 			$output .= "<tr><td>".$this->loc->s("Dest-node")."</td><td>".$this->showNodeList("node2",NULL)."</td></tr>";
-			//$output .= FS::$iMgr->idxLine("Label","elabel",array("length" => 60));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Size"),"esize",array("type" => "num", "length" => 2, "size" => 2));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Color"),"ecolor",array("value" => "000000","type" => "color", "length" => 6, "size" => 6));
+			//$output .= FS::$iMgr->idxLine("Label","elabel",array("length" => 60,"rawlabel" => true));
+			$output .= FS::$iMgr->idxLine("Size","esize",array("type" => "num", "length" => 2, "size" => 2));
+			$output .= FS::$iMgr->idxLine("Color","ecolor",array("value" => "000000","type" => "color", "length" => 6, "size" => 6));
 			$output .= FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
