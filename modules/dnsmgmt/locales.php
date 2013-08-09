@@ -23,6 +23,8 @@
 			$locales = array(
 				"fr" => array(
 					"ACL-Mgmt" => "Gestion des ACLs",
+					"acl-name" => "Nom de l'ACL",
+					"acls-to-include" => "ACL à inclure",
 					"Addr" => "Adresse",
 					"add-acl" => "Ajouter une ACL",
 					"add-server" => "Ajouter un serveur",
@@ -87,6 +89,8 @@
 				),
 				"en" => array(
 					"ACL-Mgmt" => "ACL Management",
+					"acl-name" => "ACL Name",
+					"acls-to-include" => "ACLs to include",
 					"Addr" => "Address",
 					"add-acl" => "Add ACL",
 					"add-server" => "Add server",

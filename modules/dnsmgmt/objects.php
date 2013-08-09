@@ -57,18 +57,34 @@
 			}
 
 			$output = FS::$iMgr->cbkForm("7")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("acl-name"),"aclname",$this->addr,array("type" => "idxedit", "value" => $this->aclname,
+				FS::$iMgr->idxLine($this->loc->s("acl-name"),"aclname",$this->aclname,array("type" => "idxedit", "value" => $this->aclname,
 					"length" => "32", "edit" => $this->aclname != "")).
 				FS::$iMgr->idxLine($this->loc->s("Description"),"description",$this->description);
 
-			$output .= "<tr><td>".$this->loc->s("included-acls")."</td><td>".$this->getSelect(array("name" => "acllist", "multi" => true,
-				"exclude" => array($this->aclname)))."</td></tr>";
+			$acllist = $this->getSelect(array("name" => "acllist", "multi" => true,
+				"exclude" => $this->aclname));
+			if ($acllist != NULL) {
+				$output .= "<tr><td>".$this->loc->s("acls-to-include")."</td><td>".$acllist."</td></tr>";
+			}
+
 			$output .= FS::$iMgr->aeTableSubmit($this->aclname != "");
+
+			return $output;
 		}
 
 		public function getSelect($options = array()) {
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
-			$output = FS::$iMgr->select($options["name"],"","",$multi);
+			$sqlcond = (isset($options["exclude"])) ? "aclname != '".$options["exclude"]."'" : "";
+
+			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
+
+			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,"aclname",array("sqlcond" => $sqlcond));
+			if ($elements == "") {
+				return NULL;
+			}
+				
+			$output .= $elements."</select>";
+			return $output;
 		}
 
 		protected function Load($name = "") {

@@ -686,14 +686,16 @@
 
 		public function getTimePeriodList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name",array($select),array("order" => "alias"));
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","name",
+				array("labelfield" => "alias", "selected" => array($select),"sqlopts" => array("order" => "alias")));
 			$output .= "</select>";
 			return $output;
 		}
 
 		public function genCommandList($name,$tocheck = NULL) {
 			$output = FS::$iMgr->select($name);
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name","name",array($tocheck),array("order" => "name"));
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name",
+				array("selected" => array($tocheck),"sqlopts" => array("order" => "name")));
 			$output .= "</select>";
 			return $output;
 		}

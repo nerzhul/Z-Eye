@@ -256,7 +256,7 @@
 				"<tr><td>".$this->loc->s("Icon")."</td><td>".
 				FS::$iMgr->select("icon").
 				FS::$iMgr->selElmt("Aucun","",($this->icon == "")).
-				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_icons","name","id",array($this->icon)).
+				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_icons","id",array("labelfield" => "name","selected" => array($this->icon))).
 				"</select></td></tr>".
 
 				"<tr><td>".$this->loc->s("Parent")."</td><td>";

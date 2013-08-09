@@ -559,11 +559,36 @@
 			return $output;
 		}
 
-		public function selElmtFromDB($table,$labelfield,$valuefield,$selected = array(),$sqlopts = array()) {
+		public function selElmtFromDB($table,$valuefield,$options = array()) {
 			$output = "";
-			$query = FS::$dbMgr->Select($table,$labelfield.",".$valuefield,"",$sqlopts);
+			
+			$sqlopts = array();
+			$sqlcond = "";
+			$selected = array();
+			$lf = $valuefield;
+
+			if (isset($options["sqlopts"])) {
+				$sqlopts = $options["sqlopts"];
+			}
+
+			if (isset($options["selected"])) {
+				$selected = $options["selected"];
+			}
+
+			if (isset($options["sqlcond"])) {
+				$sqlcond = $options["sqlcond"];
+			}
+
+			if (isset($options["labelfield"])) {	
+				$lf = $options["labelfield"];
+				$query = FS::$dbMgr->Select($table,$options["labelfield"].",".$valuefield,$sqlcond,$sqlopts);
+			}
+			else {
+				$query = FS::$dbMgr->Select($table,$valuefield,$sqlcond,$sqlopts);
+			}
+
                         while($data = FS::$dbMgr->Fetch($query)) {
-                                $output .= FS::$iMgr->selElmt($data[$labelfield],$data[$valuefield],in_array($data[$valuefield],$selected));
+                                $output .= FS::$iMgr->selElmt($data[$lf],$data[$valuefield],in_array($data[$valuefield],$selected));
                         }
 			return $output;
 		}

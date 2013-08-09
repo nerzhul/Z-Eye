@@ -88,7 +88,8 @@
 
 		private function addGrouplist($gid=-1) {
 			$output = "";
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gname","gid",array($gid),array("order" => "gname"));
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gid",
+				array("labelfield" => "gname", "selected" => array($gid),"sqlopts" => array("order" => "gname")));
 			return $output;
 		}
 
