@@ -163,8 +163,8 @@
 								$problems[$host][3]++;
 								$this->criticinga++;
 							}
-							$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
-	                                                       	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
+							$problems[$host][1] .= "<tr><td>".$this->loc->s("Availability")."</td><td style=\"".$stylestate."\">".$outstate.
+	                                                       	"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>"; 
 						}
 					}
 				}
