@@ -247,7 +247,7 @@
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("13").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
-			$output .= FS::$iMgr->idxIdLine("Name","name",$this->name).
+				FS::$iMgr->idxIdLine("Name","name",$this->name).
 				FS::$iMgr->idxLines(array(
 					array("is-template","istemplate",array("value" => false,"type" => "chk")),
 					array("Alias","alias",array("value" => $this->alias)),
