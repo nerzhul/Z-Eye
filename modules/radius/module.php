@@ -201,7 +201,8 @@
 			if ($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr-dns"),"saddr",$saddr);
 				$output .= FS::$iMgr->idxLine($this->loc->s("Port"),"sport","",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
-				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td class=\"ctrel\">".FS::$iMgr->select("sdbtype").FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>";
+				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td class=\"ctrel\">".FS::$iMgr->select("sdbtype").
+					FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("db-name"),"sdbname",$sdbname,array("tooltip" => "tooltip-dbname"));
 			}
 			else {
@@ -234,7 +235,7 @@
 			$output = "";
 			$found = 0;
 			if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
+				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius",array("js" => "submit()"));
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,radalias");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == 0) $found = 1;
@@ -245,7 +246,7 @@
 				else $output .= FS::$iMgr->printDebug($this->loc->s("err-no-server"));
 			}
 			else {
-				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius","submit()");
+				$tmpoutput = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1").FS::$iMgr->select("radius",array("js" => "submit()"));
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname");
 	               	        while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == 0) $found = 1;
@@ -276,7 +277,7 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname");
 				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname");
 				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername");
-				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil","","").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
+				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".
 					FS::$iMgr->radioList("validity",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
 				$output .= FS::$iMgr->calendar("startdate","",$this->loc->s("From"))."<br />";
@@ -305,7 +306,7 @@
 					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
 					FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
 		                $output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct","",array("size" => 4, "length" => 4, "type" => "num"));
-	        	        $output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil2","","").FS::$iMgr->selElmt("","none").
+	        	        $output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil2").FS::$iMgr->selElmt("","none").
 					$this->addGroupList($radSQLMgr)."</select></td></tr>";
 		                $output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
                 		$output .= FS::$iMgr->calendar("startdate2","",$this->loc->s("From"))."<br />";
@@ -350,14 +351,14 @@
 							$('#radd').fadeIn();
 							});
 					}");
-				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=12&r=".$raddb."&h=".$radhost."&p=".$radport,array("id" => "radf"));
-				$output .= FS::$iMgr->select("uf","filterRadiusDatas()");
-				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Type")."--","",true);
-				$output .= FS::$iMgr->selElmt($this->loc->s("Mac-addr"),"mac");
-				$output .= FS::$iMgr->selElmt($this->loc->s("Other"),"other");
-				$output .= "</select>";
-				$output .= FS::$iMgr->select("ug","filterRadiusDatas()");
-				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Group")."--","",true);
+				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=12&r=".$raddb."&h=".$radhost."&p=".$radport,array("id" => "radf")).
+					FS::$iMgr->select("uf",array("js" => "filterRadiusDatas()")).
+					FS::$iMgr->selElmt("--".$this->loc->s("Type")."--","",true).
+					FS::$iMgr->selElmt($this->loc->s("Mac-addr"),"mac").
+					FS::$iMgr->selElmt($this->loc->s("Other"),"other").
+					"</select>".
+					FS::$iMgr->select("ug",array("js" => "filterRadiusDatas()")).
+					FS::$iMgr->selElmt("--".$this->loc->s("Group")."--","",true);
 				$query = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"distinct groupname");
 				while ($data = $radSQLMgr->Fetch($query))
 						$output .= FS::$iMgr->selElmt($data["groupname"],$data["groupname"]);
@@ -434,21 +435,24 @@
 						}
 				};");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=6"); // #todo change this
-				$output .= "<ul class=\"ulform\"><li width=\"100%\">".FS::$iMgr->select("usertype","changeUForm()","Type d'authentification");
+				$output .= "<ul class=\"ulform\"><li width=\"100%\">".
+					FS::$iMgr->select("usertype",array("js" => "changeUForm()","label" => "Type d'authentification"));
 				$output .= FS::$iMgr->selElmt($this->loc->s("User"),1);
 				$output .= FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2);
 				//$formoutput .= FS::$iMgr->selElmt("Code PIN",3);
-				$output .= "</select></li><li id=\"uptype\">".FS::$iMgr->select("upwdtype","",$this->loc->s("Pwd-Type")).
-				FS::$iMgr->selElmt("Cleartext-Password",1).
-				FS::$iMgr->selElmt("User-Password",2).
-				FS::$iMgr->selElmt("Crypt-Password",3).
-				FS::$iMgr->selElmt("MD5-Password",4).
-				FS::$iMgr->selElmt("SHA1-Password",5).
-				FS::$iMgr->selElmt("CHAP-Password",6).
-				"</select></li><li>".FS::$iMgr->select("ugroup","",$this->loc->s("Profil")).FS::$iMgr->selElmt("","none").
-				$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->textarea("csvlist","",580,330,$this->loc->s("Userlist-CSV")).
+				$output .= "</select></li><li id=\"uptype\">".FS::$iMgr->select("upwdtype",array("label" => $this->loc->s("Pwd-Type"))).
+					FS::$iMgr->selElmt("Cleartext-Password",1).
+					FS::$iMgr->selElmt("User-Password",2).
+					FS::$iMgr->selElmt("Crypt-Password",3).
+					FS::$iMgr->selElmt("MD5-Password",4).
+					FS::$iMgr->selElmt("SHA1-Password",5).
+					FS::$iMgr->selElmt("CHAP-Password",6).
+					"</select></li><li>".
+					FS::$iMgr->select("ugroup",array("label" => $this->loc->s("Profil"))).
+					FS::$iMgr->selElmt("","none").
+					$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->textarea("csvlist","",580,330,$this->loc->s("Userlist-CSV")).
 					"</li><li id=\"csvtooltip\">".$this->loc->s("mass-import-restriction")."</li><li>".
-				FS::$iMgr->submit("","Importer")."</li></ul></form>";
+					FS::$iMgr->submit("","Importer")."</li></ul></form>";
 			}
 			else if ($sh == 4) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
@@ -461,7 +465,7 @@
 				$formoutput = "";
 				$formoutput .= FS::$iMgr->h3("title-auto-import");
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=7");
-				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("subnet","","Subnet DHCP");
+				$formoutput .= "<ul class=\"ulform\"><li>".FS::$iMgr->select("subnet",array("label" => "Subnet DHCP"));
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) $found = 1;
@@ -469,7 +473,7 @@
 				}
 				if ($found) {
 					$found = 0;
-					$formoutput .= "</select></li><li>".FS::$iMgr->select("radgroup","",$this->loc->s("Radius-profile"));
+					$formoutput .= "</select></li><li>".FS::$iMgr->select("radgroup",array("label" => $this->loc->s("Radius-profile")));
 
 					$groups=array();
 					$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
@@ -546,7 +550,8 @@
 				$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname");
 				$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname");
 				$output .= FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername");
-				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil","","").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
+				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".
+					FS::$iMgr->select("profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity",array(1,2),array("Toujours valide","Période"),1);
 				$output .= FS::$iMgr->calendar("startdate","",$this->loc->s("From"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhours","limmins")."<br />";
@@ -573,8 +578,9 @@
 				$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 				FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
 				$output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct","",array("size" => 4,"length" => 4, "type" => "num"));
-				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".FS::$iMgr->select("profil2","","").FS::$iMgr->selElmt("","none").
-				$this->addGroupList($radSQLMgr)."</select></td></tr>";
+				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".
+					FS::$iMgr->select("profil2").FS::$iMgr->selElmt("","none").
+					$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
 				$output .= FS::$iMgr->calendar("startdate2","",$this->loc->s("From"))."<br />";
 				$output .= FS::$iMgr->hourlist("limhours2","limmins2")."<br />";
@@ -638,7 +644,7 @@
 					drop: function(e) { $(location).attr('href','index.php?mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=2&radentry='+e.dataTransfer.getData('text/html')); }
 				});");
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3").
-				"<ul class=\"ulform\"><li>".FS::$iMgr->select("radgrptpl","addTemplAttributes()","Template").
+				"<ul class=\"ulform\"><li>".FS::$iMgr->select("radgrptpl",array("js" => "addTemplAttributes()","label" => "Template")).
 				FS::$iMgr->selElmt($this->loc->s("None"),0).
 				FS::$iMgr->selElmt("VLAN",1).
 				"</select></li><li>".
@@ -661,7 +667,8 @@
 					$('#userdf').hide();
 				}
 			}; grpidx = 0; function addGrpForm() {
-				$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
+				$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Profil")).
+					FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
 				<a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
 				grpidx++;
 			}
@@ -682,7 +689,7 @@
 
 			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 			$output .= "<ul class=\"ulform\"><li>".
-				FS::$iMgr->select("utype","changeUForm()",$this->loc->s("Auth-Type"));
+				FS::$iMgr->select("utype",array("js" => "changeUForm()","label" => $this->loc->s("Auth-Type")));
 			$output .= FS::$iMgr->selElmt($this->loc->s("User"),1).
 				FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2).
 			//$output .= FS::$iMgr->selElmt("Code PIN",3);
@@ -690,7 +697,7 @@
 				FS::$iMgr->input("username","",20,40,$this->loc->s("User"))."</li><li>".
 				"<fieldset id=\"userdf\" style=\"border:0; padding:0; margin-left: -1px;\"><li>".
 				FS::$iMgr->password("pwd","",$this->loc->s("Password"))."</li><li>".
-				FS::$iMgr->select("upwdtype","",$this->loc->s("Pwd-Type")).
+				FS::$iMgr->select("upwdtype",array("label" => $this->loc->s("Pwd-Type"))).
 				FS::$iMgr->selElmt("Cleartext-Password",1).
 				FS::$iMgr->selElmt("User-Password",2).
 				FS::$iMgr->selElmt("Crypt-Password",3).
@@ -794,7 +801,8 @@
 				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradreply"],"username","username = '".$radentry."'");
 				$formoutput = FS::$iMgr->js("grpidx = ".$grpcount."; 
 				function addGrpForm() {
-					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select> <a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
+					$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Profil")).
+						FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select> <a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
 					grpidx++;
 				}
 				function delGrpElmt(grpidx) {
@@ -832,7 +840,7 @@
 					$formoutput .= "<li><fieldset id=\"userdf\" style=\"border:0;\">";
 					$pwd = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"value","username = '".$radentry."' AND attribute = 'Cleartext-Password' AND op = ':='");
 					$formoutput .= FS::$iMgr->password("pwd",$pwd,$this->loc->s("Password"))."<br />".
-					FS::$iMgr->select("upwdtype","",$this->loc->s("Pwd-Type")).
+					FS::$iMgr->select("upwdtype",array("label" => $this->loc->s("Pwd-Type"))).
 					FS::$iMgr->selElmt("Cleartext-Password",1,($upwdtype && $upwdtype == "Cleartext-Password" ? true : false)).
 					FS::$iMgr->selElmt("User-Password",2,($upwdtype && $upwdtype == "User-Password" ? true : false)).
 					FS::$iMgr->selElmt("Crypt-Password",3,($upwdtype && $upwdtype == "Crypt-Password" ? true : false)).
@@ -844,7 +852,7 @@
 				$query = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"groupname","username = '".$radentry."'");
 				$grpidx = 0;
 				while ($data = $radSQLMgr->Fetch($query)) {
-					$formoutput .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Profil")).
+					$formoutput .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,array("label" => $this->loc->s("Profil"))).
 					$this->addGroupList($radSQLMgr,$data["groupname"])."</select> <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 					$grpidx++;
 				}

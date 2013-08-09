@@ -41,6 +41,15 @@
 		public function showForm() { return ""; }
 
 		protected function Load($id = "") {}
+
+		/*
+		* Options are:
+		* name: select name
+		* multi: multiselect or not (default false)
+		* exclude: array of excluded elements
+		*/
+		protected function getSelect($options = array()) {}
+
 		protected function removeFromDB($id) {}
 
 		protected function Modify() {}

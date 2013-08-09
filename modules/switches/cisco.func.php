@@ -55,7 +55,7 @@
 			$sp = $this->getPortSpeed();
 			$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
 			if($sp > 0) {
-				$output .= FS::$iMgr->select("speed","",null,false,array("tooltip" => "tooltip-speed"));
+				$output .= FS::$iMgr->select("speed",array("tooltip" => "tooltip-speed"));
 				$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
 				if(preg_match("#Ethernet#",$port)) {
 					$output .= FS::$iMgr->selElmt("10 Mbits",10000000,$sp == 10000000 ? true : false);
@@ -152,7 +152,7 @@
 					$output .= "</td></tr>";
 					// Action when violation is performed
 					$psviolact = $this->getPortSecViolAct();
-					$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact","",NULL,false,array("tooltip" => "portsec-viol-tooltip"));
+					$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact",array("tooltip" => "portsec-viol-tooltip"));
 					$output .= FS::$iMgr->selElmt($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
 					$output .= FS::$iMgr->selElmt($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
 					$output .= FS::$iMgr->selElmt($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
@@ -210,7 +210,7 @@
 			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_voicevlan") ||
 				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_voicevlan")) {
 				$output .= "<tr><td>".$this->loc->s("voice-vlan")."</td><td>";
-				$output .= FS::$iMgr->select("voicevlan","",null,false,array("tooltip" => "tooltip-voicevlan"));
+				$output .= FS::$iMgr->select("voicevlan",array("tooltip" => "tooltip-voicevlan"));
 				$output .= $voicevlanoutput;
 				$output .= "</select></td></tr>";
 			}
@@ -265,7 +265,7 @@
 			$mabstate = $this->getSwitchportMABState();
 			if($mabstate == 1)
 				$trmode = 3;
-			$output .= FS::$iMgr->select("trmode","arangeform()");
+			$output .= FS::$iMgr->select("trmode",array("js" => "arangeform()"));
 			$output .= FS::$iMgr->selElmt("Access",2,$trmode == 2 ? true : false);
 			$output .= FS::$iMgr->selElmt("Trunk",1,$trmode == 1 ? true : false);
 			if($mabstate != -1)
@@ -293,7 +293,7 @@
 					break;
 			}
 			$output .= "</td><td id=\"vln\">";
-			$output .= FS::$iMgr->select("nvlan","");
+			$output .= FS::$iMgr->select("nvlan");
 			// Added none for VLAN fail
 			if($trmode == 3)
 				$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$nvlan == 0 ? true : false);
@@ -320,7 +320,7 @@
 			}
 			$output .= "</select></td></tr>";
 			$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
-			$output .= FS::$iMgr->select("vllist","",NULL,true,array("size" => round($vlannb/4)));
+			$output .= FS::$iMgr->select("vllist",array("multi" => true, "size" => round($vlannb/4)));
 			$output .= FS::$iMgr->selElmt($this->loc->s("All"),"all",$trunkall);
 			$output .= $trunkvlanoutput;
 			$output .= "</select>";
@@ -331,13 +331,13 @@
 
 			// NoResp Vlan
 			$output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-noresp")."</td><td>";
-			$output .= FS::$iMgr->select("norespvlan","",NULL,false,array("tooltip" => "MAB-noresp-tooltip"));
+			$output .= FS::$iMgr->select("norespvlan",array("tooltip" => "MAB-noresp-tooltip"));
 			$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
 			$output .= $norespvlanoutput;
 			$output .= "</select></td></tr>";
 			// Dead Vlan
 			$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-dead")."</td><td>";
-			$output .= FS::$iMgr->select("deadvlan","",NULL,false,array("tooltip" => "MAB-dead-tooltip"));
+			$output .= FS::$iMgr->select("deadvlan",array("tooltip" => "MAB-dead-tooltip"));
 			$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
 			$output .= $deadvlanoutput;
 			$output .= "</select></td></tr>";
@@ -346,7 +346,7 @@
 			$mabeap = $this->getSwitchportMABType();
 			$dot1xhostmode = $this->getSwitchportAuthHostMode();
 			$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
-			$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode","");
+			$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode");
 			$output .= FS::$iMgr->selElmt($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
 			$output .= FS::$iMgr->selElmt($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
 			$output .= FS::$iMgr->selElmt($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);

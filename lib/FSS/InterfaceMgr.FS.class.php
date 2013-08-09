@@ -516,20 +516,37 @@
 			return $output;
 		}
 
-		public function select($name,$js = "",$label=NULL, $multival=false, $options=array()) {
+		public function select($name, $options = array()) {
 			$output = "";
-			if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+
+			if (isset($options["label"])) {
+				$output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
+			}
+
 			$selId = preg_replace("#\[|\]#","",$name);
-			$output .= "<select name=\"".$name.($multival ? "[]" : "")."\" id=\"".$selId."\"";
-			if (strlen($js) > 0)
-				$output .= " onchange=\"javascript:".$js.";\" ";
-			if ($multival)
+
+			$multi = (isset($options["multi"]) && $options["multi"] == true);
+			$output .= "<select name=\"".$name.($multi ? "[]" : "")."\" id=\"".$selId."\"";
+
+			if (isset($options["js"]) > 0) {
+				$output .= " onchange=\"javascript:".$options["js"].";\" ";
+			}
+
+			if ($multi) {
 				$output .= " multiple=\"multiple\" ";
-			if (isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]))
+			}
+
+			if (isset($options["size"]) && FS::$secMgr->isNumeric($options["size"])) {
 				$output .= " size=\"".$options["size"]."\" ";
-			if (isset($options["style"]))
+			}
+
+			if (isset($options["style"])) {
 				$output .= " style=\"".$style."\" ";
-			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
+			}
+
+			if (isset($options["tooltip"])) {
+				$output .= $this->tooltip($options["tooltip"]);
+			}
 			$output .= ">";
 			return $output;
 		}

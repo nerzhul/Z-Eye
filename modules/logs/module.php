@@ -90,19 +90,19 @@
 						});
 					}");
 				$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
-				$output .= FS::$iMgr->select("uf","filterAppLogs()");
+				$output .= FS::$iMgr->select("uf",array("js" => "filterAppLogs()"));
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","_user","",array("order" => "_user","ordersens" => 2,"group" => "_user"));
 				while ($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["_user"],$data["_user"]);
 
-				$output .= "</select>".FS::$iMgr->select("af","filterAppLogs()");
+				$output .= "</select>".FS::$iMgr->select("af",array("js" => "filterAppLogs()"));
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","module","",array("order" => "module","ordersens" => 2,"group" => "module"));
 				while ($data = FS::$dbMgr->Fetch($query))
 					$output .= FS::$iMgr->selElmt($data["module"],$data["module"]);
 				
-				$output .= "</select>".FS::$iMgr->select("lf","filterAppLogs()");
+				$output .= "</select>".FS::$iMgr->select("lf",array("js" => "filterAppLogs()"));
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("Level")."--","",true);
 				$output .= FS::$iMgr->selElmt("Info",0);
 				$output .= FS::$iMgr->selElmt("Warn",1);

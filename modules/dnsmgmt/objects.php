@@ -55,7 +55,22 @@
 			if (!$this->Load($aclname)) {
 				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
 			}
+
+			$output = FS::$iMgr->cbkForm("7")."<table>".
+				FS::$iMgr->idxLine($this->loc->s("acl-name"),"aclname",$this->addr,array("type" => "idxedit", "value" => $this->aclname,
+					"length" => "32", "edit" => $this->aclname != "")).
+				FS::$iMgr->idxLine($this->loc->s("Description"),"description",$this->description);
+
+			$output .= "<tr><td>".$this->loc->s("included-acls")."</td><td>".$this->getSelect(array("name" => "acllist", "multi" => true,
+				"exclude" => array($this->aclname)))."</td></tr>";
+			$output .= FS::$iMgr->aeTableSubmit($this->aclname != "");
 		}
+
+		public function getSelect($options = array()) {
+			$multi = (isset($options["multi"]) && $options["multi"] == true);
+			$output = FS::$iMgr->select($options["name"],"","",$multi);
+		}
+
 		protected function Load($name = "") {
 			$this->aclname = $name;
 			$this->description = "";

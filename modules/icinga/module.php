@@ -741,7 +741,7 @@
 				$tmpoutput .= FS::$iMgr->selElmt($host,(!$grouponly ? $value[0]."$" : "").$value[1],in_array((!$grouponly ? $value[0]."$" : "").$value[1],$selected));
 			}
 			if ($countElmt/4 < 4) $countElmt = 16;
-			$output = FS::$iMgr->select($name,"",NULL,$multi,array("size" => round($countElmt/4)));
+			$output = FS::$iMgr->select($name,array("multi" => $multi, "size" => round($countElmt/4)));
 			$output .= $tmpoutput;
 			$output .= "</select>";
 			return $output;

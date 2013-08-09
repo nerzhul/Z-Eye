@@ -93,7 +93,7 @@
 			if ($create) {
 				$output .= FS::$iMgr->idxLine($this->loc->s("ip-addr"),"saddr",$saddr,array("type" => "ip"));
 				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
-				$output .= FS::$iMgr->select("stype","arangeform();");
+				$output .= FS::$iMgr->select("stype",array("js" => "arangeform();"));
 				$output .= FS::$iMgr->selElmt("TFTP",1);
 				$output .= FS::$iMgr->selElmt("FTP",2);
 				$output .= FS::$iMgr->selElmt("SCP",4);
@@ -209,7 +209,7 @@
 			if ($found) {
 				if ($ip == "") {
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=2",array("id" => "swfform"));
-					$output .= FS::$iMgr->select("ip","filterSw()");
+					$output .= FS::$iMgr->select("ip",array("js" => "filterSw()"));
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSw()")."</form>";
 					$output .= FS::$iMgr->js("function filterSw() {
@@ -360,7 +360,7 @@
 			if ($found) {
 				if ($community == "") {
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=1",array("id" => "snmpfform"));
-					$output .= FS::$iMgr->select("snmp","filterSNMP()");
+					$output .= FS::$iMgr->select("snmp",array("js" => "filterSNMP()"));
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSNMP()")."</form>";
 					$output .= FS::$iMgr->js("function filterSNMP() {

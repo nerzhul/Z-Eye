@@ -66,27 +66,29 @@
 			$grpidx = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
 			while ($data = FS::$dbMgr->Fetch($query)) {
-				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,"",$this->loc->s("Group")).$this->addGroupList($data["gid"])."</select>";
-				$output .= " <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
+				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,array("label" => $this->loc->s("Group"))).
+					$this->addGroupList($data["gid"])."</select>".
+					" <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
 				$grpidx++;
 			}
                         $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("Add-to-new-group"),"addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
                         $output .= "</ul></form>";
 
 			FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
-                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'","","Groupe").$this->addGroupList()."</select><a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a> </li>').
-                        	insertBefore('#formactions');
-                                        grpidx++;
-                                }
-                                function delGrpElmt(grpidx) {
-                                        $('.ugroupli'+grpidx).remove();
-                                }");
+                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Groupe")).
+					$this->addGroupList()."</select><a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a> </li>').
+                   		     		insertBefore('#formactions');
+                                		grpidx++;
+                               		}
+	                                function delGrpElmt(grpidx) {
+               	                        	$('.ugroupli'+grpidx).remove();
+        	                        }");
 			return $output;
 		}
 
 		private function addGrouplist($gid=-1) {
 			$output = "";
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gname","gid",$gid,array(),array("order" => "gname"));
+			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gname","gid",array($gid),array("order" => "gname"));
 			return $output;
 		}
 
@@ -186,7 +188,7 @@
 					$size = round($countElmt/4);
 				else
 					$size = $countElmt;
-				$output .= "<tr><td>".$this->loc->s("Groups")."</td><td>".FS::$iMgr->select("groups","",NULL,true,array("size" => $size));
+				$output .= "<tr><td>".$this->loc->s("Groups")."</td><td>".FS::$iMgr->select("groups",array("multi" => true, "size" => $size));
 				$output .= $tmpoutput;
 				$output .= "</select></td></tr>";
 			}
@@ -213,7 +215,7 @@
 				$ssl = ($data["ssl"] == 't');
 			}
 
-			$output .= "<table><tr><td>".$this->loc->s("Template")."</td><td>".FS::$iMgr->select("ldapmodel","autoCompleteLDAP(this);").
+			$output .= "<table><tr><td>".$this->loc->s("Template")."</td><td>".FS::$iMgr->select("ldapmodel",array("js" => "autoCompleteLDAP(this);")).
 				FS::$iMgr->selElmt($this->loc->s("None"),0).
 				FS::$iMgr->selElmt("Active Directory",1).
 				"</select></td></tr>";

@@ -157,7 +157,7 @@
 		}
 
 		private function showNodeList($name,$label,$selected = "") {
-			$output = FS::$iMgr->select($name,"",$label);
+			$output = FS::$iMgr->select($name,array("label" => $label));
 			$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."map_nodes","nodename,node_label","mapname = 'mainmap'");
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["node_label"]." (".$data["nodename"].")",$data["nodename"],$selected == $data["nodename"]);

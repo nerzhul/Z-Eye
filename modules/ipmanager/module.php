@@ -531,7 +531,7 @@
 			$output = FS::$iMgr->cbkForm("16")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Groupname"),"optgroup",$optgroup,array("type" => "idxedit", "length" => 64,
 					"edit" => $optgroup != "")).
-				"<tr><td>".$this->loc->s("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions","",NULL,true);
+				"<tr><td>".$this->loc->s("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions",array("multi" => true));
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option","optalias,optname");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -714,7 +714,8 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","",array("order" => "clustername", "group" => "clustername"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
-					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>".$this->loc->s("dhcp-cluster")."</td><td>".FS::$iMgr->select("subnetclusters","",NULL,true);
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>".$this->loc->s("dhcp-cluster")."</td><td>".
+						FS::$iMgr->select("subnetclusters",array("multi" => true));
 					$found = true;
 				}
 				$output .= FS::$iMgr->selElmt($data["clustername"],$data["clustername"],in_array($data["clustername"],$clusters));
@@ -747,7 +748,7 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
-					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("dopts","",NULL,true);
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("dopts",array("multi" => true));
 					$found = true;
 				}
 				$output .= FS::$iMgr->selElmt($data["optgroup"],$data["optgroup"],in_array($data["optgroup"],$optgroups));
@@ -888,7 +889,7 @@
 			}
 			$output = FS::$iMgr->cbkForm("9")."<table>".
 				FS::$iMgr->idxLine($this->loc->s("Cluster-name"),"cname",$name,array("type" => "idxedit", "edit" => $name != "")).
-				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers","",NULL,true);
+				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers",array("multi" => true));
 
 			$outputlist2 = "";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias","",array("order" => "addr"));
@@ -989,7 +990,8 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
-					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("ipopts","",NULL,true);
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".
+						FS::$iMgr->select("ipopts",array("multi" => true));
 					$found = true;
 				}
 				$output .= FS::$iMgr->selElmt($data["optgroup"],$data["optgroup"],in_array($data["optgroup"],$optgroups));

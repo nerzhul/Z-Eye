@@ -69,7 +69,7 @@
 			if($countElmt/4 < 4) $countElmt = 16;
 
 			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".
-				FS::$iMgr->select("cts","",NULL,true,array("size" => round($countElmt/4))).
+				FS::$iMgr->select("cts",array("multi" => true, "size" => round($countElmt/4))).
 				$output2."</select></td></tr>".
 				FS::$iMgr->aeTableSubmit($this->name == "");
 			return $output;
@@ -271,7 +271,7 @@
 			}
 
 			if($countElmt/4 < 4) $countElmt = 16;
-			$output .= FS::$iMgr->select("parent","",NULL,true,array("size" => round($countElmt/4))).
+			$output .= FS::$iMgr->select("parent",array("multi" => true, "size" => round($countElmt/4))).
 				$output2."</select></td></tr>".
 				FS::$iMgr->idxLine($this->loc->s("Address"),"addr",$this->addr);
 
