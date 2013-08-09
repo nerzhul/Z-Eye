@@ -417,7 +417,8 @@
 			return $output;
 		}
 
-		public function idxLine($label,$name,$def_value = "", $options = array()) {
+		public function idxLine($label,$name,$options = array()) {
+			$value = (isset($options["value"]) ? $options["value"] : "");
 			$output = "<tr ";
 			if (isset($options["tooltip"])) {
 				$output .= $this->tooltip($options["tooltip"]);
@@ -428,29 +429,29 @@
 				switch($options["type"]) {
 					case "idxedit": 
 						if (isset($options["edit"]) && $options["edit"])
-							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
+							$output .= $value.FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
 						else
-							$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
+							$output .= $this->input($name,$value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
                                         			(isset($options["label"]) ? $options["label"] : NULL));
 						break;
 					case "idxipedit":
 						if (isset($options["edit"]) && $options["edit"])
-							$output .= $def_value.FS::$iMgr->hidden($name,$def_value).FS::$iMgr->hidden("edit",1);
+							$output .= $value.FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
 						else
-							$output .= $this->IPInput($name,$def_value);
+							$output .= $this->IPInput($name,$value);
 						break;
-					case "chk": $options["check"] = $def_value; $output .= $this->check($name, $options); break;
-					case "ip": $output .= $this->IPInput($name,$def_value); break;
-					case "ipmask": $output .= $this->IPMaskInput($name,$def_value); break;
-					case "num": $output .= $this->numInput($name,(isset($options["value"]) ? $options["value"] : ""),$options); break;
-					case "pwd": $output .= $this->password($name,$def_value); break;
-					case "color": $output .= $this->colorInput($name,$def_value); break;
-					case "area": $output .= $this->textarea($name, (isset($options["value"]) ? $options["value"] : ""), $options); break;
+					case "chk": $options["check"] = $value; $output .= $this->check($name, $options); break;
+					case "ip": $output .= $this->IPInput($name,$value); break;
+					case "ipmask": $output .= $this->IPMaskInput($name,$value); break;
+					case "num": $output .= $this->numInput($name,$value,$options); break;
+					case "pwd": $output .= $this->password($name,$value); break;
+					case "color": $output .= $this->colorInput($name,$value); break;
+					case "area": $output .= $this->textarea($name,$value, $options); break;
 					default: break;
 				}
 			}
 			else
-				$output .= $this->input($name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
+				$output .= $this->input($name,$value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
 					(isset($options["label"]) ? $options["label"] : NULL));
 			$output .= "</td></tr>";
 			return $output;

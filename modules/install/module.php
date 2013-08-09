@@ -97,8 +97,8 @@
 					$output .= FS::$iMgr->idxLine($this->loc->s("Username"),"username");
 					$output .= FS::$iMgr->idxLine($this->loc->s("Name"),"name");
 					$output .= FS::$iMgr->idxLine($this->loc->s("Surname"),"surname");
-					$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"pwd","",array("type" => "pwd"));
-					$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"pwd2","",array("type" => "pwd"));
+					$output .= FS::$iMgr->idxLine($this->loc->s("Password"),"pwd",array("type" => "pwd"));
+					$output .= FS::$iMgr->idxLine($this->loc->s("Password-repeat"),"pwd2",array("type" => "pwd"));
 					$output .= FS::$iMgr->idxLine($this->loc->s("Mail"),"mail");
 					$output .= FS::$iMgr->idxLine($this->loc->s("Mail-repeat"),"mail2");
 					$output .= FS::$iMgr->tableSubmit("Send",array("js" => "sendAdmCfg();"));

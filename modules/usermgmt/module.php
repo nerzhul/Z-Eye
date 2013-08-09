@@ -174,7 +174,7 @@
 		private function showUserImportForm() {
 			$output = FS::$iMgr->cbkForm("6");
 			$output .= "<table>";
-			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"username","");
+			$output .= FS::$iMgr->idxLine($this->loc->s("User"),"username");
 
 			$countElmt = 0;
 			$tmpoutput = "";
@@ -221,17 +221,17 @@
 				FS::$iMgr->selElmt("Active Directory",1).
 				"</select></td></tr>";
 			
-			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-addr"),	"addr",		$addr,		array("type" => "idxedit", "length" => 40, "size" => 20, "edit" => $addr != "")).
-				FS::$iMgr->idxLine($this->loc->s("ldap-port"),	"port",		$port,		array("size" => 5, "length" => 5)).
-				FS::$iMgr->idxLine($this->loc->s("SSL")." ?",	"ssl",		$ssl,		array("type" => "chk")).
-				FS::$iMgr->idxLine($this->loc->s("base-dn"),		"dn",		$dn,		array("size" => 20, "length" => 200,"tooltip" => "tooltip-base-dn")).
-				FS::$iMgr->idxLine($this->loc->s("root-dn"),		"rootdn",	$rootdn,	array("size" => 20, "length" => 200,"tooltip" => "tooltip-root-dn")).
-				FS::$iMgr->idxLine($this->loc->s("root-pwd"),	"rootpwd",	"",		array("type" => "pwd")).
-				FS::$iMgr->idxLine($this->loc->s("attr-name"),	"ldapname",	$ldapname,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-name")).
-				FS::$iMgr->idxLine($this->loc->s("attr-subname"),	"ldapsurname",	$ldapsurname,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-subname")).
-				FS::$iMgr->idxLine($this->loc->s("attr-mail"),	"ldapmail",	$ldapmail,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-mail")).
-				FS::$iMgr->idxLine($this->loc->s("attr-uid"),	"ldapuid",	$ldapuid,	array("size" => 20, "length" => 40,"tooltip" => "tooltip-attr-uid")).
-				FS::$iMgr->idxLine($this->loc->s("ldap-filter"),	"ldapfilter",	$ldapfilter,	array("size" => 20, "length" => 200,"tooltip" => "tooltip-ldap-filter")).
+			$output .= FS::$iMgr->idxLine($this->loc->s("ldap-addr"),	"addr",	array("value" => $addr, "type" => "idxedit", "length" => 40, "size" => 20, "edit" => $addr != "")).
+				FS::$iMgr->idxLine($this->loc->s("ldap-port"),	"port",		array("value" => $port, "size" => 5, "length" => 5)).
+				FS::$iMgr->idxLine($this->loc->s("SSL")." ?",	"ssl",		array("value" => $ssl, "type" => "chk")).
+				FS::$iMgr->idxLine($this->loc->s("base-dn"),	"dn",		array("value" => $dn, "size" => 20, "length" => 200,"tooltip" => "tooltip-base-dn")).
+				FS::$iMgr->idxLine($this->loc->s("root-dn"),	"rootdn",	array("value" => $rootdn, "size" => 20, "length" => 200,"tooltip" => "tooltip-root-dn")).
+				FS::$iMgr->idxLine($this->loc->s("root-pwd"),	"rootpwd",	array("type" => "pwd")).
+				FS::$iMgr->idxLine($this->loc->s("attr-name"),	"ldapname",	array("value" => $ldapname, "size" => 20, "length" => 40,"tooltip" => "tooltip-attr-name")).
+				FS::$iMgr->idxLine($this->loc->s("attr-subname"),	"ldapsurname",	array("value" => $ldapsurname, "size" => 20, "length" => 40,"tooltip" => "tooltip-attr-subname")).
+				FS::$iMgr->idxLine($this->loc->s("attr-mail"),	"ldapmail",	array("value" => $ldapmail, "size" => 20, "length" => 40,"tooltip" => "tooltip-attr-mail")).
+				FS::$iMgr->idxLine($this->loc->s("attr-uid"),	"ldapuid",	array("value" => $ldapuid, "size" => 20, "length" => 40,"tooltip" => "tooltip-attr-uid")).
+				FS::$iMgr->idxLine($this->loc->s("ldap-filter"),	"ldapfilter",	array("value" => $ldapfilter, "size" => 20, "length" => 200,"tooltip" => "tooltip-ldap-filter")).
 				FS::$iMgr->tableSubmit("Save");
 
 			$js = "function autoCompleteLDAP(obj) {

@@ -82,9 +82,9 @@
 				$output .= "<tr><td>".$this->loc->s("snmp-community")."</td><td>".$name.FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1)."</td></tr>";
 			}
 			else
-				$output .= FS::$iMgr->idxLine($this->loc->s("snmp-community"),"name",$name,array("length" => 64, "size" => 20));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Read"),"ro",$ro,array("type" => "chk", "tooltip" => "tooltip-read"));
-			$output .= FS::$iMgr->idxLine($this->loc->s("Write"),"rw",$rw,array("type" => "chk", "tooltip" => "tooltip-write"));
+				$output .= FS::$iMgr->idxLine($this->loc->s("snmp-community"),"name",array("value" => $name,"length" => 64, "size" => 20));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Read"),"ro",array("value" => $ro,"type" => "chk", "tooltip" => "tooltip-read"));
+			$output .= FS::$iMgr->idxLine($this->loc->s("Write"),"rw",array("value" => $rw,"type" => "chk", "tooltip" => "tooltip-write"));
 			$output .= FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
