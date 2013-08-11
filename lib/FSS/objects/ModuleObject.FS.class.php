@@ -47,6 +47,7 @@
 		* name: select name
 		* multi: multiselect or not (default false)
 		* exclude: array of excluded elements
+		* noneelmt: is none element is shown
 		*/
 		protected function getSelect($options = array()) {}
 

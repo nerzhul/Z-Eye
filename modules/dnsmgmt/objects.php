@@ -17,6 +17,8 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/../ipmanager/objects.php");
+
 	final class dnsACL extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -63,8 +65,17 @@
 					array("Description","description",array("value" => $this->description))
 				));
 
+			// Subnet list
+			$sObj = new dhcpSubnet();
+			$subnetlist = $sObj->getSelect(array("name" => "subnetlist", "multi" => true,
+				"exclude" => $this->aclname, "noneelmt" => true));
+			if ($subnetlist != NULL) {
+				$output .= FS::$iMgr->idxLine("subnets-to-include","",array("type" => "raw", "value" => $subnetlist));
+			}
+
+			// ACL list
 			$acllist = $this->getSelect(array("name" => "acllist", "multi" => true,
-				"exclude" => $this->aclname));
+				"exclude" => $this->aclname, "noneelmt" => true));
 			if ($acllist != NULL) {
 				$output .= FS::$iMgr->idxLine("acls-to-include","",array("type" => "raw", "value" => $acllist));
 			}
@@ -76,13 +87,19 @@
 
 		public function getSelect($options = array()) {
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
-			$sqlcond = (isset($options["exclude"])) ? "aclname != '".$options["exclude"]."'" : "";
+			$sqlcond = (isset($options["exclude"])) ? $this->sqlAttrId." != '".$options["exclude"]."'" : "";
+			$none = (isset($options["noneelmt"]) && $options["noneelmt"] == true);
 
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
-			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,"aclname",array("sqlcond" => $sqlcond));
-			if ($elements == "") {
+			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,$this->sqlAttrId,array("sqlcond" => $sqlcond,
+				"sqlopts" => array("order" => $this->sqlAttrId)));
+			if ($elements == "" && $none == false) {
 				return NULL;
+			}
+
+			if ($none) {
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
 			}
 				
 			$output .= $elements."</select>";
