@@ -66,17 +66,19 @@
 				));
 
 			// TSIG list
+			$selected = array("none");
 			$tsig = new dnsTSIGKey();
 			$tsiglist = $tsig->getSelect(array("name" => "tsiglist", "multi" => true,
-				"exclude" => $this->aclname, "noneelmt" => true));
+				"exclude" => $this->aclname, "noneelmt" => true, "selected" => $selected));
 			if ($tsiglist != NULL) {
 				$output .= FS::$iMgr->idxLine("tsig-to-include","",array("type" => "raw", "value" => $tsiglist));
 			}
 
 			// Subnet list
+			$selected = array("none");
 			$sObj = new dhcpSubnet();
 			$subnetlist = $sObj->getSelect(array("name" => "subnetlist", "multi" => true,
-				"exclude" => $this->aclname, "noneelmt" => true));
+				"exclude" => $this->aclname, "noneelmt" => true, "selected" => $selected));
 			if ($subnetlist != NULL) {
 				$output .= FS::$iMgr->idxLine("subnets-to-include","",array("type" => "raw", "value" => $subnetlist));
 			}
@@ -86,8 +88,9 @@
 				"width" => 300, "height" => "150", "length" => 1024));
 
 			// ACL list
+			$selected = array("none");
 			$acllist = $this->getSelect(array("name" => "acllist", "multi" => true,
-				"exclude" => $this->aclname, "noneelmt" => true));
+				"exclude" => $this->aclname, "noneelmt" => true, "selected" => $selected));
 			if ($acllist != NULL) {
 				$output .= FS::$iMgr->idxLine("acls-to-include","",array("type" => "raw", "value" => $acllist));
 			}
@@ -407,7 +410,8 @@
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
+					isset($options["selected"]) && in_array("none",$options["selected"]));
 			}
 
 			$found = false;

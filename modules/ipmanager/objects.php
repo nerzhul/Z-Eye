@@ -46,6 +46,7 @@
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
 			$sqlcond = (isset($options["exclude"])) ? "netid != '".$options["exclude"]."'" : "";
 			$none = (isset($options["noneelmt"]) && $options["noneelmt"] == true);
+			$selected = (isset($options["selected"])) ? $options["selected"] : array();
 
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
@@ -54,7 +55,7 @@
 				array("order" => $this->sqlAttrId));
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",in_array("none",$selected));
 			}
 
                         while ($data = FS::$dbMgr->Fetch($query)) {
@@ -62,7 +63,7 @@
 					$found = true;
 				}
                                 $output .= FS::$iMgr->selElmt($data[$this->sqlAttrId]."/".$data["netmask"]." (".$data["subnet_short_name"].")",
-					$data[$this->sqlAttrId]);
+					$data[$this->sqlAttrId],in_array($data[$this->sqlAttrId],$selected));
                         }
 
 			// If no elements found & no empty element
@@ -70,7 +71,7 @@
 				return NULL;
 			}
 
-			$output .= $elements."</select>";
+			$output .= "</select>";
 			return $output;
 
 		}
