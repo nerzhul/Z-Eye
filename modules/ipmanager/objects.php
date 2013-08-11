@@ -49,16 +49,27 @@
 
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
-			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,$this->sqlAttrId,array("sqlcond" => $sqlcond,
-				"sqlopts" => array("order" => $this->sqlAttrId)));
-			if ($elements == "" && $none == false) {
-				return NULL;
-			}
+			$found = false;
+			$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",netmask,subnet_short_name",$sqlcond,
+				array("order" => $this->sqlAttrId));
 
 			if ($none) {
 				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
 			}
-				
+
+                        while ($data = FS::$dbMgr->Fetch($query)) {
+				if (!$found) {
+					$found = true;
+				}
+                                $output .= FS::$iMgr->selElmt($data[$this->sqlAttrId]."/".$data["netmask"]." (".$data["subnet_short_name"].")",
+					$data[$this->sqlAttrId]);
+                        }
+
+			// If no elements found & no empty element
+			if (!$found && !$none) {
+				return NULL;
+			}
+
 			$output .= $elements."</select>";
 			return $output;
 

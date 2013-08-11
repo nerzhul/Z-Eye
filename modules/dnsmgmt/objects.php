@@ -65,6 +65,14 @@
 					array("Description","description",array("value" => $this->description))
 				));
 
+			// TSIG list
+			$tsig = new dnsTSIGKey();
+			$tsiglist = $tsig->getSelect(array("name" => "tsiglist", "multi" => true,
+				"exclude" => $this->aclname, "noneelmt" => true));
+			if ($tsiglist != NULL) {
+				$output .= FS::$iMgr->idxLine("tsig-to-include","",array("type" => "raw", "value" => $tsiglist));
+			}
+
 			// Subnet list
 			$sObj = new dhcpSubnet();
 			$subnetlist = $sObj->getSelect(array("name" => "subnetlist", "multi" => true,
@@ -73,12 +81,20 @@
 				$output .= FS::$iMgr->idxLine("subnets-to-include","",array("type" => "raw", "value" => $subnetlist));
 			}
 
+			// IP List
+			$output .= FS::$iMgr->idxLine("ip-to-include","iplist",array("type" => "area", "tooltip" => "tooltip-ipinclude",
+				"width" => 300, "height" => "150", "length" => 1024));
+
 			// ACL list
 			$acllist = $this->getSelect(array("name" => "acllist", "multi" => true,
 				"exclude" => $this->aclname, "noneelmt" => true));
 			if ($acllist != NULL) {
 				$output .= FS::$iMgr->idxLine("acls-to-include","",array("type" => "raw", "value" => $acllist));
 			}
+
+			// DNS Name List
+			$output .= FS::$iMgr->idxLine("dns-to-include","dnslist",array("type" => "area", "tooltip" => "tooltip-dnsinclude",
+				"width" => 300, "height" => "150", "length" => 4096));
 
 			$output .= FS::$iMgr->aeTableSubmit($this->aclname != "");
 
@@ -92,14 +108,14 @@
 
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
+			if ($none) {
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
+			}
+
 			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,$this->sqlAttrId,array("sqlcond" => $sqlcond,
 				"sqlopts" => array("order" => $this->sqlAttrId)));
 			if ($elements == "" && $none == false) {
 				return NULL;
-			}
-
-			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
 			}
 				
 			$output .= $elements."</select>";
@@ -381,6 +397,28 @@
 				"rmlink" => "mod=".$this->mid."&act=6&keyalias",
 				"rmconfirm" => "confirm-remove-tsig",
 			));
+		}
+
+		public function getSelect($options = array()) {
+			$multi = (isset($options["multi"]) && $options["multi"] == true);
+			$sqlcond = (isset($options["exclude"])) ? $this->sqlAttrId." != '".$options["exclude"]."'" : "";
+			$none = (isset($options["noneelmt"]) && $options["noneelmt"] == true);
+
+			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
+
+			if ($none) {
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
+			}
+
+			$found = false;
+			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,$this->sqlAttrId,array("sqlcond" => $sqlcond,
+				"sqlopts" => array("order" => $this->sqlAttrId)));
+			if ($elements == "" && $none == false) {
+				return NULL;
+			}
+				
+			$output .= $elements."</select>";
+			return $output;
 		}
 
 		protected function Load($name = "") {
