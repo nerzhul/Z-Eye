@@ -73,7 +73,52 @@
 
 			$output .= "</select>";
 			return $output;
-
 		}
+
+		public function Load($netid = "") {
+			$this->netid = $netid;
+			$this->netmask = "";
+			$this->vlanid = 0;
+			$this->shortname = "";
+			$this->desc = "";
+			$this->router = "";
+			$this->dns1 = "";
+			$this->dns2 = "";
+			$this->domainname = "";
+			$this->maxleasetime = 0;
+			$this->defaultleasetime = 0;
+
+			if ($this->netid) {
+				$query = FS::$dbMgr->Select($this->sqlTable,"netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname,mleasetime,dleasetime",
+					$this->sqlAttrId." = '".$this->netid."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->netmask = $data["netmask"];
+					$this->vlanid = $data["vlanid"];
+					$this->shortname = $data["subnet_short_name"];
+					$this->desc = $data["subnet_desc"];
+					$this->router = $data["router"];
+					$this->dns1 = $data["dns1"];
+					$this->dns2 = $data["dns2"];
+					$this->domainname = $data["domainname"];
+					$this->maxleasetime = $data["mleasetime"];
+					$this->defaultleasetime = $data["dleasetime"];
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+
+		private $netid;
+		private $netmask;
+		private $vlanid;
+		private $shortname;
+		private $desc;
+		private $router;
+		private $dns1;
+		private $dns2;
+		private $domainname;
+		private $maxleasetime;
+		private $defaultleasetime;
 	};
 

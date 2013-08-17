@@ -71,6 +71,10 @@
 			return false;
 		}
 
+		protected function log($level,$str,$user=NULL) {
+			$this->mod->log($level,$str,$user);
+		}
+
 		protected $loc;
 		protected $mod;
 		protected $mid;

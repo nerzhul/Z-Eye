@@ -67,6 +67,10 @@
 
 			// TSIG list
 			$selected = array("none");
+			if (count($this->tsigs) > 0) {
+				$selected = $this->tsigs;
+			}
+
 			$tsig = new dnsTSIGKey();
 			$tsiglist = $tsig->getSelect(array("name" => "tsiglist", "multi" => true,
 				"exclude" => $this->aclname, "noneelmt" => true, "selected" => $selected));
@@ -76,6 +80,10 @@
 
 			// Subnet list
 			$selected = array("none");
+			if (count($this->networks) > 0) {
+				$selected = $this->networks;
+			}
+
 			$sObj = new dhcpSubnet();
 			$subnetlist = $sObj->getSelect(array("name" => "subnetlist", "multi" => true,
 				"exclude" => $this->aclname, "noneelmt" => true, "selected" => $selected));
@@ -84,11 +92,25 @@
 			}
 
 			// IP List
+			$list = "";
+			$count = count($this->ips);
+			if ($count > 0) {
+				for ($i=0;$i<$count;$i++) {
+					$list .= $this->ips[$i];
+					if ($i < $count-1)
+						$list .= "\n";
+				}
+			}
+
 			$output .= FS::$iMgr->idxLine("ip-to-include","iplist",array("type" => "area", "tooltip" => "tooltip-ipinclude",
-				"width" => 300, "height" => "150", "length" => 1024));
+				"width" => 300, "height" => "150", "length" => 1024, "value" => $list));
 
 			// ACL list
 			$selected = array("none");
+			if (count($this->acls) > 0) {
+				$selected = $this->acls;
+			}
+
 			$acllist = $this->getSelect(array("name" => "acllist", "multi" => true,
 				"exclude" => $this->aclname, "noneelmt" => true, "selected" => $selected));
 			if ($acllist != NULL) {
@@ -96,8 +118,18 @@
 			}
 
 			// DNS Name List
+			$list = "";
+			$count = count($this->dnsnames);
+			if ($count > 0) {
+				for ($i=0;$i<$count;$i++) {
+					$list .= $this->dnsnames[$i];
+					if ($i < $count-1)
+						$list .= "\n";
+				}
+			}
+
 			$output .= FS::$iMgr->idxLine("dns-to-include","dnslist",array("type" => "area", "tooltip" => "tooltip-dnsinclude",
-				"width" => 300, "height" => "150", "length" => 4096));
+				"width" => 300, "height" => "150", "length" => 4096, "value" => $list));
 
 			$output .= FS::$iMgr->aeTableSubmit($this->aclname != "");
 
@@ -108,15 +140,17 @@
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
 			$sqlcond = (isset($options["exclude"])) ? $this->sqlAttrId." != '".$options["exclude"]."'" : "";
 			$none = (isset($options["noneelmt"]) && $options["noneelmt"] == true);
+			$selected = (isset($options["selected"]) ? $options["selected"] : array("none"));
 
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none");
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
+					in_array("none",$selected));
 			}
 
 			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,$this->sqlAttrId,array("sqlcond" => $sqlcond,
-				"sqlopts" => array("order" => $this->sqlAttrId)));
+				"sqlopts" => array("order" => $this->sqlAttrId),"selected" => $selected));
 			if ($elements == "" && $none == false) {
 				return NULL;
 			}
@@ -137,23 +171,23 @@
 			if ($this->aclname) {
 				if ($desc = FS::$dbMgr->GetOneData($this->sqlTable,"description","aclname = '".$this->aclname."'")) {
 					$this->description = $desc;
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_ip","ip","aclname = '".$aclname."'");
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_ip","ip","aclname = '".$this->aclname."'");
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						$this->ips[] = $data["ip"];
 					}
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_network","netid","aclname = '".$aclname."'");
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_network","netid","aclname = '".$this->aclname."'");
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						$this->networks[] = $data["netid"];
 					}
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_tsig","keyalias","aclname = '".$aclname."'");
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_tsig","tsig","aclname = '".$this->aclname."'");
 					while ($data = FS::$dbMgr->Fetch($query)) {
-						$this->tsigs[] = $data["keyalias"];
+						$this->tsigs[] = $data["tsig"];
 					}
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_acl","aclchild","aclname = '".$aclname."'");
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_acl","aclchild","aclname = '".$this->aclname."'");
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						$this->acls[] = $data["aclchild"];
 					}
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_dnsname","dnsname","aclname = '".$aclname."'");
+					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dns_acl_dnsname","dnsname","aclname = '".$this->aclname."'");
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						$this->dnsnames[] = $data["dnsname"];
 					}
@@ -166,14 +200,12 @@
 		}
 
 		protected function removeFromDB($aclname) {
-			FS::$dbMgr->BeginTr();
 			FS::$dbMgr->Delete($this->sqlTable,"aclname = '".$aclname."'");
 			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_ip","aclname = '".$aclname."'");
 			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_network","aclname = '".$aclname."'");
 			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_tsig","aclname = '".$aclname."'");
 			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_acl","aclname = '".$aclname."'");
 			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_dnsname","aclname = '".$aclname."'");
-			FS::$dbMgr->CommitTr();
 		}
 
 		public function Modify() {
@@ -181,6 +213,186 @@
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			} 
+
+			$aclname = FS::$secMgr->checkAndSecurisePostData("aclname");
+			$description = FS::$secMgr->checkAndSecurisePostData("description");
+			$tsiglist = FS::$secMgr->checkAndSecurisePostData("tsiglist");
+			$subnetlist = FS::$secMgr->checkAndSecurisePostData("subnetlist");
+			$acllist = FS::$secMgr->checkAndSecurisePostData("acllist");
+			$iplist = FS::$secMgr->checkAndSecurisePostData("iplist");
+			$dnslist = FS::$secMgr->checkAndSecurisePostData("dnslist");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+			$iplistarr = array();
+			$dnslistarr = array();
+
+			if (!$aclname || !$description) {
+				FS::$iMgr->ajaxEchoNC("err-bad-datas");
+				$this->log(2,"Some datas are invalid or wrong for modify dns ACL");
+				return;
+			}
+
+			$exists = $this->exists($aclname);
+			if ($edit) {	
+				if (!$exists) {
+					$this->log(1,"Unable to edit acl '".$aclname."': not exists");
+					FS::$iMgr->ajaxEcho($this->errNotExists);
+					return;
+				}
+			}
+			else {
+				if ($exists) {
+					$this->log(1,"Unable to add acl '".$aclname ."': already exists");
+					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					return;
+				}
+			}
+			$rulefound = false;
+
+			if ($tsiglist && is_array($tsiglist)) {
+				if (!in_array("none",$tsiglist)) {
+					$count = count($tsiglist);
+					for ($i=0;$i<$count;$i++) {
+						$tsig = new dnsTSIGKey();
+						if (!$tsig->Load($tsiglist[$i])) {
+							FS::$iMgr->ajaxEchoNC("err-tsig-key-not-exists");
+							return;
+						}
+						$rulefound = true;
+					}
+				}
+			}
+
+			if ($subnetlist && is_array($subnetlist)) {
+				if (!in_array("none",$subnetlist)) {
+					$count = count($subnetlist);
+					for ($i=0;$i<$count;$i++) {
+						$subnet = new dhcpSubnet();
+						if (!$subnet->Load($subnetlist[$i])) {
+							FS::$iMgr->ajaxEchoNC("err-subnet-not-exists");
+							return;
+						}
+						$rulefound = true;
+					}
+				}
+			}
+
+			if ($acllist && is_array($acllist)) {
+				if (!in_array("none",$acllist)) {
+					$count = count($acllist);
+					for ($i=0;$i<$count;$i++) {
+						$acl = new dnsACL();
+						if (!$acl->Load($acllist[$i])) {
+							FS::$iMgr->ajaxEchoNC("err-acl-not-exists");
+							return;
+						}
+						$rulefound = true;
+					}
+				}
+			}
+
+			if ($iplist) {
+				$iplistarr = explode("\r\n",$iplist);
+				$count = count($iplistarr);
+				for ($i=0;$i<$count;$i++) {
+					if ($iplistarr[$i] == "") {
+						continue;
+					}
+
+					if (!FS::$secMgr->isIP($iplistarr[$i])) {
+						var_dump($iplistarr[$i]);
+						FS::$iMgr->ajaxEchoNC("err-some-ip-invalid");
+						return;
+					}
+					$rulefound = true;
+				}
+			}
+			if ($dnslist) {
+				$dnslistarr = explode("\r\n",$dnslist);
+				$count = count($dnslistarr);
+				for ($i=0;$i<$count;$i++) {
+					if ($dnslistarr[$i] == "") {
+						continue;
+					}
+
+					if (!FS::$secMgr->isDNSName($dnslistarr[$i])) {
+						FS::$iMgr->ajaxEchoNC("err-some-dns-invalid");
+						return;
+					}
+					$rulefound = true;
+				}
+			}
+
+			if (!$rulefound) {
+				FS::$iMgr->ajaxEchoNC("err-no-rule-specified");
+				return;
+			}
+
+			FS::$dbMgr->BeginTr();
+
+			if ($edit) {
+				$this->removeFromDB($aclname);
+			}
+
+			FS::$dbMgr->Insert($this->sqlTable,"aclname,description","'".$aclname."','".$description."'");
+
+			if ($tsiglist && is_array($tsiglist)) {
+				if (!in_array("none",$tsiglist)) {
+					$count = count($tsiglist);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_acl_tsig","aclname,tsig",
+							"'".$aclname."','".$tsiglist[$i]."'");
+					}
+				}
+			}
+
+			if ($subnetlist && is_array($subnetlist)) {
+				if (!in_array("none",$subnetlist)) {
+					$count = count($subnetlist);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_acl_network","aclname,netid",
+							"'".$aclname."','".$subnetlist[$i]."'");
+					}
+				}
+			}
+
+			if ($acllist && is_array($acllist)) {
+				if (!in_array("none",$acllist)) {
+					$count = count($acllist);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_acl_acl","aclname,aclchild",
+							"'".$aclname."','".$acllist[$i]."'");
+					}
+				}
+			}
+
+			if ($iplist) {
+				$count = count($iplistarr);
+				for ($i=0;$i<$count;$i++) {
+					if ($iplistarr[$i] == "") {
+						continue;
+					}
+
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_acl_ip","aclname,ip",
+						"'".$aclname."','".$iplistarr[$i]."'");
+				}
+			}
+
+			if ($dnslist) {
+				$count = count($dnslistarr);
+				for ($i=0;$i<$count;$i++) {
+					if ($dnslistarr[$i] == "") {
+						continue;
+					}
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_acl_dnsname","aclname,dnsname",
+						"'".$aclname."','".$dnslistarr[$i]."'");
+				}
+			}
+
+			FS::$dbMgr->CommitTr();
+
+			$js = $this->tMgr->addLine($aclname,$edit);
+			FS::$iMgr->ajaxEcho("Done",$js);
+			return;
 		}
 
 		public function Remove() {
@@ -188,6 +400,27 @@
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			} 
+
+			$aclname = FS::$secMgr->checkAndSecuriseGetData("aclname");
+			if (!$aclname) {
+				FS::$dbMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+
+			$exists = $this->exists($aclname);
+			if (!$exists) {
+				$this->log(1,"Unable to remove acl '".$aclname."': not exists");
+				FS::$iMgr->ajaxEcho($this->errNotExists);
+				return;
+			}
+
+			FS::$dbMgr->BeginTr();
+			$this->removeFromDB($aclname);
+			FS::$dbMgr->CommitTr();
+			
+			$js = $this->tMgr->removeLine($aclname);
+			FS::$iMgr->ajaxEcho("Done",$js);
+			return;
 		}
 
 		private $aclname;
@@ -315,16 +548,15 @@
 			$exists = $this->exists($saddr);
 			if ($edit) {	
 				if (!$exists) {
-					$this->log(1,"Unable to add server '".$saddr."': already exists");
-					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					$this->log(1,"Unable to edit server '".$saddr."': not exists");
+					FS::$iMgr->ajaxEcho($this->errNotExists);
 					return;
 				}
-
 			}
 			else {
 				if ($exists) {
 					$this->log(1,"Unable to add server '".$saddr."': already exists");
-					FS::$iMgr->ajaxEcho($this->errNotExists);
+					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
 					return;
 				}
 			}
@@ -364,7 +596,7 @@
 			}
 			
 			$this->removeFromDB($addr);
-			//$this->log(0,"Removing server '".$addr."'");
+			$this->log(0,"Removing server '".$addr."'");
 
 			$js = $this->tMgr->removeLine($addr);
 			FS::$iMgr->ajaxEcho("Done",$js);
@@ -406,17 +638,18 @@
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
 			$sqlcond = (isset($options["exclude"])) ? $this->sqlAttrId." != '".$options["exclude"]."'" : "";
 			$none = (isset($options["noneelmt"]) && $options["noneelmt"] == true);
+			$selected = (isset($options["selected"]) ? $options["selected"] : array("none"));
 
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
 			if ($none) {
 				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
-					isset($options["selected"]) && in_array("none",$options["selected"]));
+					in_array("none",$selected));
 			}
 
 			$found = false;
 			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,$this->sqlAttrId,array("sqlcond" => $sqlcond,
-				"sqlopts" => array("order" => $this->sqlAttrId)));
+				"sqlopts" => array("order" => $this->sqlAttrId), "selected" => $selected));
 			if ($elements == "" && $none == false) {
 				return NULL;
 			}

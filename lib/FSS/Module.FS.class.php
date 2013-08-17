@@ -40,7 +40,7 @@
 		public function getMenuTitle() { return $this->loc->s("menu-title"); }
 		public function getLoc() { return $this->loc; }
 
-		protected function log($level,$str,$user=NULL) {
+		public function log($level,$str,$user=NULL) {
 			if ($user === NULL) {
 				$user = FS::$sessMgr->getUserName();
 			}
