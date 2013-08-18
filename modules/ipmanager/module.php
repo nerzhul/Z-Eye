@@ -362,8 +362,8 @@
 				FS::$iMgr->idxLine("start-ip","startip",array("type" => "ip", "length" => 16)).
 				FS::$iMgr->idxLine("end-ip","endip",array("type" => "ip", "length" => 16)).
 				"<tr><td>".$this->loc->s("Action")."</td><td>".FS::$iMgr->select("rangeact").
-				FS::$iMgr->selElmt("add-to-dynamic-distrib",1).
-				FS::$iMgr->selElmt("remove-from-dynamic-distrib",2).
+				FS::$iMgr->selElmt($this->loc->s("add-to-dynamic-distrib"),1).
+				FS::$iMgr->selElmt($this->loc->s("remove-from-dynamic-distrib"),2).
 				"</select>".FS::$iMgr->hidden("subnet",$subnet)."</td></tr>".
 				FS::$iMgr->aeTableSubmit();
 

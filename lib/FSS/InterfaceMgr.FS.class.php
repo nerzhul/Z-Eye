@@ -420,13 +420,25 @@
 		public function idxLine($text,$name,$options = array()) {
 			$value = (isset($options["value"]) ? $options["value"] : "");
 			$label = ((isset($options["rawlabel"]) && $options["rawlabel"] == true) ? $text : $this->getLocale($text));
+			$star = (isset($options["star"]) ? $options["star"] : 0);
 
 			$output = "<tr ";
 			if (isset($options["tooltip"])) {
 				$output .= $this->tooltip($options["tooltip"]);
 				unset($options["tooltip"]);
 			}
-			$output .= "><td>".$label."</td><td class=\"ctrel\">";
+
+			$output .= "><td>".$label;
+			// Stars for tips
+			if ($star > 0) {
+				$output .= " (";
+				for ($i=0;$i<$star;$i++) {
+					$output .= "*";
+				}
+				$output .= ")";
+			}
+			$output .= "</td><td class=\"ctrel\">";
+
 			if (isset($options["type"])) {
 				switch($options["type"]) {
 					case "idxedit": 

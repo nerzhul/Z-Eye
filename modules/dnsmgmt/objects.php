@@ -446,9 +446,9 @@
 				"htmgrid" => "dnssrv",
 				"sqltable" => "dns_servers",
 				"sqlattrid" => "addr",
-				"attrlist" => array(array("Addr","addr",""), array("Login","sshuser","")),
+				"attrlist" => array(array("Addr","addr",""), array("Login","sshuser",""), array("named-conf-path","namedpath","")),
 				"sorted" => true,
-				"odivnb" => 1,
+				"odivnb" => 2,
 				"odivlink" => "addr=",
 				"rmcol" => true,
 				"rmlink" => "mod=".$this->mid."&act=4&addr",
@@ -472,7 +472,8 @@
 			}
 
 			
-			$output = FS::$iMgr->cbkForm("3")."<table>".
+			$output = FS::$iMgr->cbkForm("3").
+				FS::$iMgr->tip("tip-dnsserver")."<table>".
 				FS::$iMgr->idxLines(array(
 					array("ip-addr-dns","saddr",array("type" => "idxedit", "value" => $this->addr,
 						"length" => "128", "edit" => $this->addr != "")),
@@ -480,9 +481,15 @@
 					array("Password","spwd",array("type" => "pwd")),
 					array("Password-repeat","spwd2",array("type" => "pwd")),
 					array("named-conf-path","namedpath",array("value" => $this->namedPath,"tooltip" => "tooltip-rights")),
-					array("chroot-path","chrootnamed",array("value" => $this->chrootPath,"tooltip" => "tooltip-chroot"))
+					array("chroot-path","chrootnamed",array("value" => $this->chrootPath,"tooltip" => "tooltip-chroot")),
+					array("named-zeye-path","zeyenamedpath",array("value" => $this->zeyeNamedPath,"tooltip" => "tooltip-zeyenamed-path",
+						"star" => 1)),
+					array("masterzone-path","mzonepath",array("value" => $this->masterZonePath,"tooltip" => "tooltip-masterzone-path",
+						"star" => 1)),
+					array("slavezone-path","szonepath",array("value" => $this->slaveZonePath,"tooltip" => "tooltip-slavezone-path",
+						"star" => 1))
 				)).
-				FS::$iMgr->aeTableSubmit($addr != "");
+				FS::$iMgr->aeTableSubmit($addr == "");
 			
 			return $output;
 		}
@@ -490,18 +497,20 @@
 		protected function Load($addr = "") {
 			$this->addr = $addr;
 			$this->sshUser = ""; $this->namedPath = ""; $this->chrootPath = "";
+			$this->masterZonePath = ""; $this->slaveZonePath = "";
 
 			if ($this->addr) {
-				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath,tsig","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath","addr = '".$addr."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->sshUser = $data["sshuser"];
 					$this->namedPath = $data["namedpath"];
 					$this->chrootPath = $data["chrootpath"];
-					$this->TSIGKey = $data["tsig"];
+					$this->zeyeNamedPath = $data["zeyenamedpath"];
+					$this->masterZonePath = $data["mzonepath"];
+					$this->slaveZonePath = $data["szonepath"];
+					return true;
 				}
-				else {
-					return false;
-				}
+				return false;
 			}
 			return true;
 		}
@@ -524,17 +533,29 @@
 			$spwd2 = FS::$secMgr->checkAndSecurisePostData("spwd2");
 			$namedpath = FS::$secMgr->checkAndSecurisePostData("namedpath");
 			$chrootnamed = FS::$secMgr->checkAndSecurisePostData("chrootnamed");
+			$zeyenamedpath = FS::$secMgr->checkAndSecurisePostData("zeyenamedpath");
+			$mzonepath = FS::$secMgr->checkAndSecurisePostData("mzonepath");
+			$szonepath = FS::$secMgr->checkAndSecurisePostData("szonepath");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 			if (!$saddr || !$slogin || !$spwd || !$spwd2 || $spwd != $spwd2 ||
 				!$namedpath || !FS::$secMgr->isPath($namedpath) ||
-					(!$chrootnamed && !FS::$secMgr->isPath($chrootnamed))
+					($chrootnamed && !FS::$secMgr->isPath($chrootnamed)) ||
+					($zeyenamedpath && !FS::$secMgr->isPath($zeyenamedpath)) ||
+					($mzonepath && !FS::$secMgr->isPath($chrootnamed.$mzonepath)) ||
+					($szonepath && !FS::$secMgr->isPath($chrootnamed.$szonepath))
 				) {
 				$this->log(2,"Some datas are invalid or wrong for add server");
 				FS::$iMgr->ajaxEcho("err-miss-bad-fields");
 				return;
 			}
 
+			if (($zeyenamedpath && (!$mzonepath || !$szonepath)) ||
+				($mzonepath && (!$zeyenamedpath || !$szonepath)) ||
+				($szonepath && (!$zeyenamedpath || !$mzonepath))) {
+				FS::$iMgr->ajaxEchoNC("err-zeyenamedpath-together");
+				return;
+			}
 			$ssh = new SSH($saddr);
 			if (!$ssh->Connect()) {
 				FS::$iMgr->ajaxEcho("err-unable-conn");
@@ -566,12 +587,13 @@
 			if ($edit) {
 				FS::$dbMgr->Delete($this->sqlTable,"addr = '".$saddr."'");
 			}
-			FS::$dbMgr->Insert($this->sqlTable,"addr,sshuser,sshpwd,namedpath,chrootpath",
-				"'".$saddr."','".$slogin."','".$spwd."','".$namedpath."','".$chrootnamed."'");
+			FS::$dbMgr->Insert($this->sqlTable,"addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath",
+				"'".$saddr."','".$slogin."','".$spwd."','".$namedpath."','".$chrootnamed."','".$mzonepath.
+				"','".$szonepath."','".$zeyenamedpath."'");
 
 			FS::$dbMgr->CommitTr();
 
-			//$this->log(0,"Added server '".$saddr."'");
+			$this->log(0,"Add/Edit server '".$saddr."'");
 
 			$js = $this->tMgr->addLine($saddr,$edit);
 			FS::$iMgr->ajaxEcho("Done",$js);
@@ -605,7 +627,9 @@
 		private $sshUser;
 		private $chrootPath;
 		private $namedPath;
-		private $TSIGKey;
+		private $zeyeNamedPath;
+		private $masterZonePath;
+		private $slaveZonePath;
 	};
 
 	final class dnsTSIGKey extends FSMObj {
