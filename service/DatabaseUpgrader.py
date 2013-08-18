@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1305"
+	nextDBVersion = "1306"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -164,6 +164,17 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1304":
 				self.tryAddColumn("z_eye_dns_servers","zeyenamedpath","varchar(256)")
 				self.setDBVersion("1305")
+			if self.dbVersion == "1305":
+				self.tryCreateTable("z_eye_dns_clusters","clustername varchar(64) NOT NULL, description varchar(256), PRIMARY KEY(clustername)")
+				self.tryCreateTable("z_eye_dns_cluster_masters","clustername varchar(64) NOT NULL, server varchar(16) NOT NULL, PRIMARY KEY(clustername,server)")
+				self.tryCreateTable("z_eye_dns_cluster_slaves","clustername varchar(64) NOT NULL, server varchar(16) NOT NULL, PRIMARY KEY(clustername,server)")
+				self.tryCreateTable("z_eye_dns_cluster_caches","clustername varchar(64) NOT NULL, server varchar(16) NOT NULL, PRIMARY KEY(clustername,server)")
+				self.tryCreateTable("z_eye_dns_cluster_allow_recurse","clustername varchar(64) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(clustername,aclname)")
+				self.tryCreateTable("z_eye_dns_cluster_allow_transfer","clustername varchar(64) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(clustername,aclname)")
+				self.tryCreateTable("z_eye_dns_cluster_allow_update","clustername varchar(64) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(clustername,aclname)")
+				self.tryCreateTable("z_eye_dns_cluster_allow_query","clustername varchar(64) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(clustername,aclname)")
+				self.tryCreateTable("z_eye_dns_cluster_allow_notify","clustername varchar(64) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(clustername,aclname)")
+				self.setDBVersion("1306")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

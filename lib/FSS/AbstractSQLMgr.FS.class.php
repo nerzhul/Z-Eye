@@ -90,7 +90,7 @@
 			$options["limit"] = 1;
 
 			$query = $this->Select($table,$fields,$cond,$options);
-			if ($data = $query->fetch()) {
+			if ($data = $this->Fetch($query)) {
 				return $data;
 			}
 			return NULL;
@@ -102,7 +102,7 @@
 			$options["limit"] = 1;
 
 			$query = $this->Select($table,$field,$cond,$options);
-			if ($data = $query->fetch()) {
+			if ($data = $this->Fetch($query)) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data[$splstr[count($splstr)-1]];
@@ -110,9 +110,19 @@
 			return NULL;
 		}
 
+		public function getArray($table,$field,$cond = "",$options = array()) {
+			$results = array();
+
+			$query = $this->Select($table,$field,$cond,$options);
+			while ($data = $this->Fetch($query)) {
+				$results[] = $data[$field];
+			}
+			return $results;
+		}
+
 		public function GetMax($table,$field,$cond = "") {
 			$query = $this->Select($table,"MAX(".$field.") as mx",$cond);
-			if ($data = $query->fetch()) {
+			if ($data = $this->Fetch($query)) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data["mx"];
@@ -122,7 +132,7 @@
 
 		public function GetMin($table,$field,$cond = "") {
 			$query = $this->Select($table,"MIN(".$field.") as mn",$cond);
-                        if ($data = $query->fetch()) {
+                        if ($data = $this->Fetch($query)) {
                                  $splstr = preg_split("#[\.]#",$field);
                                  $splstr = preg_replace("#`#","",$splstr);
                                  return $data["mn"];
@@ -132,7 +142,7 @@
 
 		public function Sum($table,$field,$cond = "") {
 			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
-			if ($data = $query->fetch()) {
+			if ($data = $this->Fetch($query)) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data["mx"];
@@ -142,7 +152,7 @@
 
 		public function Count($table,$field,$cond = "") {
 			$query = $this->Select($table,"COUNT(".$field.") as ct",$cond);
-			if ($data = $query->fetch()) {
+			if ($data = $this->Fetch($query)) {
 				$splstr = preg_split("#[\.]#",$field);
 				$splstr = preg_replace("#`#","",$splstr);
 				return $data["ct"];

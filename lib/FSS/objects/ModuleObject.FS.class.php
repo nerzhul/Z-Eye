@@ -75,6 +75,14 @@
 			$this->mod->log($level,$str,$user);
 		}
 
+		public function getErrNotExists() {
+			return $this->errNotExists;
+		}
+
+		public function getErrAlreadyExists() {
+			return $this->errAlreadyExists;
+		}
+
 		protected $loc;
 		protected $mod;
 		protected $mid;

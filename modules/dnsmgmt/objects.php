@@ -432,6 +432,457 @@
 		private $dnsnames;
 	};
 
+	final class dnsCluster extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_clusters";
+			$this->sqlAttrId = "clustername";
+			$this->readRight = "mrule_dnsmgmt_read";
+			$this->writeRight = "mrule_dnsmgmt_write";
+			$this->errNotExists = "err-cluster-not-exists";
+			$this->errAlreadyExists = "err-cluster-already-exists";
+
+			$this->tMgr = new HTMLTableMgr(array(
+				"htmgrid" => "dnsclustr",
+				"sqltable" => "dns_clusters",
+				"sqlattrid" => "clustername",
+				"attrlist" => array(array("Name","clustername",""), array("Desc","description","")), 
+				"sorted" => true,
+				"odivnb" => 8,
+				"odivlink" => "clustername=",
+				"rmcol" => true,
+				"rmlink" => "mod=".$this->mid."&act=10&clustername",
+				"rmconfirm" => "confirm-remove-cluster",
+			));
+		}
+
+		public function renderAll() {
+			$output = FS::$iMgr->opendiv(7,$this->loc->s("add-cluster"),array("line" => true));
+			$output .= $this->tMgr->render();
+			return $output;
+		}
+
+		public function showForm($clustername = "") { 
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
+
+			if (!$this->Load($clustername)) {
+				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+			}
+
+			$acls = new dnsACL();
+			$recurselist = $acls->getSelect(array("name" => "recurse", "multi" => true,
+				"noneelmt" => true, "selected" => $this->recurseAcls));
+			$transferlist = $acls->getSelect(array("name" => "transfer", "multi" => true,
+				"noneelmt" => true, "selected" => $this->transferAcls));
+			$notifylist = $acls->getSelect(array("name" => "notify", "multi" => true,
+				"noneelmt" => true, "selected" => $this->notifyAcls));
+			$updatelist = $acls->getSelect(array("name" => "update", "multi" => true,
+				"noneelmt" => true, "selected" => $this->updateAcls));
+			$querylist = $acls->getSelect(array("name" => "query", "multi" => true,
+				"noneelmt" => true, "selected" => $this->queryAcls));
+
+			$server = new dnsServer();
+			$masters = $server->getSelect(array("name" => "masters", "multi" => true,
+				"selected" => $this->masterMembers));
+			$slaves = $server->getSelect(array("name" => "slaves", "multi" => true,
+				"selected" => $this->slaveMembers));
+			$caches = $server->getSelect(array("name" => "caches", "multi" => true,
+				"selected" => $this->cachingMembers));
+
+			$output = FS::$iMgr->cbkForm("9").FS::$iMgr->tip("tip-dnscluster")."<table>".
+				FS::$iMgr->idxLines(array(
+					array("clustername","clustername",array("type" => "idxedit", "value" => $this->clustername,
+						"length" => "64", "edit" => $this->clustername != "")),
+						array("Desc","description",array("value" => $this->description, "length" => "128")),
+						array("master-servers","",array("type" => "raw", "value" => $masters)),
+						array("slave-servers","",array("type" => "raw", "value" => $slaves)),
+						array("caching-servers","",array("type" => "raw", "value" => $caches)),
+						array("allow-recurse","",array("type" => "raw", "value" => $recurselist)),
+						array("allow-transfer","",array("type" => "raw", "value" => $transferlist)),
+						array("allow-notify","",array("type" => "raw", "value" => $notifylist)),
+						array("allow-update","",array("type" => "raw", "value" => $updatelist)),
+						array("allow-query","",array("type" => "raw", "value" => $querylist)),
+				)).
+				FS::$iMgr->aeTableSubmit($clustername == "");
+
+			return $output;
+		}
+
+		protected function Load($clustername = "") {
+			$this->clustername = $clustername;
+			$this->description = "";
+			$this->masterMembers = array();
+			$this->slaveMembers = array();
+			$this->cachingMembers = array();
+			$this->recurseAcls = array();
+			$this->transferAcls = array();
+			$this->notifyAcls = array();
+			$this->updateAcls = array();
+			$this->queryAcls = array();
+
+			if ($this->clustername) {
+				$query = FS::$dbMgr->Select($this->sqlTable,"description",$this->sqlAttrId."= '".$this->clustername."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->description = $data["description"];
+					$this->masterMembers = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_masters","server",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					$this->slaveMembers = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_slaves","server",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					$this->cachingMembers = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_caches","server",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					$this->recurseAcls = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_allow_recurse","aclname",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					$this->transferAcls = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_allow_transfer","aclname",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					$this->notifyAcls = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_allow_notify","aclname",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					$this->updateAcls = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_allow_update","aclname",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					$this->queryAcls = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_cluster_allow_query","aclname",
+						$this->sqlAttrId." = '".$this->clustername."'");
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+
+		protected function removeFromDB($name) {
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_masters",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_slaves",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_caches",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_allow_recurse",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_allow_transfer",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_allow_notify",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_allow_update",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_cluster_allow_query",$this->sqlAttrId." = '".$name."'");
+			FS::$dbMgr->Delete($this->sqlTable,$this->sqlAttrId." = '".$name."'");
+		}
+		public function Modify() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$clustername = FS::$secMgr->checkAndSecurisePostData("clustername");
+			$description = FS::$secMgr->checkAndSecurisePostData("description");
+			$masters = FS::$secMgr->checkAndSecurisePostData("masters");
+			$slaves = FS::$secMgr->checkAndSecurisePostData("slaves");
+			$caches = FS::$secMgr->checkAndSecurisePostData("caches");
+			$recurse = FS::$secMgr->checkAndSecurisePostData("recurse");
+			$transfer = FS::$secMgr->checkAndSecurisePostData("transfer");
+			$notify = FS::$secMgr->checkAndSecurisePostData("notify");
+			$update = FS::$secMgr->checkAndSecurisePostData("update");
+			$query = FS::$secMgr->checkAndSecurisePostData("query");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+
+			if (!$clustername || !$description || $masters && !is_array($masters) ||
+				$slaves && !is_array($slaves) || $caches && !is_array($caches) ||
+				$recurse && !is_array($recurse) || $transfer && !is_array($transfer) ||
+				$notify && !is_array($notify) || $update && !is_array($update) ||
+				$query && !is_array($query) || $edit && $edit != 1) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+		
+			// Verify cluster existence
+			$exists = $this->exists($clustername);
+			if ($edit) {
+				if (!$exists) {
+					$this->log(1,"Unable to edit cluster '".$clustername."': not exists");
+					FS::$iMgr->ajaxEcho($this->errNotExists);
+					return;
+				}
+			}
+			else {
+				if ($exists) {
+					$this->log(1,"Unable to add cluster '".$clustername."': already exists");
+					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					return;
+				}
+			}
+
+			$masterfound = false;
+			// Verify servers (exist and no duplicates)
+			if ($masters) {
+				$count = count($masters);
+				for ($i=0;$i<$count;$i++) {
+					$server = new dnsServer();
+					if (!$server->exists($masters[$i])) {
+						FS::$iMgr->ajaxEcho($server->getErrNotExists());
+						return;
+					}
+					if ($slaves) {
+						if (in_array($masters[$i],$slaves)) {
+							FS::$iMgr->ajaxEchoNC("err-cluster-member-only-one-category");
+							return;
+						}
+					}
+					if ($caches) {
+						if (in_array($masters[$i],$caches)) {
+							FS::$iMgr->ajaxEchoNC("err-cluster-member-only-one-category");
+							return;
+						}
+					}
+					$masterfound = true;
+				}
+			}
+
+			// No master found, stop it.
+			if (!$masterfound) {
+				FS::$iMgr->ajaxEchoNC("err-cluster-need-master");
+				return;
+			}
+
+			if ($slaves) {
+				$count = count($slaves);
+				for ($i=0;$i<$count;$i++) {
+					$server = new dnsServer();
+					if (!$server->exists($slaves[$i])) {
+						FS::$iMgr->ajaxEcho($server->getErrNotExists());
+						return;
+					}
+					// Slave - master already checked
+					if ($caches) {
+						if (in_array($slaves[$i],$caches)) {
+							FS::$iMgr->ajaxEchoNC("err-cluster-member-only-one-category");
+							return;
+						}
+					}
+				}
+			}
+
+			if ($caches) {
+				$count = count($caches);
+				for ($i=0;$i<$count;$i++) {
+					$server = new dnsServer();
+					if (!$server->exists($caches[$i])) {
+						FS::$iMgr->ajaxEcho($server->getErrNotExists());
+						return;
+					}
+					// All duplicated have been checked at this time
+				}
+			}
+
+			if ($recurse) {
+				$count = count($recurse);
+				for ($i=0;$i<$count;$i++) {
+					if ($recurse[$i] == "none") {
+						continue;
+					}
+
+					$acl = new dnsACL();
+					if (!$acl->exists($recurse[$i])) {
+						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						return;
+					}
+				}
+			}
+
+			if ($notify) {
+				$count = count($notify);
+				for ($i=0;$i<$count;$i++) {
+					if ($notify[$i] == "none") {
+						continue;
+					}
+
+					$acl = new dnsACL();
+					if (!$acl->exists($notify[$i])) {
+						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						return;
+					}
+				}
+			}
+			if ($transfer) {
+				$count = count($transfer);
+				for ($i=0;$i<$count;$i++) {
+					if ($transfer[$i] == "none") {
+						continue;
+					}
+
+					$acl = new dnsACL();
+					if (!$acl->exists($transfer[$i])) {
+						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						return;
+					}
+				}
+			}
+			if ($query) {
+				$count = count($query);
+				for ($i=0;$i<$count;$i++) {
+					if ($query[$i] == "none") {
+						continue;
+					}
+
+					$acl = new dnsACL();
+					if (!$acl->exists($query[$i])) {
+						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						return;
+					}
+				}
+			}
+			if ($update) {
+				$count = count($update);
+				for ($i=0;$i<$count;$i++) {
+					if ($update[$i] == "none") {
+						continue;
+					}
+
+					$acl = new dnsACL();
+					if (!$acl->exists($update[$i])) {
+						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						return;
+					}
+				}
+			}
+
+			FS::$dbMgr->BeginTr();
+			if ($edit) {
+				$this->removeFromDB($clustername);
+			}
+			FS::$dbMgr->Insert($this->sqlTable,$this->sqlAttrId.",description","'".$clustername."','".$description."'");
+
+			$count = count($masters);
+			for ($i=0;$i<$count;$i++) {
+				FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_masters",$this->sqlAttrId.",server",
+					"'".$clustername."','".$masters[$i]."'");
+			}
+
+			if ($slaves) {
+				$count = count($slaves);
+				for ($i=0;$i<$count;$i++) {
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_slaves",$this->sqlAttrId.",server",
+						"'".$clustername."','".$slaves[$i]."'");
+				}
+			}
+
+			if ($caches) {
+				$count = count($caches);
+				for ($i=0;$i<$count;$i++) {
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_caches",$this->sqlAttrId.",server",
+						"'".$clustername."','".$caches[$i]."'");
+				}
+			}
+
+			if ($recurse) {
+				if (in_array("none",$recurse)) {
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_recurse",$this->sqlAttrId.",aclname",
+						"'".$clustername."','none'");
+				}
+				else {
+					$count = count($recurse);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_recurse",$this->sqlAttrId.",aclname",
+							"'".$clustername."','".$recurse[$i]."'");
+					}
+				}
+			}
+
+			if ($transfer) {
+				if (in_array("none",$transfer)) {
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_transfer",$this->sqlAttrId.",aclname",
+						"'".$clustername."','none'");
+				}
+				else {
+					$count = count($tranfer);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_transfer",$this->sqlAttrId.",aclname",
+							"'".$clustername."','".$transfer[$i]."'");
+					}
+				}
+			}
+
+			if ($notify) {
+				if (in_array("none",$notify)) {
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_notify",$this->sqlAttrId.",aclname",
+						"'".$clustername."','none'");
+				}
+				else {
+					$count = count($notify);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_notify",$this->sqlAttrId.",aclname",
+							"'".$clustername."','".$notify[$i]."'");
+					}
+				}
+			}
+
+			if ($update) {
+				if (in_array("none",$update)) {
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_update",$this->sqlAttrId.",aclname",
+						"'".$clustername."','none'");
+				}
+				else {
+					$count = count($update);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_update",$this->sqlAttrId.",aclname",
+							"'".$clustername."','".$update[$i]."'");
+					}
+				}
+			}
+
+			if ($query) {
+				if (in_array("none",$query)) {
+					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_query",$this->sqlAttrId.",aclname",
+						"'".$clustername."','none'");
+				}
+				else {
+					$count = count($query);
+					for ($i=0;$i<$count;$i++) {
+						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_query",$this->sqlAttrId.",aclname",
+							"'".$clustername."','".$query[$i]."'");
+					}
+				}
+			}
+
+			FS::$dbMgr->CommitTr();
+
+			$js = $this->tMgr->addLine($clustername,$edit);
+			FS::$iMgr->ajaxEcho("Done",$js);
+		}
+
+		public function Remove() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$clustername = FS::$secMgr->checkAndSecuriseGetData("clustername");
+
+			if (!$clustername) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+
+			if (!$this->exists($clustername)) {
+				FS::$iMgr->ajaxEcho($this->errNotExists);
+				return;
+			}
+
+			FS::$dbMgr->BeginTr();
+			$this->removeFromDb($clustername);
+			FS::$dbMgr->CommitTr();
+
+			$this->log(0,"Removing cluster '".$clustername."'");
+
+			$js = $this->tMgr->removeLine($clustername);
+			FS::$iMgr->ajaxEcho("Done",$js);
+		}
+
+		private $clustername;
+		private $description;
+		private $masterMembers;
+		private $slaveMembers;
+		private $cachingMembers;
+		private $recurseAcls;
+		private $transferAcls;
+		private $notifyAcls;
+		private $updateAcls;
+		private $queryAcls;
+	}
+
+			
 	final class dnsServer extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -471,7 +922,6 @@
 				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
 			}
 
-			
 			$output = FS::$iMgr->cbkForm("3").
 				FS::$iMgr->tip("tip-dnsserver")."<table>".
 				FS::$iMgr->idxLines(array(
@@ -491,6 +941,29 @@
 				)).
 				FS::$iMgr->aeTableSubmit($addr == "");
 			
+			return $output;
+		}
+
+		public function getSelect($options = array()) {
+			$multi = (isset($options["multi"]) && $options["multi"] == true);
+			$sqlcond = (isset($options["exclude"])) ? $this->sqlAttrId." != '".$options["exclude"]."'" : "";
+			$none = (isset($options["noneelmt"]) && $options["noneelmt"] == true);
+			$selected = (isset($options["selected"]) ? $options["selected"] : array("none"));
+
+			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
+
+			if ($none) {
+				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
+					in_array("none",$selected));
+			}
+
+			$elements = FS::$iMgr->selElmtFromDB($this->sqlTable,$this->sqlAttrId,array("sqlcond" => $sqlcond,
+				"sqlopts" => array("order" => $this->sqlAttrId),"selected" => $selected));
+			if ($elements == "" && $none == false) {
+				return NULL;
+			}
+				
+			$output .= $elements."</select>";
 			return $output;
 		}
 

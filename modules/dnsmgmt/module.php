@@ -50,7 +50,7 @@
 					case 1: $output .= $this->showZoneMgmt(); break;
 					case 2: $output .= $this->showDNSSecMgmt(); break;
 					case 3: $output .= $this->showAdvancedTools(); break;
-					case 4: $output .= $this->showServerList(); break;
+					case 4: $output .= $this->showServerMgmt(); break;
 					case 5: $output .= $this->showACLList(); break;
 				}
 			}
@@ -292,9 +292,14 @@
 			return $acl->renderAll();
 		}
 
-		private function showServerList() {
+		private function showServerMgmt() {
+			$cluster = new dnsCluster();
+			$output = $cluster->renderAll();
+
 			$server = new dnsServer();
-			return $server->renderAll();
+			$output .= $server->renderAll();
+
+			return $output;
 		}
 
 		private function showCreateEditErr() {
@@ -342,6 +347,17 @@
 
 					$dnsACL = new dnsACL();
 					return $dnsACL->showForm($aclname);
+				case 7:
+					$dnsCluster = new dnsCluster();
+					return $dnsCluster->showForm();
+				case 8:
+					$clustername = FS::$secMgr->checkAndSecuriseGetData("clustername");
+					if (!$clustername) {
+						return $this->loc->s("err-bad-datas");
+					}
+
+					$dnsCluster = new dnsCluster();
+					return $dnsCluster->showForm($clustername);
 				default: return;
 			}
 		}
@@ -480,6 +496,16 @@
 				case 8:
 					$acl = new dnsAcl();
 					$acl->Remove();
+					return;
+				// Add/Edit cluster
+				case 9:
+					$cluster = new dnsCluster();
+					$cluster->Modify();
+					return;
+				// Remove Cluster
+				case 10:
+					$cluster = new dnsCluster();
+					$cluster->Remove();
 					return;
 			}
 		}
