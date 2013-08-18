@@ -299,7 +299,6 @@
 					}
 
 					if (!FS::$secMgr->isIP($iplistarr[$i])) {
-						var_dump($iplistarr[$i]);
 						FS::$iMgr->ajaxEchoNC("err-some-ip-invalid");
 						return;
 					}
