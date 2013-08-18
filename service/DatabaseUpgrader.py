@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1306"
+	nextDBVersion = "1307"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -175,6 +175,10 @@ class ZEyeDBUpgrade():
 				self.tryCreateTable("z_eye_dns_cluster_allow_query","clustername varchar(64) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(clustername,aclname)")
 				self.tryCreateTable("z_eye_dns_cluster_allow_notify","clustername varchar(64) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(clustername,aclname)")
 				self.setDBVersion("1306")
+			if self.dbVersion == "1306":
+				self.tryDropColumn("z_eye_users","ulevel")
+				self.tryAddColumn("z_eye_users","failauthnb","int DEFAULT '0'")
+				self.setDBVersion("1307")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
@@ -207,6 +211,22 @@ class ZEyeDBUpgrade():
 			pgcursor.execute("%s" % request)
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
+			if self.pgsqlCon:
+				self.pgsqlCon.close()
+                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			print "PgSQL Error: %s" % e
+                        sys.exit(1);
+
+	def tryDropColumn(self,tablename,columnname):
+		try:
+			pgcursor = self.pgsqlCon.cursor()
+			pgcursor.execute("ALTER TABLE %s DROP COLUMN %s" % (tablename,columnname))
+			self.pgsqlCon.commit()
+		except PgSQL.Error, e:
+			# If column exists, maybe the database is already up-to-date
+			if re.search("column \"%s\" of relation \"%s\" does not exists" % (columnname,tablename),"%s" % e):	
+				return
+
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
                         Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)

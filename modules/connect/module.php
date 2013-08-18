@@ -43,14 +43,20 @@
 			while (!$found && ($data = FS::$dbMgr->Fetch($query))) {
 				$tmpldapMgr = new LDAP();
 				$tmpldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
-				if ($tmpldapMgr->Authenticate($username, $password)) {
-					$ldapok = true;
-					$ldapident = $data["ldapuid"];
-					$ldapsurname = $data["ldapsurname"];
-					$ldapname = $data["ldapname"];
-					$ldapmail = $data["ldapmail"];
-					$ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
-					$found = true;
+				$tmpldapMgr->RootConnect();
+				if ($tmpldapMgr->GetOneEntry($data["ldapuid"]."=".$username)) {
+					if ($tmpldapMgr->Authenticate($username, $password)) {
+						$ldapok = true;
+						$ldapident = $data["ldapuid"];
+						$ldapsurname = $data["ldapsurname"];
+						$ldapname = $data["ldapname"];
+						$ldapmail = $data["ldapmail"];
+						$ldapMgr->setServerInfos($data["addr"],$data["port"],($data["ssl"] == 1 ? true : false),$data["dn"],$data["rootdn"],$data["dnpwd"],$data["ldapuid"],$data["filter"]);
+						$found = true;
+					}
+					else {
+						FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."users","failauthnb = failauthnb + 1","username = '".$username."'");
+					}
 				}
 			}
 
@@ -74,37 +80,36 @@
 				$user->setUsername($username);
 				$user->setSubName($prenom);
 				$user->setName($nom);
-				$user->setUserLevel(4);
 				$user->setMail($mail);
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
-					$this->connectUser($data["uid"],$data["ulevel"]);
+					$this->connectUser($data["uid"]);
 					$this->log(0,"Login success for user '".$username."'","None");
-					FS::$iMgr->redir($url,true);
+					$this->reloadInterface($url);
 					return;
 				}
 				else {
 					$user->Create();
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");
 					if ($data = FS::$dbMgr->Fetch($query)) { 
-						$this->connectUser($data["uid"],$data["ulevel"]);
+						$this->connectUser($data["uid"]);
 						$this->log(0,"Login success for user '".$username."'","None");
-						FS::$iMgr->redir($url,true);
+						$this->reloadInterface($url);
 						return;
 					}
 				}
 			} else {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd,ulevel","username = '".$username."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid,username,sha_pwd","username = '".$username."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$encryptPwd = FS::$secMgr->EncryptPassword($password,$username,$data["uid"]);
 					if ($data["sha_pwd"] != $encryptPwd) {
 						$this->log(1,"Login failed for user '".$username."' (Bad password)","None");
+						FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."users","failauthnb = failauthnb + 1","username = '".$username."'");
 						FS::$iMgr->ajaxEcho("err-bad-user");
 						return;
 					}
-					$this->connectUser($data["uid"],$data["ulevel"]);
+					$this->connectUser($data["uid"]);
 					$this->log(0,"Login success for user '".$username."'","None");
-					//FS::$iMgr->redir($url,true);
 					$this->reloadInterface($url);
 					return;
 				}
@@ -113,13 +118,13 @@
 			FS::$iMgr->ajaxEcho("err-bad-user");
 		}
 		
-		private function connectUser($uid,$ulevel) {
+		private function connectUser($uid) {
 			$langs = preg_split("#[;]#",$_SERVER["HTTP_ACCEPT_LANGUAGE"]);
 			if (count($langs) > 0)
 				$_SESSION["lang"] = $langs[0];
 			$_SESSION["uid"] = $uid;
-			$_SESSION["ulevel"] = $ulevel;
-			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
+			$_SESSION["prevfailedauth"] = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","failauthnb","uid = '".$uid."'");
+			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","failauthnb = '0', last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
 		}
 
 		public function reloadInterface($url) {

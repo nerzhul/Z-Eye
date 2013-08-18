@@ -121,8 +121,6 @@
 			if (!isset($_SESSION["uid"]))
 				$_SESSION["uid"] = 0;
 
-			if (!isset($_SESSION["ulevel"]))
-				$_SESSION["ulevel"] = 0;
 		}
 
 		public function isConnected() {
@@ -155,7 +153,6 @@
 			$lang = strtolower(substr(chop($tmp[0]),0,2));
 		}
 		
-		public function getUserLevel() { return (isset($_SESSION["ulevel"]) ? $_SESSION["ulevel"] : 0); }
 		public function getUid() { return $_SESSION["uid"]; }
 
 		public function getUserName() {

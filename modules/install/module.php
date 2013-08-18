@@ -172,7 +172,6 @@
 	                                $user->setUsername($username);
         	                        $user->setSubName($surname);
                 	                $user->setName($name);
-                        	        $user->setUserLevel(4);
                                 	$user->setMail($mail);
 					$user->Create(1);
 					$user->changePassword($pwd);

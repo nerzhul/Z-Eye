@@ -39,7 +39,7 @@
 		}
 
 		public function LoadFromDB($uid) {
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","username,ulevel,subname,name,mail,join_date,last_conn,last_ip",
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","username,subname,name,mail,join_date,last_conn,last_ip,failauthnb",
 				"uid = '".$uid."'");
 			if ($data = pg_fetch_array($query)) {
 				$this->id = $uid;
@@ -50,7 +50,7 @@
 				$this->joindate = $data["join_date"];
 				$this->lastconn = $data["last_conn"];
 				$this->lastip = $data["last_ip"];
-				$this->ulevel = $data["ulevel"];
+				$this->failedauth = $data["failauthnb"];
 			}
 		}
 
@@ -62,13 +62,13 @@
 				$id = FS::$dbMgr->GetMax(PGDbConfig::getDbPrefix()."users","uid")+1;
 			}
 			$this->id = $uid;
-			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."users","uid,username,ulevel,subname,name,mail,join_date,last_ip,sha_pwd,last_conn",
-				"'".$id."','".$this->username."','0','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW()");
+			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."users","uid,username,subname,name,mail,join_date,last_ip,sha_pwd,last_conn,failauthnb",
+				"'".$id."','".$this->username."','".$this->subname."','".$this->name."','".$this->mail."',NOW(),'0.0.0.0','',NOW(),'0'");
 		}
 
 		public function SaveToDB() {
-			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","subname ='".$this->subname."', ulevel = '".$this->ulevel."', join_date = '".$this->joindate."', 
-			last_ip = '".$this->lastip."', last_conn = '".$this->lastconn."', ulevel = '".$this->ulevel."'","uid = '".$_SESSION["uid"]."'");
+			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","subname ='".$this->subname."', join_date = '".$this->joindate."', 
+			last_ip = '".$this->lastip."', last_conn = '".$this->lastconn."'","uid = '".$_SESSION["uid"]."'");
 		}
 
 		public function changePassword($password) {
@@ -91,9 +91,6 @@
 		public function getSubName() { return $this->subname; }
 		public function setSubName($sname) { return $this->subname = $sname; }
 
-		public function getUserLevel() { return $this->ulevel;	}
-		public function setUserLevel($ulevel) { $this->ulevel = $ulevel; }
-
 		public function getMail() { return $this->mail; }
 		public function setMail($m) { $this->mail = $m; }
 
@@ -108,7 +105,7 @@
 		private $joindate;
 		private $lastconn;
 		private $lastip;
-		private $ulevel;
+		private $failedauth;
 	}
 
 ?>
