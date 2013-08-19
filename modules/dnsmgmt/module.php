@@ -39,6 +39,7 @@
 				$output .= FS::$iMgr->h1("title-dns");
 
 				$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("DNS-zones"));
+				$tabs[] = array(6,"mod=".$this->mid,$this->loc->s("Zone-Mgmt"));
 				$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("DNSSec-Mgmt"));
 				$tabs[] = array(5,"mod=".$this->mid,$this->loc->s("ACL-Mgmt"));
 				$tabs[] = array(4,"mod=".$this->mid,$this->loc->s("Server-Mgmt"));
@@ -47,14 +48,20 @@
 			}
 			else {
 				switch($sh) {
-					case 1: $output .= $this->showZoneMgmt(); break;
+					case 1: $output .= $this->showRecordMgmt(); break;
 					case 2: $output .= $this->showDNSSecMgmt(); break;
 					case 3: $output .= $this->showAdvancedTools(); break;
 					case 4: $output .= $this->showServerMgmt(); break;
 					case 5: $output .= $this->showACLList(); break;
+					case 6: $output .= $this->showZoneMgmt(); break;
 				}
 			}
 			return $output;
+		}
+
+		private function showZoneMgmt() {
+			$dnsZone = new dnsZone();
+			return $dnsZone->renderAll();
 		}
 
 		private function showDNSSecMgmt() {
@@ -63,7 +70,7 @@
 			return $output;
 		}
 
-		private function showZoneMgmt() {
+		private function showRecordMgmt() {
 			$output = "";
 			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
 				$output .= $this->showCreateEditErr();
@@ -358,6 +365,17 @@
 
 					$dnsCluster = new dnsCluster();
 					return $dnsCluster->showForm($clustername);
+				case 9:
+					$dnsZone = new dnsZone();
+					return $dnsZone->showForm();
+				case 10:
+					$zonename = FS::$secMgr->checkAndSecuriseGetData("zonename");
+					if (!$zonename) {
+						return $this->loc->s("err-bad-datas");
+					}
+
+					$dnsZone = new dnsZone();
+					return $dnsZone->showForm($zonename);
 				default: return;
 			}
 		}
@@ -506,6 +524,16 @@
 				case 10:
 					$cluster = new dnsCluster();
 					$cluster->Remove();
+					return;
+				// Add/Edit zone
+				case 11:
+					$zone = new dnsZone();
+					$zone->Modify();
+					return;
+				// Remove zone
+				case 12:
+					$zone = new dnsZone();
+					$zone->Remove();
 					return;
 			}
 		}

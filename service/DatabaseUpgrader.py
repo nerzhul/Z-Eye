@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1307"
+	nextDBVersion = "1309"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -179,6 +179,18 @@ class ZEyeDBUpgrade():
 				self.tryDropColumn("z_eye_users","ulevel")
 				self.tryAddColumn("z_eye_users","failauthnb","int DEFAULT '0'")
 				self.setDBVersion("1307")
+			if self.dbVersion == "1307":
+				self.tryCreateTable("z_eye_dns_zones","zonename varchar(256) NOT NULL, description varchar(256), zonetype int NOT NULL, PRIMARY KEY(zonename)")
+				self.tryCreateTable("z_eye_dns_zone_forwarders","zonename varchar(256) NOT NULL, zoneforwarder varchar(16) NOT NULL, PRIMARY KEY(zonename,zoneforwarder)")
+				self.tryCreateTable("z_eye_dns_zone_masters","zonename varchar(256) NOT NULL, zonemaster varchar(16) NOT NULL, PRIMARY KEY(zonename,zonemaster)")
+				self.tryCreateTable("z_eye_dns_zone_allow_transfer","zonename varchar(256) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(zonename,aclname)")
+				self.tryCreateTable("z_eye_dns_zone_allow_update","zonename varchar(256) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(zonename,aclname)")
+				self.tryCreateTable("z_eye_dns_zone_allow_query","zonename varchar(256) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(zonename,aclname)")
+				self.tryCreateTable("z_eye_dns_zone_allow_notify","zonename varchar(256) NOT NULL, aclname varchar(64) NOT NULL, PRIMARY KEY(zonename,aclname)")
+				self.setDBVersion("1308")
+			if self.dbVersion == "1308":
+				self.tryCreateTable("z_eye_dns_zone_clusters","zonename varchar(256) NOT NULL, clustername varchar(64) NOT NULL, PRIMARY KEY(zonename,clustername)")
+				self.setDBVersion("1309")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

@@ -92,6 +92,21 @@
 			return true;
 		}
 
+		public function getDNSNameList($buffer) {
+			$tmparr = explode("\r\n",$buffer);
+			$count = count($tmparr);
+			for ($i=0;$i<$count;$i++) {
+				if ($tmparr[$i] == "") {
+					continue;
+				}
+
+				if (!$this->isDNSName($tmparr[$i])) {
+					return NULL;
+				}
+			}
+			return $tmparr;
+		}
+
 		public function isPath($str) {
 			if ($str == "/" || preg_match("#^(/(?:(?:(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*)(?:/(?:(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*))*))$#",$str))
 				return true;
@@ -121,6 +136,21 @@
 			}
 			else
 				return false;
+		}
+
+		public function getIPList($buffer) {
+			$tmparr = explode("\r\n",$buffer);
+			$count = count($tmparr);
+			for ($i=0;$i<$count;$i++) {
+				if ($tmparr[$i] == "") {
+					continue;
+				}
+
+				if (!$this->isIP($tmparr[$i])) {
+					return NULL;
+				}
+			}
+			return $tmparr;
 		}
 
 		public function isCIDR($str) {
