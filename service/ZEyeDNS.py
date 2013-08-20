@@ -106,7 +106,6 @@ class DNSManager(threading.Thread):
 		Logger.ZEyeLogger().write("DNS Management task done (time: %s)" % totaltime)
 
 	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn):
-		Logger.ZEyeLogger().write("DNS Manager: server cfg %s" % addr)
 		self.incrThreadNb()
 
 		cfgbuffer = ""
