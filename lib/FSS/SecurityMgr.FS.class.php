@@ -259,10 +259,17 @@
 		}
 
 		public function isLDAPDN($str) {
-			if (preg_match("#^(\w+[=]{1}\w+)([,{1}]\w+[=]{1}\w+)*$#",$str))
+			if (preg_match("#^(\w+[=]{1}\w+)([,{1}]\w+[=]{1}\w+)*$#",$str)) {
 				return true;
-			else
-				return false;
+			}
+			return false;
+		}
+
+		public function isBase64($str) {
+			if (base64_decode($str, true)) {
+				return true;
+			}
+			return false;
 		}
 
 		private function checkSentData($data) {

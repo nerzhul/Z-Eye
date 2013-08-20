@@ -1481,13 +1481,19 @@
 				FS::$iMgr->ajaxEchoNC("err-zeyenamedpath-together");
 				return;
 			}
+
+			if ($zeyenamedpath == $namedpath) {
+				FS::$iMgr->ajaxEchoNC("err-named-zeyenamed-different");
+				return;
+			}
+
 			$ssh = new SSH($saddr);
 			if (!$ssh->Connect()) {
 				FS::$iMgr->ajaxEcho("err-unable-conn");
 				return;
 			}
 			if (!$ssh->Authenticate($slogin,$spwd)) {
-				FS::$iMgr->ajaxEcho("err-bad-login");
+				FS::$iMgr->ajaxEchoNC("err-bad-login");
 				return;
 			}
 		
@@ -1677,6 +1683,11 @@
 			if (!$keyalias || !$keyid || !$keyalgo || !FS::$secMgr->isNumeric($keyalgo) || !$keyvalue ||
 				$edit && $edit != 1) {
 				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+
+			if (!FS::$secMgr->isBase64($keyvalue)) {
+				FS::$iMgr->ajaxEchoNC("err-tsig-not-base64");
 				return;
 			}
 

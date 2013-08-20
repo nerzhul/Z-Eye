@@ -30,6 +30,7 @@ from dns.exception import DNSException
 import Logger
 import netdiscoCfg
 import ZEyeUtil
+from SSHBroker import ZEyeSSHBroker
 
 class DNSManager(threading.Thread):
 	sleepingTimer = 0
@@ -103,8 +104,69 @@ class DNSManager(threading.Thread):
 		totaltime = datetime.datetime.now() - starttime
 		Logger.ZEyeLogger().write("DNS Management task done (time: %s)" % totaltime)
 
-	def doConfigDNS(self,addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn):
-		Logger.ZEyeLogger().write("DNS Manager: server cfg %s" % server)
+	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn):
+		Logger.ZEyeLogger().write("DNS Manager: server cfg %s" % addr)
+		self.incrThreadNb()
+
+		cfgbuffer = ""
+		try:
+			# No zone or cluster, stop it
+			if len(self.zoneList) == 0 or len(self.clusterList) == 0:
+				self.decrThreadNb()
+				return
+
+			ssh = ZEyeSSHBroker(addr,user,pwd)
+			if ssh.connect() == False:
+				self.decrThreadNb()
+				return
+
+			# We get the remote OS for some commands
+			remoteOs = ssh.getRemoteOS()
+			if remoteOs != "Linux" and remoteOs != "FreeBSD" and remoteOs != "OpenBSD":
+				Logger.ZEyeLogger().write("DNS Manager: %s OS (on %s) is not supported" % (remoteOs,addr))
+				self.decrThreadNb()
+				return
+
+			hashCmd = ""
+			if remoteOs == "Linux":
+				hashCmd = "md5sum"
+			elif remoteOs == "FreeBSD" or remoteOs == "OpenBSD":
+				hashCmd = "md5 -q"
+
+			# We test file existence. If they doesn't exist, we create it. If creation failed, the DNS manager cannot use this server
+			if ssh.isRemoteExists(zeyenamedpath) == False:
+				ssh.sendCmd("touch %s" % zeyenamedpath)
+
+			if ssh.isRemoteWritable(zeyenamedpath) == False:
+				Logger.ZEyeLogger().write("DNS Manager: %s (on %s) is not writable" % (zeyenamedpath,addr))
+				self.decrThreadNb()
+				return
+
+			for tsig in self.tsigList:
+				algo = ""
+				if self.tsigList[tsig][1] == 1:
+					algo = "hmac-md5"
+				elif self.tsigList[tsig][1] == 2:
+					algo = "hmac-sha1"
+				elif self.tsigList[tsig][2] == 3:
+					algo = "hmac-sha256"
+				if algo != "":
+					cfgbuffer += "key \"%s\" {\n\talgorithm %s;\n\tsecret \"%s\";\n};\n" % (self.tsigList[tsig][0],algo,self.tsigList[tsig][2])	
+
+			# check md5 trace to see if subnet file is different
+			tmpmd5 = ssh.sendCmd("cat %s|%s" % (zeyenamedpath,hashCmd))
+			tmpmd52 = subprocess.check_output(["/sbin/md5","-qs","%s\n" % cfgbuffer])
+			if tmpmd5 != tmpmd52:
+				ssh.sendCmd("echo '%s' > %s" % (cfgbuffer,zeyenamedpath))
+				ssh.sendCmd("echo 1 > /tmp/dnsrestart")
+				Logger.ZEyeLogger().write("DNSManager: configuration modified on %s" % addr)
+
+			ssh.close()
+
+		except Exception, e:
+			Logger.ZEyeLogger().write("DNS Manager: FATAL %s" % e)
+		finally:
+			self.decrThreadNb()
 
 	def loadServerList(self,pgcursor):
 		self.serverList = {}
