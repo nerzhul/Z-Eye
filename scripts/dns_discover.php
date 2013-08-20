@@ -82,11 +82,13 @@
 							switch($zonetype) {
 								case "master": $zonetype = 1; break;
 								case "slave": $zonetype = 2; break;
-								case "hint": default: $zonetype = 0; break;
+								case "forward": $zonetype = 3; break;
+								case "hint": $zonetype = 0; break;
+								default: $zonetype = -1; break;
 							}
 						}
 					}
-					if($zonename && !FS::$dbMgr->GetOneData("z_eye_dns_zone_cache","zonename","zonename = '".$zonename."' AND server = '".$data["addr"]."'"))
+					if($zonetype >= 0 && $zonename && !FS::$dbMgr->GetOneData("z_eye_dns_zone_cache","zonename","zonename = '".$zonename."' AND server = '".$data["addr"]."'"))
 						FS::$dbMgr->Insert("z_eye_dns_zone_cache","zonename,zonetype,server","'".$zonename."','".$zonetype."','".$data["addr"]."'");
 				}
 			}
