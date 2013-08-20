@@ -22,7 +22,7 @@ import datetime,re,sys,time,thread,threading,subprocess
 from threading import Lock
 from ipcalc import Network
 
-import Logger,Util,netdiscoCfg
+import Logger,ZEyeUtil,netdiscoCfg
 from SSHBroker import ZEyeSSHBroker
 
 """
@@ -263,7 +263,7 @@ class ZEyeDHCPManager(threading.Thread):
 							for options in self.subnetOptgroupsList[subnet]:
 								# Text values must have braces and strip ' " ' char
 								if self.customOptsList[options[0]][1] == "text":
-									subnetBuf += "\toption %s \"%s\";\n" % (options[0],Util.addslashes(options[1]))
+									subnetBuf += "\toption %s \"%s\";\n" % (options[0],ZEyeUtil.addslashes(options[1]))
 								else:
 									subnetBuf += "\toption %s %s;\n" % (options[0],options[1])
 
@@ -300,7 +300,7 @@ class ZEyeDHCPManager(threading.Thread):
 								for options in self.IPv4OptgroupsList[ip]:
 									# Text values must have braces and strip ' " ' char
 									if self.customOptsList[options[0]][1] == "text":
-										reservBuf += "\toption %s \"%s\";\n" % (options[0],Util.addslashes(options[1]))
+										reservBuf += "\toption %s \"%s\";\n" % (options[0],ZEyeUtil.addslashes(options[1]))
 									else:
 										reservBuf += "\toption %s %s;\n" % (options[0],options[1])
 							reservBuf += "}\n"

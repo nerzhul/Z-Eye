@@ -20,6 +20,13 @@
 """
 
 
+def getCIDR(netmask):
+	netmask = netmask.split('.')
+	binary_str = ''
+	for octet in netmask:
+		binary_str += bin(int(octet))[2:].zfill(8)
+	return str(len(binary_str.rstrip('0')))
+
 def addslashes(s):
 	l = ["\\", '"', "'", "\0", ]
 	for i in l:

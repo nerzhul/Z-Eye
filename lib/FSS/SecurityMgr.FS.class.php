@@ -104,6 +104,7 @@
 					return NULL;
 				}
 			}
+			$tmparr = array_unique($tmparr);
 			return $tmparr;
 		}
 
@@ -150,6 +151,7 @@
 					return NULL;
 				}
 			}
+			$tmparr = array_unique($tmparr);
 			return $tmparr;
 		}
 

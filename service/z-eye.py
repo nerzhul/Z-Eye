@@ -51,6 +51,7 @@ class ZEyeDaemon(Daemon.Daemon):
 		ZEyeServiceMgr().start()	
 
 		ZEyeDHCPManager().start()
+		ZEyeDNS.DNSManager().start()
 		ZEyeDNS.RecordCollector().start()
 		
 		while True:
