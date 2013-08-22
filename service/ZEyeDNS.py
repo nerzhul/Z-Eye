@@ -20,7 +20,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, sys, thread, subprocess, string, time, commands, threading
+import datetime, sys, thread, subprocess, string, time, commands, threading, re
 from threading import Lock
 
 import dns.query
@@ -241,6 +241,11 @@ class DNSManager(threading.Thread):
 				
 				if srvType > 0:
 					validZone = False
+
+					masterList = None
+					slaveList = None
+					cacheList = None
+
 					tmpcfgbuffer = "zone \"%s.\" {\n" % zone
 					# Zone in classic mode
 					if self.zoneList[zone][0] == 1:
@@ -260,7 +265,10 @@ class DNSManager(threading.Thread):
 							# Configuration for masters
 							if srvType == 1:
 								tmpcfgbuffer += "\ttype master;\n"
-								tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (mzonepath,zone)
+								if len(chrootpath) > 0:
+									tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (re.sub(ZEyeUtil.addslashes(chrootpath),"",mzonepath),zone)
+								else:
+									tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (mzonepath,zone)
 
 								transferBuf = ""
 								updateBuf = ""
@@ -271,8 +279,6 @@ class DNSManager(threading.Thread):
 								If there is caches, we must allow queries
 								We also load herited rules if herited is selected
 								"""
-								slaveList = None
-								cacheList = None
 								for cluster in self.zoneList[zone][1]:
 									if len(self.clusterList[cluster][1]) > 0:
 										slaveList = self.clusterList[cluster][1]
@@ -351,8 +357,6 @@ class DNSManager(threading.Thread):
 								If there is caches, we must allow queries
 								We also load herited rules if herited is selected
 								"""
-								masterList = None
-								cacheList = None
 								for cluster in self.zoneList[zone][1]:
 									if len(self.clusterList[cluster][0]) > 0:
 										masterList = self.clusterList[cluster][0]
@@ -440,7 +444,6 @@ class DNSManager(threading.Thread):
 								If there is caches, we must allow queries
 								We also load herited rules if herited is selected
 								"""
-								cacheList = None
 								for cluster in self.zoneList[zone][1]:
 									if len(self.clusterList[cluster][2]) > 0:
 										cacheList = self.clusterList[cluster][2]
@@ -524,6 +527,27 @@ class DNSManager(threading.Thread):
 					
 					if validZone == True:
 						cfgbuffer += "%s};\n" % tmpcfgbuffer
+						# Classic zone
+						if self.zoneList[zone][0] == 1 and srvType == 1:
+							"""
+							Verify if zone file exists on master servers. If not exists create a basic file
+							Not needed for slaves. Zonefile is created when transfer if not exists on slave servers.
+							"""
+							if ssh.isRemoteExists("%s/%s" % (mzonepath,zone)) == False:
+								# SOA record
+								zonefile = "$ORIGIN .\n$TTL 86400\n%s IN SOA %s. hostmaster.%s. (\n\t\t\t1\n\t\t\t86400\n\t\t\t3600\n\t\t\t864000\n\t\t\t3600 )\n" % (zone,nsfqdn,zone)
+
+								# If caches, NS are on caches
+								if cacheList != None:
+									for cache in cacheList:
+										zonefile += "\t\t\tNS\t%s.\n" % self.serverList[cache][7]
+								else:
+									zonefile += "\t\t\tNS\t%s.\n" % nsfqdn
+									if slaveList != None:
+										for slave in slaveList:
+											zonefile += "\t\t\tNS\t%s.\n" % self.serverList[slave][7]
+								zonefile += "\n$ORIGIN %s.\n" % zone
+								ssh.sendCmd("echo '%s' > %s/%s" % (zonefile,mzonepath,zone))
 								
 
 			# check md5 trace to see if subnet file is different
