@@ -183,11 +183,12 @@ class DNSManager(threading.Thread):
 						tmpcfgbuffer += "\t};\n"
 
 					if len(self.clusterList[cluster][7]) > 0:
-						tmpcfgbuffer += "\tallow-query {\n"
+						tmpcfgbuffer += "\tallow-query {\n\t\t127.0.0.1;\n\t\t::1;\n"
 						for acl in self.clusterList[cluster][7]:
-							if acl == "none" or acl == "any":
+							# If none ACL is found, don't write it because we must allow localhost
+							if acl == "any":
 								tmpcfgbuffer += "\t\t%s;\n" % acl
-							else:
+							elif acl != "none":
 								tmpcfgbuffer += "\t\t\"%s\";\n" % acl
 						tmpcfgbuffer += "\t};\n"
 
@@ -287,13 +288,16 @@ class DNSManager(threading.Thread):
 
 									if "herited" in self.zoneList[zone][4]:
 										for acl in self.clusterList[cluster][4]:
-											transferBuf += "\t\t\"%s\";\n" % acl
+											if acl != "none":
+												transferBuf += "\t\t\"%s\";\n" % acl
 									if "herited" in self.zoneList[zone][6]:
 										for acl in self.clusterList[cluster][5]:
-											updateBuf += "\t\t\"%s\";\n" % acl
+											if acl != "none":
+												updateBuf += "\t\t\"%s\";\n" % acl
 									if "herited" in self.zoneList[zone][7]:
 										for acl in self.clusterList[cluster][7]:
-											queryBuf += "\t\t\"%s\";\n" % acl
+											if acl != "none":
+												queryBuf += "\t\t\"%s\";\n" % acl
 
 
 								if slaveList != None:
@@ -335,7 +339,7 @@ class DNSManager(threading.Thread):
 								if len(updateBuf) > 0:
 									tmpcfgbuffer += "\tallow-update {\n%s\t};\n" % updateBuf 
 								if len(queryBuf) > 0:
-									tmpcfgbuffer += "\tallow-query {\n%s\t};\n" % queryBuf
+									tmpcfgbuffer += "\tallow-query {\n%s\t\t127.0.0.1;\n\t\t::1;\n\t};\n" % queryBuf
 
 								validZone = True
 							# Configuration for slaves
@@ -345,8 +349,12 @@ class DNSManager(threading.Thread):
 								for cluster in self.zoneList[zone][1]:
 									for master in self.clusterList[cluster][0]:
 										tmpcfgbuffer += "\t\t%s;\n" % master
-								tmpcfgbuffer += "\t};\n"		
-								tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (szonepath,zone)
+								tmpcfgbuffer += "\t};\n"
+
+								if len(chrootpath) > 0:
+									tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (re.sub(ZEyeUtil.addslashes(chrootpath),"",szonepath),zone)
+								else:
+									tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (szonepath,zone)
 
 								transferBuf = ""
 								notifyBuf = ""
@@ -365,13 +373,16 @@ class DNSManager(threading.Thread):
 										
 									if "herited" in self.zoneList[zone][4]:
 										for acl in self.clusterList[cluster][4]:
-											transferBuf += "\t\t\"%s\";\n" % acl
+											if acl != "none":
+												transferBuf += "\t\t\"%s\";\n" % acl
 									if "herited" in self.zoneList[zone][5]:
 										for acl in self.clusterList[cluster][6]:
-											notifyBuf += "\t\t\"%s\";\n" % acl
+											if acl != "none":
+												notifyBuf += "\t\t\"%s\";\n" % acl
 									if "herited" in self.zoneList[zone][7]:
 										for acl in self.clusterList[cluster][7]:
-											queryBuf += "\t\t\"%s\";\n" % acl
+											if acl != "none":
+												queryBuf += "\t\t\"%s\";\n" % acl
 
 
 								if masterList != None:
@@ -414,7 +425,7 @@ class DNSManager(threading.Thread):
 								if len(notifyBuf) > 0:
 									tmpcfgbuffer += "\tallow-notify {\n%s\t};\n" % notifyBuf
 								if len(queryBuf) > 0:
-									tmpcfgbuffer += "\tallow-query {\n%s\t};\n" % queryBuf
+									tmpcfgbuffer += "\tallow-query {\n%s\t\t127.0.0.1;\n\t\t::1;\n\t};\n" % queryBuf
 
 								validZone = True
 					# Zone in slave mode
@@ -434,6 +445,11 @@ class DNSManager(threading.Thread):
 								for master in self.zoneList[zone][2]:
 									tmpcfgbuffer += "\t\t%s;\n" % master
 								tmpcfgbuffer += "\t};\n"
+
+								if len(chrootpath) > 0:
+									tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (re.sub(ZEyeUtil.addslashes(chrootpath),"",szonepath),zone)
+								else:
+									tmpcfgbuffer += "\tfile \"%s/%s\";\n" % (szonepath,zone)
 
 								transferBuf = ""
 								notifyBuf = ""
@@ -497,7 +513,7 @@ class DNSManager(threading.Thread):
 								if len(notifyBuf) > 0:
 									tmpcfgbuffer += "\tallow-notify {\n%s\t};\n" % notifyBuf
 								if len(queryBuf) > 0:
-									tmpcfgbuffer += "\tallow-query {\n%s\t};\n" % queryBuf
+									tmpcfgbuffer += "\tallow-query {\n%s\t\t127.0.0.1;\n\t\t::1;\n\t};\n" % queryBuf
 								validZone = True
 					# Zone in forward mode
 					elif self.zoneList[zone][0] == 3:
