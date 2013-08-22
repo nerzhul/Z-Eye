@@ -22,9 +22,9 @@
 import datetime, time, os,re, subprocess, thread, threading
 from threading import Lock
 
-import Logger
+import Logger, ZEyeUtil
 
-class ZEyeMRTGDataRefresher(threading.Thread):
+class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 	sleepingTimer = 0
         startTime = 0
 	tc_mutex = Lock()
@@ -34,8 +34,7 @@ class ZEyeMRTGDataRefresher(threading.Thread):
         def __init__(self):
                 """ 5 mins between two refresh """
                 self.sleepingTimer = 5*60
-                threading.Thread.__init__(self)
-
+                ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("MRTG Data Refresher launched")
@@ -43,23 +42,6 @@ class ZEyeMRTGDataRefresher(threading.Thread):
 			self.launchRefreshProcess()
 			time.sleep(self.sleepingTimer)
 
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter + 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
-		
 	def refreshMRTG(self,filename,blackhole):
 		self.incrThreadNb()
 		

@@ -22,14 +22,10 @@ from pyPgSQL import PgSQL
 import datetime,re,sys,time,thread,threading,subprocess
 from threading import Lock
 
-import Logger
+import Logger, ZEyeUtil
 import netdiscoCfg
 
-class ZEyeMRTGDiscoverer(threading.Thread):
-	sleepingTimer = 0
-	startTime = 0
-	threadCounter = 0
-	tc_mutex = Lock()
+class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 	SNMPcc = None
 
 	def __init__(self,SNMPcc):
@@ -37,30 +33,13 @@ class ZEyeMRTGDiscoverer(threading.Thread):
 		self.sleepingTimer = 30*60
 		self.SNMPcc = SNMPcc
 
-		threading.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("MRTG Config discoverer launched")
 		while True:
 			self.launchCfgGenerator()
 			time.sleep(self.sleepingTimer)
-
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter + 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
 
 	def launchCfgGenerator(self):
 		while self.SNMPcc.isRunning == True:

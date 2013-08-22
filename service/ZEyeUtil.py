@@ -19,6 +19,8 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
+import threading
+from threading import Lock
 
 def getCIDR(netmask):
 	netmask = netmask.split('.')
@@ -33,3 +35,32 @@ def addslashes(s):
 		if i in s:
 			s = s.replace(i, '\\'+i)
 	return s
+
+class Thread(threading.Thread):
+	tc_mutex = Lock()
+	threadCounter = 0
+	max_threads = 30
+
+	sleepingTimer = 0
+	startTime = 0
+
+	def __init__(self):
+                threading.Thread.__init__(self)
+
+	def incrThreadNb(self):
+		self.tc_mutex.acquire()
+		self.threadCounter += 1
+		self.tc_mutex.release()
+
+	def decrThreadNb(self):
+		self.tc_mutex.acquire()
+		self.threadCounter = self.threadCounter - 1
+		self.tc_mutex.release()
+
+	def getThreadNb(self):
+		val = 0
+		self.tc_mutex.acquire()
+		val = self.threadCounter
+		self.tc_mutex.release()
+		return val
+

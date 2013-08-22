@@ -19,10 +19,11 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime,re,sys,time,thread,threading,subprocess
+import datetime,re,sys,time,thread,subprocess,threading
 from threading import Lock
 
 import Logger
+import ZEyeUtil
 import netdiscoCfg
 from SNMPBroker import ZEyeSNMPBroker
 
@@ -32,15 +33,11 @@ but also for Z-Eye web interface.
 SNMP cache is used by some other modules to not use DB and improve perfs
 """
 
-class ZEyeSNMPCommCacher(threading.Thread):
-	sleepingTimer = 0
-	startTime = 0
-	threadCounter = 0
+class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 	isRunning = False
 
 	pgcon = None
 	pgcursor = None
-	tc_mutex = Lock()
 	dev_mutex = Lock()
 
 	snmpro = []
@@ -50,30 +47,13 @@ class ZEyeSNMPCommCacher(threading.Thread):
 	def __init__(self):
 		""" 1 hour between two discover """
 		self.sleepingTimer = 60*60
-		threading.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("SNMP communities caching launched")
 		while True:
 			self.launchSNMPCaching()
 			time.sleep(self.sleepingTimer)
-
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter + 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
 
 	def setDevCommunities(self,name,snmpro,snmprw):
 		self.dev_mutex.acquire()

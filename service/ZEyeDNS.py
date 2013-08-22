@@ -33,11 +33,7 @@ import netdiscoCfg
 import ZEyeUtil
 from SSHBroker import ZEyeSSHBroker
 
-class DNSManager(threading.Thread):
-	sleepingTimer = 0
-	startTime = 0
-	threadCounter = 0
-	tc_mutex = Lock()
+class DNSManager(ZEyeUtil.Thread):
 	serverList = {}
 	clusterList = {}
 	tsigList = {}
@@ -47,30 +43,13 @@ class DNSManager(threading.Thread):
 	def __init__(self):
 		""" 1 min between two DNS updates """
 		self.sleepingTimer = 60
-		threading.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("DNS Manager launched")
 		while True:
 			self.launchDNSManagement()
 			time.sleep(self.sleepingTimer)
-
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter + 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
 
 	def launchDNSManagement(self):
 		Logger.ZEyeLogger().write("DNS Management task started")
@@ -796,10 +775,7 @@ class DNSManager(threading.Thread):
 
 
 
-class RecordCollector(threading.Thread):
-	tc_mutex = Lock()
-	threadCounter = 0
-	max_threads = 30
+class RecordCollector(ZEyeUtil.Thread):
 	pgcursor = None
 	serversZones = {}
 
@@ -807,31 +783,13 @@ class RecordCollector(threading.Thread):
                 """ 5 min between two refresh """
                 self.sleepingTimer = 5*60
 
-                threading.Thread.__init__(self)
-
+                ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("DNS Record collector launched")
 		while True:
 			self.launchCachingProcess()
 			time.sleep(self.sleepingTimer)
-
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter += 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
 
 	def collectRecords(self,server,zone):
 		self.incrThreadNb()

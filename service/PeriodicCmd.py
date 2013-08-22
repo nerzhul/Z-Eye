@@ -21,11 +21,9 @@
 from pyPgSQL import PgSQL
 import datetime,re,time,threading,subprocess
 
-import Logger
+import Logger,ZEyeUtil
 
-class ZEyePeriodicCmd(threading.Thread):
-	sleepingTimer = 0
-	startTimer = 0
+class ZEyePeriodicCmd(ZEyeUtil.Thread):
 	processName = ""
 	processCmd = ""
 	
@@ -34,7 +32,7 @@ class ZEyePeriodicCmd(threading.Thread):
 		self.startTimer = start
 		self.processName = pname
 		self.processCmd = cmd
-		threading.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("%s (periodic cmd) process launched" % self.processName)

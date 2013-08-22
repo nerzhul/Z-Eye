@@ -36,11 +36,7 @@ from SSHBroker import ZEyeSSHBroker
 *   OpenBSD: /etc/rc.d/dhcpd restart
 """
 
-class ZEyeDHCPManager(threading.Thread):
-	sleepingTimer = 0
-	startTime = 0
-	threadCounter = 0
-	tc_mutex = Lock()
+class ZEyeDHCPManager(ZEyeUtil.Thread):
 	ipList = {}
 	subnetList = {}
 	rangeList = {}
@@ -56,30 +52,13 @@ class ZEyeDHCPManager(threading.Thread):
 	def __init__(self):
 		""" 1 min between two DHCP updates """
 		self.sleepingTimer = 60
-		threading.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("DHCP Manager launched")
 		while True:
 			self.launchDHCPManagement()
 			time.sleep(self.sleepingTimer)
-
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter + 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
 
 	def launchDHCPManagement(self):
 		Logger.ZEyeLogger().write("DHCP Management task started")

@@ -26,45 +26,24 @@ import random
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
 
-import Logger
+import Logger, ZEyeUtil
 import netdiscoCfg
 from SNMPBroker import ZEyeSNMPBroker
 
-class ZEyeSwitchesBackup(threading.Thread):
-	sleepingTimer = 0
-	startTime = 0
-	threadCounter = 0
-	tc_mutex = Lock()
+class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 	SNMPcc = None
 
 	def __init__(self,SNMPcc):
 		""" 24 hours between two backups """
 		self.sleepingTimer = 24*60*60
 		self.SNMPcc = SNMPcc
-		threading.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("Switch backup process launched")
 		while True:
 			self.launchBackup()
 			time.sleep(self.sleepingTimer)
-
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter + 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
 
 	def launchBackup(self):
 		while self.SNMPcc.isRunning == True:

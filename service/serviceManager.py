@@ -20,13 +20,13 @@
 
 import os,re,time,threading
 
-import Logger
+import Logger, ZEyeUtil
 
-class ZEyeServiceMgr(threading.Thread):
-	sleepingTimer = 0
+class ZEyeServiceMgr(ZEyeUtil.Thread):
+
 	def __init__(self):
 		self.sleepingTimer = 15
-		threading.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("ServiceMgr launched")

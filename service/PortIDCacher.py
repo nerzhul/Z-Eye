@@ -25,11 +25,9 @@ from threading import Lock
 
 import Logger
 import netdiscoCfg
+import ZEyeUtil
 
-class ZEyeSwitchesPortIDCacher(threading.Thread):
-	tc_mutex = Lock()
-	threadCounter = 0
-	max_threads = 30
+class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 	SNMPcc = None
 
 	def __init__(self,SNMPcc):
@@ -37,31 +35,13 @@ class ZEyeSwitchesPortIDCacher(threading.Thread):
                 self.sleepingTimer = 60*60
 		self.SNMPcc = SNMPcc
 
-                threading.Thread.__init__(self)
-
+                ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
 		Logger.ZEyeLogger().write("Switches Port ID caching launched")
 		while True:
 			self.launchCachingProcess()
 			time.sleep(self.sleepingTimer)
-
-	def incrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter += 1
-		self.tc_mutex.release()
-
-	def decrThreadNb(self):
-		self.tc_mutex.acquire()
-		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
-
-	def getThreadNb(self):
-		val = 0
-		self.tc_mutex.acquire()
-		val = self.threadCounter
-		self.tc_mutex.release()
-		return val
 
 	def fetchSNMPInfos(self,ip,devname,devcom,vendor):
 		self.incrThreadNb()
