@@ -341,6 +341,8 @@ class DNSManager(threading.Thread):
 								if len(queryBuf) > 0:
 									tmpcfgbuffer += "\tallow-query {\n%s\t\t127.0.0.1;\n\t\t::1;\n\t};\n" % queryBuf
 
+								tmpcfgbuffer += "\tnotify yes;\n"
+
 								validZone = True
 							# Configuration for slaves
 							elif srvType == 2:
@@ -551,7 +553,20 @@ class DNSManager(threading.Thread):
 							"""
 							if ssh.isRemoteExists("%s/%s" % (mzonepath,zone)) == False:
 								# SOA record
-								zonefile = "$ORIGIN .\n$TTL 86400\n%s IN SOA %s. hostmaster.%s. (\n\t\t\t1\n\t\t\t86400\n\t\t\t3600\n\t\t\t864000\n\t\t\t3600 )\n" % (zone,nsfqdn,zone)
+								ttlRefresh = self.zoneList[zone][8]
+								if ttlRefresh == 0:
+									ttlRefresh = 3600
+								ttlRetry = self.zoneList[zone][9]
+								if ttlRetry == 0:
+									ttlRetry = 180
+								ttlExpire = self.zoneList[zone][10]
+								if ttlExpire == 0:
+									ttlExpire = 864000
+								ttlMinimum = self.zoneList[zone][11]
+								if ttlMinimum == 0:
+									ttlMinimum = 3600
+
+								zonefile = "$ORIGIN .\n$TTL 86400\n%s IN SOA %s. hostmaster.%s. (\n\t\t\t1\n\t\t\t%d\n\t\t\t%d\n\t\t\t%d\n\t\t\t%d )\n" % (zone,nsfqdn,zone,ttlRefresh,ttlRetry,ttlExpire,ttlMinimum)
 
 								# If caches, NS are on caches
 								if cacheList != None:
@@ -720,7 +735,7 @@ class DNSManager(threading.Thread):
 		self.zoneList = {}
 
 		# We only load zones attached to clusters
-		pgcursor.execute("SELECT zonename,zonetype FROM z_eye_dns_zones WHERE zonename IN (SELECT zonename FROM z_eye_dns_zone_clusters) AND zonetype IN (1,2,3)")
+		pgcursor.execute("SELECT zonename,zonetype,ttlrefresh,ttlretry,ttlexpire,ttlminimum FROM z_eye_dns_zones WHERE zonename IN (SELECT zonename FROM z_eye_dns_zone_clusters) AND zonetype IN (1,2,3)")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
 			tmpForwarders = []
@@ -777,7 +792,7 @@ class DNSManager(threading.Thread):
 			for idx2 in pgres2:
 				tmpACLQuery.append(idx2[0])
 
-			self.zoneList[idx[0]] = (idx[1],tmpClusters,tmpMasters,tmpForwarders,tmpACLTransfer,tmpACLNotify,tmpACLUpdate,tmpACLQuery)
+			self.zoneList[idx[0]] = (idx[1],tmpClusters,tmpMasters,tmpForwarders,tmpACLTransfer,tmpACLNotify,tmpACLUpdate,tmpACLQuery,idx[2],idx[3],idx[4],idx[5])
 
 
 
