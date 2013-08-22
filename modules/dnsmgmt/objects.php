@@ -119,6 +119,10 @@
 					array("allow-notify","",array("type" => "raw", "value" => $notifylist)),
 					array("allow-update","",array("type" => "raw", "value" => $updatelist)),
 					array("allow-query","",array("type" => "raw", "value" => $querylist)),
+					array("soa-ttl-refresh","ttlretry",array("type" => "num", "value" => $this->ttlRefresh, "tooltip" => "tooltip-soattl-refresh")),
+					array("soa-ttl-retry","ttlrefresh",array("type" => "num", "value" => $this->ttlRetry, "tooltip" => "tooltip-soattl-retry")),
+					array("soa-ttl-expire","ttlexpire",array("type" => "num", "value" => $this->ttlExpire, "tooltip" => "tooltip-soattl-expire")),
+					array("soa-ttl-minimum","ttlminimum",array("type" => "num", "value" => $this->ttlMinimum, "tooltip" => "tooltip-soattl-minimum")),
 				)).
 				FS::$iMgr->aeTableSubmit($this->zonename != "");
 
@@ -136,18 +140,29 @@
 			$this->updateAcls = array("herited");
 			$this->queryAcls = array("herited");
 			$this->notifyAcls = array("herited");
+			$this->ttlRefresh = 3600;
+			$this->ttlRetry = 180;
+			$this->ttlExpire = 864000;
+			$this->ttlMinimum = 3600;
 
 			if ($this->zonename) {
-				$query = FS::$dbMgr->Select($this->sqlTable,"description,zonetype",$this->sqlAttrId." = '".$this->zonename."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"description,zonetype,ttlrefresh,ttlretry,ttlexpire,ttlminimum",$this->sqlAttrId." = '".$this->zonename."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->description = $data["description"];
 					$this->zonetype = $data["zonetype"];
+
+					$this->ttlRefresh = $data["ttlrefresh"];
+					$this->ttlRetry = $data["ttlretry"];
+					$this->ttlExpire = $data["ttlexpire"];
+					$this->ttlMinimum = $data["ttlminimum"];
+
 					$this->clusters = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_zone_clusters","clustername",
 						$this->sqlAttrId." = '".$this->zonename."'");
 					$this->forwarders = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_zone_forwarders","zoneforwarder",
 						$this->sqlAttrId." = '".$this->zonename."'");
 					$this->masters = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_zone_masters","zonemaster",
 						$this->sqlAttrId." = '".$this->zonename."'");
+
 					$this->transferAcls = FS::$dbMgr->getArray(PgDbConfig::getDbPrefix()."dns_zone_allow_transfer","aclname",
 						$this->sqlAttrId." = '".$this->zonename."'");
 					if (count($this->transferAcls) == 0) {
@@ -202,6 +217,10 @@
 			$updateAcls = FS::$secMgr->checkAndSecurisePostData("update");
 			$queryAcls = FS::$secMgr->checkAndSecurisePostData("query");
 			$notifyAcls = FS::$secMgr->checkAndSecurisePostData("notify");
+			$ttlRefresh = FS::$secMgr->checkAndSecurisePostData("ttlrefresh");
+			$ttlRetry = FS::$secMgr->checkAndSecurisePostData("ttlretry");
+			$ttlExpire = FS::$secMgr->checkAndSecurisePostData("ttlexpire");
+			$ttlMinimum = FS::$secMgr->checkAndSecurisePostData("ttlminimum");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 			$fwdarr = array();
 			$masterarr = array();
@@ -210,6 +229,10 @@
 				!$clusters || $transferAcls && !is_array($transferAcls) ||
 				$updateAcls && !is_array($updateAcls) || $queryAcls && !is_array($queryAcls) ||
 				$notifyAcls && !is_array($notifyAcls) ||
+				!$ttlRefresh || !FS::$secMgr->isNumeric($ttlRefresh) ||
+				!$ttlRetry || !FS::$secMgr->isNumeric($ttlRetry) ||
+				!$ttlExpire || !FS::$secMgr->isNumeric($ttlExpire) ||
+				!$ttlMinimum || !FS::$secMgr->isNumeric($ttlMinimum) ||
 				$edit && $edit != 1) {
 				FS::$iMgr->ajaxEcho("err-bad-datas");
 				return;
@@ -313,8 +336,9 @@
 				$this->removeFromDB($zonename);
 			}
 
-			FS::$dbMgr->Insert($this->sqlTable,$this->sqlAttrId.",description,zonetype",
-				"'".$zonename."','".$description."','".$zonetype."'");
+			FS::$dbMgr->Insert($this->sqlTable,$this->sqlAttrId.",description,zonetype,ttlrefresh,ttlretry,ttlexpire,ttlminimum",
+				"'".$zonename."','".$description."','".$zonetype."','".$ttlRefresh."','".$ttlRetry."','".$ttlExpire.
+				"','".$ttlMinimum."'");
 
 			FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_zone_clusters",$this->sqlAttrId.",clustername",
 				"'".$zonename."','".$clusters."'");
@@ -392,12 +416,21 @@
 		private $description;
 		private $zonetype;
 		private $clusters;
+
 		private $forwarders;
 		private $masters;
+
+		// ACLS
 		private $transferAcls;
 		private $updateAcls;
 		private $queryAcls;
 		private $notifyAcls;
+
+		// TTL for SOA record
+		private $ttlRefresh;
+		private $ttlRetry;
+		private $ttlExpire;
+		private $ttlMinimum;
 	};
 
 	final class dnsACL extends FSMObj {
