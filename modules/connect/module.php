@@ -31,6 +31,7 @@
 		}
 
 		public function TryConnect($username,$password) {
+			$username = strtolower($username);
 			$output = "";
 			$ldapok = false;
 			$ldapident = "";

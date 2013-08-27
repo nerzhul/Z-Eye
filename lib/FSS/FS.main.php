@@ -106,8 +106,17 @@
 		}
 
 		public static function isAjaxCallNoHack() {
-			if (FS::$secMgr->checkAndSecuriseGetData("at"))
+			if (FS::$secMgr->checkAndSecuriseGetData("at")) {
 				return true;
+			}
+			return false;
+		}
+
+		public static function isAndroidCall() {
+			$android = FS::$secMgr->checkAndSecuriseGetData("adod");
+			if ($android && $android == 1) {
+				return true;
+			}
 			return false;
 		}
 
