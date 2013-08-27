@@ -36,7 +36,7 @@
 				return;
 			}
 
-			$cm = FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("connect",3));
+			$cm = FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("connect"),3);
 			if ($cm) {
 				echo "{'code': ".AndroidMgr::$ZEYECODE_KEY_INVALID."}";
 				return;

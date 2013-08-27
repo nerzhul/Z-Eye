@@ -52,6 +52,8 @@
 					"Remove" => "Remove",
 					"rule-read-datas" => "Read datas",
 					"rule-write-datas" => "Write datas",
+					"Save" => "Save",
+					"Settings" => "Settings",
 					"unknown" => "unknown",
 				),
 				"fr" => array(
@@ -75,6 +77,8 @@
 					"Remove" => "Supprimer",
 					"rule-read-datas" => "Lire les données",
 					"rule-write-datas" => "Ecrire les données",
+					"Save" => "Enregistrer",
+					"Settings" => "Paramètres",
 					"unknown" => "inconnu",
 				)
 			);

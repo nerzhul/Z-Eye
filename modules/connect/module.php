@@ -84,6 +84,7 @@
 				$user->setMail($mail);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->genAPIKeyIfNot($username);
 					$this->connectUser($data["uid"]);
 					$this->log(0,"Login success for user '".$username."'","None");
 					$this->reloadInterface($url);
@@ -93,6 +94,7 @@
 					$user->Create();
 					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'");
 					if ($data = FS::$dbMgr->Fetch($query)) { 
+						$this->genAPIKeyIfNot($username);
 						$this->connectUser($data["uid"]);
 						$this->log(0,"Login success for user '".$username."'","None");
 						$this->reloadInterface($url);
@@ -109,6 +111,7 @@
 						FS::$iMgr->ajaxEcho("err-bad-user");
 						return;
 					}
+					$this->genAPIKeyIfNot($username);
 					$this->connectUser($data["uid"]);
 					$this->log(0,"Login success for user '".$username."'","None");
 					$this->reloadInterface($url);
@@ -117,6 +120,27 @@
 			}
 			$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
 			FS::$iMgr->ajaxEcho("err-bad-user");
+		}
+
+		private function genAPIKeyIfNot($username) {
+			if (FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","android_api_key","username = '".$username."'")) {
+				return;
+			}
+			$dict = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+			$valid = false;
+			do {
+				$bigkey = "";
+				for ($i=0;$i<rand(10,40);$i++) {
+					$bigkey .= substr(str_shuffle($dict),0,rand(8,15));
+				}
+				$apikey = hash("sha256",$bigkey);
+				if (!FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","android_api_key","android_api_key = '".$apikey."'")) {
+					FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."users","android_api_key = '".$apikey."'","username = '".$username."'");
+					$valid = true;
+				}
+			}
+			while ($valid == false);
 		}
 		
 		private function connectUser($uid) {
@@ -129,15 +153,20 @@
 		}
 
 		public function LoadForAndroid() {
-			$apikey = FS::$secMgr->checkAndSecurisePostData("apikey");
-			if (!$this->AuthenticateAndroid($apikey)) {
-				return false;
+			if (!$this->AuthenticateAndroid()) {
+				return 1;
 			}
 
-			return NULL;
+			return 0;
 		}
 
-		public function AuthenticateAndroid($apikey) {
+		public function AuthenticateAndroid() {
+			$apikey = FS::$secMgr->checkAndSecurisePostData("apikey");
+			$user = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","username","android_api_key = '".$apikey."' AND android_api_key != ''");
+			if (!$user) {
+				return false;
+			}
+				
 			return true;
 		}
 
