@@ -128,6 +128,19 @@
 			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","failauthnb = '0', last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
 		}
 
+		public function LoadForAndroid() {
+			$apikey = FS::$secMgr->checkAndSecurisePostData("apikey");
+			if (!$this->AuthenticateAndroid($apikey)) {
+				return false;
+			}
+
+			return NULL;
+		}
+
+		public function AuthenticateAndroid($apikey) {
+			return true;
+		}
+
 		public function reloadInterface($url) {
 			if ($url) {
 				$url = "&".$url;

@@ -31,6 +31,7 @@
 	require_once(dirname(__FILE__)."/lib/FSS/FS.main.php");
 	require_once(dirname(__FILE__)."/modules/ActionMgr.class.php");
 	require_once(dirname(__FILE__)."/modules/Ajax.class.php");
+	require_once(dirname(__FILE__)."/modules/AndroidMgr.class.php");
 
 	//$start_time = microtime(true);
 
@@ -41,7 +42,7 @@
 	if (FS::isAJAXCallNoHack()) {
 		FS::$ajaxMgr->handle();
 	}
-	else if (FS::isAndroid()) {
+	else if (FS::isAndroidCall()) {
 		$aMgr = new AndroidMgr();
 		$aMgr->Work();
 	}

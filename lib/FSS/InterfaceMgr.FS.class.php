@@ -157,6 +157,7 @@
 					switch($act) {
 						case 1: default: $output .= $module->getModuleClass()->Load(); break;
 						case 2: $output .= $module->getModuleClass()->getIfaceElmt(); break;
+						case 3: $output .= $module->getModuleClass()->LoadForAndroid(); break;
 					}
 						
 				}
