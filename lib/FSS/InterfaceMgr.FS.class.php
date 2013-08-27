@@ -50,6 +50,7 @@
 				$this->js_buffer[] = "";
 			}
 			$this->js_buffer_idx = 0;
+			$this->moduleIdBuf = array();
 		}
 
 		// header/footer/content
@@ -738,6 +739,10 @@
 		}
 
 		public function getModuleIdByPath($path) {
+			if (isset($this->moduleIdBuf[$path])) {
+				return $this->moduleIdBuf[$path];
+			}
+
 			$dir = opendir(dirname(__FILE__)."/../../modules");
 			$moduleid = 0;
 			$found = false;
@@ -747,8 +752,10 @@
 				if (is_dir($dirpath) && $elem == $path) {
 					$dir2 = opendir($dirpath);
 					while(($elem2 = readdir($dir2)) && $found == false) {
-						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php") {
+							$this->moduleIdBuf[$path] = $moduleid;
 							return $moduleid;
+						}
 					}
 				}
 			}
@@ -789,5 +796,7 @@
 		private $title;
 		private $js_buffer;
 		private $js_buffer_idx;
+
+		private $moduleIdBuf;
 	};
 ?>
