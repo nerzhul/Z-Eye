@@ -113,7 +113,7 @@
 		}
 
 		public static function isAndroidCall() {
-			$android = FS::$secMgr->checkAndSecuriseGetData("adod");
+			$android = FS::$secMgr->checkAndSecuriseGetData("android");
 			if ($android && $android == 1) {
 				return true;
 			}

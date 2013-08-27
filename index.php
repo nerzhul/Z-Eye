@@ -38,10 +38,14 @@
 
 	FS::$sessMgr->Start();
 
-	if(FS::isAJAXCallNoHack()) {
+	if (FS::isAJAXCallNoHack()) {
 		FS::$ajaxMgr->handle();
 	}
-	else if(FS::isActionToDo()) {
+	else if (FS::isAndroid()) {
+		$aMgr = new AndroidMgr();
+		$aMgr->Work();
+	}
+	else if (FS::isActionToDo()) {
 		$aMgr = new ActionMgr();
 		$aMgr->DoAction(FS::$secMgr->checkAndSecuriseGetData("act"));
 	}
