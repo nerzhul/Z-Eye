@@ -48,7 +48,12 @@
 					echo "{'code': ".AndroidMgr::$ZEYECODE_KEY_VALID."}";
 					return;
 				case "loadmm":
-					echo "{'code': 5, 'monitor_allowed': true, 'serverinfos_allowed': true}";
+					$enmon = "false";
+					$cm = FS::$iMgr->getModuleByPath("usersettings");
+					if ($cm) {
+						$enmon = $cm->getModuleClass()->getMonitorOption();;
+					}
+					echo "{'code': 5, 'monitor_allowed': ".$enmon.", 'serverinfos_allowed': true}";
 					return;
 				case "getsinfos":
 					$uptime = shell_exec("/usr/bin/uptime | awk -F',' '{print $1}'");

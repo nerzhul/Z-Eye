@@ -133,24 +133,27 @@
 			return $output;
 		}
 
-		public function loadModule($id,$act=1) {
-			$output = "";
+		private function findModulePath($id) {
 			$dir = opendir(dirname(__FILE__)."/../../modules/");
-			$found = false;
 			$moduleid = 0;
-			while(($elem = readdir($dir)) && $found == false) {
+			while(($elem = readdir($dir))) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
 				if (is_dir($dirpath)) $moduleid++;
 				if (is_dir($dirpath) && $moduleid == $id) {
 					$dir2 = opendir($dirpath);
-					while(($elem2 = readdir($dir2)) && $found == false) {
+					while(($elem2 = readdir($dir2))) {
 						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php")
-							$found = true;
-							$path = $elem;
+							return $elem;
 					}
 				}
 			}
-			if ($found == true) {
+
+			return NULL;
+		}
+
+		public function loadModule($id,$act=1) {
+			$output = "";
+			if ($path = $this->findModulePath($id)) {
 				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
 				if ($module->getRulesClass()->canAccessToModule()) {
 					$this->setCurrentModule($module->getModuleClass());
@@ -169,6 +172,14 @@
 				$output .= $this->printError($this->getLocale("err-unk-module"));
 
 			return $output;
+		}
+
+		public function getModuleByPath($path) {
+			if ($path = $this->findModulePath($this->getModuleIdByPath($path))) {
+				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
+				return $module;
+			}
+			return NULL;
 		}
 
 		public function getRealNameById($id) {

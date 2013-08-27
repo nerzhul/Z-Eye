@@ -44,6 +44,18 @@
 			return $output;
 		}
 
+		public function getMonitorOption() {
+			$apikey = FS::$secMgr->checkAndSecurisePostData("apikey");
+			// true and false are strings, it's a JSON answer 
+			$enmon = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."user_settings_android","enable_monitor",
+				"uid = (SELECT uid FROM ".PgDbConfig::getDbPrefix()."users WHERE android_api_key = '".$apikey."')");
+			if ($enmon == 't') {
+				return "true";
+			}
+
+			return "false";
+		}
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
