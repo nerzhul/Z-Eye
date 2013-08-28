@@ -201,7 +201,7 @@ class ZEyeDBUpgrade():
 				self.tryAddColumn("z_eye_dns_zones","ttlminimum","int DEFAULT 0")
 				self.setDBVersion("1311")
 			if self.dbVersion == "1311":
-				self.tryAddColumn("z_eye_users","android_api_key","varchar(128) UNIQUE DEFAULT ''")
+				self.tryAddColumn("z_eye_users","android_api_key","varchar(128) UNIQUE")
 				self.setDBVersion("1312")
 			if self.dbVersion == "1312":
 				self.tryCreateTable("z_eye_user_settings_android","uid int NOT NULL, enable_monitor bool NOT NULL, PRIMARY KEY(uid)")
