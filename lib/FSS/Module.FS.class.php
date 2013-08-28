@@ -36,6 +36,8 @@
 
 		public function Load() { FS::$iMgr->printError("Unknown module !"); }
 		public function LoadForAndroid() { return "{'code': 7}"; }
+		public function handlePostDatas($act) {}
+
 		public function setModuleId($id) { $this->mid = $id; }
 		public function getModuleId() { return $this->mid; }
 		public function getMenuTitle() { return $this->loc->s("menu-title"); }
