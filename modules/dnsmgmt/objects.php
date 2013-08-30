@@ -1817,6 +1817,23 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					$autoresults["dnsrecord"][] = $data["recval"];
 				}
+				
+				$searchsplit = preg_split("#\.#",$search);
+				$count = count($searchsplit);
+				if ($count > 1) {
+					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."%'",
+						array("order" => "record,zonename","limit" => "10"));
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
+					}
+				}
+				else if ($count == 1) {
+					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$hostname."%'",
+						array("order" => "record,zonename","limit" => "10"));
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
+					}
+				}
 			}
 			else {
 				$output = "";
@@ -1861,6 +1878,59 @@
 
 				if ($found) {
 					$resout .= $this->searchResDiv($output,"title-dns-assoc");
+				}
+				
+				$output = "";
+				$found = false;
+				
+				$searchsplit = preg_split("#\.#",$search);
+				$count = count($searchsplit);
+				if ($count > 1) {
+					$hostname = $searchsplit[0];
+					$dnszone = "";
+					for ($i=1;$i<$count;$i++) {
+						$dnszone .= $searchsplit[$i];
+						if ($i != $count-1)
+							$dnszone .= ".";
+					}
+					$curserver = "";
+					$query = FS::$dbMgr->Select($this->sqlCacheTable,"rectype,recval,server",
+						"record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'",
+						array("order" => "server"));
+					$output = "";
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						if ($found == false) {
+							$found = true;
+						}
+						if ($curserver != $data["server"]) {
+							$curserver = $data["server"];
+							$output .= FS::$iMgr->h3($data["server"],true);
+						}
+						switch($data["rectype"]) {
+							case "A": $output .= $this->loc->s("ipv4-addr").": "; break;
+							case "AAAA": $output .= $this->loc->s("ipv6-addr").": "; break;
+							case "CNAME": $output .= $this->loc->s("Alias").": "; break;
+							default: $output .= $this->loc->s("Other")." (".$data["rectype"]."): "; break;
+						}
+						if (FS::$secMgr->isIP($data["recval"])) {
+							$output .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a>";
+						}
+						else {
+							$output .= $data["recval"];
+						}
+						$output .= "<br />";
+						if ($data["server"]) {
+							$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
+							if ($out != NULL) {
+								$output .= FS::$iMgr->h4("dig-results");
+								$output .= preg_replace("#[\n]#","<br />",$out);
+							}
+						}
+						//$this->nbresults++;
+					}
+					if ($found) {
+						$resout .= $this->searchResDiv($output,"title-dns-records");
+					}
 				}
 				return $resout;
 			}

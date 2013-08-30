@@ -348,13 +348,26 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					$autoresults["ip"][] = $data["ip"];
 				}
+				
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr","macaddr ILIKE '".$search."%'",
+					array("order" => "macaddr","limit" => "10","group" => "macaddr"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["mac"][] = $data["macaddr"];
+				}
+
+				$query = FS::$dbMgr->Select($this->sqlTable,"macaddr","macaddr ILIKE '".$search."%'",
+					array("order" => "macaddr","limit" => "10","group" => "macaddr"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["mac"][] = $data["macaddr"];
+				}
 			}
 			else {
 				$output = "";
 				$resout = "";
 				$found = false;
 				
-				$query = FS::$dbMgr->Select($this->sqlTable,"macaddr,hostname,comment,reserv","ip = '".$search."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"ip,macaddr,hostname,comment,reserv",
+					"ip = '".$search."' OR CAST(macaddr AS varchar) = '".$search."'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
@@ -363,6 +376,11 @@
 						$output .= FS::$iMgr->hr();
 					}
 
+					if (strlen($data["ip"]) > 0) {
+						$output .= $this->loc->s("link-ip").": <a href=\"index.php?mod=".$this->mid.
+							"&s=".$data["ip"]."\">".$data["ip"]."</a><br />";
+					}
+							
 					if (strlen($data["hostname"]) > 0) {
 						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
 					}
@@ -387,7 +405,7 @@
 				}
 		
 				if ($found) {
-					$outres .= $this->searchResDiv($output,"title-dhcp-distrib-z-eye");
+					$resout .= $this->searchResDiv($output,"title-dhcp-distrib-z-eye");
 				}
 				
 				$found = false;
@@ -423,7 +441,8 @@
 				$output = "";
 				$found = false;
 				
-				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr,hostname,leasetime,distributed,server",
+					"ip = '".$search."' OR CAST(macaddr as varchar) = '".$search."'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
@@ -453,6 +472,7 @@
 				if ($found) {
 					$resout .= $this->searchResDiv($output,"title-dhcp-distrib");
 				}
+				
 				return $resout;
 			}
 		}
