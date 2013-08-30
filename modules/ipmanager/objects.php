@@ -108,6 +108,66 @@
 			}
 			return true;
 		}
+		
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			if ($autocomplete) {
+				$query = FS::$dbMgr->Select($this->sqlTable,
+						"vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",
+						array("order" => "vlanid","limit" => "10","group" => "vlanid"));
+
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["vlan"][] = $data["vlanid"];
+				}
+				
+				$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","subnet_short_name",
+					"subnet_short_name ILIKE '".$search."%'",
+					array("order" => "subnet_short_name","limit" => "10","group" => "subnet_short_name"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["vlan"][] = $data["subnet_short_name"];
+				}
+
+				$query = FS::$dbMgr->Select($this->sqlTable,"netid","CAST(netid as TEXT) ILIKE '".$search."%'",
+					array("order" => "netid","limit" => "10","group" => $this->sqlAttrId));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["dhcpsubnet"][] = $data["netid"];
+				}
+			}
+			else {
+				$output = "";
+				$resout = "";
+				$found = false;
+				
+				// by VLAN ID
+				$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,subnet_short_name","vlanid = '".$search."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$output .= $this->loc->s("subnet-shortname").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("ipmanager").
+						"&sh=2\">".$data["subnet_short_name"]."</a><br />".
+						$this->loc->s("netid").": ".$data["netid"]."<br />".
+						$this->loc->s("netmask").": ".$data["netmask"]."<br />";
+					$resout .= $this->searcResDiv($output,"title-vlan-ipmanager");
+				}
+				
+				// by shortname
+				$output = "";
+				
+				$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid","subnet_short_name = '".$search."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+					}
+					$output .= $this->loc->s("vlanid").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("ipmanager").
+						"&sh=2\">".$data["vlanid"]."</a><br />".
+						$this->loc->s("netid").": ".$data["netid"]."<br />".
+						$this->loc->s("netmask").": ".$data["netmask"]."<br />";
+						
+				}
+
+				if ($found) {
+					$resout .= $this->searcResDiv($output,"title-vlan-ipmanager");
+				}
+				return $resout;
+			}
+		}
 
 		private $netid;
 		private $netmask;
