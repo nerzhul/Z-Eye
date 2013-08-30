@@ -37,6 +37,12 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 						$autoresults["device"][] = $data["name"];
 				}
+				
+				$query = FS::$dbMgr->Select($this->sqlTable,"ip","host(ip) ILIKE '".$search."%'",
+					array("order" => "ip","limit" => "10","group" => "ip"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["ip"][] = $data["ip"];
+				}
 			}
 			else {
 				$output = "";
@@ -44,7 +50,7 @@
 				$found = false;
 				
 				// Device himself
-				$query = FS::$dbMgr->Select($this->sqlTable,"mac,ip,description,model","name ILIKE '".$search."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"mac,ip,description,model","name ILIKE '".$search."' OR host(ip) = '".$search."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$output = "<b>".$this->loc->s("Informations")."<i>: </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
 					if (strlen($data["mac"]) > 0) {
@@ -153,6 +159,7 @@
 			parent::__construct();
 			$this->sqlTable = "node";
 			$this->nbtTable = "node_nbt";
+			$this->nipTable = "node_ip";
 		}
 		
 		public function search($search, $autocomplete = false, $autoresults = NULL) {
@@ -168,6 +175,18 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					$autoresults["nbname"][] = $data["nbname"];
 				}
+				
+				$query = FS::$dbMgr->Select($this->nipTable,"ip","host(ip) ILIKE '".$search."%'",
+					array("order" => "ip","limit" => "10","group" => "ip"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["ip"][] = $data["ip"];
+				}
+				
+				$query = FS::$dbMgr->Select("node_nbt","ip","host(ip) ILIKE '".$search."%'",
+					array("order" => "ip","limit" => "10","group" => "ip"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["ip"][] = $data["ip"];
+				}
 			}
 			else {
 				$output = "";
@@ -175,7 +194,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last",
-					"domain ILIKE '%".$search."%' OR nbname ILIKE '%".$search."%'");
+					"domain ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
@@ -195,10 +214,96 @@
 				if ($found) {
 					$resout .= $this->searchResDiv($output."</table>","title-netbios");
 				}
+				
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last",
+					"host(ip) = '".$search."' OR nbname ILIKE '%".$search."%'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+
+					$fst = preg_split("#\.#",$data["time_first"]);
+					$lst = preg_split("#\.#",$data["time_last"]);
+
+					$output .= $this->loc->s("netbios-machine").": \\\\<a href=\"index.php?mod=".$this->mid.
+						"&s=".$data["domain"]."\">".$data["domain"]."</a>";
+						"\\<a href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a><br />";
+						$this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
+						"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")";
+					//$this->nbresults++;
+				}
+
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-netbios");
+				}
+
+				$output = "";
+				$found = false;
+				$lastmac = "";
+				
+				$query = FS::$dbMgr->Select($this->nipTable,"mac,time_first,time_last","ip = '".$search."'",
+					array("order" => "time_last","ordersens" => 1));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+						$lastmac = $data["mac"];
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+					
+					$fst = preg_split("#\.#",$data["time_first"]);
+					$lst = preg_split("#\.#",$data["time_last"]);
+					$output .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"].
+						"</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0].
+						" ".$this->loc->s("and-the")." ".$lst[0].")";
+					//$this->nbresults++;
+				}
+				
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-mac-addr");
+				}
+				
+				if ($lastmac) {
+					$output = "";
+					$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last","mac ILIKE '".$lastmac."' AND active = 't'",array("order" => "time_last","ordersens" => 1,"limit" => 1));
+					if ($data = FS::$dbMgr->Fetch($query)) {
+						$fst = preg_split("#\.#",$data["time_first"]);
+						$lst = preg_split("#\.#",$data["time_last"]);
+						$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
+						$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise",
+							"ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
+						$convport = preg_replace("#\/#","-",$data["port"]);
+						
+						$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ".
+							"[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".
+							$convport."\">".$data["port"]."</a>] ".
+							"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".
+							$data["port"]."\">".FS::$iMgr->img("styles/images/pencil.gif",10,10)."</a>";
+							
+						if ($piece) {
+							$output .= "/ ".$this->loc->s("Plug")." ".$piece;
+						}
+						
+						$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+						$resout .= $this->searchResDiv($output,"title-last-device");
+					}
+				}
+			
+				
+				
+				return $resout;
 			}
 		}
 		
 		private $nbtTable;
+		private $nipTable;
 	};
 	
 	final class netPlug extends FSMObj {

@@ -298,225 +298,33 @@
 			
 			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
 				if (!$autocomp) {
-					$curserver = "";
-					$locoutput = "";
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,server","recval ILIKE '".$search."'");
-					while ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found == 0) {
-							$found = 1;
-						}
-						if ($curserver != $data["server"]) {
-							$curserver = $data["server"];
-							$locoutput .= FS::$iMgr->h4($data["server"],true);
-						}
-						if ($data["record"] == "@") {
-							$locoutput .= $data["zonename"].FS::$iMgr->hr();
-						}
-						else {
-							$locoutput .= $data["record"].".".$data["zonename"].FS::$iMgr->hr();
-						}
-						// Resolve with DIG to search what the DNS thinks
-						if ($data["server"]) {
-							$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
-							if ($out != NULL) {
-								$locoutput .= FS::$iMgr->h4("dig-results");
-								$locoutput .= preg_replace("#[\n]#",FS::$iMgr->hr(),$out);
-							}
-						}
-						$this->nbresults++;
-					}
-
-					if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dns-assoc");
-					$found = 0;
+					$tmpoutput .= (new dnsRecord())->search($search);
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","recval","recval ILIKE '".$search."%'",array("order" => "recval","limit" => "10","group" => "recval"));
-					while ($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["dnsrecord"][] = $data["recval"];
+					(new dnsRecord())->search($search,true,$this->autoresults);
 				}
 			}
 
 			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
 				if (!$autocomp) {
-					$locoutput = "";
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
-					while ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found == 0) {
-							$found = 1;
-						}
-						else $locoutput .= FS::$iMgr->hr();
-						if (strlen($data["hostname"]) > 0) {
-							$locoutput .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
-						}
-
-						if (strlen($data["macaddr"]) > 0) {
-							$locoutput .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
-						}
-
-						$locoutput .= "<b>".$this->loc->s("attribution-type")."</b>: ".($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
-						if ($data["distributed"] != 3 && $data["distributed"] != 4)
-							$locoutput .= $this->loc->s("Validity")." : ".$data["leasetime"];
-						$this->nbresults++;
-					}
-			
-					if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-distrib");
-					$found = 0;
-
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment,reserv","ip = '".$search."'");
-					while ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found == 0) {
-							$found = 1;
-						}
-						else {
-							$locoutput .= FS::$iMgr->hr();
-						}
-
-						if (strlen($data["hostname"]) > 0) {
-							$locoutput .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
-						}
-
-						if (strlen($data["macaddr"]) > 0) {
-							$locoutput .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
-						}
-
-						if (strlen($data["comment"]) > 0) {
-							$locoutput .= "<b>".$this->loc->s("comment")."</b>: ".$data["comment"]."<br />";
-						}
-
-						if ($data["reserv"] == 't') {
-							$locoutput .= "<b>".$this->loc->s("active-reserv")."</b><br />";
-						}
-						else {
-							$locoutput .= $this->loc->s("inactive-reserv")."<br />";
-						}
-
-						$this->nbresults++;
-					}
-			
-					if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dhcp-distrib-z-eye");
-					$found = 0;
-
+					$tmpoutput .= (new dhcpIP())->search($search);
 					$tmpoutput .= (new dhcpServer())->search($search);
-					
-					// subnet on ipmanger
-					$ipmmodid = FS::$iMgr->getModuleIdByPath("ipmanager");
-					$locoutput = "";
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name","netid = '".$search."'");
-					if ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found == 0)
-							$found = 1;
-						$locoutput .= "<b>".$this->loc->s("subnet-shortname")."</b>: <a href=\"index.php?mod=".$ipmmodid."&sh=2\">".$data["subnet_short_name"]."</a><br />".
-							"<b>".$this->loc->s("netid")."</b>: ".$data["netid"]."<br />".
-							"<b>".$this->loc->s("netmask")."</b>: ".$data["netmask"]."<br />".
-							"<b>".$this->loc->s("vlanid")."</b>: ".$data["vlanid"]."<br />";
-							
-					}
-
-					if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-subnet-ipmanager");
-					$found = 0;
+					$tmpoutput .= (new dhcpSubnet())->search($search);
 				}
 				else {
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip_cache","ip","ip ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
-					while ($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["ip"][] = $data["ip"];
-
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","ip ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
-					while ($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["ip"][] = $data["ip"];
-
+					(new dhcpSubnet())->search($search,true,$this->autoresults);
 					(new dhcpServer())->search($search,true,$this->autoresults);
-
-					$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared",
-						"netid","CAST(netid as TEXT) ILIKE '".$search."%'",array("order" => "netid","limit" => "10","group" => "netid"));
-					while ($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["dhcpsubnet"][] = $data["netid"];
-
 				}
 			}
 			
 			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
 				if (!$autocomp) {
-					$locoutput = "";
-					$query = FS::$dbMgr->Select("node_ip","mac,time_first,time_last","ip = '".$search."'",array("order" => "time_last","ordersens" => 1));
-					while ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found == 0) {
-							$found = 1;
-							$lastmac = $data["mac"];
-						}
-						else
-							$locoutput .= FS::$iMgr->hr();
-						$fst = preg_split("#\.#",$data["time_first"]);
-						$lst = preg_split("#\.#",$data["time_last"]);
-						$locoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")";
-						$this->nbresults++;
-					}
-				
-					if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-mac-addr");
-					$found = 0;
-
-					if ($lastmac) {
-						$locoutput = "";
-						$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last","mac ILIKE '".$lastmac."' AND active = 't'",array("order" => "time_last","ordersens" => 1,"limit" => 1));
-						if ($data = FS::$dbMgr->Fetch($query)) {
-							$fst = preg_split("#\.#",$data["time_first"]);
-							$lst = preg_split("#\.#",$data["time_last"]);
-							$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
-							$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
-							$convport = preg_replace("#\/#","-",$data["port"]);
-							$locoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ";
-							$locoutput .= "[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".$convport."\">".$data["port"]."</a>] ";
-							$locoutput .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->img("styles/images/pencil.gif",10,10)."</a>";
-							if ($piece) $tmpoutput .= "/ ".$this->loc->s("Plug")." ".$piece;
-							$locoutput .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
-							$tmpoutput .= $this->divEncapResults($locoutput,"title-last-device");
-						}
-					}
-
-					$locoutput = "";
-					$query = FS::$dbMgr->Select("node_nbt","domain,nbname,nbuser,time_first,time_last","ip = '".$search."'");
-					while ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found == 0) {
-							$found = 1;
-						}
-						else $locoutput .= FS::$iMgr->hr();
-
-						$fst = preg_split("#\.#",$data["time_first"]);
-						$lst = preg_split("#\.#",$data["time_last"]);
-
-						$locoutput .= $this->loc->s("netbios-machine").": \\\\<a href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>";
-						$locoutput .= "\\<a href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a><br />";
-						$locoutput .= $this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
-						$locoutput .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")";
-						$this->nbresults++;
-					}
-
-					if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-netbios");
-					$found = 0;
-
-					// Devices
-					$query = FS::$dbMgr->Select("device","mac,name,description,model","ip = '".$search."'");
-					if ($data = FS::$dbMgr->Fetch($query)) {
-						$locoutput = "<b><i>".$this->loc->s("Name").": </i></b><a href=\"index.php?mod=".$this->mid."&s=".$data["name"]."\">".$data["name"]."</a><br />";
-						$locoutput .= "<b><i>".$this->loc->s("Informations").": </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
-						$locoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a>)<br />";
-						$locoutput .= "<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />";
-						$locoutput .= "<b><i>".$this->loc->s("Description").": </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
-						$tmpoutput = $this->divEncapResults($locoutput,"Network-device");
-						$this->nbresults++;
-					}
+					$tmpoutput .= (new netNode())->search($search);
+					$tmpoutput .= (new netDevice())->search($search);
 				}
 				else {
-					$query = FS::$dbMgr->Select("node_ip","ip","host(ip) ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
-					while ($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["ip"][] = $data["ip"];
-
-					$query = FS::$dbMgr->Select("node_nbt","ip","host(ip) ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
-					while ($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["ip"][] = $data["ip"];
-
-					$query = FS::$dbMgr->Select("device","ip","host(ip) ILIKE '".$search."%'",array("order" => "ip","limit" => "10","group" => "ip"));
-					while ($data = FS::$dbMgr->Fetch($query))
-						$this->autoresults["ip"][] = $data["ip"];
+					(new netNode())->search($search,true,$this->autoresults);
+					(new netDevice())->search($search,true,$this->autoresults);
 				}
 			}
 

@@ -1812,6 +1812,11 @@
 						}
 					}
 				}
+				
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"recval","recval ILIKE '".$search."%'",array("order" => "recval","limit" => "10","group" => "recval"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["dnsrecord"][] = $data["recval"];
+				}
 			}
 			else {
 				$output = "";
@@ -1822,6 +1827,40 @@
 					$output .= preg_replace("#[\n]#","<br />",$out);
 					$resout .= $this->searchResDiv($output,"title-dns-resolution");
 					//$this->nbresults++;
+				}
+				
+				$curserver = "";
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"zonename,record,server","recval ILIKE '".$search."'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+					}
+					if ($curserver != $data["server"]) {
+						$curserver = $data["server"];
+						$output .= FS::$iMgr->h4($data["server"],true);
+					}
+					if ($data["record"] == "@") {
+						$output .= $data["zonename"].FS::$iMgr->hr();
+					}
+					else {
+						$output .= $data["record"].".".$data["zonename"].FS::$iMgr->hr();
+					}
+					// Resolve with DIG to search what the DNS thinks
+					if ($data["server"]) {
+						$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
+						if ($out != NULL) {
+							$output .= FS::$iMgr->h4("dig-results").
+								preg_replace("#[\n]#",FS::$iMgr->hr(),$out);
+						}
+					}
+					//$this->nbresults++;
+				}
+
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-dns-assoc");
 				}
 				return $resout;
 			}

@@ -152,7 +152,7 @@
 				// by shortname
 				$output = "";
 				
-				$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid","subnet_short_name = '".$search."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,vlanid","subnet_short_name = '".$search."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
@@ -165,8 +165,30 @@
 				}
 
 				if ($found) {
-					$resout .= $this->searcResDiv($output,"title-vlan-ipmanager");
+					$resout .= $this->searchResDiv($output,"title-vlan-ipmanager");
 				}
+				
+				// by netid
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,vlanid,subnet_short_name","netid = '".$search."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+					}
+					$output .= "<b>".$this->loc->s("subnet-shortname")."</b>: <a href=\"index.php?mod=".
+						FS::$iMgr->getModuleIdByPath("ipmanager")."&sh=2\">".$data["subnet_short_name"]."</a><br />".
+						"<b>".$this->loc->s("netid")."</b>: ".$data["netid"]."<br />".
+						"<b>".$this->loc->s("netmask")."</b>: ".$data["netmask"]."<br />".
+						"<b>".$this->loc->s("vlanid")."</b>: ".$data["vlanid"]."<br />";
+						
+				}
+
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-subnet-ipmanager");
+				}
+				$found = 0;
 				return $resout;
 			}
 		}
@@ -303,6 +325,7 @@
 	final class dhcpIP extends FSMObj {
 		function __construct() {
 			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_ip";
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dhcp_ip_cache";
 		}
 		
@@ -313,11 +336,62 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					$autoresults["dhcphostname"][] = $data["hostname"];
 				}
+				
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"ip","ip ILIKE '".$search."%'",
+					array("order" => "ip","limit" => "10","group" => "ip"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["ip"][] = $data["ip"];
+				}
+
+				$query = FS::$dbMgr->Select($this->sqlTable,"ip","ip ILIKE '".$search."%'",
+					array("order" => "ip","limit" => "10","group" => "ip"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["ip"][] = $data["ip"];
+				}
 			}
 			else {
 				$output = "";
 				$resout = "";
 				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlTable,"macaddr,hostname,comment,reserv","ip = '".$search."'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+
+					if (strlen($data["hostname"]) > 0) {
+						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+					}
+
+					if (strlen($data["macaddr"]) > 0) {
+						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".$this->mid.
+							"&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+					}
+
+					if (strlen($data["comment"]) > 0) {
+						$output .= "<b>".$this->loc->s("comment")."</b>: ".$data["comment"]."<br />";
+					}
+
+					if ($data["reserv"] == 't') {
+						$output .= "<b>".$this->loc->s("active-reserv")."</b><br />";
+					}
+					else {
+						$output .= $this->loc->s("inactive-reserv")."<br />";
+					}
+
+					//$this->nbresults++;
+				}
+		
+				if ($found) {
+					$outres .= $this->searchResDiv($output,"title-dhcp-distrib-z-eye");
+				}
+				
+				$found = false;
+				$output = "";
 				
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"hostname,macaddr,ip,leasetime,distributed,server","hostname ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -344,6 +418,40 @@
 				
 				if ($found) {
 					$resout .= $this->searchResDiv($output,"title-dhcp-hostname");
+				}
+				
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr,hostname,leasetime,distributed,server","ip = '".$search."'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+					
+					if (strlen($data["hostname"]) > 0) {
+						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+					}
+
+					if (strlen($data["macaddr"]) > 0) {
+						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".
+							$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+					}
+
+					$output .= "<b>".$this->loc->s("attribution-type")."</b>: ".
+						($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
+						
+					if ($data["distributed"] != 3 && $data["distributed"] != 4) {
+						$output .= $this->loc->s("Validity")." : ".$data["leasetime"];
+					}
+					//$this->nbresults++;
+				}
+		
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-dhcp-distrib");
 				}
 				return $resout;
 			}
