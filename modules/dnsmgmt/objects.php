@@ -1358,7 +1358,6 @@
 		private $updateAcls;
 		private $queryAcls;
 	}
-
 			
 	final class dnsServer extends FSMObj {
 		function __construct() {
@@ -1792,5 +1791,40 @@
 		private $keyid;
 		private $keyvalue;
 		private $keyalgo;
+	};
+	
+	final class dnsRecord extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dns_zone_record_cache";
+		}
+		
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			if ($autocomplete) {
+				$out = shell_exec("/usr/bin/dig +short ".$search);
+				if ($out != NULL) {
+					$found = false;
+					$spl = preg_split("#[\n]#",$out);
+					for ($i=0;$i<count($spl) && !$found;$i++) {
+						if (strlen($spl[$i]) > 0) {
+							$found = true;
+							$autoresults["dnsrecord"][] = $search;
+						}
+					}
+				}
+			}
+			else {
+				$output = "";
+				$resout = "";
+				
+				$out = shell_exec("/usr/bin/dig ".$search);
+				if ($out != NULL) {
+					$output .= preg_replace("#[\n]#","<br />",$out);
+					$resout .= $this->searchResDiv($output,"title-dns-resolution");
+					//$this->nbresults++;
+				}
+				return $resout;
+			}
+		}
 	};
 ?>

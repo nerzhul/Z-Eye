@@ -61,19 +61,21 @@
 				// VLAN on a device
 				$output = "";
 				
-				$query = FS::$dbMgr->Select($this->vlanTable,"ip,description","vlan = '".$search."'",array("order" => "ip"));
-				while ($data = FS::$dbMgr->Fetch($query)) {
-					if ($found = false) {
-						$found = true;
+				if (FS::$secMgr->isNumeric($search)) {
+					$query = FS::$dbMgr->Select($this->vlanTable,"ip,description","vlan = '".$search."'",array("order" => "ip"));
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						if ($found = false) {
+							$found = true;
+						}
+						
+						if ($dname = FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$data["ip"]."'")) {
+							$output .= "<li> <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
+						}
 					}
-					
-					if ($dname = FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$data["ip"]."'")) {
-						$output .= "<li> <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-							"&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
+					if ($found) {
+						$resout .= $this->searchResDiv($output,"title-vlan-device");
 					}
-				}
-				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-vlan-device");
 				}
 				return $resout;
 			}
@@ -98,12 +100,13 @@
 			else {
 				$output = "";
 				$resout = "";
+				$found = false;
 				
 				$devportname = array();
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,port,name","name ILIKE '%".$search."%'",array("order" => "ip,port"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					if ($found == 0)
-						$found = 1;
+					if ($found == false)
+						$found = true;
 					$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
 					$prise =  FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 					if (!isset($devportname[$swname]))
@@ -143,6 +146,59 @@
 				return $resout;
 			}
 		}
+	};
+	
+	final class netNode extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = "node";
+			$this->nbtTable = "node_nbt";
+		}
+		
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			if ($autocomplete) {
+				$query = FS::$dbMgr->Select($this->nbtTable,"domain","domain ILIKE '%".$search."%'",
+					array("order" => "domain","limit" => "10","group" => "domain"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["nbdomain"][] = $data["domain"];
+				}
+
+				$query = FS::$dbMgr->Select($this->nbtTable,"nbname","nbname ILIKE '%".$search."%'",
+					array("order" => "nbname","limit" => "10","group" => "nbname"));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["nbname"][] = $data["nbname"];
+				}
+			}
+			else {
+				$output = "";
+				$resout = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last",
+					"domain ILIKE '%".$search."%' OR nbname ILIKE '%".$search."%'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+						$output = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Node")."</th><th>".
+							$this->loc->s("Name")."</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("First-view")."</th><th>".$this->loc->s("Last-view")."</th></tr>";
+					}
+					$fst = preg_split("#\.#",$data["time_first"]);
+					$lst = preg_split("#\.#",$data["time_last"]);
+					$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>".
+						"\\\\<a href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>\\<a href=\"index.php?mod=".
+						$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>".
+						($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".
+						$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
+					//$this->nbresults++;
+				}
+
+				if ($found) {
+					$resout .= $this->searchResDiv($output."</table>","title-netbios");
+				}
+			}
+		}
+		
+		private $nbtTable;
 	};
 	
 	final class netPlug extends FSMObj {
@@ -237,13 +293,14 @@
 						$found = true;
 					}
 					
-					$swname = FS::$dbMgr->GetOneData(($this->deviceTable,"name","ip = '".$data["ip"]."'");
+					$swname = FS::$dbMgr->GetOneData($this->deviceTable,"name","ip = '".$data["ip"]."'");
 					if (!isset($devroom[$swname])) {
 						$devroom[$swname] = array();
 					}
 
 					$devroom[$swname][$data["port"]]["room"] = $data["room"];
-					$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData(,"name","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
+					$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData($this->sqlTable,"name",
+						"ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 					//$this->nbresults++;
 				}
 				if ($found) {
