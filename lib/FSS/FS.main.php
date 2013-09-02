@@ -39,6 +39,7 @@
 	require_once(dirname(__FILE__)."/../../modules/LocalInterface.class.php");
 	require_once(dirname(__FILE__)."/../../modules/Ajax.class.php");
 	require_once(dirname(__FILE__)."/SessionMgr".CLASS_EXT);
+	require_once(dirname(__FILE__)."/Search".CLASS_EXT);
 	require_once(dirname(__FILE__)."/Module".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/ModuleObject".CLASS_EXT);
 
@@ -78,6 +79,9 @@
 
 			// Load Ajax Mgr
 			FS::$ajaxMgr = new AjaxManager();
+
+			// Load Search Mgr
+			FS::$searchMgr = new SearchMgr();
 
 			// Load SNMP Mgr
 			if (Config::enableSNMP()) {
@@ -137,5 +141,6 @@
 		public static $ajaxMgr;
 		public static $snmpMgr;
 		public static $log;
+		public static $searchMgr;
 	};
 ?>

@@ -35,6 +35,7 @@
 			$this->mid = $this->mod->getModuleId();
 			$this->readRight = "";
 			$this->writeRight = "";
+			$this->searchMode = 0;
 		}
 
 		public function renderAll() { return ""; }
@@ -88,13 +89,23 @@
 		}
 		
 		public function searchResDiv($output,$title,$minwidth = false) {
-			if ($output) {
-				return "<div id=\"searchres\"".($minwidth ? " style=\"width: auto; min-width:400px;\"" : "").">".
-						($title != "" ? FS::$iMgr->h3($title).FS::$iMgr->hr() : "").$output."</div>";
-			}
-			else {
+			if ($this->searchMode == 1) {
+				FS::$searchMgr->addResult(array($this->loc->s($title),$output));
 				return "";
 			}
+			else {
+				if ($output) {
+					return "<div id=\"searchres\"".($minwidth ? " style=\"width: auto; min-width:400px;\"" : "").">".
+							($title != "" ? FS::$iMgr->h3($title).FS::$iMgr->hr() : "").$output."</div>";
+				}
+				else {
+					return "";
+				}
+			}
+		}
+
+		public function setSearchMode($sm) {
+			$this->searchMode = $sm;
 		}
 
 		protected $loc;

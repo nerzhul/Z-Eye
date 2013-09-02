@@ -162,11 +162,12 @@
 
 		public function AuthenticateAndroid() {
 			$apikey = FS::$secMgr->checkAndSecurisePostData("apikey");
-			$user = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","username","android_api_key = '".$apikey."' AND android_api_key != ''");
-			if (!$user) {
+			$uid = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","uid","android_api_key = '".$apikey."' AND android_api_key != ''");
+			if (!$uid) {
 				return false;
 			}
 				
+			$_SESSION["uid"] = $uid;
 			return true;
 		}
 

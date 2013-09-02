@@ -188,7 +188,7 @@
 				if ($found) {
 					$resout .= $this->searchResDiv($output,"title-subnet-ipmanager");
 				}
-				$found = 0;
+
 				return $resout;
 			}
 		}

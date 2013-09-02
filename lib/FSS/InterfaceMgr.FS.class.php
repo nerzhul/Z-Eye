@@ -155,7 +155,8 @@
 			$output = "";
 			if ($path = $this->findModulePath($id)) {
 				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
-				if ($module->getRulesClass()->canAccessToModule()) {
+				// Bypass access for Android
+				if ($module->getRulesClass()->canAccessToModule() || $act == 3) {
 					$this->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($id);
 					switch($act) {

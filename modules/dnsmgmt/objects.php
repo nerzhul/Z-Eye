@@ -1821,14 +1821,14 @@
 				$searchsplit = preg_split("#\.#",$search);
 				$count = count($searchsplit);
 				if ($count > 1) {
-					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."%'",
+					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$search."' AND zonename ILIKE '".$search."%'",
 						array("order" => "record,zonename","limit" => "10"));
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						$autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
 					}
 				}
 				else if ($count == 1) {
-					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$hostname."%'",
+					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$search."%'",
 						array("order" => "record,zonename","limit" => "10"));
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						$autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
@@ -1839,11 +1839,13 @@
 				$output = "";
 				$resout = "";
 				
-				$out = shell_exec("/usr/bin/dig ".$search);
-				if ($out != NULL) {
-					$output .= preg_replace("#[\n]#","<br />",$out);
-					$resout .= $this->searchResDiv($output,"title-dns-resolution");
-					//$this->nbresults++;
+				if (!FS::$secMgr->isIP($search)) {
+					$out = shell_exec("/usr/bin/dig ".$search);
+					if ($out != NULL) {
+						$output .= preg_replace("#[\n]#","<br />",$out);
+						$resout .= $this->searchResDiv($output,"title-dns-resolution");
+						//$this->nbresults++;
+					}
 				}
 				
 				$curserver = "";

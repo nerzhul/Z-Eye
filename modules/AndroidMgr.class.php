@@ -21,7 +21,6 @@
 		function __construct() {}
 
 		public function Work() {
-			$apikey = FS::$secMgr->checkAndSecurisePostData("apikey");
 			$act = FS::$secMgr->checkAndSecurisePostData("act");
 
 			// If no action we present the server
@@ -30,18 +29,11 @@
 				return;
 			}
 
-			// APIKey and action are necessary
-			if (!$apikey) {
+			if (!$this->Authenticate()) {
 				echo json_encode(array("code" => AndroidMgr::$ZEYECODE_KEY_INVALID));
 				return;
 			}
 
-			$cm = FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("connect"),3);
-			if ($cm) {
-				echo json_encode(array("code" => AndroidMgr::$ZEYECODE_KEY_INVALID));
-				return;
-			}
-			
 			// Now we use actions to determine what to do
 			switch ($act) {
 				case "auth":
@@ -63,17 +55,24 @@
 						"uptime" => $uptime, "charge" => $charge));
 					return;
 				case "search":
-					$search = FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("search"),3);
-					if ($search) {
-						echo json_encode(array("code" => AndroidMgr::$ZEYECODE_REQUEST_OK, "searchres" => $search));
+					if (FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("search"),3) != 0) {
+						echo json_encode(array("code" => AndroidMgr::$ZEYECODE_ACTION_INVALID));
+						return;
 					}
-					else {
-						echo json_encode(array("code" => AndroidMgr::$ZEYECODE_SERVER_ERROR));
-					}
+
+					echo json_encode(array("code" => AndroidMgr::$ZEYECODE_REQUEST_OK, "sres" => FS::$searchMgr->getResults()));
+					return;
 				default:
 					echo json_encode(array("code" => AndroidMgr::$ZEYECODE_ACTION_INVALID));
 					return;
 			}
+		}
+
+		public function Authenticate() {
+			if (FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("connect"),3) != 0) {
+				return false;
+			}
+			return true;
 		}
 
 		private static $ZEYECODE_SERVER = 1;
