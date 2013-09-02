@@ -71,7 +71,7 @@
 			return false;
 		}
 
-		protected function log($level,$str,$user=NULL) {
+		protected function log($level,$str,$user = NULL) {
 			$this->mod->log($level,$str,$user);
 		}
 
@@ -81,6 +81,20 @@
 
 		public function getErrAlreadyExists() {
 			return $this->errAlreadyExists;
+		}
+		
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			return NULL;
+		}
+		
+		public function searchResDiv($output,$title,$minwidth = false) {
+			if ($output) {
+				return "<div id=\"searchres\"".($minwidth ? " style=\"width: auto; min-width:400px;\"" : "").">".
+						($title != "" ? FS::$iMgr->h3($title).FS::$iMgr->hr() : "").$output."</div>";
+			}
+			else {
+				return "";
+			}
 		}
 
 		protected $loc;
