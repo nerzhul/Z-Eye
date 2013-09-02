@@ -40,6 +40,11 @@ class ZEyeDaemon(Daemon.Daemon):
 		SNMPcc = ZEyeSNMPCommCacher()
 		SNMPcc.start()
 
+		"""
+		We wait 1 second to let SNMP caching start and block other SNMP using processes
+		"""
+		time.sleep(1)
+
 		ZEyeMRTGDiscoverer(SNMPcc).start()
 		ZEyeMRTGDataRefresher().start()
 		ZEyePeriodicCmd(15*60,15,"Netdisco device discovery","/usr/local/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()

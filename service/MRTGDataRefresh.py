@@ -44,7 +44,6 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 
 	def refreshMRTG(self,filename,blackhole):
 		self.incrThreadNb()
-		
 		try:
 			subprocess.check_output(["/usr/local/bin/perl", "/usr/local/bin/mrtg", "%s" % filename])
 		except Exception, e:
@@ -53,6 +52,9 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 			self.decrThreadNb()
 
 	def launchRefreshProcess(self):
+		while self.SNMPcc.isRunning == True:
+                        Logger.ZEyeLogger().write("MRTG-Datas-Refresh: SNMP community caching is running, waiting 10 seconds")
+                        time.sleep(10)	
 		try:
 			starttime = datetime.datetime.now()
 			Logger.ZEyeLogger().write("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")

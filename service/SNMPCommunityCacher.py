@@ -108,29 +108,34 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		try:
 			foundro = ""
 			foundrw = ""
-			SNMPB = ZEyeSNMPBroker(ip)	
+			SNMPB = ZEyeSNMPBroker(ip)
 
 			# First we test the collected communities
-			if self.testCommunity(SNMPB,self.deviceCommunities[name][0]) == True:
-				foundro = self.deviceCommunities[name][0]
+			if name in self.deviceCommunities:
+				if self.testCommunity(SNMPB,self.deviceCommunities[name][0]) == True:
+					foundro = self.deviceCommunities[name][0]
 
-			if self.testCommunity(SNMPB,self.deviceCommunities[name][1]) == True:
-				foundrw = self.deviceCommunities[name][1]
+			if name in self.deviceCommunities:
+				if self.testCommunity(SNMPB,self.deviceCommunities[name][1]) == True:
+					foundrw = self.deviceCommunities[name][1]
 
 			if foundro == "":
 				for comm in self.snmpro:
 					if self.testCommunity(SNMPB,comm) == True:
 						foundro = comm
+					if foundro != "":
+						break
 
 			if foundrw == "":
 				for comm in self.snmprw:
 					if self.testCommunity(SNMPB,comm) == True:
 						foundrw = comm
+					if foundrw != "":
+						break
 
 			self.setDevCommunities(name,foundro,foundrw)
-					
 		except Exception, e:
-			Logger.ZEyeLogger().write("SNMP-Communities-Caching: FATAL %s" % e)
+			Logger.ZEyeLogger().write("SNMP-Communities-Caching: search FATAL %s" % e)
 		finally:
 			self.decrThreadNb()
 
@@ -141,9 +146,9 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		pgres = self.pgcursor.fetchall()
 		for idx in pgres:
 			if idx[1] == True:
-				self.snmpro.append(idx[1])
+				self.snmpro.append(idx[0])
 			if idx[2] == True:
-				self.snmprw.append(idx[2])
+				self.snmprw.append(idx[0])
 
 	def loadDevicesCommunities(self):
 		self.deviceCommunities = {}

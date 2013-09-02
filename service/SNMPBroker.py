@@ -32,16 +32,13 @@ class ZEyeSNMPBroker():
 		self.ip = ip
 
 	def snmpget(self,devcom,mib):
-		if self.ip == "":
-			Logger.ZEyeLogger().write("SNMPBroker: invalid IP '%s'" % (self.ip))
-			return 0
-
 		cmdGen = cmdgen.CommandGenerator()
 		errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
 			cmdgen.CommunityData(devcom),
 			cmdgen.UdpTransportTarget((self.ip, 161)),
 			mib
 		)
+
 		if errorIndication:
 			Logger.ZEyeLogger().write("SNMPBroker: errorIndication on %s: %s" % (self.ip,errorIndication))
 			return -1
@@ -54,6 +51,7 @@ class ZEyeSNMPBroker():
 		else:
 			for name, val in varBinds:
 				return val.prettyPrint()
+		Logger.ZEyeLogger().write("SNMPBroker: test 4")
 		return 0
 
 	def snmpset(self,devcom,mib,value):
