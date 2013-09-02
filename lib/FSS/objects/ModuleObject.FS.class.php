@@ -35,7 +35,6 @@
 			$this->mid = $this->mod->getModuleId();
 			$this->readRight = "";
 			$this->writeRight = "";
-			$this->searchMode = 0;
 		}
 
 		public function renderAll() { return ""; }
@@ -89,7 +88,7 @@
 		}
 		
 		public function searchResDiv($output,$title,$minwidth = false) {
-			if ($this->searchMode == 1) {
+			if (FS::$searchMgr->getMode() == 1) {
 				FS::$searchMgr->addResult(array($this->loc->s($title),$output));
 				return "";
 			}
@@ -102,10 +101,6 @@
 					return "";
 				}
 			}
-		}
-
-		public function setSearchMode($sm) {
-			$this->searchMode = $sm;
 		}
 
 		protected $loc;

@@ -33,6 +33,7 @@
 
         class SearchMgr {
                 function __construct() {
+			$this->searchMode = 0;
 			$this->results = array();
 			$this->resultsCount = 0;
 		}
@@ -45,6 +46,17 @@
 		public function getResults() {
 			return $this->results;
 		}
+
+		public function setMode($sm) {
+			$this->searchMode = $sm;
+		}
+
+		public function getMode() {
+			return $this->searchMode;
+		}
+
+		// 0: classic / 1: Android
+		private $searchMode;
 
 		private $results;
 		private $resultsCount;
