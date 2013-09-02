@@ -26,43 +26,52 @@
 
 			// If no action we present the server
 			if (!$act) {
-				echo "{'server': 'Z-Eye','version':'".Config::getWebsiteName()."', 'code': ".AndroidMgr::$ZEYECODE_SERVER."}";
+				echo json_encode(array("server" => "Z-Eye", "version" => Config::getWebsiteName(), "code" => AndroidMgr::$ZEYECODE_SERVER));
 				return;
 			}
 
 			// APIKey and action are necessary
 			if (!$apikey) {
-				echo "{'code': ".AndroidMgr::$ZEYECODE_KEY_INVALID."}";
+				echo json_encode(array("code" => AndroidMgr::$ZEYECODE_KEY_INVALID));
 				return;
 			}
 
 			$cm = FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("connect"),3);
 			if ($cm) {
-				echo "{'code': ".AndroidMgr::$ZEYECODE_KEY_INVALID."}";
+				echo json_encode(array("code" => AndroidMgr::$ZEYECODE_KEY_INVALID));
 				return;
 			}
 			
 			// Now we use actions to determine what to do
 			switch ($act) {
 				case "auth":
-					echo "{'code': ".AndroidMgr::$ZEYECODE_KEY_VALID."}";
+					echo json_encode(array("code" => AndroidMgr::$ZEYECODE_KEY_VALID));
 					return;
 				case "loadmm":
 					$enmon = "false";
 					$cm = FS::$iMgr->getModuleByPath("usersettings");
 					if ($cm) {
-						$enmon = $cm->getModuleClass()->getMonitorOption();;
+						$enmon = $cm->getModuleClass()->getMonitorOption();
 					}
-					echo "{'code': 5, 'monitor_allowed': ".$enmon.", 'serverinfos_allowed': true}";
+					echo json_encode(array("code" => AndroidMgr::$ZEYECODE_REQUEST_OK, "monitor_allowed" => $enmon, "serverinfos_allowed" => true,
+						"search_allowed" => true));
 					return;
 				case "getsinfos":
 					$uptime = shell_exec("/usr/bin/uptime | awk -F',' '{print $1}'");
 					$charge = shell_exec("/usr/bin/uptime |awk -F': ' '{print $2}'");
-					echo "{'code': ".AndroidMgr::$ZEYECODE_REQUEST_OK.", 'version':'".Config::getWebsiteName().
-						"', 'uptime':'".$uptime."', 'charge':'".$charge."'}"; break;
-					break;
+					echo json_encode(array("code" => AndroidMgr::$ZEYECODE_REQUEST_OK, "version" => Config::getWebsiteName(),
+						"uptime" => $uptime, "charge" => $charge));
+					return;
+				case "search":
+					$search = FS::$iMgr->loadModule(FS::$iMgr->getModuleIdByPath("search"),3);
+					if ($search) {
+						echo json_encode(array("code" => AndroidMgr::$ZEYECODE_REQUEST_OK, "searchres" => $search));
+					}
+					else {
+						echo json_encode(array("code" => AndroidMgr::$ZEYECODE_SERVER_ERROR));
+					}
 				default:
-					echo "{'code': ".AndroidMgr::$ZEYECODE_ACTION_INVALID."}";
+					echo json_encode(array("code" => AndroidMgr::$ZEYECODE_ACTION_INVALID));
 					return;
 			}
 		}

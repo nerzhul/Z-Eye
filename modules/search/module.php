@@ -47,6 +47,10 @@
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-search"));
 			return $output;
 		}
+		
+		public function LoadForAndroid() {
+			return array();
+		}
 
 		private function findRefsAndShow($search,$autocomp=false) {
 			$output = "";
