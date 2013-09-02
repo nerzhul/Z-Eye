@@ -51,7 +51,6 @@ class ZEyeSNMPBroker():
 		else:
 			for name, val in varBinds:
 				return val.prettyPrint()
-		Logger.ZEyeLogger().write("SNMPBroker: test 4")
 		return 0
 
 	def snmpset(self,devcom,mib,value):
