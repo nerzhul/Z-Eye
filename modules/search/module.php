@@ -30,7 +30,8 @@
 			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array(),
-				"dhcpcluster" => array(), "dhcpserver" => array(), "dhcpoptions" => array(), "dhcpsubnet" => array());
+				"dhcpcluster" => array(), "dhcpserver" => array(), "dhcpoptions" => array(), "dhcpsubnet" => array(),
+				"dnszone" => array());
 			$this->nbresults = 0;
 		}
 
@@ -221,6 +222,8 @@
 						}
 						if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dns-records");
 						$found = 0;
+						
+						
 					}
 					else if ($autocomp) {
 						if ($count > 1) {
@@ -240,10 +243,18 @@
 				if (FS::$secMgr->isDNSName($search)) {
 					if (!$autocomp) {
 						$tmpoutput .= (new dnsRecord())->search($search);
+						$tmpoutput .= (new dnsZone())->search($search);
 					}
 					else {
 						(new dnsRecord())->search($search,true,$this->autoresults);
 					}
+				}
+				
+				if (!$autocomp) {
+					$tmpoutput .= (new dnsZone())->search($search);
+				}
+				else {
+					(new dnsZone())->search($search,true,$this->autoresults);
 				}
 			}
 

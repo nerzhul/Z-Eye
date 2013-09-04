@@ -60,7 +60,6 @@
 				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
 			}
 
-
 			$ztsel = FS::$iMgr->select("zonetype"/*JS*/).
 				FS::$iMgr->selElmt($this->loc->s("Classic"),"1",$this->zonetype == 1).
 				FS::$iMgr->selElmt($this->loc->s("Slave-only"),"2",$this->zonetype == 2).
@@ -127,6 +126,56 @@
 				FS::$iMgr->aeTableSubmit($this->zonename != "");
 
 			return $output;
+		}
+		
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
+			if ($autocomplete) {
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["dnszone"][] = $search;
+				}
+			}
+			else {
+				$resout = "";
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",description,zonetype",
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (!$found) {
+						$found = true;
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+					
+					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"]."<br />".
+						$this->loc->s("Zone-type");
+					switch ($data["zonetype"]) {
+						case 1:
+							$output .= $this->loc->s("Classic");
+							break;
+						case 2:
+							$output .= $this->loc->s("Slave-only");
+							break;
+						case 3:
+							$output .= $this->loc->s("Forward-only");
+							break
+					}		
+				}
+				
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-dns-zone");
+				}
+				
+				return $resout;
+			}
 		}
 
 		protected function Load($name = "") {
