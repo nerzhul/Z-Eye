@@ -77,6 +77,24 @@
 
 			return $output;
 		}
+		
+		private function hasDeviceReadOrWriteRight($snmpro, $snmprw, $dip) {
+			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+				return false;
+			}
+			return true;
+		}
+		
+		private function hasDeviceWriteRight($snmprw,$dip) {
+			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+				return false;
+			}
+			return true;
+		}
 
 		private function showPortInfos() {
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
@@ -87,10 +105,7 @@
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+			if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$dip) {
 				return FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 			}
 			switch($err) {
@@ -120,8 +135,7 @@
 				if (!$sh || $sh == 1) {
 					$query = FS::$dbMgr->Select("device_port","name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."' AND port ='".$port."'");
 					if ($data = FS::$dbMgr->Fetch($query)) {
-						if ($portid != -1 && (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
-							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write"))) {
+						if ($portid != -1 && $this->hasDeviceWriteRight($snmprw,$dip)) {
 							$output .= FS::$iMgr->cbkForm("9");
 							$output .= FS::$iMgr->hidden("portid",$portid);
 							$output .= FS::$iMgr->hidden("sw",$device);
@@ -166,8 +180,7 @@
 
 						$output .= "</table>";
 						if ($portid != -1) {
-							if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") ||
-								FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+							if ($this->hasDeviceWriteRight($snmprw,$dip)) {
 								$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
 								$output .= "</form>";
 							}
@@ -209,7 +222,7 @@
 				}
 				// Monitoring
 				else if ($sh == 3) {
-					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") && 
+					if (!$this->hasDeviceWriteRight($snmprw,$dip) && 
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						return $output;
@@ -279,10 +292,7 @@
 
 			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) { 
+			if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$dip)) { 
 				return FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 			}
 			if (!FS::isAjaxCall()) {
@@ -1278,10 +1288,7 @@
 					// Rights: show only reading/writing switches
 					$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
-					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
-						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$data["ip"]."_read") && 
-						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$data["ip"]."_write")) 
+					if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$data["ip"])) 
 						continue;
 
 					// Split WiFi and Switches
@@ -1388,8 +1395,7 @@
 
 						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$sw)) {
 							echo "NORIGHTS";
 							return;	
 						}
@@ -1417,8 +1423,7 @@
 						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
 						$this->devapi->setDevice($device);
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$sw)) {
 							echo "NORIGHTS";
 							return;	
 						}
@@ -1449,8 +1454,7 @@
 						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
 						$this->devapi->setDevice($device);
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$sw."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$sw)) {
 							echo "NORIGHTS";
 							return;	
 						}
@@ -1489,8 +1493,7 @@
 						$dip = $this->devapi->getDeviceIP();
 
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$sw."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							echo $this->loc->s("err-no-credentials");
 							return;	
 						}
@@ -1572,8 +1575,7 @@
 						$this->devapi->setDevice($device);
 						$dip = $this->devapi->getDeviceIP();
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 							return;	
 						}
@@ -1608,8 +1610,7 @@
 						$this->devapi->setDevice($device);
 						$dip = $this->devip->getDeviceIP();
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&err=99");
 							return;	
 						}
@@ -1634,8 +1635,7 @@
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 							return;	
 						}
@@ -1683,8 +1683,7 @@
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 							return;	
 						}
@@ -1700,8 +1699,7 @@
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 							return;	
 						}
@@ -1731,8 +1729,7 @@
 						$this->devapi->setDevice($device);
 						$dip = $this->devapi->getDeviceIP();
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 							return;	
 						}
@@ -1754,7 +1751,7 @@
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write") && 
+						if (!$this->hasDeviceWriteRight($snmprw,$dip) && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 							return;	
@@ -1798,8 +1795,7 @@
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							FS::$iMgr->redir("mod=".$this->mid."&err=99");
 							return;	
 						}
