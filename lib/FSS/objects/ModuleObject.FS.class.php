@@ -83,7 +83,7 @@
 			return $this->errAlreadyExists;
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			return NULL;
 		}
 		

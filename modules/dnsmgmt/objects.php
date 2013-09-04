@@ -128,7 +128,7 @@
 			return $output;
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return "";
 			}
@@ -137,7 +137,7 @@
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
 					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dnszone"][] = $search;
+					FS::$searchMgr->addAR("dnszone",$data[$this->sqlAttrId]);
 				}
 			}
 			else {
@@ -632,7 +632,7 @@
 			return $output;
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return "";
 			}
@@ -641,7 +641,7 @@
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
 					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dnsacl"][] = $search;
+					FS::$searchMgr->addAR("dnsacl",$data[$this->sqlAttrId]);
 				}
 			}
 			else {
@@ -1050,7 +1050,7 @@
 			return $output;
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return "";
 			}
@@ -1059,7 +1059,7 @@
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
 					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dnscluster"][] = $search;
+					FS::$searchMgr->addAR("dnscluster",$data[$this->sqlAttrId]);
 				}
 			}
 			else {
@@ -1571,7 +1571,7 @@
 			return $output;
 		}
 
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return "";
 			}
@@ -1580,7 +1580,7 @@
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
 					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dnsserver"][] = $search;
+					FS::$searchMgr->addAR("dnsserver",$data[$this->sqlAttrId]);
 				}
 			}
 			else {
@@ -1810,7 +1810,7 @@
 			return $output;
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return "";
 			}
@@ -1819,7 +1819,7 @@
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
 					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dnstsig"][] = $search;
+					FS::$searchMgr->addAR("dnstsig",$data[$this->sqlAttrId]);
 				}
 			}
 			else {
@@ -2002,7 +2002,7 @@
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dns_zone_record_cache";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$out = shell_exec("/usr/bin/dig +short ".$search);
 				if ($out != NULL) {
@@ -2011,14 +2011,15 @@
 					for ($i=0;$i<count($spl) && !$found;$i++) {
 						if (strlen($spl[$i]) > 0) {
 							$found = true;
-							$autoresults["dnsrecord"][] = $search;
+							FS::$searchMgr->addAR("dnsrecord",$search);
 						}
 					}
 				}
 				
-				$query = FS::$dbMgr->Select($this->sqlCacheTable,"recval","recval ILIKE '".$search."%'",array("order" => "recval","limit" => "10","group" => "recval"));
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"recval","recval ILIKE '".$search."%'",
+					array("order" => "recval","limit" => "10","group" => "recval"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dnsrecord"][] = $data["recval"];
+					FS::$searchMgr->addAR("dnsrecord",$data["recval"]);
 				}
 				
 				$searchsplit = preg_split("#\.#",$search);
@@ -2027,14 +2028,14 @@
 					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$search."' AND zonename ILIKE '".$search."%'",
 						array("order" => "record,zonename","limit" => "10"));
 					while ($data = FS::$dbMgr->Fetch($query)) {
-						$autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
+						FS::$searchMgr->addAR("dnsrecord",$data["record"].".".$data["zonename"]);
 					}
 				}
 				else if ($count == 1) {
 					$query = FS::$dbMgr->Select($this->sqlCacheTable,"record,zonename","record ILIKE '".$search."%'",
 						array("order" => "record,zonename","limit" => "10"));
 					while ($data = FS::$dbMgr->Fetch($query)) {
-						$autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
+						FS::$searchMgr->addAR("dnsrecord",$data["record"].".".$data["zonename"]);
 					}
 				}
 			}

@@ -109,27 +109,27 @@
 			return true;
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,
 						"vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",
 						array("order" => "vlanid","limit" => "10","group" => "vlanid"));
 
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["vlan"][] = $data["vlanid"];
+					FS::$searchMgr->addAR("vlan",$data["vlanid"]);
 				}
 				
 				$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","subnet_short_name",
 					"subnet_short_name ILIKE '".$search."%'",
 					array("order" => "subnet_short_name","limit" => "10","group" => "subnet_short_name"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["vlan"][] = $data["subnet_short_name"];
+					FS::$searchMgr->addAR("dhcpsubnet",$data["subnet_short_name"]);
 				}
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"netid","CAST(netid as TEXT) ILIKE '".$search."%'",
 					array("order" => "netid","limit" => "10","group" => $this->sqlAttrId));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpsubnet"][] = $data["netid"];
+					FS::$searchMgr->addAR("dhcpsubnet",$data["netid"]);
 				}
 			}
 			else {
@@ -212,24 +212,24 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_servers";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"description","description ILIKE '%".$search."%'",array("order" => "description","limit" => "10",
 					"group" => "description"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpserver"][] = $data["description"];
+					FS::$searchMgr->addAR("dhcpserver",$data["description"]);
 				}
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"alias","alias ILIKE '%".$search."%'",array("order" => "alias","limit" => "10",
 					"group" => "alias"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpserver"][] = $data["alias"];
+					FS::$searchMgr->addAR("dhcpserver",$data["alias"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"addr","addr ILIKE '%".$search."%'",array("order" => "addr","limit" => "10",
 					"group" => "addr"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpserver"][] = $data["addr"];
+					FS::$searchMgr->addAR("dhcpserver",$data["addr"]);
 				}
 			}
 			else {
@@ -272,12 +272,12 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_cluster";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","limit" => "10",
 					"group" => "clustername"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpcluster"][] = $data["clustername"];
+					FS::$searchMgr->addAR("dhcpcluster",$data["clustername"]);
 				}
 			}
 			else {
@@ -329,36 +329,36 @@
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dhcp_ip_cache";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"hostname", "hostname ILIKE '%".$search."%'",
 					array("order" => "hostname","limit" => "10","group" => "hostname"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcphostname"][] = $data["hostname"];
+					FS::$searchMgr->addAR("dhcphostname",$data["hostname"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"ip","ip ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["ip"][] = $data["ip"];
+					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip","ip ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["ip"][] = $data["ip"];
+					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr","macaddr ILIKE '".$search."%'",
 					array("order" => "macaddr","limit" => "10","group" => "macaddr"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["mac"][] = $data["macaddr"];
+					FS::$searchMgr->addAR("mac",$data["macaddr"]);
 				}
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"macaddr","macaddr ILIKE '".$search."%'",
 					array("order" => "macaddr","limit" => "10","group" => "macaddr"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["mac"][] = $data["macaddr"];
+					FS::$searchMgr->addAR("mac",$data["macaddr"]);
 				}
 			}
 			else {
@@ -486,12 +486,12 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_custom_option";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optname","optname ILIKE '%".$search."%'",array("order" => "optname","limit" => "10",
 					"group" => "optname"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpoptions"][] = $data["optname"];
+					FS::$searchMgr->addAR("dhcpoptions",$data["optname"]);
 				}
 			}
 			else {
@@ -530,12 +530,12 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_option";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optalias","optalias ILIKE '%".$search."%'",array("order" => "optalias","limit" => "10",
 					"group" => "optalias"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpoptions"][] = $data["optalias"];
+					FS::$searchMgr->addAR("dhcptions",$data["optalias"]);
 				}
 			}
 			else {
@@ -573,12 +573,12 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_option_group";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optgroup","optgroup ILIKE '%".$search."%'",array("order" => "optgroup","limit" => "10",
 					"group" => "optgroup"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["dhcpoptions"][] = $data["optgroup"];
+					FS::$searchMgr->addAR("dhcpoptions",$data["optgroup"]);
 				}
 			}
 			else {

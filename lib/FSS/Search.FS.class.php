@@ -34,6 +34,7 @@
         class SearchMgr {
                 function __construct() {
 			$this->searchMode = 0;
+			$this->autoResults = array();
 			$this->results = array();
 			$this->resultsCount = 0;
 		}
@@ -41,6 +42,13 @@
 		public function addResult($res) {
 			$this->results[] = $res;
 			$this->resultsCount++;
+		}
+
+		public funciton addAR($idx,$res) {
+			if (!isset($this->autoResults[$idx])) {
+				$this->autoResults[$idx] = array();
+			}
+			$this->autoResults[$idx][] = $res;
 		}
 
 		public function getResults() {
@@ -54,9 +62,15 @@
 		public function getMode() {
 			return $this->searchMode;
 		}
+		
+		public function getAutoResults() {
+			return $this->autoResults;
+		}
 
 		// 0: classic / 1: Android
 		private $searchMode;
+
+		private $autoResults;
 
 		private $results;
 		private $resultsCount;

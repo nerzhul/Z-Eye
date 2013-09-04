@@ -27,11 +27,6 @@
 			parent::__construct($locales);
 			$this->modulename = "search";
 
-			$this->autoresults = array("device" => array(), "dhcphostname" => array(), "dnsrecord" => array(), "ip" => array(),
-				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
-				"prise" => array(), "room" => array(), "vlan" => array(),
-				"dhcpcluster" => array(), "dhcpserver" => array(), "dhcpoptions" => array(), "dhcpsubnet" => array(),
-				"dnszone" => array(), "dnsacl" => array(), "dnscluster" => array(), "dnsserver" => array(), "dnstsig" => array());
 			$this->nbresults = 0;
 		}
 
@@ -91,19 +86,17 @@
 				else
 					$this->showNamedInfos($search,true);
 				$output = "[";
-				if (is_array($this->autoresults)) {
-					$outresults = array();
-					foreach ($this->autoresults as $key => $values) {
-						for ($i=0;$i<count($values);$i++) {
-							$outresults[] = $values[$i];
-						}
+				$outresults = array();
+				foreach (FS::$searchMgr->getAutoResults() as $key => $values) {
+					for ($i=0;$i<count($values);$i++) {
+						$outresults[] = $values[$i];
 					}
-					$outresults = array_unique($outresults);
-					sort($outresults);
-					for ($i=0;$i<count($outresults) && $i<10;$i++) {
-						if ($i!=0) $output .= ",";
-						$output .= "{\"id\":\"".$outresults[$i]."\",\"value\":\"".$outresults[$i]."\"}";
-					}
+				}
+				$outresults = array_unique($outresults);
+				sort($outresults);
+				for ($i=0;$i<count($outresults) && $i<10;$i++) {
+					if ($i!=0) $output .= ",";
+					$output .= "{\"id\":\"".$outresults[$i]."\",\"value\":\"".$outresults[$i]."\"}";
 				}
 				$output .= "]";
 			}
@@ -122,9 +115,9 @@
 					$tmpoutput .= (new netDevice())->search($search);
 				}
 				else {
-					(new netPlug())->search($search,true,$this->autoresults);
-					(new netRoom())->search($search,true,$this->autoresults);
-					(new netDevice())->search($search,true,$this->autoresults);
+					(new netPlug())->search($search,true);
+					(new netRoom())->search($search,true);
+					(new netDevice())->search($search,true);
 				}
 			}
 
@@ -133,7 +126,7 @@
 					$tmpoutput .= (new dhcpSubnet())->search($search);
 				}
 				else {
-					(new netDevice())->search($search,true,$this->autoresults);
+					(new netDevice())->search($search,true);
 				}
 			}
 
@@ -167,90 +160,17 @@
 					$tmpoutput .= (new dhcpSubnet())->search($search);
 				}
 				else {
-					(new netDevice())->search($search,true,$this->autoresults);
-					(new netPlug())->search($search,true,$this->autoresults);
-					(new netRoom())->search($search,true,$this->autoresults);
-					(new netDevicePort())->search($search,true,$this->autoresults);
-					(new dhcpSubnet())->search($search,true,$this->autoresults);
+					(new netDevice())->search($search,true);
+					(new netPlug())->search($search,true);
+					(new netRoom())->search($search,true);
+					(new netDevicePort())->search($search,true);
+					(new dhcpSubnet())->search($search,true);
 				}	
 			}
 
 			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
-				// DNS infos
-				$searchsplit = preg_split("#\.#",$search);
-				$count = count($searchsplit);
-				if ($count >= 1) {
-					$hostname = $searchsplit[0];
-					$dnszone = "";
-					for ($i=1;$i<$count;$i++) {
-						$dnszone .= $searchsplit[$i];
-						if ($i != $count-1)
-							$dnszone .= ".";
-					}
-					if (!$autocomp && $count > 1) {
-						$curserver = "";
-						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","rectype,recval,server","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."'",
-							array("order" => "server"));
-						$locoutput = "";
-						while ($data = FS::$dbMgr->Fetch($query)) {
-							if ($found == 0) {
-								$found = 1;
-							}
-							if ($curserver != $data["server"]) {
-								$curserver = $data["server"];
-								$locoutput .= FS::$iMgr->h3($data["server"],true);
-							}
-							switch($data["rectype"]) {
-								case "A": $locoutput .= $this->loc->s("ipv4-addr").": "; break;
-								case "AAAA": $locoutput .= $this->loc->s("ipv6-addr").": "; break;
-								case "CNAME": $locoutput .= $this->loc->s("Alias").": "; break;
-								default: $locoutput .= $this->loc->s("Other")." (".$data["rectype"]."): "; break;
-							}
-							if (FS::$secMgr->isIP($data["recval"]))
-								$locoutput .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a>";
-							else
-								$locoutput .= $data["recval"];
-							$locoutput .= "<br />";
-							if ($data["server"]) {
-								$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
-								if ($out != NULL) {
-									$locoutput .= FS::$iMgr->h4("dig-results");
-									$locoutput .= preg_replace("#[\n]#","<br />",$out);
-								}
-							}
-							$this->nbresults++;
-						}
-						if ($found) $tmpoutput .= $this->divEncapResults($locoutput,"title-dns-records");
-						$found = 0;
-						
-						
-					}
-					else if ($autocomp) {
-						if ($count > 1) {
-							$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,zonename","record ILIKE '".$hostname."' AND zonename ILIKE '".$dnszone."%'",
-								array("order" => "record,zonename","limit" => "10"));
-							while ($data = FS::$dbMgr->Fetch($query))
-								$this->autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
-						}
-						else if ($count == 1) {
-							$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","record,zonename","record ILIKE '".$hostname."%'",array("order" => "record,zonename","limit" => "10"));
-							while ($data = FS::$dbMgr->Fetch($query))
-								$this->autoresults["dnsrecord"][] = $data["record"].".".$data["zonename"];
-						}
-					}
-				}
-				// DNS resolution
-				if (FS::$secMgr->isDNSName($search)) {
-					if (!$autocomp) {
-						$tmpoutput .= (new dnsRecord())->search($search);
-						$tmpoutput .= (new dnsZone())->search($search);
-					}
-					else {
-						(new dnsRecord())->search($search,true,$this->autoresults);
-					}
-				}
-				
 				if (!$autocomp) {
+					$tmpoutput .= (new dnsRecord())->search($search);
 					$tmpoutput .= (new dnsZone())->search($search);
 					$tmpoutput .= (new dnsACL())->search($search);
 					$tmpoutput .= (new dnsCluster())->search($search);
@@ -258,11 +178,12 @@
 					$tmpoutput .= (new dnsTSIGKey())->search($search);
 				}
 				else {
-					(new dnsZone())->search($search,true,$this->autoresults);
-					(new dnsACL())->search($search,true,$this->autoresults);
-					(new dnsCluster())->search($search,true,$this->autoresults);
-					(new dnsServer())->search($search,true,$this->autoresults);
-					(new dnsTSIGKey())->search($search,true,$this->autoresults);
+					(new dnsRecord())->search($search,true);
+					(new dnsZone())->search($search,true);
+					(new dnsACL())->search($search,true);
+					(new dnsCluster())->search($search,true);
+					(new dnsServer())->search($search,true);
+					(new dnsTSIGKey())->search($search,true);
 				}
 			}
 
@@ -273,7 +194,7 @@
 
 				}
 				else {
-					(new netNode())->search($search,true,$this->autoresults);
+					(new netNode())->search($search,true);
 				}
 			}
 
@@ -293,17 +214,17 @@
 					}
 				}
 				else {
-					(new dhcpIP())->search($search,true,$this->autoresults);
+					(new dhcpIP())->search($search,true);
 
 					if (FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
-						(new dhcpServer())->search($search,true,$this->autoresults);
-						(new dhcpCluster())->search($search,true,$this->autoresults);
+						(new dhcpServer())->search($search,true);
+						(new dhcpCluster())->search($search,true);
 					}
 
 					if (FS::$sessMgr->hasRight("mrule_ipmanager_optionsmgmt")) {
-						(new dhcpOption())->search($search,true,$this->autoresults);
-						(new dhcpCustomOption())->search($search,true,$this->autoresults);
-						(new dhcpOptionGroup())->search($search,true,$this->autoresults);
+						(new dhcpOption())->search($search,true);
+						(new dhcpCustomOption())->search($search,true);
+						(new dhcpOptionGroup())->search($search,true);
 					}
 				}
 			}
@@ -327,7 +248,7 @@
 					$tmpoutput .= (new dnsRecord())->search($search);
 				}
 				else {
-					(new dnsRecord())->search($search,true,$this->autoresults);
+					(new dnsRecord())->search($search,true);
 				}
 			}
 
@@ -338,9 +259,9 @@
 					$tmpoutput .= (new dhcpSubnet())->search($search);
 				}
 				else {
-					(new dhcpIP())->search($search,true,$this->autoresults);
-					(new dhcpSubnet())->search($search,true,$this->autoresults);
-					(new dhcpServer())->search($search,true,$this->autoresults);
+					(new dhcpIP())->search($search,true);
+					(new dhcpSubnet())->search($search,true);
+					(new dhcpServer())->search($search,true);
 				}
 			}
 			
@@ -350,8 +271,8 @@
 					$tmpoutput .= (new netDevice())->search($search);
 				}
 				else {
-					(new netNode())->search($search,true,$this->autoresults);
-					(new netDevice())->search($search,true,$this->autoresults);
+					(new netNode())->search($search,true);
+					(new netDevice())->search($search,true);
 				}
 			}
 
@@ -567,7 +488,7 @@
 					$tmpoutput .= (new dhcpIP())->search($search);
 				}
 				else {
-					(new dhcpIP())->search($search,true,$this->autoresults);
+					(new dhcpIP())->search($search,true);
 				}
 			}
 
@@ -576,7 +497,7 @@
 					$tmpoutput .= (new netNode())->search($search);
 				}
 				else {
-					(new netNode())->search($search,true,$this->autoresults);
+					(new netNode())->search($search,true);
 				}
 			}
 	
@@ -592,7 +513,7 @@
 					$tmpoutput .= (new netDevice())->search($search);
 				}
 				else {
-					(new netDevice())->search($search,true,$this->autoresults);
+					(new netDevice())->search($search,true);
 				}
 			}
 			if (!$autocomp) {
@@ -614,7 +535,6 @@
 			}
 		}
 
-		private $autoresults;
 		private $nbresults;
 	};
 ?>

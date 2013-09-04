@@ -24,30 +24,30 @@
 			$this->vlanTable = "device_vlan";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->vlanTable,"vlan","CAST(vlan as TEXT) ILIKE '".$search."%'",
 					array("order" => "vlan","limit" => "10","group" => "vlan"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["vlan"][] = $data["vlan"];
+					FS::$searchMgr->addAR("vlan",$data["vlan"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"name","name ILIKE '".$search."%'",
 					array("order" => "name","limit" => "10","group" => "name"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-						$autoresults["device"][] = $data["name"];
+					FS::$searchMgr->addAR("device",$data["name"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip","host(ip) ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["ip"][] = $data["ip"];
+					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"mac","text(mac) ILIKE '".$search."%'",
 					array("order" => "mac","limit" => "10","group" => "mac"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$utoresults["mac"][] = $data["mac"];
+					FS::$searchMgr->addAR("mac",$data["mac"]);
 				}
 			}
 			else {
@@ -102,12 +102,12 @@
 			$this->sqlTable = "device_port";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"name","name ILIKE '".$search."%'",
 					array("order" => "name","limit" => "10","group" => "name"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["portname"][] = $data["name"];
+					FS::$searchMgr->addAR("devport",$data["name"]);
 				}
 			}
 			else {
@@ -169,48 +169,48 @@
 			$this->nipTable = "node_ip";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->nbtTable,"domain","domain ILIKE '%".$search."%'",
 					array("order" => "domain","limit" => "10","group" => "domain"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["nbdomain"][] = $data["domain"];
+					FS::$searchMgr->addAR("nbdomain",$data["domain"]);
 				}
 
 				$query = FS::$dbMgr->Select($this->nbtTable,"nbname","nbname ILIKE '%".$search."%'",
 					array("order" => "nbname","limit" => "10","group" => "nbname"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["nbname"][] = $data["nbname"];
+					FS::$searchMgr->addAR("nbname",$data["nbname"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->nipTable,"ip","host(ip) ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["ip"][] = $data["ip"];
+					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->nbtTable,"ip","host(ip) ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["ip"][] = $data["ip"];
+					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
 				
 				$query = FS::$dbMgr->Select($this->nipTable,"mac","text(mac) ILIKE '".$search."%'",
 					array("order" => "mac","limit" => "10","group" => "mac"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["mac"][] = $data["mac"];
+					FS::$searchMgr->addAR("mac",$data["mac"]);
 				}
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"mac","text(mac) ILIKE '".$search."%'",
 					array("order" => "mac","limit" => "10","group" => "mac"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["mac"][] = $data["mac"];
+					FS::$searchMgr->addAR("mac",$data["mac"]);
 				}
 
 				$query = FS::$dbMgr->Select($this->nbtTable,"mac","text(mac) ILIKE '".$search."%'",
 					array("order" => "mac","limit" => "10","group" => "mac"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["mac"][] = $data["mac"];
+					FS::$searchMgr->addAR("mac",$data["mac"]);
 				}
 			}
 			else {
@@ -365,11 +365,11 @@
 			$this->devPortTable = "device_port";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"prise","prise ILIKE '".$search."%'",array("order" => "prise","limit" => "10","group" => "prise"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["prise"][] = $data["prise"];
+					FS::$searchMgr->addAR("plug",$data["prise"]);
 				}
 			}
 			else {
@@ -429,12 +429,12 @@
 			$this->deviceTable = "device";
 		}
 		
-		public function search($search, $autocomplete = false, $autoresults = NULL) {
+		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"room","room ILIKE '".$search."%'",
 					array("order" => "room","limit" => "10","group" => "room"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$autoresults["room"][] = $data["room"];
+					FS::$searchMgr->addAR("room",$data["room"]);
 				}
 			}
 			else {
