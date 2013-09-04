@@ -31,7 +31,7 @@
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array(),
 				"dhcpcluster" => array(), "dhcpserver" => array(), "dhcpoptions" => array(), "dhcpsubnet" => array(),
-				"dnszone" => array(), "dnsacl" => array());
+				"dnszone" => array(), "dnsacl" => array(), "dnscluster" => array(), "dnsserver" => array(), "dnstsig" => array());
 			$this->nbresults = 0;
 		}
 
@@ -254,11 +254,15 @@
 					$tmpoutput .= (new dnsZone())->search($search);
 					$tmpoutput .= (new dnsACL())->search($search);
 					$tmpoutput .= (new dnsCluster())->search($search);
+					$tmpoutput .= (new dnsServer())->search($search);
+					$tmpoutput .= (new dnsTSIGKey())->search($search);
 				}
 				else {
 					(new dnsZone())->search($search,true,$this->autoresults);
 					(new dnsACL())->search($search,true,$this->autoresults);
 					(new dnsCluster())->search($search,true,$this->autoresults);
+					(new dnsServer())->search($search,true,$this->autoresults);
+					(new dnsTSIGKey())->search($search,true,$this->autoresults);
 				}
 			}
 

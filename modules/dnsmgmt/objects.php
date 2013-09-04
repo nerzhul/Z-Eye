@@ -1088,7 +1088,6 @@
 			}
 		}
 
-
 		protected function Load($clustername = "") {
 			$this->clustername = $clustername;
 			$this->description = "";
@@ -1572,6 +1571,44 @@
 			return $output;
 		}
 
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
+			if ($autocomplete) {
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["dnsserver"][] = $search;
+				}
+			}
+			else {
+				$resout = "";
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",nsfqdn",
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (!$found) {
+						$found = true;
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+					
+					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("machine-FQDN")."</b>: ".$data["nsfqdn"];
+				}
+				
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-dns-server");
+				}
+				
+				return $resout;
+			}
+		}
+		
 		protected function Load($addr = "") {
 			$this->addr = $addr;
 			$this->sshUser = ""; $this->namedPath = ""; $this->chrootPath = "";
@@ -1579,7 +1616,8 @@
 			$this->machineFQDN = "";
 
 			if ($this->addr) {
-				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn",
+					$this->sqlAttrId." = '".$addr."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->sshUser = $data["sshuser"];
 					$this->namedPath = $data["namedpath"];
@@ -1770,6 +1808,45 @@
 				
 			$output .= $elements."</select>";
 			return $output;
+		}
+		
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
+			if ($autocomplete) {
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["dnstsig"][] = $search;
+				}
+			}
+			else {
+				$resout = "";
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",keyid,keyalgo",
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (!$found) {
+						$found = true;
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+					
+					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("key-id")."</b>: ".$data["keyid"].
+						"<br /><b>".$this->loc->s("algorithm")."</b>: ".$data["keyalgo"];
+				}
+				
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-dns-tsig");
+				}
+				
+				return $resout;
+			}
 		}
 
 		protected function Load($name = "") {
