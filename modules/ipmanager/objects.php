@@ -110,6 +110,10 @@
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,
 						"vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",
@@ -210,9 +214,15 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_servers";
+			$this->readRight = "mrule_ipmanager_servermgmt";
+			$this->writeRight = "mrule_ipmanager_servermgmt";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"description","description ILIKE '%".$search."%'",array("order" => "description","limit" => "10",
 					"group" => "description"));
@@ -270,9 +280,15 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_cluster";
+			$this->readRight = "mrule_ipmanager_servermgmt";
+			$this->writeRight = "mrule_ipmanager_servermgmt";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","limit" => "10",
 					"group" => "clustername"));
@@ -327,9 +343,15 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_ip";
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dhcp_ip_cache";
+			$this->readRight = "mrule_ipmanager_read";
+			$this->writeRight = "mrule_ipmmgmt_subnetmgmt";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"hostname", "hostname ILIKE '%".$search."%'",
 					array("order" => "hostname","limit" => "10","group" => "hostname"));
@@ -484,9 +506,15 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_custom_option";
+			$this->readRight = "mrule_ipmanager_optionsmgmt";
+			$this->writeRight = "mrule_ipmanager_optionsmgmt";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optname","optname ILIKE '%".$search."%'",array("order" => "optname","limit" => "10",
 					"group" => "optname"));
@@ -528,9 +556,15 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_option";
+			$this->readRight = "mrule_ipmanager_optionsmgmt";
+			$this->writeRight = "mrule_ipmanager_optionsmgmt";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optalias","optalias ILIKE '%".$search."%'",array("order" => "optalias","limit" => "10",
 					"group" => "optalias"));
@@ -571,9 +605,15 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_option_group";
+			$this->readRight = "mrule_ipmanager_optionsmgmt";
+			$this->writeRight = "mrule_ipmanager_optionsmgmt";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optgroup","optgroup ILIKE '%".$search."%'",array("order" => "optgroup","limit" => "10",
 					"group" => "optgroup"));

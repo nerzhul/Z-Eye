@@ -156,79 +156,36 @@
 					// Search device_ports
 					$tmpoutput .= (new netDevicePort())->search($search);
 
-					// Subnet
-					$tmpoutput .= (new dhcpSubnet())->search($search);
+					// Nodes
+					$tmpoutput .= (new netNode())->search($search);
+					
+					// @TODO: rewrite this function as objects
+					$tmpoutput .= $this->showRadiusInfos($search);
 				}
 				else {
 					(new netDevice())->search($search,true);
 					(new netPlug())->search($search,true);
 					(new netRoom())->search($search,true);
 					(new netDevicePort())->search($search,true);
-					(new dhcpSubnet())->search($search,true);
+					
+					(new netNode())->search($search,true);
 				}	
 			}
 
-			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
+			$objs = array(new dnsRecord(), new dnsZone(), new dnsACL(), new dnsCluster(), new dnsServer(), new dnsTSIGKey(),
+				new dhcpSubnet(), new dhcpServer(), new dhcpCluster(), new dhcpIP(), new dhcpCustomOption(), new dhcpOption(),
+				new dhcpOptionGroup());
+				
+			$count = count($objs);
+			for ($i=0;$i<$count;$i++) {
 				if (!$autocomp) {
-					$tmpoutput .= (new dnsRecord())->search($search);
-					$tmpoutput .= (new dnsZone())->search($search);
-					$tmpoutput .= (new dnsACL())->search($search);
-					$tmpoutput .= (new dnsCluster())->search($search);
-					$tmpoutput .= (new dnsServer())->search($search);
-					$tmpoutput .= (new dnsTSIGKey())->search($search);
+					$tmpoutput .= $objs[$i]->search($search);
 				}
 				else {
-					(new dnsRecord())->search($search,true);
-					(new dnsZone())->search($search,true);
-					(new dnsACL())->search($search,true);
-					(new dnsCluster())->search($search,true);
-					(new dnsServer())->search($search,true);
-					(new dnsTSIGKey())->search($search,true);
+					$objs[$i]->search($search,true);
 				}
 			}
 
-			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
-				if (!$autocomp) {
-					$tmpoutput .= (new netNode())->search($search);
-					$tmpoutput .= $this->showRadiusInfos($search);
-
-				}
-				else {
-					(new netNode())->search($search,true);
-				}
-			}
-
-			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
-				if (!$autocomp) {
-					$tmpoutput .= (new dhcpIP())->search($search);
-					
-					if (FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
-						$tmpoutput .= (new dhcpServer())->search($search);
-						$tmpoutput .= (new dhcpCluster())->search($search);
-					}
-
-					if (FS::$sessMgr->hasRight("mrule_ipmanager_optionsmgmt")) {
-						$tmpoutput .= (new dhcpOption())->search($search);
-						$tmpoutput .= (new dhcpCustomOption())->search($search);
-						$tmpoutput .= (new dhcpOptionGroup())->search($search);
-					}
-				}
-				else {
-					(new dhcpIP())->search($search,true);
-
-					if (FS::$sessMgr->hasRight("mrule_ipmanager_servermgmt")) {
-						(new dhcpServer())->search($search,true);
-						(new dhcpCluster())->search($search,true);
-					}
-
-					if (FS::$sessMgr->hasRight("mrule_ipmanager_optionsmgmt")) {
-						(new dhcpOption())->search($search,true);
-						(new dhcpCustomOption())->search($search,true);
-						(new dhcpOptionGroup())->search($search,true);
-					}
-				}
-			}
-			
 			if (!$autocomp) {
 				if (strlen($tmpoutput) > 0)
 					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$this->nbresults,true).$tmpoutput;
