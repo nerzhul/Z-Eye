@@ -22,9 +22,14 @@
 			parent::__construct();
 			$this->sqlTable = "device";
 			$this->vlanTable = "device_vlan";
+			$this->readRight = "mrule_switches_read";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->vlanTable,"vlan","CAST(vlan as TEXT) ILIKE '".$search."%'",
 					array("order" => "vlan","limit" => "10","group" => "vlan"));
@@ -100,9 +105,14 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = "device_port";
+			$this->readRight = "mrule_switches_read";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"name","name ILIKE '".$search."%'",
 					array("order" => "name","limit" => "10","group" => "name"));
@@ -167,9 +177,14 @@
 			$this->sqlTable = "node";
 			$this->nbtTable = "node_nbt";
 			$this->nipTable = "node_ip";
+			$this->readRight = "mrule_switches_read";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->nbtTable,"domain","domain ILIKE '%".$search."%'",
 					array("order" => "domain","limit" => "10","group" => "domain"));
@@ -363,9 +378,14 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."switch_port_prises";
 			$this->deviceTable = "device";
 			$this->devPortTable = "device_port";
+			$this->readRight = "mrule_switches_read";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"prise","prise ILIKE '".$search."%'",array("order" => "prise","limit" => "10","group" => "prise"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -427,9 +447,14 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."switch_port_prises";
 			$this->devPortTable = "device_port";
 			$this->deviceTable = "device";
+			$this->readRight = "mrule_switches_read";
 		}
 		
 		public function search($search, $autocomplete = false) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"room","room ILIKE '".$search."%'",
 					array("order" => "room","limit" => "10","group" => "room"));

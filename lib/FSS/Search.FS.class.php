@@ -54,6 +54,10 @@
 		public function getResults() {
 			return $this->results;
 		}
+		
+		public function getResultsCount() {
+			return $this->resultsCount;
+		}
 
 		public function setMode($sm) {
 			$this->searchMode = $sm;

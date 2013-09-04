@@ -26,8 +26,6 @@
 		function __construct($locales) { 
 			parent::__construct($locales);
 			$this->modulename = "search";
-
-			$this->nbresults = 0;
 		}
 
 		public function Load() {
@@ -106,33 +104,22 @@
 		private function showNumericResults($search,$autocomp=false) {
 			$output = "";
 			$tmpoutput = "";
-			$found = 0;
-
-			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
+			
+			$objs = array(new netPlug(), new netRoom(), new netDevice(), new dhcpIP());
+			
+			$count = count($objs);
+			for ($i=0;$i<$count;$i++) {
 				if (!$autocomp) {
-					$tmpoutput .= (new netPlug())->search($search);
-					$tmpoutput .= (new netRoom())->search($search);
-					$tmpoutput .= (new netDevice())->search($search);
+					$tmpoutput .= $objs[$i]->search($search);
 				}
 				else {
-					(new netPlug())->search($search,true);
-					(new netRoom())->search($search,true);
-					(new netDevice())->search($search,true);
-				}
-			}
-
-			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
-				if (!$autocomp) {
-					$tmpoutput .= (new dhcpSubnet())->search($search);
-				}
-				else {
-					(new netDevice())->search($search,true);
+					$objs[$i]->search($search,true);
 				}
 			}
 
 			if (!$autocomp) {
 				if (strlen($tmpoutput) > 0)
-					$output .= $tmpoutput;
+					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).$tmpoutput;
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 
@@ -143,38 +130,11 @@
 		private function showNamedInfos($search,$autocomp=false) {
 			$output = "";
 			$tmpoutput = "";
-			$found = 0;
-
-			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
-				if (!$autocomp) {
-					// Devices
-					$tmpoutput .= (new netDevice())->search($search);
-
-					$tmpoutput .= (new netPlug())->search($search);
-					$tmpoutput .= (new netRoom())->search($search);
-
-					// Search device_ports
-					$tmpoutput .= (new netDevicePort())->search($search);
-
-					// Nodes
-					$tmpoutput .= (new netNode())->search($search);
-					
-					// @TODO: rewrite this function as objects
-					$tmpoutput .= $this->showRadiusInfos($search);
-				}
-				else {
-					(new netDevice())->search($search,true);
-					(new netPlug())->search($search,true);
-					(new netRoom())->search($search,true);
-					(new netDevicePort())->search($search,true);
-					
-					(new netNode())->search($search,true);
-				}	
-			}
 
 			$objs = array(new dnsRecord(), new dnsZone(), new dnsACL(), new dnsCluster(), new dnsServer(), new dnsTSIGKey(),
 				new dhcpSubnet(), new dhcpServer(), new dhcpCluster(), new dhcpIP(), new dhcpCustomOption(), new dhcpOption(),
-				new dhcpOptionGroup());
+				new dhcpOptionGroup(),
+				new netDevice(), new netPlug(), new netRoom(), new netDevicePort() , new netNode());
 				
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
@@ -188,7 +148,7 @@
 
 			if (!$autocomp) {
 				if (strlen($tmpoutput) > 0)
-					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$this->nbresults,true).$tmpoutput;
+					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).$tmpoutput;
 
 				return $output;
 			}
@@ -197,45 +157,23 @@
 		private function showIPAddrResults($search,$autocomp=false) {
 			$output = "";
 			$tmpoutput = "";
-			$found = 0;
-			$lastmac = "";
 			
-			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
-				if (!$autocomp) {
-					$tmpoutput .= (new dnsRecord())->search($search);
-				}
-				else {
-					(new dnsRecord())->search($search,true);
-				}
-			}
-
-			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
-				if (!$autocomp) {
-					$tmpoutput .= (new dhcpIP())->search($search);
-					$tmpoutput .= (new dhcpServer())->search($search);
-					$tmpoutput .= (new dhcpSubnet())->search($search);
-				}
-				else {
-					(new dhcpIP())->search($search,true);
-					(new dhcpSubnet())->search($search,true);
-					(new dhcpServer())->search($search,true);
-				}
-			}
+			$objs = array(new dnsRecord(), new dhcpIP(), new dhcpServer(), new dhcpSubnet(),
+				new netNode(), new netDevice());
 			
-			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
+			$count = count($objs);
+			for ($i=0;$i<$count;$i++) {
 				if (!$autocomp) {
-					$tmpoutput .= (new netNode())->search($search);
-					$tmpoutput .= (new netDevice())->search($search);
+					$tmpoutput .= $objs[$i]->search($search);
 				}
 				else {
-					(new netNode())->search($search,true);
-					(new netDevice())->search($search,true);
+					$objs[$i]->search($search,true);
 				}
 			}
 
 			if (!$autocomp) {
 				if (strlen($tmpoutput) > 0)
-					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".$this->nbresults,true).$tmpoutput;
+					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).$tmpoutput;
 				else
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 				return $output;
@@ -491,7 +429,5 @@
 				return "";
 			}
 		}
-
-		private $nbresults;
 	};
 ?>
