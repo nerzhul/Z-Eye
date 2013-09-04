@@ -31,7 +31,7 @@
 				"mac" => array(), "nbdomain" => array(), "nbname" => array(), "portname" => array(),
 				"prise" => array(), "room" => array(), "vlan" => array(),
 				"dhcpcluster" => array(), "dhcpserver" => array(), "dhcpoptions" => array(), "dhcpsubnet" => array(),
-				"dnszone" => array());
+				"dnszone" => array(), "dnsacl" => array());
 			$this->nbresults = 0;
 		}
 
