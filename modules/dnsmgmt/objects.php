@@ -1049,6 +1049,45 @@
 			$output .= $elements."</select>";
 			return $output;
 		}
+		
+		public function search($search, $autocomplete = false, $autoresults = NULL) {
+			if (!$this->canRead()) {
+				return "";
+			}
+			
+			if ($autocomplete) {
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$autoresults["dnscluster"][] = $search;
+				}
+			}
+			else {
+				$resout = "";
+				$output = "";
+				$found = false;
+				
+				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",description",
+					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (!$found) {
+						$found = true;
+					}
+					else {
+						$output .= FS::$iMgr->hr();
+					}
+					
+					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"];
+				}
+				
+				if ($found) {
+					$resout .= $this->searchResDiv($output,"title-dns-cluster");
+				}
+				
+				return $resout;
+			}
+		}
+
 
 		protected function Load($clustername = "") {
 			$this->clustername = $clustername;

@@ -252,9 +252,13 @@
 				
 				if (!$autocomp) {
 					$tmpoutput .= (new dnsZone())->search($search);
+					$tmpoutput .= (new dnsACL())->search($search);
+					$tmpoutput .= (new dnsCluster())->search($search);
 				}
 				else {
 					(new dnsZone())->search($search,true,$this->autoresults);
+					(new dnsACL())->search($search,true,$this->autoresults);
+					(new dnsCluster())->search($search,true,$this->autoresults);
 				}
 			}
 
