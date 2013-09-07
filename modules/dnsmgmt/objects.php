@@ -135,7 +135,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."%'", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnszone",$data[$this->sqlAttrId]);
 				}
@@ -146,7 +146,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",description,zonetype",
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+					$this->sqlAttrId." ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
@@ -639,7 +639,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."%'", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnsacl",$data[$this->sqlAttrId]);
 				}
@@ -650,7 +650,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",description",
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+					$this->sqlAttrId." ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
@@ -1057,7 +1057,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$search."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."%'", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnscluster",$data[$this->sqlAttrId]);
 				}
@@ -1068,7 +1068,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",description",
-					$this->sqlAttrId." ILIKE '%".$search."'%");
+					$this->sqlAttrId." ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
@@ -1578,7 +1578,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$search."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."%'", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnsserver",$data[$this->sqlAttrId]);
 				}
@@ -1589,7 +1589,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",nsfqdn",
-					$this->sqlAttrId." ILIKE '%".$search."'%");
+					$this->sqlAttrId." ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
@@ -1817,7 +1817,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$search."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."%'", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnstsig",$data[$this->sqlAttrId]);
 				}
@@ -1828,7 +1828,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",keyid,keyalgo",
-					$this->sqlAttrId." ILIKE '%".$search."'%");
+					$this->sqlAttrId." ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
@@ -2043,12 +2043,11 @@
 				$output = "";
 				$resout = "";
 				
-				if (!FS::$secMgr->isIP($search)) {
+				if (!FS::$secMgr->isIP($search) && !FS::$secMgr->isHostname($search)) {
 					$out = shell_exec("/usr/bin/dig ".$search);
 					if ($out != NULL) {
 						$output .= preg_replace("#[\n]#","<br />",$out);
 						$resout .= $this->searchResDiv($output,"title-dns-resolution");
-						//$this->nbresults++;
 					}
 				}
 				
@@ -2072,14 +2071,15 @@
 						$output .= $data["record"].".".$data["zonename"].FS::$iMgr->hr();
 					}
 					// Resolve with DIG to search what the DNS thinks
-					if ($data["server"]) {
-						$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
-						if ($out != NULL) {
-							$output .= FS::$iMgr->h4("dig-results").
-								preg_replace("#[\n]#",FS::$iMgr->hr(),$out);
+					if (!FS::$secMgr->isIP($search) && !FS::$secMgr->isHostname($search)) {
+						if ($data["server"]) {
+							$out = shell_exec("/usr/bin/dig @".$data["server"]." +short ".$search);
+							if ($out != NULL) {
+								$output .= FS::$iMgr->h4("dig-results").
+									preg_replace("#[\n]#",FS::$iMgr->hr(),$out);
+							}
 						}
 					}
-					//$this->nbresults++;
 				}
 
 				if ($found) {
