@@ -1057,7 +1057,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnscluster",$data[$this->sqlAttrId]);
 				}
@@ -1068,7 +1068,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",description",
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+					$this->sqlAttrId." ILIKE '%".$search."'%");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
@@ -1578,7 +1578,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnsserver",$data[$this->sqlAttrId]);
 				}
@@ -1589,7 +1589,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",nsfqdn",
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+					$this->sqlAttrId." ILIKE '%".$search."'%");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
@@ -1817,7 +1817,7 @@
 			
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId,
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%", array("limit" => 10));
+					$this->sqlAttrId." ILIKE '%".$search."'%", array("limit" => 10));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dnstsig",$data[$this->sqlAttrId]);
 				}
@@ -1828,7 +1828,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",keyid,keyalgo",
-					$this->sqlAttrId." ILIKE '%".$this->zonename."'%");
+					$this->sqlAttrId." ILIKE '%".$search."'%");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
