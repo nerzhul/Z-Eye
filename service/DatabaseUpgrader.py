@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1313"
+	nextDBVersion = "1314"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -206,6 +206,10 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1312":
 				self.tryCreateTable("z_eye_user_settings_android","uid int NOT NULL, enable_monitor bool NOT NULL, PRIMARY KEY(uid)")
 				self.setDBVersion("1313")
+			if self.dbVersion == "1313":
+				self.tryAddColumn("z_eye_dns_servers","tsigtransfer","varchar(64)")
+				self.tryAddColumn("z_eye_dns_servers","tsigupdate","varchar(64)")
+				self.setDBVersion("1314")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

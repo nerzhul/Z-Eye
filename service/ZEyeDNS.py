@@ -773,8 +773,6 @@ class DNSManager(ZEyeUtil.Thread):
 
 			self.zoneList[idx[0]] = (idx[1],tmpClusters,tmpMasters,tmpForwarders,tmpACLTransfer,tmpACLNotify,tmpACLUpdate,tmpACLQuery,idx[2],idx[3],idx[4],idx[5])
 
-
-
 class RecordCollector(ZEyeUtil.Thread):
 	pgcursor = None
 	serversZones = {}

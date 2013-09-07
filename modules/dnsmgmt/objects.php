@@ -1524,6 +1524,12 @@
 				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
 			}
 
+			$tsiglistTransfer = (new dnsTSIGKey())->getSelect(
+				array("noneelmt" => true, "name" => "tsigupdate", "selected" => array($this->transferTSIG)));
+				
+			$tsiglistUpdate = (new dnsTSIGKey())->getSelect(
+				array("noneelmt" => true, "name" => "tsigtransfer", "selected" => array($this->updateTSIG)));
+			
 			$output = FS::$iMgr->cbkForm("3").
 				FS::$iMgr->tip("tip-dnsserver")."<table>".
 				FS::$iMgr->idxLines(array(
@@ -1531,7 +1537,19 @@
 						"length" => "128", "edit" => $this->addr != "")),
 					array("ssh-user","slogin",array("value" => $this->sshUser)),
 					array("Password","spwd",array("type" => "pwd")),
-					array("Password-repeat","spwd2",array("type" => "pwd")),
+					array("Password-repeat","spwd2",array("type" => "pwd"))
+				));
+				
+			if ($tsiglistTransfer) {
+				$output .= FS::$iMgr->idxLine("tsig-transfer","",
+					array("type" => "raw", "value" => $tsiglistTransfer, "tooltip" => "tooltip-tsig-transfer"));
+			}
+			if ($tsiglistUpdate) {
+				$output .= FS::$iMgr->idxLine("tsig-update","",
+					array("type" => "raw", "value" => $tsiglistUpdate, "tooltip" => "tooltip-tsig-update"));
+			}
+			
+			$output .= FS::$iMgr->idxLines(array(
 					array("named-conf-path","namedpath",array("value" => $this->namedPath,"tooltip" => "tooltip-rights")),
 					array("chroot-path","chrootnamed",array("value" => $this->chrootPath,"tooltip" => "tooltip-chroot")),
 					array("machine-FQDN","nsfqdn",array("value" => $this->machineFQDN,"tooltip" => "tooltip-machine-FQDN",
@@ -1616,7 +1634,8 @@
 			$this->machineFQDN = "";
 
 			if ($this->addr) {
-				$query = FS::$dbMgr->Select($this->sqlTable,"sshuser,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn",
+				$query = FS::$dbMgr->Select($this->sqlTable,
+					"sshuser,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer,tsigupdate",
 					$this->sqlAttrId." = '".$addr."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->sshUser = $data["sshuser"];
@@ -1626,6 +1645,8 @@
 					$this->masterZonePath = $data["mzonepath"];
 					$this->slaveZonePath = $data["szonepath"];
 					$this->machineFQDN = $data["nsfqdn"];
+					$this->transferTSIG = $data["tsigtransfer"];
+					$this->updateTSIG = $data["tsigupdate"];
 					return true;
 				}
 				return false;
@@ -1655,6 +1676,8 @@
 			$zeyenamedpath = FS::$secMgr->checkAndSecurisePostData("zeyenamedpath");
 			$mzonepath = FS::$secMgr->checkAndSecurisePostData("mzonepath");
 			$szonepath = FS::$secMgr->checkAndSecurisePostData("szonepath");
+			$tsigtransfer = FS::$secMgr->checkAndSecurisePostData("tsigtransfer");
+			$tsigupdate  = FS::$secMgr->checkAndSecurisePostData("tsigupdate");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 			if (!$saddr || !FS::$secMgr->isIP($saddr) || !$slogin || !$spwd || !$spwd2 || $spwd != $spwd2 ||
@@ -1708,15 +1731,34 @@
 					return;
 				}
 			}
+			
+			if ($tsigtransfer && $tsigtransfer != "none") {
+				if (!(new dnsTSIGKey())->exists($tsigtransfer)) {
+					$this->log(1,"Unable to add server '".$saddr."': tsig key '".$tsigtransfer."' doesn't exists");
+				}
+			}
+			else {
+				$tsigtransfer = "";
+			}
+			
+			if ($tsigupdate && $tsigupdate != "none") {
+				if (!(new dnsTSIGKey())->exists($tsigupdate)) {
+					$this->log(1,"Unable to add server '".$saddr."': tsig key '".$tsigupdate."' doesn't exists");
+				}
+			}
+			else {
+				$tsigupdate = "";
+			}
 
 			FS::$dbMgr->BeginTr();
 
 			if ($edit) {
 				FS::$dbMgr->Delete($this->sqlTable,"addr = '".$saddr."'");
 			}
-			FS::$dbMgr->Insert($this->sqlTable,"addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn",
+			FS::$dbMgr->Insert($this->sqlTable,
+				"addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer,tsigupdate",
 				"'".$saddr."','".$slogin."','".$spwd."','".$namedpath."','".$chrootnamed."','".$mzonepath.
-				"','".$szonepath."','".$zeyenamedpath."','".$machineFQDN."'");
+				"','".$szonepath."','".$zeyenamedpath."','".$machineFQDN."','".$tsigtransfer."','".$tsigupdate."'");
 
 			FS::$dbMgr->CommitTr();
 
@@ -1752,6 +1794,8 @@
 		}
 		private $addr;
 		private $sshUser;
+		private $transferTSIG;
+		private $updateTSIG;
 		private $chrootPath;
 		private $namedPath;
 		private $machineFQDN;
