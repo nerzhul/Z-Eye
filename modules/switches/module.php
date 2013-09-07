@@ -105,7 +105,7 @@
 			$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-			if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$dip) {
+			if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$dip)) {
 				return FS::$iMgr->printError($this->loc->s("err-no-credentials"));
 			}
 			switch($err) {

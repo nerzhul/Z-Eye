@@ -166,7 +166,7 @@
 							break;
 						case 3:
 							$output .= $this->loc->s("Forward-only");
-							break
+							break;
 					}		
 				}
 				

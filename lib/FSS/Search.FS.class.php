@@ -44,7 +44,7 @@
 			$this->resultsCount++;
 		}
 
-		public funciton addAR($idx,$res) {
+		public function addAR($idx,$res) {
 			if (!isset($this->autoResults[$idx])) {
 				$this->autoResults[$idx] = array();
 			}
