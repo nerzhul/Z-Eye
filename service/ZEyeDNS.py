@@ -67,7 +67,7 @@ class DNSManager(ZEyeUtil.Thread):
 					self.loadClusterList(pgcursor)
 					self.loadZoneList(pgcursor)
 
-					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7]))
+					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7],self.serverList[server][8]))
 		except Exception, e:
 			Logger.ZEyeLogger().write("DNS Manager: FATAL %s" % e)
 			sys.exit(1);	
@@ -84,7 +84,7 @@ class DNSManager(ZEyeUtil.Thread):
 		totaltime = datetime.datetime.now() - starttime
 		Logger.ZEyeLogger().write("DNS Management task done (time: %s)" % totaltime)
 
-	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn):
+	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer):
 		self.incrThreadNb()
 
 		cfgbuffer = ""
@@ -287,6 +287,13 @@ class DNSManager(ZEyeUtil.Thread):
 								if cacheList != None:
 									for cache in cacheList:
 										queryBuf += "\t\t%s;\n" % cache
+										
+								"""
+								We add Z-Eye TSIG key, if present
+								"""
+								if tsigtransfer != None and tsigtransfer != "" and tsigtransfer in self.tsigList:
+									transferBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
+									queryBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
 
 								"""
 								Now we load real ACLs
@@ -375,6 +382,13 @@ class DNSManager(ZEyeUtil.Thread):
 								if cacheList != None:
 									for cache in cacheList:
 										queryBuf += "\t\t%s;\n" % cache
+								
+								"""
+								We add Z-Eye TSIG key, if present
+								"""
+								if tsigtransfer != None and tsigtransfer != "" and tsigtransfer in self.tsigList:
+									transferBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
+									queryBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
 
 								"""
 								Now we load real ACLs
@@ -463,6 +477,13 @@ class DNSManager(ZEyeUtil.Thread):
 								if cacheList != None and srvType != 3:
 									for cache in cacheList:
 										queryBuf += "\t\t%s;\n" % cache
+								
+								"""
+								We add Z-Eye TSIG key, if present
+								"""
+								if tsigtransfer != None and tsigtransfer != "" and tsigtransfer in self.tsigList:
+									transferBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
+									queryBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
 
 								"""
 								Now we load real ACLs
@@ -579,12 +600,12 @@ class DNSManager(ZEyeUtil.Thread):
 		self.serverList = {}
 
 		# Only load servers in clusters
-		pgcursor.execute("SELECT addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn FROM z_eye_dns_servers WHERE addr IN (SELECT server FROM z_eye_dns_cluster_masters) OR addr IN (SELECT server FROM z_eye_dns_cluster_slaves) OR addr IN (SELECT server FROM z_eye_dns_cluster_caches)")
+		pgcursor.execute("SELECT addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer FROM z_eye_dns_servers WHERE addr IN (SELECT server FROM z_eye_dns_cluster_masters) OR addr IN (SELECT server FROM z_eye_dns_cluster_slaves) OR addr IN (SELECT server FROM z_eye_dns_cluster_caches)")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
 			# Only load if all required fields are populated
 			if idx[1] != None and idx[2] != None and idx[4] != None and idx[5] != None and idx[6] != None and idx[7] != None and idx[8] != None:
-				self.serverList[idx[0]] = (idx[1],idx[2],idx[3],idx[4],idx[5],idx[6],idx[7],idx[8])
+				self.serverList[idx[0]] = (idx[1],idx[2],idx[3],idx[4],idx[5],idx[6],idx[7],idx[8],idx[9])
 
 	def loadClusterList(self,pgcursor):
 		self.clusterList = {}
