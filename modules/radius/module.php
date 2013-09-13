@@ -1708,10 +1708,7 @@
 				case 13:
 					if (!FS::$sessMgr->hasRight("mrule_radius_manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
-						if (FS::isAjaxCall())
-							echo $this->loc->s("err-no-right");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=99");
+						FS::$iMgr->ajaxEcho("err-no-right");
 						return;
 					}
 
@@ -1735,16 +1732,13 @@
 					if ($edit) $sdbtype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","data","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					else $sdbtype = FS::$secMgr->checkAndSecurisePostData("sdbtype");
 
-					if (!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname || !$sdbtype || !$slogin  || !$spwd || !$spwd2 ||
-						$spwd != $spwd2 || !$tradcheck || !$tradreply || !$tradgrpchk || !$tradgrprep || !$tradusrgrp || $tradacct ||
+					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname || !$sdbtype || !$slogin  || !$spwd || !$spwd2 ||
+						$spwd != $spwd2 || !$tradcheck || !$tradreply || !$tradgrpchk || !$tradgrprep || !$tradusrgrp || !$tradacct ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradcheck) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradacct) ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradreply) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) || 
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
 						$this->log(2,"Some fields are missing or wrong for radius db adding");
-						if (FS::isAjaxCall())
-							echo $this->loc->s("err-miss-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEcho("err-miss-data");
 						return;
 					}
 
