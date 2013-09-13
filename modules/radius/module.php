@@ -339,7 +339,7 @@
 				if(!$radSQLMgr)
 					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 
-				$output .= FS::$iMgr->opendiv(2,$this->loc->s("New-User"));
+				$output .= FS::$iMgr->opendiv(2,$this->loc->s("New-User"),array("lnkadd" => "h=".$radhost."&p=".$radport."&r=".$raddb));
 				$found = 0;
 
 				// Filtering
@@ -366,7 +366,7 @@
 				$output .= "<div id=\"radd\">".$this->showRadiusDatas($radSQLMgr,$raddb,$radhost,$radport)."</div>";
 			}
 			else if($sh == 2) {
-				$output .= FS::$iMgr->opendiv(3,$this->loc->s("New-Profil"));
+				$output .= FS::$iMgr->opendiv(3,$this->loc->s("New-Profil"),array("lnkadd" => "h=".$radhost."&p=".$radport."&r=".$raddb));
 				$tmpoutput = FS::$iMgr->h3("title-profillist");
 				$found = 0;
 
@@ -593,6 +593,10 @@
 		* Radius group form, support VLAN auto complete fields
 		*/
 		private function showGroupForm() {
+			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
+			
 			$output = FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 				$this->raddbCondSelector().
@@ -650,6 +654,10 @@
 		}
 
 		private function showUserForm() {
+			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
+			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
+			
 			$output = FS::$iMgr->js("function changeUForm() {
 				if(document.getElementsByName('utype')[0].value == 1) {
 					$('#userdf').show();
@@ -815,7 +823,7 @@
 
 				if(FS::$secMgr->isMacAddr($radentry) || preg_match('#^[0-9A-F]{12}$#i', $radentry))
 					$utype = 2;
-				else
+				elseact=3
 					$utype = 1;
 				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=2");
 				$formoutput .= FS::$iMgr->hidden("uedit",1);
