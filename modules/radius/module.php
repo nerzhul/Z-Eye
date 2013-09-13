@@ -1777,7 +1777,7 @@
 						}
 					}
 					$this->log(0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,type,login,pwd,radalias,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,dbtype,login,pwd,radalias,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
 					"'".$saddr."','".$sport."','".$sdbname."','".$sdbtype."','".$slogin."','".$spwd."','".$salias."','".$tradcheck."','".$tradreply."','".$tradgrpchk."','".$tradgrprep."','".
 					$tradusrgrp."','".$tradacct."'");
 					FS::$iMgr->redir("mod=".$this->mid,true);
