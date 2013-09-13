@@ -1967,7 +1967,7 @@
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
 						while($data = FS::$dbMgr->Fetch($query)) {
 							if($netobj->isUsableIP($data["ip"])) {
-								$this->loc(1,"Edit IP informations: mac addr '".$mac."' already used in this subnet");
+								$this->log(1,"Edit IP informations: mac addr '".$mac."' already used in this subnet");
 								FS::$iMgr->ajaxEchoNC("err-mac-already-used-in-subnet");
 								return;
 							}
