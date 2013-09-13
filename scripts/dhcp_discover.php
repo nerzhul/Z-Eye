@@ -201,6 +201,7 @@
 		global $execdate;
 		$subnet_hist = array();
 		$en_hist = array();
+		$syncNets = array();
 
 		// Enable history 
 		$query = FS::$dbMgr->Select("z_eye_dhcp_monitoring","subnet,eniphistory");
@@ -289,20 +290,15 @@
 						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 						$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
 						if($data = FS::$dbMgr->Fetch($query)) {
-							$radhost = $data["addr"];
-							$radport = $data["port"];
-							$raddb = $data["dbname"];
-							$radlogin = FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-							$radpwd = FS::$dbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
-							$radSQLMgr = new FSMySQLMgr();
-							if($radSQLMgr->setConfig($raddb,$radport,$radhost,$radlogin,$radpwd) == 0)
-								$radSQLMgr->Connect();
+							if (!isset($syncNets[$netfound])) {
+								$syncNets[$netfound] = array();
+							}
 
-							if(!$radSQLMgr->GetOneData("radusergroup","username","username = '".$macaddr."' AND groupname = '".$data["groupname"]."'"))
-								$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$macaddr."','".$data["groupname"]."','0'");
-							if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$macaddr."' AND attribute = 'Auth-Type' AND op = ':=' AND value = 'Accept'"))
-								$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$macaddr."','Auth-Type',':=','Accept'");
+							if (!in_array($macaddr,$syncNets[$netfound])) {
+								$syncNets[$netfound][] = $macaddr;
+							}
 						}
+
 					}
 				}
 			}
@@ -323,6 +319,28 @@
 			}
 		}
 		FS::$dbMgr->CommitTr();
+		
+		foreach ($syncNets as $subnet => $mac) {
+			FS::$dbMgr->Connect();
+			$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$subnet."'");
+			if($data = FS::$dbMgr->Fetch($query)) {
+				$radhost = $data["addr"];
+				$radport = $data["port"];
+				$raddb = $data["dbname"];
+				$radlogin = FS::$dbMgr->GetOneData("z_eye_radius_db_list","login","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+				$radpwd = FS::$dbMgr->GetOneData("z_eye_radius_db_list","pwd","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+				$dbtype = FS::$dbMgr->GetOneData("z_eye_radius_db_list","dbtype","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
+
+				$radSQLMgr = new AbstractSQLMgr();
+                                $radSQLMgr->setConfig($dbtype,$raddb,$radport,$radhost,$radlogin,$radpwd);
+				$radSQLMgr->Connect();
+
+				if(!$radSQLMgr->GetOneData("radusergroup","username","username = '".$mac."' AND groupname = '".$data["groupname"]."'"))
+					$radSQLMgr->Insert("radusergroup","username,groupname,priority","'".$mac."','".$data["groupname"]."','0'");
+				if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$mac."' AND attribute = 'Auth-Type' AND op = ':=' AND value = 'Accept'"))
+					$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$mac."','Auth-Type',':=','Accept'");
+			}
+		}
 	}
 
 	FS::LoadFSModules();
