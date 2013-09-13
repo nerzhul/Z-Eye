@@ -1936,7 +1936,7 @@
 
 					// Format MAC addr
 					$mac = strtolower(preg_replace("#[-]#",":",$mac));
-					
+
 					// Reservations needs MAC & hostname
 					if ($reserv == "on" && (!$mac || !$hostname)) {
 						$this->log(1,"Edit IP informations: reservation need mac address and hostname");
@@ -1980,9 +1980,9 @@
 					if ($mac) {
 						// Check if MAC addr is not registered on another IP in the same subnet
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
-						while ($data = FS::$dbMgr->Fetch($query)) {
-							if ($netobj->isUsableIP($data["ip"])) {
-								$this->loc(1,"Edit IP informations: mac addr '".$mac."' already used in this subnet");
+						while($data = FS::$dbMgr->Fetch($query)) {
+							if($netobj->isUsableIP($data["ip"])) {
+								$this->log(1,"Edit IP informations: mac addr '".$mac."' already used in this subnet");
 								FS::$iMgr->ajaxEchoNC("err-mac-already-used-in-subnet");
 								return;
 							}
