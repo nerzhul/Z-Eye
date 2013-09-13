@@ -1934,6 +1934,9 @@
 						return;
 					}
 
+					// Format MAC addr
+					$mac = strtolower(preg_replace("#[-]#",":",$mac));
+					
 					// Reservations needs MAC & hostname
 					if ($reserv == "on" && (!$mac || !$hostname)) {
 						$this->log(1,"Edit IP informations: reservation need mac address and hostname");
