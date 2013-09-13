@@ -233,7 +233,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 						# Special case for DNS2
 						dns2 = ""
 						if len(self.subnetList[subnet][4]) > 0 and self.subnetList[subnet][4] != self.subnetList[subnet][3]:
-							dns2 = " %s" % self.subnetList[subnet][4]
+							dns2 = ",%s" % self.subnetList[subnet][4]
 
 						subnetBuf += "subnet %s netmask %s {\n\toption routers %s;\n\toption domain-name \"%s\";\n" % (subnet,netmask,self.subnetList[subnet][2],self.subnetList[subnet][5])
 
