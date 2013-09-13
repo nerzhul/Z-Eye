@@ -1728,7 +1728,7 @@
 					else $sdbtype = FS::$secMgr->checkAndSecurisePostData("sdbtype");
 
 					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname || !$sdbtype || !$slogin  || !$spwd || !$spwd2 ||
-						$spwd != $spwd2 || !$tradcheck || !$tradreply || !$tradgrpchk || !$tradgrprep || !$tradusrgrp || $tradacct ||
+						$spwd != $spwd2 || !$tradcheck || !$tradreply || !$tradgrpchk || !$tradgrprep || !$tradusrgrp || !$tradacct ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradcheck) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradacct) ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradreply) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) || 
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
