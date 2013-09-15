@@ -29,16 +29,9 @@
 		public function content() {
 			$installlocked = file_get_contents(dirname(__FILE__)."/../config/LOCK");
 
-			$output = $this->header().$this->popupContainer();
-			if($installlocked) {
-				$output .= "<div draggable=\"true\" id=\"trash\">".FS::$iMgr->img("styles/trash.png",64,64)."</div>";
-				$output .= "<div draggable=\"true\" id=\"editf\">".FS::$iMgr->img("styles/edit.png",64,64)."</div>";
-			}
-			$output .= "<div id=\"tooltip\"></div>";
-			
-			$output .= "<div id=\"main\">";
-			$output .= $this->showModule();
-			$output .= "</div>";
+			$output = $this->header().$this->popupContainer().
+				"<div id=\"tooltip\"></div><div id=\"main\">".$this->showModule()."</div>";
+
 			if($installlocked) {
 				$output .= $this->showWindowHead();
 			}

@@ -428,7 +428,7 @@ canvas { display: inline-block; }
 	color: red;
 }
 
-#editf, #trash, #tooltip {
+#tooltip {
 	background-color: #333;
         border-radius: 4px 4px 4px 4px;
         position: fixed;
@@ -452,26 +452,12 @@ canvas { display: inline-block; }
 
 #tip { font-style: italic; border: 1px solid #dbdabc; border-radius: 3px; min-width: 350px; max-width: 40%; display: inline-block; padding: 4px; background-color: #fffed6;}
 
-#trash {
-	right: 20px;
-	bottom: 20px;
-	display: none;
-}
-
-#editf {
-	right: 20px;
-	bottom: 130px;
-	display: none;
-}
-
 .ulform {
 	list-style-type: none;
 	display: inline-block;
 }
 
-.ulform li {
-	margin-bottom: 4px;
-}
+.ulform li { margin-bottom: 4px; }
 
 label { float: left; font-weight: bold; text-align: left; }
 

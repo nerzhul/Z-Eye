@@ -1276,12 +1276,23 @@
 
 				$foundsw = 0;
 				$foundwif = 0;
-				$outputswitch = "<table id=\"dev\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("MAC-addr")."</th><th>".
-					$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th><th>".$this->loc->s("State")."</th></tr></thead>";
+				$outputswitch = "<table id=\"dev\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
+					"</th><th>".$this->loc->s("MAC-addr")."</th><th>".
+					$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb").
+					"</th><th>".$this->loc->s("State")."</th>";
+				if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+					$outputswitch .= "<th></th>";
+				}
+				$outputswitch .= "</tr></thead>";
 
-				$outputwifi = FS::$iMgr->h2("title-WiFi-AP");
-				$outputwifi .= "<table id=\"dev2\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Model")."</th><th>".
-					$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th></tr></thead>";
+				$outputwifi = FS::$iMgr->h2("title-WiFi-AP").
+					"<table id=\"dev2\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
+					"</th><th>".$this->loc->s("Model")."</th><th>".
+					$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th>";
+				if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+					$outputwifi .= "<th></th>";
+				}
+				$outputwifi .= "</tr></thead>";
 
 				$query = FS::$dbMgr->Select("device","*","",array("order" => "name"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -1293,17 +1304,34 @@
 
 					// Split WiFi and Switches
 					if (preg_match("#AIR#",$data["model"])) {
-						if ($foundwif == 0) $foundwif = 1;
-						$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>";
-						$outputwifi .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td></tr>";
+						if ($foundwif == 0) {
+							$foundwif = 1;
+						}
+						$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".
+							$data["name"]."</a></td><td>".$data["ip"]."</td><td>".
+							$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".
+							$data["serial"]."</td>";
+						if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+							$outputwifi .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
+							"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
+						}
+						$outputwifi .= "</tr>";
 					}
 					else {
-						if ($foundsw == 0) $foundsw = 1;
-						$outputswitch .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>";
-						$outputswitch .= $data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
-						<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
-						FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
-						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td></tr>";
+						if ($foundsw == 0) {
+							$foundsw = 1;
+						}
+						$outputswitch .= "<tr><td><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".
+							$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>".
+							$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
+							<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
+							FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
+							$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td>";
+						if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+							$outputswitch .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
+							"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
+						}
+						$outputswitch .= "</tr>";
 					}
 				}
 				if ($foundsw != 0 || $foundwif != 0) {
@@ -1326,32 +1354,10 @@
 					$output .= "</table>";
 					FS::$iMgr->jsSortTable("dev2");
 				}
-				if ($foundsw != 0 || $foundwif != 0) {
-					$output .= FS::$iMgr->js("$.event.props.push('dataTransfer');
-						$('#dev #draga').on({
-							mouseover: function(e) { $('#trash').show(); },
-							mouseleave: function(e) { $('#trash').hide(); },
-							dragstart: function(e) { $('#trash').show(); e.dataTransfer.setData('text/html', $(this).text()); },
-							dragenter: function(e) { e.preventDefault();},
-							dragover: function(e) { e.preventDefault(); },
-							dragleave: function(e) { },
-							drop: function(e) {},
-							dragend: function() { $('#trash').hide(); }
-						});
-						$('#trash').on({
-							dragover: function(e) { e.preventDefault(); },
-							drop: function(e) { $('#subpop').html('".$this->loc->s("sure-remove-device")." \''+e.dataTransfer.getData('text/html')+'\' ?".
-								FS::$iMgr->form("index.php?mod=".$this->mid."&act=17").
-								FS::$iMgr->hidden("device","'+e.dataTransfer.getData('text/html')+'").
-								FS::$iMgr->submit("",$this->loc->s("Remove")).
-								FS::$iMgr->button("popcancel",$this->loc->s("Cancel"),"unlockScreen()")."</form>');
-								lockScreen();
-							}
-						});");
-				}
 
-				if ($foundsw == 0 && $foundwif == 0)
+				if ($foundsw == 0 && $foundwif == 0) {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
+				}
 
 				return $output;
 			}
@@ -1787,7 +1793,7 @@
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
 						return;
 					case 17: // device cleanup
-						$device = FS::$secMgr->checkAndSecurisePostData("device");
+						$device = FS::$secMgr->checkAndSecuriseGetData("device");
 						if (!$device) {
 							$this->log(2,"Some fields are missing (Device cleanup)");
 							FS::$iMgr->redir("mod=".$this->mid."&err=1");

@@ -391,7 +391,7 @@
 				"sshportinfos","sshshowstart","sshshowrun");
 			$rwrules = array("write","writeportmon","restorestartupcfg","exportcfg","retagvlan",
 				"sshpwd","portmod_portsec","portmod_cdp","portmod_voicevlan","portmod_dhcpsnooping",
-				"dhcpsnmgmt");
+				"dhcpsnmgmt","rmswitch");
 			if ($ro == 't') {
 				for ($i=0;$i<count($rorules);$i++) {
 					if (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $rulefilter == $rorules[$i])
@@ -433,6 +433,7 @@
 					case "write": case "writeportmon": case "restorestartupcfg": case "exportcfg":
 					case "retagvlan": case "sshpwd": case "portmod_portsec": case "portmod_cdp":
 					case "portmod_voicevlan": case "portmod_dhcpsnooping": case "dhcpsnmgmt":
+					case "rmswitch":
 						if ($rw == 't' && (strlen($rulefilter) == 0 || strlen($rulefilter) > 0 && $ruleidx == $rulefilter))
 							$rules[$ruleidx][] = $data2[$idx];
 						break;
@@ -587,6 +588,7 @@
 				case "portmod_voicevlan": return $this->loc->s("Portmod-voicevlan");
 				case "portmod_dhcpsnooping": return $this->loc->s("Portmod-dhcpsnooping");
 				case "dhcpsnmgmt": return $this->loc->s("DHCP-Snooping-mgmt");
+				case "rmswitch": return $this->loc->s("Remove-Switch");
 				default: return FS::$iMgr->printError($this->loc->s("err-not-found"));
 			}
 		}
