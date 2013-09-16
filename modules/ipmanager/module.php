@@ -197,7 +197,9 @@
 					$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
 					$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
 					$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
-					$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
+					if ($iparray[ip2long($data2["ip"])]["distrib"] != 6) {
+						$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
+					}
 				}
 				// List servers where the data is
 				$iparray[ip2long($data2["ip"])]["servers"][] = $data2["server"];
