@@ -105,7 +105,41 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = "device_port";
+			$this->sqlPlugRoomTable = PGDbConfig::getDbPrefix()."switch_port_prises";
 			$this->readRight = "mrule_switches_read";
+		}
+		
+		public function Load($device = "", $port = "") {
+			$this->device = $device;
+			$this->port = $port;
+			$this->plug = "";
+			$this->room = "";
+			$this->deviceIP = "";
+			
+			if ($this->device != "" && $this->port != "") {
+				$this->deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+				if (!$this->deviceIP) {
+					return false;
+				}
+				$query = FS::$dbMgr->Select(,"prise,room","ip = '".$this->deviceIP.
+					"' AND port = '".$this->port."'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$this->plug = $data["prise"];
+					$this->room = $data["room"];
+				}
+			}
+			return true;
+		}
+		
+		public function removeDatas() {
+			FS::$dbMgr->Delete($this->sqlPlugRoomTable,"ip = '".$dip."'");
+		}
+		
+		public function SaveRoomAndPlug() {
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete($this->sqlPlugRoomTable,"ip = '".$this->deviceIP."' AND port = '".$this->port."'");
+			FS::$dbMgr->Insert($this->sqlPlugRoomTable,"ip,port,prise,room","'".$this->deviceIP."','".$this->port."','".$this->plug."','".$this->room."'");
+			FS::$dbMgr->CommitTr();
 		}
 		
 		public function search($search, $autocomplete = false) {
@@ -136,8 +170,6 @@
 						$devportname[$swname] = array();
 
 					$devportname[$swname][$data["port"]] = array($data["name"],$prise);
-
-					//$this->nbresults++;
 				}
 
 				if ($found) {
@@ -169,6 +201,30 @@
 				return $resout;
 			}
 		}
+		
+		public function setPlug($plug) {
+			$this->plug = $plug;
+		}
+		
+		public function getPlug() {
+			return $this->plug;
+		}
+		
+		public function setRoom($room) {
+			$this->room = $room;
+		}
+		
+		public function getRoom() {
+			return $this->room;
+		}
+		
+		private $device;
+		private $deviceIP;
+		private $port;
+		private $plug;
+		private $room;
+		
+		private $sqlPlugRoomTable;
 	};
 	
 	final class netNode extends FSMObj {
