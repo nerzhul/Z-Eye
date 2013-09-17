@@ -118,10 +118,11 @@
 			
 			if ($this->device != "" && $this->port != "") {
 				$this->deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+				var_dump($this->device);
 				if (!$this->deviceIP) {
 					return false;
 				}
-				$query = FS::$dbMgr->Select(,"prise,room","ip = '".$this->deviceIP.
+				$query = FS::$dbMgr->Select($this->sqlPlugRoomTable,"prise,room","ip = '".$this->deviceIP.
 					"' AND port = '".$this->port."'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					$this->plug = $data["prise"];

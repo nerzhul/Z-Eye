@@ -25,6 +25,7 @@
 	require_once(dirname(__FILE__)."/cisco.func.php");
 	require_once(dirname(__FILE__)."/dell.func.php");
 	require_once(dirname(__FILE__)."/device.api.php");
+	require_once(dirname(__FILE__)."/objects.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 	
 	final class iSwitchMgmt extends FSModule {
@@ -1394,30 +1395,39 @@
 				switch($act) {
 					case 2: // Plug fast edit
 						$port = FS::$secMgr->checkAndSecurisePostData("swport");
-						$sw = FS::$secMgr->checkAndSecurisePostData("sw");
-						$prise = FS::$secMgr->checkAndSecurisePostData("swprise");
-						if ($port == NULL || $sw == NULL /*|| $prise != NULL && !preg_match("#^[A-Z][1-9]\.[1-9A-Z][0-9]?\.[1-9][0-9A-Z]?$#",$prise)*/) {
+						$dip = FS::$secMgr->checkAndSecurisePostData("sw");
+						$plug = FS::$secMgr->checkAndSecurisePostData("swprise");
+						if ($port == NULL || $dip == NULL /*|| $plug != NULL && !preg_match("#^[A-Z][1-9]\.[1-9A-Z][0-9]?\.[1-9][0-9A-Z]?$#",$plug)*/) {
 							$this->log(2,"Some fields are missing (plug fast edit)");
 							echo "ERROR";
 							return;
 						}
 
-						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$sw."'");
+						$device = FS::$dbMgr->GetOneData("device","name","ip = '".$dip."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
-						if (!$this->hasDeviceWriteRight($snmprw,$sw)) {
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 							echo "NORIGHTS";
 							return;	
 						}
 
-						if ($prise == NULL) $prise = "";
-						// Modify Plug for switch port
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_port_prises","ip = '".$sw."' AND port = '".$port."'");
-						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."switch_port_prises","ip,port,prise","'".$sw."','".$port."','".$prise."'");
+						if ($plug == NULL) {
+							$plug = "";
+						}
+						
+						$portObj = new netDevicePort();
+						if (!$portObj->Load($device,$port)) {
+							echo "ERROR";
+							return;
+						}
+						$portObj->setPlug($plug);
+						$portObj->SaveRoomAndPlug();
 
 						// Return text for AJAX call
-						$this->log(0,"Set plug for device '".$sw."' to '".$prise."' on port '".$port."'");
-						if ($prise == "") $prise = "Modifier";
-						echo $prise;
+						$this->log(0,"Set plug for device '".$dip."' to '".$plug."' on port '".$port."'");
+						if ($plug == "") {
+							$plug = "Modifier";
+						}
+						echo $plug;
 						return;
 					case 3: // Desc fast edit
 						$port = FS::$secMgr->checkAndSecurisePostData("swport");
@@ -1439,8 +1449,9 @@
 						if (FS::$dbMgr->GetOneData("device_port","up","ip = '".$sw."' AND port = '".$port."'") != NULL) {
 							if ($this->devapi->setPortDesc($desc) == 0) {
 								echo $desc;
-								if ($save == "true")
+								if ($save == "true") {
 									$this->devapi->writeMemory();
+								}
 								FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$sw."' AND port = '".$port."'");
 								$this->log(0,"Set description for '".$sw."' to '".$desc."' on port '".$port."'");
 							}
