@@ -72,6 +72,10 @@
 					"err-enable-auth-fail" => "Mot de passe privilégié incorrect",
 					"err-fail-mod-switch" => "Echec de la modification des données sur le switch",
 					"err-fail-tab" => "Impossible de charger l'onglet, le lien peut être faux ou la page indisponible",
+					"err-invalid-csv" => "Fichier CSV invalide",
+					"err-invalid-csv-device" => "Un équipement du fichier CSV n'existe pas : '",
+					"err-invalid-csv-entry" => "Entrée du fichier CSV invalide : '",
+					
 					"err-invalid-export" => "Type d'export invalide !",
 					"err-not-implemented" => "Pas implémenté",
 					"err-no-credentials" => "Vous n'êtes pas accrédité pour cela",

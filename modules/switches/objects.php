@@ -118,7 +118,7 @@
 			
 			if ($this->device != "" && $this->port != "") {
 				$this->deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
-				var_dump($this->device);
+
 				if (!$this->deviceIP) {
 					return false;
 				}
@@ -141,6 +141,64 @@
 			FS::$dbMgr->Delete($this->sqlPlugRoomTable,"ip = '".$this->deviceIP."' AND port = '".$this->port."'");
 			FS::$dbMgr->Insert($this->sqlPlugRoomTable,"ip,port,prise,room","'".$this->deviceIP."','".$this->port."','".$this->plug."','".$this->room."'");
 			FS::$dbMgr->CommitTr();
+		}
+		
+		public function injectPlugRoomCSV() {
+			$csv = FS::$secMgr->checkAndSecurisePostDatas("csv");
+			$sep = FS::$secMgr->checkAndSecurisePostDatas("sep");
+			
+			if (!$csv || !$sep || $sep != "," && $sep != ";") {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			
+			$lines = preg_split("#[\n]#",$csv);
+			if (!$lines) {
+				FS::$iMgr->ajaxEcho("err-invalid-csv");
+				return;
+			}
+			
+			$plugAndRooms = array();
+			
+			$count = count($lines);
+			for ($i=0;$i<$count;$i++) {
+				$entry = preg_split("#[".$sep."]#",$lines[$i]);
+				
+				// Entry has 4 fields
+				if (count($entry) != 4) {
+					FS::$iMgr->ajaxEcho($this->loc->s("err-invalid-csv-entry").$entry."'","",true);
+					return;
+				}
+				
+				// Create array dimension by device
+				if (!isset($plugAndRooms[$entry[0]])) {
+					$plugAndRooms[$entry[0]] = array();
+				}
+				
+				// Create array dimension by port
+				if (!isset($plugAndRooms[$entry[0]][$entry[1]])) {
+					$plugAndRooms[$entry[0]][$entry[1]] = array();
+				}
+				
+				// Store port informations into buffer
+				$plugAndRooms[$entry[0]][$entry[1]][0] = $entry[2];
+				$plugAndRooms[$entry[0]][$entry[1]][1] = $entry[3];
+			}
+			
+			// Now we test if devices and ports exists
+			foreach ($plugAndRooms as $device => $ports) {
+				$deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
+				if (!$deviceIP) {
+					FS::$iMgr->ajaxEcho($this->loc->s("err-invalid-csv-device").$device,"",true);
+					return;
+				}
+				foreach($ports as $port => $values) {
+					if (!FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$deviceIP."' AND port = '".$port."'")) {
+						FS::$iMgr->ajaxEcho($this->loc->s("err-invalid-csv-port").$device."/".$port."'","",true);
+						return;
+					}
+				}
+			}
 		}
 		
 		public function search($search, $autocomplete = false) {
