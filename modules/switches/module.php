@@ -1370,14 +1370,29 @@
 				$output = "";
 				if (FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
 					// Write all devices button
-					$output .= FS::$iMgr->cbkForm("20");
-					$output .= FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
+					$output .= FS::$iMgr->cbkForm("20").
+						FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
 				}
 				if (FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
 					$rightsok = true;
 					// Backup all devices button
-					$output .= FS::$iMgr->cbkForm("21");
-					$output .= FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
+					$output .= FS::$iMgr->cbkForm("21").
+						FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
+				}
+
+				if (FS::$sessMgr->hasRight("mrule_switches_import_plugs")) {
+					$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt($this->loc->s("comma"),",").
+						FS::$iMgr->selElmt($this->loc->s("semi-colon"),";")."</select>";
+					
+					$output .= FS::$iMgr->h3("title-import-plug-room").
+						FS::$iMgr->tip("tip-import-plug-room").
+						FS::$iMgr->cbkForm("25")."<table>".
+						FS::$iMgr->idxLines(array(
+							array("CSV-content","csv",array("type" => "area", "width" => 600)),
+							array("separator","sep",array("type" => "raw", "value" => $selOutput)),
+							array("Replace-?","repl",array("type" => "chk"))
+						)).
+						FS::$iMgr->tableSubmit("Import");
 				}
 				return $output;
 			}
@@ -2148,6 +2163,11 @@
 						$this->devapi->setDHCPSnoopingVlans($vlanlist);
 
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4");
+						return;
+					// CSV plug and room import
+					case 25:
+						$portObj = new netDevicePort();
+						$portObj->injectPlugRoomCSV();
 						return;
 				default: break;
 			}

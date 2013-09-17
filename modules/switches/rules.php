@@ -26,7 +26,8 @@
 				array($this->loc->s("rule-write-datas"),		"mrule_switches_write"),
 				array($this->loc->s("rule-discover-device"),		"mrule_switches_discover"),
 				array($this->loc->s("rule-save-devices"),		"mrule_switches_globalsave"),
-				array($this->loc->s("rule-export-cfg"),			"mrule_switches_globalbackup")
+				array($this->loc->s("rule-export-cfg"),			"mrule_switches_globalbackup"),
+				array($this->loc->s("rule-import-plugs"),			"mrule_switches_import_plugs"),
 			));
                 	return $output;
                 }

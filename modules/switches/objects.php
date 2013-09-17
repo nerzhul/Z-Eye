@@ -144,14 +144,16 @@
 		}
 		
 		public function injectPlugRoomCSV() {
-			$csv = FS::$secMgr->checkAndSecurisePostDatas("csv");
-			$sep = FS::$secMgr->checkAndSecurisePostDatas("sep");
+			$csv = FS::$secMgr->checkAndSecurisePostData("csv");
+			$sep = FS::$secMgr->checkAndSecurisePostData("sep");
+			$repl = FS::$secMgr->checkAndSecurisePostData("repl");
 			
 			if (!$csv || !$sep || $sep != "," && $sep != ";") {
 				FS::$iMgr->ajaxEcho("err-bad-datas");
 				return;
 			}
 			
+			$csv = preg_replace("#[\r]#","",$csv);
 			$lines = preg_split("#[\n]#",$csv);
 			if (!$lines) {
 				FS::$iMgr->ajaxEcho("err-invalid-csv");
@@ -197,8 +199,30 @@
 						FS::$iMgr->ajaxEcho($this->loc->s("err-invalid-csv-port").$device."/".$port."'","",true);
 						return;
 					}
+					
+					if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlPlugRoomTable,"ip",
+						"ip = '".$deviceIP."' AND port = '".$port."' AND (prise != '' OR room != '')")) {
+						FS::$iMgr->ajaxEcho($this->loc->s("err-csv-replace-data").$device."/".$port."'","",true);
+						return;
+					}
+					
+					// We add device IP there for improve perfs (not the best location)
+					$plugAndRooms[$device][$port][2] = $deviceIP;
 				}
 			}
+			
+			FS::$dbMgr->BeginTr();
+			foreach ($plugAndRooms as $device => $ports) {
+				foreach($ports as $port => $values) {
+					if ($repl == "on") {
+						FS::$dbMgr->Delete($this->sqlPlugRoomTable,"ip = '".$values[2]."' AND port = '".$port."'");
+					}
+					
+					FS::$dbMgr->Insert($this->sqlPlugRoomTable,"ip,port,prise,room","'".$values[2]."','".$port."','".$values[0]."','".$values[1]."'");
+				}
+			}
+			FS::$dbMgr->CommitTr();
+			FS::$iMgr->ajaxEcho("Done");
 		}
 		
 		public function search($search, $autocomplete = false) {
@@ -224,11 +248,11 @@
 					if ($found == false)
 						$found = true;
 					$swname = FS::$dbMgr->GetOneData("device","name","ip = '".$data["ip"]."'");
-					$prise =  FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
+					$prise =  FS::$dbMgr->GetOneData($this->sqlPlugRoomTable,"prise","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 					if (!isset($devportname[$swname]))
 						$devportname[$swname] = array();
 
-					$devportname[$swname][$data["port"]] = array($data["name"],$prise);
+					$devportname[$swname][$data["port"]] = array($data["prise"],$prise);
 				}
 
 				if ($found) {
@@ -595,7 +619,7 @@
 					}
 
 					$devroom[$swname][$data["port"]]["room"] = $data["room"];
-					$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData($this->sqlTable,"name",
+					$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData($this->devPortTable,"name",
 						"ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
 					//$this->nbresults++;
 				}
