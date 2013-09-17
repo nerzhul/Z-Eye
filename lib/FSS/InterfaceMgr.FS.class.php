@@ -502,7 +502,7 @@
 			if ($value)
 				return "<tr><td>".$this->getLocale($label)."</td><td>".$value."</td></tr>".FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
 			else
-				return $this->idxLine($this->getLocale($label),$name,"",$options);
+				return $this->idxLine($label,$name,"",$options);
 		}
 
 		public function ruleLine($label,$rulename,$rulelist,$idx = "") {
