@@ -144,13 +144,15 @@
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
 						$output .= FS::$iMgr->idxLine("Description","desc",array("value" => $data["name"],"tooltip" => "tooltip-desc"));
 
-						$prise = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$dip."' AND port = '".$port."'");
-						$room = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","room","ip = '".$dip."' AND port = '".$port."'");
-						$output .= FS::$iMgr->idxLine("Room","room",array("value" => $room,"tooltip" => "tooltip-room"));
-						$output .= FS::$iMgr->idxLine("Plug","prise",array("value" => $prise,"tooltip" => "tooltip-plug"));
+						$portObj = new netDevicePort();
+						$portObj->Load($device,$port);
+
+						$output .= FS::$iMgr->idxLine("Room","room",array("value" => $portObj->getRoom(),"tooltip" => "tooltip-room"));
+						$output .= FS::$iMgr->idxLine("Plug","prise",array("value" => $portObj->getPlug(),"tooltip" => "tooltip-plug"));
 						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = $this->devapi->getPortMtu();
-						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
+						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").
+							($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
 						if ($data["up_admin"] == "down")
 								$output .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
 						else if ($data["up_admin"] == "up" && $data["up"] == "down")
@@ -159,7 +161,8 @@
 							$output .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
 						else
 							$output .= "unk";
-						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
+						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).
+							($mtu != -1 ? " / ".$mtu : "")."</td></tr>";
 						$output .= $this->devapi->showStateOpts();
 					
 						$output .= $this->devapi->showSpeedOpts();
@@ -1538,14 +1541,21 @@
 
 						$this->devapi->handleSaveCfg();
 
-						if ($prise == NULL) $prise = "";
-						if ($room == NULL) $room = "";
-						FS::$dbMgr->BeginTr();
-						FS::$dbMgr->Delete("z_eye_switch_port_prises","ip = '".$dip."' AND port = '".$port."'");
-						FS::$dbMgr->Insert("z_eye_switch_port_prises","ip,port,prise,room","'".$dip."','".$port."','".$prise."','".$room."'");
+						if ($prise == NULL) {
+							$prise = "";
+						}
+						
+						if ($room == NULL) {
+							$room = "";
+						}
+						
+						$portObj = new netDevicePort();
+						$portObj->Load($sw,$port);
+						$portObj->setPlug($prise);
+						$portObj->setRoom($room);
+						$portObj->SaveRoomAndPlug();
 	
 						FS::$dbMgr->Update("device_port","name = '".$desc."'","ip = '".$dip."' AND port = '".$port."'");
-						FS::$dbMgr->CommitTr();
 	
 						foreach ($logvals as $keys => $values) {
 							if (is_array($values["src"]) || isset($values["dst"]) && is_array($values["dst"])) {
@@ -1822,7 +1832,11 @@
 						FS::$dbMgr->Delete("admin","device = '".$dip."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_id_cache","device = '".$device."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."'");
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_port_prises","ip = '".$dip."'");
+						
+						$portObj = new netDevicePort();
+						$portObj->Load($device,$port);
+						$portObj->RemoveDatas();
+						
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_cache","device = '".$device."'");
 						FS::$dbMgr->Delete("device","ip = '".$dip."'");
 						FS::$dbMgr->CommitTr();
