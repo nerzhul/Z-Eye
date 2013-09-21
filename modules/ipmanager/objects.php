@@ -54,7 +54,7 @@
 			$output = "";
 			
 			if (!$onlyelements) {
-				FS::$iMgr->select($options["name"],array("multi" => $multi));
+				$output .= FS::$iMgr->select($options["name"],array("multi" => $multi));
 			}
 
 			$found = false;
