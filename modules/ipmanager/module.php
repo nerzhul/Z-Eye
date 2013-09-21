@@ -18,6 +18,7 @@
 	*/
 	
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
+	require_once(dirname(__FILE__)."/objects.php");
 
 	final class iIPManager extends FSModule{
 		function __construct($locales) {
@@ -75,12 +76,11 @@
 
 			$netfound = false;
 			$tmpoutput = FS::$iMgr->cbkForm("1");
-			$tmpoutput .= FS::$iMgr->select("f");
-			$formoutput = "";
 
 			// We bufferize all netid because of multiple sources
 			$subnetObj = new dhcpSubnet();
-			$formoutput .= $subnetObj->getSelect(array("selected" => $filter, "withcache" => true));
+			$formoutput = $subnetObj->getSelect(array("name" => "f", "selected" => $filter,
+				"withcache" => true));
 			
 			$tmpoutput .= $formoutput.
 				FS::$iMgr->select("view").FS::$iMgr->selElmt($this->loc->s("Stats"),1).
@@ -88,8 +88,9 @@
 				FS::$iMgr->selElmt($this->loc->s("Monitoring"),3)."</select> ".
 				FS::$iMgr->submit("","Consulter")."</form><br />";
 
-			if (count($netarray) == 0)
+			if ($formoutput == NULL) {
 				return FS::$iMgr->printError($this->loc->s("no-net-found"));
+			}
 
 			$output .= $tmpoutput.
 				"<div id=\"netHCr\"></div><div id=\"netshowcont\"></div>";

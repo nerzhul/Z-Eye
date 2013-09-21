@@ -52,14 +52,11 @@
 
 			$netarray = array();
 			$output = "";
+			$found = false;
 			
 			if (!$onlyelements) {
 				$output .= FS::$iMgr->select($options["name"],array("multi" => $multi));
 			}
-
-			$found = false;
-			$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",netmask,vlanid,subnet_short_name",$sqlcond,
-				array("order" => $this->sqlAttrId));
 
 			if ($none) {
 				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",in_array("none",$selected));
@@ -69,11 +66,16 @@
 			if ($withcache) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
 				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (!$found) {
+						$found = true;
+					}
 					$netarray[$data["netid"]] = $data["netmask"];
 				}
 			}
 			
 			// Then bufferize with declared datas and override cached datas
+			$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",netmask,vlanid,subnet_short_name",$sqlcond,
+				array("order" => $this->sqlAttrId));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
@@ -88,7 +90,6 @@
 				$output .= FS::$iMgr->selElmt($value,$netid,$selected == $netid);
 			}
 			
-
 			// If no elements found & no empty element
 			if (!$found && !$none) {
 				return NULL;
