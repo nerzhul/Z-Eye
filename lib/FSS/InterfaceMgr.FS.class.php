@@ -708,6 +708,10 @@
 
 			return $output;
 		}
+		
+		public function iconOpendiv($callid,$iconname,$options=array()) {
+			return $this->opendiv($callid,$this->img("styles/images/".$iconname.".png",15,15),$options);
+		}
 
 		/*
 		* jQuery accordion generator

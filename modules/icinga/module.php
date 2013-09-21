@@ -129,14 +129,20 @@
 				
 				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_host_write"))
+				if (FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
 					$output .= FS::$iMgr->opendiv(10,$data["name"],array("lnkadd" => "name=".$data["name"]));
-				else
+				}
+				else {
 					$output .= $data["name"];
+				}
 
 				$output .= "</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
-				if ($data["template"] == "t") $output .= $this->loc->s("Yes");
-				else $output .= $this->loc->s("No");
+				if ($data["template"] == "t") {
+					$output .= $this->loc->s("Yes");
+				}
+				else {
+					$output .= $this->loc->s("No");
+				}
 				$output .= "</td><td>";
 				$found2 = false;
 				for ($i=0;$i<count($parentlist);$i++) {

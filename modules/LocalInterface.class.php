@@ -139,7 +139,10 @@
 			$output = "<a ";
 			if(isset($options["js"]) && $options["js"] == true) {
 				$jsarr = "{";
-				if(isset($options["snotif"])) $jsarr .= "'snotif': '".addslashes($options["snotif"])."'";
+				if(isset($options["snotif"])) {
+					$jsarr .= "'snotif': '".addslashes($options["snotif"])."'";
+				}
+				
 				// Confirmation div
 				if(isset($options["confirm"]) && is_array($options["confirm"]) && count($options["confirm"]) == 3) {
 					$jsarr .= ($jsarr != "{" ? "," : "")."'lock': true";
@@ -148,15 +151,17 @@
 						addslashes($this->cur_module->getLoc()->s($options["confirm"][2]))."','index.php?".
 						addslashes($link)."'";
 				}
-				else
+				else {
 					$output .= "onclick=\"callbackLink('index.php?".addslashes($link)."'";
+				}
 				$jsarr .= "}";
 				if($jsarr != "{}")
 					$output .= ",".$jsarr;
 				$output .= ");\" ";
 			}
-			else
+			else {
 				$output .= "href=\"index.php?".$link."\"";
+			}
 			$output .= ">".FS::$iMgr->img("styles/images/".$iconname.".png",15,15)."</a>";
 			return $output;
 		}

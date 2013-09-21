@@ -33,11 +33,11 @@
 				$this->alias = FS::$dbMgr->GetOneData($this->sqlTable,"name",
 					"name = '".$name."'");
 
-                        	$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member",
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name,member",
 					"name = '".$name."'");
-                        	while($data = FS::$dbMgr->Fetch($query)) {
-                	                $this->contacts[] = $data["member"];
-             	        	}
+				while($data = FS::$dbMgr->Fetch($query)) {
+						$this->contacts[] = $data["member"];
+				}
 			}
 		}
 
