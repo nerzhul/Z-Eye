@@ -47,31 +47,56 @@
 			$sqlcond = (isset($options["exclude"])) ? "netid != '".$options["exclude"]."'" : "";
 			$none = (isset($options["noneelmt"]) && $options["noneelmt"] == true);
 			$selected = (isset($options["selected"])) ? $options["selected"] : array();
+			$onlyelements = (isset($options["onlyelmts"]) && $options["onlyelmts"] == true);
+			$withcache = (isset($options["withcache"]) && $options["withcache"] == true);
 
-			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
+			$netarray = array();
+			$output = "";
+			
+			if (!$onlyelements) {
+				FS::$iMgr->select($options["name"],array("multi" => $multi));
+			}
 
 			$found = false;
-			$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",netmask,subnet_short_name",$sqlcond,
+			$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",netmask,vlanid,subnet_short_name",$sqlcond,
 				array("order" => $this->sqlAttrId));
 
 			if ($none) {
 				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",in_array("none",$selected));
 			}
 
-                        while ($data = FS::$dbMgr->Fetch($query)) {
+			// bufferize with cache first because cache has less datas
+			if ($withcache) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					$netarray[$data["netid"]] = $data["netmask"];
+				}
+			}
+			
+			// Then bufferize with declared datas and override cached datas
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
 				}
-                                $output .= FS::$iMgr->selElmt($data[$this->sqlAttrId]."/".$data["netmask"]." (".$data["subnet_short_name"].")",
-					$data[$this->sqlAttrId],in_array($data[$this->sqlAttrId],$selected));
-                        }
+				
+				$netarray[$data[$this->sqlAttrId]] = $data[$this->sqlAttrId]."/".$data["netmask"].
+					" (VLAN ".$data["vlanid"]." - ".$data["subnet_short_name"].")";
+			}
+			
+			ksort($netarray);
+			foreach ($netarray as $netid => $value) {
+				$output .= FS::$iMgr->selElmt($value,$netid,$selected == $netid);
+			}
+			
 
 			// If no elements found & no empty element
 			if (!$found && !$none) {
 				return NULL;
 			}
 
-			$output .= "</select>";
+			if (!$onlyelements) {
+				$output .= "</select>";
+			}
 			return $output;
 		}
 

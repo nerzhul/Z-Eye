@@ -223,7 +223,6 @@
 					$netfound = $subnet_list[$i][0];
 			}
 
-
 			switch($rstate) {
 				case "free":
 					$rstate = 1;

@@ -79,26 +79,10 @@
 			$formoutput = "";
 
 			// We bufferize all netid because of multiple sources
-			$netarray = array();
-
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask");
-			while ($data = FS::$dbMgr->Fetch($query)) {
-				if (!isset($netarray[$data["netid"]]))
-					$netarray[$data["netid"]] = $data["netmask"];
-			}
-
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask");
-			while ($data = FS::$dbMgr->Fetch($query)) {
-				if (!isset($netarray[$data["netid"]]))
-					$netarray[$data["netid"]] = $data["netmask"];
-			}
+			$subnetObj = new dhcpSubnet();
+			$formoutput .= $subnetObj->getSelect(array("selected" => $filter, "withcache" => true));
 			
-			ksort($netarray);
-			foreach ($netarray as $netid => $netmask) {
-				$formoutput .= FS::$iMgr->selElmt($netid."/".$netmask,$netid,$filter == $netid);
-			}
-
-			$tmpoutput .= $formoutput."</select>".
+			$tmpoutput .= $formoutput.
 				FS::$iMgr->select("view").FS::$iMgr->selElmt($this->loc->s("Stats"),1).
 				FS::$iMgr->selElmt($this->loc->s("History"),2).
 				FS::$iMgr->selElmt($this->loc->s("Monitoring"),3)."</select> ".
