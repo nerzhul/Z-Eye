@@ -113,7 +113,7 @@
 									$outstate = $this->loc->s("WARN");
 									$stylestate = "color: orange; font-size: 18px;";
 									if ($svalues["last_time_ok"])
-										$timedown = $this->timeInterval($svalues["last_time_ok"]);
+										$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
 									$problems[$host][2]++;
 									$this->warnicinga++;
 								}
@@ -121,7 +121,7 @@
 									$outstate = $this->loc->s("CRITICAL");
 									$stylestate = "color: red; font-size: 20px;";
 									if ($svalues["last_time_ok"])
-										$timedown = $this->timeInterval($svalues["last_time_ok"]);
+										$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
 
 									$problems[$host][3]++;
 									$this->criticinga++;
@@ -129,7 +129,7 @@
 									
 								$this->hsicinga++;
 								$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
-	                                                        	"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
+	                                "</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
 										
 							}
 						}
@@ -158,13 +158,13 @@
 								$outstate = $this->loc->s("DOWN");
 								$stylestate = "color: red; font-size: 20px;";
 								if ($hosvalues["last_time_up"])
-									$timedown = $this->timeInterval($hosvalues["last_time_up"]);
+									$timedown = FSTimeMgr::timeSince($hosvalues["last_time_up"]);
 
 								$problems[$host][3]++;
 								$this->criticinga++;
 							}
 							$problems[$host][1] .= "<tr><td>".$this->loc->s("Availability")."</td><td style=\"".$stylestate."\">".$outstate.
-	                                                       	"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>"; 
+	                            "</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>"; 
 						}
 					}
 				}
@@ -215,22 +215,6 @@
 				FS::$iMgr->js($js);
 			}
 				
-			return $output;
-		}
-
-		private function timeInterval($time) {
-			$dt1 = new DateTime("now");
-        		$dt2 = new DateTime(date("Y-m-d H:i:s",$time));
-        		$interval = $dt1->diff($dt2);
-			$output = "";
-			if ($interval->d > 0)
-				$output .= $interval->d."d ";
-			if ($interval->h > 0)
-				$output .= $interval->h."h ";
-			if ($interval->i > 0)
-				$output .= $interval->i."m ";
-			if ($interval->s > 0)
-				$output .= $interval->s."s";
 			return $output;
 		}
 

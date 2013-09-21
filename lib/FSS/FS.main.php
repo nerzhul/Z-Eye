@@ -41,6 +41,7 @@
 	require_once(dirname(__FILE__)."/SessionMgr".CLASS_EXT);
 	require_once(dirname(__FILE__)."/Search".CLASS_EXT);
 	require_once(dirname(__FILE__)."/Module".CLASS_EXT);
+	require_once(dirname(__FILE__)."/Time".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/ModuleObject".CLASS_EXT);
 
 	if (Config::enableSNMP())

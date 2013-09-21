@@ -116,7 +116,7 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"thostList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"20%\">".$this->loc->s("Name")."</th><th width=\"20%\">".
+					$output .= "<table id=\"thostList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"20%\">".$this->loc->s("Name")."</th><th></th><th width=\"20%\">".
 						$this->loc->s("Alias")."</th><th width=\"20%\">".$this->loc->s("Address")."</th><th width=\"15%\">".$this->loc->s("Template").
 						"</th><th width=\"20%\">".$this->loc->s("Parent")."</th><th></th></tr></thead>";
 				}
@@ -135,7 +135,14 @@
 				else {
 					$output .= $data["name"];
 				}
-
+				
+				$output .= "</td><td>";
+				if ($data["template"] == "t") {
+				}
+				else {
+					$output .= FS::$iMgr->iconOpendiv("17","monitor",array("lnkadd" => "host=".$data["name"]));
+				}
+				
 				$output .= "</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
 				if ($data["template"] == "t") {
 					$output .= $this->loc->s("Yes");
@@ -143,6 +150,7 @@
 				else {
 					$output .= $this->loc->s("No");
 				}
+				
 				$output .= "</td><td>";
 				$found2 = false;
 				for ($i=0;$i<count($parentlist);$i++) {
@@ -857,10 +865,18 @@
 						return $this->loc->s("err-no-rights");
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if (!$name)
+					if (!$name) {
 						return $this->loc->s("err-bad-datas");
+					}
 
-					return $this->showCommandForm($name);	
+					return $this->showCommandForm($name);
+				case 17:
+					$name = FS::$secMgr->checkAndSecuriseGetData("host");
+					if (!$name) {
+						return $this->loc->s("err-bad-datas");
+					}
+					$host = new icingaHost();
+					return $host->showSensors($name);
 				default: return;
 			}
 		}

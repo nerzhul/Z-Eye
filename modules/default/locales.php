@@ -76,7 +76,7 @@
 					"out-bw" => "Output bandwidth",
 					"sensors" => "sensors",
 					"Service" => "Service",
-					"Since-icinga-start" => "Depuis le démarrage du processus Icinga",
+					"Since-icinga-start" => "Since icinga start",
 					"State" => "State",
 					"state-net" => "Network state",
 					"state-security" => "Security state",
