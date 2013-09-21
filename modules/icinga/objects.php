@@ -381,7 +381,7 @@
 						}
 						$output .= ";\"><td>".$sensor."</td><td>".$outstate.
 							"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
-				}
+					}
 				}
 				else if ($hos == "hoststatus") {
 					$totalSensors++;
@@ -414,6 +414,11 @@
 				}
 			}
 			
+			$output = "<b>".$this->loc->s("total-sensors")."</b>".$totalSensors."<br />".
+				"<b>".$this->loc->s("total-problems")."</b>".$totalPbs.
+				" ("."<b>".$this->loc->s("Critical")."</b>: ".$totalCrits." / <b>".
+				$this->loc->s("Warn")."</b>: ".$totalWarns.")".$output;
+				
 			$output .= "</table>";
 			return $output;
 		}

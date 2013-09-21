@@ -710,7 +710,8 @@
 		}
 		
 		public function iconOpendiv($callid,$iconname,$options=array()) {
-			return $this->opendiv($callid,$this->img("styles/images/".$iconname.".png",15,15),$options);
+			$size = (isset($options["iconsize"]) && is_numeric($options["iconsize"])) ? $options["iconsize"] : 15;
+			return $this->opendiv($callid,$this->img("styles/images/".$iconname.".png",$size,$size),$options);
 		}
 
 		/*

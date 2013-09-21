@@ -140,7 +140,8 @@
 				if ($data["template"] == "t") {
 				}
 				else {
-					$output .= FS::$iMgr->iconOpendiv("17","monitor",array("lnkadd" => "host=".$data["name"]));
+					$output .= FS::$iMgr->iconOpendiv("17","monitor",array("lnkadd" => "host=".$data["name"],
+						"iconsize" => 20));
 				}
 				
 				$output .= "</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
