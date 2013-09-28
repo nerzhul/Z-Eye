@@ -54,7 +54,7 @@
 				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
 				return $output;
 			}
-			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
+			$output = FS::$iMgr->cbkForm("2");
                         $output .= "<ul class=\"ulform\"><li><b>".$this->loc->s("User").":</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
 			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","sha_pwd","username = '".$user."'")) {
 				$mail = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","mail","username = '".$user."'");
@@ -339,19 +339,20 @@
 				case 2: // edit user
 					if (!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
 						$this->log(2,"User tries to edit user but don't have rights !");
+						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					if (!$uid || !FS::$secMgr->isNumeric($uid)) {
 						$this->log(2,"Some fields are missing for user management (user edit)");
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
 						return;
 					}
 
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 					if (!$username) {
 						$this->log(2,"User uid '".$uid."' doesn't exists");
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
 						return;
 					}
 
@@ -360,7 +361,7 @@
 					if ($pwd || $pwd2) {
 						if ($pwd != $pwd2) {
 							$this->log(1,"Try to modify password for user ".$uid." but passwords didn't match");
-							FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=5");
+							FS::$iMgr->ajaxEchoNC("err-pwd-match");
 							return;
 						}
 						$user = new User();
@@ -368,21 +369,21 @@
 						switch($user->changePassword($pwd)) {
 							case 0: break; // ok
 							case 1: // too short
-								FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=6");
+								FS::$iMgr->ajaxEchoNC("err-pwd-short");
 								return;
 							case 2: // complexity
-								FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=7");
-                                                                return;
+								FS::$iMgr->ajaxEchoNC("err-pwd-complex");
+                                return;
 							default: // unk
-								FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=8");
-                                                                return;
+								FS::$iMgr->ajaxEchoNC("err-pwd-unk");
+                                return;
 						}
 					}
 
 					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
 					if ($mail) {
 						if (!FS::$secMgr->isMail($mail)) {
-							FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=9");
+							FS::$iMgr->ajaxEchoNC("err-mail");
 							return;
 						}
 						FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","mail = '".$mail."'","uid = '".$uid."'");
@@ -394,7 +395,7 @@
 								$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$value."'");
 								if (!$exist) {
 									$this->log(1,"Try to add user ".$uid." to inexistant group '".$value."'");
-									FS::$iMgr->redir("mod=".$this->mid."&user=".$username."&err=2");
+									FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
 									return;
 								}
 								$groups[] = $value;
@@ -403,33 +404,28 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","uid = '".$uid."'");
 					$groups = array_unique($groups);
 					$count = count($groups);
-					for ($i=0;$i<$count;$i++)
+					for ($i=0;$i<$count;$i++) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_group","uid,gid","'".$uid."','".$groups[$i]."'");
+					}
 					$this->log(0,"User ".$uid." edited");
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				case 3: // del user
 					if (!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
-                                                $this->log(2,"User tries to delete user but don't have rights");
+                        $this->log(2,"User tries to delete user but don't have rights");
 						FS::$iMgr->ajaxEcho("err-no-right");
-                                                return;
-                                        }
+                        return;
+                    }
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					if (!$uid || !FS::$secMgr->isNumeric($uid)) {
 						$this->log(2,"Some fields are wrong or missing for user management (User delete)");
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","last_conn","uid = '".$uid."'");
 					if (!$exist) {
 						$this->log(1,"Unable to remove user '".$uid."', doesn't exist");
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEchoNC("err-invalid-user");
-						else
-						FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						FS::$iMgr->ajaxEchoNC("err-invalid-user");
 						return;
 					}
 					FS::$dbMgr->BeginTr();
@@ -437,16 +433,13 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","uid = '".$uid."'");
 					FS::$dbMgr->CommitTr();
 					$this->log(0,"User '".$uid."' removed");
-					if (FS::isAjaxCall())
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#u".$uid."tr');");
-					else
-						FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#u".$uid."tr');");
 					return;
 				case 4: // add ldap
 					if (!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
-                                                $this->log(2,"User tries to add ldap but don't have rights");
-                                                return;
-                                        }
+						$this->log(2,"User tries to add ldap but don't have rights");
+						return;
+					}
 					$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 					$port = FS::$secMgr->checkAndSecurisePostData("port");
 					$ssl = FS::$secMgr->checkAndSecurisePostData("ssl");
