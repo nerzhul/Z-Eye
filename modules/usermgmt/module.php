@@ -26,18 +26,7 @@
 		}
 
 		public function Load() {
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			$output = "";
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-user")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-bad-data")); break;
-				case 5: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-match")); break;
-				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-short")); break;
-				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-complex")); break;
-				case 8: $output .= FS::$iMgr->printError($this->loc->s("err-pwd-unk")); break;
-				case 9: $output .= FS::$iMgr->printError($this->loc->s("err-mail")); break;
-				case 10: $output .= FS::$iMgr->printError($this->loc->s("err-ldap-not-exist")); break;
-			}
 
 			$user = FS::$secMgr->checkAndSecuriseGetData("user");
 			if ($user)
