@@ -208,17 +208,17 @@
 			}
 			if ($found) {
 				if ($ip == "") {
-					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=2",array("id" => "swfform"));
+					$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&sh=2",array("id" => "swfform"));
 					$output .= FS::$iMgr->select("ip",array("js" => "filterSw()"));
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSw()")."</form>";
 					$output .= FS::$iMgr->js("function filterSw() {
-                                   		     	$('#swfdiv').fadeOut('slow',function() {
-                                        			$.post('index.php?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
-                                                        		$('#swfdiv').html(data);
-                                    	        	    	});
-							});
-              	                          		$('#swfdiv').fadeIn();
+							$('#swfdiv').fadeOut('slow',function() {
+								$.post('index.php?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
+											$('#swfdiv').html(data);
+										});
+						});
+              	        $('#swfdiv').fadeIn();
 						}")."<div id=\"swfdiv\">";
 				}
 				$output .= $grpoutput."</table>";
@@ -807,7 +807,7 @@
 				case 3: // add or edit backup server
 					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
 						$this->log(2,"User don't have rights to add/edit server '".$saddr."' from switches backup");
-						FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
+						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
@@ -819,29 +819,20 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if ($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
 						$this->log(2,"Some fields are missing/wrong for saving switch config");
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEchoNC("err-bad-datas");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
+						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
 					if ($edit) {
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
-							if (FS::isAjaxCall())
-								FS::$iMgr->ajaxEchoNC("err-not-found");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=4");
+							FS::$iMgr->ajaxEchoNC("err-not-found");
 							return;
 						}
 					}
 					else {
 						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
-							if (FS::isAjaxCall())
-								FS::$iMgr->ajaxEchoNC("err-already-exists");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=3");
+							FS::$iMgr->ajaxEchoNC("err-already-exists");
 							return;
 						}
 					}
@@ -859,10 +850,7 @@
 				case 4: // remove backup server
 					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_backup")) {
 						$this->log("User don't have rights to remove server '".$saddr."' from switches backup");
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-no-rights");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=99");
+						FS::$iMgr->ajaxEcho("err-no-rights");
 						return;
 					}
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
@@ -870,15 +858,10 @@
 					if ($saddr && $stype) {
 						$this->log(0,"Delete server '".$saddr."' for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."');");
-						else FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
+						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."');");
 					}
 					else {
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-bad-datas");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=1");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
 					}
 					
 					return;
