@@ -28,12 +28,7 @@
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-mgmt"));
 			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-already-exist")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-not-exist")); break;
-			}
+
 			if (!FS::isAjaxCall()) {
 				$gname = FS::$secMgr->checkAndSecuriseGetData("g");
 				$output = FS::$iMgr->h1("title-mgmt");
@@ -53,7 +48,7 @@
 
 			FS::$iMgr->showReturnMenu(true);
 			$output = FS::$iMgr->h2($this->loc->s("title-edit")." '".$gname."'",true);
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
+			$output .= FS::$iMgr->cbkForm("3");
 			$rules = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
 			while ($data = FS::$dbMgr->Fetch($query))
@@ -117,7 +112,7 @@
 		}
 
 		private function getGroupForm() {
-			$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$output = FS::$iMgr->cbkForm("1");
 			$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
 			$output .= FS::$iMgr->h2("title-opts");
 			$output .= $this->loadModuleRuleSets();
@@ -141,12 +136,12 @@
 					$gname = FS::$secMgr->checkAndSecurisePostData("gname");
 					if (!$gname) {
 						$this->log(2,"Some datas are missing when try to create group");
-						FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 					if ($exist) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						FS::$iMgr->ajaxEcho("err-already-exist");
 						$this->log(1,"The group ".$gname." already exists");
 						return;
 					}
@@ -162,25 +157,19 @@
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					$this->log(0,"New group '".$gname."' added");
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				// Remove group
 				case 2:
 					$gname = FS::$secMgr->checkAndSecuriseGetData("gname");
 					if (!$gname) {
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-bad-data");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
 						$this->log(2,"Some datas are missing when try to remove group");
 						return;
 					}
 					$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 					if (!$gid) {
-						if (FS::isAjaxCall())
-							FS::$iMgr->ajaxEcho("err-not-exist");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=1");
+						FS::$iMgr->ajaxEcho("err-not-exist");
 						$this->log(1,"Unable to remove group '".$gname."', group doesn't exists");
 						return;
 					}
@@ -189,16 +178,14 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","gid = '".$gid."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","gid = '".$gid."'");
 					FS::$dbMgr->CommitTr();
+					
 					$this->log(0,"Group '".$gname."' removed");
-					if (FS::isAjaxCall())
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#gr".$gid."tr');");
-					else
-						FS::$iMgr->redir("mod=".$this->mid);
-                                        return;
+					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#gr".$gid."tr');");
+                    return;
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
 					if (!$gid) {
-						FS::$iMgr->redir("mod=".$this->mid."&err=3");
+						FS::$iMgr->ajaxEcho("err-not-exist");
 						$this->log(2,"Some datas are missing when try to edit group");
 						return;
 					}
@@ -213,7 +200,7 @@
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					$this->log(0,"Group Id '".$gid."' edited");
-					FS::$iMgr->redir("mod=".$this->mid);
+					FS::$iMgr->redir("mod=".$this->mid,true);
 
 				default: break;
 			}
