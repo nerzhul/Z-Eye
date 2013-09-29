@@ -760,35 +760,44 @@
 					$host = new icingaHost();
 					return $host->showForm();
 				case 4:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
 					$hostexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","");
-					if (!$hostexist)
+					if (!$hostexist) {
 						return FS::$iMgr->printError($this->loc->s("err-no-hosts"));
+					}
+					
 					return $this->showHostgroupForm();
 				case 5:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 						
 					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
-					if ($tpexist)
+					if ($tpexist) {
 						return $this->showServiceForm();
+					}
+					
 					return FS::$iMgr->printError($this->loc->s("err-no-service"));
 				case 6:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
 					return $this->showTimeperiodForm();
 				case 7:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
-					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");
-					if ($tpexist)
-						return $this->showContactForm();	
-					else
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");) {
+						return $this->showContactForm();
+					}
+					else {
 						return FS::$iMgr->printError($this->loc->s("err-no-contact"));
+					}
 				case 8:
 					$ctg = new icingaCtg();
 					return $ctg->showForm();
@@ -798,39 +807,47 @@
 					$host = new icingaHost();
 					return $host->showForm($name);
 				case 11:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if (!$name)
+					if (!$name) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showHostgroupForm($name);
 				case 12:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if (!$name)
+					if (!$name) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showServiceForm($name);
 				case 13:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if (!$name)
+					if (!$name) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showTimeperiodForm($name);
 				case 14:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if (!$name)
+					if (!$name) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showContactForm($name);
 				case 15:
@@ -842,8 +859,9 @@
 					$ctg = new icingaCtg();
 					return $ctg->showForm($name);
 				case 16:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
+					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 						return $this->loc->s("err-no-rights");
+					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
