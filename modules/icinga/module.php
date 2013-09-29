@@ -35,29 +35,25 @@
 		private function showTabPanel() {
 			$output = "";
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-
-			if ($err == 99)
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-right"));
 
 			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-icinga");
 				$panElmts = array();
 				//$panElmts[] = array(1,"mod=".$this->mid,$this->loc->s("General"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_host_write"))
-					$panElmts[] = array(2,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hosts"));
+					$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("Hosts"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
-					$panElmts[] = array(3,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Hostgroups"));
+					$panElmts[] = array(3,"mod=".$this->mid,$this->loc->s("Hostgroups"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
-					$panElmts[] = array(4,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Services"));
+					$panElmts[] = array(4,"mod=".$this->mid,$this->loc->s("Services"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
-					$panElmts[] = array(5,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Timeperiods"));
+					$panElmts[] = array(5,"mod=".$this->mid,$this->loc->s("Timeperiods"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
-					$panElmts[] = array(6,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contacts"));
+					$panElmts[] = array(6,"mod=".$this->mid,$this->loc->s("Contacts"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
-					$panElmts[] = array(7,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Contactgroups"));
+					$panElmts[] = array(7,"mod=".$this->mid,$this->loc->s("Contactgroups"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
-					$panElmts[] = array(8,"mod=".$this->mid.($err ? "&err=".$err : ""),$this->loc->s("Commands"));
+					$panElmts[] = array(8,"mod=".$this->mid,$this->loc->s("Commands"));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				return $output;
 			}
@@ -170,17 +166,14 @@
 		}
 
 		private function showHostgroupsTab() {
-			if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) 
+			if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
 			}
-			if (FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+			$output = "";
+
+			if (FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 				$output .= FS::$iMgr->opendiv(4,$this->loc->s("new-hostgroup"));
+			}
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","",array("order" => "name"));
@@ -580,12 +573,6 @@
 			if (!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) 
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
-			}
 			
 			/*
 			 * Ajax new contactgroup
@@ -636,21 +623,14 @@
 		}
 
 		private function showCommandTab() {
-			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) 
+			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-data")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-data-not-exist")); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-data-exist")); break;
-				case 4: $output .= Fs::$iMgr->printError($this->loc->s("err-binary-not-found")); break;
 			}
 			
 			/*
 			 * Ajax new command
 			 */
-			$output .= FS::$iMgr->opendiv(9,$this->loc->s("new-cmd"));
+			$output = FS::$iMgr->opendiv(9,$this->loc->s("new-cmd"));
 
 			/*
 			 * Command table
@@ -916,14 +896,14 @@
 					$out = "";
 					exec("if [ -f ".$tmpcmd[0]." ] && [ -x ".$tmpcmd[0]." ]; then echo 0; else echo 1; fi;",$out);
 					if (!is_array($out) || count($out) != 1 || $out[0] != 0 || $this->isForbidCmd($tmpcmd[0])) {
-						echo $this->loc->s("err-binary-not-found");
+						FS::$iMgr->ajaxEcho("err-binary-not-found");
 						return;
 					} 
 
 					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");	
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=8&err=5");
+						FS::$iMgr->ajaxEcho("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->redir("mod=".$this->mid."&sh=8",true);
@@ -1054,7 +1034,7 @@
 						"'".$name."','".$alias."','".$mhs."','".$mms."','".$tuhs."','".$tums."','".$whs."','".$wms."','".$thhs."','".$thms."','".$fhs."','".$fms."','".$sahs."','".$sams."','".$suhs."','".$sums.
 						"','".$mhe."','".$mme."','".$tuhe."','".$tume."','".$whe."','".$wme."','".$thhe."','".$thme."','".$fhe."','".$fme."','".$sahe."','".$same."','".$suhe."','".$sume."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->redir("mod=".$this->mid."&sh=5&err=5");
+						FS::$iMgr->ajaxEcho("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->redir("mod=".$this->mid."&sh=5",true);
