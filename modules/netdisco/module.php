@@ -27,23 +27,12 @@
 		
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-netdisco"));
-			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-data")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-write-fail")); break;
-				case 5: $output .= FS::$iMgr->printError($this->loc->s("err-read-fail")); break;
-				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-readorwrite")); break;
-				case -1: $output .= FS::$iMgr->printDebug($this->loc->s("mod-ok")); break;
-				default: break;
-			}
-			$output .= $this->showMain();
-			return $output;
+			return $this->showMain();
 		}
 
 		private function showMain() {
 			$output = FS::$iMgr->h1("title-netdisco");
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=1");
+			$output .= FS::$iMgr->cbkForm("1");
 			$file = file("/usr/local/etc/netdisco/netdisco.conf");
 
 			$dnssuffix = ".local";
@@ -72,27 +61,30 @@
 				return $output;
 			}
 
-			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>";
-			$output .= FS::$iMgr->idxLine("dns-suffix","suffix",array("value" => $netdiscoCfg["dnssuffix"],"tooltip" => "tooltip-dnssuffix"));
-			$output .= FS::$iMgr->idxLine("main-node","fnode",array("value" => $netdiscoCfg["firstnode"],"type" => "ip", "tooltip" => "tooltip-firstnode"));
-			$output .= "<tr><th colspan=\"2\">".$this->loc->s("timer-conf")."</th></tr>";
-			$output .= FS::$iMgr->idxLine("node-expiration","nodetimeout",array("type" => "num", "value" => $netdiscoCfg["nodetimeout"], "size" => 4, "length" => 4, "tooltip" => "tooltip-nodetimeout"));
-			$output .= FS::$iMgr->idxLine("device-expiration","devicetimeout",array("type" => "num", "size" => 4, "value" => $netdiscoCfg["devicetimeout"], "length" => 4, "tooltip" => "tooltip-devicetimeout"));
-			$output .= "<tr><th colspan=\"2\">".$this->loc->s("database")."</th></tr>";
-			$output .= FS::$iMgr->idxLine("pg-host","pghost",array("value" => $netdiscoCfg["pghost"]));
-			$output .= FS::$iMgr->idxLine("pg-db","dbname",array("value" => $netdiscoCfg["dbname"]));
-			$output .= FS::$iMgr->idxLine("pg-user","dbuser",array("value" => $netdiscoCfg["dbuser"]));
-			$output .= FS::$iMgr->idxLine("pg-pwd","dbpwd",array("value" => $netdiscoCfg["dbpwd"],"type" => "pwd"));
-			$output .= "<tr><th colspan=\"2\">".$this->loc->s("snmp-conf")."</th></tr>";
-			$output .= FS::$iMgr->idxLine("snmp-timeout","snmptimeout",
-				array("type" => "num", "value" => $netdiscoCfg["snmptimeout"], "size" => 2, "length" => 2, "tooltip" => "tooltip-snmptimeout"));
-			$output .= FS::$iMgr->idxLine("snmp-try","snmptry",array("type" => "num", "value" => $netdiscoCfg["snmptry"], "size" => 2, "length" => 2, "tooltip" => "tooltip-snmptry"));
-			$output .= "<tr><td>".$this->loc->s("snmp-version")."</td><td>";
-			$output .= FS::$iMgr->select("snmpver");
-			$output .= FS::$iMgr->selElmt("1","1",$netdiscoCfg["snmpver"] == 1 ? true : false);
-			$output .= FS::$iMgr->selElmt("2c","2",$netdiscoCfg["snmpver"] == 2 ? true : false);
-			$output .= "</select></td></tr>";
-			$output .= FS::$iMgr->tableSubmit("Save");
+			$output .= "<table class=\"standardTable\"><tr><th colspan=\"2\">".$this->loc->s("global-conf")."</th></tr>".
+				FS::$iMgr->idxLine("dns-suffix","suffix",array("value" => $netdiscoCfg["dnssuffix"],"tooltip" => "tooltip-dnssuffix")).
+				FS::$iMgr->idxLine("main-node","fnode",array("value" => $netdiscoCfg["firstnode"],"type" => "ip", "tooltip" => "tooltip-firstnode")).
+				"<tr><th colspan=\"2\">".$this->loc->s("timer-conf")."</th></tr>".
+				FS::$iMgr->idxLine("node-expiration","nodetimeout",array("type" => "num", "value" => $netdiscoCfg["nodetimeout"],
+					"size" => 4, "length" => 4, "tooltip" => "tooltip-nodetimeout")).
+				FS::$iMgr->idxLine("device-expiration","devicetimeout",array("type" => "num", "size" => 4,
+					"value" => $netdiscoCfg["devicetimeout"], "length" => 4, "tooltip" => "tooltip-devicetimeout")).
+				"<tr><th colspan=\"2\">".$this->loc->s("database")."</th></tr>".
+				FS::$iMgr->idxLine("pg-host","pghost",array("value" => $netdiscoCfg["pghost"])).
+				FS::$iMgr->idxLine("pg-db","dbname",array("value" => $netdiscoCfg["dbname"])).
+				FS::$iMgr->idxLine("pg-user","dbuser",array("value" => $netdiscoCfg["dbuser"])).
+				FS::$iMgr->idxLine("pg-pwd","dbpwd",array("value" => $netdiscoCfg["dbpwd"],"type" => "pwd")).
+				"<tr><th colspan=\"2\">".$this->loc->s("snmp-conf")."</th></tr>".
+				FS::$iMgr->idxLine("snmp-timeout","snmptimeout",
+					array("type" => "num", "value" => $netdiscoCfg["snmptimeout"], "size" => 2, "length" => 2, "tooltip" => "tooltip-snmptimeout")).
+				FS::$iMgr->idxLine("snmp-try","snmptry",array("type" => "num", "value" => $netdiscoCfg["snmptry"],
+					"size" => 2, "length" => 2, "tooltip" => "tooltip-snmptry")).
+				"<tr><td>".$this->loc->s("snmp-version")."</td><td>".
+				FS::$iMgr->select("snmpver").
+				FS::$iMgr->selElmt("1","1",$netdiscoCfg["snmpver"] == 1 ? true : false).
+				FS::$iMgr->selElmt("2c","2",$netdiscoCfg["snmpver"] == 2 ? true : false).
+				"</select></td></tr>".
+				FS::$iMgr->tableSubmit("Save");
 			return $output;
 		}
 		
@@ -113,15 +105,15 @@
 					if (checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
 						if (writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) != 0) {
 							$this->log(2,"Fail to write netdisco configuration");
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							FS::$iMgr->ajaxEcho("err-write-fail");
 							return;
 						}
 						$this->log(0,"Netdisco configuration changed");
-						FS::$iMgr->redir("mod=".$this->mid."&err=-1");
+						FS::$iMgr->ajaxEcho("Done");
 						return;
 					}
 					$this->log(2,"Bad netdisco configuration");
-					FS::$iMgr->redir("mod=".$this->mid."&err=1");
+					FS::$iMgr->ajaxEcho("err-bad-datas");
 					return;
 				default: break;
 			}
