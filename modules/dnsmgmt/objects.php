@@ -167,7 +167,8 @@
 						case 3:
 							$output .= $this->loc->s("Forward-only");
 							break;
-					}		
+					}
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -660,6 +661,7 @@
 					}
 					
 					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"];
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -1078,6 +1080,7 @@
 					}
 					
 					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"];
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -1617,6 +1620,7 @@
 					}
 					
 					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("machine-FQDN")."</b>: ".$data["nsfqdn"];
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -1883,6 +1887,7 @@
 					
 					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("key-id")."</b>: ".$data["keyid"].
 						"<br /><b>".$this->loc->s("algorithm")."</b>: ".$data["keyalgo"];
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -2121,6 +2126,7 @@
 							if ($out != NULL) {
 								$output .= FS::$iMgr->h4("dig-results").
 									preg_replace("#[\n]#",FS::$iMgr->hr(),$out);
+								FS::$searchMgr->incResultCount();
 							}
 						}
 					}
@@ -2176,7 +2182,7 @@
 								$output .= preg_replace("#[\n]#","<br />",$out);
 							}
 						}
-						//$this->nbresults++;
+						FS::$searchMgr->incResultCount();
 					}
 					if ($found) {
 						$resout .= $this->searchResDiv($output,"title-dns-records");

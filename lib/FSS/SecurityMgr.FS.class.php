@@ -35,7 +35,15 @@
 		function __construct() {}
 
 		public function isNumeric($str) {
-			return is_numeric($str) == true;
+			/*
+			 * It seems is_numeric matches also the point to decimals.
+			 * We don't use it
+			 */
+			
+			if(is_numeric($str) === true && !preg_match("#[.]#",$str))
+				return true;
+			
+			return false;
 		}
 
 		public function isAlphaNumeric($str) {
