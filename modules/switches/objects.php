@@ -73,7 +73,7 @@
 						"<b><i>".$this->loc->s("Description").": </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
 						
 					$resout .= $this->searchResDiv($locoutput,"Network-device");
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 				
 				// VLAN on a device
@@ -387,7 +387,7 @@
 						$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>".
 						($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".
 						$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 
 				if ($found) {
@@ -415,7 +415,7 @@
 						"\\<a href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a><br />";
 						$this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
 						"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")";
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -442,7 +442,7 @@
 					$output .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"].
 						"</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0].
 						" ".$this->loc->s("and-the")." ".$lst[0].")";
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -550,7 +550,7 @@
 
 					$devprise[$swname][$data["port"]]["plug"] = $data["prise"];
 					$devprise[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData($this->devPortTable,"name","ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 				if ($found) {
 					foreach ($devprise as $device => $devport) {
@@ -621,7 +621,7 @@
 					$devroom[$swname][$data["port"]]["room"] = $data["room"];
 					$devroom[$swname][$data["port"]]["desc"] = FS::$dbMgr->GetOneData($this->devPortTable,"name",
 						"ip = '".$data["ip"]."' AND port = '".$data["port"]."'");
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 				if ($found) {
 					foreach ($devroom as $device => $devport) {

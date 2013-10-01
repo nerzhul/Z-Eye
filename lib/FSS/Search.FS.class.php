@@ -58,6 +58,10 @@
 		public function getResultsCount() {
 			return $this->resultsCount;
 		}
+		
+		public function incResultCount() {
+			$this->resultsCount++;
+		}
 
 		public function setMode($sm) {
 			$this->searchMode = $sm;

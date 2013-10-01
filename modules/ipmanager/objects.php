@@ -290,7 +290,7 @@
 							break;
 					}
 					$output .= FS::$iMgr->hr();
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 
 				if ($found) {
@@ -353,7 +353,7 @@
 							$output .= "<li>".($alias ? $alias." (" : "").$members[$i].($alias ? ")" : "")."</li>";
 						}
 						$output .= "</ul>".FS::$iMgr->hr();
-						//$this->nbresults++;
+						FS::$searchMgr->incResultCount();
 					}
 					$resout .= $this->searchResDiv($output,"title-dhcp-cluster");
 				}
@@ -449,7 +449,7 @@
 						$output .= $this->loc->s("inactive-reserv")."<br />";
 					}
 
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 		
 				if ($found) {
@@ -479,7 +479,7 @@
 						$output .= "<b>".$this->loc->s("Validity")."</b>: ".$data["leasetime"]."<br />";
 					}
 					$output .= FS::$iMgr->hr();
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 				
 				if ($found) {
@@ -514,7 +514,7 @@
 					if ($data["distributed"] != 3 && $data["distributed"] != 4) {
 						$output .= $this->loc->s("Validity")." : ".$data["leasetime"];
 					}
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 		
 				if ($found) {
@@ -565,7 +565,7 @@
 						"<b>".$this->loc->s("option-code")."</b>: ".$data["optcode"]."<br />".
 						"<b>".$this->loc->s("option-type")."</b>: ".$data["opttype"]."<br />".
 						FS::$iMgr->hr();
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 
 				if ($found) {
@@ -614,7 +614,7 @@
 						"<b>".$this->loc->s("option-name")."</b>: ".$data["optname"]."<br />".
 						"<b>".$this->loc->s("option-value")."</b>: ".$data["optval"]."<br />".
 						FS::$iMgr->hr();
-					//$this->nbresults++;
+					FS::$searchMgr->incResultCount();
 				}
 
 				if ($found) {
@@ -677,7 +677,7 @@
 						}
 							
 						$output .= "</ul>".FS::$iMgr->hr();
-						//$this->nbresults++;
+						FS::$searchMgr->incResultCount();
 					}
 
 					$resout .= $this->searchResDiv($output,"title-dhcp-option-groups");
