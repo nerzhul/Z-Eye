@@ -714,16 +714,18 @@
 		}	
 
 		public function upload($name) {
-			return "<input type=\"file\" name=\"".$name."\" />";
+			return sprintf("<input type=\"file\" name=\"%s\" />",$name);
 		}
 		
 		public function canvas($name, $width=480, $height=480) {
-			return "<canvas id=\"".$name."\" height=\"".$height."\" width=\"".$width."\">[Votre Navigateur ne supporte pas le HTML5]</canvas>";
+			return sprintf("<canvas id=\"%s\" height=\"%s\" width=\"%s\">[Your browser doesn't support HTML5]</canvas>",
+				$name,$height,$width);
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			$output = "<li".($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : "")."><a href=\"index.php?".$link."&at=2&sh=".$shid."\">".$label."</a>";
-			return $output;
+			return sprintf("<li%s><a href=\"index.php?%s&at=2&sh=%s\">%s</a>",
+				($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : ""),
+				$link,$shid,$label);
 		}
 
 		public function tabPan($elmts = array(),$cursh) {
