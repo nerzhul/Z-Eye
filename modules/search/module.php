@@ -29,16 +29,13 @@
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("Search"));
-			$output = "";
 			$autosearch = FS::$secMgr->checkAndSecuriseGetData("term");
-			$search = FS::$secMgr->checkAndSecuriseGetData("s");
-			if ($search)
-				$output .= $this->findRefsAndShow($search);
-			else if ($autosearch)
-				$output .= $this->findRefsAndShow($autosearch,true);
-			else
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-search"));
-			return $output;
+			if ($autosearch) {
+				return $this->findRefsAndShow($autosearch,true);
+			}
+			else {
+				return FS::$iMgr->printError($this->loc->s("err-no-search"));
+			}
 		}
 
 		public function LoadForAndroid() {
@@ -53,7 +50,7 @@
 		private function findRefsAndShow($search,$autocomp=false) {
 			$output = "";
 			if (!$autocomp) {
-				$output .= FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
+				$output = FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
 				if (FS::$secMgr->isMacAddr($search)) {
 					$output .= $this->showMacAddrResults($search);
 				}
@@ -65,12 +62,13 @@
 				}
 				else {
 					$tmpoutput = $this->showNamedInfos($search);
-					if (strlen($tmpoutput) > 0)
+					if (strlen($tmpoutput) > 0) {
 						$output .= $tmpoutput;
-					else
+					}
+					else {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
+					}
 				}
-
 				$this->log(0,"searching '".$search."'");
 			}
 			else {
@@ -426,6 +424,18 @@
 			}
 			else {
 				return "";
+			}
+		}
+		
+		public function handlePostDatas($act) {
+			switch($act) {
+				case 1:
+					$search = FS::$secMgr->checkAndSecurisePostData("s");
+					if ($search) {
+						$js = "$('#main').html('".addslashes($this->findRefsAndShow($search))."');";
+						FS::$iMgr->ajaxEcho("Done",$js);
+					}
+					return;
 			}
 		}
 	};

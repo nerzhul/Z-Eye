@@ -107,12 +107,11 @@
 		}
 
 		protected function showSearchForm() {
-			return "<div id=\"menuStack\"><div id=\"search\">".
-				$this->form("index.php?mod=".$this->getModuleIdByPath("search"),array("get" => 1)).
-                        	$this->hidden("mod",$this->getModuleIdByPath("search")).
-				$this->autoComplete("s",array("size" => 30,"length" => 60))." <button class=\"searchButton\" type=\"submit\">".
-					"<img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>".
-					"</div></div>";
+			return sprintf("<div id=\"menuStack\"><div id=\"search\">%s%s<button class=\"searchButton\" type=\"submit\">".
+				"<img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>".
+				"</div></div>",
+				$this->cbkForm("index.php?mod=".$this->getModuleIdByPath("search")."&act=1","Searching...",true),
+				$this->autoComplete("s",array("size" => 30,"length" => 60)));
 		}
 
 		public function showModule() {
