@@ -792,7 +792,7 @@
 						return $this->loc->s("err-no-rights");
 					}
 
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias");) {
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias")) {
 						return $this->showContactForm();
 					}
 					else {

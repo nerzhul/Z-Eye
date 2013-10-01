@@ -231,18 +231,21 @@
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
 						return $output;
 					}
-					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=16");
-					$output .= FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port);
 					$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","climit","device = '".$device."' AND port = '".$port."'");
 					$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
 					$desc = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","description","device = '".$device."' AND port = '".$port."'");
-					$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),"label" => $this->loc->s("enable-monitor")))."</li><li>";
-					$output .= FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>";
-					$output .= FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>";
-					$output .= FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>";
-					$output .= FS::$iMgr->submit("","Enregister")."</li>";
-					$output .= "</ul>";
-					$output .= "</form>";
+					
+					$output .= FS::$iMgr->cbkForm("16").
+						FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port).
+						"<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),
+							"label" => $this->loc->s("enable-monitor")))."</li><li>".
+						FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>".
+						FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),
+							array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>".
+						FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),
+							array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>".
+						FS::$iMgr->submit("","Enregister")."</li>".
+						"</ul></form>";
 				}
 				else if ($sh == 4) {
 					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshportinfos") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshportinfos")) {
@@ -770,7 +773,7 @@
 					if (FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_dhcpsnmgmt") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_dhcpsnmgmt")) { 
 						$output .= FS::$iMgr->h3("title-dhcpsnooping");
-						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&act=24",array("id" => "dhcpsnfrm"));
+						$output .= FS::$iMgr->cbkForm("24&d=".$device,array("id" => "dhcpsnfrm"));
 						$enable = $this->devapi->getDHCPSnoopingStatus();
 						$opt82 = $this->devapi->getDHCPSnoopingOpt82();
 						$match = $this->devapi->getDHCPSnoopingMatchMAC();
@@ -803,8 +806,8 @@
 							var ovlid = document.getElementsByName('oldvl')[0].value;
 							$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
 							$('#vlplist').html(data); unlockScreen(true); });
-							return false; };";
-						$js .= "function checkTagForm() {
+							return false; };
+							function checkTagForm() {
 							if ($('#vlplist') == null || $('#vlplist').html().length < 1) {
 								alert('".$this->loc->s("must-verify-ports")." !');
 								return false;
@@ -815,16 +818,18 @@
 							}
 							return true;
 						};";
-						$output .= FS::$iMgr->js($js);
-						$output .= FS::$iMgr->h3("title-retag");
-						if ($err && $err == 1) $output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
-						$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&d=".$device."&d=".$device."&act=11");
-						$output .= $this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />";
-						$output .= $this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />";
-						$output .= FS::$iMgr->JSSubmit("searchvlan",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>";
-						$output .= $this->loc->s("Confirm")." ".FS::$iMgr->check("accept");
-						$output .= FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
-
+						$output .= FS::$iMgr->js($js).
+							FS::$iMgr->h3("title-retag");
+							
+						if ($err && $err == 1) {
+							$output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
+						}
+						$output .= FS::$iMgr->cbkForm("11&d=".$device).
+							$this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />".
+							$this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />".
+							FS::$iMgr->JSSubmit("searchvlan",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>".
+							$this->loc->s("Confirm")." ".FS::$iMgr->check("accept").
+							FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
 					}
 
 					if (FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_exportcfg") ||
@@ -1266,7 +1271,6 @@
 					case 1: $output .= FS::$iMgr->printError($this->loc->s("err-some-backup-fail")); break;
 					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-some-field-missing")); break;
 					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-no-rights")); break;
-					case 99: $output .= FS::$iMgr->printError($this->loc->s("err-no-credentials")); break;
 					case -1: $output .= FS::$iMgr->printSuccess($this->loc->s("done-with-success")); break;
 					default: break;
 				}
@@ -1645,7 +1649,7 @@
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						if (!$device || !$old || !$new || !FS::$secMgr->isNumeric($old) || !FS::$secMgr->isNumeric($new) || $old > 4096 || $new > 4096 || $old < 0 || $new < 0) {
 							$this->log(2,"Some fields are missing/wrong (vlan replacement)");
-							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4&err=1");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 
@@ -1653,12 +1657,12 @@
 						$dip = $this->devip->getDeviceIP();
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&err=99");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;	
 						}
 						$this->log(0,"Replace VLAN '".$old."' by '".$new."' on device '".$device."'");
 						$this->devapi->replaceVlan($old,$new);
-						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4");
+						FS::$iMgr->ajaxEcho("Done");
 						return;
 					/*
 					* Backup startup-config
@@ -1786,36 +1790,39 @@
 						$climit = FS::$secMgr->checkAndSecurisePostData("climit");
 						$wlimit = FS::$secMgr->checkAndSecurisePostData("wlimit");
 						$desc = FS::$secMgr->checkAndSecurisePostData("desc");
+						
 						if (!$device || !$port) {
 							$this->log(2,"Some fields are missing (port monitoring)");
-							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip) && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
-							FS::$iMgr->redir("mod=".$this->mid."&err=99");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;	
 						}
 	
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						if (!$dip) {
 							$this->log(2,"Bad device '".$device."' (port monitoring)");
-							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 	
 						$dport = FS::$dbMgr->GetOneData("device_port","name","ip = '".$dip."' AND port = '".$port."'");
 						if (!$dport) {
 							$this->log(2,"Bad port '".$dport."' for device '".$dip."' (port monitoring)");
-							FS::$iMgr->redir("mod=".$this->mid."&sh=3&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
+						
+						FS::$dbMgr->BeginTr();
 						if ($enmon == "on") {
 							if (!$climit || !$wlimit || !FS::$secMgr->isNumeric($wlimit) || !FS::$secMgr->isNumeric($climit) || $climit <= 0 || $wlimit <= 0) {
 								$this->log(2,"Some fields are missing/wrong (port monitoring)");
-								FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3&err=2");
+								FS::$iMgr->ajaxEcho("err-bad-datas");
 								return;
 							}
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."' AND port = '".$port."'");
@@ -1824,24 +1831,26 @@
 						else {
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."port_monitor","device = '".$device."' AND port = '".$port."'");
 						}
+						FS::$dbMgr->CommitTr();
+						
 						$this->log(0,"Port monitoring for device '".$device."' and port '".$dport."' edited. Enabled: ".($enmon == "on" ? "yes" : "no").
 							" wlimit: ".$wlimit." climit: ".$climit." desc: '".$desc."'");
-						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&p=".$port."&sh=3");
+						FS::$iMgr->ajaxEcho("Done");
 						return;
 					case 17: // device cleanup
 						$device = FS::$secMgr->checkAndSecuriseGetData("device");
 						if (!$device) {
 							$this->log(2,"Some fields are missing (Device cleanup)");
-							FS::$iMgr->redir("mod=".$this->mid."&err=1");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
+						
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-							FS::$iMgr->redir("mod=".$this->mid."&err=99");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;	
 						}
-						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 
 						FS::$dbMgr->BeginTr();
 						FS::$dbMgr->Delete("device_ip","ip = '".$dip."'");
@@ -1868,7 +1877,7 @@
 						FS::$dbMgr->CommitTr();
 
 						$this->log(0,"Remove device '".$device."' from Z-Eye");
-						FS::$iMgr->redir("mod=".$this->mid);
+						FS::$iMgr->redir("mod=".$this->mid,true);
 					case 18: // Device discovery
 						if (!FS::$sessMgr->hasRight("mrule_switches_discover")) {
 							$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");
@@ -1933,7 +1942,7 @@
 					case 20: // Save all devices
 						if (!FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
 							$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to save all devices !");
-							FS::$iMgr->redir("mod=".$this->mid."&err=3");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;
 						}
 						$query = FS::$dbMgr->Select("device","name,vendor");
@@ -1949,17 +1958,15 @@
 						}
 						
 						$this->log(0,"User ".FS::$sessMgr->getUserName()." saved all devices");
-						if (FS::isAjaxCall())
-							echo $this->loc->s("saveorder-terminated");
-						else
-							FS::$iMgr->redir("mod=".$this->mid."&err=-1");
+						FS::$iMgr->ajaxEcho("saveorder-terminated");
 						return;
 					case 21: // Backup all devices
 						if (!FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
 							$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to backup all devices !");
-							FS::$iMgr->redir("mod=".$this->mid."&err=3");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;
 						}
+						
 						$output = "";
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login,pwd");
 						while ($data = FS::$dbMgr->Fetch($query)) {
@@ -2016,11 +2023,11 @@
 						else {
 							if (strlen($output) > 0) {
 								$this->log(1,"Some devices cannot be backup: ".$output);
-								FS::$iMgr->redir("mod=".$this->mid."&err=1");
+								FS::$iMgr->ajaxEcho("err-bad-datas");
 							}
 							else {
 								$this->log(0,"User ".FS::$sessMgr->getUserName()." backup all devices");
-								FS::$iMgr->redir("mod=".$this->mid);
+								FS::$iMgr->ajaxEcho("Done");
 							}
 						}
 						return;
@@ -2029,19 +2036,13 @@
 						$dip = "";	
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
-							if (FS::isAjaxCall())
-								echo $this->loc->s("err-bad-datas");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 
 						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_sshpwd") && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd")) {
-							if (FS::isAjaxCall())
-								echo $this->loc->s("err-no-rights");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=1");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;
 						}
 							
@@ -2051,54 +2052,36 @@
 						$enablepwd = FS::$secMgr->checkAndSecurisePostData("enablepwd");
 						$enablepwd2 = FS::$secMgr->checkAndSecurisePostData("enablepwd2");
 						if (!$sshuser || !$sshpwd || !$sshpwd2 || !$enablepwd || !$enablepwd2) {
-							if (FS::isAjaxCall())
-								echo $this->loc->s("err-bad-datas");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 
 						if ($sshpwd != $sshpwd2 || $enablepwd != $enablepwd2) {
-							if (FS::isAjaxCall())
-								echo $this->loc->s("err-pwd-mismatch");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=3");
+							FS::$iMgr->ajaxEcho("err-pwd-mismatch");
 							return;
 						}
 
 						if ($sshpwd != $sshpwd2 || $enablepwd != $enablepwd2) {
-							if (FS::isAjaxCall())
-								echo $this->loc->s("err-pwd-mismatch");
-							else
-								FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=4");
+							FS::$iMgr->ajaxEcho("err-pwd-mismatch");
 							return;
 						}
 					
 						$res = $this->devapi->connectToDevice($dip,$sshuser,$sshpwd,$enablepwd);
 						switch($res) {
 							case 1:
-								if (FS::isAjaxCall())
-									echo $this->loc->s("err-conn-fail");
-								else
-									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=5");
+								FS::$iMgr->ajaxEcho("err-conn-fail");
 								return;
 							case 2:
-								if (FS::isAjaxCall())
-									echo $this->loc->s("err-auth-fail");
-								else
-									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=6");
+								FS::$iMgr->ajaxEcho("err-auth-fail");
 								return;
 							case 3:
-								if (FS::isAjaxCall())
-									echo $this->loc->s("err-enable-auth-fail");
-								else
-									FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=7");
+								FS::$iMgr->ajaxEcho("err-enable-auth-fail");
 								return;
 						}
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_pwd","device = '".$device."'");
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."switch_pwd","device,sshuser,sshpwd,enablepwd","'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".
 							base64_encode($enablepwd)."'");
-						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7",true);
+						FS::$iMgr->ajaxEcho("Done");
 						return;
 					// Remove SSH link
 					case 23:
@@ -2106,13 +2089,13 @@
 						$dip = "";	
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 
 						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_sshpwd") && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd")) {
-							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=7&err=1");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 							
@@ -2125,13 +2108,13 @@
 						$dip = "";	
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 
 						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_dhcpsnmgmt") &&
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_dhcpsnmgmt")) { 
-							FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&err=2");
+							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;
 						}
 
@@ -2141,7 +2124,7 @@
 						$vlans = FS::$secMgr->checkAndSecurisePostData("vlansnooping");
 
 						if ($vlans && !is_array($vlans)) {
-							FS::$iMgr->redir("mod=".$this->mid."&err=2");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
 
@@ -2151,7 +2134,7 @@
 						$count = count($vlans);
 						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isNumeric($vlans[$i])) {
-								FS::$iMgr->redir("mod=".$this->mid."&err=2");
+								FS::$iMgr->ajaxEcho("err-bad-datas");
 								return;
 							}
 							$vlanlist[$vlans[$i]] = 1;
@@ -2162,7 +2145,7 @@
 						$this->devapi->setDHCPSnoopingMatchMAC($matchmac == "on" ? 1 : 2);
 						$this->devapi->setDHCPSnoopingVlans($vlanlist);
 
-						FS::$iMgr->redir("mod=".$this->mid."&d=".$device."&sh=4");
+						FS::$iMgr->ajaxEcho("Done");
 						return;
 					// CSV plug and room import
 					case 25:

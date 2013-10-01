@@ -60,25 +60,41 @@
 		}
 
 		public function Select($table,$fields,$cond = "",$options = array()) {
-			$sql = "SELECT ".$fields." FROM ".$table."";
-			if (strlen($cond) > 0)
-				$sql .= " WHERE ".$cond;
-			if (isset($options["group"]) && strlen($options["group"]) > 0)
-				$sql .= " GROUP BY ".$options["group"];
+			$sql = sprintf("SELECT %s FROM %s",$fields,$table);
+			
+			// Where clause
+			if (strlen($cond) > 0) {
+				$sql = sprintf("%s WHERE %s",$sql,$cond);
+			}
+			
+			// Group By clause
+			if (isset($options["group"]) && strlen($options["group"]) > 0) {
+				$sql = sprintf("%s GROUP BY %s",$sql,$options["group"]);
+			}
+			
+			// Order cause
 			if (isset($options["order"]) && strlen($options["order"]) > 0) {
-				$sql .= " ORDER BY ".$options["order"];
+				$sql = sprintf("%s ORDER BY %s",$sql,$options["order"]);
+				
+				// Desc/Asc clause
 				if (isset($options["ordersens"])) {
-					if ($options["ordersens"] == 1)
-						$sql .= " DESC";
-					else if ($options["ordersens"] == 2)
-						$sql .= " ASC";
+					if ($options["ordersens"] == 1) {
+						$sql = sprintf("%s DESC",$sql);
+					}
+					else if ($options["ordersens"] == 2) {
+						$sql = sprintf("%s ASC",$sql);
+					}
 				}
 			}
+			
+			// Limit clause
 			if (isset($options["limit"]) && $options["limit"] > 0) {
-				if (isset($options["startidx"]) && $options["startidx"] > 0)
-					$sql .= " LIMIT ".$options["startidx"].",".($options["startidx"]+$options["limit"]);
-				else
-					$sql .= " LIMIT ".$options["limit"];
+				if (isset($options["startidx"]) && $options["startidx"] > 0) {
+					$sql = sprintf("%s LIMIT %s,%s",$sql,$options["startidx"],($options["startidx"]+$options["limit"]));
+				}
+				else {
+					$sql = sprintf("%s LIMIT %s",$sql,$options["limit"]);
+				}
 			}
 			$this->sqlQuery = $sql;
 			return $this->PDO->query($sql);
@@ -161,31 +177,35 @@
 		}
 
 		public function Insert($table,$keys,$values) {
-			$sql = "INSERT INTO ".$table."(".$keys.") VALUES (".$values.");";
+			$sql = sprintf("INSERT INTO %s(%s) VALUES (%s)",$table,$keys,$values);
 			return $this->PDO->query($sql);
 		}
 
 		public function Fetch(&$query) {
 			if (!$query) {
-				echo FS::$iMgr->printError("Query failed: ".$this->sqlQuery);
+				echo FS::$iMgr->printError(sprintf("Query failed: '%s'",$this->sqlQuery));
 				return NULL;
 			}
 			return $query->fetch();
 		}
 
 		public function Delete($table,$cond = "") {
-			$sql = "DELETE FROM ".$table."";
-			if (strlen($cond) > 0)
-				$sql .= " WHERE ".$cond;
+			$sql = sprintf("DELETE FROM %s",$table);
+			
+			if (strlen($cond) > 0) {
+				$sql = sprintf("%s WHERE %s",$sql,$cond);
+			}
 			$this->sqlQuery = $sql;
 
 			return $this->PDO->query($sql);
 		}
 
 		public function Update($table,$mods,$cond = "") {
-			$sql = "UPDATE ".$table." SET ".$mods."";
-			if (strlen($cond) > 0)
-				$sql .= " WHERE ".$cond;
+			$sql = sprintf("UPDATE %s SET %s",$table,$mods);
+			
+			if (strlen($cond) > 0) {
+				$sql = sprintf("%s WHERE %s",$sql,$cond);
+			}
 			$this->sqlQuery = $sql;
 			return $this->PDO->query($sql);
 		}
