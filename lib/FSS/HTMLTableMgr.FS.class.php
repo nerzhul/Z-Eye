@@ -106,8 +106,8 @@
 		public function render() {
 			$found = false;
 
-			$output = "<div id=\"".$this->tableDivId."\">";
-			$tmpoutput = $this->showHeader();
+			$output = "";
+			$tmpoutput = "";
 			
 			// for optimization we calcule this number here
 			$attrCount = count($this->attrList);
@@ -126,12 +126,14 @@
 				$rowBuf = array();
 				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
 					$this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
+					
 				while($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found)
 						$found = true;
 					// Bufferize entry
-					if (!isset($rowBuf[$data[$this->sqlAttrId]]))
+					if (!isset($rowBuf[$data[$this->sqlAttrId]])) {
 						$rowBuf[$data[$this->sqlAttrId]] = array();
+					}
 
 					// Store values into a buffer
 					$entry = array();
@@ -141,23 +143,24 @@
 
 					// Write buffer to row buffer
 					$rowBuf[$data[$this->sqlAttrId]][] = $entry;
-                     		}
-				$tmpoutput .= $this->showLineM($rowBuf,$attrCount);
+                }
+				$tmpoutput = sprintf("%s%s",$tmpoutput,$this->showLineM($rowBuf,$attrCount));
 			}
 			else {
 				$query = FS::$dbMgr->Select(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
 					$this->sqlTable,$sqlAttrList,$this->sqlCondition,array("order" => $this->sqlAttrId));
 				while($data = FS::$dbMgr->Fetch($query)) {
-					if (!$found)
+					if (!$found) {
 						$found = true;
-					$tmpoutput .= $this->showLine($data,$attrCount);
-                     		}
+					}
+					$tmpoutput = sprintf("%s%s",$tmpoutput,$this->showLine($data,$attrCount));
+				}
 			}
-                        if ($found)
-				$output .= $tmpoutput."</table>".FS::$iMgr->jsSortTable($this->tableId);
+            if ($found) {
+				$output = sprintf("%s%s</table>%s",$this->showHeader(),$tmpoutput,FS::$iMgr->jsSortTable($this->tableId));
+			}
 
-                        $output .= "</div>";
-			return $output;
+			return sprintf("<div id=\"%s\">%s</div>",$this->tableDivId,$output);
 		}
 
 		private function showLineM($rowBuf,$attrCount) {
@@ -165,42 +168,45 @@
 			$output = "";
 
 			foreach ($rowBuf as $rowIdx => $values) {
-				$output .= "<tr id=\"".$this->trPrefix.FS::$iMgr->formatHTMLId($rowIdx).$this->trSuffix."\"><td>".
+				$output = sprintf("%s<tr id=\"%s%s%s\"><td>%s</td>",$output,$this->trPrefix,FS::$iMgr->formatHTMLId($rowIdx),$this->trSuffix,
 					FS::$iMgr->opendiv($this->opendivNumber,$rowIdx,
-						array("lnkadd" => $this->opendivLink.$rowIdx))."</td>";
+						array("lnkadd" => $this->opendivLink.$rowIdx)));
 		
 				$valueCount = count($values);
 				// Read attributes
 				for ($i=0;$i<$attrCount-1;$i++) {
-					$output .= "<td><ul>";
+					$output = sprintf("%s<td><ul>",$output);
 
 					// Read values
 					for ($j=0;$j<$valueCount;$j++) {
-						$output .= "<li>";
+						$locoutput = "";
 						// Boolean 
-						if ($this->attrList[$i][2] == "b")
-							$output .= ($values[$j][$i] == 't' ? "X" : "");	
+						if ($this->attrList[$i][2] == "b") {
+							$locoutput = ($values[$j][$i] == 't' ? "X" : "");
+						}
 						// Select values
-						else if ($this->attrList[$i][2] == "s")
-							$output .= FS::$iMgr->getLocale($this->attrList[$i][3][$values[$j][$i]]);
+						else if ($this->attrList[$i][2] == "s") {
+							$locoutput = FS::$iMgr->getLocale($this->attrList[$i][3][$values[$j][$i]]);
+						}
 						// Select values (raw mode)
-						else if ($this->attrList[$i][2] == "sr")
-							$output .= $this->attrList[$i][3][$values[$j][$i]];
+						else if ($this->attrList[$i][2] == "sr") {
+							$locoutput = $this->attrList[$i][3][$values[$j][$i]];
+						}
 						// Raw values
-						else
-							$output .= $values[$j][$i];
-						$output .= "</li>";
+						else {
+							$locoutput = $values[$j][$i];
+						}
+						$output = sprintf("%s<li>%s</li>",$output,$locoutput);
 					}
-					$output .= "</ul></td>";
+					$output = sprintf("%s</ul></td>",$output);
 				}
 
 				if ($this->removeColumn) {
-					$output .= "<td>".FS::$iMgr->removeIcon($this->removeLink."=".$rowIdx,
+					$output = sprintf("%s<td>%s</td>",$output,FS::$iMgr->removeIcon($this->removeLink."=".$rowIdx,
 						array("js" => true, "confirm" =>
-						array(FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?","Confirm","Cancel"))).
-						"</td>";
+						array(FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?","Confirm","Cancel"))));
 				}
-				$output .= "</tr>";
+				$output = sprintf("%s</tr>",$output);
 			}
 
 			return $output;
@@ -208,50 +214,55 @@
 
 		private function showLine($sqlDatas,$attrCount) {
 			FS::$iMgr->setJSBuffer(1);
-                        $output = "<tr id=\"".$this->trPrefix.FS::$iMgr->formatHTMLId($sqlDatas[$this->sqlAttrId]).$this->trSuffix."\"><td>".
-				FS::$iMgr->opendiv($this->opendivNumber,$sqlDatas[$this->sqlAttrId],
-					array("lnkadd" => $this->opendivLink.$sqlDatas[$this->sqlAttrId]))."</td>";
-	
+			$output = "";
+			
 			for ($i=1;$i<$attrCount;$i++) {
-				$output .= "<td>";
+				$locoutput = "";
 				// Boolean 
-				if ($this->attrList[$i][2] == "b")
-					$output .= ($sqlDatas[$this->attrList[$i][1]] == 't' ? "X" : "");	
+				if ($this->attrList[$i][2] == "b") {
+					$locoutput = ($sqlDatas[$this->attrList[$i][1]] == 't' ? "X" : "");	
+				}
 				// Select values
-				else if ($this->attrList[$i][2] == "s")
-					$output .= FS::$iMgr->getLocale($this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]]);
-				else if ($this->attrList[$i][2] == "sr")
-					$output .= $this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]];
+				else if ($this->attrList[$i][2] == "s") {
+					$locoutput = FS::$iMgr->getLocale($this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]]);
+				}
+				else if ($this->attrList[$i][2] == "sr") {
+					$locoutput = $this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]];
+				}
 				// Raw values
-				else
-					$output .= $sqlDatas[$this->attrList[$i][1]];
-				$output .= "</td>";
+				else {
+					$locoutput = $sqlDatas[$this->attrList[$i][1]];
+				}
+				
+				$output = sprintf("%s<td>%s</td>",$output,$locoutput);
 			}
 
 			if ($this->removeColumn) {
-                                $output .= "<td>".FS::$iMgr->removeIcon($this->removeLink."=".$sqlDatas[$this->sqlAttrId],
+				$output = sprintf("%s<td>%s</td>",$output,FS::$iMgr->removeIcon($this->removeLink."=".$sqlDatas[$this->sqlAttrId],
 					array("js" => true, "confirm" =>
-                                        array(FS::$iMgr->getLocale($this->removeConfirm)."'".$sqlDatas[$this->sqlAttrId]."' ?","Confirm","Cancel"))).
-					"</td>";
+					array(FS::$iMgr->getLocale($this->removeConfirm)."'".$sqlDatas[$this->sqlAttrId]."' ?","Confirm","Cancel"))));
 			}
-			$output .= "</tr>";
-			return $output;
+
+			return sprintf("<tr id=\"%s%s%s\"><td>%s</td>%s</tr>",$this->trPrefix,FS::$iMgr->formatHTMLId($sqlDatas[$this->sqlAttrId]),
+				$this->trSuffix,FS::$iMgr->opendiv($this->opendivNumber,$sqlDatas[$this->sqlAttrId],
+					array("lnkadd" => $this->opendivLink.$sqlDatas[$this->sqlAttrId])),$output);
 		}
 
 		public function addLine($idx,$edit) {
-			$output = ""; $jscontent = "";
+			$output = "";
+			$jscontent = "";
 
 			$count = FS::$dbMgr->Count(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
 				$this->sqlTable,$this->sqlAttrId);
 			if ($count == 1) {
-				$jscontent = $this->showHeader()."</table>";
-				$output .= "$('#".$this->tableDivId."').html('".addslashes($jscontent)."'); 
-					$('#".$this->tableDivId."').show('slow');";
+				$jscontent = sprintf("%s</table>",$this->showHeader());
+				$output = sprintf("$('#%s').html('%s'); $('#%s').show('slow');",$this->tableDivId,addslashes($jscontent),
+					$this->tableDivId);
 			}
 
 			if ($edit) {
-				$output .= "hideAndRemove('#".FS::$iMgr->formatHTMLId($this->trPrefix.$idx.$this->trSuffix).
-					"'); setTimeout(function() {";
+				$output = sprintf("%shideAndRemove('#%s'); setTimeout(function() {",$output,
+					FS::$iMgr->formatHTMLId($this->trPrefix.$idx.$this->trSuffix));
 			}
 
 			$attrCount = count($this->attrList);
@@ -279,20 +290,23 @@
 
 					// Write buffer to row buffer
 					$rowBuf[$data[$this->sqlAttrId]][] = $entry;
-                		}
+                }
 				$jscontent = $this->showLineM($rowBuf,$attrCount);
 			}
 			else {
-				if ($data = FS::$dbMgr->Fetch($query))
+				if ($data = FS::$dbMgr->Fetch($query)) {
 					$jscontent = $this->showLine($data,$attrCount);
-				else
+				}
+				else {
 					$jscontent = "";
+				}
 			}
 
-			$output .= "$('".addslashes($jscontent)."').insertAfter('#".$this->firstLineId."');";
+			$output = sprintf("%s$('%s').insertAfter('#%s');",$output,addslashes($jscontent),$this->firstLineId);
 
-			if ($edit)
-				$output .= "},1000);";
+			if ($edit) {
+				$output = sprintf("%s},1000);",$output);
+			}
 
 			return $output;
 		}
@@ -301,28 +315,32 @@
 			FS::$iMgr->setJSBuffer(1);
 			$attrCount = count($this->attrList);
 
-                        $output = "<table id=\"".$this->tableId."\"><thead><tr id=\"".$this->firstLineId."\"><th class=\"headerSortDown\">";
+            $output = sprintf("<table id=\"%s\"><thead><tr id=\"%s\"><th class=\"headerSortDown\">",
+				$this->tableId,$this->firstLineId);
 			
 			for ($i=0;$i<$attrCount;$i++) {
-				$output .= FS::$iMgr->getLocale($this->attrList[$i][0])."</th>";
-				if ($i < $attrCount-1) 
-					$output .= "<th>";
+				$output = sprintf("%s%s</th>",$output,FS::$iMgr->getLocale($this->attrList[$i][0]));
+				
+				if ($i < $attrCount-1) {
+					$output = sprintf("%s<th>",$output);
+				}
 			}
-			if ($this->removeColumn)
-				$output .= "<th></th>";
-			$output .= "</tr></thead>";
+			if ($this->removeColumn) {
+				$output = sprintf("%s<th></th>",$output);
+			}
+			$output = sprintf("%s</tr></thead>",$output);
 			return $output;
 		}
 		
 		public function removeLine($id) {
-			$output = "";
 			$count = FS::$dbMgr->Count(($this->prefixSQLTable ? PGDbConfig::getDbPrefix() : "").
 				$this->sqlTable,$this->sqlAttrId);
-			if ($count == 0)
-				$output .= "hideAndEmpty('#".$this->tableDivId."');";
-			else
-				$output .= "hideAndRemove('#".FS::$iMgr->formatHTMLId($this->trPrefix.$id.$this->trSuffix)."');";
-			return $output;
+			if ($count == 0) {
+				return sprintf("hideAndEmpty('#%s');",$this->tableDivId);
+			}
+			else {
+				return sprintf("hideAndRemove('#%s');",FS::$iMgr->formatHTMLId($this->trPrefix.$id.$this->trSuffix));
+			}
 		}
 
 		private $tableId;
