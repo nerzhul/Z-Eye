@@ -56,29 +56,30 @@
 		// header/footer/content
 
 		public function header() {
-			$output = "<!DOCTYPE html>
-				<html lang=\"".Config::getSysLang()."\">
+			$output = sprintf("<!DOCTYPE html><html lang=\"%s\">
 				<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
 				<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />
-				<head>
-				<title>".Config::getWebsiteName().(strlen($this->title) > 0 ? " - ".$this->title : "")."</title>";
+				<head><title>%s%s</title>",
+				Config::getSysLang(),Config::getWebsiteName(),(strlen($this->title) > 0 ? " - ".$this->title : ""));
 
-				$count = count($this->arr_css);
-				for ($i=0;$i<$count;$i++) {
-					$output .= "<link rel=\"stylesheet\" href=\"".$this->arr_css[$i]."\" type=\"text/css\" />";
-				}
+			$count = count($this->arr_css);
+			for ($i=0;$i<$count;$i++) {
+				$output = sprintf("%s<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\" />",
+					$output,$this->arr_css[$i]);
+			}
 
-				if (Config::hasFavicon()) {
-					$output .= "<link rel=\"shortcut icon\" href=\"/styles/images/favicon.png\" />";
-				}
+			if (Config::hasFavicon()) {
+				$output = sprintf("%s<link rel=\"shortcut icon\" href=\"/styles/images/favicon.png\" />",
+					$output);
+			}
 
-				$count = count($this->arr_js);
-				for ($i=0;$i<$count;$i++) {
-					$output .= "<script type=\"text/javascript\" src=\"".$this->arr_js[$i]."\"></script>";
-				}
+			$count = count($this->arr_js);
+			for ($i=0;$i<$count;$i++) {
+				$output = sprintf("%s<script type=\"text/javascript\" src=\"%s\"></script>",
+					$output,$this->arr_js[$i]);
+			}
 
-				$output .= "</head><body>";
-			return $output;
+			return sprintf("%s</head><body>",$output);
 		}
 
 		public function footer() {
@@ -112,8 +113,8 @@
 								}
 								if ($module->getRulesClass()->canAccessToModule()) {
 									$menus[$menuname][] = 
-										"<div class=\"menuItem\" onclick=\"loadInterface('&mod=".$moduleid."');\">".
-										$module->getModuleClass()->getMenuTitle()."</div>";
+										sprintf("<div class=\"menuItem\" onclick=\"loadInterface('&mod=%s');\">%s</div>",
+										$moduleid,$module->getModuleClass()->getMenuTitle());
 								}
 							}
 						}
@@ -122,13 +123,15 @@
 			}
 
 			foreach ($menus as $menuname => $elemts) {
-				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\">".$menuname."</div><div class=\"menupopup\">";
+				$locoutput = "";
 
 				for ($i=0;$i<count($elemts);$i++) {
-					$output .= $elemts[$i];
+					$locoutput = sprintf("%s%s",$locoutput,$elemts[$i]);
 				}
-
-				$output .= "</div></div>";
+				
+				$output = sprintf("%s<div id=\"menuStack\"><div id=\"menuTitle\">%s</div>
+					<div class=\"menupopup\">%s</div></div>",
+					$output,$menuname,$locoutput);
 			}
 			return $output;
 		}
@@ -152,7 +155,6 @@
 		}
 
 		public function loadModule($id,$act=1) {
-			$output = "";
 			if ($path = $this->findModulePath($id)) {
 				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
 				// Bypass access for Android
@@ -160,19 +162,14 @@
 					$this->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($id);
 					switch($act) {
-						case 1: default: $output .= $module->getModuleClass()->Load(); break;
-						case 2: $output .= $module->getModuleClass()->getIfaceElmt(); break;
-						case 3: $output .= $module->getModuleClass()->LoadForAndroid(); break;
-					}
-						
+						case 1: default: return $module->getModuleClass()->Load(); break;
+						case 2: return $module->getModuleClass()->getIfaceElmt(); break;
+						case 3: return $module->getModuleClass()->LoadForAndroid(); break;
+					}	
 				}
-				else
-					$output .= $this->printError($this->getLocale("err-no-rights"));
+				return $this->printError($this->getLocale("err-no-rights"));
 			}
-			else
-				$output .= $this->printError($this->getLocale("err-unk-module"));
-
-			return $output;
+			return $this->printError($this->getLocale("err-unk-module"));
 		}
 
 		public function getModuleByPath($path) {
@@ -184,29 +181,34 @@
 		}
 
 		public function getRealNameById($id) {
-                        $user = new User();
-                        $user->LoadFromDB($id);
-                        return $user->getSubName()." ".$user->getName();
-                }
+			$user = new User();
+			$user->LoadFromDB($id);
+			return $user->getSubName()." ".$user->getName();
+		}
 
 		public function backLink() {
-			return "<div id=\"backarrow\"><a href=\"javascript:history.back()\">".FS::$iMgr->img("styles/back.png",32,32)."</a></div>";
+			return sprintf("<div id=\"backarrow\"><a href=\"javascript:history.back()\">%s</a></div>",
+				FS::$iMgr->img("styles/back.png",32,32));
 		}
 
 		public function h1($str,$raw=false,$id="") {
-			return "<h1".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h1>";
+			return sprintf("<h1%s>%s</h1>",
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
 		}
 
 		public function h2($str,$raw=false,$id="") {
-			return "<h2".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h2>";
+			return sprintf("<h2%s>%s</h2>",
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
 		}
 
 		public function h3($str,$raw=false,$id="") {
-			return "<h3".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h3>";
+			return sprintf("<h3%s>%s</h3>",
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
 		}
 
 		public function h4($str,$raw=false,$id="") {
-			return "<h4".($id ? " id=\"".$id."\"" : "").">".($raw ? $str : $this->getLocale($str))."</h4>";
+			return sprintf("<h4%s>%s</h4>",
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
 		}
 
 		public function hr() { return "<div id=\"hr\"></div>"; }
@@ -221,114 +223,152 @@
 		}
 
 		public function renderJS() {
-			if (strlen($this->js_buffer[$this->js_buffer_idx]) > 0)
-                        	return "<script type=\"text/javascript\">".$this->js_buffer[$this->js_buffer_idx]."</script>";
+			if (strlen($this->js_buffer[$this->js_buffer_idx]) > 0) {
+				return sprintf("<script type=\"text/javascript\">%s</script>",
+					$this->js_buffer[$this->js_buffer_idx]);
+			}
 			return "";
 		}
 
 		public function label($for,$value,$class = "") {
-			return "<label class=\"".$class."\" for=\"".$for."\">".$value."</label>";
+			return sprintf("<label class=\"%s\" for=\"%s\">%s</label>",
+				$class,$for,$value);
 		}
 
 		public function tooltip($text) {
-			$output = "onmouseover=\"showTooltip('".addslashes($this->getLocale($text))."');\" ";
-			$output .= "onmouseout=\"hideTooltip();\" ";
-			return $output;
+			return sprintf(" onmouseover=\"showTooltip('%s');\" onmouseout=\"hideTooltip();\" ",
+				addslashes($this->getLocale($text)));
 		}
 
 		public function tip($text,$raw=false) {
-			return "<div id=\"tip\">".($raw ? $text : $this->getLocale($text))."</div>";
+			return sprintf("<div id=\"tip\">%s</div>",
+				($raw ? $text : $this->getLocale($text)));
 		}
 
 		public function textarea($name, $def_value = "", $options=array()) {
 			$output = "";
-			if (isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<textarea name=\"".$name."\" id=\"".$name."\" style=\"width:".(isset($options["width"]) ? $options["width"] : 400).
-				"px;height:".(isset($options["height"]) ? $options["height"] : 300)."px\" ";
-			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
-			if (isset($options["length"])) $output .= " maxlength=\"".$options["length"]."\"";
-			$output .= ">".$def_value."</textarea>";
+			if (isset($options["label"])) {
+				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]);
+			}
+			
+			$output = sprintf("%s<textarea name=\"%s\" id=\"%s\" style=\"width:%spx;height:%spx\" ",
+				$output,$name,$name,(isset($options["width"]) ? $options["width"] : 400),
+				(isset($options["height"]) ? $options["height"] : 300));
+				
+			if (isset($options["tooltip"])) {
+				$output = sprintf("%s%s",$output,$this->tooltip($options["tooltip"]));
+			}
+			if (isset($options["length"])) {
+				$output = sprintf("%s maxlength=\"%s\"",$output,$options["length"]);
+			}
+			$output = sprintf("%s>%s</textarea>",$output,$def_value);
 			return $output;
 		}
 
 		public function tabledTextArea($label,$name,$options = array()) {
-			$output = "<tr><td>".$label."</td><td class=\"ctrel\">";
-			$output .= $this->textarea($name,(isset($options["value"]) ? $options["value"] : ""),$options);
-			$output .= "</td></tr>";
-			return $output;
+			return sprintf("<tr><td>%s</td><td class=\"ctrel\">%s</td></tr>",
+				$label,$this->textarea($name,(isset($options["value"]) ? $options["value"] : ""),$options));
 		}
 
 		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
-			if ($label) $output .= "<label for=\"".$name."\">".$label." </label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" ";
-			if ($tooltip)
-				$output .= $this->tooltip($tooltip);
-			$output .= "/>";
-			return $output;
+			if ($label) {
+				$output = sprintf("<label for=\"%s\">%s </label> ",$name,$label);
+			}
+			
+			$output .= sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" ",
+				$output,$name,$name,$def_value,$size,$length);
+				
+			if ($tooltip) {
+				$output = sprintf("%s%s",$output,$this->tooltip($tooltip));
+			}
+			
+			return sprintf("%s />",$output);
 		}
 
 		public function numInput($name, $def_value = "", $options = array()) {
 			$output = "";
-		        if (isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".(isset($options["size"]) ? $options["size"] : 20)."\" maxlength=\"".(isset($options["length"]) ? $options["length"] : 40)."\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ";
-			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
-			$output .= " />";
-			return $output;
+			if (isset($options["label"])) {
+				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]);
+			}
+			
+			$output = sprintf("<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ",
+				$output,$name,$name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40));
+				
+			if (isset($options["tooltip"])) {
+				$output = sprintf("%s%s",$output,$this->tooltip($options["tooltip"]));
+			}
+			
+			return sprintf("%s />",$output);
 		}
 
 		public function IPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
-                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkIP(this);\" ";
-			if ($tooltip) $output .= $this->tooltip($tooltip);
-			$output .= " />";
-			return $output;
+            if ($label) {
+				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$label);
+			}
+			
+			$output = sprintf("<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:checkIP(this);\" ",
+				$name,$name,$def_value,$size,$length);
+			
+			if ($tooltip) {
+				$output = sprintf("%s%s",$output,$this->tooltip($tooltip));
+			}
+			
+			return sprintf("%s />",$output);
 		}
 
 		public function MacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
-                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMAC(this);\" />";
-			return $output;
+            if ($label) {
+				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$label);
+			}
+			return sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:checkMAC(this);\" />",
+				$output,$name,$name,$def_value,$size,$length);
 		}
 
 		public function IPMaskInput($name, $def_value = "", $size = 20, $length = 40) {
-			return "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"".$size."\" maxlength=\"".$length."\" onkeyup=\"javascript:checkMask(this);\" />";
+			return sprintf("<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:checkMask(this);\" />",
+				$name,$name,$def_value,$size,$length);
 		}
 
 		public function colorInput($name, $def_value) {
-			$output = "<input type=\"textbox\" name=\"".$name."\" id=\"".$name."\" value=\"".$def_value."\" size=\"6\" maxlength=\"6\" onfocus=\"showColorPicker(this,'".$def_value."');\"/>";
-			return $output;
+			return sprintf("<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"6\" maxlength=\"6\" onfocus=\"showColorPicker(this,'%s');\"/>",
+				$name,$name,$def_value,$def_value);
 		}
 
 		public function autoComplete($name, $options = array()) {
 			$output = $this->input($name,"",(isset($options["size"]) ? $options["size"] : 20),
 				(isset($options["length"]) ? $options["length"] : 40), (isset($options["label"]) ? $options["label"] : NULL),
 				(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
-			$this->js("$('#".$name."').autocomplete({source: 'index.php?mod=".$this->getModuleIdByPath("search")."&at=2',
-				minLength: 3});");
+				
+			$this->js(sprintf("$('#%s').autocomplete({source: 'index.php?mod=%s&at=2',minLength: 3});",
+				$name,$this->getModuleIdByPath("search")));
 			return $output;
 		}
 
 		public function slider($slidername, $name, $min, $max, $options = array()) {
-			if (isset($options["hidden"]))
+			if (isset($options["hidden"])) {
 				$output = FS::$iMgr->hidden($name,(isset($options["value"]) ? $options["value"] : 0));
-			else
+			}
+			else {
 				$output = FS::$iMgr->input($name,(isset($options["value"]) ? $options["value"] : 0));
+			}
 			$js = "$(function() {
                         	$('#".$slidername."').slider({
 					range: 'min',
 					min: ".$min.",
 					max:".$max.",";
 
-			if (isset($options["value"])) $js .= "value: ".$options["value"].",";
+			if (isset($options["value"])) {
+				$js .= "value: ".$options["value"].",";
+			}
 
 			$js .= "slide: function(event,ui) { $('#".$name."').val(".(isset($options["valoverride"]) ? $options["valoverride"] : "ui.value").");";
-			if (isset($options["hidden"])) $js.= "$('#".$name."label').html(ui.value);";
-			$js.= "}
-				});
-                        });";
+			if (isset($options["hidden"])) {
+				$js.= "$('#".$name."label').html(ui.value);";
+			}
+			$js.= "}});});";
 			$output .= $this->js($js).
 				"<div id=\"".$slidername."\" ".(isset($options["width"]) ? "style=\"width: ".$options["width"]."\" " : "")."></div>";
 			if (isset($options["hidden"])) $output .= "<br /><span id=\"".$name."label\">".
@@ -337,24 +377,32 @@
 		}
 
 		public function hidden($name, $value) {
-			return "<input type=\"hidden\" id=\"".$name."\" name=\"".$name."\" value=\"".$value."\" />";
+			return sprintf("<input type=\"hidden\" id=\"%s\" name=\"%s\" value=\"%s\" />",
+				$name,$name,$value);
 		}
 
 		public function password($name, $def_value = "", $label=NULL) {
 			$output = "";
-                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
+            if ($label) {
+				$output .= "<label for=\"".$name."\">".$label."</label> ";
+			}
 			$output .= "<input type=\"password\" name=\"".$name."\" value=\"".$def_value."\" />";
 			return $output;
 		}
 
 		public function calendar($name, $def_value, $label=NULL) {
 			$output = "";
-                        if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-                        $output .= "<input type=\"textbox\" value=\"".$def_value."\" name=\"".$name."\" id=\"".$name."\" size=\"20\" />";
+            if ($label) {
+				$output .= "<label for=\"".$name."\">".$label."</label> ";
+			}
+            
+            $output .= "<input type=\"textbox\" value=\"".$def_value."\" name=\"".$name."\" id=\"".$name."\" size=\"20\" />";
 			$js = "$('#".$name."').datepicker($.datepicker.regional['fr']);
 				$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
-			if ($def_value)
+				
+			if ($def_value) {
 				$js .= "$('#".$name."').datepicker('setDate','".$def_value."');";
+			}
 			$output .= $this->js($js);
 			return $output;
 		}
