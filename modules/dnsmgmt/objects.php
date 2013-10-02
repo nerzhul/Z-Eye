@@ -130,7 +130,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -141,7 +141,6 @@
 				}
 			}
 			else {
-				$resout = "";
 				$output = "";
 				$found = false;
 				
@@ -172,10 +171,8 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dns-zone");
+					$this->storeSearchResult($output,"title-dns-zone");
 				}
-				
-				return $resout;
 			}
 		}
 
@@ -635,7 +632,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -646,7 +643,6 @@
 				}
 			}
 			else {
-				$resout = "";
 				$output = "";
 				$found = false;
 				
@@ -665,10 +661,8 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dns-acl");
+					$this->storeSearchResult($output,"title-dns-acl");
 				}
-				
-				return $resout;
 			}
 		}
 
@@ -1054,7 +1048,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -1065,7 +1059,6 @@
 				}
 			}
 			else {
-				$resout = "";
 				$output = "";
 				$found = false;
 				
@@ -1084,10 +1077,8 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dns-cluster");
+					$this->storeSearchResult($output,"title-dns-cluster");
 				}
-				
-				return $resout;
 			}
 		}
 
@@ -1594,7 +1585,7 @@
 
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -1605,7 +1596,6 @@
 				}
 			}
 			else {
-				$resout = "";
 				$output = "";
 				$found = false;
 				
@@ -1624,10 +1614,8 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dns-server");
+					$this->storeSearchResult($output,"title-dns-server");
 				}
-				
-				return $resout;
 			}
 		}
 		
@@ -1860,7 +1848,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -1871,7 +1859,6 @@
 				}
 			}
 			else {
-				$resout = "";
 				$output = "";
 				$found = false;
 				
@@ -1891,10 +1878,8 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dns-tsig");
+					$this->storeSearchResult($output,"title-dns-tsig");
 				}
-				
-				return $resout;
 			}
 		}
 
@@ -2090,13 +2075,13 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				
 				if (!FS::$secMgr->isIP($search) && !FS::$secMgr->isHostname($search)) {
 					$out = shell_exec("/usr/bin/dig ".$search);
 					if ($out != NULL) {
 						$output .= preg_replace("#[\n]#","<br />",$out);
-						$resout .= $this->searchResDiv($output,"title-dns-resolution");
+						FS::$searchMgr->incResultCount();
+						$this->storeSearchResult($output,"title-dns-resolution");
 					}
 				}
 				
@@ -2133,7 +2118,7 @@
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dns-assoc");
+					$this->storeSearchResult($output,"title-dns-assoc");
 				}
 				
 				$output = "";
@@ -2185,7 +2170,7 @@
 						FS::$searchMgr->incResultCount();
 					}
 					if ($found) {
-						$resout .= $this->searchResDiv($output,"title-dns-records");
+						$this->storeSearchResult($output,"title-dns-records");
 					}
 				}
 				return $resout;

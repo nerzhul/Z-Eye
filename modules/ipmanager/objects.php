@@ -164,7 +164,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 				
 				// by VLAN ID
@@ -175,7 +174,8 @@
 							"&sh=2\">".$data["subnet_short_name"]."</a><br />".
 							$this->loc->s("netid").": ".$data["netid"]."<br />".
 							$this->loc->s("netmask").": ".$data["netmask"]."<br />";
-						$resout .= $this->searchResDiv($output,"title-vlan-ipmanager");
+						FS::$searchMgr->incResultCount();
+						$this->storeSearchResult($output,"title-vlan-ipmanager");
 					}
 				}
 				
@@ -191,11 +191,11 @@
 						"&sh=2\">".$data["vlanid"]."</a><br />".
 						$this->loc->s("netid").": ".$data["netid"]."<br />".
 						$this->loc->s("netmask").": ".$data["netmask"]."<br />";
-						
+					FS::$searchMgr->incResultCount();
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-vlan-ipmanager");
+					$this->storeSearchResult($output,"title-vlan-ipmanager");
 				}
 				
 				// by netid
@@ -246,7 +246,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -270,7 +270,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"addr,alias,description,osname,dhcptype",
@@ -294,10 +293,8 @@
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dhcp-servers");
+					$this->storeSearchResult($output,"title-dhcp-servers");
 				}
-				
-				return $resout;
 			}
 		}
 	};
@@ -312,7 +309,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -325,7 +322,6 @@
 			else {
 				$clusters = array();
 				$output = "";
-				$resout = "";
 				$found = false;
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"clustername,dhcpaddr",
@@ -355,10 +351,8 @@
 						$output .= "</ul>".FS::$iMgr->hr();
 						FS::$searchMgr->incResultCount();
 					}
-					$resout .= $this->searchResDiv($output,"title-dhcp-cluster");
+					$this->storeSearchResult($output,"title-dhcp-cluster");
 				}
-				
-				return $resout;
 			}
 		}
 	};
@@ -375,7 +369,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -411,7 +405,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,macaddr,hostname,comment,reserv",
@@ -453,7 +446,7 @@
 				}
 		
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dhcp-distrib-z-eye");
+					$this->storeSearchResult($output,"title-dhcp-distrib-z-eye");
 				}
 				
 				$found = false;
@@ -483,7 +476,7 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dhcp-hostname");
+					$this->storeSearchResult($output,"title-dhcp-hostname");
 				}
 				
 				$output = "";
@@ -518,10 +511,8 @@
 				}
 		
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dhcp-distrib");
+					$this->storeSearchResult($output,"title-dhcp-distrib");
 				}
-				
-				return $resout;
 			}
 		}
 		
@@ -538,7 +529,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -551,7 +542,6 @@
 			else {
 				// Custom DHCP options
 				$output = "";
-				$resout = "";
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"optcode,opttype,optname",
@@ -569,11 +559,8 @@
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dhcp-custom-options");
-					$found = false;
+					$this->storeSearchResult($output,"title-dhcp-custom-options");
 				}
-				
-				return $resout;
 			}
 		}
 	};
@@ -588,7 +575,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -600,7 +587,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"optalias,optname,optval",
@@ -618,11 +604,8 @@
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-dhcp-options");
-					$found = false;
+					$this->storeSearchResult($output,"title-dhcp-options");
 				}
-				
-				return $resout;
 			}
 		}
 	};
@@ -637,7 +620,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -649,7 +632,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 				$optgroups = array();
 
@@ -680,10 +662,8 @@
 						FS::$searchMgr->incResultCount();
 					}
 
-					$resout .= $this->searchResDiv($output,"title-dhcp-option-groups");
+					$this->storeSearchResult($output,"title-dhcp-option-groups");
 				}
-				
-				return $resout;
 			}
 		}
 	};

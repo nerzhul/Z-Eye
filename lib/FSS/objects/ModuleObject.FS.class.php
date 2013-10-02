@@ -87,7 +87,7 @@
 			return NULL;
 		}
 		
-		public function searchResDiv($output,$title,$minwidth = false) {
+		public function storeSearchResult($output,$title,$minwidth = false) {
 			if (FS::$searchMgr->getMode() == 1) {
 				FS::$searchMgr->addResult(array($this->loc->s($title),$output));
 				return "";

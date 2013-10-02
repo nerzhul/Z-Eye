@@ -118,14 +118,12 @@
 		}
 
 		private function showNumericResults($search,$autocomp=false) {
-			$tmpoutput = "";
-			
 			$objs = array(new netPlug(), new netRoom(), new netDevice(), new dhcpIP());
 			
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
 				if (!$autocomp) {
-					$tmpoutput .= $objs[$i]->search($search);
+					$objs[$i]->search($search);
 				}
 				else {
 					$objs[$i]->search($search,true);
@@ -135,11 +133,7 @@
 			if (!$autocomp) {
 				// A numeric can be an IP
 				if (FS::$secMgr->isNumeric($search) && $search < 256) {
-					$tmpoutput .= $this->showIPAddrResults($search);
-				}
-				
-				if (strlen($tmpoutput) > 0) {
-					return $tmpoutput;
+					$this->showIPAddrResults($search);
 				}
 			}
 		}

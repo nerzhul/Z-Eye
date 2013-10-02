@@ -27,7 +27,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -72,7 +72,7 @@
 						"<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />";
 						"<b><i>".$this->loc->s("Description").": </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
 						
-					$resout .= $this->searchResDiv($locoutput,"Network-device");
+					$this->storeSearchResult($locoutput,"Network-device");
 					FS::$searchMgr->incResultCount();
 				}
 				
@@ -92,10 +92,9 @@
 						}
 					}
 					if ($found) {
-						$resout .= $this->searchResDiv($output,"title-vlan-device");
+						$this->storeSearchResult($output,"title-vlan-device");
 					}
 				}
-				return $resout;
 			}
 		}
 		private $vlanTable;
@@ -227,7 +226,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -239,7 +238,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 				
 				$devportname = array();
@@ -257,6 +255,7 @@
 
 				if ($found) {
 					$output = "";
+					
 					foreach ($devportname as $device => $devport) {
 						if ($output != "") {
 							$output .= FS::$iMgr->hr();
@@ -276,12 +275,13 @@
 								$output .= "<br /><b>".$this->loc->s("Plug").":</b> ".$portdata[1];
 							}
 							$output .= "</li>";
+							
+							FS::$searchMgr->incResultCount();
 						}
 						$output .= "</ul>";
 					}
-					$resout .= $this->searchResDiv($output,"Ref-desc");
+					$this->storeSearchResult($output,"Ref-desc");
 				}
-				return $resout;
 			}
 		}
 		
@@ -321,7 +321,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -369,7 +369,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last",
@@ -391,7 +390,7 @@
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output."</table>","title-netbios");
+					$this->storeSearchResult($output."</table>","title-netbios");
 				}
 				
 				$output = "";
@@ -419,7 +418,7 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-netbios");
+					$this->storeSearchResult($output,"title-netbios");
 				}
 				
 				$output = "";
@@ -446,7 +445,7 @@
 				}
 				
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-mac-addr");
+					$this->storeSearchResult($output,"title-mac-addr");
 				}
 				
 				if ($lastmac) {
@@ -471,7 +470,9 @@
 						}
 						
 						$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
-						$resout .= $this->searchResDiv($output,"title-last-device");
+						
+						FS::$searchMgr->incResultCount();
+						$this->storeSearchResult($output,"title-last-device");
 					}
 				}
 			
@@ -497,10 +498,12 @@
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 					$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+					
+					FS::$searchMgr->incResultCount();
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-network-places");
+					$this->storeSearchResult($output,"title-network-places");
 				}
 				
 				return $resout;
@@ -522,7 +525,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -534,8 +537,7 @@
 			else {
 				$found = false;
 				$output = "";
-				$resout = "";
-
+				
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,port,prise","prise ILIKE '".$search."%'",array("order" => "port"));
 				$devprise = array();
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -570,9 +572,8 @@
 						}
 						$output .= "</ul><br />";
 					}
-					$resout .= $this->searchResDiv($output,"Ref-plug");
+					$this->storeSearchResult($output,"Ref-plug");
 				}
-				return $resout;
 			}
 		}
 		
@@ -591,7 +592,7 @@
 		
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
-				return "";
+				return;
 			}
 			
 			if ($autocomplete) {
@@ -604,7 +605,6 @@
 			else {
 				$found = false;
 				$output = "";
-				$resout = "";
 
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,port,room","room ILIKE '".$search."%'",array("order" => "port"));
 				$devroom = array();
@@ -641,7 +641,7 @@
 						}
 						$output .= "</ul><br />";
 					}
-					$resout .= $this->searchResDiv($output,"Ref-room");
+					$resout .= $this->storeSearchResult($output,"Ref-room");
 				}
 				return $resout;
 			}
