@@ -94,8 +94,7 @@
 			}
 			else {
 				if ($output) {
-					return "<div id=\"searchres\"".($minwidth ? " style=\"width: auto; min-width:400px;\"" : "").">".
-							($title != "" ? FS::$iMgr->h3($title).FS::$iMgr->hr() : "").$output."</div>";
+					return FS::$searchMgr->addCompleteResult($title,$output);
 				}
 				else {
 					return "";

@@ -41,7 +41,11 @@
 
 		public function addResult($res) {
 			$this->results[] = $res;
-			$this->resultsCount++;
+			$this->incResultCount();
+		}
+		
+		public function addCompleteResult($title,$res) {
+			$this->results[$title] = $res;
 		}
 
 		public function addAR($idx,$res) {

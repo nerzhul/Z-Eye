@@ -66,25 +66,39 @@
 					if (strlen($tmpoutput2) > 0) {
 						$tmpoutput .= $tmpoutput2;
 					}
-					else {
-						$tmpoutput .= FS::$iMgr->printError($this->loc->s("err-no-res"));
-					}
 				}
 				
 				$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).
 					$tmpoutput;
+				
+				if (FS::$searchMgr->getMode() != 1) {
+					if (count(FS::$searchMgr->getResults()) > 0) {
+						foreach (FS::$searchMgr->getResults() as $title => $results) {
+							$output .= "<div id=\"searchres\" style=\"width: auto; min-width:400px;\">".
+									($title != "" ? FS::$iMgr->h3($title).FS::$iMgr->hr() : "").$results."</div>";
+						}
+					}
+					else {
+						return $output.FS::$iMgr->printError($this->loc->s("err-no-res"));
+					}
+				}
 							
 				$this->log(0,"searching '".$search."'");
 			}
 			else {
-				if (preg_match('#^([0-9A-F]{2}:)#i',$search) || preg_match('#([0-9A-F]{2}-)#i',$search))
+				if (preg_match('#^([0-9A-F]{2}:)#i',$search) || preg_match('#([0-9A-F]{2}-)#i',$search)) {
 					$this->showMacAddrResults($search,true);
-				else if (preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.#",$search))
+				}
+				else if (preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.#",$search)) {
 					$this->showIPAddrResults($search,true);
-				else if (is_numeric($search))
+				}
+				else if (FS::$secMgr->isNumeric($search)) {
 					$this->showNumericResults($search,true);
-				else
+				}
+				else {
 					$this->showNamedInfos($search,true);
+				}
+				
 				$output = "[";
 				$outresults = array();
 				foreach (FS::$searchMgr->getAutoResults() as $key => $values) {
@@ -127,8 +141,6 @@
 				if (strlen($tmpoutput) > 0) {
 					return $tmpoutput;
 				}
-
-				return FS::$iMgr->printError($this->loc->s("err-no-res"));
 			}
 		}
 
@@ -180,9 +192,6 @@
 			if (!$autocomp) {
 				if (strlen($tmpoutput) > 0) {
 					$output .= $tmpoutput;
-				}
-				else {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 				}
 				return $output;
 			}
@@ -420,10 +429,9 @@
 				}
 			}
 			if (!$autocomp) {
-				if (strlen($tmpoutput) > 0)
+				if (strlen($tmpoutput) > 0) {
 					$output .= $tmpoutput;
-				else
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
+				}
 				return $output;
 			}
 		}
