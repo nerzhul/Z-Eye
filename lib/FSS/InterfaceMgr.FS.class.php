@@ -292,7 +292,7 @@
 				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]);
 			}
 			
-			$output = sprintf("<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ",
+			$output = sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ",
 				$output,$name,$name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40));
 				
 			if (isset($options["tooltip"])) {
