@@ -122,19 +122,12 @@
 			
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
-				if (!$autocomp) {
-					$objs[$i]->search($search);
-				}
-				else {
-					$objs[$i]->search($search,true);
-				}
+				$objs[$i]->search($search,$autocomp);
 			}
 
-			if (!$autocomp) {
-				// A numeric can be an IP
-				if (FS::$secMgr->isNumeric($search) && $search < 256) {
-					$this->showIPAddrResults($search);
-				}
+			// A numeric can be an IP
+			if (FS::$secMgr->isNumeric($search) && $search < 256) {
+				$this->showIPAddrResults($search,$autocomp);
 			}
 		}
 
@@ -146,12 +139,7 @@
 				
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
-				if (!$autocomp) {
-					$objs[$i]->search($search);
-				}
-				else {
-					$objs[$i]->search($search,true);
-				}
+				$objs[$i]->search($search,$autocomp);
 			}
 		}
 
@@ -161,12 +149,7 @@
 			
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
-				if (!$autocomp) {
-					$objs[$i]->search($search);
-				}
-				else {
-					$objs[$i]->search($search,true);
-				}
+				$objs[$i]->search($search,$autocomp);
 			}
 		}
 
@@ -366,39 +349,19 @@
 			}
 
 			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
-				if (!$autocomp) {
-					(new dhcpIP())->search($search);
-				}
-				else {
-					(new dhcpIP())->search($search,true);
-				}
+				(new dhcpIP())->search($search,$autocomp);
 			}
 
 			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
-				if (!$autocomp) {
-					(new netNode())->search($search);
-				}
-				else {
-					(new netNode())->search($search,true);
-				}
+				(new netNode())->search($search,$autocomp);
 			}
 	
 			if (FS::$sessMgr->hasRight("mrule_radius_read")) {
-				if (!$autocomp) {
-					$this->showRadiusInfos($search);
-				}
-				else {
-					$this->showRadiusInfos($search,true);
-				}
+				$this->showRadiusInfos($search,$autocomp);
 			}
 			
 			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
-				if (!$autocomp) {
-					(new netDevice())->search($search);
-				}
-				else {
-					(new netDevice())->search($search,true);
-				}
+				(new netDevice())->search($search,$autocomp);
 			}
 		}
 
