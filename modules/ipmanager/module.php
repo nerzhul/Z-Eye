@@ -1090,15 +1090,15 @@
                                        yAxis: { title: { text: 'Nombre d\'adresses' } },
                                        legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
                                        	x: -10, y: 100 },
-                                       series: [ { name: '".addslashes($this->loc->s("Usable"))."',
+                                       series: [ { name: '".FS::$secMgr->cleanForJS($this->loc->s("Usable"))."',
 					data: [".$total."], color: 'green' },
-					{ name: '".addslashes($this->loc->s("not-usable"))."',
+					{ name: '".FS::$secMgr->cleanForJS($this->loc->s("not-usable"))."',
                                                data: [".$free."], color: 'black' },";
-				if ($bauxshow) $js .= "{ name: '".addslashes($this->loc->s("Baux"))."',
+				if ($bauxshow) $js .= "{ name: '".FS::$secMgr->cleanForJS($this->loc->s("Baux"))."',
 					data: [".$baux."], color: 'red' },";
-				if ($reservshow) $js .= "{ name: '".addslashes($this->loc->s("Reservations"))."',
+				if ($reservshow) $js .= "{ name: '".FS::$secMgr->cleanForJS($this->loc->s("Reservations"))."',
 					data: [".$reserv."], color: 'yellow' },";
-				if ($availshow) $js .= "{ name: '".addslashes($this->loc->s("Available-s"))."',
+				if ($availshow) $js .= "{ name: '".FS::$secMgr->cleanForJS($this->loc->s("Available-s"))."',
 					data: [".$avail."], color: 'cyan' }";
 			$js .= "]});},300);";
 			FS::$iMgr->js($js);
@@ -1263,7 +1263,7 @@
 						case 2: $subout = $this->showSubnetHistory($filtr); break;
 						case 3: $subout = $this->showSubnetMonitoring($filtr); break;
 					}
-					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$subout))."');";
+					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$subout))."');";
 					if ($view == 3) 
 						$js .= "$('#netHCr').html('');";
 
@@ -1301,11 +1301,11 @@
 							$output .= $value;
 						}
 						
-						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".addslashes($output)."');");
+						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');");
 						$this->log(0,"User find obsolete datas");
 					}
 					else
-						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".addslashes(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
+						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".FS::$secMgr->cleanForJS(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
 					
 					return;
 				// Monitor DHCP subnet
@@ -1680,14 +1680,15 @@
 					// One record we must create table if it's not and edit
 					if ($count == 1 && !$edit) {
 						$jscontent = $this->showDeclaredNetTableHead()."</table>".FS::$iMgr->jsSortTable("declsubnettable");
-						$js .= "$('#declsubnets').html('".addslashes($jscontent)."'); $('#declsubnets').show('slow');";
+						$js .= "$('#declsubnets').html('".FS::$secMgr->cleanForJS($jscontent).
+							"'); $('#declsubnets').show('slow');";
 					}
 
 					if ($edit) {
 						$js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr'); setTimeout(function(){";
 					}
 					$jscontent = $this->tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid);
-					$js .= "$('".addslashes($jscontent)."').insertAfter('#declsubnethead');";
+					$js .= "$('".FS::$secMgr->cleanForJS($jscontent)."').insertAfter('#declsubnethead');";
 					if ($edit) {
 						$js .= "},1200);";
 					}
@@ -1840,13 +1841,13 @@
 					$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername");
 					if ($count == 1 && !$edit) {
 						$jscontent = $this->showTableHeadCluster()."</table>".FS::$iMgr->jsSortTable("clustertable");
-						$js .= "$('#clusterdiv').html('".addslashes($jscontent)."'); $('#clusterdiv').show('slow');";
+						$js .= "$('#clusterdiv').html('".FS::$secMgr->cleanForJS($jscontent)."'); $('#clusterdiv').show('slow');";
 					}
 					if ($edit) {
 						$js .= "hideAndRemove('#cl".FS::$iMgr->formatHTMLId($cname)."tr'); setTimeout(function() {";
 					}
 					$jscontent = $this->showDHCPClusterTableEntry($cname,$cmembers);
-					$js .= "$('".addslashes($jscontent)."').insertAfter('#clusterth');";
+					$js .= "$('".FS::$secMgr->cleanForJS($jscontent)."').insertAfter('#clusterth');";
 					if ($edit) {
 						$js .= "},1200);";
 					}
@@ -2022,7 +2023,7 @@
 
 					$this->log(0,"Edit IP informations: informations edited for IP '".$ip."'");
 					// Maybe replace only the concerned tr and also the graph ? 
-					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
+					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Add/Edit Custom Option
@@ -2543,7 +2544,7 @@
 					$this->log(0,"IP range management: range modified. action '".$action."' / startIP: '".$startip.
 						"' / endIP: '".$endip."'");
 
-					$js = "$('#netshowcont').html('".addslashes(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
+					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 			}

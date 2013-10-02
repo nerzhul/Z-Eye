@@ -663,8 +663,9 @@
 							FS::$dbMgr->CommitTr();
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","snmp",$gname,$gid,$right,$snmp);
-							$js .= $this->jsUserGroupSelect($right,"snmp","gid",$snmp);
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchsnmpgrpr_".FS::$iMgr->formatHTMLId("g".$snmp."-".$right)."');";
+							$js .= $this->jsUserGroupSelect($right,"snmp","gid",$snmp).
+								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchsnmpgrpr_".
+								FS::$iMgr->formatHTMLId("g".$snmp."-".$right)."');";
 						}
 						else if ($uid) {
 							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'") ||
@@ -686,8 +687,9 @@
 							FS::$dbMgr->CommitTr();
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","snmp",$username,$uid,$right,$snmp);
-							$js .= $this->jsUserGroupSelect($right,"snmp","uid",$snmp);
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchsnmpusrr_".FS::$iMgr->formatHTMLId("u".$snmp."-".$right)."');";
+							$js .= $this->jsUserGroupSelect($right,"snmp","uid",$snmp).
+								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchsnmpusrr_".
+								FS::$iMgr->formatHTMLId("u".$snmp."-".$right)."');";
 						}
 					}
 					else if ($ip) {
@@ -708,8 +710,9 @@
 							FS::$dbMgr->CommitTr();
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","ip",$gname,$gid,$right,$ip);
-							$js .= $this->jsUserGroupSelect($right,"ip","gid",$ip);
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchipgrpr_".FS::$iMgr->formatHTMLId("g".$ip."-".$right)."');";
+							$js .= $this->jsUserGroupSelect($right,"ip","gid",$ip).
+								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchipgrpr_".
+								FS::$iMgr->formatHTMLId("g".$ip."-".$right)."');";
 						}
 						else if ($uid) {
 							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'") ||
@@ -728,8 +731,9 @@
 							FS::$dbMgr->CommitTr();
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","ip",$username,$uid,$right,$ip);
-							$js .= $this->jsUserGroupSelect($right,"ip","uid",$ip);
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchipusrr_".FS::$iMgr->formatHTMLId("u".$ip."-".$right)."');";
+							$js .= $this->jsUserGroupSelect($right,"ip","uid",$ip).
+								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchipusrr_".
+								FS::$iMgr->formatHTMLId("u".$ip."-".$right)."');";
 						}
 					}
 

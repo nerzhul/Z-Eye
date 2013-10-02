@@ -497,8 +497,9 @@
 
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","global",$gname,$gid,$right,"1");
-							$js .= $this->jsUserGroupSelect($right,"glbl","gid");
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchgrpr_".FS::$iMgr->formatHTMLId("gglbl-".$right)."');";
+							$js .= $this->jsUserGroupSelect($right,"glbl","gid").
+								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchgrpr_".
+								FS::$iMgr->formatHTMLId("gglbl-".$right)."');";
 							$this->log(0,"global right '".$right."' for group '".$gid."' added/edited");
 						}
 						else if ($uid) {
@@ -520,8 +521,9 @@
 
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","global",$username,$uid,$right,"1");
-							$js .= $this->jsUserGroupSelect($right,"glbl","uid");
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchusrr_".FS::$iMgr->formatHTMLId("uglbl-".$right)."');";
+							$js .= $this->jsUserGroupSelect($right,"glbl","uid").
+								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchusrr_".
+								FS::$iMgr->formatHTMLId("uglbl-".$right)."');";
 							$this->log(0,"global right '".$right."' for user '".$uid."' added/edited");
 						}
 					}
@@ -550,7 +552,7 @@
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","subnet",$gname,$gid,$right,$subnet);
 							$js .= $this->jsUserGroupSelect($right,"subnet","gid",$subnet);
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchgrpr_".
+							$js .= "$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchgrpr_".
 								FS::$iMgr->formatHTMLId("g".FS::$iMgr->FormatHTMLId($subnet)."-".$right)."');";
 							$this->log(0,"subnet right '".$right."' for group '".$gid."' and subnet '".$subnet."' added/edited");
 						}
@@ -577,7 +579,7 @@
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","subnet",$username,$uid,$right,$subnet);
 							$js .= $this->jsUserGroupSelect($right,"subnet","uid",$subnet);
-							$js .= "$('".addslashes($jscontent)."').insertBefore('#anchusrr_".
+							$js .= "$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchusrr_".
 								FS::$iMgr->formatHTMLId("u".FS::$iMgr->formatHTMLId($subnet)."l-".$right)."');";
 							$this->log(0,"subnet right '".$right."' for user '".$uid."' and subnet '".$subnet."' added/edited");
 						}
@@ -687,7 +689,7 @@
 						return;
 					}
 					
-					$js = "$('#subnetrights').html('".addslashes($this->showSubnetRights($subnet))."');";
+					$js = "$('#subnetrights').html('".FS::$secMgr->cleanForJS($this->showSubnetRights($subnet))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				default: break;

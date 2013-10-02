@@ -256,7 +256,8 @@
 				$this->sqlTable,$this->sqlAttrId);
 			if ($count == 1) {
 				$jscontent = sprintf("%s</table>",$this->showHeader());
-				$output = sprintf("$('#%s').html('%s'); $('#%s').show('slow');",$this->tableDivId,addslashes($jscontent),
+				$output = sprintf("$('#%s').html('%s'); $('#%s').show('slow');",$this->tableDivId,
+					FS::$secMgr->cleanForJS($jscontent),
 					$this->tableDivId);
 			}
 
@@ -302,7 +303,8 @@
 				}
 			}
 
-			$output = sprintf("%s$('%s').insertAfter('#%s');",$output,addslashes($jscontent),$this->firstLineId);
+			$output = sprintf("%s$('%s').insertAfter('#%s');",$output,
+				FS::$secMgr->cleanForJS($jscontent),$this->firstLineId);
 
 			if ($edit) {
 				$output = sprintf("%s},1000);",$output);

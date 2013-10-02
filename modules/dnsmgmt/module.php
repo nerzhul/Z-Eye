@@ -398,7 +398,7 @@
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 					}
 					else {
-						FS::$iMgr->js("$('#recordlist').html('".addslashes($this->showRecords($dnszone))."');");
+						FS::$iMgr->js("$('#recordlist').html('".FS::$secMgr->cleanForJS($this->showRecords($dnszone))."');");
 						FS::$iMgr->ajaxEcho("Done".FS::$iMgr->jsSortTable("dnsRecords"));
 					}
 					return;
@@ -479,7 +479,7 @@
 						$output .= FS::$iMgr->printDebug($this->loc->s("no-found-records"));
 					}
 
-					$js = "$('#obsres').html('".addslashes($output)."');";
+					$js = "$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');";
 					FS::$iMgr->js($js);
 
 					FS::$iMgr->ajaxEcho("Done");

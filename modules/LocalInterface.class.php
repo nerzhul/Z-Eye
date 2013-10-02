@@ -99,7 +99,7 @@
 				"</div><div class=\"userpopup\">".
 				"<div class=\"menuItem\" onclick=\"loadInterface('&mod=".FS::$iMgr->getModuleIdByPath("usersettings")."');\">".
 				$this->getLocale("Settings")."</div>".
-				"<div class=\"menuItem\" onclick=\"confirmPopup('".addslashes($this->getLocale("confirm-disconnect")).
+				"<div class=\"menuItem\" onclick=\"confirmPopup('".FS::$secMgr->cleanForJS($this->getLocale("confirm-disconnect")).
 				"','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',".
 				"'index.php?mod=".$this->getModuleIdByPath("connect")."&act=2',{});\">".
 				$this->getLocale("Disconnection").
@@ -139,19 +139,19 @@
 			if(isset($options["js"]) && $options["js"] == true) {
 				$jsarr = "{";
 				if(isset($options["snotif"])) {
-					$jsarr .= "'snotif': '".addslashes($options["snotif"])."'";
+					$jsarr .= "'snotif': '".FS::$secMgr->cleanForJS($options["snotif"])."'";
 				}
 				
 				// Confirmation div
 				if(isset($options["confirm"]) && is_array($options["confirm"]) && count($options["confirm"]) == 3) {
 					$jsarr .= ($jsarr != "{" ? "," : "")."'lock': true";
-					$output .= "onclick=\"confirmPopup('".addslashes($options["confirm"][0])."','".
-						addslashes($this->cur_module->getLoc()->s($options["confirm"][1]))."','".
-						addslashes($this->cur_module->getLoc()->s($options["confirm"][2]))."','index.php?".
-						addslashes($link)."'";
+					$output .= "onclick=\"confirmPopup('".FS::$secMgr->cleanForJS($options["confirm"][0])."','".
+						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][1]))."','".
+						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][2]))."','index.php?".
+						FS::$secMgr->cleanForJS($link)."'";
 				}
 				else {
-					$output .= "onclick=\"callbackLink('index.php?".addslashes($link)."'";
+					$output .= "onclick=\"callbackLink('index.php?".FS::$secMgr->cleanForJS($link)."'";
 				}
 				$jsarr .= "}";
 				if($jsarr != "{}")

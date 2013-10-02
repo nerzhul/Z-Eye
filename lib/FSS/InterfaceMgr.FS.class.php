@@ -237,7 +237,7 @@
 
 		public function tooltip($text) {
 			return sprintf(" onmouseover=\"showTooltip('%s');\" onmouseout=\"hideTooltip();\" ",
-				addslashes($this->getLocale($text)));
+				FS::$secMgr->cleanForJS($this->getLocale($text)));
 		}
 
 		public function tip($text,$raw=false) {
@@ -474,7 +474,7 @@
 				$link = "index.php?mod=".$this->cur_module->getModuleId()."&act=".$link;
 			}
 			return sprintf("<form action=\"%s\" method=\"POST\" onsubmit=\"return callbackForm('%s',this,{'snotif':'%s'});\" >",
-				$link,$link,addslashes($this->getLocale($textid)));
+				$link,$link,FS::$secMgr->cleanForJS($this->getLocale($textid)));
 		}
 
 		public function idxLine($text,$name,$options = array()) {

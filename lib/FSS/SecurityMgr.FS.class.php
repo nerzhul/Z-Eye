@@ -375,6 +375,10 @@
 			if ($this->hasJS($str))
 				$str = "";
 		}
+		
+		public function cleanForJS($str) {
+			return addslashes(preg_replace("#[\n\r]#","",$str));
+		}
 
 		public function isStrongPwd($pwd) {
 			if (strlen($pwd) < Config::getPasswordMinLength())

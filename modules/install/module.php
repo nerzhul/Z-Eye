@@ -52,7 +52,7 @@
 		}
 
 		private function showNotification($text,$timeout = 5000) {
-			return "showNotification({'snotif':'".addslashes($text)."','timeout': '.$timeout.'});";
+			return "showNotification({'snotif':'".FS::$secMgr->cleanForJS($text)."','timeout': '.$timeout.'});";
 		}
 
 		private function showInstaller() {
