@@ -57,7 +57,6 @@
 			}
 			else {
 				$output = "";
-				$resout = "";
 				$found = false;
 				
 				// Device himself
@@ -505,8 +504,6 @@
 				if ($found) {
 					$this->storeSearchResult($output,"title-network-places");
 				}
-				
-				return $resout;
 			}
 		}
 		
@@ -641,9 +638,8 @@
 						}
 						$output .= "</ul><br />";
 					}
-					$resout .= $this->storeSearchResult($output,"Ref-room");
+					$this->storeSearchResult($output,"Ref-room");
 				}
-				return $resout;
 			}
 		}
 		

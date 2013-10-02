@@ -212,14 +212,12 @@
 						"<b>".$this->loc->s("netid")."</b>: ".$data["netid"]."<br />".
 						"<b>".$this->loc->s("netmask")."</b>: ".$data["netmask"]."<br />".
 						"<b>".$this->loc->s("vlanid")."</b>: ".$data["vlanid"]."<br />";
-						
+					FS::$iMgr->incResultCount();
 				}
 
 				if ($found) {
-					$resout .= $this->searchResDiv($output,"title-subnet-ipmanager");
+					$this->storeSearchResult($output,"title-subnet-ipmanager");
 				}
-
-				return $resout;
 			}
 		}
 

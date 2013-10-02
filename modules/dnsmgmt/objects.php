@@ -2173,7 +2173,6 @@
 						$this->storeSearchResult($output,"title-dns-records");
 					}
 				}
-				return $resout;
 			}
 		}
 	};
