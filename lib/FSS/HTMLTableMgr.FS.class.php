@@ -182,7 +182,7 @@
 						$locoutput = "";
 						// Boolean 
 						if ($this->attrList[$i][2] == "b") {
-							$locoutput = ($values[$j][$i] == 't' ? "X" : "");
+							$locoutput = ($values[$j][$i] == 't' ? FS::$iMgr->img("styles/images/okay.png",15,15) : "");
 						}
 						// Select values
 						else if ($this->attrList[$i][2] == "s") {
@@ -220,7 +220,7 @@
 				$locoutput = "";
 				// Boolean 
 				if ($this->attrList[$i][2] == "b") {
-					$locoutput = ($sqlDatas[$this->attrList[$i][1]] == 't' ? "X" : "");	
+					$locoutput = ($sqlDatas[$this->attrList[$i][1]] == 't' ? FS::$iMgr->img("styles/images/okay.png",15,15) : "");	
 				}
 				// Select values
 				else if ($this->attrList[$i][2] == "s") {
