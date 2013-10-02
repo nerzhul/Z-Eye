@@ -49,27 +49,31 @@
 
 		private function findRefsAndShow($search,$autocomp=false) {
 			$output = "";
+			$tmpoutput = "";
 			if (!$autocomp) {
 				$output = FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
 				if (FS::$secMgr->isMacAddr($search)) {
-					$output .= $this->showMacAddrResults($search);
+					$tmpoutput .= $this->showMacAddrResults($search);
 				}
 				else if (FS::$secMgr->isIP($search)) {
-					$output .= $this->showIPAddrResults($search);
+					$tmpoutput .= $this->showIPAddrResults($search);
 				}
 				else if (FS::$secMgr->isNumeric($search)) {
-					$output .= $this->showNumericResults($search);
+					$tmpoutput .= $this->showNumericResults($search);
 				}
 				else {
-					$tmpoutput = $this->showNamedInfos($search);
-					if (strlen($tmpoutput) > 0) {
-						$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).
-							$tmpoutput;
+					$tmpoutput2 = $this->showNamedInfos($search);
+					if (strlen($tmpoutput2) > 0) {
+						$tmpoutput .= $tmpoutput2;
 					}
 					else {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
+						$tmpoutput .= FS::$iMgr->printError($this->loc->s("err-no-res"));
 					}
 				}
+				
+				$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).
+					$tmpoutput;
+							
 				$this->log(0,"searching '".$search."'");
 			}
 			else {
