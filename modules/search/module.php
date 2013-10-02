@@ -139,9 +139,6 @@
 		}
 
 		private function showNamedInfos($search,$autocomp=false) {
-			$output = "";
-			$tmpoutput = "";
-
 			$objs = array(new dnsRecord(), new dnsZone(), new dnsACL(), new dnsCluster(), new dnsServer(), new dnsTSIGKey(),
 				new dhcpSubnet(), new dhcpServer(), new dhcpCluster(), new dhcpIP(), new dhcpCustomOption(), new dhcpOption(),
 				new dhcpOptionGroup(),
@@ -150,44 +147,26 @@
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
 				if (!$autocomp) {
-					$tmpoutput .= $objs[$i]->search($search);
+					$objs[$i]->search($search);
 				}
 				else {
 					$objs[$i]->search($search,true);
 				}
 			}
-
-			if (!$autocomp) {
-				if (strlen($tmpoutput) > 0) {
-					$output .= $tmpoutput;
-				}
-
-				return $output;
-			}
 		}
 
 		private function showIPAddrResults($search,$autocomp=false) {
-			$output = "";
-			$tmpoutput = "";
-			
 			$objs = array(new dnsRecord(), new dhcpIP(), new dhcpServer(), new dhcpSubnet(),
 				new netNode(), new netDevice());
 			
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
 				if (!$autocomp) {
-					$tmpoutput .= $objs[$i]->search($search);
+					$objs[$i]->search($search);
 				}
 				else {
 					$objs[$i]->search($search,true);
 				}
-			}
-
-			if (!$autocomp) {
-				if (strlen($tmpoutput) > 0) {
-					$output .= $tmpoutput;
-				}
-				return $output;
 			}
 		}
 
@@ -378,20 +357,17 @@
 		}
 
 		private function showMacAddrResults($search,$autocomp=false) {
-			$output = "";
-			$tmpoutput = "";
-			$found = 0;
 			$search = preg_replace("#[-]#",":",$search);
 
 			if (!$autocomp) {
 				if ($company = FS::$dbMgr->GetOneData("oui","company","oui = '".substr($search,0,8)."'")) {
-					$tmpoutput .= $this->divEncapResults($company,"Manufacturer");
+					FS::$searchMgr->addCompleteResult("Manufacturer",$company);
 				}
 			}
 
 			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
 				if (!$autocomp) {
-					$tmpoutput .= (new dhcpIP())->search($search);
+					(new dhcpIP())->search($search);
 				}
 				else {
 					(new dhcpIP())->search($search,true);
@@ -400,7 +376,7 @@
 
 			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
 				if (!$autocomp) {
-					$tmpoutput .= (new netNode())->search($search);
+					(new netNode())->search($search);
 				}
 				else {
 					(new netNode())->search($search,true);
@@ -408,25 +384,21 @@
 			}
 	
 			if (FS::$sessMgr->hasRight("mrule_radius_read")) {
-				if (!$autocomp)
-					$tmpoutput .= $this->showRadiusInfos($search);
-				else
+				if (!$autocomp) {
+					$this->showRadiusInfos($search);
+				}
+				else {
 					$this->showRadiusInfos($search,true);
+				}
 			}
 			
 			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
 				if (!$autocomp) {
-					$tmpoutput .= (new netDevice())->search($search);
+					(new netDevice())->search($search);
 				}
 				else {
 					(new netDevice())->search($search,true);
 				}
-			}
-			if (!$autocomp) {
-				if (strlen($tmpoutput) > 0) {
-					$output .= $tmpoutput;
-				}
-				return $output;
 			}
 		}
 
