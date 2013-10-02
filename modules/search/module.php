@@ -48,28 +48,22 @@
 		}
 
 		private function findRefsAndShow($search,$autocomp=false) {
-			$output = "";
-			$tmpoutput = "";
 			if (!$autocomp) {
 				$output = FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
 				if (FS::$secMgr->isMacAddr($search)) {
-					$tmpoutput .= $this->showMacAddrResults($search);
+					$this->showMacAddrResults($search);
 				}
 				else if (FS::$secMgr->isIP($search)) {
-					$tmpoutput .= $this->showIPAddrResults($search);
+					$this->showIPAddrResults($search);
 				}
 				else if (FS::$secMgr->isNumeric($search)) {
-					$tmpoutput .= $this->showNumericResults($search);
+					$this->showNumericResults($search);
 				}
 				else {
-					$tmpoutput2 = $this->showNamedInfos($search);
-					if (strlen($tmpoutput2) > 0) {
-						$tmpoutput .= $tmpoutput2;
-					}
+					$this->showNamedInfos($search);
 				}
 				
-				$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).
-					$tmpoutput;
+				$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true);
 				
 				if (FS::$searchMgr->getMode() != 1) {
 					if (count(FS::$searchMgr->getResults()) > 0) {
@@ -380,7 +374,7 @@
 				case 1:
 					$search = FS::$secMgr->checkAndSecurisePostData("s");
 					if ($search) {
-						$js = "$('#main').html('".addslashes($this->findRefsAndShow($search))."');";
+						$js = sprintf("var data = \"%s\"; $('#main').html(data);",addslashes($this->findRefsAndShow($search)));
 						FS::$iMgr->ajaxEcho("Done",$js);
 					}
 					return;

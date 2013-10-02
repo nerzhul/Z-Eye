@@ -473,10 +473,8 @@
 			if($raw == false) {
 				$link = "index.php?mod=".$this->cur_module->getModuleId()."&act=".$link;
 			}
-			$output = "<form action=\"".$link.
-				"\" method=\"POST\" onsubmit=\"return callbackForm('".$link."',this,".
-				"{'snotif':'".addslashes($this->getLocale($textid))."'});\" >";
-			return $output;
+			return sprintf("<form action=\"%s\" method=\"POST\" onsubmit=\"return callbackForm('%s',this,{'snotif':'%s'});\" >",
+				$link,$link,addslashes($this->getLocale($textid)));
 		}
 
 		public function idxLine($text,$name,$options = array()) {

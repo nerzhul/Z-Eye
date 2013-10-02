@@ -1492,7 +1492,7 @@
                 	                        }
 					}
 
-					$osname = $ssh->execCmd("uname -srm");
+					$osname = preg_replace("#[\n\r]#","",$ssh->execCmd("uname -srm"));
 
 					FS::$dbMgr->BeginTr();
 					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$saddr."'");

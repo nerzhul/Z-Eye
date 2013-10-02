@@ -54,6 +54,7 @@
 					"rule-read-datas" => "Read datas",
 					"rule-write-datas" => "Write datas",
 					"Save" => "Save",
+					"Searching..." => "Searching...",
 					"Settings" => "Settings",
 					"unknown" => "unknown",
 				),
@@ -80,6 +81,7 @@
 					"rule-read-datas" => "Lire les données",
 					"rule-write-datas" => "Ecrire les données",
 					"Save" => "Enregistrer",
+					"Searching..." => "Recherche...",
 					"Settings" => "Paramètres",
 					"unknown" => "inconnu",
 				)
