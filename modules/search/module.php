@@ -57,13 +57,14 @@
 				else if (FS::$secMgr->isIP($search)) {
 					$output .= $this->showIPAddrResults($search);
 				}
-				else if (is_numeric($search)) {
+				else if (FS::$secMgr->isNumeric($search)) {
 					$output .= $this->showNumericResults($search);
 				}
 				else {
 					$tmpoutput = $this->showNamedInfos($search);
 					if (strlen($tmpoutput) > 0) {
-						$output .= $tmpoutput;
+						$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).
+							$tmpoutput;
 					}
 					else {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
@@ -99,7 +100,6 @@
 		}
 
 		private function showNumericResults($search,$autocomp=false) {
-			$output = "";
 			$tmpoutput = "";
 			
 			$objs = array(new netPlug(), new netRoom(), new netDevice(), new dhcpIP());
@@ -115,12 +115,16 @@
 			}
 
 			if (!$autocomp) {
-				if (strlen($tmpoutput) > 0)
-					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).$tmpoutput;
-				else
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
+				// A numeric can be an IP
+				if (FS::$secMgr->isNumeric($search) && $search < 256) {
+					$tmpoutput .= $this->showIPAddrResults($search);
+				}
+				
+				if (strlen($tmpoutput) > 0) {
+					return $tmpoutput;
+				}
 
-				return $output;
+				return FS::$iMgr->printError($this->loc->s("err-no-res"));
 			}
 		}
 
@@ -144,8 +148,9 @@
 			}
 
 			if (!$autocomp) {
-				if (strlen($tmpoutput) > 0)
-					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).$tmpoutput;
+				if (strlen($tmpoutput) > 0) {
+					$output .= $tmpoutput;
+				}
 
 				return $output;
 			}
@@ -169,10 +174,12 @@
 			}
 
 			if (!$autocomp) {
-				if (strlen($tmpoutput) > 0)
-					$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true).$tmpoutput;
-				else
+				if (strlen($tmpoutput) > 0) {
+					$output .= $tmpoutput;
+				}
+				else {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-res"));
+				}
 				return $output;
 			}
 		}
@@ -370,9 +377,9 @@
 			$search = preg_replace("#[-]#",":",$search);
 
 			if (!$autocomp) {
-				$company = FS::$dbMgr->GetOneData("oui","company","oui = '".substr($search,0,8)."'");
-				if ($company)
+				if ($company = FS::$dbMgr->GetOneData("oui","company","oui = '".substr($search,0,8)."'")) {
 					$tmpoutput .= $this->divEncapResults($company,"Manufacturer");
+				}
 			}
 
 			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
