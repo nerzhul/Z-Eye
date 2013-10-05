@@ -214,7 +214,9 @@
 		public function hr() { return "<div id=\"hr\"></div>"; }
 
 		public function js($js) {
-			if (!isset($this->js_buffer[$this->js_buffer_idx])) $this->js_buffer[$this->js_buffer_idx] = "";
+			if (!isset($this->js_buffer[$this->js_buffer_idx])) {
+				$this->js_buffer[$this->js_buffer_idx] = "";
+			}
 			$this->js_buffer[$this->js_buffer_idx] .= $js;
 		}
 
@@ -354,26 +356,25 @@
 			else {
 				$output = FS::$iMgr->input($name,(isset($options["value"]) ? $options["value"] : 0));
 			}
-			$js = "$(function() {
-						$('#".$slidername."').slider({
-				range: 'min',
-				min: ".$min.",
-				max:".$max.",";
+			$js = sprintf("$(function() {
+				$('#%s').slider({ range: 'min', min: %s, max: %s,%sslide: function(event,ui) { $('#%s').val(%s);%s}});});",
+				$slidername, $min, $max,
+				isset($options["value"]) ? sprintf("value: %s,", $options["value"]) : "",
+				$name, 
+				isset($options["valoverride"]) ? $options["valoverride"] : "ui.value",
+				isset($options["hidden"]) ? sprintf("$('#%slabel').html(ui.value);", $name) : ""
+			);
 
-			if (isset($options["value"])) {
-				$js .= "value: ".$options["value"].",";
-			}
-
-			$js .= "slide: function(event,ui) { $('#".$name."').val(".(isset($options["valoverride"]) ? $options["valoverride"] : "ui.value").");";
-			if (isset($options["hidden"])) {
-				$js.= "$('#".$name."label').html(ui.value);";
-			}
-			$js.= "}});});";
-			$output .= $this->js($js).
-				"<div id=\"".$slidername."\" ".(isset($options["width"]) ? "style=\"width: ".$options["width"]."\" " : "")."></div>";
-			if (isset($options["hidden"])) $output .= "<br /><span id=\"".$name."label\">".
-				(isset($options["value"]) ? $options["value"] : 0)."</span> ".$options["hidden"]."<br />";
-			return $output;
+			$this->js($js);
+		
+			return sprintf("%s<div id=\"%s\" %s></div>%s",
+				$output, $slidername, 
+				isset($options["width"]) ? sprintf("style=\"width: %s\"", $options["width"]) : "",
+				isset($options["hidden"]) ? sprintf("<br /><span id=\"%slabel\">%s</span>%s<br />",
+					$name,
+					isset($options["value"]) ? $options["value"] : 0,
+					$options["hidden"]) : ""
+			);
 		}
 
 		public function hidden($name, $value) {
@@ -382,43 +383,39 @@
 		}
 
 		public function password($name, $def_value = "", $label=NULL) {
-			$output = "";
-            if ($label) {
-				$output .= "<label for=\"".$name."\">".$label."</label> ";
-			}
-			$output .= "<input type=\"password\" name=\"".$name."\" value=\"".$def_value."\" />";
-			return $output;
+			return sprintf("%s<input type=\"password\" name=\"%s\" value=\"%s\" />",
+				$label ? sprintf("<label for=\"%s\">%s</label> ", $name, $label) : "",
+				$name, $def_value);
 		}
 
 		public function calendar($name, $def_value, $label=NULL) {
-			$output = "";
-            if ($label) {
-				$output .= "<label for=\"".$name."\">".$label."</label> ";
-			}
-            
-            $output .= "<input type=\"textbox\" value=\"".$def_value."\" name=\"".$name."\" id=\"".$name."\" size=\"20\" />";
-			$js = "$('#".$name."').datepicker($.datepicker.regional['fr']);
-				$('#".$name."').datepicker('option', 'dateFormat', 'dd-mm-yy');";
-				
-			if ($def_value) {
-				$js .= "$('#".$name."').datepicker('setDate','".$def_value."');";
-			}
-			$output .= $this->js($js);
+			$output = sprintf("%s<input type=\"textbox\" value=\"%s\" name=\"%s\" id=\"%s\" size=\"20\" />",
+				$label ? sprintf("<label for=\"%s\">%s</label> ", $name, $label) : "",
+				$def_value, $name, $name);
+
+			$js = sprintf("$('#%s').datepicker($.datepicker.regional['fr']);
+				$('#%s').datepicker('option', 'dateFormat', 'dd-mm-yy');%s",
+				$name, $name, 
+				$def_value ? sprintf("$('#%s').datepicker('setDate','%s');", $name, $def_value) : ""
+			);
+
+			$this->js($js);
 			return $output;
 		}
 
-		public function hourlist($hname,$mname,$hselect=0,$mselect=0) {
+		public function hourlist($hname, $mname, $hselect=0, $mselect=0) {
 			$output = $this->select($hname);
+			
 			for ($i=0;$i<24;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-				$output .= $this->selElmt($txt,$i,$hselect == $i);
+				$output = sprintf("%s%s",$output, $this->selElmt($txt,$i,$hselect == $i));
 			}
 			$output .= "</select> h ".$this->select($mname);
 			for ($i=0;$i<60;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-                                $output .= $this->selElmt($txt,$i,$mselect == $i);
-                        }
-			$output .= "</select>";
+				$output = sprintf("%s%s",$output, $this->selElmt($txt,$i,$mselect == $i));
+			}
+			$output = sprintf("%s</select>", $output);
 
 			return $output;
 		}
@@ -449,31 +446,36 @@
 		}
 		
 		public function radioList($name,$values, $labels, $checkid = NULL) {
-			if (!is_array($values)) return "";
+			if (!is_array($values)) {
+				return "";
+			}
+			
 			$output = "";
 
 			$count = count($values);
 			for ($i=0;$i<$count;$i++) {
-				$output .= $this->radio($name,$values[$i],$checkid == $values[$i] ? true : false, $labels[$i])."<br />";
+				$output = sprintf("%s%s<br />", $output,
+					$this->radio($name, $values[$i], ($checkid == $values[$i]), $labels[$i]));
 			}
 
 			return $output;
 		}
 
 		public function form($link,$options=array()) {
-			$output = "<form action=\"".$link."\" ";
-			if (isset($options["id"]) && strlen($options["id"]) > 0)
-				$output .= "id=\"".$options["id"]."\" ";
-			$output .= "method=\"".((isset($options["get"]) && $options["get"]) ? "GET" : "POST")."\"";
-			if (isset($options["js"]))
-				$output .= " onsubmit=\"return ".$options["js"].";\" ";
-			$output .= ">";
-			return $output;
+			return sprintf("<form action=\"%s\" %smethod=\"%s\"%s>",
+				$link, 
+				isset($options["id"]) && strlen($options["id"]) > 0 ? 
+					sprintf("id=\"%s\" ",$options["id"]) : "",
+				isset($options["get"]) && $options["get"] ? "GET" : "POST",
+				isset($options["js"]) ?
+					sprintf(" onsubmit=\"return %s;\" ", $options["js"]) : ""
+			);
 		}
 
 		public function cbkForm($link, $textid = "Modification",$raw = false) {
 			if($raw == false) {
-				$link = "index.php?mod=".$this->cur_module->getModuleId()."&act=".$link;
+				$link = sprintf("index.php?mod=%s&act=%s",
+					$this->cur_module->getModuleId(), $link);
 			}
 			return sprintf("<form action=\"%s\" method=\"POST\" onsubmit=\"return callbackForm('%s',this,{'snotif':'%s'});\" >",
 				$link,$link,FS::$secMgr->cleanForJS($this->getLocale($textid)));
@@ -541,7 +543,7 @@
 
 			for ($i=0;$i<$lCount;$i++) {
 				$opts = (isset($lines[$i][2]) ? $lines[$i][2] : array());
-				$output .= $this->idxLine($lines[$i][0],$lines[$i][1],$opts);
+				$output = sprintf("%s%s",$output,$this->idxLine($lines[$i][0],$lines[$i][1],$opts));
 			}
 			return $output;
 		}
@@ -576,23 +578,17 @@
 		}
 
 		public function tableSubmit($label,$options = array()) {
-			$output = "<tr><th colspan=\"".(isset($options["size"]) ? $options["size"] : 2)."\" class=\"ctrel\">";
-			if (isset($options["js"])) {
-				$output .= $this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label),$options["js"]);
-			}
-			else {
-				$output .= $this->submit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label));
-			}
-			$output .= "</th></tr></table></form>";
-			return $output;
+			return sprintf("<tr><th colspan=\"%d\" class=\"ctrel\">%s</th></tr></table></form>",
+				isset($options["size"]) ? $options["size"] : 2,
+				isset($options["js"]) ?
+					$this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label),$options["js"]) :
+					$this->submit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label))
+			);
 		}
 
 		// Helper for tabled Add/Submit forms
 		public function aeTableSubmit($add = true, $options = array()) {
-			if ($add)
-				return $this->tableSubmit("Add",$options);
-			else
-				return $this->tableSubmit("Save",$options);
+			return $this->tableSubmit($add ? "Add" : "Save", $options);
 		}
 
 		public function jsSortTable($id) {
@@ -604,47 +600,35 @@
 		}
 
 		public function progress($name,$value,$max=100,$label=NULL) {
-			$output = "";
-			if ($label) $output .= "<label for=\"".$name."\">".$label."</label> ";
-			$output .= "<progress id=\"".$name."\" value=\"".$value."\" max=\"".$max."\"></progress><span id=\"".$name."val\"></span>";
-			$output .= $this->js("eltBar = document.getElementById(\"".$name."\");
-				eltPct = document.getElementById(\"".$name."val\");
-				eltPct.innerHTML = ' ' + Math.floor(eltBar.position * 100) + \"%\";");
+			$output = sprintf("%s<progress id=\"%s\" value=\"%s\" max=\"%s\"></progress><span id=\"prog%sval\"></span>",
+				$label ? sprintf("<label for=\"%s\">%s</label> ",$name,$label) : "",
+				$name, $value, $max, $name);
+				
+			$this->js(sprintf("eltBar = document.getElementById(\"%s\");
+				eltPct = document.getElementById(\"prog%sval\");
+				eltPct.innerHTML = ' ' + Math.floor(eltBar.position * 100) + \"%%\";",$name,$name));
 			return $output;
 		}
 
 		public function select($name, $options = array()) {
-			$output = "";
-
-			if (isset($options["label"])) {
-				$output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			}
-
 			$selId = preg_replace("#\[|\]#","",$name);
-
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
-			$output .= "<select name=\"".$name.($multi ? "[]" : "")."\" id=\"".$selId."\"";
+			
+			return sprintf("%s<select name=\"%s%s\" id=\"%s\"%s%s%s%s%s>",
+				isset($options["label"]) ?
+					sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]) : "",
+				$name, ($multi ? "[]" : ""), $selId,
+				isset($options["js"]) ? 
+					sprintf(" onchange=\"javascript:%s;\" ",$options["js"]) : "",
+				$multi ? " multiple=\"multiple\" " : "",
+				isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]) ? 
+					sprintf(" size=\"%s\" ",$options["size"]) : "",
+				isset($options["style"]) ?
+					sprintf(" style=\"%s\" ",$style) : "",
+				isset($options["tooltip"] ?
+					$this->tooltip($options["tooltip"]) : ""
+			);
 
-			if (isset($options["js"]) > 0) {
-				$output .= " onchange=\"javascript:".$options["js"].";\" ";
-			}
-
-			if ($multi) {
-				$output .= " multiple=\"multiple\" ";
-			}
-
-			if (isset($options["size"]) && FS::$secMgr->isNumeric($options["size"])) {
-				$output .= " size=\"".$options["size"]."\" ";
-			}
-
-			if (isset($options["style"])) {
-				$output .= " style=\"".$style."\" ";
-			}
-
-			if (isset($options["tooltip"])) {
-				$output .= $this->tooltip($options["tooltip"]);
-			}
-			$output .= ">";
 			return $output;
 		}
 
