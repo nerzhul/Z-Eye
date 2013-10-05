@@ -355,10 +355,10 @@
 				$output = FS::$iMgr->input($name,(isset($options["value"]) ? $options["value"] : 0));
 			}
 			$js = "$(function() {
-                        	$('#".$slidername."').slider({
-					range: 'min',
-					min: ".$min.",
-					max:".$max.",";
+						$('#".$slidername."').slider({
+				range: 'min',
+				min: ".$min.",
+				max:".$max.",";
 
 			if (isset($options["value"])) {
 				$js .= "value: ".$options["value"].",";
@@ -424,26 +424,28 @@
 		}
 
 		public function submit($name, $value, $options = array()) {
-			$output = "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" ";
-			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
-			$output .= " />";
-			return $output;
+			return sprintf("<input class=\"buttonStyle\" type=\"submit\" name=\"%s\" id=\"%s\" value=\"%s\" %s />",
+				$name, $name, $value,
+				isset($options["tooltip"]) ? $this->tooltip($options["tooltip"]) : ""
+			);
 		}
 
 		public function JSSubmit($name, $value, $function) {
-			return "<input class=\"buttonStyle\" type=\"submit\" name=\"".$name."\" id=\"".$name."\" value=\"".$value."\" onclick=\"".$function."\" />";
+			return sprintf("<input class=\"buttonStyle\" type=\"submit\" name=\"%s\" id=\"%s\" value=\"%s\" onclick=\"%s\" />",
+				$name, $name, $value, $function);
 		}
 
 		public function button($name, $value, $js) {
-			return "<input class=\"buttonStyle\" type=\"button\" name=\"".$name."\" value=\"".$value."\" onclick=\"".$js."\" />";
+			return sprintf("<input class=\"buttonStyle\" type=\"button\" name=\"%s\" value=\"%s\" onclick=\"%s\" />",
+				$name,$value,$js);
 		}
 
-		public function radio($name, $value, $checked = false, $label=NULL) {
-			$output = "";
-			$output .= "<input id=\"".$name."\" type=\"radio\" value=\"".$value."\" name=\"".$name."\"";
-			if ($checked) $output .= " checked=\"checked\"";
-			$output .= "> ".($label ? $label : "");
-			return $output;
+		public function radio($name, $value, $checked = false, $label="") {
+			return sprintf("<input id=\"%s\" type=\"radio\" value=\"%s\" name=\"%s\"%s>%s";
+				$name,$value,$name,
+				$checked ? " checked=\"checked\"" : "",
+				$label
+			);
 		}
 		
 		public function radioList($name,$values, $labels, $checkid = NULL) {
@@ -545,14 +547,20 @@
 		}
 
 		public function idxIdLine($label,$name,$value = "",$options = array()) {
-			if ($value)
-				return "<tr><td>".$this->getLocale($label)."</td><td>".$value."</td></tr>".FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
-			else
-				return $this->idxLine($label,$name,"",$options);
+			if ($value) {
+				return sprintf("<tr><td>%s</td><td>%s%s%s</td></tr>",
+					$this->getLocale($label), $value,
+					FS::$iMgr->hidden($name,$value), FS::$iMgr->hidden("edit",1)
+				);
+			}
+			
+			return $this->idxLine($label,$name,"",$options);
 		}
 
 		public function ruleLine($label,$rulename,$rulelist,$idx = "") {
-			return "<tr><td>".$idx."</td><td>".$this->check($rulename,array("check" => in_array($rulename,$rulelist),"label" => $label))."</td></tr>";
+			return sprintf("<tr><td>%s</td><td>%s</td></tr>",
+				$idx,$this->check($rulename,array("check" => in_array($rulename,$rulelist),"label" => $label))
+			);
 		}
 
 		public function ruleLines($idx,$rulelist,$rules = array()) {
@@ -560,7 +568,8 @@
 
 			$count = count($rules);
 			for ($i=0;$i<$count;$i++) {
-				$output .= $this->ruleLine($rules[$i][0],$rules[$i][1],$rulelist,$i == 0 ? $idx : "");
+				$output = sprintf("%s%s",$output,
+					$this->ruleLine($rules[$i][0],$rules[$i][1],$rulelist,$i == 0 ? $idx : ""));
 			}
 
 			return $output;
@@ -640,11 +649,10 @@
 		}
 
 		public function selElmt($name,$value,$selected = false) {
-			$output = "<option value=\"".$value."\"";
-			if ($selected)
-				$output .= " selected=\"selected\"";
-			$output .= ">".$name."</option>";
-			return $output;
+			return sprintf("<option value=\"%s\"%s>%s</option>",
+				$value,
+				$selected ? " selected=\"selected\"" : "",
+				$name);
 		}
 
 		public function selElmtFromDB($table,$valuefield,$options = array()) {
@@ -675,33 +683,35 @@
 				$query = FS::$dbMgr->Select($table,$valuefield,$sqlcond,$sqlopts);
 			}
 
-                        while($data = FS::$dbMgr->Fetch($query)) {
-                                $output .= FS::$iMgr->selElmt($data[$lf],$data[$valuefield],in_array($data[$valuefield],$selected));
-                        }
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$output = sprintf("%s%s",$output,
+					FS::$iMgr->selElmt($data[$lf],$data[$valuefield],in_array($data[$valuefield],$selected)));
+			}
 			return $output;
 		}
 
 		public function check($name,$options = array()) {
 			$output = "";
-			if (isset($options["label"])) $output .= "<label for=\"".$name."\">".$options["label"]."</label> ";
-			$output .= "<input type=\"checkbox\" name=\"".$name."\" id=\"".$name."\" ";
-			if (isset($options["check"]) && $options["check"])
-				$output .= "checked ";
-			if (isset($options["tooltip"])) $output .= $this->tooltip($options["tooltip"]);
-			$output .= " />";
-			return $output;
+			if (isset($options["label"])) {
+				$output = sprintf("<label for=\"%s\">%s</label> ",
+					$name,$options["label"]);
+			}
+			
+			return sprintf("%s<input type=\"checkbox\" name=\"%s\" id=\"%s\" %s%s />",
+				$output,$name,$name,
+				(isset($options["check"]) && $options["check"]) ? "checked " : "",
+				(isset($options["tooltip"])) ? $this->tooltip($options["tooltip"]) : ""
+			);
+
 		}
 
 		public function img($path,$sizeX = 0,$sizeY = 0, $id = "") {
-			$output = "<img src=\"".$path."\" ";
-			if ($sizeX != 0)
-				$output .= "width=\"".$sizeX."\" ";
-			if ($sizeY != 0)
-				$output .= "height=\"".$sizeY."\" ";
-			if (strlen($id) > 0)
-				$output .= "id=\"".$id."\" ";
-			$output .= "style=\"border: none;\"/>";	
-			return $output;
+			return sprintf("<img src=\"%s\" %s%s%s style=\"border: none;\"/>";
+				$path,
+				($sizeX != 0 ? "width=\"".$sizeX."\" " : ""),
+				($sizeY != 0 ? "height=\"".$sizeY."\" " : ""),
+				($id ? "id=\"".$id."\" " : "")
+			);
 		}
 		
 		public function imgWithZoom2($path,$title,$id,$bigpath="") {
