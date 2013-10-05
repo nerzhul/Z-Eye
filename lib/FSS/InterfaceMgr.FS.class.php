@@ -705,9 +705,13 @@
 		}
 		
 		public function imgWithZoom2($path,$title,$id,$bigpath="") {
-			$output = "<a href=\"".(strlen($bigpath) > 0 ? $bigpath : $path)."\" id=\"".$id."\" title=\"".$title."\">"; 
-			$output .= FS::$iMgr->img($path,0,0,"jqzoom-img");
-			$output .= "</a>".$this->js("$('#".$id."').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});");
+			$output = sprintf("<a href=\"%s\" id=\"%s\" title=\"%s\">%s</a>",
+				(strlen($bigpath) > 0 ? $bigpath : $path),
+				$id, $title,
+				FS::$iMgr->img($path,0,0,"jqzoom-img"))
+				
+			$this->js(sprintf("$('#%s').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});",
+				$id);
 			return $output;
 		}	
 
@@ -727,14 +731,14 @@
 		}
 
 		public function tabPan($elmts = array(),$cursh) {
-			$output = "<div id=\"contenttabs\"><ul>";
+			$output = ""
 
 			$count = count($elmts);
 			for ($i=0;$i<$count;$i++) {
-				$output .= $this->tabPanElmt($elmts[$i][0],$elmts[$i][1],$elmts[$i][2],$cursh);	
+				$output = sprintf("%s%s",$output,$this->tabPanElmt($elmts[$i][0],$elmts[$i][1],$elmts[$i][2],$cursh));
 			}
 
-			$output .= "</ul></div>";
+			$output = sprintf("<div id=\"contenttabs\"><ul>%s</ul></div>",$output);
 			FS::$iMgr->js("$('#contenttabs').tabs({cache: false,
 				ajaxOptions: { error: function(xhr,status,index,anchor) {
                         		$(anchor.hash).html(\"".$this->getLocale("fail-tab")."\");
@@ -748,13 +752,11 @@
 		* lnkadd option contain get arguments in HTML form for AJAX calls
 		*/
 		public function opendiv($callid,$text1,$options=array()) {
-			$output = "<a href=\"#\" onclick=\"formPopup('".$this->cur_module->getModuleId()."','".$callid."','".
-				(isset($options["lnkadd"]) ? $options["lnkadd"] : "")."'";
-			$output .= ");\">".$text1."</a>";
-			if (isset($options["line"]) && $options["line"])
-				$output .= "<br />";
-
-			return $output;
+			return sprintf("<a href=\"#\" onclick=\"formPopup('%s','%s','%s');\">%s</a>%s",
+				$this->cur_module->getModuleId(),$callid,
+				(isset($options["lnkadd"]) ? $options["lnkadd"] : ""),
+				$text1,
+				(isset($options["line"]) && $options["line"]) ? "<br />" : "");
 		}
 		
 		public function iconOpendiv($callid,$iconname,$options=array()) {
@@ -766,16 +768,16 @@
 		* jQuery accordion generator
 		*/
 		public function accordion($accId,$elements=array()) {
-			$output = "<div id=\"".$accId."\">";
+			$output = "";
 
-			$count = count($elements);
 			foreach ($elements as $key => $values) {
-				$output .= $this->h3($values[0],true,"acc".$key."h3")."<div id=\"acc".$key."div\">".$values[1]."</div>";
+				$output = sprintf("%s%s<div id=\"acc%sdiv\">%s</div>",
+					$output,$this->h3($values[0],true,"acc".$key."h3"),$key,$values[1]);
 			}
 
-			$output .= "</div>";
+			$output = sprintf("<div id=\"%s\">%s</div>",$accId,$output);
 
-			$this->js("$('#".$accId."').accordion({heightStyle: 'content'});");
+			$this->js(sprintf("$('#%s').accordion({heightStyle: 'content'});",$accId));
 			return $output;
 		}
 
@@ -789,18 +791,20 @@
 		}
 
 		public function redir($link,$js=false) {
-			if ($js && FS::isAjaxCall())
+			if ($js && FS::isAjaxCall()) {
 				$this->js("window.location.href=\"index.php?".$link."\";");
-			else
+			}
+			else {
 				header("Location: index.php?".$link);
+			}
 		}
 
 		public function printError($msg) {
-			return "<div id=\"errorContent\">Erreur: ".$msg."</div>";
+			return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$msg);
 		}
 
 		public function printDebug($msg) {
-			return "<div id=\"debugContent\">Notification: ".$msg."</div>";
+			return sprintf("<div id=\"debugContent\">%s: %s</div>",$this->getLocale("Notification"),$msg);
 		}
 
 		public function getModuleIdByPath($path) {
