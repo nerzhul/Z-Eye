@@ -219,10 +219,11 @@
 				}
 			}
 			$output .= "<span id=\"anchusrr_".FS::$iMgr->formatHTMLId("u".$subnet."l-".$right)."\" style=\"display:none;\"></span>";
+			$idsfx = FS::$iMgr->formatHTMLId($right.$subnet);
 			$tmpoutput = FS::$iMgr->cbkForm("1").
 				FS::$iMgr->hidden("subnet",$subnet).FS::$iMgr->hidden("right",$right).
-				"<span id=\"lu".FS::$iMgr->formatHTMLId($right.$subnet)."\">";
-			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
+				"<span id=\"lu".$idsfx."\">";
+			$output .= $tmpoutput.$this->userSelect("uid".$idsfx,$values)."</span></form>";
 			return $output;
 		}
 
@@ -237,9 +238,10 @@
 				}
 			}
 			$output .= "<span id=\"anchusrr_".FS::$iMgr->formatHTMLId("uglbl-".$right)."\" style=\"display:none;\"></span>";
+			$idsfx = $right."glbl";
 			$tmpoutput = FS::$iMgr->cbkForm("1");
-			$tmpoutput .= FS::$iMgr->hidden("global",1).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."glbl\">";
-			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
+			$tmpoutput .= FS::$iMgr->hidden("global",1).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$idsfx."\">";
+			$output .= $tmpoutput.$this->userSelect("uid".$idsfx,$values)."</span></form>";
 			return $output;
 		}
 
@@ -254,10 +256,13 @@
 				}
 			}
 			$output .= "<span id=\"anchgrpr_".FS::$iMgr->formatHTMLId("g".$subnet."-".$right)."\" style=\"display:none;\"></span>";
+			
+			$idsfx = FS::$iMgr->formatHTMLId($right.$subnet);
+			
 			$tmpoutput = FS::$iMgr->cbkForm("1").
 				FS::$iMgr->hidden("subnet",$subnet).FS::$iMgr->hidden("right",$right).
-				"<span id=\"lg".FS::$iMgr->formatHTMLId($right.$subnet)."\">";
-			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
+				"<span id=\"lg".$idsfx."\">";
+			$output .= $tmpoutput.$this->groupSelect("gid".$idsfx,$values)."</span></form>";
 			return $output;
 		}
 
@@ -272,9 +277,10 @@
 				}
 			}
 			$output .= "<span id=\"anchgrpr_".FS::$iMgr->formatHTMLId("gglbl-".$right)."\" style=\"display:none;\"></span>";
+			$idsfx = $right."glbl";
 			$tmpoutput = FS::$iMgr->cbkForm("1");
-			$tmpoutput .= FS::$iMgr->hidden("global","1").FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."glbl\">";
-			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
+			$tmpoutput .= FS::$iMgr->hidden("global","1").FS::$iMgr->hidden("right",$right)."<span id=\"lg".$idsfx."\">";
+			$output .= $tmpoutput.$this->groupSelect("gid".$idsfx,$values)."</span></form>";
 			return $output;
 		}
 
@@ -396,12 +402,13 @@
 		*/
 		private function jsUserGroupSelect($right,$type,$id,$value="") {
 			$rules = NULL;
+
 			if ($type == "glbl") {
 				$rules = $this->initRules($right);
-				if ($id == "uid") {
+				if (preg_match("#^uid#",$id)) {
 					$rules = $this->loadGlobalRules($rules,2,$right);
 				}
-				else if ($id == "gid") {
+				else if (preg_match("#^gid#",$id)) {
 					$rules = $this->loadGlobalRules($rules,1,$right);
 				}
 				else {
@@ -410,10 +417,10 @@
 			}
 			else if ($type == "subnet") {
 				$rules = $this->initSubnetRules($right);
-				if ($id == "uid") {
+				if (preg_match("#^uid#",$id)) {
 					$rules = $this->loadSubnetRules($rules,2,$value,$right);
 				}
-				else if ($id == "gid") {
+				else if (preg_match("#^gid#",$id)) {
 					$rules = $this->loadSubnetRules($rules,1,$value,$right);
 				}
 				else {
@@ -427,19 +434,27 @@
 			$js = "";
 			foreach ($rules as $key => $values) {
 				if ($type == "glbl") {
-					if ($id == "uid") {
-						$js .= "$('#lu".$right.$type."').html('".$this->userSelect("uid",$values)."');";
+					if (preg_match("#^uid#",$id)) {
+						$js = sprintf("%s$('#lu%s%s').html('%s'); $('#%s').select2();", 
+							$js, $right, $type, $this->userSelect($id,$values), $id);
 					}
-					else if ($id == "gid") {
-						$js .= "$('#lg".$right.$type."').html('".$this->groupSelect("gid",$values)."');";
+					else if (preg_match("#^gid#",$id)) {
+						$js = sprintf("%s$('#lg%s%s').html('%s'); $('#%s').select2();",
+							$js, $right, $type, $this->groupSelect($id,$values), $id);
 					}
 				}
 				else if ($type == "subnet") {
-					if ($id == "uid") {
-						$js .= "$('#lu".FS::$iMgr->formatHTMLId($right.$value)."').html('".$this->userSelect("uid",$values)."');";
+					if (preg_match("#^uid#",$id)) {
+						$js = sprintf("%s$('#lu%s').html('%s'); $('#%s').select2();",
+							$js, FS::$iMgr->formatHTMLId($right.$value),
+							$this->userSelect($id,$values), $id
+						);
 					}
-					else if ($id == "gid") {
-						$js .= "$('#lg".FS::$iMgr->formatHTMLId($right.$value)."').html('".$this->groupSelect("gid",$values)."');";
+					else if (preg_match("#^gid#",$id)) {
+						$js = sprintf("%s$('#lg%s').html('%s'); $('#%s').select2();",
+							$js, FS::$iMgr->formatHTMLId($right.$value),
+							$this->groupSelect($id,$values), $id
+						);
 					}
 
 				}
@@ -463,11 +478,16 @@
 						return;
 					}
 
-					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
-					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					$global = FS::$secMgr->checkAndSecurisePostData("global");
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 					$right = FS::$secMgr->checkAndSecurisePostData("right");
+					
+					// gid and uid fields are dynamic
+					
+					$idsfx = FS::$iMgr->formatHTMLId($right.($global == 1 ? "glbl" : $subnet));
+					
+					$gid = FS::$secMgr->checkAndSecurisePostData("gid".$idsfx);
+					$uid = FS::$secMgr->checkAndSecurisePostData("uid".$idsfx);
 
 					if ((!$gid && !$uid) || (!$global && !$subnet) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
@@ -497,7 +517,7 @@
 
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","global",$gname,$gid,$right,"1");
-							$js .= $this->jsUserGroupSelect($right,"glbl","gid").
+							$js .= $this->jsUserGroupSelect($right,"glbl","gid".$idsfx).
 								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchgrpr_".
 								FS::$iMgr->formatHTMLId("gglbl-".$right)."');";
 							$this->log(0,"global right '".$right."' for group '".$gid."' added/edited");
@@ -521,7 +541,7 @@
 
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","global",$username,$uid,$right,"1");
-							$js .= $this->jsUserGroupSelect($right,"glbl","uid").
+							$js .= $this->jsUserGroupSelect($right,"glbl","uid".$idsfx).
 								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchusrr_".
 								FS::$iMgr->formatHTMLId("uglbl-".$right)."');";
 							$this->log(0,"global right '".$right."' for user '".$uid."' added/edited");
@@ -551,7 +571,7 @@
 
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","subnet",$gname,$gid,$right,$subnet);
-							$js .= $this->jsUserGroupSelect($right,"subnet","gid",$subnet);
+							$js .= $this->jsUserGroupSelect($right,"subnet","gid".$idsfx,$subnet);
 							$js .= "$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchgrpr_".
 								FS::$iMgr->formatHTMLId("g".FS::$iMgr->FormatHTMLId($subnet)."-".$right)."');";
 							$this->log(0,"subnet right '".$right."' for group '".$gid."' and subnet '".$subnet."' added/edited");
@@ -578,7 +598,7 @@
 
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","subnet",$username,$uid,$right,$subnet);
-							$js .= $this->jsUserGroupSelect($right,"subnet","uid",$subnet);
+							$js .= $this->jsUserGroupSelect($right,"subnet","uid".$idsfx,$subnet);
 							$js .= "$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchusrr_".
 								FS::$iMgr->formatHTMLId("u".FS::$iMgr->formatHTMLId($subnet)."l-".$right)."');";
 							$this->log(0,"subnet right '".$right."' for user '".$uid."' and subnet '".$subnet."' added/edited");
@@ -594,11 +614,16 @@
 						return;
 					}
 
-					$gid = FS::$secMgr->checkAndSecuriseGetData("gid");
-					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					$global = FS::$secMgr->checkAndSecuriseGetData("global");
 					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
 					$right = FS::$secMgr->checkAndSecuriseGetData("right");
+					
+					// ID are dynamic (due to JS)
+					$idsfx = FS::$iMgr->formatHTMLId($right.($global == 1 ? "glbl" : $subnet));
+					
+					
+					$gid = FS::$secMgr->checkAndSecuriseGetData("gid");
+					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 
 					if ((!$uid && !$gid) || (!$global && !$subnet) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
@@ -656,22 +681,34 @@
 					}
 					if ($gid) {
 						if ($global) {
-							$js = $this->jsUserGroupSelect($right,"glbl","gid");
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."global');".$js);
+							$js = sprintf("hideAndRemove('#g%s%sglobal');%s",
+								$gid,$right,
+								$this->jsUserGroupSelect($right,"glbl","gid".$idsfx)
+							);
+							FS::$iMgr->ajaxEcho("Done",$js);
 						}
 						else if ($subnet) {
-							$js = $this->jsUserGroupSelect($right,"subnet","gid",$subnet);
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".FS::$iMgr->formatHTMLId($gid.$right.$subnet)."');".$js);
+							$js = sprintf("hideAndRemove('#g%s');%s",
+								FS::$iMgr->formatHTMLId($gid.$right.$subnet),
+								$this->jsUserGroupSelect($right,"subnet","gid".$idsfx,$subnet)
+							);
+							FS::$iMgr->ajaxEcho("Done",$js);
 						}
 					}
 					else if ($uid) {
 						if ($global) {
-							$js = $this->jsUserGroupSelect($right,"glbl","uid");
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."global');".$js); 
+							$js = sprintf("hideAndRemove('#u%s%sglobal');%s",
+								$uid,$right,
+								$this->jsUserGroupSelect($right,"glbl","uid".$idsfx)
+							);
+							FS::$iMgr->ajaxEcho("Done",$js); 
 						}
 						else if ($subnet) {
-							$js = $this->jsUserGroupSelect($right,"subnet","uid",$subnet);
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".FS::$iMgr->formatHTMLId($uid.$right.$subnet)."');".$js); 
+							$js = sprintf("hideAndRemove('#u%s');%s",
+								FS::$iMgr->formatHTMLId($uid.$right.$subnet),
+								$this->jsUserGroupSelect($right,"subnet","uid".$idsfx,$subnet)
+							);
+							FS::$iMgr->ajaxEcho("Done",$js); 
 						}
 					}
 					return;
