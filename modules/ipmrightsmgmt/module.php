@@ -51,6 +51,9 @@
 					FS::$iMgr->Submit("","Filter")."</form>".
 					"<div id=\"subnetrights\"></div>";
 			}
+			else {
+				return FS::$iMgr->printError($this->loc->s("err-no-subnet"));
+			}
 
 			return $output;
 		}
@@ -364,9 +367,11 @@
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 					$output = FS::$iMgr->h1("title-ipmrightsmgmt");
 					$panElmts = array(
-						array(1,"mod=".$this->mid,$this->loc->s("title-globalrights")),
-						array(2,"mod=".$this->mid,$this->loc->s("title-bysubnet"))
+						array(1,"mod=".$this->mid,$this->loc->s("title-globalrights"))
 					);
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid")) {
+						$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("title-bysubnet"));
+					}
 					// Show only if there is devices
 					$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				}
