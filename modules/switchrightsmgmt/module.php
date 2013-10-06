@@ -26,18 +26,7 @@
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-switchrightsmgmt"));
 
-			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-bad-datas")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-snmpgid-not-found")); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-already-exist")); break;
-				case 4: $output .= FS::$iMgr->printError($this->loc->s("err-not-found")); break;
-				case 99: $output .= FS::$iMgr->printError($this->loc->s("err-no-rights")); break;
-				default: break;
-			}
-			$output .= $this->showMain();
-			return $output;
+			return $this->showMain();;
 		}
 
 
