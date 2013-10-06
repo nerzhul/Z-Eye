@@ -829,12 +829,32 @@
 
 
 		public function ajaxEcho($str,$js="",$raw=false) {
-			echo ($raw ? $str : $this->getLocale($str)).(strlen($js) > 0 ? $this->js($js) : "");
+			echo ($raw ? $str : $this->getLocale($str));
+			
+			if (strlen($js) > 0) {
+				$this->js($js);
+			}
 		}
 
 		public function ajaxEchoNC($str,$js="",$raw=false) {
-			echo ($raw ? $str : $this->getLocale($str)).(strlen($js) > 0 ? $this->js("dontClosePopup(); ".$js) : 
-				$this->js("dontClosePopup();"));
+			echo ($raw ? $str : $this->getLocale($str));
+			
+			if(strlen($js) > 0) {
+				$this->js("dontClosePopup(); ".$js);
+			}
+			else {
+				$this->js("dontClosePopup();");
+			}
+		}
+		
+		public function ajaxEchoError($str,$js="",$raw=false) {
+			echo sprintf("<span style=\"strErr\">%s:</span> %s",
+				$this->loc->s("Error"),
+				$raw ? $str : $this->getLocale($str));
+			
+			if(strlen($js) > 0) {
+				$this->js($js);
+			}
 		}
 
 		public function getLocale($locid) {

@@ -290,6 +290,7 @@ a:hover { color: #F10; cursor: pointer; }
 canvas { display: inline-block; }
 #sigmap { background-color: #DDD; }
 
+#strErr { font-weight: bold; color: #B00; }
 #errorContent {
 	font-weight: bold;
 	color: #B00;
