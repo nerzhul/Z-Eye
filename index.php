@@ -53,14 +53,13 @@
 	else {
 		FS::$sessMgr->InitSessionIfNot();
 		FS::$iMgr->stylesheet("/styles/z-eye.css");
-		FS::$iMgr->jsinc("/lib/jQuery/jQuery.js");
+		FS::$iMgr->jsinc("/lib/jQuery/req.min.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jQueryUI.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jquery.jqzoom.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jquery.tablesorter.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jquery.colorpicker.js");
 		FS::$iMgr->jsinc("/lib/jQuery/springy.js");
 		FS::$iMgr->jsinc("/lib/jQuery/springyui.js");
-		FS::$iMgr->jsinc("/lib/jQuery/select2.min.js");
 		FS::$iMgr->jsinc("/lib/FSS/js/FSS.js");
 		FS::$iMgr->jsinc("/lib/HighCharts/highcharts.min.js");
 		FS::$iMgr->jsinc("/lib/Sigma/sigma.min.js");
