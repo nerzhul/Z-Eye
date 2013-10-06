@@ -60,6 +60,7 @@
 		FS::$iMgr->jsinc("/lib/jQuery/jquery.colorpicker.js");
 		FS::$iMgr->jsinc("/lib/jQuery/springy.js");
 		FS::$iMgr->jsinc("/lib/jQuery/springyui.js");
+		FS::$iMgr->jsinc("/lib/jQuery/select2.min.js");
 		FS::$iMgr->jsinc("/lib/FSS/js/FSS.js");
 		FS::$iMgr->jsinc("/lib/HighCharts/highcharts.min.js");
 		FS::$iMgr->jsinc("/lib/Sigma/sigma.min.js");

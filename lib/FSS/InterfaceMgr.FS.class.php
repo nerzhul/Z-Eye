@@ -438,7 +438,7 @@
 		}
 
 		public function radio($name, $value, $checked = false, $label="") {
-			return sprintf("<input id=\"%s\" type=\"radio\" value=\"%s\" name=\"%s\"%s>%s";
+			return sprintf("<input id=\"%s\" type=\"radio\" value=\"%s\" name=\"%s\"%s>%s",
 				$name,$value,$name,
 				$checked ? " checked=\"checked\"" : "",
 				$label
@@ -614,6 +614,8 @@
 			$selId = preg_replace("#\[|\]#","",$name);
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
 			
+			$this->js(sprintf("$('#%s').select2();",$name));
+			
 			return sprintf("%s<select name=\"%s%s\" id=\"%s\"%s%s%s%s%s>",
 				isset($options["label"]) ?
 					sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]) : "",
@@ -625,7 +627,7 @@
 					sprintf(" size=\"%s\" ",$options["size"]) : "",
 				isset($options["style"]) ?
 					sprintf(" style=\"%s\" ",$style) : "",
-				isset($options["tooltip"] ?
+				isset($options["tooltip"]) ?
 					$this->tooltip($options["tooltip"]) : ""
 			);
 
@@ -690,7 +692,7 @@
 		}
 
 		public function img($path,$sizeX = 0,$sizeY = 0, $id = "") {
-			return sprintf("<img src=\"%s\" %s%s%s style=\"border: none;\"/>";
+			return sprintf("<img src=\"%s\" %s%s%s style=\"border: none;\"/>",
 				$path,
 				($sizeX != 0 ? "width=\"".$sizeX."\" " : ""),
 				($sizeY != 0 ? "height=\"".$sizeY."\" " : ""),
@@ -702,10 +704,10 @@
 			$output = sprintf("<a href=\"%s\" id=\"%s\" title=\"%s\">%s</a>",
 				(strlen($bigpath) > 0 ? $bigpath : $path),
 				$id, $title,
-				FS::$iMgr->img($path,0,0,"jqzoom-img"))
+				FS::$iMgr->img($path,0,0,"jqzoom-img"));
 				
 			$this->js(sprintf("$('#%s').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});",
-				$id);
+				$id));
 			return $output;
 		}	
 
@@ -725,7 +727,7 @@
 		}
 
 		public function tabPan($elmts = array(),$cursh) {
-			$output = ""
+			$output = "";
 
 			$count = count($elmts);
 			for ($i=0;$i<$count;$i++) {
