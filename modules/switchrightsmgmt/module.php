@@ -204,8 +204,8 @@
 					$output .= FS::$iMgr->js("function filterSw() {
 							$('#swfdiv').fadeOut('slow',function() {
 								$.post('index.php?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
-											$('#swfdiv').html(data);
-										});
+									$('#swfdiv').html(data);
+								});
 						});
               	        $('#swfdiv').fadeIn();
 						}")."<div id=\"swfdiv\">";
@@ -272,9 +272,12 @@
 				}
 			}
 			$output .= "<span id=\"anchipusrr_".FS::$iMgr->formatHTMLId("u".$ip."-".$right)."\" style=\"display:none;\"></span>";
+			
+			$idsfx = FS::$iMgr->formatHTMLId($right.$ip);
+			
 			$tmpoutput = FS::$iMgr->cbkForm("1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."ip\">";
-			$output .= $tmpoutput.$this->userSelect("uid",$values)."</span></form>";
+			$output .= $tmpoutput.$this->userSelect("uid".$idsfx,$values)."</span></form>";
 			return $output;
 		}
 
@@ -289,9 +292,12 @@
 				}
 			}
 			$output .= "<span id=\"anchipgrpr_".FS::$iMgr->formatHTMLId("g".$ip."-".$right)."\" style=\"display:none;\"></span>";
+			
+			$idsfx = FS::$iMgr->formatHTMLId($right.$ip);
+			
 			$tmpoutput = FS::$iMgr->cbkForm("1".($filterIP ? "&filter=".$filterIP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("ip",$ip).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."ip\">";
-			$output .= $tmpoutput.$this->groupSelect("gid",$values)."</span></form>";
+			$output .= $tmpoutput.$this->groupSelect("gid".$idsfx,$values)."</span></form>";
 			return $output;
 		}
 
@@ -455,9 +461,12 @@
 				}
 			}
 			$output .= "<span id=\"anchsnmpgrpr_".FS::$iMgr->formatHTMLId("g".$snmp."-".$right)."\" style=\"display:none;\"></span>";
+			
+			$idsfx = FS::$iMgr->formatHTMLId($right.$snmp);
+			
 			$tmpoutput = FS::$iMgr->cbkForm("1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lg".$right."snmp\">";
-			$tmpoutput .= $this->groupSelect("gid",$values);
+			$tmpoutput .= $this->groupSelect("gid".$idsfx,$values);
 			$output .= $tmpoutput."</span></form>";
 			return $output;
 		}
@@ -473,9 +482,12 @@
 				}
 			}
 			$output .= "<span id=\"anchsnmpusrr_".FS::$iMgr->formatHTMLId("u".$snmp."-".$right)."\" style=\"display:none;\"></span>";
+			
+			$idsfx = FS::$iMgr->formatHTMLId($right.$snmp);
+			
 			$tmpoutput = FS::$iMgr->cbkForm("1".($filterSNMP ? "&filter=".$filterSNMP : ""));
 			$tmpoutput .= FS::$iMgr->hidden("snmp",$snmp).FS::$iMgr->hidden("right",$right)."<span id=\"lu".$right."snmp\">";
-			$tmpoutput .= $this->userSelect("uid",$values);
+			$tmpoutput .= $this->userSelect("uid".$idsfx,$values);
 			$output .= $tmpoutput."</span></form>";
 			return $output;
 		}
@@ -586,22 +598,26 @@
 		* $type snmp/ip
 		* $id uid/gid
 		*/
-		private function jsUserGroupSelect($right,$type,$id,$snmpip) {
+		private function jsUserGroupSelect($right, $type, $id, $snmpip) {
 			$rules = "";
 			if ($type == "ip") {
 				$rules = $this->initIPRules($right);
-				$rules = $this->loadIPRules($rules,$id == "gid" ? 1 : 2,$snmpip,$right);
+				$rules = $this->loadIPRules($rules,preg_match("#^gid#",$id) ? 1 : 2,$snmpip,$right);
 			}
 			else {
 				$rules = $this->initSNMPRules('t','t',$right);
-				$rules = $this->loadSNMPRules($rules,$id == "gid" ? 1 : 2,$snmpip,'t','t',$right);
+				$rules = $this->loadSNMPRules($rules,preg_match("#^gid#",$id) ? 1 : 2,$snmpip,'t','t',$right);
 			}
 			$js = "";
 			foreach ($rules as $key => $values) {
-				if ($id == "uid")
-					$js .= "$('#lu".$right.$type."').html('".$this->userSelect("uid",$values)."');";
-				else if ($id == "gid")
-					$js .= "$('#lg".$right.$type."').html('".$this->groupSelect("gid",$values)."');";
+				if (preg_match("#^uid#",$id)) {
+					$js = sprintf("%s$('#lu%s%s').html('%s');$('#%s').select2();",
+						$js, $right, $type, $this->userSelect($id,$values),$id);
+				}
+				else if (preg_match("#^gid#",$id)) {
+					$js = sprintf("%s$('#lg%s%s').html('%s');$('#%s').select2();",
+						$js, $right, $type, $this->groupSelect($id,$values),$id);
+				}
 			}
 			return $js;
 		}
@@ -617,12 +633,15 @@
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1: // Add group right for SNMP/IP community 
-					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
-					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					$snmp = FS::$secMgr->checkAndSecurisePostData("snmp");
 					$ip = FS::$secMgr->checkAndSecurisePostData("ip");
 					$right = FS::$secMgr->checkAndSecurisePostData("right");
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
+					
+					$idsfx = FS::$iMgr->formatHTMLId($right.($snmp ? $snmp : $ip));
+					
+					$gid = FS::$secMgr->checkAndSecurisePostData("gid".$idsfx);
+					$uid = FS::$secMgr->checkAndSecurisePostData("uid".$idsfx);
 
 					if ((!$gid && !$uid) || (!$snmp && !$ip) || !$right) {
 						FS::$iMgr->ajaxEcho("err-bad-datas");
@@ -652,7 +671,7 @@
 							FS::$dbMgr->CommitTr();
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","snmp",$gname,$gid,$right,$snmp);
-							$js .= $this->jsUserGroupSelect($right,"snmp","gid",$snmp).
+							$js .= $this->jsUserGroupSelect($right,"snmp","gid".$idsfx,$snmp).
 								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchsnmpgrpr_".
 								FS::$iMgr->formatHTMLId("g".$snmp."-".$right)."');";
 						}
@@ -676,7 +695,7 @@
 							FS::$dbMgr->CommitTr();
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","snmp",$username,$uid,$right,$snmp);
-							$js .= $this->jsUserGroupSelect($right,"snmp","uid",$snmp).
+							$js .= $this->jsUserGroupSelect($right,"snmp","uid".$idsfx,$snmp).
 								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchsnmpusrr_".
 								FS::$iMgr->formatHTMLId("u".$snmp."-".$right)."');";
 						}
@@ -699,7 +718,7 @@
 							FS::$dbMgr->CommitTr();
 							$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$gid."'");
 							$jscontent = $this->showRemoveSpan("g","ip",$gname,$gid,$right,$ip);
-							$js .= $this->jsUserGroupSelect($right,"ip","gid",$ip).
+							$js .= $this->jsUserGroupSelect($right,"ip","gid".$idsfx,$ip).
 								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchipgrpr_".
 								FS::$iMgr->formatHTMLId("g".$ip."-".$right)."');";
 						}
@@ -720,7 +739,7 @@
 							FS::$dbMgr->CommitTr();
 							$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 							$jscontent = $this->showRemoveSpan("u","ip",$username,$uid,$right,$ip);
-							$js .= $this->jsUserGroupSelect($right,"ip","uid",$ip).
+							$js .= $this->jsUserGroupSelect($right,"ip","uid".$idsfx,$ip).
 								"$('".FS::$secMgr->cleanForJS($jscontent)."').insertBefore('#anchipusrr_".
 								FS::$iMgr->formatHTMLId("u".$ip."-".$right)."');";
 						}
@@ -729,14 +748,18 @@
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				case 2: // Remove group/ from SNMP community
-					$gid = FS::$secMgr->checkAndSecuriseGetData("gid");
-					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					$snmp = FS::$secMgr->checkAndSecuriseGetData("snmp");
 					$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
 					$right = FS::$secMgr->checkAndSecuriseGetData("right");
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
+					
+					$idsfx = FS::$iMgr->formatHTMLId($right.($snmp ? $snmp : $ip));
+					
+					$gid = FS::$secMgr->checkAndSecuriseGetData("gid");
+					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 
 					if ((!$uid && !$gid) || (!$ip && !$snmp) || !$right) {
+						var_dump($gid);
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
@@ -778,21 +801,21 @@
 					}
 					if ($gid) {
 						if ($snmp) {
-							$js = $this->jsUserGroupSelect($right,"snmp","gid",$snmp);
+							$js = $this->jsUserGroupSelect($right,"snmp","gid".$idsfx,$snmp);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."snmp');".$js);
 						}
 						else if ($ip) {
-							$js = $this->jsUserGroupSelect($right,"ip","gid",$ip);
+							$js = $this->jsUserGroupSelect($right,"ip","gid".$idsfx,$ip);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."ip');".$js);
 						}
 					}
 					else if ($uid) {
 						if ($snmp) {
-							$js = $this->jsUserGroupSelect($right,"snmp","uid",$snmp);
+							$js = $this->jsUserGroupSelect($right,"snmp","uid".$idsfx,$snmp);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."snmp');".$js);
 						}
 						else if ($ip) {
-							$js = $this->jsUserGroupSelect($right,"ip","uid",$ip);
+							$js = $this->jsUserGroupSelect($right,"ip","uid".$idsfx,$ip);
 							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."ip');".$js); 
 						}
 					}
