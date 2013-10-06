@@ -33,15 +33,12 @@
 			$dt1 = new DateTime("now");
 			$dt2 = new DateTime(date("Y-m-d H:i:s",$time));
 			$interval = $dt1->diff($dt2);
-			$output = "";
-			if ($interval->d > 0)
-				$output .= $interval->d."d ";
-			if ($interval->h > 0)
-				$output .= $interval->h."h ";
-			if ($interval->i > 0)
-				$output .= $interval->i."m ";
-			if ($interval->s > 0)
-				$output .= $interval->s."s";
-			return $output;
+			
+			return sprintf("%s%s%s%s",
+				$interval->d > 0 ? $interval->d."d " : "",
+				$interval->h > 0 ? $interval->h."h " : "",
+				$interval->i > 0 ? $interval->i."m " : "",
+				$interval->s > 0 ? $interval->s."s" : ""
+			);
 		}
 	}

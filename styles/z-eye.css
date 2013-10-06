@@ -74,27 +74,27 @@ select { min-width: 50px; }
 }
 
 #notification {
-        position: fixed;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        bottom: 0;
-        font-weight: bold;
-        color: white;
-        width: 100%;
+	position: fixed;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	bottom: 0;
+	font-weight: bold;
+	color: white;
+	width: 100%;
 	display: none;
 	z-index: 3000;
 }
 
 #subnotification {
-        border-radius: 10px 10px 0 0;
-        display: inline-block;
-        padding: 10px;
-        margin-left: 5px;
-        margin-right: 5px;
-        min-width: 420px;
-        font-size: 12px;
-        background-color: rgba(0,0,0,0.9);
+	border-radius: 10px 10px 0 0;
+	display: inline-block;
+	padding: 10px;
+	margin-left: 5px;
+	margin-right: 5px;
+	min-width: 420px;
+	font-size: 12px;
+	background-color: rgba(0,0,0,0.9);
 }
 
 #menuStack, #hstslide { display:inline-block; }
@@ -146,19 +146,19 @@ div#menuStack div { font-size: 12px; }
 
 .searchButton {
 	background-image: linear-gradient(#FAFAFA, #DCDCDC);
-        background-image: -moz-linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -moz-linear-gradient(#FAFAFA, #DCDCDC);
 	background-image: -ms-linear-gradient(#FAFAFA, #DCDCDC);
 	background-image: -o-linear-gradient(#FAFAFA, #DCDCDC);
 	background-image: -webkit-linear-gradient(#FAFAFA, #DCDCDC);
-        border: 1px solid #CCC;
-        vertical-align: center;
-        height: 28px;
-        border-radius: 3px 3px 3px 3px;
-        cursor: pointer;
+	border: 1px solid #CCC;
+	vertical-align: center;
+	height: 28px;
+	border-radius: 3px 3px 3px 3px;
+	cursor: pointer;
 }
 
 .searchButton:hover {
-        background-image: linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: linear-gradient(#DCDCDC, #FAFAFA);
 	background-image: -moz-linear-gradient(#DCDCDC, #FAFAFA);
 	background-image: -ms-linear-gradient(#DCDCDC, #FAFAFA);
 	background-image: -o-linear-gradient(#DCDCDC, #FAFAFA);
@@ -320,22 +320,22 @@ canvas { display: inline-block; }
 
 .buttonStyle {
 	background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
-        border: 1px solid #CCC;
-        vertical-align: center;
-        height: 28px;
-        margin-top: 10px;
-        border-radius: 3px;
-        cursor: pointer;
+	border: 1px solid #CCC;
+	vertical-align: center;
+	height: 28px;
+	margin-top: 10px;
+	border-radius: 3px;
+	cursor: pointer;
 }
 
 .buttonStyle:hover {
 	background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
-        border: 1px solid #CCC;
-        vertical-align: center;
-        height: 28px;
-        margin-top: 10px;
-        border-radius: 3px;
-        cursor: pointer;
+	border: 1px solid #CCC;
+	vertical-align: center;
+	height: 28px;
+	margin-top: 10px;
+	border-radius: 3px;
+	cursor: pointer;
 }
 
 .debugMsg { color:blue; font-weight:100; }
