@@ -3,4 +3,5 @@ jQueryUI - 1.10.3
 jqzoom - 2.3
 colorpicker - 23/05/2009 - http://www.eyecon.ro/colorpicker/ 
 tablesorter - 2.0.5 - http://tablesorter.com/docs/
-select2.min - 3.4.3 - https://github.com/ivaynberg/select2/
+select2 - 3.4.3 - https://github.com/ivaynberg/select2/
+highcharts - 3.0.6 - http://www.highcharts.com/
