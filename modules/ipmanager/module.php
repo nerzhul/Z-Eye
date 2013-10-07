@@ -291,13 +291,13 @@
 				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\"><td>".FS::$iMgr->opendiv(7,long2ip($key),array("lnkadd" => "ip=".long2ip($key))).
 					"</td><td>".FS::$iMgr->searchIcon(long2ip($key)).
 					"</td><td>".$rstate."</td><td>".
-					"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"]."\">".$value["mac"]."</a></td><td>";
+					FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"], $value["mac"])."</td><td>";
 				$output .= $value["host"]."</td><td>".$value["comment"]."</td><td>";
 				// Show switch column only of a switch is here
 				if ($swfound) {
-					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."\">".$value["switch"]."</a>" : "").
+					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"], $value["switch"]) : "").
 						"</td><td>";
-					$output .= (strlen($value["switch"]) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"]."\">".$value["port"]."</a>" : "").
+					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"], $value["port"]) : "").
 						"</td><td>";
 				}
 				$output .= $value["ltime"]."</td><td>";
@@ -1286,7 +1286,7 @@
 						$ltime = FS::$dbMgr->GetOneData("node","time_last","mac = '".$data["macaddr"]."'",array("order" => "time_last","ordersens" => 1,"limit" => 1));
 						if ($ltime) {
 							if (strtotime($ltime) < strtotime("-".$interval." day",strtotime(date("y-m-d H:i:s")))) {
-								$obsoletes[$data["ip"]] = $data["ip"]." - <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a>";
+								$obsoletes[$data["ip"]] = $data["ip"]." - ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data["macaddr"], $data["macaddr"]);
 								$obsoletes[$data["ip"]] .= " (".$this->loc->s("last-view")." ".date("d/m/y H:i",strtotime($ltime)).")";
 								$obsoletes[$data["ip"]] .= "<br />";
 								if (!$found) $found = true;

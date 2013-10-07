@@ -262,7 +262,7 @@
 						}
 						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
 						if ($recordtype == "A" || $recordtype == "AAAA")
-							$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$recordval."\">".$recordval."</a>";
+							$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$recordval, $recordval);
 						else
 							$output .= $recordval;
 						$output .= "</td><td>";
@@ -428,8 +428,8 @@
 								array("order" => "time_last","ordersens" => 1));
 							if (!$foundrecent) {
 								if (!$found) $found = true;
-								$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search").
-									"&s=".$data["record"].".".$data["zonename"]."\">".$data["record"].".".$data["zonename"]."</a> / ".$data["recval"]."<br />";
+								$obsoletes[$data["record"]] = FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search").
+									"&s=".$data["record"].".".$data["zonename"], $data["record"].".".$data["zonename"])." / ".$data["recval"]."<br />";
 							}
 						}
 					}
@@ -447,8 +447,8 @@
 						# pipe spaces are very important
 						exec("/usr/bin/dig +short -t A ".$toquery." | grep -ve \"^;\" | grep -ve \"^$\" | grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
 						if (count($out) == 0 || $out == "") {
-							$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].
-								".".$data["zonename"]."\">".$data["record"].".".$data["zonename"]."</a> / ".$this->loc->s("Alone")."<br />";
+							$obsoletes[$data["record"]] = FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].
+								".".$data["zonename"], $data["record"].".".$data["zonename"])." / ".$this->loc->s("Alone")."<br />";
 						}
 						else {
 							$count = count($out);
@@ -462,8 +462,8 @@
 										array("order" => "time_last","ordersens" => 1));
 									if (!$foundrecent) {
 										if (!$found) $found = true;
-										$obsoletes[$data["record"]] = "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search").
-										"&s=".$data["record"].".".$data["zonename"]."\">".$data["record"].".".$data["zonename"]."</a> / ".$out[$i]."<br />";
+										$obsoletes[$data["record"]] = FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search").
+										"&s=".$data["record"].".".$data["zonename"], $data["record"].".".$data["zonename"])." / ".$out[$i]."<br />";
 									}
 								}
 							}

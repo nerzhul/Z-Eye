@@ -97,8 +97,8 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,login,dbtype");
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($found == false) $found = true;
-			$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dbname"].$data["addr"].$data["port"])."\"><td>
-				<a href=\"index.php?mod=".$this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"]."\">".$data["addr"];
+			$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dbname"].$data["addr"].$data["port"])."\"><td>".
+				FS::$iMgr->aLink($this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"], $data["addr"]);
 			$tmpoutput .= "</td><td>".$data["port"]."</td><td>";
 
 			switch($data["dbtype"]) {
@@ -174,7 +174,7 @@
 			}
 
 			if (!$create) {
-				$output .= "<a href=\"m-".$this->mid.".html\">".$this->loc->s("Return")."</a><br />";
+				$output .= FS::$iMgr->aLink($this->mid, $this->loc->s("Return"))."<br />";
 				$err = FS::$secMgr->checkAndSecuriseGetData("err");
 				switch($err) {
 					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;

@@ -168,7 +168,9 @@
 					while ($data2 = $radSQLMgr->Fetch($query2)) {
 						if (!$found) {
 							$found = 1;
-							$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
+							$output .= $this->loc->s("Username").": ".
+								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"].
+									"&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"],$data2["username"]);
 						}
 					}
 					if (!$found) {
@@ -176,7 +178,10 @@
 						while ($data2 = $radSQLMgr->Fetch($query2)) {
 							if (!$found) {
 								$found = 1;
-								$output .= $this->loc->s("Username").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"]."\">".$data2["username"]."</a>";
+								$output .= $this->loc->s("Username").": ".
+									FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".
+										$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"],
+										$data2["username"]);
 							}
 						}
 					}
@@ -207,8 +212,8 @@
 							}
 							$fst = preg_split("#\.#",$data2["acctstarttime"]);
 							$lst = preg_split("#\.#",$data2["acctstoptime"]);
-							$locoutput = $this->loc->s("User").": ".$data2["username"]." / ".$this->loc->s("Device").": <a href=\"index.php?mod=".
-							$this->mid."&s=".$data2["calledstationid"]."\">".$data2["calledstationid"]."</a>";
+							$locoutput = $this->loc->s("User").": ".$data2["username"]." / ".$this->loc->s("Device").": ".
+								FS::$iMgr->aLink($this->mid."&s=".$data2["calledstationid"],$data2["calledstationid"]);
 							$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")<br />";
 						}
 
@@ -315,7 +320,8 @@
 								$macdev = FS::$dbMgr->GetOneData("device","name","ip = '".$macdevip."'");
 							}
 						}
-						$output .= "<tr><td>".(strlen($macdev) > 0 ? "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev."\">".$macdev."</a>" : $this->loc->s("Unknown"))."</td>
+						$output .= "<tr><td>".
+							(strlen($macdev) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev, $macdev) : $this->loc->s("Unknown"))."</td>
 							<td>".date("d-m-y H:i:s",strtotime($data2["acctstarttime"]))."</td><td>".
 							($data2["acctstoptime"] != NULL ? date("d-m-y H:i:s",strtotime($data2["acctstoptime"])) : "").
 						"</td><td>".$inputbw."</td><td>".$outputbw."</td>

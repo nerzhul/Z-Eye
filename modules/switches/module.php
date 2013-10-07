@@ -62,7 +62,7 @@
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
                         if ($count < 1) {
                                 $output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-                                        "<br /><br /><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2\">".$this->loc->s("Go")."</a>");
+                                        "<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
                                 return $output;
                         }
 
@@ -115,7 +115,7 @@
 				default: break;
 			}
 			if (!FS::isAjaxCall()) {
-				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." <a href=\"index.php?mod=".$this->mid."&d=".$device."\">".$device."</a>",true);
+				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".FS::$iMgr->aLink($this->mid."&d=".$device, $device),true);
 				$panElmts = array();
 				$panElmts[] = array(1,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"));
 				if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
@@ -255,8 +255,8 @@
 
 					$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 					if (!$sshuser) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
-							<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
+						$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
+							FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")));
 						return $output;
 					}
 					
@@ -984,7 +984,8 @@
 						}); }
 						else $(src).toggle(); }");
 					}
-					$tmpoutput = "<table id=\"tportList\"><thead><tr><th class=\"headerSortDown\"><a href=\"index.php?mod=".$this->mid."&d=".$device."&od=port\">Port</a></th><th>";
+					$tmpoutput = "<table id=\"tportList\"><thead><tr><th class=\"headerSortDown\">".
+						FS::$iMgr->aLink($this->mid."&d=".$device."&od=port", "Port")."</th><th>";
 					$tmpoutput .= $this->loc->s("Description")."</th>
 						<th>".$this->loc->s("Plug")."</th><th>Up (Link/Admin)</th>";
 					if ($iswif == false)
@@ -1005,11 +1006,11 @@
 						if ($found == 0) $found = 1;
 						$convport = preg_replace("#\/#","-",$data["port"]);
 						$swpdata = (isset($prisearr[$data["port"]]) ? $prisearr[$data["port"]] : "");
-						$tmpoutput2 = "<tr id=\"".$convport."\"><td><a href=\"index.php?mod=".$this->mid."&d=".$device."&p=".$data["port"]."\">".$data["port"]."</a></td><td>";
+						$tmpoutput2 = "<tr id=\"".$convport."\"><td>".
+							FS::$iMgr->aLink($this->mid."&d=".$device."&p=".$data["port"], $data["port"])."</td><td>";
 
 						// Editable Desc
-						$tmpoutput2 .= $data["name"];
-						$tmpoutput2 .= "</td><td>";
+						$tmpoutput2 .= $data["name"]."</td><td>";
 						// Editable piece
 						$tmpoutput2 .= "<div id=\"swpr_".$convport."\">";
 						$tmpoutput2 .= "<a onclick=\"javascript:modifyPrise('#swpr_".$convport." a',false);\"><div id=\"swpr_".$convport."l\" class=\"modport\">";
@@ -1069,7 +1070,7 @@
 								$vlancount = 0;
 								$vlanlist .= "<br />";
 							}
-							$vlanlist .= "<a href=\"index.php?mod=".$this->mid."&vlan=".$data2["vlan"]."\">".$data2["vlan"]."</a>";
+							$vlanlist .= FS::$iMgr->aLink($this->mid."&vlan=".$data2["vlan"], $data2["vlan"]);
 							if ($data2["native"] == "t") $vlanlist .= "<span style=\"font-size:10px\">(n)</span>";
 							if ($data2["voice"] == "t") $vlanlist .= "<span style=\"font-size:10px\">(v)</span>";
 							$vlanlist .= ",";
@@ -1084,17 +1085,21 @@
 							$tmpoutput2 .= "</td><td>";
 							$query2 = FS::$dbMgr->Select("node","mac","switch = '".$dip."' AND port = '".$data["port"]."'",array("order" => "mac"));
 							while ($data2 = FS::$dbMgr->Fetch($query2)) {
-								$tmpoutput2 .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"]."\">".$data2["mac"]."</a><br />";
+								$tmpoutput2 .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data2["mac"], $data2["mac"])."<br />";
 								$query3 = FS::$dbMgr->Select("node_ip","ip","mac = '".$data2["mac"]."'",array("order" => "time_last","ordersens" => 1,"limit" => 5));
 								while ($data3 = FS::$dbMgr->Fetch($query3)) {
-									$tmpoutput2 .= "&nbsp;&nbsp;<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
+									$tmpoutput2 .= "&nbsp;&nbsp;".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"], $data3["ip"])."<br />";
 									$query4 = FS::$dbMgr->Select("node_nbt","nbname,domain,nbuser","mac = '".$data2["mac"]."' AND ip = '".$data3["ip"]."'");
 									if ($data4 = FS::$dbMgr->Fetch($query4)) {
-										if ($data4["domain"] != "")
-											$tmpoutput2 .= "&nbsp;&nbsp;\\\\<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["domain"]."\">".$data4["domain"]."</a>\\<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
-										else
-											$tmpoutput2 .= "&nbsp;&nbsp;<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"]."\">".$data4["nbname"]."</a><br />";
-										$tmpoutput2 .= "&nbsp;&nbsp;".($data4["nbuser"] == "" ? "[UNK]" : $data4["nbuser"])."@<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"]."\">".$data3["ip"]."</a><br />";
+										if ($data4["domain"] != "") {
+											$tmpoutput2 .= "&nbsp;&nbsp;\\\\".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["domain"], $data4["domain"]).
+												"\\".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"], $data4["nbname"])."<br />";
+										}
+										else {
+											$tmpoutput2 .= "&nbsp;&nbsp;".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data4["nbname"], $data4["nbname"])."<br />";
+										}
+										$tmpoutput2 .= "&nbsp;&nbsp;".($data4["nbuser"] == "" ? "[UNK]" : $data4["nbuser"])."@".
+											FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data3["ip"], $data3["ip"])."<br />";
 									}
 								}
 							}
@@ -1148,8 +1153,8 @@
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {
-							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
-								<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
+							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
+								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7",$this->loc->s("Go")));
 							return $output;
 						}
 					
@@ -1175,8 +1180,8 @@
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {
-							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />
-								<a href=\"index.php?mod=".$this->mid."&d=".$device."&sh=7\">".$this->loc->s("Go")."</a>");
+							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
+								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")));
 							return $output;
 						}
 					
@@ -1315,8 +1320,8 @@
 						if ($foundwif == 0) {
 							$foundwif = 1;
 						}
-						$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\"><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".
-							$data["name"]."</a></td><td>".$data["ip"]."</td><td>".
+						$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\">".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
+							"</td><td>".$data["ip"]."</td><td>".
 							$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".
 							$data["serial"]."</td>";
 						if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
@@ -1329,8 +1334,8 @@
 						if ($foundsw == 0) {
 							$foundsw = 1;
 						}
-						$outputswitch .= "<tr><td><a href=\"index.php?mod=".$this->mid."&d=".$data["name"]."\">".
-							$data["name"]."</a></td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>".
+						$outputswitch .= "<tr><td>".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
+							"</td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>".
 							$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
 							<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
 							FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {

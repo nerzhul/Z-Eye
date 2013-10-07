@@ -58,7 +58,7 @@
 					$output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !");
 					return $output;
 				}
-				$output .= "<a href=\"index.php?mod=".$this->mid."\">".$this->loc->s("Return")."</a><br />";
+				$output .= FS::$iMgr->aLink($this->mid, $this->loc->s("Return"))."<br />";
 			}
 
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
@@ -121,8 +121,8 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login");
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($found == false) $found = true;
-				$tmpoutput .= "<tr id=\"b".preg_replace("#[. ]#","-",$data["addr"]).$data["type"]."\"><td>
-					<a href=\"index.php?mod=".$this->mid."&bck=".$data["addr"]."&type=".$data["type"]."\">".$data["addr"]."</td><td>";
+				$tmpoutput .= "<tr id=\"b".preg_replace("#[. ]#","-",$data["addr"]).$data["type"]."\"><td>".
+					FS::$iMgr->aLink($this->mid."&bck=".$data["addr"]."&type=".$data["type"], $data["addr"])."</td><td>";
 				$bcktype = "";
 				switch($data["type"]) {
 					case 1: $bcktype = "TFTP"; break;
@@ -375,7 +375,7 @@
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-                                        "<br /><br /><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2\">".$this->loc->s("Go")."</a>");
+                                        "<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
 			}
 			return $output;
 		}

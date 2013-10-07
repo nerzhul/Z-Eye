@@ -63,11 +63,12 @@
 				$query = FS::$dbMgr->Select($this->sqlTable,"mac,ip,description,model",
 					"name ILIKE '".$search."' OR host(ip) = '".$search."' OR CAST(mac as varchar) = '".$search."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
-					$output = "<b>".$this->loc->s("Informations")."<i>: </i></b><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$search."\">".$search."</a> (";
+					$output = "<b>".$this->loc->s("Informations")."<i>: </i></b>".
+						FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$search, $search)." (";
 					if (strlen($data["mac"]) > 0) {
-						$output .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a> - ";
+						$output .= FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"])." - ";
 					}
-					$output .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".$data["ip"]."</a>)<br />";
+					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).")<br />";
 						"<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />";
 						"<b><i>".$this->loc->s("Description").": </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
 						
@@ -86,8 +87,8 @@
 						}
 						
 						if ($dname = FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$data["ip"]."'")) {
-							$output .= "<li> <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-								"&d=".$dname."&fltr=".$search."\">".$dname."</a> (".$data["description"].")<br />";
+							$output .= "<li> ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$dname."&fltr=".$search, $dname)." (".$data["description"].")<br />";
 						}
 					}
 					if ($found) {
@@ -260,14 +261,14 @@
 							$output .= FS::$iMgr->hr();
 						}
 						
-						$output .= $this->loc->s("Device").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-							"&d=".$device."\">".$device."</a><ul>";
+						$output .= $this->loc->s("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+							"&d=".$device, $device)."<ul>";
 						foreach ($devport as $port => $portdata) {
 							$convport = preg_replace("#\/#","-",$port);
-							$output .= "<li><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-								"&d=".$device."#".$convport."\">".$port."</a> ".
-								"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-								"&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ".
+							$output .= "<li>".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$device."#".$convport, $port)." ".
+								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$device."&p=".$port, FS::$iMgr->img("styles/images/pencil.gif",12,12))." ".
 								"<br /><b>".$this->loc->s("Description").":</b> ".$portdata[0];
 								
 							if ($portdata[1]) {
@@ -380,11 +381,12 @@
 					}
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
-					$output .= "<tr><td><a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"]."</a></td><td>".
-						"\\\\<a href=\"index.php?mod=".$this->mid."&s=".$data["domain"]."\">".$data["domain"]."</a>\\<a href=\"index.php?mod=".
-						$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a></td><td>".
-						($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ <a href=\"index.php?mod=".$this->mid."&s=".$data["ip"]."\">".
-						$data["ip"]."</a></td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
+					$output .= "<tr><td>".FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"])."</td><td>".
+						"\\\\".FS::$iMgr->aLink($this->mid."&s=".$data["domain"], $data["domain"])."\\".
+						FS::$iMgr->aLink($this->mid."&s=".$data["nbname"], $data["nbname"])."</td><td>".
+						($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ ".
+						FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).
+						"</td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
 					FS::$searchMgr->incResultCount();
 				}
 
@@ -408,9 +410,9 @@
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 
-					$output .= $this->loc->s("netbios-machine").": \\\\<a href=\"index.php?mod=".$this->mid.
-						"&s=".$data["domain"]."\">".$data["domain"]."</a>";
-						"\\<a href=\"index.php?mod=".$this->mid."&s=".$data["nbname"]."\">".$data["nbname"]."</a><br />";
+					$output .= $this->loc->s("netbios-machine").": \\\\".FS::$iMgr->aLink($this->mid.
+						"&s=".$data["domain"], $data["domain"]);
+						"\\".FS::$iMgr->aLink($this->mid."&s=".$data["nbname"], $data["nbname"])."<br />";
 						$this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
 						"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")";
 					FS::$searchMgr->incResultCount();
@@ -437,8 +439,8 @@
 					
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
-					$output .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["mac"]."\">".$data["mac"].
-						"</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0].
+					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"]).
+						"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0].
 						" ".$this->loc->s("and-the")." ".$lst[0].")";
 					FS::$searchMgr->incResultCount();
 				}
@@ -458,11 +460,11 @@
 							"ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 						$convport = preg_replace("#\/#","-",$data["port"]);
 						
-						$output .= "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ".
-							"[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".
-							$convport."\">".$data["port"]."</a>] ".
-							"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".
-							$data["port"]."\">".FS::$iMgr->img("styles/images/pencil.gif",10,10)."</a>";
+						$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch, $switch)." ".
+							"[".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".
+							$convport, $data["port"])."] ".
+							FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".
+							$data["port"], FS::$iMgr->img("styles/images/pencil.gif",10,10));
 							
 						if ($piece) {
 							$output .= "/ ".$this->loc->s("Plug")." ".$piece;
@@ -488,11 +490,11 @@
 					$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
 					$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 					$convport = preg_replace("#\/#","-",$data["port"]);
-					$output .=  "<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."\">".$switch."</a> ".
-						"[<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-						"&d=".$switch."#".$convport."\">".$data["port"]."</a>] ".
-						"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-						"&d=".$switch."&p=".$data["port"]."\">".FS::$iMgr->img("styles/images/pencil.gif",10,10)."</a>".
+					$output .=  FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch, $switch)." ".
+						"[".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+						"&d=".$switch."#".$convport, $data["port"])."] ".
+						FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+						"&d=".$switch."&p=".$data["port"], FS::$iMgr->img("styles/images/pencil.gif",10,10)).
 						($piece == NULL ? "" : " / Prise ".$piece);
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
@@ -553,14 +555,14 @@
 				}
 				if ($found) {
 					foreach ($devprise as $device => $devport) {
-						$output .= $this->loc->s("Device").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-							"&d=".$device."\">".$device."</a><ul>";
+						$output .= $this->loc->s("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+							"&d=".$device, $device)."<ul>";
 						foreach ($devport as $port => $values) {
 							$convport = preg_replace("#\/#","-",$port);
-							$output .= "<li><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-								"&d=".$device."#".$convport."\">".$port."</a> ".
-								"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-								"&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ".
+							$output .= "<li>".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$device."#".$convport, $port)." ".
+								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$device."&p=".$port, FS::$iMgr->img("styles/images/pencil.gif",12,12))." ".
 								"<br /><b>".$this->loc->s("Plug").":</b> ".$values["plug"];
 							if ($values["desc"]) {
 								$output .= "<br /><b>".$this->loc->s("Description").":</b> ".$values["desc"];
@@ -622,14 +624,14 @@
 				}
 				if ($found) {
 					foreach ($devroom as $device => $devport) {
-						$output .= $this->loc->s("Device").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-							"&d=".$device."\">".$device."</a><ul>";
+						$output .= $this->loc->s("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+							"&d=".$device, $device)."<ul>";
 						foreach ($devport as $port => $values) {
 							$convport = preg_replace("#\/#","-",$port);
-							$output .= "<li><a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-								"&d=".$device."#".$convport."\">".$port."</a> ".
-								"<a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("switches").
-								"&d=".$device."&p=".$port."\">".FS::$iMgr->img("styles/images/pencil.gif",12,12)."</a> ".
+							$output .= "<li>".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$device."#".$convport, $port)." ".
+								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+								"&d=".$device."&p=".$port, FS::$iMgr->img("styles/images/pencil.gif",12,12))." ".
 								"<br /><b>".$this->loc->s("Room").":</b> ".$values["room"];
 							if ($values["desc"]) {
 								$output .= "<br /><b>".$this->loc->s("Description").":</b> ".$values["desc"];

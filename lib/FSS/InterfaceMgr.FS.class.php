@@ -190,6 +190,13 @@
 			return sprintf("<div id=\"backarrow\"><a href=\"javascript:history.back()\">%s</a></div>",
 				FS::$iMgr->img("styles/back.png",32,32));
 		}
+		
+		public function aLink($link,$label,$raw=false) {
+			return sprintf("<a href=\"%s\">%s</a>",
+				$raw ? $link : sprintf("index.php?mod=%s",$link),
+				$label
+			);
+		}
 
 		public function h1($str,$raw=false,$id="") {
 			return sprintf("<h1%s>%s</h1>",

@@ -69,7 +69,8 @@
 					$found = 1;
 					$tmpoutput .= "<table id=\"groupList\"><thead><tr><th class=\"headerSortDown\">GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr></thead>";
 				}
-				$tmpoutput .= "<tr id=\"gr".$data["gid"]."tr\"><td>".$data["gid"]."</td><td><a href=\"index.php?mod=".$this->mid."&g=".$data["gname"]."\">".$data["gname"]."</a></td><td>".
+				$tmpoutput .= "<tr id=\"gr".$data["gid"]."tr\"><td>".$data["gid"]."</td><td>".
+					FS::$iMgr->aLink($this->mid."&g=".$data["gname"], $data["gname"])."</td><td>".
 					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gname=".$data["gname"],array("js" => true, 
 						"confirm" => array($this->loc->s("confirm-removegrp")."'".$data["gname"]."' ?","Confirm","Cancel")))."</td></tr>";

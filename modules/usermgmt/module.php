@@ -135,7 +135,7 @@
 		}
 
 		private function showUserTr($uid, $username = "", $localuser = false, $subname = "", $name = "", $mail = "",$last_ip = "",$last_conn = "", $join_date = "") {
-			$output = "<tr id=\"u".$uid."tr\"><td>".$uid."</td><td><a href=\"index.php?mod=".$this->mid."&user=".$username."\">".$username."</a></td><td>".
+			$output = "<tr id=\"u".$uid."tr\"><td>".$uid."</td><td>".FS::$iMgr->aLink($this->mid."&user=".$username, $username)."</td><td>".
 				($localuser ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
 			while ($data = FS::$dbMgr->Fetch($query)) {

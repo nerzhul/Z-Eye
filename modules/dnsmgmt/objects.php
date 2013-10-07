@@ -2154,7 +2154,7 @@
 							default: $output .= $this->loc->s("Other")." (".$data["rectype"]."): "; break;
 						}
 						if (FS::$secMgr->isIP($data["recval"])) {
-							$output .= "<a href=\"index.php?mod=".$this->mid."&s=".$data["recval"]."\">".$data["recval"]."</a>";
+							$output .= FS::$iMgr->aLink($this->mid."&s=".$data["recval"], $data["recval"]);
 						}
 						else {
 							$output .= $data["recval"];

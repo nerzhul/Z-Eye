@@ -170,8 +170,8 @@
 				if (FS::$secMgr->isNumeric($search)) {
 					$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,subnet_short_name","vlanid = '".$search."'");
 					if ($data = FS::$dbMgr->Fetch($query)) {
-						$output .= $this->loc->s("subnet-shortname").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("ipmanager").
-							"&sh=2\">".$data["subnet_short_name"]."</a><br />".
+						$output .= $this->loc->s("subnet-shortname").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager").
+							"&sh=2", $data["subnet_short_name"])."<br />".
 							$this->loc->s("netid").": ".$data["netid"]."<br />".
 							$this->loc->s("netmask").": ".$data["netmask"]."<br />";
 						FS::$searchMgr->incResultCount();
@@ -187,8 +187,8 @@
 					if ($found == false) {
 						$found = true;
 					}
-					$output .= $this->loc->s("vlanid").": <a href=\"index.php?mod=".FS::$iMgr->getModuleIdByPath("ipmanager").
-						"&sh=2\">".$data["vlanid"]."</a><br />".
+					$output .= $this->loc->s("vlanid").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager").
+						"&sh=2>", $data["vlanid"])."<br />".
 						$this->loc->s("netid").": ".$data["netid"]."<br />".
 						$this->loc->s("netmask").": ".$data["netmask"]."<br />";
 					FS::$searchMgr->incResultCount();
@@ -207,8 +207,8 @@
 					if ($found == false) {
 						$found = true;
 					}
-					$output .= "<b>".$this->loc->s("subnet-shortname")."</b>: <a href=\"index.php?mod=".
-						FS::$iMgr->getModuleIdByPath("ipmanager")."&sh=2\">".$data["subnet_short_name"]."</a><br />".
+					$output .= "<b>".$this->loc->s("subnet-shortname")."</b>: ".
+						FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager")."&sh=2", $data["subnet_short_name"])."<br />".
 						"<b>".$this->loc->s("netid")."</b>: ".$data["netid"]."<br />".
 						"<b>".$this->loc->s("netmask")."</b>: ".$data["netmask"]."<br />".
 						"<b>".$this->loc->s("vlanid")."</b>: ".$data["vlanid"]."<br />";
@@ -416,8 +416,8 @@
 					}
 
 					if (strlen($data["ip"]) > 0) {
-						$output .= $this->loc->s("link-ip").": <a href=\"index.php?mod=".$this->mid.
-							"&s=".$data["ip"]."\">".$data["ip"]."</a><br />";
+						$output .= $this->loc->s("link-ip").": ".FS::$iMgr->aLink($this->mid.
+							"&s=".$data["ip"], $data["ip"])."<br />";
 					}
 							
 					if (strlen($data["hostname"]) > 0) {
@@ -425,8 +425,8 @@
 					}
 
 					if (strlen($data["macaddr"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".$this->mid.
-							"&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".FS::$iMgr->aLink($this->mid.
+							"&s=".$data["macaddr"], $data["macaddr"])."<br />";
 					}
 
 					if (strlen($data["comment"]) > 0) {
@@ -461,8 +461,8 @@
 					}
 					
 					if (strlen($data["macaddr"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".
-							$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".
+							FS::$iMgr->aLink($this->mid."&s=".$data["macaddr"], $data["macaddr"])."<br />";
 					}
 					$output .= "<b>".$this->loc->s("attribution-type")."</b>: ".
 						($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
@@ -495,8 +495,8 @@
 					}
 
 					if (strlen($data["macaddr"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: <a href=\"index.php?mod=".
-							$this->mid."&s=".$data["macaddr"]."\">".$data["macaddr"]."</a><br />";
+						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".
+							FS::$iMgr->aLink($this->mid."&s=".$data["macaddr"], $data["macaddr"])."<br />";
 					}
 
 					$output .= "<b>".$this->loc->s("attribution-type")."</b>: ".
