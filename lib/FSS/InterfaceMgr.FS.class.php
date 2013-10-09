@@ -880,7 +880,15 @@
 		public function getCurModule() { return $this->cur_module; }
 
 		public function setCurrentModule($module) { $this->cur_module = $module; }
-		public function setTitle($title) { $this->title = $title; }
+		public function setTitle($title) { 
+			$this->title = $title;
+			if (FS::isAjaxCall()) {
+				$this->js(sprintf("document.title='%s%s';",
+					addslashes(Config::getWebsiteName()),
+					addslashes(strlen($this->title) > 0 ? " - ".$this->title : "")
+				));
+			}
+		}
 
 		protected $cur_module;
 		private $arr_css;
