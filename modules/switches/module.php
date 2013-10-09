@@ -969,17 +969,24 @@
 							$poearr[$data["port"]] = $data["class"];
 					}
 
-					$prisearr = array();
-					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","port,prise","ip = '".$dip."'");
-					while ($data = FS::$dbMgr->Fetch($query))
-						$prisearr[$data["port"]] = $data["prise"];
+					$plugAndRoomsarr = array();
+					$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."switch_port_prises","port,prise,room","ip = '".$dip."'");
+					while ($data = FS::$dbMgr->Fetch($query)) {
+						$plugAndRoomsarr[$data["port"]] = array($data["prise"],$data["room"]);
+					}
 
 					$found = 0;
 					if ($iswif == false) {
 						// Script pour modifier le nom de la prise
-						$output .= FS::$iMgr->js("function modifyPrise(src,sbmit,sw_,swport_,swpr_) {
+						FS::$iMgr->js("function modifyPlug(src,sbmit,sw_,swport_,swpr_) {
 						if (sbmit == true) {
 						$.post('index.php?at=3&mod=".$this->mid."&d=".$device."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) {
+						$(src+'l').html(data); $(src+' a').toggle();
+						}); }
+						else $(src).toggle(); }
+						function modifyRoom(src,sbmit,sw_,swport_,swproom_) {
+						if (sbmit == true) {
+						$.post('index.php?at=3&mod=".$this->mid."&d=".$device."&act=26', { sw: sw_, swport: swport_, room: document.getElementsByName(swproom_)[0].value }, function(data) {
 						$(src+'l').html(data); $(src+' a').toggle();
 						}); }
 						else $(src).toggle(); }");
@@ -1005,31 +1012,45 @@
 
 						if ($found == 0) $found = 1;
 						$convport = preg_replace("#\/#","-",$data["port"]);
-						$swpdata = (isset($prisearr[$data["port"]]) ? $prisearr[$data["port"]] : "");
+						$plug = (isset($plugAndRoomsarr[$data["port"]]) ? $plugAndRoomsarr[$data["port"]][0] : "");
+						$room = (isset($plugAndRoomsarr[$data["port"]]) ? $plugAndRoomsarr[$data["port"]][1] : "");
 						$tmpoutput2 = "<tr id=\"".$convport."\"><td>".
 							FS::$iMgr->aLink($this->mid."&d=".$device."&p=".$data["port"], $data["port"])."</td><td>";
 
 						// Editable Desc
-						$tmpoutput2 .= $data["name"]."</td><td>";
-						// Editable piece
-						$tmpoutput2 .= "<div id=\"swpr_".$convport."\">";
-						$tmpoutput2 .= "<a onclick=\"javascript:modifyPrise('#swpr_".$convport." a',false);\"><div id=\"swpr_".$convport."l\" class=\"modport\">";
-						$tmpoutput2 .= ($swpdata == "" ? "Modifier" : $swpdata);
-						$tmpoutput2 .= "</div></a><a style=\"display: none;\">";
-						$tmpoutput2 .= FS::$iMgr->input("swprise-".$convport,$swpdata,10,10);
-						$tmpoutput2 .= "<input class=\"buttonStyle\" type=\"button\" value=\"OK\" onclick=\"javascript:modifyPrise('#swpr_".$convport."',true,'".$dip."','".$data["port"]."','swprise-".$convport."');\" />";
-						$tmpoutput2 .= "</a></div>";
-						$tmpoutput2 .= "</td><td>";
+						$tmpoutput2 .= $data["name"]."</td>";
+						// Editable plug
+						$tmpoutput2 .= "<td><div id=\"swpr_".$convport."\">".
+							"<a onclick=\"javascript:modifyPlug('#swpr_".$convport." a',false);\"><div id=\"swpr_".$convport."l\" class=\"modport\">".
+							($plug == "" ? $this->loc->s("Modify") : $plug).
+							"</div></a><a style=\"display: none;\">".
+							FS::$iMgr->input("swprise-".$convport,$plug,10,10).
+							FS::$iMgr->button("Save","OK","javascript:modifyPlug('#swpr_".$convport.
+								"',true,'".$dip."','".$data["port"]."','swprise-".$convport."');").
+							"</a></div></td>";
+						// Editable room
+						$tmpoutput2 .= "<td><div id=\"swproom_".$convport."\">".
+							"<a onclick=\"javascript:modifyRoom('#swpr_".$convport." a',false);\"><div id=\"swproom_".$convport."l\" class=\"modport\">".
+							($plug == "" ? $this->loc->s("Modify") : $plug).
+							"</div></a><a style=\"display: none;\">".
+							FS::$iMgr->input("swroom-".$convport,$room,10,10).
+							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#swproom_".$convport.
+								"',true,'".$dip."','".$data["port"]."','swroom-".$convport."');").
+							"</a></div></td><td>".
 						// Editable state
 						$tmpoutput2 .= "<div id=\"swst_".$convport."\">";
-						if ($data["up_admin"] == "down")
+						if ($data["up_admin"] == "down") {
 							$tmpoutput2 .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
-						else if ($data["up_admin"] == "up" && $data["up"] == "down")
+						}
+						else if ($data["up_admin"] == "up" && $data["up"] == "down") {
 							$tmpoutput2 .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
-						else if ($data["up"] == "up")
+						}
+						else if ($data["up"] == "up") {
 							$tmpoutput2 .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
-						else
+						}
+						else {
 							$tmpoutput2 .= "unk";
+						}
 						$tmpoutput2 .= "</td><td>";
 						if ($iswif == false) {
 
@@ -2156,6 +2177,11 @@
 					case 25:
 						$portObj = new netDevicePort();
 						$portObj->injectPlugRoomCSV();
+						return;
+					// Room fast edit
+					case 26:
+						$netRoom = new netRoom();
+						$netRoom->FastModify();					
 						return;
 				default: break;
 			}

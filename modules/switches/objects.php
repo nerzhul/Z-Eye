@@ -587,6 +587,7 @@
 			$this->devPortTable = "device_port";
 			$this->deviceTable = "device";
 			$this->readRight = "mrule_switches_read";
+			$this->readRight = "mrule_switches_write";
 		}
 		
 		public function search($search, $autocomplete = false) {
@@ -645,7 +646,55 @@
 			}
 		}
 		
+		protected function canWrite() {
+			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_write") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->deviceIP."_write")) {
+				return false;
+			}
+		}
+		public function FastModify() {
+			$this->devicePort = FS::$secMgr->checkAndSecurisePostData("swport");
+			$this->deviceIP = FS::$secMgr->checkAndSecurisePostData("sw");
+			$room = FS::$secMgr->checkAndSecurisePostData("room");
+			if ($port == NULL || $dip == NULL) {
+				$this->log(2,"Some fields are missing (plug fast edit)");
+				echo "ERROR";
+				return;
+			}
+			
+			$this->device = FS::$dbMgr->GetOneData("device","name","ip = '".$this->deviceIP."'");
+			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("NORIGHTS");
+				return;	
+			}
+
+			if ($room == NULL) {
+				$room = "";
+			}
+			
+			$portObj = new netDevicePort();
+			if (!$portObj->Load($this->device,$this->devicePort)) {
+				echo "ERROR";
+				return;
+			}
+			
+			$portObj->setRoom($room);
+			$portObj->SaveRoomAndPlug();
+
+			// Return text for AJAX call
+			$this->log(0,"Set room for device '".$this->deviceIP."' to '".$room."' on port '".$this->devicePort."'");
+			if ($room == "") {
+				$room = $this->loc->s("Modify");
+			}
+			echo $room;
+		}
+		
 		private $deviceTable;
 		private $devPortTable;
+		private $device;
+		private $deviceIP;
+		private $devicePort;
+		private $snmprw;
 	};
 ?>
