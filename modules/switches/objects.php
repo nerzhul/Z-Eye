@@ -587,7 +587,7 @@
 			$this->devPortTable = "device_port";
 			$this->deviceTable = "device";
 			$this->readRight = "mrule_switches_read";
-			$this->readRight = "mrule_switches_write";
+			$this->writeRight = "mrule_switches_write";
 		}
 		
 		public function search($search, $autocomplete = false) {
