@@ -250,7 +250,7 @@
 					if (!isset($devportname[$swname]))
 						$devportname[$swname] = array();
 
-					$devportname[$swname][$data["port"]] = array($data["prise"],$prise);
+					$devportname[$swname][$data["port"]] = array($data["name"],$prise);
 				}
 
 				if ($found) {
@@ -656,7 +656,7 @@
 			$this->devicePort = FS::$secMgr->checkAndSecurisePostData("swport");
 			$this->deviceIP = FS::$secMgr->checkAndSecurisePostData("sw");
 			$room = FS::$secMgr->checkAndSecurisePostData("room");
-			if ($port == NULL || $dip == NULL) {
+			if ($this->devicePort || $this->deviceIP == NULL) {
 				$this->log(2,"Some fields are missing (plug fast edit)");
 				echo "ERROR";
 				return;

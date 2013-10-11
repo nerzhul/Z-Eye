@@ -994,15 +994,22 @@
 					$tmpoutput = "<table id=\"tportList\"><thead><tr><th class=\"headerSortDown\">".
 						FS::$iMgr->aLink($this->mid."&d=".$device."&od=port", "Port")."</th><th>";
 					$tmpoutput .= $this->loc->s("Description")."</th>
-						<th>".$this->loc->s("Plug")."</th><th>Up (Link/Admin)</th>";
-					if ($iswif == false)
+						<th>".$this->loc->s("Plug")."</th><th>".$this->loc->s("Room")."</th><th>Up (Link/Admin)</th>";
+					if ($iswif == false) {
 						$tmpoutput .= "<th>".$this->loc->s("Duplex")." (Link/Admin)</th>";
+					}
 					$tmpoutput .= "<th>Vitesse</th>";
-					if ($iswif == false)
+					if ($iswif == false) {
 						$tmpoutput .= "<th>POE</th>";
+					}
 					$tmpoutput .= "<th>";
-					if ($iswif == true) $tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
-					else $tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr></thead>";
+					if ($iswif == true) {
+						$tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
+					}
+					else {
+						$tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr></thead>";
+					}
+
 					$query = FS::$dbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",array("order" => $od));
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						if (preg_match("#unrouted#",$data["port"]))
@@ -1030,15 +1037,15 @@
 							"</a></div></td>";
 						// Editable room
 						$tmpoutput2 .= "<td><div id=\"swproom_".$convport."\">".
-							"<a onclick=\"javascript:modifyRoom('#swpr_".$convport." a',false);\"><div id=\"swproom_".$convport."l\" class=\"modport\">".
-							($plug == "" ? $this->loc->s("Modify") : $plug).
+							"<a onclick=\"javascript:modifyRoom('#swproom_".$convport." a',false);\"><div id=\"swproom_".$convport."l\" class=\"modport\">".
+							($room == "" ? $this->loc->s("Modify") : $room).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("swroom-".$convport,$room,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#swproom_".$convport.
 								"',true,'".$dip."','".$data["port"]."','swroom-".$convport."');").
-							"</a></div></td><td>".
+							"</a></div></td>";
 						// Editable state
-						$tmpoutput2 .= "<div id=\"swst_".$convport."\">";
+						$tmpoutput2 .= "<td><div id=\"swst_".$convport."\">";
 						if ($data["up_admin"] == "down") {
 							$tmpoutput2 .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
 						}
