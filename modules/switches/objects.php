@@ -250,7 +250,7 @@
 					if (!isset($devportname[$swname]))
 						$devportname[$swname] = array();
 
-					$devportname[$swname][$data["port"]] = array($data["prise"],$prise);
+					$devportname[$swname][$data["port"]] = array($data["name"],$prise);
 				}
 
 				if ($found) {
