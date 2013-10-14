@@ -428,4 +428,167 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 					if ip in Network("%s/%s" % (idx[0],idx[1])):
 						ipList.append(ip)
 				self.subnetList[idx[0]] = (idx[1],ipList,idx[2],idx[3],idx[4],idx[5],idx[6],idx[7])
+				
+class ZEyeDHCPRadiusSyncer:
+	radiusList = {}
+	subnetList = {}
+	
+	def __init__(self):
+		""" 1 min between two DHCP updates """
+		self.sleepingTimer = 300
+		ZEyeUtil.Thread.__init__(self)
+
+	def run(self):
+		Logger.ZEyeLogger().write("DHCP/Radius Sync launched")
+		while True:
+			self.syncDHCPAndRadius()
+			time.sleep(self.sleepingTimer)
+	
+	def syncDHCPAndRadius(self):
+		Logger.ZEyeLogger().write("DHCP/Radius Sync started")
+		starttime = datetime.datetime.now()
+		try:
+			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgcursor = pgsqlCon.cursor()
+			pgcursor.execute("SELECT dbname,addr,port,groupname,subnet FROM z_eye_radius_dhcp_import")
+			pgres = pgcursor.fetchall()
+			if pgcursor.rowcount > 0:
+				# Buffer for better performances
+				self.loadRadiusList(pgcursor)
+				self.loadMACList(pgcursor)
+				for idx in pgres:
+					if len(idx[0]) > 0 and len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
+						thread.start_new_thread(self.doSyncDHCPRadius,(idx[0],idx[1],idx[2],idx[3],idx[4]))
+		except Exception, e:
+			Logger.ZEyeLogger().write("DHCP/Radius Sync: FATAL %s" % e)
+			sys.exit(1);	
+
+		finally:
+			if pgsqlCon:
+				pgsqlCon.close()
+		
+		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
+		time.sleep(1)
+		while self.getThreadNb() > 0:
+			time.sleep(1)
+
+		totaltime = datetime.datetime.now() - starttime
+		Logger.ZEyeLogger().write("DHCP/Radius Sync done (time: %s)" % totaltime)
+
+	def doSyncDHCPRadius(self,dbname,addr,port,groupname,subnet):
+		self.incrThreadNb()
+		
+		# We test if Radius has been loaded
+		if addr not in self.radiusList or port not in self.radiusList[addr] or dbname not in self.radiusList[addr][port]:
+			Logger.ZEyeLogger().write("DHCP/Radius Sync: Warning %s cannot be sync with radius (%s:%s/%s). Radius not exists" % (subnet,addr,port,dbname))
+			self.decrThreadNb()
+			return
+		
+		dbtype = self.radiusList[addr][port][dbname][2]
+		login = self.radiusList[addr][port][dbname][0]
+		pwd = self.radiusList[addr][port][dbname][1]
+		
+		# DB can only be MySQL or PgSQL
+		if dbtype != "my" and dbtype != "pg":
+			Logger.ZEyeLogger().write("DHCP/Radius Sync: Warning %s is not a valid DB type" % dbtype)
+			self.decrThreadNb()
+			return
+		
+		radCon = None
+		pgsqlCon = None
+		try:
+			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			if pgsqlCon == None:
+				Logger.ZEyeLogger().write("DHCP/Radius Sync: unable to connect to Z-Eye database" % (addr,port,dbname))
+				self.decrThreadNb()
+				return
+			
+			pgcursor = pgsqlCon.cursor()
+			
+			if dbtype == "pg":
+				radCon = PgSQL.connect(host=addr,user=login,passwordpwd,database=dbname)
+				if radCon == None:
+					Logger.ZEyeLogger().write("DHCP/Radius Sync: unable to connect to %s:%s/%s" % (addr,port,dbname))
+					self.decrThreadNb()
+					return
+				
+				radCursor = radCon.cursor()
+				
+				maxId = 1
+				radCursor.execute("SELECT MAX(id) FROM radcheck")
+				radRes = radCursor.fetchOne()
+				if radRes != None:
+					maxId = radRes[0]
+				
+				for mac in self.subnetList[subnet]:
+					maxId += 1
+					radCursor.execute("DELETE FROM radusergroup WHERE username = '%s'" % mac)
+					radCursor.execute("DELETE FROM radcheck WHERE username = '%s'" % mac)
+					radCursor.execute("INSERT INTO radusergroup(username,groupname,priority) VALUES ('%s','%s','0')" % (mac,groupname))
+					radCursor.execute("INSERT INTO radcheck(id,username,attribute,op,value) VALUES ('%s','%s','Auth-Type',':=','Accept')" % (maxId,mac))
+					
+			elif dbtype == "my":
+				#@TODO
+				Logger.ZEyeLogger().write("DHCP/Radius Sync: MySQL not handled")
+				
+		except Exception, e:
+			Logger.ZEyeLogger().write("DHCP/Radius Sync: doSyncDHCPRadius FATAL %s" % e)
+		finally:
+			if pgsqlCon:
+				pgsqlCon.close()
+			if radCon:
+				if dbtype == "pg":
+					radCon.close()
+				elif dbtype == "my":
+					# @TODO
+					Logger.ZEyeLogger().write("DHCP/Radius Sync: MySQL not handled")
+
+			self.decrThreadNb()
+
+	
+	def loadMACList(self,pgcursor):
+		self.subnetList = {}
+		
+		# We load required subnets from cache and IPM
+		pgcursor.execute("SELECT netid FROM z_eye_dhcp_subnet_cache WHERE netid in (SELECT subnet FROM z_eye_radius_dhcp_import)")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] not in self.subnetList:
+				self.subnetList = []
+		
+		pgcursor.execute("SELECT netid FROM dhcp_subnet_v4_declared WHERE netid in (SELECT subnet FROM z_eye_radius_dhcp_import)")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] not in self.subnetList:
+				self.subnetList = []
+		
+		for subnet in self.subnetList:
+			# Then we load all MAC addr informations (per subnet), from cache
+			pgcursor.execute("SELECT macaddr FROM z_eye_dhcp_ip_cache WHERE netid = '%s'" % subnet)
+			pgres = pgcursor.fetchall()
+			for idx in pgres:
+				if idx[0] not in self.subnetList[subnet]:
+					self.subnetList[subnet].append(idx[0])
+			"""		
+			# And from IPM, we need to check if IP is in net
+			pgcursor.execute("SELECT macaddr FROM z_eye_dhcp_ip WHERE netid = '%s'" % subnet)
+			pgres = pgcursor.fetchall()
+			for idx in pgres:
+				if idx[0] not in self.subnetList[subnet]:
+					self.subnetList[subnet].append(idx[0])
+			"""
+	
+	def loadRadiusList(self,pgcursor):
+		self.radiusList = {}
+		pgcursor.execute("SELECT addr,port,dbname,login,pwd,dbtype FROM z_eye_radius_db_list")
+		pgres = pgcursor.fetchall()
+		for idx in pgres:
+			if idx[0] not in self.radiusList:
+				self.radiusList[idx[0]] = {}
+			if idx[1] not in self.radiusList[idx[0]]:
+				self.radiusList[idx[0]][idx[1]] = {}
+			if idx[5] == "pg" or idx[5] == "my":
+				self.radiusList[idx[0]][idx[1]][idx[2]] = (idx[3],idx[4],idx[5])
+			else:
+				Logger.ZEyeLogger().write("DHCP/Radius Sync: Warning %s is not a valid DB type (%s:%s/%s)" % (idx[0],idx[1],idx[2]))
 
