@@ -1299,6 +1299,7 @@
 			}
 
 			protected function showDeviceList() {
+				FS::$iMgr->setURL("");
 				$output = "";
 				$err = FS::$secMgr->checkAndSecuriseGetData("err");
 				switch($err) {
