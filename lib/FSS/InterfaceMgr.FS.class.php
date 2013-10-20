@@ -783,8 +783,13 @@
 			$this->js(sprintf("$('#%s').accordion({heightStyle: 'content'});",$accId));
 			return $output;
 		}
+		
+		public function setURL($url) {
+			$this->js(sprintf("window.history.pushState('', '', '/index.php?mod=%s%s');", 
+				$this->cur_module->getModuleId(),
+				strlen($url) > 0 ? "&".$url : ""));
+		}
 
-		// Simple methods
 		public function stylesheet($path) {
 			$this->arr_css[count($this->arr_css)] = $path;
 		}

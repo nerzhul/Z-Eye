@@ -66,6 +66,7 @@
 		}
 
 		private function showStats() {
+			FS::$iMgr->setURL("sh=1");
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
@@ -416,9 +417,12 @@
 		}
 
 		private function showAdvancedTools() {
+			FS::$iMgr->setURL("sh=4");
+			
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_advancedtools")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
+			
 			$output = FS::$iMgr->h4("title-search-old");
 			$output .= FS::$iMgr->cbkForm("2");
 			$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
@@ -428,6 +432,8 @@
 		}
 
 		private function showDHCPOptsMgmt() {
+			FS::$iMgr->setURL("sh=5");
+			
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt") &&
 				!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
@@ -601,6 +607,8 @@
 		}
 
 		private function showSubnetMgmt() {
+			FS::$iMgr->setURL("sh=2");
+			
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}
@@ -835,6 +843,8 @@
 		}
 
 		private function showDHCPMgmt() {
+			FS::$iMgr->setURL("sh=3");
+			
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
 			}

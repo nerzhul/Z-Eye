@@ -26,6 +26,7 @@
 		}
 
 		public function Load() {
+			FS::$iMgr->setURL("");
 			FS::$iMgr->setTitle($this->loc->s("title-mgmt"));
 			$output = "";
 

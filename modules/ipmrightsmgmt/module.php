@@ -59,6 +59,8 @@
 		}
 
 		private function showSubnetRights($subnet) {
+			FS::$iMgr->setURL("sh=2");
+			
 			$output = "";	
 			$found = false;
 
@@ -96,6 +98,8 @@
 		}
 
 		private function showGlobalRights() {
+			FS::$iMgr->setURL("sh=1");
+			
 			$output = "";	
 			$found = false;
 

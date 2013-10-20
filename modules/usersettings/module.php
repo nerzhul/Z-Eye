@@ -23,6 +23,8 @@
 		}
 		
 		public function Load() {
+			FS::$iMgr->setURL("");
+			
 			$output = FS::$iMgr->h1("Settings").
 				$this->showAndroidForm();
 

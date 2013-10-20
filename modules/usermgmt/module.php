@@ -83,6 +83,7 @@
 		}
 
 		private function showMain() {
+			FS::$iMgr->setURL("");
 			$output = FS::$iMgr->h1("title-usermgmt");
 
 			if (FS::$sessMgr->hasRight("mrule_usermgmt_ldapuserimport")) {

@@ -28,8 +28,7 @@
 
 		public function Load() {
 			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
-			$output = $this->showTabPanel();
-			return $output;
+			return $this->showTabPanel();
 		}
 
 		private function showTabPanel() {
@@ -58,7 +57,9 @@
 				return $output;
 			}
 			
-			if (!$sh) $sh = 1;
+			if (!$sh) {
+				$sh = 1;
+			}
 			
 			switch($sh) {
 				case 1: $output .= $this->showGeneralTab(); break;
@@ -75,12 +76,15 @@
 		}
 
 		private function showGeneralTab() {
+			FS::$iMgr->setURL("index.php?mod=".$this->mid."&sh=1");
 			$output = FS::$iMgr->printError($this->loc->s("not-implemented"));
 			
 			return $output;
 		}
 
 		private function showHostsTab() {
+			FS::$iMgr->setURL("sh=2");
+			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			}
@@ -166,6 +170,7 @@
 		}
 
 		private function showHostgroupsTab() {
+			FS::$iMgr->setURL("sh=3");
 			if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			}
@@ -236,13 +241,17 @@
 		}
 
 		private function showServicesTab() {
-			if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+			FS::$iMgr->setURL("sh=4");
+			
+			if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
 
 			$output = "";
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) 
+			if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 				$output .= FS::$iMgr->opendiv(5,$this->loc->s("new-service"));
+			}
 
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,template","",array("order" => "name"));
@@ -368,8 +377,11 @@
 		}
 
 		private function showTimeperiodsTab() {
-			if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) 
+			FS::$iMgr->setURL("sh=5");
+			
+			if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
 			$output = "";
 			
 			/*
@@ -479,12 +491,17 @@
 		}
 
 		private function showContactsTab() {
-			if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) 
+			FS::$iMgr->setURL("sh=6");
+			
+			if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
+			
 			$output = "";
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+			if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 				$output .= FS::$iMgr->opendiv(7,$this->loc->s("new-contact"));
+			}
 
 			/*
 			 * Command table
@@ -570,16 +587,17 @@
 		}
 
 		private function showContactgroupsTab() {
-			if (!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) 
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
-			$output = "";
+			FS::$iMgr->setURL("sh=7");
 			
-			/*
-			 * Ajax new contactgroup
-			 */
+			if (!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
+				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+			}
+			
+			$output = "";
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+			if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
 				$output .= FS::$iMgr->opendiv(8,$this->loc->s("new-contactgroup"));
+			}
 
 			/*
 			 * Contactgroup table
@@ -623,6 +641,8 @@
 		}
 
 		private function showCommandTab() {
+			FS::$iMgr->setURL("sh=8");
+			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			}

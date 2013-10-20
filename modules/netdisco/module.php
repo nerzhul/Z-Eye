@@ -31,6 +31,8 @@
 		}
 
 		private function showMain() {
+			FS::$iMgr->setURL("");
+			
 			$output = FS::$iMgr->h1("title-netdisco");
 			$output .= FS::$iMgr->cbkForm("1");
 			$file = file("/usr/local/etc/netdisco/netdisco.conf");
