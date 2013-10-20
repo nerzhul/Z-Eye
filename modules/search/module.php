@@ -41,6 +41,10 @@
 		public function LoadForAndroid() {
 			$search = FS::$secMgr->checkAndSecurisePostData("s");
 			if (!$search) {
+				$search = FS::$secMgr->checkAndSecuriseGetData("s");
+			}
+			
+			if (!$search) {
 				return NULL;
 			}
 			FS::$searchMgr->setMode(1);
