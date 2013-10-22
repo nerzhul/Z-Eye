@@ -26,14 +26,8 @@
 		}
 
 		public function Load() {
-			$output = "";
-
-			$user = FS::$secMgr->checkAndSecuriseGetData("user");
-			if ($user)
-				$output .= $this->EditUser($user);
-			else
-				$output .= $this->showMain();
-			return $output;
+			FS::$iMgr->setURL("");
+			return $this->showMain();
 		}
 
 		private function EditUser($user) {
@@ -63,15 +57,15 @@
                         $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("Add-to-new-group"),"addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
                         $output .= "</ul></form>";
 
-			FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
-                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Groupe")).
-					$this->addGroupList()."</select><a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a> </li>').
-                   		     		insertBefore('#formactions');
-                                		grpidx++;
-                               		}
-	                                function delGrpElmt(grpidx) {
-               	                        	$('.ugroupli'+grpidx).remove();
-        	                        }");
+			FS::$iMgr->js("var grpidx = ".$grpidx."; function addGrpForm() {
+				$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Groupe")).
+				$this->addGroupList()."</select><a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a> </li>').
+				insertBefore('#formactions');
+					grpidx++;
+				}
+				function delGrpElmt(grpidx) {
+						$('.ugroupli'+grpidx).remove();
+				}");
 			return $output;
 		}
 
@@ -83,7 +77,7 @@
 		}
 
 		private function showMain() {
-			FS::$iMgr->setURL("");
+			
 			$output = FS::$iMgr->h1("title-usermgmt");
 
 			if (FS::$sessMgr->hasRight("mrule_usermgmt_ldapuserimport")) {
@@ -136,7 +130,8 @@
 		}
 
 		private function showUserTr($uid, $username = "", $localuser = false, $subname = "", $name = "", $mail = "",$last_ip = "",$last_conn = "", $join_date = "") {
-			$output = "<tr id=\"u".$uid."tr\"><td>".$uid."</td><td>".FS::$iMgr->aLink($this->mid."&user=".$username, $username)."</td><td>".
+			$output = "<tr id=\"u".$uid."tr\"><td>".$uid.
+				"</td><td>".FS::$iMgr->opendiv(4,$username,array("lnkadd" => "user=".$username))."</td><td>".
 				($localuser ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -312,8 +307,16 @@
 				case 2: return $this->showDirectoryForm();
 				case 3: 
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-					if (!$addr) return $this->loc->s("err-bad-datas");
+					if (!$addr) {
+						return $this->loc->s("err-bad-datas");
+					}
 					return $this->showDirectoryForm($addr);
+				case 4:
+					$user = FS::$secMgr->checkAndSecuriseGetData("user");
+					if (!$user) {
+						return $this->loc->s("err-bad-datas");
+					}
+					return $this->EditUser($user);
 				default: return;
 			}
 		}
