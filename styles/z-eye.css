@@ -153,6 +153,7 @@ div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:b
 	border-radius: 3px 3px 3px 3px;
 	cursor: pointer;
 	margin-left: 4px;
+	margin-top: 2px;
 }
 
 .searchButton:hover {
@@ -164,16 +165,17 @@ div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:b
 }
 
 input {
-	padding-left: 3px;
+	padding: 2px;
 	background: no-repeat;
-	border:1px solid #d1c7ac;
+	border: 1px solid rgb(170, 170, 170);
 	background-color: white;
 	color : #444;
 	height: 20px;
+	border-radius: 2px;
 }
 
 input:focus {
-	border:1px solid #807267;
+	border: 1px solid rgb(164, 23, 35);
 }
 
 #external {
@@ -399,7 +401,7 @@ canvas { display: inline-block; }
 #menupanel a:hover { font-weight: bold; }
 
 #search { position:fixed; top:4px; right:10px; }
-#search input { margin-left: 20px; }
+#search input { margin-left: 20px; background: url("/styles/images/select2.png") no-repeat scroll 100% -22px, -moz-linear-gradient(center bottom , rgb(255, 255, 255) 85%, rgb(238, 238, 238) 99%) repeat scroll 0% 0% transparent; }
 
 .userMenu { position:fixed; top: 0px; left:10px;
 	display: inline-block;
@@ -1264,7 +1266,7 @@ label { float: left; font-weight: bold; text-align: left; }
               user-select: none;
 }
 
-.select2-results .select2-highlighted { background: #A41723; color: #fff; }
+.select2-results .select2-highlighted { background: linear-gradient(rgb(122, 0, 0), rgb(138, 0, 0)); border-radius: 2px; color: #fff; }
 .select2-results li em { background: #feffde; font-style: normal; }
 .select2-results .select2-highlighted em { background: transparent; }
 .select2-results .select2-highlighted ul { background: #fff; color: #000; }
