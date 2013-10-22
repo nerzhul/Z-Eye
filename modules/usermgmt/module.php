@@ -37,14 +37,14 @@
 				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
 				return $output;
 			}
-			$output = FS::$iMgr->cbkForm("2");
-                        $output .= "<ul class=\"ulform\"><li><b>".$this->loc->s("User").":</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
+			$output = FS::$iMgr->cbkForm("2").FS::$iMgr->tip("tip-password").
+                "<table><tr><td>".$this->loc->s("User")."</td><td>".$user.FS::$iMgr->hidden("uid",$uid)."</td></tr>";
+                
 			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","sha_pwd","username = '".$user."'")) {
 				$mail = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","mail","username = '".$user."'");
-				$output .= "<li><i>".$this->loc->s("tip-password")."</i></li>
-					<li>".$this->loc->s("Password").": ".FS::$iMgr->password("pwd","")."</li>
-					<li>".$this->loc->s("Password-repeat").": ".FS::$iMgr->password("pwd2","")."</li>
-					<li>".$this->loc->s("Mail").": ".FS::$iMgr->input("mail",$mail,24,64)."</li>";
+				$output .= "<tr><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("pwd","")."</td></tr>".
+					"<tr><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("pwd2","")."</td></tr>".
+					"<tr><td>".$this->loc->s("Mail")."</td><td>".FS::$iMgr->input("mail",$mail,24,64)."</td></tr>";
 			}
 			
 			$gids = array();
@@ -52,13 +52,13 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				$gids[] = $data["gid"];
 			}
-			$output .= "<li class=\"ugroupli\">".
-				FS::$iMgr->select("ugroup",array("label" => $this->loc->s("Group"),"multi" => true)).
+			$output .= "<tr><td>".$this->loc->s("Group")."</td><td>".
+				FS::$iMgr->select("ugroup",array("multi" => true)).
 				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gid",
 					array("labelfield" => "gname", "selected" => $gids,"sqlopts" => array("order" => "gname"))).
-				"</select></li>".
-				"<li id=\"formactions\">".FS::$iMgr->submit("",$this->loc->s("Save"))."</li>".
-				"</ul></form>";
+				"</select></td></tr>".
+				FS::$iMgr->tableSubmit("Save").
+				"</ul></table></form>";
 
 			return $output;
 		}
