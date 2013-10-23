@@ -56,15 +56,16 @@
 
 		private function showMain() {
 			$output = "";
-			if (!FS::isAjaxCall())
+			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-network-device-mgmt");
+			}
 
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
-                        if ($count < 1) {
-                                $output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-                                        "<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
-                                return $output;
-                        }
+			if ($count < 1) {
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
+							"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
+					return $output;
+			}
 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
@@ -1298,6 +1299,7 @@
 			}
 
 			protected function showDeviceList() {
+				FS::$iMgr->setURL("");
 				$output = "";
 				$err = FS::$secMgr->checkAndSecuriseGetData("err");
 				switch($err) {

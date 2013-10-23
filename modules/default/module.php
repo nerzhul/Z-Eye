@@ -34,16 +34,17 @@
 		private function showMain() {
 			$output = "";
 			if (!FS::isAjaxCall()) {
-			        $output = FS::$iMgr->js("var refreshId = setInterval(function()
-        			{
-					$.get('index.php?mod=".$this->mid."&at=2', function(data) {
-	        		        	$('#reports').fadeOut(1500,function() {
-							$('#reports').html(data);
-			                		$('#reports').fadeIn(1500);
+				FS::$iMgr->setURL("");
+				FS::$iMgr->js("var refreshId = setInterval(function()
+				{
+				$.get('index.php?mod=".$this->mid."&at=2', function(data) {
+							$('#reports').fadeOut(1500,function() {
+						$('#reports').html(data);
+								$('#reports').fadeIn(1500);
+					});
 						});
-        			        });
-		        	}, 20000);");
-				$output .= FS::$iMgr->h1("Speed Reporting",true);
+				}, 20000);");
+				$output = FS::$iMgr->h1("Speed Reporting",true);
 				$output .= "<div id=\"reports\">";
 			}
 	

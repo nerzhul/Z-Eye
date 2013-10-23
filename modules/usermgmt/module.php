@@ -26,14 +26,8 @@
 		}
 
 		public function Load() {
-			$output = "";
-
-			$user = FS::$secMgr->checkAndSecuriseGetData("user");
-			if ($user)
-				$output .= $this->EditUser($user);
-			else
-				$output .= $this->showMain();
-			return $output;
+			FS::$iMgr->setURL("");
+			return $this->showMain();
 		}
 
 		private function EditUser($user) {
@@ -43,46 +37,34 @@
 				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
 				return $output;
 			}
-			$output = FS::$iMgr->cbkForm("2");
-                        $output .= "<ul class=\"ulform\"><li><b>".$this->loc->s("User").":</b> ".$user.FS::$iMgr->hidden("uid",$uid)."</li>";
+			$output = FS::$iMgr->cbkForm("2").FS::$iMgr->tip("tip-password").
+                "<table><tr><td>".$this->loc->s("User")."</td><td>".$user.FS::$iMgr->hidden("uid",$uid)."</td></tr>";
+                
 			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","sha_pwd","username = '".$user."'")) {
 				$mail = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","mail","username = '".$user."'");
-				$output .= "<li><i>".$this->loc->s("tip-password")."</i></li>
-					<li>".$this->loc->s("Password").": ".FS::$iMgr->password("pwd","")."</li>
-					<li>".$this->loc->s("Password-repeat").": ".FS::$iMgr->password("pwd2","")."</li>
-					<li>".$this->loc->s("Mail").": ".FS::$iMgr->input("mail",$mail,24,64)."</li>";
+				$output .= "<tr><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("pwd","")."</td></tr>".
+					"<tr><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("pwd2","")."</td></tr>".
+					"<tr><td>".$this->loc->s("Mail")."</td><td>".FS::$iMgr->input("mail",$mail,24,64)."</td></tr>";
 			}
-			$grpidx = 0;
+			
+			$gids = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
 			while ($data = FS::$dbMgr->Fetch($query)) {
-				$output .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,array("label" => $this->loc->s("Group"))).
-					$this->addGroupList($data["gid"])."</select>".
-					" <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">X</a></li>";
-				$grpidx++;
+				$gids[] = $data["gid"];
 			}
-                        $output .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("Add-to-new-group"),"addGrpForm()").FS::$iMgr->submit("",$this->loc->s("Save"))."</li>";
-                        $output .= "</ul></form>";
+			$output .= "<tr><td>".$this->loc->s("Group")."</td><td>".
+				FS::$iMgr->select("ugroup",array("multi" => true)).
+				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gid",
+					array("labelfield" => "gname", "selected" => $gids,"sqlopts" => array("order" => "gname"))).
+				"</select></td></tr>".
+				FS::$iMgr->tableSubmit("Save").
+				"</ul></table></form>";
 
-			FS::$iMgr->js("grpidx = ".$grpidx."; function addGrpForm() {
-                                $('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Groupe")).
-					$this->addGroupList()."</select><a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a> </li>').
-                   		     		insertBefore('#formactions');
-                                		grpidx++;
-                               		}
-	                                function delGrpElmt(grpidx) {
-               	                        	$('.ugroupli'+grpidx).remove();
-        	                        }");
 			return $output;
 		}
-
-		private function addGrouplist($gid=-1) {
-			$output = "";
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gid",
-				array("labelfield" => "gname", "selected" => array($gid),"sqlopts" => array("order" => "gname")));
-			return $output;
-		}
-
+		
 		private function showMain() {
+			
 			$output = FS::$iMgr->h1("title-usermgmt");
 
 			if (FS::$sessMgr->hasRight("mrule_usermgmt_ldapuserimport")) {
@@ -135,7 +117,8 @@
 		}
 
 		private function showUserTr($uid, $username = "", $localuser = false, $subname = "", $name = "", $mail = "",$last_ip = "",$last_conn = "", $join_date = "") {
-			$output = "<tr id=\"u".$uid."tr\"><td>".$uid."</td><td>".FS::$iMgr->aLink($this->mid."&user=".$username, $username)."</td><td>".
+			$output = "<tr id=\"u".$uid."tr\"><td>".$uid.
+				"</td><td>".FS::$iMgr->opendiv(4,$username,array("lnkadd" => "user=".$username))."</td><td>".
 				($localuser ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -311,8 +294,16 @@
 				case 2: return $this->showDirectoryForm();
 				case 3: 
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-					if (!$addr) return $this->loc->s("err-bad-datas");
+					if (!$addr) {
+						return $this->loc->s("err-bad-datas");
+					}
 					return $this->showDirectoryForm($addr);
+				case 4:
+					$user = FS::$secMgr->checkAndSecuriseGetData("user");
+					if (!$user) {
+						return $this->loc->s("err-bad-datas");
+					}
+					return $this->EditUser($user);
 				default: return;
 			}
 		}
@@ -344,7 +335,9 @@
 						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
 						return;
 					}
-
+					
+					FS::$dbMgr->BeginTr();
+					
 					$pwd = FS::$secMgr->checkAndSecurisePostData("pwd");
 					$pwd2 = FS::$secMgr->checkAndSecurisePostData("pwd2");
 					if ($pwd || $pwd2) {
@@ -378,17 +371,15 @@
 						FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","mail = '".$mail."'","uid = '".$uid."'");
 					}
 
-					$groups = array();
-					foreach ($_POST as $key => $value) {
-						   if (preg_match("#^ugroup#",$key)) {
-								$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$value."'");
-								if (!$exist) {
-									$this->log(1,"Try to add user ".$uid." to inexistant group '".$value."'");
-									FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
-									return;
-								}
-								$groups[] = $value;
-						   }
+					$groups = FS::$secMgr->checkAndSecurisePostData("ugroup");
+					$count = count($groups);
+					for ($i=0;$i<$count;$i++) {
+						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$groups[$i]."'");
+						if (!$exist) {
+							$this->log(1,"Try to add user ".$uid." to inexistant group '".$groups[$i]."'");
+							FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
+							return;
+						}
 					}
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","uid = '".$uid."'");
 					$groups = array_unique($groups);
@@ -396,6 +387,8 @@
 					for ($i=0;$i<$count;$i++) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_group","uid,gid","'".$uid."','".$groups[$i]."'");
 					}
+					FS::$dbMgr->CommitTr();
+					
 					$this->log(0,"User ".$uid." edited");
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;

@@ -60,22 +60,25 @@
 		}
 
 		private function showZoneMgmt() {
+			FS::$iMgr->setURL("sh=6");
+			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("Zone-Mgmt"));
 			$dnsZone = new dnsZone();
 			return $dnsZone->renderAll();
 		}
 
 		private function showDNSSecMgmt() {
+			FS::$iMgr->setURL("sh=2");
+			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("DNSSec-Mgmt"));
 			$dnsTSIG = new dnsTSIGKey();
 			$output = $dnsTSIG->renderAll();
 			return $output;
 		}
 
 		private function showRecordMgmt() {
+			FS::$iMgr->setURL("sh=1");
+			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("DNS-zones"));
 			$output = "";
 			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
-				$output .= $this->showCreateEditErr();
-
-
 				$found = false;
 			}
 
@@ -286,6 +289,9 @@
 		}
 
 		private function showAdvancedTools() {
+			FS::$iMgr->setURL("sh=3");
+			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("Advanced-tools"));
+			
 			$output = FS::$iMgr->h3("title-old-records").
 				FS::$iMgr->cbkForm("2").
 				"Intervalle (jours) ".FS::$iMgr->numInput("ival")."<br />".
@@ -295,11 +301,15 @@
 		}
 
 		private function showACLList() {
+			FS::$iMgr->setURL("sh=5");
+			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("ACL-Mgmt"));
 			$acl = new dnsACL();
 			return $acl->renderAll();
 		}
 
 		private function showServerMgmt() {
+			FS::$iMgr->setURL("sh=4");
+			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("Server-Mgmt"));
 			$cluster = new dnsCluster();
 			$output = $cluster->renderAll();
 
@@ -307,15 +317,6 @@
 			$output .= $server->renderAll();
 
 			return $output;
-		}
-
-		private function showCreateEditErr() {
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: return FS::$iMgr->printError($this->loc->s("err-miss-bad-fields"));
-				case 2: return FS::$iMgr->printError($this->loc->s("err-unable-conn"));
-				case 99: return FS::$iMgr->printError($this->loc->s("err-no-rights"));
-			}
 		}
 
 		public function getIfaceElmt() {

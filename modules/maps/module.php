@@ -55,6 +55,8 @@
 		}
 
 		private function showSpringyMap() {
+			FS::$iMgr->setURL("sh=5");
+			
 			$output = FS::$iMgr->canvas("springy",1000,1000); 
 			
 			$js = "var graph = new Springy.Graph({'repulsion': 800});";
@@ -74,6 +76,8 @@
 		}
 
 		private function showSigmaMap() {
+			FS::$iMgr->setURL("sh=4");
+			
 			$output	= FS::$iMgr->opendiv(1,$this->loc->s("Add-Node"),array("line" => true));
 			$output	.= FS::$iMgr->opendiv(2,$this->loc->s("Add-Edge"),array("line" => true));
 			$output	.= FS::$iMgr->opendiv(3,$this->loc->s("Import"));
@@ -167,6 +171,8 @@
 		}
 
 		private function showNetworkMap() {
+			FS::$iMgr->setURL("sh=1");
+			
 			$nodeFound = false;
 			$output = "";
 			$tmpoutput = FS::$iMgr->canvas("springy-net",1000,1000); 
@@ -313,6 +319,8 @@
 		}
 
 		private function showIcingaMap() {
+			FS::$iMgr->setURL("sh=3");
+			
 			// We store problematic hosts for renderer
 			$hostStatusWarn = array();
 			$serviceStatusWarn = array();
