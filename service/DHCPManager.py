@@ -22,7 +22,7 @@ import datetime,re,sys,time,thread,threading,subprocess
 from threading import Lock
 from ipcalc import Network
 
-import Logger,ZEyeUtil,netdiscoCfg
+import Logger,ZEyeUtil,netdiscoCfg,DatabaseManager
 from SSHBroker import ZEyeSSHBroker
 
 """
@@ -429,7 +429,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 						ipList.append(ip)
 				self.subnetList[idx[0]] = (idx[1],ipList,idx[2],idx[3],idx[4],idx[5],idx[6],idx[7])
 				
-class ZEyeDHCPRadiusSyncer:
+class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 	zeyeDB = None
 	radiusList = {}
 	subnetList = {}
@@ -506,7 +506,7 @@ class ZEyeDHCPRadiusSyncer:
 			pgcursor = pgsqlCon.cursor()
 			
 			if dbtype == "pg":
-				radCon = PgSQL.connect(host=addr,user=login,passwordpwd,database=dbname)
+				radCon = PgSQL.connect(host=addr,user=login,password=pwd,database=dbname)
 				if radCon == None:
 					Logger.ZEyeLogger().write("DHCP/Radius Sync: unable to connect to %s:%s/%s" % (addr,port,dbname))
 					self.decrThreadNb()
