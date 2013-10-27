@@ -55,8 +55,9 @@
 				FS::$iMgr->selElmt(FSTimeMgr::genStr(3600),"60",($inactivityTimer == 60))
 			);
 			
-			return sprintf("%s<table>%s%s",
-				FS::$iMgr->h2("Android-options").FS::$iMgr->cbkForm("1"),
+			return sprintf("%s%s<table>%s%s",
+				FS::$iMgr->h2("Account-parameters"),
+				FS::$iMgr->cbkForm("2"),
 				FS::$iMgr->idxLines(array(
 					array("App-Lang","",array("type" => "raw", "value" => $langSelect)),
 					array("Disconnect-after","",array("type" => "raw", "value" => $inactSelect, "tooltip" => "tooltip-disconnect-after")),
@@ -71,8 +72,9 @@
 
 			$enmon = ($data["enable_monitor"] == 't');
 
-			return sprintf("%s<table>%s%s",
-				FS::$iMgr->h2("Android-options").FS::$iMgr->cbkForm("1"),
+			return sprintf("%s%s<table>%s%s",
+				FS::$iMgr->h2("Android-options"),
+				FS::$iMgr->cbkForm("1"),
 				FS::$iMgr->idxLines(array(
 					array("API-Key","",array("type" => "raw", "value" => $apiKey)),
 					array("Enable-Monitoring","enmon",array("type" => "chk", "value" => $enmon)),
@@ -95,6 +97,7 @@
 
 		public function handlePostDatas($act) {
 			switch($act) {
+				// Set android options
 				case 1:
 					$enmon = FS::$secMgr->checkAndSecurisePostData("enmon");
 
@@ -105,6 +108,39 @@
 					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."user_settings_android","uid,enable_monitor",
 						"'".FS::$sessMgr->getUid()."','".($enmon == "on" ? 't' : 'f')."'");
 					FS::$dbMgr->CommitTr();
+					FS::$iMgr->ajaxEcho("Done");
+					return;
+				// Set account options
+				case 2:
+					$lang = FS::$secMgr->checkAndSecurisePostData("lang");
+					$inactivityTimer = FS::$secMgr->checkAndSecurisePostData("intim");
+					
+					if (!$lang || !$inactivityTimer || !FS::$secMgr->isNumeric($inactivityTimer)) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+					
+					if ($lang == "none") {
+						$lang = "";
+					}
+					
+					if ($lang && $lang != "fr" && $lang != "en") {
+						FS::$iMgr->ajaxEcho("err-bad-lang");
+						return;
+					}
+					
+					FS::$dbMgr->BeginTr();
+					FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."users","lang = '".$lang."', inactivity_timer = '".$inactivityTimer."'","uid = '".FS::$sessMgr->getUid()."'");
+					FS::$dbMgr->CommitTr();
+					
+					// Set lang
+					if ($lang) {
+						$_SESSION["lang"] = $lang;
+					}
+					else {
+						$_SESSION["lang"] = FS::$sessMgr->getBrowserLang();
+					}
+			
 					FS::$iMgr->ajaxEcho("Done");
 					return;
 				default: break;

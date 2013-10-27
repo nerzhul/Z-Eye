@@ -147,10 +147,11 @@
 			return $_SERVER['REQUEST_URI'];
 		}
 		
-		public function getLang() {
-			$lang = "fr";
+		public function getBrowserLang() {
+			$lang = Config::getSysLang();
 			$tmp = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			$lang = strtolower(substr(chop($tmp[0]),0,2));
+			return $lang;
 		}
 		
 		public function getUid() { return $_SESSION["uid"]; }

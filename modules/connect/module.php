@@ -144,9 +144,13 @@
 		}
 		
 		private function connectUser($uid) {
-			$langs = preg_split("#[;]#",$_SERVER["HTTP_ACCEPT_LANGUAGE"]);
-			if (count($langs) > 0)
-				$_SESSION["lang"] = $langs[0];
+			$settingsLang = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","lang","uid = '".$uid."'");
+			if ($settingsLang) {
+				$_SESSION["lang"] = $settingsLang;
+			}
+			else {
+				$_SESSION["lang"] = FS::$sessMgr->getBrowserLang();
+			}
 			$_SESSION["uid"] = $uid;
 			$_SESSION["prevfailedauth"] = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","failauthnb","uid = '".$uid."'");
 			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","failauthnb = '0', last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
