@@ -295,6 +295,7 @@
 					"err-cluster-already-exists" => "A cluster with this name already exists",
 					"err-cluster-need-members" => "A cluster need to have one or more members",
 					"err-cluster-not-exists" => "This cluster doesn't exists",
+					"err-custom-option-already-exists" => "This custom option already exists",
 					"err-custom-option-not-exists" => "This custom option doesn't exists",
 					"err-dlease-sup-mlease" => "Default lease time is superior than max lease time",
 					"err-dhcpserver-invalid-alias" => "Invalid DHCP server alias",
