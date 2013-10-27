@@ -25,25 +25,60 @@
 		public function Load() {
 			FS::$iMgr->setURL("");
 			
-			$output = FS::$iMgr->h1("Settings").
-				$this->showAndroidForm();
-
-			return $output;
+			return sprintf("%s%s%s",
+				FS::$iMgr->h1("Settings"),
+				$this->showUserForm(),
+				$this->showAndroidForm()
+			);
+		}
+		
+		private function showUserForm() {
+			$lang = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","lang","uid = '".FS::$sessMgr->getUid()."'");
+			$inactivityTimer = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","inactivity_timer","uid = '".FS::$sessMgr->getUid()."'");
+			
+			$langSelect = sprintf("%s%s%s%s</select>",
+				FS::$iMgr->select("lang"),
+				FS::$iMgr->selElmt($this->loc->s("Default"),"none",($lang != "en" && $lang != "fr")),
+				FS::$iMgr->selElmt($this->loc->s("English"),"en",($lang == "en")),
+				FS::$iMgr->selElmt($this->loc->s("French"),"fr",($lang == "fr"))
+			);
+			
+			$inactSelect = sprintf("%s%s%s%s%s%s%s%s%s</select>",
+				FS::$iMgr->select("intim"),
+				FS::$iMgr->selElmt($this->loc->s("Default"),"0",true),
+				FS::$iMgr->selElmt(FSTimeMgr::genStr(60),"1",($inactivityTimer == 1)),
+				FS::$iMgr->selElmt(FSTimeMgr::genStr(120),"2",($inactivityTimer == 2)),
+				FS::$iMgr->selElmt(FSTimeMgr::genStr(300),"5",($inactivityTimer == 5)),
+				FS::$iMgr->selElmt(FSTimeMgr::genStr(600),"10",($inactivityTimer == 10)),
+				FS::$iMgr->selElmt(FSTimeMgr::genStr(1200),"20",($inactivityTimer == 20)),
+				FS::$iMgr->selElmt(FSTimeMgr::genStr(1800),"30",($inactivityTimer == 30)),
+				FS::$iMgr->selElmt(FSTimeMgr::genStr(3600),"60",($inactivityTimer == 60))
+			);
+			
+			return sprintf("%s<table>%s%s",
+				FS::$iMgr->h2("Android-options").FS::$iMgr->cbkForm("1"),
+				FS::$iMgr->idxLines(array(
+					array("App-Lang","",array("type" => "raw", "value" => $langSelect)),
+					array("Disconnect-after","",array("type" => "raw", "value" => $inactSelect, "tooltip" => "tooltip-disconnect-after")),
+				)),
+				FS::$iMgr->aeTableSubmit(false)
+			);
 		}
 
 		private function showAndroidForm() {
 			$apiKey = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","android_api_key","uid = '".FS::$sessMgr->getUid()."'");
 			$data = FS::$dbMgr->getOneEntry(PgDbConfig::getDbPrefix()."user_settings_android","enable_monitor","uid = '".FS::$sessMgr->getUid()."'");
 
-			$enmon = ($data["enable_monitor"] == 't' ? true : false);
+			$enmon = ($data["enable_monitor"] == 't');
 
-			$output = FS::$iMgr->h2("Android-options").FS::$iMgr->cbkForm("1")."<table>".
+			return sprintf("%s<table>%s%s",
+				FS::$iMgr->h2("Android-options").FS::$iMgr->cbkForm("1"),
 				FS::$iMgr->idxLines(array(
 					array("API-Key","",array("type" => "raw", "value" => $apiKey)),
 					array("Enable-Monitoring","enmon",array("type" => "chk", "value" => $enmon)),
-				)).
-				FS::$iMgr->aeTableSubmit(false);
-			return $output;
+				)),
+				FS::$iMgr->aeTableSubmit(false)
+			);
 		}
 
 		public function getMonitorOption() {

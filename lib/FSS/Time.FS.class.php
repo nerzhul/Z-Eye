@@ -41,4 +41,69 @@
 				$interval->s > 0 ? $interval->s."s" : ""
 			);
 		}
+		
+		/*
+		 * It's a value in second and this returns value in a string format
+		 */
+		public static function genStr($value) {
+			$days = floor($value/(60*60*24));
+			$value = $value % (60*60*24);
+			
+			$hours = floor($value/(60*60));
+			$value = $value % (60*60);
+			
+			$minutes = floor($value/60);
+			
+			$seconds = $value % 60;
+			
+			$dayStr = "";
+			if ($days > 0) {
+				if ($days == 1) {
+					$dayStr = sprintf("%s %s", $days, FS::$iMgr->getLocale("day"));
+				}
+				else {
+					$dayStr = sprintf("%s %s", $days, FS::$iMgr->getLocale("days"));
+				}
+			}
+			
+			$hourStr = "";
+			if ($hours > 0) {
+				if ($hours == 1) {
+					$hourStr = sprintf("%s %s", $hours, FS::$iMgr->getLocale("hour"));
+				}
+				else {
+					$hourStr = sprintf("%s %s", $hours, FS::$iMgr->getLocale("hours"));
+				}
+			}
+			
+			$minStr = "";
+			if ($minutes > 0) {
+				if ($minutes == 1) {
+					$minStr = sprintf("%s %s", $minutes, FS::$iMgr->getLocale("minute"));
+				}
+				else {
+					$minStr = sprintf("%s %s", $minutes, FS::$iMgr->getLocale("minutes"));
+				}
+			}
+			
+			$secStr = "";
+			if ($seconds > 0) {
+				if ($seconds == 1) {
+					$secStr = sprintf("%s %s", $seconds, FS::$iMgr->getLocale("second"));
+				}
+				else {
+					$secStr = sprintf("%s %s", $seconds, FS::$iMgr->getLocale("seconds"));
+				}
+			}
+			
+			return sprintf("%s%s%s%s%s%s%s",
+				$dayStr,
+				($dayStr && ($hourStr || $minStr || $secStr) ? " " : ""),
+				$hourStr,
+				($hourStr && ($minStr || $secStr) ? " " : ""),
+				$minStr,
+				($minStr && $secStr ? " " : ""),
+				$secStr
+			);
+		}
 	}
