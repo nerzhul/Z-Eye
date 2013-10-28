@@ -134,8 +134,9 @@
 					FS::$dbMgr->CommitTr();
 					
 					// Set lang
-					if ($lang) {
+					if ($_SESSION["lang"] != $lang) {
 						$_SESSION["lang"] = $lang;
+						FS::$iMgr->js("loadWindowHead();");
 					}
 					else {
 						$_SESSION["lang"] = FS::$sessMgr->getBrowserLang();
