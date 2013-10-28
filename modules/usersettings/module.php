@@ -141,7 +141,8 @@
 						$_SESSION["lang"] = FS::$sessMgr->getBrowserLang();
 					}
 			
-					FS::$iMgr->ajaxEcho("Done");
+					$js = "setMaxIdleTimer('".$inactivityTimer."');"; 
+					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				default: break;
 			}

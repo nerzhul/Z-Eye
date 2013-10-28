@@ -108,11 +108,11 @@
 		private function connectDBIfNot() {
 			if (!$this->dbMgr) {
 				$this->dbMgr = new AbstractSQLMgr();
-                	        $this->dbMgr->initForZEye();
+                $this->dbMgr->initForZEye();
 			}
 
 			if (!$this->dbMgr->isPDOOK()) {
-                		$this->dbMgr->Connect();
+                $this->dbMgr->Connect();
 			}
 		}
 		

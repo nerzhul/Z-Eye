@@ -162,6 +162,14 @@
 			else {
 				$_SESSION["lang"] = FS::$sessMgr->getBrowserLang();
 			}
+			
+			$inactivityTimer = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","inactivity_timer","uid = '".$uid."'");
+			if ($inactivityTimer) {
+				FS::$iMgr->js("setMaxIdleTimer('".$inactivityTimer."');"); 
+			}
+			else {
+				FS::$iMgr->js("setMaxIdleTimer('30');"); 
+			}
 			$_SESSION["uid"] = $uid;
 			$_SESSION["prevfailedauth"] = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","failauthnb","uid = '".$uid."'");
 			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","failauthnb = '0', last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
@@ -195,14 +203,19 @@
 			FS::$iMgr->ajaxEcho("Done",$js);
 		}
 
-		public function Disconnect() {
+		public function Disconnect($loginForm=false) {
 			if (FS::$sessMgr->getUid()) {
 				$this->log(0,"User disconnected");
 				FS::$sessMgr->Close(); 
 
 				$this->setLoginResult("",true);
-				$js = "loadWindowHead();loadMainContainer('');unlockScreen(true);";
+				$js = "loadWindowHead();loadMainContainer('');unlockScreen(true); setMaxIdleTimer('-1');";
 				FS::$iMgr->ajaxEcho("Done",$js);
+				
+				if ($loginForm) {
+					$this->setLoginResult("inactivity-disconnect");
+					FS::$iMgr->js("openLogin();");
+				}
 			}
 		}
 

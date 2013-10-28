@@ -48,6 +48,12 @@
 					echo FS::$iMgr->loadModule($mod,2);
 					echo FS::$iMgr->renderJS();
 					break;
+				case 5: // special case: disconnect user
+					if ($module = FS::$iMgr->getModuleByPath("connect")) {
+						$module->getModuleClass()->Disconnect(true);
+						echo FS::$iMgr->renderJS();
+					}
+					break;
 				default: $this->honeyPot(); break;
 			}
 		}

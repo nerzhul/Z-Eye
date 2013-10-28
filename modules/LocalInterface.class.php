@@ -66,8 +66,8 @@
 
 			if(!FS::$sessMgr->isConnected()) {
 				// Connect button which open Login Container
-				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\">".
-					"<a onclick='return openLogin();' href=\"#\">Connexion</a>".
+				$output .= "<div id=\"menuStack\" onclick=\"return openLogin();\">".
+					"<div id=\"menuTitle\"><a href=\"#\">Connexion</a>".
 					"</div></div>";
 			}
 
