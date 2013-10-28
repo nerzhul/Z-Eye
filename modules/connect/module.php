@@ -179,7 +179,7 @@
 			if ($url) {
 				$url = "&".$url;
 			}
-			$js = "loadWindowHead();loadMainContainer('".$url."');";
+			$js = "loadWindowHead();loadMainContainer('".$url."');$('#login').slideUp('slow');$('#loginupwd').removeAttr('value');";
 			FS::$iMgr->ajaxEcho("Done",$js);
 		}
 

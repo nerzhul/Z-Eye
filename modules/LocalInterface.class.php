@@ -29,7 +29,7 @@
 		public function content() {
 			$installlocked = file_get_contents(dirname(__FILE__)."/../config/LOCK");
 
-			$output = $this->header().$this->popupContainer().
+			$output = $this->header().$this->popupContainer().$this->loginContainer().
 				"<div id=\"tooltip\"></div><div id=\"main\">".$this->showModule()."</div>";
 
 			if($installlocked) {
@@ -65,31 +65,28 @@
 			}
 
 			if(!FS::$sessMgr->isConnected()) {
-				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\"><ul class=\"login\">";
-
-				$output .= "<li id=\"logintoggle\">".
-					"<a id=\"loginopen\" class=\"open\" href=\"#\">Connexion</a>".
-					"<a id=\"loginclose\" style=\"display: none;\" class=\"close\" href=\"#\">Fermer</a>
-					</li></ul></div></div>".
-					"<div id=\"logpanel\"><div class=\"contentlog clearfixlogform\"><div class=\"left\">".
-					$this->h4("Bienvenue sur Z-Eye",true).
-					"<p class=\"grey\">Cette interface permet de gérer et monitorer les services et équipements réseau</p>".
-					"</div><div class=\"left\">";
-
-				$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection",true).
-					$this->h4("Identification",true).
-					$this->label("loginuname","Utilisateur").
-					$this->input("loginuname","").
-					$this->label("loginupwd","Mot de passe").
-					$this->password("loginupwd","").
-					$this->hidden("redir",$_SERVER["REQUEST_URI"]).
-					$this->submit("conn",$this->getLocale("Connection")).
-					"</form></div></div></div>";
+				// Connect button which open Login Container
+				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\">".
+					"<a onclick='return openLogin();' href=\"#\">Connexion</a>".
+					"</div></div>";
 			}
 
 			$output .= "</div></div>";
 
 			return $output;
+		}
+		
+		private function loginContainer() {
+			return "<div id=\"login\" style=\"display:none;\"><div id=\"loginF\"><header>".
+				FS::$iMgr->img("styles/images/LogoHD.png",446,214).
+				"</header><div id=\"loginMsg\">".
+				$this->getLocale("Connect-to")." ".Config::getWebsiteName()."</div><div>".
+				FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection",true).
+				$this->input("loginuname","").
+				$this->password("loginupwd","").
+				$this->hidden("redir",$_SERVER["REQUEST_URI"]).
+				$this->submit("conn",$this->getLocale("Connection")).
+				"</form></div></div></div>";
 		}
 
 		private function showUserForm() {
