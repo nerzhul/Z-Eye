@@ -23,11 +23,12 @@
 			$locales = array(
 				"fr" => array(
 					"Connect" => "Connexion",
-					"err-bad-user" => "Nom d'utilisateur et/ou mot de passe inconnu",
+					"err-bad-user" => "Nom d'utilisateur et/ou mot de passe incorrect",
 					"err-unk" => "Erreur inconnue",
 					"menu-title" => "Connexion",
 					"Login" => "Utilisateur",
 					"Password" => "Mot de passe",
+					"result-ok-load" => "Connexion réussie. Chargement de l'interface.",
 					"title-conn" => "Connexion à l'espace d'administration",
 				),
 				"en" => array(
@@ -37,6 +38,7 @@
 					"Login" => "User",
 					"menu-title" => "Connexion",
 					"Password" => "Password",
+					"result-ok-load" => "Connection success. Loading interface.",
 					"title-conn" => "Connect to the admin panel",
 				)
 			);

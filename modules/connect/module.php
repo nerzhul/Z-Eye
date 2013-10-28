@@ -69,7 +69,7 @@
 				$ldapMgr->RootConnect();
 				$result = $ldapMgr->GetOneEntry($ldapident."=".$username);
 				if (!$result) {
-					FS::$iMgr->ajaxEcho("err-bad-user");
+					$this->setLoginResult("err-bad-user");
 					$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
 					return;
 				}
@@ -108,7 +108,7 @@
 					if ($data["sha_pwd"] != $encryptPwd) {
 						$this->log(1,"Login failed for user '".$username."' (Bad password)","None");
 						FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."users","failauthnb = failauthnb + 1","username = '".$username."'");
-						FS::$iMgr->ajaxEcho("err-bad-user");
+						$this->setLoginResult("err-bad-user");
 						return;
 					}
 					$this->genAPIKeyIfNot($username);
@@ -119,7 +119,18 @@
 				}
 			}
 			$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
-			FS::$iMgr->ajaxEcho("err-bad-user");
+			$this->setLoginResult("err-bad-user");
+		}
+		
+		private function setLoginResult($text,$good=false) {
+			if ($text) {
+				FS::$iMgr->js(sprintf("setLoginCbkMsg('<span style=\"color: %s;\">%s</span>');",
+					$good ? "green" : "red",
+					addslashes($this->loc->s($text))));
+			}
+			else {
+				FS::$iMgr->js("setLoginCbkMsg('');");
+			}
 		}
 
 		private function genAPIKeyIfNot($username) {
@@ -179,6 +190,7 @@
 			if ($url) {
 				$url = "&".$url;
 			}
+			$this->setLoginResult("result-ok-load",true);
 			$js = "loadWindowHead();loadMainContainer('".$url."');closeLogin();";
 			FS::$iMgr->ajaxEcho("Done",$js);
 		}
@@ -188,6 +200,7 @@
 				$this->log(0,"User disconnected");
 				FS::$sessMgr->Close(); 
 
+				$this->setLoginResult("",true);
 				$js = "loadWindowHead();loadMainContainer('');unlockScreen(true);";
 				FS::$iMgr->ajaxEcho("Done",$js);
 			}

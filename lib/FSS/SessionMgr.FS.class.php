@@ -154,11 +154,17 @@
 			return $lang;
 		}
 		
-		public function getUid() { return $_SESSION["uid"]; }
+		public function getUid() { 
+			if (isset($_SESSION["uid"])) {
+				return $_SESSION["uid"];
+			}
+			return NULL;
+		}
 
 		public function getUserName() {
-			if ($this->getUid())
+			if ($this->getUid()) {
 				return FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$this->getUid()."'");
+			}
 			return NULL;
 		}
 

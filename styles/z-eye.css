@@ -368,13 +368,11 @@ canvas { display: inline-block; }
 
 #loginF { background-color: white; padding-top: 30px; min-height: 80%; }
 #login header { margin-bottom: 2%; }
-#login #loginMsg {
-	color: rgb(113, 113, 113);
-	margin-bottom: 10px;
-}
+#login #loginMsg { color: rgb(113, 113, 113); margin-bottom: 10px; }
 #login form { width: 230px; display:inline-block; }
 #login input { width: 226px; padding-top: 10px; padding-bottom: 10px; padding-left: 5px; padding-right: 5px; border: 1px solid rgb(183, 183, 183); border-radius: 4px; margin-bottom: 12px; }
 #login .buttonStyle { width: 100%; padding-bottom: 30px; }
+#login #loginCbk { width: 230px; display: inline-block; padding: 10px; }
 
 #menuTitle ul.login {
 	margin: 0;

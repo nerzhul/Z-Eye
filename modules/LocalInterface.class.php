@@ -79,7 +79,7 @@
 		private function loginContainer() {
 			return "<div id=\"login\" style=\"display:none;\"><div id=\"loginF\"><header>".
 				FS::$iMgr->img("styles/images/LogoHD.png",446,214).
-				"</header><div id=\"loginMsg\">".
+				"</header><div id=\"loginCbk\"></div><div id=\"loginMsg\">".
 				$this->getLocale("Connect-to")." ".Config::getWebsiteName()."</div><div>".
 				FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection",true).
 				$this->input("loginuname","").
