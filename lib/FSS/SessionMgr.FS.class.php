@@ -117,10 +117,8 @@
 		}
 		
 		public function InitSessionIfNot() {
-
 			if (!isset($_SESSION["uid"]))
 				$_SESSION["uid"] = 0;
-
 		}
 
 		public function isConnected() {
@@ -159,6 +157,14 @@
 				return $_SESSION["uid"];
 			}
 			return NULL;
+		}
+		
+		public function getIdleTimer() {
+			if (isset($_SESSION["idle_timer"])) {
+				return $_SESSION["idle_timer"];
+			}
+			
+			return (Config::getSessionExpirationTime() / 60);
 		}
 
 		public function getUserName() {

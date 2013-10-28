@@ -165,10 +165,12 @@
 			
 			$inactivityTimer = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","inactivity_timer","uid = '".$uid."'");
 			if ($inactivityTimer) {
-				FS::$iMgr->js("setMaxIdleTimer('".$inactivityTimer."');"); 
+				FS::$iMgr->js("setMaxIdleTimer('".$inactivityTimer."');");
+				$_SESSION["idle_timer"] = $inactivityTimer;
 			}
 			else {
-				FS::$iMgr->js("setMaxIdleTimer('30');"); 
+				FS::$iMgr->js("setMaxIdleTimer('30');");
+				$_SESSION["idle_timer"] = 30;
 			}
 			$_SESSION["uid"] = $uid;
 			$_SESSION["prevfailedauth"] = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","failauthnb","uid = '".$uid."'");
@@ -208,14 +210,17 @@
 				$this->log(0,"User disconnected");
 				FS::$sessMgr->Close(); 
 
-				$this->setLoginResult("",true);
-				$js = "loadWindowHead();loadMainContainer('');unlockScreen(true); setMaxIdleTimer('-1');";
-				FS::$iMgr->ajaxEcho("Done",$js);
-				
 				if ($loginForm) {
 					$this->setLoginResult("inactivity-disconnect");
 					FS::$iMgr->js("openLogin();");
 				}
+				else {
+					$this->setLoginResult("",true);
+				}
+				$js = "loadWindowHead(); loadMainContainer('');unlockScreen(true); setMaxIdleTimer('-1');";
+				FS::$iMgr->ajaxEcho("Done",$js);
+				
+				
 			}
 		}
 

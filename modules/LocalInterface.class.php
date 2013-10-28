@@ -57,11 +57,13 @@
 			if($this->showRetMenu) {
 				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\" onclick=\"javascript:history.back()\">Retour</div></div>";
 			}
-                        $output .= $this->loadMenus();
+            $output .= $this->loadMenus();
 
 			if(FS::$sessMgr->isConnected()) {
 				$output .= $this->showUserForm().
 					$this->showSearchForm();
+				// Also load inactivityTimer here.
+				FS::$iMgr->js("setMaxIdleTimer('".FS::$sessMgr->getIdleTimer()."');");
 			}
 
 			if(!FS::$sessMgr->isConnected()) {
