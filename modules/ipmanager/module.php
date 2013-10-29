@@ -141,8 +141,9 @@
 			$switchlist = array();
 
 			$query2 = FS::$dbMgr->Select("device","ip,name");
-			while ($data2 = FS::$dbMgr->Fetch($query2))
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
 				$switchlist[$data2["ip"]] = $data2["name"];
+			}
 
 			// for Z-Eye ipmanager request. Not the better idea, i think 
 			$iplist = "";
@@ -183,7 +184,9 @@
 					$iparray[ip2long($data2["ip"])]["mac"] = $data2["macaddr"];
 					$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
 					$iparray[ip2long($data2["ip"])]["ltime"] = $data2["leasetime"];
-					if ($iparray[ip2long($data2["ip"])]["distrib"] != 6) {
+					// Only overwrite if it's not dynamicly distributed by Z-Eye and force it if it's a lease
+					if ($iparray[ip2long($data2["ip"])]["distrib"] != 6 ||
+						$data2["distributed"] == 2) {
 						$iparray[ip2long($data2["ip"])]["distrib"] = $data2["distributed"];
 					}
 				}
