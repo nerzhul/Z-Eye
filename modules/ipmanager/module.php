@@ -1585,7 +1585,7 @@
 					$dhcpopts = FS::$secMgr->checkAndSecurisePostData("dopts");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
-					if (!$netid || !FS::$secMgr->isIP($netid) || !$netmask || !FS::$secMgr->isMaskAddr($netmask) || !$vlanid || !FS::$secMgr->isNumeric($vlanid) ||
+					if (!$netid || !FS::$secMgr->isIP($netid) || !$netmask || !FS::$secMgr->isMaskAddr($netmask) || $vlanid === NULL || !FS::$secMgr->isNumeric($vlanid) ||
 						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $subnetclusters && !is_array($subnetclusters) ||
 						$router && !FS::$secMgr->isIP($router) || $dns1 && !FS::$secMgr->isIP($dns1) || $dns2 && (!$dns1 || !FS::$secMgr->isIP($dns2)) ||
 						$domainname && !FS::$secMgr->isDNSName($domainname) || $mleasetime && (!FS::$secMgr->isNumeric($mleasetime) || $mleasetime < 60) ||
@@ -1629,7 +1629,7 @@
 						}
 					}
 
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid != '".$netid."' AND vlanid = '".$vlanid."'")) {
+					if ($vlanid != 0 && FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid","netid != '".$netid."' AND vlanid = '".$vlanid."'")) {
 						$this->log(1,"Add/Edit subnet: vlan '".$vlanid."' already used");
 						FS::$iMgr->ajaxEchoNC("err-vlan-already-used");
 						return;
