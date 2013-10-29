@@ -29,7 +29,6 @@
 			return $this->showMain();;
 		}
 
-
 		private function addOrEditBackupServer($create = false) {
 			$saddr = "";
 			$slogin = "";
@@ -113,6 +112,8 @@
 		}
 
 		private function showBackupTab() {
+			FS::$iMgr->setURL("sh=3");
+			
 			$output = FS::$iMgr->opendiv(1,$this->loc->s("New-Server"));
 
 			$tmpoutput = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
@@ -144,6 +145,8 @@
 		}
 
 		private function showBySwitch() {
+			FS::$iMgr->setURL("sh=2");
+			
 			// IP for ajax filtering
 			$ip = (FS::isAjaxCall() ? FS::$secMgr->checkAndSecurisePostData("ip") : "");
 			$output = "";	
@@ -302,6 +305,8 @@
 		}
 
 		private function showBySNMPCommunity() {
+			FS::$iMgr->setURL("sh=1");
+			
 			$community = (FS::isAjaxCall() ? FS::$secMgr->checkAndSecurisePostData("snmp") : "");
 
 			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");

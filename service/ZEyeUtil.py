@@ -45,7 +45,7 @@ class Thread(threading.Thread):
 	startTime = 0
 
 	def __init__(self):
-                threading.Thread.__init__(self)
+		threading.Thread.__init__(self)
 
 	def incrThreadNb(self):
 		self.tc_mutex.acquire()

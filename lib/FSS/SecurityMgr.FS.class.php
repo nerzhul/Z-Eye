@@ -67,37 +67,19 @@
 		}
 
 		public function isHostname($str) {
-			// hostname cannot start with - or numeric
-			if (preg_match("#^[0-9-]#",$str))
-				return false;
-
-			// hostname cannot finish with - or has to - consecutive
-			if (preg_match("#[-]$#",$str) || preg_match("#[-]{2,}#",$str))
-				return false;
-
-			// hostname contain only letters, numerics and dashes
-			if (preg_match("#^[a-zA-Z]([a-zA-Z0-9-])+$#",$str))
-				return true;	
+			if (preg_match("#^[A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9]$#",$str)) {
+				return true;
+			}
 
 			return false;
 		}
 
 		public function isDNSName($str) {
-			$spl = preg_split("#[.]#",$str);
-			$count = count($spl);
-
-			// a DNS name has 2 parts or more
-			if ($count < 2) {
-				return false;
+			if (preg_match("#^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$#", $str)) {
+				return true;
 			}
 
-			// each part must be a hostname
-			for ($i=0;$i<$count;$i++) {
-				if (!$this->isHostname($spl[$i]))
-					return false;
-			}
-
-			return true;
+			return false;
 		}
 
 		public function getDNSNameList($buffer) {

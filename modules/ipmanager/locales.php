@@ -1,6 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+	* Copyright (C) 2010-2013 LoÃ¯c BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -73,8 +73,8 @@
 					"err-cluster-already-exists" => "Un cluster portant ce nom existe déjà",
 					"err-cluster-need-members" => "Un cluster doit avoir un membre ou plus",
 					"err-cluster-not-exists" => "Ce cluster n'existe pas !",
-					"err-custom-option-already-exists" => "Cette option personnalisée existe d�à",
-					"err-custom-option-not-exists" => "Cette option personnalisée n'existe ps",
+					"err-custom-option-already-exists" => "Cette option personnalisée existe déjà",
+					"err-custom-option-not-exists" => "Cette option personnalisée n'existe pas",
 					"err-dlease-sup-mlease" => "La durée par défaut est supérieure à la durée maximale !",
 					"err-dhcpserver-invalid-alias" => "Alias du serveur DHCP invalide",
 					"err-dhcpserver-not-exists" => "Ce serveur DHCP n'existe pas !",
@@ -259,6 +259,7 @@
 					"Cluster-mode" => "Cluster mode",
 					"Cluster-name" => "Cluster name",
 					"create-option" => "Create an option",
+					"create-option-group" => "Create an option group",
 					"Comment" => "Comment",
 					"configure-ip-range" => "Configure dynamic IP ranges",
 					"confirm-remove-cluster" => "Are you sure you want to remove cluster '",		
@@ -294,6 +295,7 @@
 					"err-cluster-already-exists" => "A cluster with this name already exists",
 					"err-cluster-need-members" => "A cluster need to have one or more members",
 					"err-cluster-not-exists" => "This cluster doesn't exists",
+					"err-custom-option-already-exists" => "This custom option already exists",
 					"err-custom-option-not-exists" => "This custom option doesn't exists",
 					"err-dlease-sup-mlease" => "Default lease time is superior than max lease time",
 					"err-dhcpserver-invalid-alias" => "Invalid DHCP server alias",

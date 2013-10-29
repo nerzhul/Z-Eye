@@ -26,20 +26,8 @@
 		}
 		
 		public function Load() {
-			$output = "";
-			$err = FS::$secMgr->checkAndSecuriseGetData("err");
-			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-data")); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-write-fail")); break;
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-already-exist")); break;
-				case 4: $output .= FS::$iMgr->printError($this->loc->s("err-not-exist")); break;
-				case 5: $output .= FS::$iMgr->printError($this->loc->s("err-read-fail")); break;
-				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-readorwrite")); break;
-				case -1: $output .= FS::$iMgr->printDebug($this->loc->s("mod-ok")); break;
-				default: break;
-			}
-			$output .= $this->showMain();
-			return $output;
+			FS::$iMgr->setURL("");
+			return $this->showMain();
 		}
 
 		private function showMain() {

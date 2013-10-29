@@ -56,15 +56,16 @@
 
 		private function showMain() {
 			$output = "";
-			if (!FS::isAjaxCall())
+			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-network-device-mgmt");
+			}
 
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
-                        if ($count < 1) {
-                                $output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-                                        "<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
-                                return $output;
-                        }
+			if ($count < 1) {
+					$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
+							"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
+					return $output;
+			}
 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
@@ -1003,8 +1004,13 @@
 						$tmpoutput .= "<th>POE</th>";
 					}
 					$tmpoutput .= "<th>";
-					if ($iswif == true) $tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
-					else $tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr></thead>";
+					if ($iswif == true) {
+						$tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
+					}
+					else {
+						$tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr></thead>";
+					}
+
 					$query = FS::$dbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",array("order" => $od));
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						if (preg_match("#unrouted#",$data["port"]))
@@ -1033,14 +1039,14 @@
 						// Editable room
 						$tmpoutput2 .= "<td><div id=\"swproom_".$convport."\">".
 							"<a onclick=\"javascript:modifyRoom('#swproom_".$convport." a',false);\"><div id=\"swproom_".$convport."l\" class=\"modport\">".
-							($plug == "" ? $this->loc->s("Modify") : $room).
+							($room == "" ? $this->loc->s("Modify") : $room).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("swroom-".$convport,$room,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#swproom_".$convport.
 								"',true,'".$dip."','".$data["port"]."','swroom-".$convport."');").
-							"</a></div></td><td>";
+							"</a></div></td>";
 						// Editable state
-						$tmpoutput2 .= "<div id=\"swst_".$convport."\">";
+						$tmpoutput2 .= "<td><div id=\"swst_".$convport."\">";
 						if ($data["up_admin"] == "down") {
 							$tmpoutput2 .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
 						}
@@ -1293,6 +1299,7 @@
 			}
 
 			protected function showDeviceList() {
+				FS::$iMgr->setURL("");
 				$output = "";
 				$err = FS::$secMgr->checkAndSecuriseGetData("err");
 				switch($err) {

@@ -23,20 +23,24 @@
 			$locales = array(
 				"fr" => array(
 					"Connect" => "Connexion",
-					"err-bad-user" => "Nom d'utilisateur et/ou mot de passe inconnu",
+					"err-bad-user" => "Nom d'utilisateur et/ou mot de passe incorrect",
 					"err-unk" => "Erreur inconnue",
+					"inactivity-disconnect" => "Vous avez été déconnecté suite à une trop longue période d'inactivité. Merci de vous reconnecter.",
 					"menu-title" => "Connexion",
 					"Login" => "Utilisateur",
 					"Password" => "Mot de passe",
+					"result-ok-load" => "Connexion réussie. Chargement de l'interface.",
 					"title-conn" => "Connexion à l'espace d'administration",
 				),
 				"en" => array(
 					"Connect" => "Connect",
 					"err-bad-user" => "Invalid user/password",
 					"err-unk" => "Unknown error",
+					"inactivity-disconnect" => "You have been disconnected because of a too long AFK. Please login another time.",
 					"Login" => "User",
 					"menu-title" => "Connexion",
 					"Password" => "Password",
+					"result-ok-load" => "Connection success. Loading interface.",
 					"title-conn" => "Connect to the admin panel",
 				)
 			);

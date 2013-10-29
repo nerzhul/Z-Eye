@@ -52,6 +52,8 @@
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			}
 			else if (!$sh || $sh == 1) {
+				FS::$iMgr->setURL("sh=1");
+				
 				$output .= FS::$iMgr->cbkForm($sh);
 				// Load snort keys for db config
 				$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
@@ -69,6 +71,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 2) {
+				FS::$iMgr->setURL("sh=2");
+				
 				$dnsenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dnsenable'");
 				$dnslist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dnslist'");
 				if (!$dnsenable) $dnsenable = 0;
@@ -79,6 +83,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 3) {
+				FS::$iMgr->setURL("sh=3");
+				
 				$smtpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'smtpenable'");
 				$smtplist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'smtplist'");
 				$smtpports = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'smtpports'");
@@ -109,6 +115,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 4) {
+				FS::$iMgr->setURL("sh=4");
+				
 				$httpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'httpenable'");
 				$httplist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'httplist'");
 				$httpports = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'httpports'");
@@ -124,6 +132,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 5) {
+				FS::$iMgr->setURL("sh=5");
+				
 				$sqlenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'sqlenable'");
 				$sqllist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'sqllist'");
 				if (!$sqlenable) $sqlenable = 0;
@@ -143,6 +153,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 6) {
+				FS::$iMgr->setURL("sh=6");
+				
 				$telnetenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'telnetenable'");
 				$telnetlist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'telnetlist'");
 				if (!$telnetenable) $telnetenable = 0;
@@ -167,6 +179,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 7) {
+				FS::$iMgr->setURL("sh=7");
+				
 				$ftpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'ftpenable'");
 				$ftplist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'ftplist'");
 				$ftpports = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'ftpports'");
@@ -181,6 +195,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 8) {
+				FS::$iMgr->setURL("sh=8");
+				
 				$snmpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'snmpenable'");
 				$snmplist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'snmplist'");
 				if (!$snmpenable) $snmpenable = 0;
@@ -192,6 +208,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 9) {
+				FS::$iMgr->setURL("sh=9");
+				
 				$sipenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'sipenable'");
 				$siplist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'siplist'");
 				$sipports = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'sipports'");
@@ -205,6 +223,8 @@
 				$output .= FS::$iMgr->tableSubmit("Register");
 			}
 			else if ($sh == 10) {
+				FS::$iMgr->setURL("sh=10");
+				
 				$nightreport = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'report_nighten'");
 				$wereport = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'report_ween'");
 				$nighth = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'report_nighthour'");

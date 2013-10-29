@@ -69,7 +69,7 @@
 				$ldapMgr->RootConnect();
 				$result = $ldapMgr->GetOneEntry($ldapident."=".$username);
 				if (!$result) {
-					FS::$iMgr->ajaxEcho("err-bad-user");
+					$this->setLoginResult("err-bad-user");
 					$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
 					return;
 				}
@@ -108,7 +108,7 @@
 					if ($data["sha_pwd"] != $encryptPwd) {
 						$this->log(1,"Login failed for user '".$username."' (Bad password)","None");
 						FS::$dbMgr->Update(PgDbConfig::getDbPrefix()."users","failauthnb = failauthnb + 1","username = '".$username."'");
-						FS::$iMgr->ajaxEcho("err-bad-user");
+						$this->setLoginResult("err-bad-user");
 						return;
 					}
 					$this->genAPIKeyIfNot($username);
@@ -119,7 +119,18 @@
 				}
 			}
 			$this->log(1,"Login failed for user '".$username."' (Unknown user)","None");
-			FS::$iMgr->ajaxEcho("err-bad-user");
+			$this->setLoginResult("err-bad-user");
+		}
+		
+		private function setLoginResult($text,$good=false) {
+			if ($text) {
+				FS::$iMgr->js(sprintf("setLoginCbkMsg('<span style=\"color: %s;\">%s</span>');",
+					$good ? "green" : "red",
+					addslashes($this->loc->s($text))));
+			}
+			else {
+				FS::$iMgr->js("setLoginCbkMsg('');");
+			}
 		}
 
 		private function genAPIKeyIfNot($username) {
@@ -144,9 +155,23 @@
 		}
 		
 		private function connectUser($uid) {
-			$langs = preg_split("#[;]#",$_SERVER["HTTP_ACCEPT_LANGUAGE"]);
-			if (count($langs) > 0)
-				$_SESSION["lang"] = $langs[0];
+			$settingsLang = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","lang","uid = '".$uid."'");
+			if ($settingsLang) {
+				$_SESSION["lang"] = $settingsLang;
+			}
+			else {
+				$_SESSION["lang"] = FS::$sessMgr->getBrowserLang();
+			}
+			
+			$inactivityTimer = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","inactivity_timer","uid = '".$uid."'");
+			if ($inactivityTimer) {
+				FS::$iMgr->js("setMaxIdleTimer('".$inactivityTimer."');");
+				$_SESSION["idle_timer"] = $inactivityTimer;
+			}
+			else {
+				FS::$iMgr->js("setMaxIdleTimer('30');");
+				$_SESSION["idle_timer"] = 30;
+			}
 			$_SESSION["uid"] = $uid;
 			$_SESSION["prevfailedauth"] = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."users","failauthnb","uid = '".$uid."'");
 			FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","failauthnb = '0', last_conn = NOW(), last_ip = '".FS::$sessMgr->getOnlineIP()."'","uid = '".$uid."'");
@@ -175,17 +200,27 @@
 			if ($url) {
 				$url = "&".$url;
 			}
-			$js = "loadWindowHead();loadMainContainer('".$url."');";
+			$this->setLoginResult("result-ok-load",true);
+			$js = "loadWindowHead();loadMainContainer('".$url."');closeLogin();";
 			FS::$iMgr->ajaxEcho("Done",$js);
 		}
 
-		public function Disconnect() {
+		public function Disconnect($loginForm=false) {
 			if (FS::$sessMgr->getUid()) {
 				$this->log(0,"User disconnected");
 				FS::$sessMgr->Close(); 
 
-				$js = "loadWindowHead();loadMainContainer('');unlockScreen(true);";
+				if ($loginForm) {
+					$this->setLoginResult("inactivity-disconnect");
+					FS::$iMgr->js("openLogin();");
+				}
+				else {
+					$this->setLoginResult("",true);
+				}
+				$js = "loadWindowHead(); loadMainContainer('');unlockScreen(true); setMaxIdleTimer('-1');";
 				FS::$iMgr->ajaxEcho("Done",$js);
+				
+				
 			}
 		}
 

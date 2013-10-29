@@ -2038,14 +2038,16 @@
 		
 		public function search($search, $autocomplete = false) {
 			if ($autocomplete) {
-				$out = shell_exec("/usr/bin/dig +short ".$search);
-				if ($out != NULL) {
-					$found = false;
-					$spl = preg_split("#[\n]#",$out);
-					for ($i=0;$i<count($spl) && !$found;$i++) {
-						if (strlen($spl[$i]) > 0) {
-							$found = true;
-							FS::$searchMgr->addAR("dnsrecord",$search);
+				if (FS::$secMgr->isDNSName($search)) {
+					$out = shell_exec("/usr/bin/dig +short ".$search);
+					if ($out != NULL) {
+						$found = false;
+						$spl = preg_split("#[\n]#",$out);
+						for ($i=0;$i<count($spl) && !$found;$i++) {
+							if (strlen($spl[$i]) > 0) {
+								$found = true;
+								FS::$searchMgr->addAR("dnsrecord",$search);
+							}
 						}
 					}
 				}
@@ -2076,7 +2078,7 @@
 			else {
 				$output = "";
 				
-				if (!FS::$secMgr->isIP($search) && !FS::$secMgr->isHostname($search)) {
+				if (FS::$secMgr->isDNSName($search)) {
 					$out = shell_exec("/usr/bin/dig ".$search);
 					if ($out != NULL) {
 						$output .= preg_replace("#[\n]#","<br />",$out);

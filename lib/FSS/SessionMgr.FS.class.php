@@ -108,19 +108,17 @@
 		private function connectDBIfNot() {
 			if (!$this->dbMgr) {
 				$this->dbMgr = new AbstractSQLMgr();
-                	        $this->dbMgr->initForZEye();
+                $this->dbMgr->initForZEye();
 			}
 
 			if (!$this->dbMgr->isPDOOK()) {
-                		$this->dbMgr->Connect();
+                $this->dbMgr->Connect();
 			}
 		}
 		
 		public function InitSessionIfNot() {
-
 			if (!isset($_SESSION["uid"]))
 				$_SESSION["uid"] = 0;
-
 		}
 
 		public function isConnected() {
@@ -147,17 +145,32 @@
 			return $_SERVER['REQUEST_URI'];
 		}
 		
-		public function getLang() {
-			$lang = "fr";
+		public function getBrowserLang() {
+			$lang = Config::getSysLang();
 			$tmp = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			$lang = strtolower(substr(chop($tmp[0]),0,2));
+			return $lang;
 		}
 		
-		public function getUid() { return $_SESSION["uid"]; }
+		public function getUid() { 
+			if (isset($_SESSION["uid"])) {
+				return $_SESSION["uid"];
+			}
+			return NULL;
+		}
+		
+		public function getIdleTimer() {
+			if (isset($_SESSION["idle_timer"])) {
+				return $_SESSION["idle_timer"];
+			}
+			
+			return (Config::getSessionExpirationTime() / 60);
+		}
 
 		public function getUserName() {
-			if ($this->getUid())
+			if ($this->getUid()) {
 				return FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$this->getUid()."'");
+			}
 			return NULL;
 		}
 

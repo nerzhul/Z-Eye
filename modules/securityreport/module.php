@@ -82,6 +82,7 @@
 			}
 			else {
 				if (!$showmodule || $showmodule == 1) {
+					FS::$iMgr->setURL("sh=1");
 					$output .= FS::$iMgr->h3("title-z-eye-report");
 					$totalips = $this->snortDB->Count(PGDbConfig::getDbPrefix()."collected_ips","ip");
 					$totalscan = $this->snortDB->Sum(PGDbConfig::getDbPrefix()."collected_ips","scans");
@@ -158,6 +159,7 @@
 						})(jQuery);");
 				}
 				else if ($showmodule == 2) {
+					FS::$iMgr->setURL("sh=2");
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=2");
@@ -187,6 +189,7 @@
 						$output .= $tmpoutput."</table>";
 				}
 				else if ($showmodule == 3) {
+					FS::$iMgr->setURL("sh=3");
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=3");
@@ -216,6 +219,7 @@
 						$output .= $tmpoutput."</table>";
 				}
 				else if ($showmodule == 4) {
+					FS::$iMgr->setURL("sh=4");
 					$found = 0;
 					
 					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4");
@@ -245,6 +249,7 @@
 						$output .= $tmpoutput."</table>";
 				}
 				else if ($showmodule == 5) {
+					FS::$iMgr->setURL("sh=5");
 					$found = false;
 					$output .= FS::$iMgr->h3("last-100");
 					$query = $this->snortDB->Select("acid_event","sig_name,timestamp,ip_src,ip_dst,ip_proto,layer4_sport,layer4_dport","",array("order" => "timestamp","ordersens" => 1,"limit" => 100));

@@ -331,7 +331,7 @@
 				$dbtype = FS::$dbMgr->GetOneData("z_eye_radius_db_list","dbtype","addr='".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'");
 
 				$radSQLMgr = new AbstractSQLMgr();
-                                $radSQLMgr->setConfig($dbtype,$raddb,$radport,$radhost,$radlogin,$radpwd);
+                $radSQLMgr->setConfig($dbtype,$raddb,$radport,$radhost,$radlogin,$radpwd);
 				$radSQLMgr->Connect();
 
 				if(!$radSQLMgr->GetOneData("radusergroup","username","username = '".$mac."' AND groupname = '".$data["groupname"]."'"))
