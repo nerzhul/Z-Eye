@@ -244,7 +244,10 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 								if self.customOptsList[options[0]][1] == "text":
 									subnetBuf += "\toption %s \"%s\";\n" % (options[0],ZEyeUtil.addslashes(options[1]))
 								else:
-									subnetBuf += "\toption %s %s;\n" % (options[0],options[1])
+									if options[0] == "next-server":
+										subnetBuf += "\t%s %s;\n" % (options[0],options[1])
+									else:
+										subnetBuf += "\toption %s %s;\n" % (options[0],options[1])
 
 						if self.subnetList[subnet][6] != "" and self.subnetList[subnet][6] != 0:
 							subnetBuf += "\tdefault-lease-time %s;\n" % self.subnetList[subnet][6]

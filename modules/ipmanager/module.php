@@ -1595,6 +1595,14 @@
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
 						return;
 					}
+					
+					if (!$dleasetime) {
+						$dleasetime = 0;
+					}
+					
+					if (!$mleasetime) {
+						$mleasetime = 0;
+					}
 
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$netid."'");
 					if ($edit) {

@@ -1,3 +1,4 @@
+
 #! python
 # -*- coding: utf-8 -*-
 
@@ -34,7 +35,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1316"
+	nextDBVersion = "1317"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -218,6 +219,10 @@ class ZEyeDBUpgrade():
 				self.tryAlterColumn("z_eye_dhcp_subnet_v4_declared","mleasetime","SET DEFAULT '0'")
 				self.tryAlterColumn("z_eye_dhcp_subnet_v4_declared","dleasetime","SET DEFAULT '0'")
 				self.setDBVersion("1316")
+			if self.dbVersion == "1316":
+				self.rawRequest("update z_eye_dhcp_custom_option set optname = 'next-server', opttype = 'ip' where optname = 'tftp-server-name'")
+				self.rawRequest("update z_eye_dhcp_option set optname = 'next-server' where optname = 'tftp-server-name'")
+				self.setDBVersion("1317")
 '		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
