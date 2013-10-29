@@ -651,12 +651,13 @@
 				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->deviceIP."_write")) {
 				return false;
 			}
+			return true;	
 		}
 		public function FastModify() {
 			$this->devicePort = FS::$secMgr->checkAndSecurisePostData("swport");
 			$this->deviceIP = FS::$secMgr->checkAndSecurisePostData("sw");
 			$room = FS::$secMgr->checkAndSecurisePostData("room");
-			if ($port == NULL || $dip == NULL) {
+			if ($this->devicePort == NULL || $this->deviceIP == NULL) {
 				$this->log(2,"Some fields are missing (plug fast edit)");
 				echo "ERROR";
 				return;
@@ -665,7 +666,7 @@
 			$this->device = FS::$dbMgr->GetOneData("device","name","ip = '".$this->deviceIP."'");
 			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("NORIGHTS");
+				FS::$iMgr->ajaxEcho("err-no-rights");
 				return;	
 			}
 

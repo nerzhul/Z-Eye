@@ -994,12 +994,14 @@
 					$tmpoutput = "<table id=\"tportList\"><thead><tr><th class=\"headerSortDown\">".
 						FS::$iMgr->aLink($this->mid."&d=".$device."&od=port", "Port")."</th><th>";
 					$tmpoutput .= $this->loc->s("Description")."</th>
-						<th>".$this->loc->s("Plug")."</th><th>Up (Link/Admin)</th>";
-					if ($iswif == false)
+						<th>".$this->loc->s("Plug")."</th><th>".$this->loc->s("Room")."</th><th>Up (Link/Admin)</th>";
+					if ($iswif == false) {
 						$tmpoutput .= "<th>".$this->loc->s("Duplex")." (Link/Admin)</th>";
-					$tmpoutput .= "<th>Vitesse</th>";
-					if ($iswif == false)
+					}
+					$tmpoutput .= "<th>".$this->loc->s("Speed")."</th>";
+					if ($iswif == false) {
 						$tmpoutput .= "<th>POE</th>";
+					}
 					$tmpoutput .= "<th>";
 					if ($iswif == true) $tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
 					else $tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr></thead>";
@@ -1030,13 +1032,13 @@
 							"</a></div></td>";
 						// Editable room
 						$tmpoutput2 .= "<td><div id=\"swproom_".$convport."\">".
-							"<a onclick=\"javascript:modifyRoom('#swpr_".$convport." a',false);\"><div id=\"swproom_".$convport."l\" class=\"modport\">".
-							($plug == "" ? $this->loc->s("Modify") : $plug).
+							"<a onclick=\"javascript:modifyRoom('#swproom_".$convport." a',false);\"><div id=\"swproom_".$convport."l\" class=\"modport\">".
+							($plug == "" ? $this->loc->s("Modify") : $room).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("swroom-".$convport,$room,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#swproom_".$convport.
 								"',true,'".$dip."','".$data["port"]."','swroom-".$convport."');").
-							"</a></div></td><td>".
+							"</a></div></td><td>";
 						// Editable state
 						$tmpoutput2 .= "<div id=\"swst_".$convport."\">";
 						if ($data["up_admin"] == "down") {
@@ -1283,11 +1285,11 @@
 			}
 
 			private function showDeviceDiscovery() {
-				$output = FS::$iMgr->cbkForm("18");
-				$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:");
-				$output .= "</li><li>".FS::$iMgr->Submit("",$this->loc->s("Discover"))."</li>";
-				$output .= "</ul></form>";
-				return $output;
+				return sprintf("%s<ul class=\"ulform\"><li>%s</li><li>%s</li></ul></form>",
+					FS::$iMgr->cbkForm("18"),
+					FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:"),
+					FS::$iMgr->Submit("",$this->loc->s("Discover"))
+				);
 			}
 
 			protected function showDeviceList() {
