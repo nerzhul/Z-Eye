@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1315"
+	nextDBVersion = "1316"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -214,7 +214,11 @@ class ZEyeDBUpgrade():
 				self.tryAddColumn("z_eye_users","lang","varchar(6) DEFAULT ''")
 				self.tryAddColumn("z_eye_users","inactivity_timer","int DEFAULT '30'")
 				self.setDBVersion("1315")
-		except PgSQL.Error, e:
+			if self.dbVersion == "1315":
+				self.tryAlterColumn("z_eye_dhcp_subnet_v4_declared","mleasetime","SET DEFAULT '0'")
+				self.tryAlterColumn("z_eye_dhcp_subnet_v4_declared","dleasetime","SET DEFAULT '0'")
+				self.setDBVersion("1316")
+'		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
                         Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
@@ -267,7 +271,22 @@ class ZEyeDBUpgrade():
                         Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
 			print "PgSQL Error: %s" % e
                         sys.exit(1);
+	def tryAlterColumn(self,tablename,columnname,attributes):
+		try:
+			pgcursor = self.pgsqlCon.cursor()
+			pgcursor.execute("ALTER TABLE %s ALTER COLUMN %s %s" % (tablename,columnname,attributes))
+			self.pgsqlCon.commit()
+		except PgSQL.Error, e:
+			# If column exists, maybe the database is already up-to-date
+			if re.search("column \"%s\" of relation \"%s\" does not exists" % (columnname,tablename),"%s" % e):	
+				return
 
+			if self.pgsqlCon:
+				self.pgsqlCon.close()
+                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			print "PgSQL Error: %s" % e
+			sys.exit(1);
+                        
 	def tryAddColumn(self,tablename,columnname,attributes):
 		try:
 			pgcursor = self.pgsqlCon.cursor()
