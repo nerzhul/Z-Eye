@@ -1,4 +1,3 @@
-
 #! python
 # -*- coding: utf-8 -*-
 
@@ -223,7 +222,7 @@ class ZEyeDBUpgrade():
 				self.rawRequest("update z_eye_dhcp_custom_option set optname = 'next-server', opttype = 'ip' where optname = 'tftp-server-name'")
 				self.rawRequest("update z_eye_dhcp_option set optname = 'next-server' where optname = 'tftp-server-name'")
 				self.setDBVersion("1317")
-'		except PgSQL.Error, e:
+		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
                         Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
