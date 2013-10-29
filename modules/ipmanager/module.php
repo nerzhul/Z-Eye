@@ -127,6 +127,7 @@
 				FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) &&
 				$netdeclared) {
 				$output .= FS::$iMgr->opendiv(14,$this->loc->s("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$netid));
+				$output .= FS::$iMgr->opendiv(15,$this->loc->s("import-dhcp-reserv"),array("line" => true,"lnkadd" => "subnet=".$netid));
 			}
 
 			$output .= "<div id=\"".FS::$iMgr->formatHTMLId($netid)."\"></div>";
@@ -335,6 +336,32 @@
 			FS::$iMgr->js($js);
 
 			return $output;
+		}
+		
+		private function showDHCPImportReservForm($subnet) {
+			$subnetu = preg_replace("#[.]#","_",$subnet);
+			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
+				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) {
+				return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+			}
+			
+			$netmask = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$subnet."'");
+			if (!$netmask) {
+				return FS::$iMgr->printError($this->loc->s("err-subnet-not-exists"));
+			}
+
+			
+			$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt($this->loc->s("comma"),",").
+					FS::$iMgr->selElmt($this->loc->s("semi-colon"),";")."</select>";
+						
+			return FS::$iMgr->tip("tip-import-reserv").
+				FS::$iMgr->cbkForm("19")."<table>".
+				FS::$iMgr->idxLines(array(
+					array("CSV-content","csv",array("type" => "area", "width" => 600)),
+					array("separator","sep",array("type" => "raw", "value" => $selOutput)),
+					array("Replace-?","repl",array("type" => "chk"))
+				)).
+				FS::$iMgr->tableSubmit("Import");
 		}
 
 		private function showDHCPRangeForm($subnet) {
@@ -1209,53 +1236,67 @@
 				case 1: return $this->showDHCPSubnetForm();
 				case 2:
 					$netid = FS::$secMgr->checkAndSecuriseGetData("netid");
-					if (!$netid)
+					if (!$netid) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showDHCPSubnetForm($netid);
 				case 3: 
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
-					if (!$addr)
+					if (!$addr) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showDHCPSrvForm($addr);
 				case 4: return $this->showDHCPClusterForm();
 				case 5: return $this->showDHCPSrvForm();
 				case 6:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if (!$name)
+					if (!$name) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showDHCPClusterForm($name);
 				case 7:
 					$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
-					if (!$ip || !FS::$secMgr->isIP($ip))
+					if (!$ip || !FS::$secMgr->isIP($ip)) {
 						return $this->loc->s("err-bad-datas");
+					}
 
 					return $this->showIPForm($ip);
 				case 8: return $this->showDHCPCustomOptsForm();
 				case 9:
 					$optname = FS::$secMgr->checkAndSecuriseGetData("optname");
-					if (!$optname)
+					if (!$optname) {
 						return $this->loc->s("err-bad-datas");
+					}
 					return $this->showDHCPCustomOptsForm($optname);
 				case 10: return $this->showDHCPOptsForm();
 				case 11:
 					$optalias = FS::$secMgr->checkAndSecuriseGetData("optalias");
-					if (!$optalias)
+					if (!$optalias) {
 						return $this->loc->s("err-bad-datas");
+					}
 					return $this->showDHCPOptsForm($optalias);
 				case 12: return $this->showDHCPOptsGroupForm();
 				case 13:
 					$optgroup = FS::$secMgr->checkAndSecuriseGetData("optgroup");
-					if (!$optgroup)
+					if (!$optgroup) {
 						return $this->loc->s("err-bad-datas");
+					}
 					return $this->showDHCPOptsGroupForm($optgroup);
 				case 14:
 					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
-					if (!$subnet)
+					if (!$subnet) {
 						return $this->loc->s("err-bad-datas");
+					}
 					return $this->showDHCPRangeForm($subnet);
+				case 15:
+					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
+					if (!$subnet) {
+						return $this->loc->s("err-bad-datas");
+					}
+					return $this->showDHCPImportReservForm($subnet);
 				default: return;
 			}
 		}
@@ -2567,6 +2608,10 @@
 
 					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
 					FS::$iMgr->ajaxEcho("Done",$js);
+					return;
+				// Import fixed adresses
+				case 19:
+					FS::$iMgr->ajaxEcho("Done");
 					return;
 			}
 		}
