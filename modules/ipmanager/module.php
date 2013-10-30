@@ -2629,7 +2629,7 @@
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 					$ipObj = new dhcpIP();
 					if ($subnetObj = $ipObj->injectIPCSV()) {
-						//$this->calculateRanges($subnet,$subnetObj);
+						$this->calculateRanges($subnet,$subnetObj);
 						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
 					}
 					return;
@@ -2638,7 +2638,7 @@
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 					$ipObj = new dhcpIP();
 					if ($subnetObj = $ipObj->importIPFromCache()) {
-						//$this->calculateRanges($subnet,$subnetObj);
+						$this->calculateRanges($subnet,$subnetObj);
 						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
 					}
 					return;
