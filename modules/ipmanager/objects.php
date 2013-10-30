@@ -559,6 +559,24 @@
 					return false;
 				}
 				
+				if (!FS::$secMgr->isHostname($entry[0])) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-hostname"),
+						$entry[0]),"",true);
+					return false;
+				}
+				
+				if (!FS::$secMgr->isIP($entry[2])) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-ip"),
+						$entry[2]),"",true);
+					return false;
+				}
+				
+				if (!FS::$secMgr->isMacAddr($entry[1])) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-mac"),
+						$entry[1]),"",true);
+					return false;
+				}
+				
 				// Hostname must be unique in this import
 				if (isset($hostList[$entry[0]])) {
 					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry-multiple-hostname"),
