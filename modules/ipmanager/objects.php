@@ -521,6 +521,35 @@
 		}
 		
 		public function importIPFromCache() {
+			$ip = FS::$secMgr->checkAndSecurisePostData("ip");
+			$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+			
+			if (!$subnet || !$ip) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return false;
+			}
+			
+			$subnetObj = new dhcpSubnet();
+			if (!$subnetObj->Load($subnet)) {
+				FS::$iMgr->ajaxEcho("err-subnet-not-exists");
+				return false;
+			}
+			
+			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+				$this->log(2,"Import IP via CSV: no rights");
+				FS::$iMgr->ajaxEcho("err-no-rights");
+				return false;
+			}
+			
+			if (!FS::$secMgr->isIP($ip)) {
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-ip"),
+					$ip),"",true);
+				return false;
+			}
+			
+			// @TODO
+			
+			return $subnetObj;
 		}
 		
 		public function injectIPCSV() {
@@ -543,7 +572,7 @@
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
 				$this->log(2,"Import IP via CSV: no rights");
 				FS::$iMgr->ajaxEcho("err-no-rights");
-				return;
+				return false;
 			}
 			
 			$csv = preg_replace("#[\r]#","",$csv);
@@ -660,7 +689,7 @@
 				}
 			}
 			FS::$dbMgr->CommitTr();
-			return true;
+			return $subnetObj;
 		}
 		
 		private $sqlCacheTable;

@@ -2628,14 +2628,17 @@
 				case 19:
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 					$ipObj = new dhcpIP();
-					if ($ipObj->injectIPCSV()) {
+					if ($subnetObj = $ipObj->injectIPCSV()) {
+						//$this->calculateRanges($subnet,$subnetObj);
 						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
 					}
 					return;
 				// Import reserv from cache
 				case 20:
+					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 					$ipObj = new dhcpIP();
-					if ($ipObj->importIPFromCache()) {
+					if ($subnetObj = $ipObj->importIPFromCache()) {
+						//$this->calculateRanges($subnet,$subnetObj);
 						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
 					}
 					return;
