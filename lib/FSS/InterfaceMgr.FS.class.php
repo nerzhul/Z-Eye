@@ -698,9 +698,10 @@
 
 		}
 
-		public function img($path,$sizeX = 0,$sizeY = 0, $id = "") {
-			return sprintf("<img src=\"%s\" %s%s%s style=\"border: none;\"/>",
+		public function img($path,$sizeX = 0,$sizeY = 0, $id = "",$options = array()) {
+			return sprintf("<img src=\"%s\" %s%s%s%s style=\"border: none;\"/>",
 				$path,
+				isset($options["tooltip"]) ? $this->tooltip($options["tooltip"]) : "",
 				($sizeX != 0 ? "width=\"".$sizeX."\" " : ""),
 				($sizeY != 0 ? "height=\"".$sizeY."\" " : ""),
 				($id ? "id=\"".$id."\" " : "")

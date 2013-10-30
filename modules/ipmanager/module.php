@@ -111,6 +111,10 @@
 				$netid = $data["netid"]; $netmask = $data["netmask"];
 				$netdeclared = true;
 			}
+			
+			// Check if subnet is distributed to cluster
+			$subnetLinkedToCluster = (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet","subnet = '".$filter."'") != NULL);
+			
 			if (!$netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
@@ -293,16 +297,26 @@
 						}
 						break;
 				}
-				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\"><td>".FS::$iMgr->opendiv(7,long2ip($key),array("lnkadd" => "ip=".long2ip($key))).
+				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\"><td>".
+					FS::$iMgr->opendiv(7,long2ip($key),array("lnkadd" => "ip=".long2ip($key))).
 					"</td><td>".FS::$iMgr->searchIcon(long2ip($key)).
-					"</td><td>".$rstate."</td><td>".
-					FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"], $value["mac"])."</td><td>";
-				$output .= $value["host"]."</td><td>".$value["comment"]."</td><td>";
+					"</td><td>".$rstate;
+				
+				// Import option when subnet is distributed on a cluster and IP is only in the cache, not IPM
+				if ($value["distrib"] == 3 && $subnetLinkedToCluster) {
+					$output .= FS::$iMgr->img("styles/images/upload.png",15,15,"",
+						array("tooltip" => "tooltip-import-reserv"));
+				}
+				$output .= "</td><td>".
+					FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"], $value["mac"])."</td><td>".
+					$value["host"]."</td><td>".$value["comment"]."</td><td>";
 				// Show switch column only of a switch is here
 				if ($swfound) {
-					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"], $value["switch"]) : "").
+					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+						"&d=".$value["switch"], $value["switch"]) : "").
 						"</td><td>";
-					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$value["switch"]."&p=".$value["port"], $value["port"]) : "").
+					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+						"&d=".$value["switch"]."&p=".$value["port"], $value["port"]) : "").
 						"</td><td>";
 				}
 				$output .= $value["ltime"]."</td><td>";
