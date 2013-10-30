@@ -520,6 +520,9 @@
 			}
 		}
 		
+		public function importIPFromCache() {
+		}
+		
 		public function injectIPCSV() {
 			$csv = FS::$secMgr->checkAndSecurisePostData("csv");
 			$sep = FS::$secMgr->checkAndSecurisePostData("sep");

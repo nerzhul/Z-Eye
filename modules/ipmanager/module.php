@@ -2618,6 +2618,13 @@
 						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
 					}
 					return;
+				// Import reserv from cache
+				case 20:
+					$ipObj = new dhcpIP();
+					if ($ipObj->importIPFromCache()) {
+						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
+					}
+					return;
 			}
 		}
 	};

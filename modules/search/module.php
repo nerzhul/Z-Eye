@@ -34,7 +34,15 @@
 				return $this->findRefsAndShow($autosearch,true);
 			}
 			else {
-				return FS::$iMgr->printError($this->loc->s("err-no-search"));
+					$search = FS::$secMgr->checkAndSecurisePostData("s");
+				if (!$search) {
+					$search = FS::$secMgr->checkAndSecuriseGetData("s");
+				}
+				
+				if (!$search) {
+					return FS::$iMgr->printError($this->loc->s("err-no-search"));
+				}
+				return $this->findRefsAndShow($search);
 			}
 		}
 
