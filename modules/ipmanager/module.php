@@ -2612,10 +2612,10 @@
 					return;
 				// Import fixed adresses
 				case 19:
+					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 					$ipObj = new dhcpIP();
 					if ($ipObj->injectIPCSV()) {
-						$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
-						FS::$iMgr->ajaxEcho("Done",$js);
+						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
 					}
 					return;
 			}

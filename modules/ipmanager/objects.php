@@ -223,8 +223,8 @@
 		
 		public function isIPIn($ip) {
 			$netObj = new FSNetwork();
-			$netObj->setNetAddr($netid);
-			$netObj->setNetMask($netmask);
+			$netObj->setNetAddr($this->netid);
+			$netObj->setNetMask($this->netmask);
 			return $netObj->isUsableIP($ip);
 		}
 		
@@ -567,16 +567,18 @@
 				}
 				
 				// Hostname mustn't be used if replace is not selected
-				if ($repl != "on" && FS::$iMgr->GetOneData($this->sqlTable,"hostname",
+				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"hostname",
 					"hostname = '".$entry[0]."' AND reserv = 't'")) {
 					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
 						$entry[2]),"",true);
+					return false;
 				}
 				
 				// IP must be in selected subnet
 				if (!$subnetObj->isIPIn($entry[2])) {
 					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-not-in-subnet"),
 						$entry[2],$subnet),"",true);
+					return false;
 				}
 				
 				// IP must be unique in this import
@@ -587,20 +589,22 @@
 				}
 				
 				// IP mustn't be used if replace is not selected
-				if ($repl != "on" && FS::$iMgr->GetOneData($this->sqlTable,"ip",
+				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"ip",
 					"ip = '".$entry[2]."' AND reserv = 't'")) {
 					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
 						$entry[2]),"",true);
+					return false;
 				}
 				
 				// cleanup MAC Address
 				$entry[1] = strtolower(preg_replace("#[-]#",":",$entry[1]));
 				
 				// MAC mustn't be used if replace is not selected
-				if ($repl != "on" && FS::$iMgr->GetOneData($this->sqlTable,"mac",
-					"mac = '".$entry[1]."' AND reserv = 't'")) {
+				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"macaddr",
+					"macaddr = '".$entry[1]."' AND reserv = 't'")) {
 					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
 						$entry[2]),"",true);
+					return false;
 				}
 				
 				// MAC must be unique in this import
@@ -623,9 +627,9 @@
 			foreach ($hostList as $hostname => $values) {
 				foreach($values as $IP => $mac) {
 					if ($repl == "on") {
-						FS::$dbMgr->Delete($this->sqlTable,"ip = '".$IP."' OR mac = '".$mac."' or hostname = '".$hostname."'");
+						FS::$dbMgr->Delete($this->sqlTable,"ip = '".$IP."' OR macaddr = '".$mac."' or hostname = '".$hostname."'");
 					}
-					FS::$dbMgr->Insert($this->sqlTable,"ip,mac,hostname,reserv","'".$IP."','".$mac."','".$hostname."','t'");
+					FS::$dbMgr->Insert($this->sqlTable,"ip,macaddr,hostname,reserv","'".$IP."','".$mac."','".$hostname."','t'");
 				}
 			}
 			FS::$dbMgr->CommitTr();
