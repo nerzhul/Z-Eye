@@ -52,8 +52,9 @@
 		}
 
 		public function isUsableIP($ip) {
-			if(ip2long($ip) >= $this->getFirstUsableIPLong() && ip2long($ip) <= $this->getLastUsableIPLong())
+			if(ip2long($ip) >= $this->getFirstUsableIPLong() && ip2long($ip) <= $this->getLastUsableIPLong()) {
 				return true;
+			}
 
 			return false;
 		}

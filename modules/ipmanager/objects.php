@@ -220,7 +220,14 @@
 				}
 			}
 		}
-
+		
+		public function isIPIn($ip) {
+			$netObj = new FSNetwork();
+			$netObj->setNetAddr($netid);
+			$netObj->setNetMask($netmask);
+			return $netObj->isUsableIP($ip);
+		}
+		
 		private $netid;
 		private $netmask;
 		private $vlanid;
@@ -355,7 +362,6 @@
 		}
 	};
 		
-
 	final class dhcpIP extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -512,6 +518,118 @@
 					$this->storeSearchResult($output,"title-dhcp-distrib");
 				}
 			}
+		}
+		
+		public function injectIPCSV() {
+			$csv = FS::$secMgr->checkAndSecurisePostData("csv");
+			$sep = FS::$secMgr->checkAndSecurisePostData("sep");
+			$repl = FS::$secMgr->checkAndSecurisePostData("repl");
+			$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+			
+			if (!$subnet || !$csv || !$sep || $sep != "," && $sep != ";") {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return false;
+			}
+			
+			$subnetObj = new dhcpSubnet();
+			if (!$subnetObj->Load($subnet)) {
+				FS::$iMgr->ajaxEcho("err-subnet-not-exists");
+				return false;
+			}
+			
+			$csv = preg_replace("#[\r]#","",$csv);
+			$lines = preg_split("#[\n]#",$csv);
+			if (!$lines) {
+				FS::$iMgr->ajaxEcho("err-invalid-csv");
+				return false;
+			}
+			
+			$hostList = array();
+			$tmpIPList = array();
+			$tmpMACList = array();
+			
+			// @TODO multiple MAC errors
+			$count = count($lines);
+			for ($i=0;$i<$count;$i++) {
+				$entry = preg_split("#[".$sep."]#",$lines[$i]);
+				
+				// Entry has 3 fields
+				if (count($entry) != 3) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
+					return false;
+				}
+				
+				// Hostname must be unique in this import
+				if (isset($hostList[$entry[0]])) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry-multiple-hostname"),
+						$entry[0]),"",true);
+					return false;
+				}
+				
+				// Hostname mustn't be used if replace is not selected
+				if ($repl != "on" && FS::$iMgr->GetOneData($this->sqlTable,"hostname",
+					"hostname = '".$entry[0]."' AND reserv = 't'")) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
+						$entry[2]),"",true);
+				}
+				
+				// IP must be in selected subnet
+				if (!$subnetObj->isIPIn($entry[2])) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-not-in-subnet"),
+						$entry[2],$subnet),"",true);
+				}
+				
+				// IP must be unique in this import
+				if (in_array($entry[2],$tmpIPList)) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry-multiple-ip"),
+						$entry[2]),"",true);
+					return false;
+				}
+				
+				// IP mustn't be used if replace is not selected
+				if ($repl != "on" && FS::$iMgr->GetOneData($this->sqlTable,"ip",
+					"ip = '".$entry[2]."' AND reserv = 't'")) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
+						$entry[2]),"",true);
+				}
+				
+				// cleanup MAC Address
+				$entry[1] = strtolower(preg_replace("#[-]#",":",$entry[1]));
+				
+				// MAC mustn't be used if replace is not selected
+				if ($repl != "on" && FS::$iMgr->GetOneData($this->sqlTable,"mac",
+					"mac = '".$entry[1]."' AND reserv = 't'")) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
+						$entry[2]),"",true);
+				}
+				
+				// MAC must be unique in this import
+				if (in_array($entry[1],$tmpMACList)) {
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry-multiple-mac"),
+						$entry[1]),"",true);
+					return false;
+				}
+				
+				// Create array dimension by hostname
+				$hostList[$entry[0]] = array();
+				
+				// Create array dimension by IP
+				$hostList[$entry[0]][$entry[2]] = $entry[1];
+				$tmpIPList[] = $entry[2];
+				$tmpMACList[] = $entry[1];
+			}
+			
+			FS::$dbMgr->BeginTr();
+			foreach ($hostList as $hostname => $values) {
+				foreach($values as $IP => $mac) {
+					if ($repl == "on") {
+						FS::$dbMgr->Delete($this->sqlTable,"ip = '".$IP."' OR mac = '".$mac."' or hostname = '".$hostname."'");
+					}
+					FS::$dbMgr->Insert($this->sqlTable,"ip,mac,hostname,reserv","'".$IP."','".$mac."','".$hostname."','t'");
+				}
+			}
+			FS::$dbMgr->CommitTr();
+			return true;
 		}
 		
 		private $sqlCacheTable;

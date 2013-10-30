@@ -167,7 +167,7 @@
 				
 				// Entry has 4 fields
 				if (count($entry) != 4) {
-					FS::$iMgr->ajaxEcho($this->loc->s("err-invalid-csv-entry").$entry."'","",true);
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
 					return;
 				}
 				

@@ -356,6 +356,7 @@
 						
 			return FS::$iMgr->tip("tip-import-reserv").
 				FS::$iMgr->cbkForm("19")."<table>".
+				FS::$iMgr->hidden("subnet",$subnet).
 				FS::$iMgr->idxLines(array(
 					array("CSV-content","csv",array("type" => "area", "width" => 600)),
 					array("separator","sep",array("type" => "raw", "value" => $selOutput)),
@@ -2611,7 +2612,11 @@
 					return;
 				// Import fixed adresses
 				case 19:
-					FS::$iMgr->ajaxEcho("Done");
+					$ipObj = new dhcpIP();
+					if ($ipObj->injectIPCSV()) {
+						$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
+						FS::$iMgr->ajaxEcho("Done",$js);
+					}
 					return;
 			}
 		}
