@@ -540,6 +540,12 @@
 				return false;
 			}
 			
+			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+				$this->log(2,"Import IP via CSV: no rights");
+				FS::$iMgr->ajaxEcho("err-no-rights");
+				return;
+			}
+			
 			$csv = preg_replace("#[\r]#","",$csv);
 			$lines = preg_split("#[\n]#",$csv);
 			if (!$lines) {
