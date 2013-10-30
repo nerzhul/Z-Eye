@@ -587,8 +587,8 @@
 				// Hostname mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"hostname",
 					"hostname = '".$entry[0]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
-						$entry[2]),"",true);
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-hostname-already-used"),
+						$entry[0]),"",true);
 					return false;
 				}
 				
@@ -620,8 +620,8 @@
 				// MAC mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"macaddr",
 					"macaddr = '".$entry[1]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
-						$entry[2]),"",true);
+					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-mac-already-used"),
+						$entry[1]),"",true);
 					return false;
 				}
 				
