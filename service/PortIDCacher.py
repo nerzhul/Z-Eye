@@ -37,7 +37,7 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("Switches Port ID caching launched")
+		self.logger.info("Switches Port ID caching launched")
 		while True:
 			self.launchCachingProcess()
 			time.sleep(self.sleepingTimer)
@@ -88,17 +88,17 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			pgcursor2.close()
 			pgsqlCon2.close()
 		except Exception, e:
-			Logger.ZEyeLogger().write("Port ID Caching: FATAL %s" % e)
+			self.logger.critical("Port ID Caching: %s" % e)
 
 		self.decrThreadNb()
 
 	def launchCachingProcess(self):
 		while self.SNMPcc.isRunning == True:
-			self.logger.write("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds",logging.DEBUG)
+			self.logger.debug("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
 		starttime = datetime.datetime.now()
-		self.logger.write("Port ID caching started")
+		self.logger.info("Port ID caching started")
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost, user=netdiscoCfg.pgUser, password=netdiscoCfg.pgPwd, database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
@@ -115,16 +115,16 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 
 					devcom = self.SNMPcc.getReadCommunity(devname)
 					if devcom == None:
-						self.logger.write("Port-ID-Caching: No read community found for %s" % devname, logging.ERROR)
+						self.logger.error("Port-ID-Caching: No read community found for %s" % devname)
 					else:
 						thread.start_new_thread(self.fetchSNMPInfos,(devip,devname,devcom,vendor))
 				""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 				time.sleep(1)
 			except StandardError, e:
-				self.logger.write("Port-ID-Caching: %s" % e, logging.CRITICAL)
+				self.logger.critical("Port-ID-Caching: %s" % e)
 				
 		except PgSQL.Error, e:
-			self.logger.write("Port-ID-Caching: Pgsql Error %s" % e, logging.CRITICAL)
+			self.logger.critical("Port-ID-Caching: Pgsql Error %s" % e)
 			return
 		finally:
 			if pgsqlCon:
@@ -133,9 +133,9 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			# We must wait 1 sec, else threadCounter == 0 because of fast algo
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				self.logger.write("Port-ID-Caching: waiting %d threads" % self.getThreadNb(),logging.DEBUG)
+				self.logger.debug("Port-ID-Caching: waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
 			totaltime = datetime.datetime.now() - starttime 
-			self.logger.write("Port ID caching done (time: %s)" % totaltime)
+			self.logger.info("Port ID caching done (time: %s)" % totaltime)
 

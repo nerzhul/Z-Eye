@@ -19,8 +19,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import paramiko,re,logging
-from Logger import ZEyeLogger
+import paramiko, re, logging
 
 class ZEyeSSHBroker():
 	sshConn = None
@@ -33,7 +32,7 @@ class ZEyeSSHBroker():
 		self.sshHost = host
 		self.sshUser = user
 		self.sshPwd = pwd
-		self.logger = ZEyeLogger()
+		self.logger = logging.getLogger("Z-Eye")
 
 	def connect(self):
 		if self.sshHost == "" or self.sshUser == "" or self.sshPwd == "":
@@ -45,13 +44,13 @@ class ZEyeSSHBroker():
 			self.sshConn.connect(self.sshHost, username=self.sshUser, password=self.sshPwd)
 			return True 
 		except paramiko.AuthenticationException, e:
-			self.logger.write("SSH Authentication failure (host %s, user %s, password %s)" % (self.sshHost,self.sshUser,self.sshPwd),logging.ERROR)
+			self.logger.error("SSH Authentication failure (host %s, user %s, password %s)" % (self.sshHost,self.sshUser,self.sshPwd))
 			return False
 		except Exception, e:
 			if str(e) == "[Errno 60] Operation timed out" or str(e) == "[Errno 64] Host is down":
-				self.logger.write("SSH %s for host %s (user %s)" % (e,self.sshHost,self.sshUser),logging.ERROR)
+				self.logger.error("SSH %s for host %s (user %s)" % (e,self.sshHost,self.sshUser))
 			else:
-				self.logger.write("SSH Exception (host %s, user %s): %s" % (self.sshHost,self.sshUser,e),logging.CRITICAL)
+				self.logger.critical("SSH Exception (host %s, user %s): %s" % (self.sshHost,self.sshUser,e))
 			return False
 
 	def sendCmd(self,cmd):
@@ -59,7 +58,7 @@ class ZEyeSSHBroker():
 			stdin,stdout,stderr = self.sshConn.exec_command(cmd)
 			return stdout.read()
 		else:
-			self.logger.write("SSH Fatal error, ssh connection not opened !",logging.CRITICAL)
+			self.logger.critical("SSH Fatal error, ssh connection not opened !")
 			return None
 
 	def getRemoteOS(self):

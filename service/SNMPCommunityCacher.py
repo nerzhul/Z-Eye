@@ -19,7 +19,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime,re,sys,time,thread,subprocess,threading
+import datetime, re, sys, time, thread, subprocess, threading
 from threading import Lock
 
 import logging
@@ -50,7 +50,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("SNMP communities caching launched")
+		self.logger.info("SNMP communities caching launched")
 		while True:
 			self.launchSNMPCaching()
 			time.sleep(self.sleepingTimer)
@@ -61,7 +61,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		self.dev_mutex.release()
 
 	def launchSNMPCaching(self):
-		self.logger.write("SNMP communities caching started")
+		self.logger.info("SNMP communities caching started")
 		starttime = datetime.datetime.now()
 		self.isRunning = True
 		try:
@@ -76,18 +76,18 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 					for idx in pgres:
 						thread.start_new_thread(self.searchCommunities,(idx[0],idx[1]))
 			except StandardError, e:
-				self.logger.write("SNMP-Communities-Caching: %s" % e,logging.CRITICAL)
+				self.logger.critical("SNMP-Communities-Caching: %s" % e)
 
 			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				# Logger.ZEyeLogger().write("SNMP communities caching waiting %d threads" % self.getThreadNb())
+				self.logger.debug("SNMP communities caching waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
 			# All threads have finished, now we can write cache to DB
 			self.registerCommunities()
 		except PgSQL.Error, e:
-			self.logger.write("SNMP-Communities-Caching: FATAL PgSQL %s" % e,logging.CRITICAL)
+			self.logger.critical("SNMP-Communities-Caching: FATAL PgSQL %s" % e)
 			sys.exit(1);	
 
 		finally:
@@ -96,7 +96,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 
 		self.isRunning = False
 		totaltime = datetime.datetime.now() - starttime
-		self.logger.write("SNMP communities caching done (time: %s)" % totaltime)
+		self.logger.info("SNMP communities caching done (time: %s)" % totaltime)
 
 	def testCommunity(self,SNMPB,comm):
 		if SNMPB.snmpget(comm,"1.3.6.1.6.3.1.1.6.1.0") != -1:
@@ -135,7 +135,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 
 			self.setDevCommunities(name,foundro,foundrw)
 		except Exception, e:
-			Logger.ZEyeLogger().write("SNMP-Communities-Caching: search FATAL %s" % e)
+			self.logger.critical("SNMP-Communities-Caching: search %s" % e)
 		finally:
 			self.decrThreadNb()
 

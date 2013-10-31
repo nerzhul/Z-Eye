@@ -37,7 +37,7 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("MRTG Data Refresher launched")
+		self.logger.info("MRTG Data Refresher launched")
 		while True:
 			self.launchRefreshProcess()
 			time.sleep(self.sleepingTimer)
@@ -47,18 +47,18 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 		try:
 			subprocess.check_output(["/usr/local/bin/perl", "/usr/local/bin/mrtg", "%s" % filename])
 		except Exception, e:
-			self.logger.write("MRTG Data Refresher: FATAL %s" % e,logging.CRITICAL)
+			self.logger.critical("MRTG Data Refresher: FATAL %s" % e)
 		finally:
 			self.decrThreadNb()
 
 	def launchRefreshProcess(self):
 		while self.SNMPcc.isRunning == True:
-			self.logger.write("MRTG-Datas-Refresh: SNMP community caching is running, waiting 10 seconds",logging.DEBUG)
+			self.logger.debug("MRTG-Datas-Refresh: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 		
 		try:
 			starttime = datetime.datetime.now()
-			self.logger.write("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
+			self.logger.info("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
 
 			_dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
 			for file in _dir:
@@ -74,7 +74,7 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 			while self.getThreadNb() > 0:
 				time.sleep(1)
 			totaltime = datetime.datetime.now() - starttime 
-			self.logger.write("MRTG datas refresh done (time: %s)" % totaltime)
+			self.logger.info("MRTG datas refresh done (time: %s)" % totaltime)
 		except Exception, e:
-			self.logger.write("MRTG Data Refresher: %s" % e,logging.CRITICAL)
+			self.logger.critical("MRTG Data Refresher: %s" % e)
 

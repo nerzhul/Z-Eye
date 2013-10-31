@@ -19,11 +19,9 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import sys,time
+import sys, time, logging
 
-from Logger import ZEyeLogger
-
-import Daemon,logging
+import Daemon
 
 from MRTGCfgDiscoverer import ZEyeMRTGDiscoverer
 from MRTGDataRefresh import ZEyeMRTGDataRefresher
@@ -35,6 +33,7 @@ from DatabaseUpgrader import ZEyeDBUpgrade
 from DHCPManager import ZEyeDHCPManager, ZEyeDHCPRadiusSyncer
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
 import ZEyeDNS
+import netdiscoCfg
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
@@ -72,23 +71,27 @@ if __name__ == "__main__":
 	daemon = ZEyeDaemon("/var/run/z-eye.pid")
 	
 	# Init logger
-	zlogger = ZEyeLogger()
-	zlogger.firstInit()
+	logger = logging.getLogger("Z-Eye")
+	handler = logging.FileHandler("/var/log/z-eye.log")
+	formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s')
+	handler.setFormatter(formatter)
+	logger.addHandler(handler) 
+	logger.setLevel(netdiscoCfg.logLevel)
         
 	if len(sys.argv) == 2:
 		if 'start' == sys.argv[1]:
 			print "Z-Eye daemon pre-start checks..."
 			ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Starting Z-Eye daemon"
-			zlogger.write("Starting Z-Eye daemon",logging.INFO)
+			logger.info("Starting Z-Eye daemon")
 			daemon.start()
 		elif 'stop' == sys.argv[1]:
 			print "Stopping Z-Eye daemon"
-			zlogger.write("Stopping Z-Eye daemon",logging.INFO)
+			logger.info("Stopping Z-Eye daemon")
 			daemon.stop()
 		elif 'restart' == sys.argv[1]:
 			print "Restarting Z-Eye daemon"
-			zlogger.write("Restarting Z-Eye daemon",logging.INFO)
+			logger.info("Restarting Z-Eye daemon")
 			daemon.restart()
 		elif 'updatedb' == sys.argv[1]:
 			ZEyeDBUpgrade().checkAndDoUpgrade()

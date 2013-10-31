@@ -19,7 +19,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime,re,sys,time,thread,threading,subprocess
+import datetime, re, sys, time, thread, threading, subprocess
 from threading import Lock
 import pysnmp, logging
 import random
@@ -40,17 +40,17 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("Switch backup process launched")
+		self.logger.info("Switch backup process launched")
 		while True:
 			self.launchBackup()
 			time.sleep(self.sleepingTimer)
 
 	def launchBackup(self):
 		while self.SNMPcc.isRunning == True:
-			self.logger.write("Switches-backup: SNMP community caching is running, waiting 10 seconds")
+			self.logger.info("Switches-backup: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
-		self.logger.write("Switches backup started")
+		self.logger.info("Switches backup started")
 		starttime = datetime.datetime.now()
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
@@ -71,7 +71,7 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 
 						# If no community found in cache dont try to backup
 						if devcom == None:
-							self.logger.write("Switches-backup: No write community found for %s" % devname,logging.WARN)
+							self.logger.warn("Switches-backup: No write community found for %s" % devname)
 						else:
 							# save type = 1 (TFTP)
 							if idx[0] == 1:
@@ -79,11 +79,11 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 							elif idx[0] == 2 or idx[0] == 4 or idx[0] == 5:
 								thread.start_new_thread(self.doAuthBackup,(devip,devname,devcom,idx[1],"%sconf-%s" % (idx[2], devname),idx[3],idx[4]))
 			except StandardError, e:
-				self.logger.write("Switches-backup: %s" % e,logging.CRITICAL)
+				self.logger.critical("Switches-backup: %s" % e)
 				return
 				
 		except PgSQL.Error, e:
-			self.logger.write("Switches-backup: FATAL PgSQL %s" % e,logging.CRITICAL)
+			self.logger.critical("Switches-backup: FATAL PgSQL %s" % e)
 			sys.exit(1);	
 
 		finally:
@@ -93,11 +93,11 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
-			self.logger.write("Switches backup waiting %d threads" % self.getThreadNb(),logging.DEBUG)
+			self.logger.debug("Switches backup waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime
-		self.logger.write("Switches backup done (time: %s)" % totaltime)
+		self.logger.info("Switches backup done (time: %s)" % totaltime)
 
 	def doBackup(self,ip,devname,devcom,addr,path):
 		self.incrThreadNb()
@@ -120,7 +120,7 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 				time.sleep(1)
 				copyState = SNMPB.snmpget(devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.%d" % rand)
 		except Exception, e:
-			self.logger.write("Switches-backup: FATAL %s" % e,logging.CRITICAL)
+			self.logger.critical("Switches-backup: FATAL %s" % e)
 		finally:
 			self.decrThreadNb()
 
@@ -141,6 +141,6 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 			SNMPB.snmpset(devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.%d" % rand,pwd)
 			SNMPB.snmpset(devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.%d" % rand,rfc1902.Integer(1))
 		except Exception, e:
-			self.logger.write("Switches-backup: FATAL %s" % e,logging.CRITICAL)
+			self.logger.critical("Switches-backup: FATAL %s" % e)
 		finally:
 			self.decrThreadNb()

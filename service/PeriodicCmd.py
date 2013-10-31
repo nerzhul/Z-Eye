@@ -19,7 +19,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime,re,time,threading,subprocess,logging
+import datetime, re, time, threading, subprocess, logging
 
 import Logger,ZEyeUtil
 
@@ -35,7 +35,7 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("%s (periodic cmd) process launched" % self.processName)
+		self.logger.info("%s (periodic cmd) process launched" % self.processName)
 		time.sleep(self.startTimer)
 		while True:
 			self.launchCmd()
@@ -43,12 +43,12 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 
 	def launchCmd(self):
 		starttime = datetime.datetime.now()
-		self.logger.write("%s (periodic cmd) started" % self.processName)
+		self.logger.info("%s (periodic cmd) started" % self.processName)
 		
 		try:
 			subprocess.check_output(re.split(" ",self.processCmd),shell=True)
 		except Exception, e:
-			self.logger.write("Port ID Caching: FATAL %s" % e,logging.CRITICAL)
+			self.logger.critical("Port ID Caching: FATAL %s" % e)
 		
 		totaltime = datetime.datetime.now() - starttime
-		self.logger.write("%s (periodic cmd) done (time: %s)" % (self.processName,totaltime))
+		self.logger.info("%s (periodic cmd) done (time: %s)" % (self.processName,totaltime))

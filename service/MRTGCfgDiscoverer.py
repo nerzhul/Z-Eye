@@ -43,10 +43,10 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 
 	def launchCfgGenerator(self):
 		while self.SNMPcc.isRunning == True:
-			self.logger.write("MRTG-Config-Discovery: SNMP community caching is running, waiting 10 seconds",logging.DEBUG)
+			self.logger.debug("MRTG-Config-Discovery: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
-		self.logger.write("MRTG configuration discovery started")
+		self.logger.info("MRTG configuration discovery started")
 		starttime = datetime.datetime.now()
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
@@ -61,15 +61,15 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 
 					# Only launch process if SNMP cache is ok
 					if devcom == None:
-						self.logger.write("MRTG-Config-Discovery: No read community found for %s" % devname,logging.ERROR)
+						self.logger.error("MRTG-Config-Discovery: No read community found for %s" % devname)
 					else:
 						thread.start_new_thread(self.fetchMRTGInfos,(devip,devname,devcom))
 			except StandardError, e:
-				self.logger.write("MRTG-Config-Discovery: %s" % e, logging.CRITICAL)
+				self.logger.critical("MRTG-Config-Discovery: %s" % e)
 				return
 				
 		except PgSQL.Error, e:
-			self.logger.write("MRTG-Config-Discovery: FATAL PgSQL %s" % e, logging.CRITICAL)
+			self.logger.critical("MRTG-Config-Discovery: FATAL PgSQL %s" % e)
 			sys.exit(1);	
 
 		finally:
@@ -79,11 +79,11 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
-			self.logger.write("MRTG configuration discovery waiting %d threads" % self.getThreadNb(), logging.DEBUG)
+			self.logger.debug("MRTG configuration discovery waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime
-		self.logger.write("MRTG configuration discovery done (time: %s)" % totaltime)
+		self.logger.info("MRTG configuration discovery done (time: %s)" % totaltime)
 
 	def fetchMRTGInfos(self,ip,devname,devcom):
 		self.incrThreadNb()
@@ -95,6 +95,6 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 			cfgfile.writelines(text)
 			cfgfile.close()
 		except Exception, e:
-			self.logger.write("MRTG-Config-Discovery: %s" % e, logging.DEBUG)
+			self.logger.debug("MRTG-Config-Discovery: %s" % e)
 		finally:
 			self.decrThreadNb()

@@ -19,9 +19,8 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import threading
+import threading, logging
 from threading import Lock
-from Logger import ZEyeLogger
 
 def getCIDR(netmask):
 	netmask = netmask.split('.')
@@ -49,7 +48,7 @@ class Thread(threading.Thread):
 
 	def __init__(self):
 		threading.Thread.__init__(self)
-		self.logger = ZEyeLogger()
+		self.logger = logging.getLogger("Z-Eye")
 
 	def incrThreadNb(self):
 		self.tc_mutex.acquire()

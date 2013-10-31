@@ -19,10 +19,9 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import pysnmp,logging
+import pysnmp, logging
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
-from Logger import ZEyeLogger
 
 class ZEyeSNMPBroker():
 	ip = ""
@@ -30,7 +29,7 @@ class ZEyeSNMPBroker():
 
 	def __init__(self,ip):
 		self.ip = ip
-		self.logger = ZEyeLogger()
+		self.logger = logging.getLogger("Z-Eye")
 
 	def snmpget(self,devcom,mib):
 		cmdGen = cmdgen.CommandGenerator()
@@ -41,13 +40,13 @@ class ZEyeSNMPBroker():
 		)
 
 		if errorIndication:
-			self.logger.write("SNMPBroker: errorIndication on %s: %s" % (self.ip,errorIndication),logging.ERROR)
+			self.logger.error("SNMPBroker: errorIndication on %s: %s" % (self.ip,errorIndication))
 			return -1
 		elif errorStatus:
 			if errorStatus.prettyPrint() == "'noAccess'":
-				self.logger.write("SNMPBroker: community %s cannot read on %s@%s" % (devcom,mib,self.ip),logging.ERROR)
+				self.logger.error("SNMPBroker: community %s cannot read on %s@%s" % (devcom,mib,self.ip))
 			else:
-				self.logger.write("SNMPBroker: errorStatus on %s: %s at %s" % (self.ip, errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'),logging.ERROR)
+				self.logger.error("SNMPBroker: errorStatus on %s: %s at %s" % (self.ip, errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
 			return -1
 		else:
 			for name, val in varBinds:
@@ -56,7 +55,7 @@ class ZEyeSNMPBroker():
 
 	def snmpset(self,devcom,mib,value):
 		if self.ip == "":
-			self.logger.write("SNMPBroker: invalid IP '%s'" % (self.ip),logging.ERROR)
+			self.logger.error("SNMPBroker: invalid IP '%s'" % (self.ip))
 			return 0
 
 		cmdGen = cmdgen.CommandGenerator()
@@ -66,12 +65,12 @@ class ZEyeSNMPBroker():
 			(mib, value)
 		)
 		if errorIndication:
-			self.logger.write("SNMPBroker: errorIndication on %s: %s" % (self.ip,errorIndication),logging.ERROR)
+			self.logger.error("SNMPBroker: errorIndication on %s: %s" % (self.ip,errorIndication))
 			return -1
 		elif errorStatus:
 			if errorStatus.prettyPrint() == "'noAccess'":
-				self.logger.write("SNMPBroker: community %s cannot write on %s@%s" % (devcom,mib,self.ip),logging.ERROR)
+				self.logger.error("SNMPBroker: community %s cannot write on %s@%s" % (devcom,mib,self.ip))
 			else:
-				self.logger.write("SNMPBroker: errorStatus on %s: %s at %s" % (self.ip,errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'),logging.ERROR)
+				self.logger.error("SNMPBroker: errorStatus on %s: %s at %s" % (self.ip,errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
 			return -1
 		return 0

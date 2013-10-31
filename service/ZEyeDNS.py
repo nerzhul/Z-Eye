@@ -46,13 +46,13 @@ class DNSManager(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("DNS Manager launched")
+		self.logger.info("DNS Manager launched")
 		while True:
 			self.launchDNSManagement()
 			time.sleep(self.sleepingTimer)
 
 	def launchDNSManagement(self):
-		self.logger.write("DNS Management task started")
+		self.logger.info("DNS Management task started")
 		starttime = datetime.datetime.now()
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
@@ -69,7 +69,7 @@ class DNSManager(ZEyeUtil.Thread):
 
 					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7],self.serverList[server][8]))
 		except Exception, e:
-			self.logger.write("DNS Manager: %s" % e,logging.CRITICAL)
+			self.logger.critical("DNS Manager: %s" % e)
 			sys.exit(1);	
 
 		finally:
@@ -79,11 +79,11 @@ class DNSManager(ZEyeUtil.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
-			self.logger.write("DNS Manager: waiting %d threads" % self.getThreadNb(),logging.DEBUG)
+			self.logger.debug("DNS Manager: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime
-		self.logger.write("DNS Management task done (time: %s)" % totaltime)
+		self.logger.info("DNS Management task done (time: %s)" % totaltime)
 
 	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer):
 		self.incrThreadNb()
@@ -103,7 +103,7 @@ class DNSManager(ZEyeUtil.Thread):
 			# We get the remote OS for some commands
 			remoteOs = ssh.getRemoteOS()
 			if remoteOs != "Linux" and remoteOs != "FreeBSD" and remoteOs != "OpenBSD":
-				self.logger.write("DNS Manager: %s OS (on %s) is not supported" % (remoteOs,addr),logging.ERROR)
+				self.logger.error("DNS Manager: %s OS (on %s) is not supported" % (remoteOs,addr))
 				self.decrThreadNb()
 				return
 
@@ -118,7 +118,7 @@ class DNSManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % zeyenamedpath)
 
 			if ssh.isRemoteWritable(zeyenamedpath) == False:
-				self.logger.write("DNS Manager: %s (on %s) is not writable" % (zeyenamedpath,addr),logging.ERROR)
+				self.logger.error("DNS Manager: %s (on %s) is not writable" % (zeyenamedpath,addr))
 				self.decrThreadNb()
 				return
 
@@ -588,13 +588,13 @@ class DNSManager(ZEyeUtil.Thread):
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (cfgbuffer,zeyenamedpath))
 				ssh.sendCmd("echo 1 > /tmp/dnsrestart")
-				self.logger.write("DNSManager: configuration modified on %s" % addr)
+				self.logger.info("DNSManager: configuration modified on %s" % addr)
 				
 
 			ssh.close()
 
 		except Exception, e:
-			self.logger.write("DNS Manager: %s" % e,logging.CRITICAL)
+			self.logger.critical("DNS Manager: %s" % e)
 		finally:
 			self.decrThreadNb()
 
@@ -807,7 +807,7 @@ class RecordCollector(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("DNS Record collector launched")
+		self.logger.info("DNS Record collector launched")
 		while True:
 			self.launchCachingProcess()
 			time.sleep(self.sleepingTimer)
@@ -829,18 +829,18 @@ class RecordCollector(ZEyeUtil.Thread):
 
 			pgsqlCon2.commit()
 		except PgSQL.Error, e:
-			self.logger.write("DNS-Record-Collector: Pgsql Error %s" % e,logging.CRITICAL)
+			self.logger.critical("DNS-Record-Collector: %s" % e)
 		except DNSException, e:
 			# If an exption occurs, it's possible it's a not allowed transfer
-			self.logger.write("DNS-Record-Collector: DNSException on zone '%s' on server '%s'. Please check DNS server logs, transfer seems to be forbidden or server is not accessible" % (zone,server),logging.ERROR)
+			self.logger.error("DNS-Record-Collector: DNSException on zone '%s' on server '%s'. Please check DNS server logs, transfer seems to be forbidden or server is not accessible" % (zone,server))
 		except Exception, e:
-			self.logger.write("DNS-Record-Collector: FATAL %s" % e,logging.CRITICAL)
+			self.logger.critical("DNS-Record-Collector: FATAL %s" % e)
 		finally:
 			self.decrThreadNb()
 
 	def launchCachingProcess(self):
 		starttime = datetime.datetime.now()
-		self.logger.write("DNS Records collect started")
+		self.logger.info("DNS Records collect started")
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			self.pgcursor = pgsqlCon.cursor()
@@ -853,10 +853,10 @@ class RecordCollector(ZEyeUtil.Thread):
 				""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 				time.sleep(1)
 			except StandardError, e:
-				self.logger.write("DNS-Record-Collector: %s" % e,logging.CRITICAL)
+				self.logger.critical("DNS-Record-Collector: %s" % e)
 				
 		except PgSQL.Error, e:
-			self.logger.write("DNS-Record-Collector: Pgsql Error %s" % e,logging.CRITICAL)
+			self.logger.critical("DNS-Record-Collector: Pgsql Error %s" % e)
 			return
 		finally:
 			if pgsqlCon:
@@ -865,11 +865,11 @@ class RecordCollector(ZEyeUtil.Thread):
 		# We must wait 1 sec, else threadCounter == 0 because of fast algo
 		time.sleep(1)
 		while self.getThreadNb() > 0:
-			self.logger.write("DNS-Record-Collector: waiting %d threads" % self.getThreadNb(),logging.DEBUG)
+			self.logger.debug("DNS-Record-Collector: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime 
-		self.logger.write("DNS Records collect done (time: %s)" % totaltime)
+		self.logger.info("DNS Records collect done (time: %s)" % totaltime)
 
 	def loadServersAndZones(self):
 		self.serversZones = {}
