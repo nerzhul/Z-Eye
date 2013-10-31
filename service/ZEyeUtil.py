@@ -21,6 +21,7 @@
 
 import threading
 from threading import Lock
+from Logger import ZEyeLogger
 
 def getCIDR(netmask):
 	netmask = netmask.split('.')
@@ -43,9 +44,12 @@ class Thread(threading.Thread):
 
 	sleepingTimer = 0
 	startTime = 0
+	
+	logger = None
 
 	def __init__(self):
 		threading.Thread.__init__(self)
+		self.logger = ZEyeLogger()
 
 	def incrThreadNb(self):
 		self.tc_mutex.acquire()

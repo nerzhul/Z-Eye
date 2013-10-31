@@ -18,9 +18,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import os,re,time,threading
-
-import Logger, ZEyeUtil
+import os,re,time,threading,logging,ZEyeUtil
 
 class ZEyeServiceMgr(ZEyeUtil.Thread):
 
@@ -29,7 +27,7 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		Logger.ZEyeLogger().write("ServiceMgr launched")
+		self.logger.write("ServiceMgr launched")
 		while True:
 			self.restartIcinga()
 			self.restartSnort()
@@ -42,7 +40,7 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 				rf = icingaFile.read()
 				rf = re.sub("\n","",rf)
 				if rf == "1":
-					Logger.ZEyeLogger().write("ServiceMgr restarted Icinga")
+					self.logger.write("ServiceMgr restarted Icinga")
 					cmd = "service icinga restart"
 					pipe = os.popen(cmd, 'r')
 					text = pipe.read()
@@ -57,7 +55,7 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 				rf = snortFile.read()
 				rf = re.sub("\n","",rf)
 				if rf == "1":
-					Logger.ZEyeLogger().write("ServiceMgr restarted SNORT")
+					self.logger.write("ServiceMgr restarted SNORT")
 					cmd = "service snort restart"
 					pipe = os.popen(cmd, 'r')
 					text = pipe.read()

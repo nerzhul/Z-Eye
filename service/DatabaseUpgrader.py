@@ -20,10 +20,10 @@
 """
 
 from pyPgSQL import PgSQL
-import sys,re
+import sys, re, logging
 
-import Logger
 import netdiscoCfg
+from Logger import ZEyeLogger
 
 """
 * Version nomenclature for DB is:
@@ -36,14 +36,17 @@ class ZEyeDBUpgrade():
 	dbVersion = "0"
 	nextDBVersion = "1319"
 	pgsqlCon = None
+	logger = None
 
 	def checkAndDoUpgrade(self):
+		self.logger = ZEyeLogger()
 		self.dbVersion = self.getDBVersion()
 		# if this version is minor than service, we must upgrade
 		if self.dbVersion < self.nextDBVersion:
 			self.doUpgrade()
 		else:
 			print "No upgrade required !"
+			self.logger.write("No database upgrade required !")
 
 		if(self.pgsqlCon):
 			self.pgsqlCon.close()
@@ -132,9 +135,9 @@ class ZEyeDBUpgrade():
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 	def do13Upgrade(self):
 		try:
@@ -235,13 +238,13 @@ class ZEyeDBUpgrade():
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 	def doUpgrade(self):
 		print "DB Upgrade needed, we perform this upgrade for you..."
-		Logger.ZEyeLogger().write("DBUpgrade is needed. Starting...")
+		self.logger.write("DB Upgrade is needed. Starting...")
 
 		# here: the upgrading process hasn't been done
 		if self.dbVersion == "0":
@@ -256,7 +259,7 @@ class ZEyeDBUpgrade():
 			self.do13Upgrade()
 
 		print "DB Upgrade done."
-		Logger.ZEyeLogger().write("DBUpgrade Done.")
+		self.logger.write("DB Upgrade Done.")
 
 	def rawRequest(self,request):
 		try:
@@ -266,9 +269,9 @@ class ZEyeDBUpgrade():
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 	def tryDropColumn(self,tablename,columnname):
 		try:
@@ -282,9 +285,10 @@ class ZEyeDBUpgrade():
 
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
+
 	def tryAlterColumn(self,tablename,columnname,attributes):
 		try:
 			pgcursor = self.pgsqlCon.cursor()
@@ -297,7 +301,7 @@ class ZEyeDBUpgrade():
 
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
 			sys.exit(1);
                         
@@ -313,9 +317,9 @@ class ZEyeDBUpgrade():
 
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 	def tryDropTable(self,tablename):
 		try:
@@ -329,9 +333,9 @@ class ZEyeDBUpgrade():
 
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 	def tryCreateTable(self,tablename,attributes):
 		try:
@@ -346,9 +350,9 @@ class ZEyeDBUpgrade():
 
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 	def setDBVersion(self,version):
 		pgcursor = self.pgsqlCon.cursor()
@@ -367,9 +371,9 @@ class ZEyeDBUpgrade():
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "PgSQL Error: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 	def getDBVersion(self):
 		try:
@@ -386,8 +390,8 @@ class ZEyeDBUpgrade():
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
-                        Logger.ZEyeLogger().write("DBUpgrade: PgSQL error %s" % e)
+			self.logger.write("DBUpgrade: %s" % e, logging.CRITICAL)
 			print "There is problem with your table z_eye_db_version: %s" % e
-                        sys.exit(1);
+			sys.exit(1);
 
 

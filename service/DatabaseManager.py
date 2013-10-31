@@ -19,7 +19,9 @@
 
 from pyPgSQL import PgSQL
 
-import Logger,netdiscoCfg
+import logging
+import netdiscoCfg
+from Logger import ZEyeLogger
 
 class ZEyeSQLMgr:
 	dbHost = ""
@@ -30,6 +32,7 @@ class ZEyeSQLMgr:
 	dbConn = None
 	dbCursor = None
 	dbType = ""
+	logger = None
 	
 	def __init__(self):
 		self.dbHost = ""
@@ -39,6 +42,7 @@ class ZEyeSQLMgr:
 		self.dbConn = None
 		self.dbCursor = None
 		self.dbType = ""
+		self.logger = ZEyeLogger()
 		
 	def configAndTryConnect(self,dbType,dbHost,dbPort,dbName,dbLogin,dbPwd):
 		if dbType != "my" and dbType != "pg":
@@ -55,7 +59,7 @@ class ZEyeSQLMgr:
 				return False
 			
 		elif dbType == "my":
-			Logger.ZEyeLogger().write("Database MySQL not supported")
+			self.logger.write("Database MySQL not supported")
 			return False
 			
 		self.dbHost = dbHost

@@ -18,11 +18,12 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime,re,sys,time,thread,threading,subprocess
+import datetime, re, sys, time, thread, threading, subprocess, logging
 from threading import Lock
 from ipcalc import Network
 
-import Logger,ZEyeUtil,netdiscoCfg,DatabaseManager
+import ZEyeUtil,netdiscoCfg, logging
+from DatabaseManager import ZEyeSQLMgr
 from SSHBroker import ZEyeSSHBroker
 
 """
@@ -55,13 +56,13 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		Logger.ZEyeLogger().write("DHCP Manager launched")
+		self.logger.write("DHCP Manager launched")
 		while True:
 			self.launchDHCPManagement()
 			time.sleep(self.sleepingTimer)
 
 	def launchDHCPManagement(self):
-		Logger.ZEyeLogger().write("DHCP Management task started")
+		self.logger.write("DHCP Management task started")
 		starttime = datetime.datetime.now()
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
@@ -83,7 +84,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 					if len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
 						thread.start_new_thread(self.doConfigDHCP,(idx[0],idx[1],idx[2],idx[3],idx[4]))
 		except Exception, e:
-			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
+			self.logger.write("DHCP Manager: %s" % e, logging.CRITICAL)
 			sys.exit(1);	
 
 		finally:
@@ -96,7 +97,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime
-		Logger.ZEyeLogger().write("DHCP Management task done (time: %s)" % totaltime)
+		self.logger.write("DHCP Management task done (time: %s)" % totaltime)
 
 	def doConfigDHCP(self,addr,user,pwd,reservpath,subnetpath):
 		self.incrThreadNb()
@@ -123,7 +124,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 			# We get the remote OS for some commands
 			remoteOs = ssh.getRemoteOS()
 			if remoteOs != "Linux" and remoteOs != "FreeBSD" and remoteOs != "OpenBSD":
-				Logger.ZEyeLogger().write("DHCP Manager: %s OS (on %s) is not supported" % (remoteOs,addr))
+				self.logger.write("DHCP Manager: %s OS (on %s) is not supported" % (remoteOs,addr), logging.ERROR)
 				self.decrThreadNb()
 				return
 
@@ -138,7 +139,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % reservpath)
 
 			if ssh.isRemoteWritable(reservpath) == False:
-				Logger.ZEyeLogger().write("DHCP Manager: %s (on %s) is not writable" % (reservpath,addr))
+				self.logger.write("DHCP Manager: %s (on %s) is not writable" % (reservpath,addr), logging.ERROR)
 				self.decrThreadNb()
 				return
 		
@@ -146,7 +147,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % subnetpath)
 
 			if ssh.isRemoteWritable(subnetpath) == False:
-				Logger.ZEyeLogger().write("DHCP Manager: %s (on %s) is not writable" % (subnetpath,addr))
+				self.logger.write("DHCP Manager: %s (on %s) is not writable" % (subnetpath,addr), logging.ERROR)
 				self.decrThreadNb()
 				return
 		
@@ -154,7 +155,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % "/tmp/dhcprestart")
 
 			if ssh.isRemoteWritable("/tmp/dhcprestart") == False:
-				Logger.ZEyeLogger().write("DHCP Manager: %s (on %s) is not writable" % ("/tmp/dhcprestart",addr))
+				self.logger.write("DHCP Manager: %s (on %s) is not writable" % ("/tmp/dhcprestart",addr), logging.ERROR)
 				self.decrThreadNb()
 				return
 			
@@ -297,7 +298,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (subnetBuf,subnetpath))
 				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
-				Logger.ZEyeLogger().write("DHCP Manager: subnets modified on %s" % addr)
+				self.logger.write("DHCP Manager: subnets modified on %s" % addr)
 			
 			# check md5 trace to see if reserv file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (reservpath,hashCmd))
@@ -305,11 +306,11 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (reservBuf,reservpath))
 				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
-				Logger.ZEyeLogger().write("DHCP Manager: reservations modified on %s" % addr)
+				self.logger.write("DHCP Manager: reservations modified on %s" % addr)
 
 			ssh.close()
 		except Exception, e:
-			Logger.ZEyeLogger().write("DHCP Manager: FATAL %s" % e)
+			self.logger.write("DHCP Manager: %s" % e, logging.CRITICAL)
 		finally:
 			self.decrThreadNb()
 
@@ -443,13 +444,13 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		Logger.ZEyeLogger().write("DHCP/Radius Sync launched")
+		self.logger.write("DHCP/Radius Sync launched")
 		while True:
 			self.syncDHCPAndRadius()
 			time.sleep(self.sleepingTimer)
 	
 	def syncDHCPAndRadius(self):
-		Logger.ZEyeLogger().write("DHCP/Radius Sync started")
+		self.logger.write("DHCP/Radius Sync started")
 		starttime = datetime.datetime.now()
 		try:
 			zeyeDB = ZEyeSQLMgr()
@@ -463,7 +464,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 					if len(idx[0]) > 0 and len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
 						thread.start_new_thread(self.doSyncDHCPRadius,(idx[0],idx[1],idx[2],idx[3],idx[4]))
 		except Exception, e:
-			Logger.ZEyeLogger().write("DHCP/Radius Sync: FATAL %s" % e)
+			self.logger.write("DHCP/Radius Sync: %s" % e, logging.CRITICAL)
 			sys.exit(1);	
 
 		finally:
@@ -473,17 +474,18 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
+			self.logger.write("DHCP/Radius Sync: waiting %d threads" % self.getThreadNb(), logging.DEBUG)
 			time.sleep(1)
 
 		totaltime = datetime.datetime.now() - starttime
-		Logger.ZEyeLogger().write("DHCP/Radius Sync done (time: %s)" % totaltime)
+		self.logger.write("DHCP/Radius Sync done (time: %s)" % totaltime)
 
 	def doSyncDHCPRadius(self,dbname,addr,port,groupname,subnet):
 		self.incrThreadNb()
 		
 		# We test if Radius has been loaded
 		if addr not in self.radiusList or port not in self.radiusList[addr] or dbname not in self.radiusList[addr][port]:
-			Logger.ZEyeLogger().write("DHCP/Radius Sync: Warning %s cannot be sync with radius (%s:%s/%s). Radius not exists" % (subnet,addr,port,dbname))
+			self.logger.write("DHCP/Radius Sync: Warning %s cannot be sync with radius (%s:%s/%s). Radius not exists" % (subnet,addr,port,dbname), logging.ERROR)
 			self.decrThreadNb()
 			return
 		
@@ -493,7 +495,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		
 		# DB can only be MySQL or PgSQL
 		if dbtype != "my" and dbtype != "pg":
-			Logger.ZEyeLogger().write("DHCP/Radius Sync: Warning %s is not a valid DB type" % dbtype)
+			self.logger.write("DHCP/Radius Sync: Warning %s is not a valid DB type" % dbtype, logging.ERROR)
 			self.decrThreadNb()
 			return
 		
@@ -502,7 +504,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			if pgsqlCon == None:
-				Logger.ZEyeLogger().write("DHCP/Radius Sync: unable to connect to Z-Eye database" % (addr,port,dbname))
+				self.logger.write("DHCP/Radius Sync: unable to connect to Z-Eye database" % (addr,port,dbname), logging.ERROR)
 				self.decrThreadNb()
 				return
 			
@@ -511,7 +513,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 			if dbtype == "pg":
 				radCon = PgSQL.connect(host=addr,user=login,password=pwd,database=dbname)
 				if radCon == None:
-					Logger.ZEyeLogger().write("DHCP/Radius Sync: unable to connect to %s:%s/%s" % (addr,port,dbname))
+					self.logger.write("DHCP/Radius Sync: unable to connect to %s:%s/%s" % (addr,port,dbname), logging.ERROR)
 					self.decrThreadNb()
 					return
 				
@@ -532,10 +534,10 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 					
 			elif dbtype == "my":
 				#@TODO
-				Logger.ZEyeLogger().write("DHCP/Radius Sync: MySQL not handled")
+				self.logger.write("DHCP/Radius Sync: MySQL not handled", logging.WARN)
 				
 		except Exception, e:
-			Logger.ZEyeLogger().write("DHCP/Radius Sync: doSyncDHCPRadius FATAL %s" % e)
+			self.logger.write("DHCP/Radius Sync: doSyncDHCPRadius %s" % e, logging.ERROR)
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
@@ -544,7 +546,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 					radCon.close()
 				elif dbtype == "my":
 					# @TODO
-					Logger.ZEyeLogger().write("DHCP/Radius Sync: MySQL not handled")
+					self.logger.write("DHCP/Radius Sync: MySQL not handled",logging.WARN)
 
 			self.decrThreadNb()
 
@@ -589,5 +591,5 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 			if idx[5] == "pg" or idx[5] == "my":
 				self.radiusList[idx[0]][idx[1]][idx[2]] = (idx[3],idx[4],idx[5])
 			else:
-				Logger.ZEyeLogger().write("DHCP/Radius Sync: Warning %s is not a valid DB type (%s:%s/%s)" % (idx[0],idx[1],idx[2]))
+				self.logger.write("DHCP/Radius Sync: %s is not a valid DB type (%s:%s/%s)" % (idx[0],idx[1],idx[2]), logging.ERROR)
 

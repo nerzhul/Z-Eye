@@ -19,12 +19,39 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import datetime
+import datetime,logging
+import netdiscoCfg
+
+from threading import Lock
 
 class ZEyeLogger():
-	logfilepath = "/var/log/z-eye.log"
+	logger = None
+	tc_mutex = Lock()
 	
-	def write(self,text):
-        	logfile = open(self.logfilepath,"a")
-        	logfile.writelines("%s - %s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),text))
-        	logfile.close()
+	def __init__(self):
+		self.logger = logging.getLogger("Z-Eye")
+	
+	def firstInit(self):
+		handler = logging.FileHandler("/var/log/z-eye.log")
+		formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s')
+		handler.setFormatter(formatter)
+		self.logger.addHandler(handler) 
+		self.logger.setLevel(netdiscoCfg.logLevel)
+	
+	def write(self,text,logLevel=logging.INFO):
+		self.tc_mutex.acquire()
+		
+		if logLevel == logging.DEBUG:
+			self.logger.debug(text)
+		if logLevel == logging.INFO:
+			self.logger.info(text)
+		elif logLevel == logging.WARN:
+			self.logger.warn(text)
+		elif logLevel == logging.ERROR:
+			self.logger.error(text)
+		elif logLevel == logging.CRITICAL:
+			self.logger.critical(text)
+			
+		self.tc_mutex.release()
+		
+        

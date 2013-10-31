@@ -20,10 +20,9 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, sys, thread, subprocess, string, time, commands, threading
+import datetime, sys, thread, subprocess, string, time, commands, threading, logging
 from threading import Lock
 
-import Logger
 import netdiscoCfg
 import ZEyeUtil
 
@@ -31,14 +30,14 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 	SNMPcc = None
 
 	def __init__(self,SNMPcc):
-                """ 1 hour between two refresh """
-                self.sleepingTimer = 60*60
+		""" 1 hour between two refresh """
+		self.sleepingTimer = 60*60
 		self.SNMPcc = SNMPcc
 
-                ZEyeUtil.Thread.__init__(self)
+		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		Logger.ZEyeLogger().write("Switches Port ID caching launched")
+		self.logger.write("Switches Port ID caching launched")
 		while True:
 			self.launchCachingProcess()
 			time.sleep(self.sleepingTimer)
@@ -95,13 +94,13 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 
 	def launchCachingProcess(self):
 		while self.SNMPcc.isRunning == True:
-			Logger.ZEyeLogger().write("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds")
+			self.logger.write("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds",logging.DEBUG)
 			time.sleep(10)
 
 		starttime = datetime.datetime.now()
-		Logger.ZEyeLogger().write("Port ID caching started")
+		self.logger.write("Port ID caching started")
 		try:
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost, user=netdiscoCfg.pgUser, password=netdiscoCfg.pgPwd, database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT ip,name,vendor FROM device ORDER BY ip")
 			try:
@@ -116,28 +115,27 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 
 					devcom = self.SNMPcc.getReadCommunity(devname)
 					if devcom == None:
-						Logger.ZEyeLogger().write("Port-ID-Caching: No read community found for %s" % devname)
+						self.logger.write("Port-ID-Caching: No read community found for %s" % devname, logging.ERROR)
 					else:
 						thread.start_new_thread(self.fetchSNMPInfos,(devip,devname,devcom,vendor))
 				""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 				time.sleep(1)
 			except StandardError, e:
-				Logger.ZEyeLogger().write("Port-ID-Caching: FATAL %s" % e)
+				self.logger.write("Port-ID-Caching: %s" % e, logging.CRITICAL)
 				
 		except PgSQL.Error, e:
-			Logger.ZEyeLogger().write("Port-ID-Caching: Pgsql Error %s" % e)
+			self.logger.write("Port-ID-Caching: Pgsql Error %s" % e, logging.CRITICAL)
 			return
-
 		finally:
-
 			if pgsqlCon:
 				pgsqlCon.close()
 
 			# We must wait 1 sec, else threadCounter == 0 because of fast algo
 			time.sleep(1)
 			while self.getThreadNb() > 0:
+				self.logger.write("Port-ID-Caching: waiting %d threads" % self.getThreadNb(),logging.DEBUG)
 				time.sleep(1)
 
 			totaltime = datetime.datetime.now() - starttime 
-			Logger.ZEyeLogger().write("Port ID caching done (time: %s)" % totaltime)
+			self.logger.write("Port ID caching done (time: %s)" % totaltime)
 

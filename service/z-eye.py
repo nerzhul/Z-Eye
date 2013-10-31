@@ -21,9 +21,10 @@
 
 import sys,time
 
-import Logger
+from Logger import ZEyeLogger
 
-import Daemon
+import Daemon,logging
+
 from MRTGCfgDiscoverer import ZEyeMRTGDiscoverer
 from MRTGDataRefresh import ZEyeMRTGDataRefresher
 from PeriodicCmd import ZEyePeriodicCmd
@@ -67,30 +68,37 @@ def usage():
 	print "usage: %s start|stop|restart|status|updatedb" % sys.argv[0]
 
 if __name__ == "__main__":
-        daemon = ZEyeDaemon("/var/run/z-eye.pid")
-        if len(sys.argv) == 2:
-                if 'start' == sys.argv[1]:
+	# Init daemon
+	daemon = ZEyeDaemon("/var/run/z-eye.pid")
+	
+	# Init logger
+	zlogger = ZEyeLogger()
+	zlogger.firstInit()
+        
+	if len(sys.argv) == 2:
+		if 'start' == sys.argv[1]:
 			print "Z-Eye daemon pre-start checks..."
 			ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Starting Z-Eye daemon"
-			Logger.ZEyeLogger().write("Starting Z-Eye daemon")
-                        daemon.start()
-                elif 'stop' == sys.argv[1]:
+			zlogger.write("Starting Z-Eye daemon",logging.INFO)
+			daemon.start()
+		elif 'stop' == sys.argv[1]:
 			print "Stopping Z-Eye daemon"
-			Logger.ZEyeLogger().write("Stopping Z-Eye daemon")
-                        daemon.stop()
-                elif 'restart' == sys.argv[1]:
+			zlogger.write("Stopping Z-Eye daemon",logging.INFO)
+			daemon.stop()
+		elif 'restart' == sys.argv[1]:
 			print "Restarting Z-Eye daemon"
-                        daemon.restart()
+			zlogger.write("Restarting Z-Eye daemon",logging.INFO)
+			daemon.restart()
 		elif 'updatedb' == sys.argv[1]:
 			ZEyeDBUpgrade().checkAndDoUpgrade()
 		elif 'status' == sys.argv[1]:
 			daemon.status()
-                else:
+		else:
 			print "Unknown arg"
 			usage()
-                        sys.exit(1)
-                sys.exit(0)
-        else:
+			sys.exit(1)
+		sys.exit(0)
+	else:
 		usage()	
-                sys.exit(1)
+		sys.exit(1)

@@ -22,7 +22,7 @@ from pyPgSQL import PgSQL
 import datetime,re,sys,time,thread,subprocess,threading
 from threading import Lock
 
-import Logger
+import logging
 import ZEyeUtil
 import netdiscoCfg
 from SNMPBroker import ZEyeSNMPBroker
@@ -50,7 +50,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		Logger.ZEyeLogger().write("SNMP communities caching launched")
+		self.logger.write("SNMP communities caching launched")
 		while True:
 			self.launchSNMPCaching()
 			time.sleep(self.sleepingTimer)
@@ -61,7 +61,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		self.dev_mutex.release()
 
 	def launchSNMPCaching(self):
-		Logger.ZEyeLogger().write("SNMP communities caching started")
+		self.logger.write("SNMP communities caching started")
 		starttime = datetime.datetime.now()
 		self.isRunning = True
 		try:
@@ -76,7 +76,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 					for idx in pgres:
 						thread.start_new_thread(self.searchCommunities,(idx[0],idx[1]))
 			except StandardError, e:
-				Logger.ZEyeLogger().write("SNMP-Communities-Caching: FATAL %s" % e)
+				self.logger.write("SNMP-Communities-Caching: %s" % e,logging.CRITICAL)
 
 			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
@@ -87,7 +87,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 			# All threads have finished, now we can write cache to DB
 			self.registerCommunities()
 		except PgSQL.Error, e:
-			Logger.ZEyeLogger().write("SNMP-Communities-Caching: FATAL PgSQL %s" % e)
+			self.logger.write("SNMP-Communities-Caching: FATAL PgSQL %s" % e,logging.CRITICAL)
 			sys.exit(1);	
 
 		finally:
@@ -96,7 +96,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 
 		self.isRunning = False
 		totaltime = datetime.datetime.now() - starttime
-		Logger.ZEyeLogger().write("SNMP communities caching done (time: %s)" % totaltime)
+		self.logger.write("SNMP communities caching done (time: %s)" % totaltime)
 
 	def testCommunity(self,SNMPB,comm):
 		if SNMPB.snmpget(comm,"1.3.6.1.6.3.1.1.6.1.0") != -1:
