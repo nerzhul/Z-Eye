@@ -34,7 +34,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1317"
+	nextDBVersion = "1318"
 	pgsqlCon = None
 
 	def checkAndDoUpgrade(self):
@@ -222,6 +222,10 @@ class ZEyeDBUpgrade():
 				self.rawRequest("update z_eye_dhcp_custom_option set optname = 'next-server', opttype = 'ip' where optname = 'tftp-server-name'")
 				self.rawRequest("update z_eye_dhcp_option set optname = 'next-server' where optname = 'tftp-server-name'")
 				self.setDBVersion("1317")
+			if self.dbVersion == "1317":
+				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '$USER1$/check_dummy 0 \"Icinga started with $$(($EVENTSTARTTIME$-$PROCESSSTARTTIME$)) seconds delay | delay=$$(($EVENTSTARTTIME$-$PROCESSSTARTTIME$))\"' WHERE cmd = 'check_icinga_startup_delay'")
+				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-host-by-email'")
+				self.dbVersion = "1318"
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

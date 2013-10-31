@@ -699,19 +699,17 @@
 		}
 
 		public function getTimePeriodList($name,$select = "") {
-			$output = FS::$iMgr->select($name);
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","name",
-				array("labelfield" => "alias", "selected" => array($select),"sqlopts" => array("order" => "alias")));
-			$output .= "</select>";
-			return $output;
+			return FS::$iMgr->select($name).
+				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","name",
+					array("labelfield" => "alias", "selected" => array($select),"sqlopts" => array("order" => "alias"))).
+				"</select>";
 		}
 
 		public function genCommandList($name,$tocheck = NULL) {
-			$output = FS::$iMgr->select($name);
-			$output .= FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name",
-				array("selected" => array($tocheck),"sqlopts" => array("order" => "name")));
-			$output .= "</select>";
-			return $output;
+			return FS::$iMgr->select($name).
+				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name",
+					array("selected" => array($tocheck),"sqlopts" => array("order" => "name"))).
+				"</select>";
 		}
 		
 		public function genContactGroupsList($name,$select = "") {
