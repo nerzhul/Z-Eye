@@ -128,6 +128,10 @@
 					$this->domainname = $data["domainname"];
 					$this->maxleasetime = $data["mleasetime"];
 					$this->defaultleasetime = $data["dleasetime"];
+					
+					$this->netCalc = new FSNetwork();
+					$this->netCalc->setNetAddr($this->netid);
+					$this->netCalc->setNetMask($this->netmask);
 					return true;
 				}
 				return false;
@@ -222,10 +226,11 @@
 		}
 		
 		public function isIPIn($ip) {
-			$netObj = new FSNetwork();
-			$netObj->setNetAddr($this->netid);
-			$netObj->setNetMask($this->netmask);
-			return $netObj->isUsableIP($ip);
+			return $netCalc->isUsableIP($ip);
+		}
+		
+		public function getNetCalc() {
+			return $this->netCalc;
 		}
 		
 		private $netid;
@@ -239,6 +244,7 @@
 		private $domainname;
 		private $maxleasetime;
 		private $defaultleasetime;
+		private $netCalc;
 	};
 	
 	final class dhcpServer extends FSMObj {
@@ -520,36 +526,93 @@
 			}
 		}
 		
-		public function importIPFromCache() {
-			$ip = FS::$secMgr->checkAndSecurisePostData("ip");
-			$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
+		protected function Load($ip = "") {
+			$this->ip = $ip;
+			$this->mac = "";
+			$this->hostname = "";
+			$this->reserv = false;
+			$this->comment = "";
 			
+			if ($this->ip) {
+				$query = FS::$dbMgr->Select($this->sqlTable,"macaddr,hostname,reserv,comment","ip = '".$this->ip."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->mac = $data["macaddr"];
+					$this->hostname = $data["hostname"];
+					$this->reserv = ($data["reserv"] == "t");
+					$this->comment = $data["comment"];
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+		
+		private function LoadFromCache($ip = "") {
+			$this->ip = $ip;
+			$this->mac = "";
+			$this->hostname = "";
+			$this->reserv = false;
+			$this->comment = "";
+			
+			if ($this->ip) {
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr,hostname","ip = '".$this->ip."' AND distributed = '3'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->mac = $data["macaddr"];
+					$this->hostname = $data["hostname"];
+					$this->reserv = true;
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+			
+		public function importIPFromCache() {
+			$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
+			$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
+
 			if (!$subnet || !$ip) {
+				$this->log(2,"Import IP from cache: bad datas");
 				FS::$iMgr->ajaxEcho("err-bad-datas");
 				return false;
 			}
 			
 			$subnetObj = new dhcpSubnet();
 			if (!$subnetObj->Load($subnet)) {
+				$this->log(2,"Import IP from cache: invalid subnet");
 				FS::$iMgr->ajaxEcho("err-subnet-not-exists");
 				return false;
 			}
 			
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
-				$this->log(2,"Import IP via CSV: no rights");
+				$this->log(2,"Import IP from cache: no rights");
 				FS::$iMgr->ajaxEcho("err-no-rights");
 				return false;
 			}
 			
 			if (!FS::$secMgr->isIP($ip)) {
+				$this->log(2,"Import IP from cache: bad IP");
 				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-ip"),
 					$ip),"",true);
 				return false;
 			}
 			
 			// @TODO
+			if (!$this->LoadFromCache($ip)) {
+				$this->log(2,"Import IP from cache: IP not in cache");
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-not-in-cache"),
+					$ip),"",true);
+				return false;
+				
+			}
 			
-			return $subnetObj;
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete($this->sqlTable,"ip = '".$this->ip."'");
+			FS::$dbMgr->Insert($this->sqlTable,"ip,macaddr,hostname,reserv,comment",
+				"'".$this->ip."','".$this->mac."','".$this->hostname."','t',''");
+			FS::$dbMgr->CommitTr();
+			
+			return $subnetObj->getNetCalc();
 		}
 		
 		public function injectIPCSV() {
@@ -689,10 +752,19 @@
 				}
 			}
 			FS::$dbMgr->CommitTr();
-			return $subnetObj;
+			return $subnetObj->getNetCalc();
+		}
+		
+		public function getIP() {
+			return $this->ip;
 		}
 		
 		private $sqlCacheTable;
+		private $ip;
+		private $mac;
+		private $hostname;
+		private $reserv;
+		private $comment;
 	};
 	
 	final class dhcpCustomOption extends FSMObj {

@@ -140,8 +140,6 @@
 			$netobj->setNetAddr($netid);
 			$netobj->setNetMask($netmask);
 
-			$swfound = false;
-
 			// Bufferize switch list
 			$switchlist = array();
 
@@ -203,7 +201,6 @@
 					if ($sw && $port) {
 						$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
 						$iparray[ip2long($data2["ip"])]["port"] = $port;
-						$swfound = true;
 					}
 				}
 
@@ -225,7 +222,6 @@
 						if ($sw && $port) {
 							$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
 							$iparray[ip2long($data2["ip"])]["port"] = $port;
-							$swfound = true;
 						}
 					}
 				}
@@ -239,10 +235,9 @@
 			$fixedip = 0;
 
 			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th></th><th>".$this->loc->s("Status")."</th>
-				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>".$this->loc->s("Comment")."</th><th>";
-			if ($swfound)
-				$output .= $this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>";
-			$output .= "Fin du bail</th><th>Serveurs</th></tr></thead>";
+				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>".$this->loc->s("Comment")."</th><th>".
+				$this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>".
+				$this->loc->s("Lease-end")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
 
 			foreach ($iparray as $key => $value) {
 				$rstate = "";
@@ -297,35 +292,12 @@
 						}
 						break;
 				}
-				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\"><td>".
-					FS::$iMgr->opendiv(7,long2ip($key),array("lnkadd" => "ip=".long2ip($key))).
-					"</td><td>".FS::$iMgr->searchIcon(long2ip($key)).
-					"</td><td>".$rstate;
 				
-				// Import option when subnet is distributed on a cluster and IP is only in the cache, not IPM
-				if ($value["distrib"] == 3 && $subnetLinkedToCluster) {
-					$output .= FS::$iMgr->img("styles/images/upload.png",15,15,"",
-						array("tooltip" => "tooltip-import-reserv"));
-				}
-				$output .= "</td><td>".
-					FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$value["mac"], $value["mac"])."</td><td>".
-					$value["host"]."</td><td>".$value["comment"]."</td><td>";
-				// Show switch column only of a switch is here
-				if ($swfound) {
-					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
-						"&d=".$value["switch"], $value["switch"]) : "").
-						"</td><td>";
-					$output .= (strlen($value["switch"]) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
-						"&d=".$value["switch"]."&p=".$value["port"], $value["port"]) : "").
-						"</td><td>";
-				}
-				$output .= $value["ltime"]."</td><td>";
-				$count = count($value["servers"]);
-				for ($i=0;$i<$count;$i++) {
-					if ($i > 0) $output .= "<br />";
-					$output .= $value["servers"][$i];
-				}
-				$output .= "</td></tr>";
+				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\">".
+					$this->showIPLine(long2ip($key),$rstate,$value["mac"],$value["host"],$value["comment"],$netid,
+						$value["switch"],$value["port"],$value["ltime"],$value["servers"],$value["distrib"],
+						$subnetLinkedToCluster).
+					"</tr>";
 			}
 			$output .= "</table>";
 			FS::$iMgr->jsSortTable("tipList");
@@ -349,6 +321,49 @@
 				}]});},300);";
 			FS::$iMgr->js($js);
 
+			return $output;
+		}
+		
+		private function showIPLine($ip,$rstate,$mac,$hostname,$comment,$subnet,$switch,$port,$leasetime="",$servers=array(),$distrib=0,$clusterLink=false) {
+			$rstateId = "sb".FS::$iMgr->formatHTMLId($ip)."rsttd";
+			$output = "<td>".FS::$iMgr->opendiv(7,$ip,array("lnkadd" => "ip=".$ip)).
+				"</td><td>".FS::$iMgr->searchIcon(long2ip($key))."</td><td id=\"".$rstateId."\">".$rstate;
+			
+			// Import option when subnet is distributed on a cluster and IP is only in the cache, not IPM
+			if ($distrib == 3 && $clusterLink) {
+				$output .= FS::$iMgr->linkIcon("mod=".$this->mid."&act=20&ip=".$ip."&subnet=".$subnet,"upload",
+					array("tooltip" => "tooltip-import-reserv", "js" => true,
+						"confirm" => array(sprintf(
+							$this->loc->s("confirm-import-reserv"),$ip),
+							"Import","Cancel")
+					)
+				);
+					
+			}
+			$output .= "</td><td>".
+				FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$mac, $mac)."</td><td>".
+				$hostname."</td><td>".$comment."</td><td>";
+			// Show switch column only of a switch is here
+			if ($switch) {
+				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+					"&d=".$switch, $switch) : "");
+			}
+					
+			$output .= "</td><td>";
+			
+			if ($switch) {
+				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+					"&d=".$switch."&p=".$port, $port) : "");
+			}
+			
+			$output .= "</td><td>".$leasetime."</td><td>";
+			$count = count($servers);
+			for ($i=0;$i<$count;$i++) {
+				if ($i > 0) $output .= "<br />";
+				$output .= $servers[$i];
+			}
+			$output .= "</td>";
+			
 			return $output;
 		}
 		
@@ -1091,24 +1106,24 @@
 			foreach ($results as $date => $values) {
 				if ($labels == "") {
 					// Bufferize vals
-                                        $bauxval = (isset($values["baux"]) ? $values["baux"] : 0);
-                                        $reservval = (isset($values["reserv"]) ? $values["reserv"] : 0);
-                                        $availval = (isset($values["avail"]) ? $values["avail"] : 0);
+					$bauxval = (isset($values["baux"]) ? $values["baux"] : 0);
+					$reservval = (isset($values["reserv"]) ? $values["reserv"] : 0);
+					$availval = (isset($values["avail"]) ? $values["avail"] : 0);
 
-                                        // Write js table
-                                        $labels .= "'".$date."'";
-                                        if ($bauxval > 0) $bauxshow = true;
-                                        $baux .= $bauxval;
-                                        if ($reservval > 0) $reservshow = true;
-                                        $reserv .= $reservval;
-                                        if ($availval > 0) $availshow = true;
-                                        $avail .= $availval;
+					// Write js table
+					$labels .= "'".$date."'";
+					if ($bauxval > 0) $bauxshow = true;
+					$baux .= $bauxval;
+					if ($reservval > 0) $reservshow = true;
+					$reserv .= $reservval;
+					if ($availval > 0) $availshow = true;
+					$avail .= $availval;
 
-                                        $totdistrib = ($bauxval+$reservval+$availval);
-                                        $total .= $totdistrib;
-                                        $free .= ($netobj->getMaxHosts() - $totdistrib);
-                                        // Save this occur
-                                        $lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
+					$totdistrib = ($bauxval+$reservval+$availval);
+					$total .= $totdistrib;
+					$free .= ($netobj->getMaxHosts() - $totdistrib);
+					// Save this occur
+					$lastvalues = array("baux" => $bauxval, "reserv" => $reservval, "avail" => $availval);
 					$totalvals++;
 				}
 				else {
@@ -2639,7 +2654,9 @@
 					$ipObj = new dhcpIP();
 					if ($subnetObj = $ipObj->importIPFromCache()) {
 						$this->calculateRanges($subnet,$subnetObj);
-						FS::$iMgr->js("$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');");
+						$rstateId = "sb".FS::$iMgr->formatHTMLId($ipObj->getIP())."rsttd";
+						FS::$iMgr->js("$('#".$rstateId."').html('".FS::$secMgr->cleanForJS($this->loc->s("Reserved-by-ipmanager"))."');");
+						FS::$iMgr->ajaxEcho("Done");
 					}
 					return;
 			}

@@ -160,7 +160,7 @@
 			else {
 				$output .= "href=\"index.php?".$link."\"";
 			}
-			$output .= ">".FS::$iMgr->img("styles/images/".$iconname.".png",15,15)."</a>";
+			$output .= ">".FS::$iMgr->img("styles/images/".$iconname.".png",15,15,"",$options)."</a>";
 			return $output;
 		}
 
