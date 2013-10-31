@@ -157,8 +157,10 @@
 		public function loadModule($id,$act=1) {
 			if ($path = $this->findModulePath($id)) {
 				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
+				
+				$ruleAccess = $module->getRulesClass()->canAccessToModule();
 				// Bypass access for Android
-				if ($module->getRulesClass()->canAccessToModule() || $act == 3) {
+				if ($ruleAccess === true || $act == 3) {
 					$this->setCurrentModule($module->getModuleClass());
 					$module->getModuleClass()->setModuleId($id);
 					switch($act) {
@@ -167,7 +169,14 @@
 						case 3: return $module->getModuleClass()->LoadForAndroid(); break;
 					}	
 				}
-				return $this->printError($this->getLocale("err-no-rights"));
+				else if($ruleAccess === -1) {
+					$this->js(sprintf("setLoginCbkMsg('<span style=\"color: red;\">%s</span>');openLogin();",
+						$this->getLocale("err-must-be-connected")));
+					return "";
+				}
+				else {
+					return $this->printError($this->getLocale("err-no-rights"));
+				}
 			}
 			return $this->printError($this->getLocale("err-unk-module"));
 		}
