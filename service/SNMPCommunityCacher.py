@@ -81,7 +81,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				Logger.ZEyeLogger().write("SNMP communities caching waiting %d threads" % self.getThreadNb())
+				# Logger.ZEyeLogger().write("SNMP communities caching waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
 			# All threads have finished, now we can write cache to DB

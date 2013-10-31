@@ -225,13 +225,13 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1317":
 				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '$USER1$/check_dummy 0 \"Icinga started with $$(($EVENTSTARTTIME$-$PROCESSSTARTTIME$)) seconds delay | delay=$$(($EVENTSTARTTIME$-$PROCESSSTARTTIME$))\"' WHERE cmd = 'check_icinga_startup_delay'")
 				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-host-by-email'")
-				self.dbVersion = "1318"
+				self.setDBVersion("1318")
 			if self.dbVersion == "1318":
 				self.rawRequest("DELETE FROM z_eye_dhcp_subnet_cache")
 				self.tryAddColumn("z_eye_dhcp_subnet_cache","server","varchar(256)")
 				self.rawRequest("alter table z_eye_dhcp_subnet_cache drop constraint z_eye_dhcp_subnet_cache_pkey")
 				self.rawRequest("alter table z_eye_dhcp_subnet_cache add primary key (netid,netmask,server)")
-				self.dbVersion = "1319"
+				self.setDBVersion("1319")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

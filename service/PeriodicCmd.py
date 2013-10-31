@@ -45,7 +45,10 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 		starttime = datetime.datetime.now()
 		Logger.ZEyeLogger().write("%s (periodic cmd) started" % self.processName)
 		
-		subprocess.check_output(re.split(" ",self.processCmd))
+		try:
+			subprocess.check_output(re.split(" ",self.processCmd),shell=True)
+		except Exception, e:
+			Logger.ZEyeLogger().write("Port ID Caching: FATAL %s" % e)
 		
 		totaltime = datetime.datetime.now() - starttime
 		Logger.ZEyeLogger().write("%s (periodic cmd) done (time: %s)" % (self.processName,totaltime))
