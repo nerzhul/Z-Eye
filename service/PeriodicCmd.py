@@ -21,7 +21,7 @@
 from pyPgSQL import PgSQL
 import datetime, re, time, threading, subprocess, logging
 
-import Logger,ZEyeUtil
+import ZEyeUtil
 
 class ZEyePeriodicCmd(ZEyeUtil.Thread):
 	processName = ""
