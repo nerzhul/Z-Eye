@@ -690,13 +690,12 @@
 				$value = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$name."'");
 			}
 	
-			$output = FS::$iMgr->cbkForm("1");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname"));
-			$output .= FS::$iMgr->idxLine("Command","cmd",array("value" => $value,"length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd"));
-			$output .= FS::$iMgr->aeTableSubmit($name == "");
-
-			return $output;
+			return FS::$iMgr->cbkForm("1").
+				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname")).
+				FS::$iMgr->idxLine("Command","cmd",array("type" => "area", "value" => $value,
+					"length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd")).
+				FS::$iMgr->aeTableSubmit($name == "");
 		}
 
 		public function getTimePeriodList($name,$select = "") {
