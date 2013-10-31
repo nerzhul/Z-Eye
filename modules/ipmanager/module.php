@@ -1625,7 +1625,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip_cache","server = '".$addr."'");
 					// Later
 					//FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","server = '".$addr."'");
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_clusters","dhcpaddr = '".$addr."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_cluster","dhcpaddr = '".$addr."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
 					FS::$dbMgr->CommitTr();
 
