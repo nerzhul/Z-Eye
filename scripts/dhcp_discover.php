@@ -89,7 +89,7 @@
 					$must_be_set[4]=true;
 				}
 
-				if(isset($lease_ip)) {
+				if(isset($lease_ip) && FS::$secMgr->isIP($lease_ip)) {
 					if($lease_ip != "failover" && (isset($st) && $st != "backup" || !isset($st))) {
 						if(!isset($hosts_list[$lease_ip]["state"]) || $st == "active" 
 						|| ($st == "expired" && $hosts_list[$lease_ip]["state"] != "active")) {
@@ -212,6 +212,7 @@
 		// Flush ip table for server
 		FS::$dbMgr->BeginTr();
 		FS::$dbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
+
 		foreach($hosts_list as $host => $value) {
 			if(isset($value["state"])) {
 				$rstate = $value["state"];
@@ -285,6 +286,7 @@
 				else $iend = "";
 
 				if($host) {
+					
 					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server",
 						"'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
 
