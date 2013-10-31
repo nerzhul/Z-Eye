@@ -90,7 +90,7 @@
 				}
 
 				if(isset($lease_ip) && FS::$secMgr->isIP($lease_ip)) {
-					if($lease_ip != "failover" && (isset($st) && $st != "backup" || !isset($st))) {
+					if(isset($st) && $st != "backup" || !isset($st)) {
 						if(!isset($hosts_list[$lease_ip]["state"]) || $st == "active" 
 						|| ($st == "expired" && $hosts_list[$lease_ip]["state"] != "active")) {
 							if(isset($st) && $must_be_set[0] == true)
