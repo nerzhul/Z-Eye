@@ -327,7 +327,7 @@
 		private function showIPLine($ip,$rstate,$mac,$hostname,$comment,$subnet,$switch,$port,$leasetime="",$servers=array(),$distrib=0,$clusterLink=false) {
 			$rstateId = "sb".FS::$iMgr->formatHTMLId($ip)."rsttd";
 			$output = "<td>".FS::$iMgr->opendiv(7,$ip,array("lnkadd" => "ip=".$ip)).
-				"</td><td>".FS::$iMgr->searchIcon(long2ip($key))."</td><td id=\"".$rstateId."\">".$rstate;
+				"</td><td>".FS::$iMgr->searchIcon($ip)."</td><td id=\"".$rstateId."\">".$rstate;
 			
 			// Import option when subnet is distributed on a cluster and IP is only in the cache, not IPM
 			if ($distrib == 3 && $clusterLink) {
