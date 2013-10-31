@@ -286,7 +286,7 @@
 							"'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
 						
 					if($rstate == 3) {
-						$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
+						/*$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
 						$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$netfound."'");
 						if($data = FS::$dbMgr->Fetch($query)) {
 							if (!isset($syncNets[$netfound])) {
@@ -296,7 +296,7 @@
 							if (!in_array($macaddr,$syncNets[$netfound])) {
 								$syncNets[$netfound][] = $macaddr;
 							}
-						}
+						}*/
 
 					}
 				}
@@ -309,17 +309,19 @@
 
 		foreach($subnet_hist as $subnet => $subnetvals) {
 			foreach($subnetvals as $server => $values) {
-				$netclass = new FSNetwork();
-				$netclass->setNetAddr($subnet);
-				$netclass->setNetMask($keydsubnets[$subnet]);
-				FS::$dbMgr->Insert("z_eye_dhcp_subnet_history","subnet,server,ipfree,ipactive,ipreserved,ipdistributed,collecteddate",
-					"'".$subnet."','".$server."','".($netclass->GetMaxHosts()-$values["active"]-$values["reserved"]-$values["distributed"])."','".
-					$values["active"]."','".$values["reserved"]."','".$values["distributed"]."','".$execdate."'::timestamp");		
+				if (isset($keydsubnets[$subnet])) {
+					$netclass = new FSNetwork();
+					$netclass->setNetAddr($subnet);
+					$netclass->setNetMask($keydsubnets[$subnet]);
+					FS::$dbMgr->Insert("z_eye_dhcp_subnet_history","subnet,server,ipfree,ipactive,ipreserved,ipdistributed,collecteddate",
+						"'".$subnet."','".$server."','".($netclass->GetMaxHosts()-$values["active"]-$values["reserved"]-$values["distributed"])."','".
+						$values["active"]."','".$values["reserved"]."','".$values["distributed"]."','".$execdate."'::timestamp");
+				}
 			}
 		}
 		FS::$dbMgr->CommitTr();
 		
-		foreach ($syncNets as $subnet => $mac) {
+		/*foreach ($syncNets as $subnet => $mac) {
 			FS::$dbMgr->Connect();
 			$query = FS::$dbMgr->Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname","dhcpsubnet ='".$subnet."'");
 			if($data = FS::$dbMgr->Fetch($query)) {
@@ -339,7 +341,7 @@
 				if(!$radSQLMgr->GetOneData("radcheck","username","username = '".$mac."' AND attribute = 'Auth-Type' AND op = ':=' AND value = 'Accept'"))
 					$radSQLMgr->Insert("radcheck","id,username,attribute,op,value","'','".$mac."','Auth-Type',':=','Accept'");
 			}
-		}
+		}*/
 	}
 
 	FS::LoadFSModules();
