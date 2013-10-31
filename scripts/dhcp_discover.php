@@ -143,7 +143,7 @@
 					$subnet = preg_split("# #",$subnet[0]);
 					$net = $subnet[1];
 					$mask = $subnet[3];
-					$subnet_list[] = array($net,$mask);
+					$subnet_list[] = array($net,$mask,$server);
 				}
 				else if(preg_match("#host(.*)#",$resline[$j],$reserv_host)){
 					$reserv_host = preg_split("# #",$reserv_host[0]);
@@ -205,22 +205,29 @@
 
 		// Enable history 
 		$query = FS::$dbMgr->Select("z_eye_dhcp_monitoring","subnet,eniphistory");
-		while($data = FS::$dbMgr->Fetch($query))
+		while($data = FS::$dbMgr->Fetch($query)) {
 			$en_hist[$data["subnet"]] = $data["eniphistory"];
+		}
+		
 		// Flush ip table for server
 		FS::$dbMgr->BeginTr();
 		FS::$dbMgr->Delete("z_eye_dhcp_ip_cache","server = '".$server."'");
 		foreach($hosts_list as $host => $value) {
-			if(isset($value["state"])) $rstate = $value["state"];
-			else $rstate = 0;
+			if(isset($value["state"])) {
+				$rstate = $value["state"];
+			}
+			else {
+				$rstate = 0;
+			}
 
 			$netfound = "";
-			for($i=0;$i<count($subnet_list)&&$netfound==false;$i++) {
+			for ($i=0;$i<count($subnet_list)&&$netfound==false;$i++) {
 				$netclass = new FSNetwork();
 				$netclass->setNetAddr($subnet_list[$i][0]);
 				$netclass->setNetMask($subnet_list[$i][1]);
-				if($netclass->isUsableIP($host))
+				if($netclass->isUsableIP($host)) {
 					$netfound = $subnet_list[$i][0];
+				}
 			}
 
 			switch($rstate) {
@@ -281,9 +288,10 @@
 					FS::$dbMgr->Insert("z_eye_dhcp_ip_cache","ip,macaddr,hostname,leasetime,distributed,netid,server",
 						"'".$host."','".$iwh."','".$ihost."','".$iend."','".$rstate."','".$netfound."','".$value["server"]."'");
 
-					if(isset($en_hist[$netfound]) && $en_hist[$netfound] == "t" && ($rstate == 2 || $rstate == 3 || $rstate == 4))
+					if(isset($en_hist[$netfound]) && $en_hist[$netfound] == "t" && ($rstate == 2 || $rstate == 3 || $rstate == 4)) {
 						FS::$dbMgr->Insert("z_eye_dhcp_ip_history","ip,mac,distributed,netid,server,collecteddate",
 							"'".$host."','".$iwh."','".$rstate."','".$netfound."','".$value["server"]."','".$execdate."'::timestamp");
+					}
 						
 					if($rstate == 3) {
 						/*$macaddr = strtolower(preg_replace("#[:]#","",$iwh));
@@ -302,10 +310,14 @@
 				}
 			}
 		}
+		
+		FS::$dbMgr->CommitTr();
+		FS::$dbMgr->BeginTr();
 
 		$keydsubnets = array();
-		for($i=0;$i<count($subnet_list);$i++)
+		for($i=0;$i<count($subnet_list);$i++) {
 			$keydsubnets[$subnet_list[$i][0]] = $subnet_list[$i][1];
+		}
 
 		foreach($subnet_hist as $subnet => $subnetvals) {
 			foreach($subnetvals as $server => $values) {
@@ -411,8 +423,9 @@
 	FS::$dbMgr->Delete("z_eye_dhcp_subnet_cache");
 
 	// Register subnets
-	for($i=0;$i<count($subnet_list);$i++)
-		FS::$dbMgr->Insert("z_eye_dhcp_subnet_cache","netid,netmask","'".$subnet_list[$i][0]."','".$subnet_list[$i][1]."'");
+	for($i=0;$i<count($subnet_list);$i++) {
+		FS::$dbMgr->Insert("z_eye_dhcp_subnet_cache","netid,netmask,server","'".$subnet_list[$i][0]."','".$subnet_list[$i][1]."','".$subnet_list[$i][2]."'");
+	}
 
 	FS::$dbMgr->CommitTr();
 
