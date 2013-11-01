@@ -854,64 +854,6 @@
 				FS::$iMgr->submit("",$this->loc->s("Save"))."</form></li></ul>";
 				$output .= $formoutput;
 			}
-			else if ($radentrytype == 2) {
-				$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$radentry."'");
-				if (!$groupexist)
-					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$radentry."'");
-				if (!$groupexist) {
-					$output .= FS::$iMgr->printError("Groupe inexistant !");
-					return $output;
-				}
-				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$radentry."'");
-				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$radentry."'");
-				
-				FS::$iMgr->js("var attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-					FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-					FS::$iMgr->raddbCondSelectElmts().
-					"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
-					FS::$iMgr->selElmt("check",1).
-					FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
-					FS::$iMgr->img("styles/images/cross.png",15,15).
-					"</a></li>').insertAfter('#groupname');
-					$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
-					$('#attrtarget'+attridx).val(attrtarget); attridx++;};
-					function delAttrElmt(attridx) {
-							$('.attrli'+attridx).remove();
-				}");
-				
-				$formoutput .= FS::$iMgr->h2($this->loc->s("title-groupmod").": '".$radentry."'",true);
-				$formoutput .= "<ul class=\"ulform\">";
-				$formoutput .= FS::$iMgr->form("index.php?mod=".$this->mid."&r=".$raddb."&h=".$radhost."&p=".$radport."&act=3");
-                		$formoutput .= FS::$iMgr->hidden("uedit",1).FS::$iMgr->hidden("groupname",$radentry);
-				$attridx = 0;
-				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"attribute,op,value","groupname = '".$radentry."'");
-				while ($data = $radSQLMgr->Fetch($query)) {
-					$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
-						FS::$iMgr->select("attrop".$attridx).
-						FS::$iMgr->raddbCondSelectElmts($data["op"]).
-						"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
-						FS::$iMgr->selElmt("check",1,true).
-						FS::$iMgr->selElmt("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
-						FS::$iMgr->img("styles/images/cross.png",15,15).
-						"</a></li>";
-					$attridx++;
-				}
-
-				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"attribute,op,value","groupname = '".$radentry."'");
-				while ($data = $radSQLMgr->Fetch($query)) {
-					$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
-					FS::$iMgr->select("attrop".$attridx).
-					FS::$iMgr->raddbCondSelectElmts($data["op"]).
-					"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
-					FS::$iMgr->selElmt("check",1).
-					FS::$iMgr->selElmt("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
-					FS::$iMgr->img("styles/images/cross.png",15,15).
-					"</a></li>";
-					$attridx++;
-				}
-				$formoutput .= "<li>".FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
-				$output .= $formoutput;
-			}
 			else
 				$output .= FS::$iMgr->printError("Type d'entrée invalide !");
 			return $output;
@@ -972,12 +914,18 @@
 					$rgObj = new radiusGroup();
 					return $rgObj->showForm();
 				case 4:
-					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
+					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
+					if (!$radentry) {
+						return $this->loc->s("err-bad-datas");
+					}
+					$rgObj = new radiusGroup();
+					return $rgObj->showForm($radentry);
+					/*$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
 					$radentrytype = FS::$secMgr->checkAndSecuriseGetData("radentrytype");
-					return $this->editRadiusEntry($raddb,$radhost,$radport,$radentry,$radentrytype);
+					return $this->editRadiusEntry($raddb,$radhost,$radport,$radentry,$radentrytype);*/
 				default: return;
 			}
 		}
@@ -1134,6 +1082,7 @@
 					$radhost = FS::$secMgr->checkAndSecurisePostData("h");
 					$radport = FS::$secMgr->checkAndSecurisePostData("p");
 					$groupname = FS::$secMgr->checkAndSecurisePostData("groupname");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if (!$groupname) {
 						$this->log(2,"Some fields are missing for group edition");
@@ -1149,7 +1098,7 @@
 					}
 
 					// For Edition Only, don't delete acct/user-group links
-					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
+					
 					if ($edit == 1) {
 						$radSQLMgr->Delete($this->raddbinfos["tradgrpchk"],"groupname = '".$groupname."'");
 						$radSQLMgr->Delete($this->raddbinfos["tradgrprep"],"groupname = '".$groupname."'");

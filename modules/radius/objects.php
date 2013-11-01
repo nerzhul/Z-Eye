@@ -17,7 +17,7 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	final class radiusGroup extends FSMObj {
+	final class radiusGroup extends radiusObject {
 		function __construct() {
 			parent::__construct();
 			$this->readRight = "rule-read-datas";
@@ -32,6 +32,25 @@
 			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
+			
+			$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+			if (!$radSQLMgr) {
+				return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
+			}
+			
+			if ($groupname) {
+				$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");
+				// If group is not in check attributes, look into reply attributes
+				if (!$groupexist) {
+					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
+				}
+				if (!$groupexist) {
+					return FS::$iMgr->printError(sprintf($this->loc->s("err-group-not-exists"),$groupname));
+				}
+				
+				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");
+				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
+			}
 			
 			FS::$iMgr->js("var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Op ".FS::$iMgr->select("attrop'+attridx+'").
@@ -55,23 +74,64 @@
 					}
 			};");
 			
+			if ($groupname) {
+				$attridx = 0;
+				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"attribute,op,value","groupname = '".$groupname."'");
+				while ($data = $radSQLMgr->Fetch($query)) {
+					FS::$iMgr->js("addAttrElmt('".$data["attribute"]."','".$data["value"]."','".$data["op"]."','1');");
+				}
+
+				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"attribute,op,value","groupname = '".$groupname."'");
+				while ($data = $radSQLMgr->Fetch($query)) {
+					FS::$iMgr->js("addAttrElmt('".$data["attribute"]."','".$data["value"]."','".$data["op"]."','2');");
+				}
+			}
+			
 			$tempSelect = FS::$iMgr->select("radgrptpl",array("js" => "addTemplAttributes()")).
 				FS::$iMgr->selElmt($this->loc->s("None"),0).
 				FS::$iMgr->selElmt("VLAN",1)."</select>";
 				
 			return FS::$iMgr->cbkForm("3")."<table>".
 				FS::$iMgr->idxLines(array(
-					array("Profilname","groupname",array("type" => "idxedit",
-						"length" => "40", "edit" => false)),
+					array("Profilname","groupname",array("type" => "idxedit", "value" => $groupname,
+						"length" => "40", "edit" => $groupname != "")),
 					array("Template","",array("type" => "raw", "value" => $tempSelect)),
 					array("Attributes","",array("type" => "raw", "value" => "<span id=\"attrgrpn\"></span>"))
 				)).
 				"<tr><td colspan=\"2\">".
 				FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
-				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
+				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','')").
 				FS::$iMgr->submit("",$this->loc->s("Save")).
 				"</td></tr></table></form>";
 		}
-	};	
-	
+	};
+
+	class radiusObject extends FSMObj {
+		function __construct() {
+			parent::__construct();
+		}
+		
+		protected function connectToRaddb($radhost,$radport,$raddb) {
+			// Load some other useful datas from DB
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list",
+				"login,pwd,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
+				"addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+			if ($data = FS::$dbMgr->Fetch($query)) {
+				$this->raddbinfos = $data;
+			}
+
+			if ($this->raddbinfos["dbtype"] != "my" && $this->raddbinfos["dbtype"] != "pg")
+				return NULL;
+
+			$radSQLMgr = new AbstractSQLMgr();
+			if ($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$raddb,$radport,$radhost,$this->raddbinfos["login"],$this->raddbinfos["pwd"]) == 0) {
+				if ($radSQLMgr->Connect() == NULL)
+					return NULL; 
+			}
+			return $radSQLMgr;
+		}
+		
+		protected $raddbinfos;
+	}
 ?>
+
