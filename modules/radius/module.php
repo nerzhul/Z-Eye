@@ -1153,16 +1153,16 @@
 					
 					foreach ($attrTab as $attrKey => $attrValue) {
 						if ($attrValue["target"] == "2") {
+							$idxRep++;
 							$radSQLMgr->Insert($this->raddbinfos["tradgrprep"],"id,groupname,attribute,op,value",
 								"'".$idxRep."','".$groupname.
 								"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
-							$idxRep++;
 						}
 						else if ($attrValue["target"] == "1") {
+							$idxChk++;
 							$radSQLMgr->Insert($this->raddbinfos["tradgrpchk"],"id,groupname,attribute,op,value",
 								"'".$idxChk."','".$groupname.
 								"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
-							$idxChk++;
 						}
 					}
 					$this->log(0,"Group '".$groupname."' edited/created");
@@ -1221,13 +1221,11 @@
 					$radSQLMgr->Delete($this->raddbinfos["tradgrpchk"],"groupname = '".$groupname."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradgrprep"],"groupname = '".$groupname."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"groupname = '".$groupname."'");
-					$radSQLMgr->Delete("radhuntgroup","groupname = '".$groupname."'");
 					$radSQLMgr->CommitTr();
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import","groupname = '".$groupname."'");
 
-					$js = "";
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEcho("Done");
 					$this->log(0,"Group '".$groupname."' removed");
 					return;
 
