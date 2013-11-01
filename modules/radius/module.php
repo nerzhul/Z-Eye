@@ -1120,33 +1120,49 @@
 					foreach ($_POST as $key => $value) {
 						if (preg_match("#attrval#",$key)) {
 							$key = preg_replace("#attrval#","",$key);
-							if (!isset($attrTab[$key])) $attrTab[$key] = array();
+							if (!isset($attrTab[$key])) {
+								$attrTab[$key] = array();
+							}
 							$attrTab[$key]["val"] = $value;
 						}
 						else if (preg_match("#attrkey#",$key)) {
 							$key = preg_replace("#attrkey#","",$key);
-							if (!isset($attrTab[$key])) $attrTab[$key] = array();
-                                                        $attrTab[$key]["key"] = $value;
+							if (!isset($attrTab[$key])) {
+								$attrTab[$key] = array();
+							}
+							$attrTab[$key]["key"] = $value;
 						}
 						else if (preg_match("#attrop#",$key)) {
 							$key = preg_replace("#attrop#","",$key);
-							if (!isset($attrTab[$key])) $attrTab[$key] = array();
-                                                        $attrTab[$key]["op"] = $value;
+							if (!isset($attrTab[$key])) {
+								$attrTab[$key] = array();
+							}
+							$attrTab[$key]["op"] = $value;
 						}
 						else if (preg_match("#attrtarget#",$key)) {
 							$key = preg_replace("#attrtarget#","",$key);
-							if (!isset($attrTab[$key])) $attrTab[$key] = array();
-                                                        $attrTab[$key]["target"] = $value;
+							if (!isset($attrTab[$key])) {
+								$attrTab[$key] = array();
+							}
+							$attrTab[$key]["target"] = $value;
 						}
 					}
+					
+					$idxRep = FS::$dbMgr->GetMax($this->raddbinfos["tradgrprep"],"id");
+					$idxChk = FS::$dbMgr->GetMax($this->raddbinfos["tradgrpchk"],"id");
+					
 					foreach ($attrTab as $attrKey => $attrValue) {
 						if ($attrValue["target"] == "2") {
-							$radSQLMgr->Insert($this->raddbinfos["tradgrprep"],"id,groupname,attribute,op,value","'','".$groupname.
-							"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
+							$radSQLMgr->Insert($this->raddbinfos["tradgrprep"],"id,groupname,attribute,op,value",
+								"'".$idxRep."','".$groupname.
+								"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
+							$idxRep++;
 						}
 						else if ($attrValue["target"] == "1") {
-							$radSQLMgr->Insert($this->raddbinfos["tradgrpchk"],"id,groupname,attribute,op,value","'','".$groupname.
+							$radSQLMgr->Insert($this->raddbinfos["tradgrpchk"],"id,groupname,attribute,op,value",
+								"'".$idxChk."','".$groupname.
 								"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
+							$idxChk++;
 						}
 					}
 					$this->log(0,"Group '".$groupname."' edited/created");
