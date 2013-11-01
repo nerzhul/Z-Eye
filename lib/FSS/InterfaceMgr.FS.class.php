@@ -439,6 +439,22 @@
 
 			return $output;
 		}
+		
+		public function raddbCondSelectElmts($select = "") {
+			return	FS::$iMgr->selElmt("=","=",$select == "=").
+				FS::$iMgr->selElmt("==","==",$select == "==").
+				FS::$iMgr->selElmt(":=",":=",$select == ":=").
+				FS::$iMgr->selElmt("+=","+=",$select == "+=").
+				FS::$iMgr->selElmt("!=","!=",$select == "!=").
+				FS::$iMgr->selElmt(">",">",$select == ">").
+				FS::$iMgr->selElmt(">=",">=",$select == ">=").
+				FS::$iMgr->selElmt("<","<",$select == "<").
+				FS::$iMgr->selElmt("<=","<=",$select == "<=").
+				FS::$iMgr->selElmt("=~","=~",$select == "=~").
+				FS::$iMgr->selElmt("!~","!~",$select == "!~").
+				FS::$iMgr->selElmt("=*","=*",$select == "=*").
+				FS::$iMgr->selElmt("!*","!*",$select == "!*");
+		}
 
 		public function submit($name, $value, $options = array()) {
 			return sprintf("<input class=\"buttonStyle\" type=\"submit\" name=\"%s\" id=\"%s\" value=\"%s\" %s />",

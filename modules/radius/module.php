@@ -19,6 +19,7 @@
 
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/PDFgen.FS.class.php");
+	require_once(dirname(__FILE__)."/objects.php");
 
 	final class iRadius extends FSModule {
 		function __construct($locales) {
@@ -614,55 +615,6 @@
 			return $output;
 		}
 
-		/*
-		* Radius group form, support VLAN auto complete fields
-		*/
-		private function showGroupForm() {
-			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
-			
-			FS::$iMgr->js("var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
-				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-				$this->raddbCondSelector().
-				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
-				FS::$iMgr->selElmt("check",1).
-				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
-				FS::$iMgr->img("styles/images/cross.png",15,15)."</a></span><br />').insertBefore('#attrgrpn');
-				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
-				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
-				function delAttrElmt(attridx) {
-					$('.attrli'+attridx).remove();
-				}
-				function addTemplAttributes() {
-					switch($('#radgrptpl').val()) {
-						case '1':
-							addAttrElmt('Tunnel-Private-Group-Id','','=','2');
-							addAttrElmt('Tunnel-Type','13','=','2');
-							addAttrElmt('Tunnel-Medium-Type','6','=','2');
-							break;
-					}
-				};");
-			
-			$tempSelect = FS::$iMgr->select("radgrptpl",array("js" => "addTemplAttributes()")).
-				FS::$iMgr->selElmt($this->loc->s("None"),0).
-				FS::$iMgr->selElmt("VLAN",1)."</select>";
-				
-			$output = FS::$iMgr->cbkForm("3")."<table>".
-				FS::$iMgr->idxLines(array(
-					array("Profilname","groupname",array("type" => "idxedit",
-						"length" => "40", "edit" => false)),
-					array("Template","",array("type" => "raw", "value" => $tempSelect)),
-					array("Attributes","",array("type" => "raw", "value" => "<span id=\"attrgrpn\"></span>"))
-				)).
-				"<tr><td colspan=\"2\">".
-				FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
-				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
-				FS::$iMgr->submit("",$this->loc->s("Save")).
-				"</td></tr></table></form>";
-			return $output;
-		}
-
 		private function showUserForm() {
 			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
@@ -693,7 +645,7 @@
 			}
 			var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 			FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-			$this->raddbCondSelector().
+			FS::$iMgr->raddbCondSelectElmts().
 			"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
 			FS::$iMgr->selElmt("check",1).
 			FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
@@ -813,7 +765,7 @@
 					var attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 					FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Valeur".
 					FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." Op ".FS::$iMgr->select("attrop'+attridx+'").
-					$this->raddbCondSelector().
+					FS::$iMgr->raddbCondSelectElmts().
 					"</select> Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
 					FS::$iMgr->selElmt("check",1).
 					FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
@@ -870,7 +822,7 @@
 					if (!($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept")) {
 						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
 						FS::$iMgr->select("attrop".$attridx).
-						$this->raddbCondSelector($data["op"]).
+						FS::$iMgr->raddbCondSelectElmts($data["op"]).
 						"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
 						FS::$iMgr->selElmt("check",1,true).
 						FS::$iMgr->selElmt("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
@@ -915,7 +867,7 @@
 				
 				FS::$iMgr->js("var attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 					FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Op ".FS::$iMgr->select("attrop'+attridx+'").
-					$this->raddbCondSelector().
+					FS::$iMgr->raddbCondSelectElmts().
 					"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
 					FS::$iMgr->selElmt("check",1).
 					FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
@@ -934,22 +886,22 @@
 				$attridx = 0;
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"attribute,op,value","groupname = '".$radentry."'");
 				while ($data = $radSQLMgr->Fetch($query)) {
-					 $formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
-					 FS::$iMgr->select("attrop".$attridx).
-					$this->raddbCondSelector($data["op"]).
-					 "</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
-					 FS::$iMgr->selElmt("check",1,true).
-					 FS::$iMgr->selElmt("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
-					 FS::$iMgr->img("styles/images/cross.png",15,15).
-					 "</a></li>";
-					 $attridx++;
+					$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
+						FS::$iMgr->select("attrop".$attridx).
+						FS::$iMgr->raddbCondSelectElmts($data["op"]).
+						"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
+						FS::$iMgr->selElmt("check",1,true).
+						FS::$iMgr->selElmt("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
+						FS::$iMgr->img("styles/images/cross.png",15,15).
+						"</a></li>";
+					$attridx++;
 				}
 
 				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"attribute,op,value","groupname = '".$radentry."'");
 				while ($data = $radSQLMgr->Fetch($query)) {
 					$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
 					FS::$iMgr->select("attrop".$attridx).
-					$this->raddbCondSelector($data["op"]).
+					FS::$iMgr->raddbCondSelectElmts($data["op"]).
 					"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
 					FS::$iMgr->selElmt("check",1).
 					FS::$iMgr->selElmt("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
@@ -1011,28 +963,14 @@
 			return false;
 		}
 
-		private function raddbCondSelector($select = "") {
-			return	FS::$iMgr->selElmt("=","=",$select == "=").
-				FS::$iMgr->selElmt("==","==",$select == "==").
-				FS::$iMgr->selElmt(":=",":=",$select == ":=").
-				FS::$iMgr->selElmt("+=","+=",$select == "+=").
-				FS::$iMgr->selElmt("!=","!=",$select == "!=").
-				FS::$iMgr->selElmt(">",">",$select == ">").
-				FS::$iMgr->selElmt(">=",">=",$select == ">=").
-				FS::$iMgr->selElmt("<","<",$select == "<").
-				FS::$iMgr->selElmt("<=","<=",$select == "<=").
-				FS::$iMgr->selElmt("=~","=~",$select == "=~").
-				FS::$iMgr->selElmt("!~","!~",$select == "!~").
-				FS::$iMgr->selElmt("=*","=*",$select == "=*").
-				FS::$iMgr->selElmt("!*","!*",$select == "!*");
-		}
-
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
 				case 1: return $this->showRadiusServerMgmt();
 				case 2: return $this->showUserForm();
-				case 3: return $this->showGroupForm();
+				case 3:
+					$rgObj = new radiusGroup();
+					return $rgObj->showForm();
 				case 4:
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
 					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
