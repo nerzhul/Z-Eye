@@ -47,7 +47,7 @@ class ZEyeSSHBroker():
 			self.logger.error("SSH Authentication failure (host %s, user %s, password %s)" % (self.sshHost,self.sshUser,self.sshPwd))
 			return False
 		except Exception, e:
-			if str(e) == "[Errno 60] Operation timed out" or str(e) == "[Errno 64] Host is down":
+			if str(e) == "[Errno 60] Operation timed out" or str(e) == "[Errno 64] Host is down" or str(e) == "[Errno 61] Connection refused":
 				self.logger.error("SSH %s for host %s (user %s)" % (e,self.sshHost,self.sshUser))
 			else:
 				self.logger.critical("SSH Exception (host %s, user %s): %s" % (self.sshHost,self.sshUser,e))

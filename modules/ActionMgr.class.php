@@ -54,22 +54,27 @@
 					}
 
 					require_once(dirname(__FILE__)."/".$mod_path."/main.php");
-
-					if(!$module->getRulesClass()->canAccessToModule()) {
+					
+					$ruleAccess = $module->getRulesClass()->canAccessToModule();
+					if($ruleAccess === false) {
 						if(FS::isAjaxCall()) {
 							FS::$iMgr->ajaxEcho("err-no-rights");
 						}
 						else {
 							header("Location: index.php");
 						}
-						return;
+					}
+					else if($ruleAccess === -1) {
+						FS::$iMgr->js(sprintf("setLoginCbkMsg('<span style=\"color: red;\">%s</span>');openLogin();",
+							FS::$iMgr->getLocale("err-must-be-connected")));
+					}
+					else {
+						FS::$iMgr->setCurrentModule($module->getModuleClass());
+						$module->getModuleClass()->setModuleId($mid);
+						$module->getModuleClass()->handlePostDatas($act);
 					}
 
-					FS::$iMgr->setCurrentModule($module->getModuleClass());
-					$module->getModuleClass()->setModuleId($mid);
-					$module->getModuleClass()->handlePostDatas($act);
 					echo FS::$iMgr->renderJS();
-
 					break;
 			}
 		}
