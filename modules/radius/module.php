@@ -434,16 +434,16 @@
 				}
 
 				$output .= FS::$iMgr->h3("title-mass-import");
-				$output .= FS::$iMgr->js("function changeUForm() {
-						if (document.getElementsByName('usertype')[0].value == 1) {
-								$('#uptype').show(); $('#csvtooltip').html(\"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b>\");
-						}
-						else if (document.getElementsByName('usertype')[0].value == 2) {
-								$('#uptype').hide(); $('#csvtooltip').html('<b>Note: </b> Les adresses MAC peuvent être de la forme <b>aa:bb:cc:dd:ee:ff</b>, <b>aa-bb-cc-dd-ee-ff</b> ou <b>aabbccddeeff</b> et ne sont pas sensibles à la casse.');
-						}
-						else if (document.getElementsByName('usertype')[0].value == 3) {
-								$('#uptype').hide(); $('#csvtooltip').html('');
-						}
+				FS::$iMgr->js("function changeUForm() {
+					if (document.getElementsByName('usertype')[0].value == 1) {
+						$('#uptype').show(); $('#csvtooltip').html(\"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b>\");
+					}
+					else if (document.getElementsByName('usertype')[0].value == 2) {
+						$('#uptype').hide(); $('#csvtooltip').html('<b>Note: </b> Les adresses MAC peuvent être de la forme <b>aa:bb:cc:dd:ee:ff</b>, <b>aa-bb-cc-dd-ee-ff</b> ou <b>aabbccddeeff</b> et ne sont pas sensibles à la casse.');
+					}
+					else if (document.getElementsByName('usertype')[0].value == 3) {
+						$('#uptype').hide(); $('#csvtooltip').html('');
+					}
 				};");
 				$output .= FS::$iMgr->cbkForm("6");
 				$output .= "<ul class=\"ulform\"><li width=\"100%\">".
@@ -618,7 +618,7 @@
 			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 			
-			$output = FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
+			FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 				$this->raddbCondSelector().
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
@@ -638,7 +638,7 @@
 							break;
 					}
 				};");
-			$output .= FS::$iMgr->cbkForm("3").
+			$output = FS::$iMgr->cbkForm("3").
 				"<ul class=\"ulform\"><li>".FS::$iMgr->select("radgrptpl",array("js" => "addTemplAttributes()","label" => "Template")).
 				FS::$iMgr->selElmt($this->loc->s("None"),0).
 				FS::$iMgr->selElmt("VLAN",1).
@@ -668,16 +668,16 @@
 				else if (document.getElementsByName('utype')[0].value == 3) {
 					$('#userdf').hide();
 				}
-			}; grpidx = 0; function addGrpForm() {
+			}; var grpidx = 0; function addGrpForm() {
 				$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Profil")).
 					FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
 				<a onclick=\"javascript:delGrpElmt('+grpidx+');\">X</a></li>').insertBefore('#formactions');
 				grpidx++;
 			}
 			function delGrpElmt(grpidx) {
-					$('.ugroupli'+grpidx).remove();
+				$('.ugroupli'+grpidx).remove();
 			}
-			attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
+			var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
 			FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 			$this->raddbCondSelector().
 			"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").

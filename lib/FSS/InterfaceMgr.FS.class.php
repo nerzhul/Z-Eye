@@ -230,6 +230,10 @@
 		public function hr() { return "<div id=\"hr\"></div>"; }
 
 		public function js($js) {
+			$js = preg_replace("#[\n]#","",$js);
+			$js = preg_replace("#[\r]#","",$js);
+			$js = preg_replace("#[\t]#"," ",$js);
+			$js = trim($js);
 			if (!isset($this->js_buffer[$this->js_buffer_idx])) {
 				$this->js_buffer[$this->js_buffer_idx] = "";
 			}
