@@ -1037,7 +1037,7 @@
 					$reserv = $data["reserv"] == 't';
 				}
 			}
-			$output = FS::$iMgr->cbkForm("11")."<table>".
+			$output = FS::$iMgr->tip("tip-reserv").FS::$iMgr->cbkForm("11")."<table>".
 				FS::$iMgr->idxLine("IP-Addr","ip",array("value" => $ip,"type" => "idxedit", "edit" => $ip != "")).
 				FS::$iMgr->idxLine("Reserv","reserv",array("value" => $reserv,"type" => "chk", "tooltip" => "tooltip-ip-reserv")).
 				FS::$iMgr->idxLine("MAC-Addr","mac",array("value" => $mac)).
@@ -2057,8 +2057,11 @@
 					$netobj->setNetAddr($netinfos[0]);
 					$netobj->setNetMask($netinfos[1]);
 
-					if ($mac) {
-						// Check if MAC addr is not registered on another IP in the same subnet
+					/*
+					 *  Check if MAC addr is not registered on another IP in the same subnet
+					 * MAC 00:00:00:00:00:00 can be used to block some IPs on DHCP
+					 */
+					if ($mac && $mac != "00:00:00:00:00:00") {
 						$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip","macaddr = '".$mac."' AND ip != '".$ip."'");
 						while($data = FS::$dbMgr->Fetch($query)) {
 							if($netobj->isUsableIP($data["ip"])) {
