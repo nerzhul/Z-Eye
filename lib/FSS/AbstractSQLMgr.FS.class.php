@@ -50,13 +50,19 @@
 		}
 		public function initForZEye() {
 			$this->setConfig("pg",PGDbConfig::getDbName(),PGDbConfig::getDbPort(),PGDbConfig::getDbHost(),PGDbConfig::getDbUser(),
-                        	PGDbConfig::getDbPwd());
+				PGDbConfig::getDbPwd());
 		}
 
 		public function Connect() {
-			$this->PDO = new PDO($this->dbDriver.":dbname=".$this->dbName.";host=".$this->dbHost.";port=".$this->dbPort,$this->dbUser,
-				$this->dbPass);
-			return $this->PDO;
+			try {
+				$this->PDO = new PDO($this->dbDriver.":dbname=".$this->dbName.";host=".$this->dbHost.";port=".$this->dbPort,$this->dbUser,
+					$this->dbPass);
+				return $this->PDO;
+			}
+			catch (PDOException $e) {
+				echo $e."<br />";
+				return NULL;
+			}
 		}
 
 		public function Select($table,$fields,$cond = "",$options = array()) {
@@ -148,13 +154,13 @@
 
 		public function GetMin($table,$field,$cond = "") {
 			$query = $this->Select($table,"MIN(".$field.") as mn",$cond);
-                        if ($data = $this->Fetch($query)) {
-                                 $splstr = preg_split("#[\.]#",$field);
-                                 $splstr = preg_replace("#`#","",$splstr);
-                                 return $data["mn"];
-                        }
+			if ($data = $this->Fetch($query)) {
+				 $splstr = preg_split("#[\.]#",$field);
+				 $splstr = preg_replace("#`#","",$splstr);
+				 return $data["mn"];
+			}
 			return NULL;
-                }
+		}
 
 		public function Sum($table,$field,$cond = "") {
 			$query = $this->Select($table,"SUM(".$field.") as mx",$cond);
