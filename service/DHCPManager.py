@@ -455,7 +455,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		try:
 			zeyeDB = ZEyeSQLMgr()
 			zeyeDB.initForZEye()
-			pgres = zeyeDB.Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname,subnet")
+			pgres = zeyeDB.Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname,dhcpsubnet")
 			if zeyeDB.getRowCount() > 0:
 				# Buffer for better performances
 				self.loadRadiusList()
@@ -468,8 +468,8 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 			sys.exit(1);	
 
 		finally:
-			if dbMgr != None:
-				dbMgr.close()
+			if zeyeDB != None:
+				zeyeDB.close()
 		
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
