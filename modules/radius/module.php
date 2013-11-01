@@ -628,7 +628,7 @@
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
 				FS::$iMgr->selElmt("check",1).
 				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
-				FS::$iMgr->img("styles/images/cross.png",15,15)."</a></span><br />').insertAfter('#attrgrpn');
+				FS::$iMgr->img("styles/images/cross.png",15,15)."</a></span><br />').insertBefore('#attrgrpn');
 				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
 				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
 				function delAttrElmt(attridx) {
