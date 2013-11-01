@@ -453,23 +453,22 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		self.logger.info("DHCP/Radius Sync started")
 		starttime = datetime.datetime.now()
 		try:
-			zeyeDB = ZEyeSQLMgr()
-			zeyeDB.initForZEye()
-			pgres = zeyeDB.Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname,dhcpsubnet")
-			if zeyeDB.getRowCount() > 0:
+			self.zeyeDB = ZEyeSQLMgr()
+			self.zeyeDB.initForZEye()
+			pgres = self.zeyeDB.Select("z_eye_radius_dhcp_import","dbname,addr,port,groupname,dhcpsubnet")
+			if self.zeyeDB.getRowCount() > 0:
 				# Buffer for better performances
 				self.loadRadiusList()
 				self.loadMACList()
 				for idx in pgres:
-					if len(idx[0]) > 0 and len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
+					if len(idx[0]) > 0 and len(idx[1]) > 0 and idx[2] != 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
 						thread.start_new_thread(self.doSyncDHCPRadius,(idx[0],idx[1],idx[2],idx[3],idx[4]))
 		except Exception, e:
 			self.logger.critical("DHCP/Radius Sync: %s" % e)
-			sys.exit(1);	
-
+			sys.exit(1);
 		finally:
-			if zeyeDB != None:
-				zeyeDB.close()
+			if self.zeyeDB != None:
+				self.zeyeDB.close()
 		
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
@@ -502,6 +501,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		radCon = None
 		pgsqlCon = None
 		try:
+			self.logger.debug("DHCP/Radius Sync: sync subnet '%s' with '%s:%s/%s'" % (subnet,addr,port,dbname))
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			if pgsqlCon == None:
 				self.logger.error("DHCP/Radius Sync: unable to connect to Z-Eye database" % (addr,port,dbname))
@@ -521,7 +521,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 				
 				maxId = 1
 				radCursor.execute("SELECT MAX(id) FROM radcheck")
-				radRes = radCursor.fetchOne()
+				radRes = radCursor.fetchone()
 				if radRes != None:
 					maxId = radRes[0]
 				
@@ -532,53 +532,52 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 					radCursor.execute("INSERT INTO radusergroup(username,groupname,priority) VALUES ('%s','%s','0')" % (mac,groupname))
 					radCursor.execute("INSERT INTO radcheck(id,username,attribute,op,value) VALUES ('%s','%s','Auth-Type',':=','Accept')" % (maxId,mac))
 					
+				radCursor.close()
+				
+				if radCon:
+					radCon.close()
 			elif dbtype == "my":
 				#@TODO
 				self.logger.warn("DHCP/Radius Sync: MySQL not handled")
-				
+			
+			self.logger.debug("DHCP/Radius Sync: sync subnet '%s' with '%s:%s/%s' finished" % (subnet,addr,port,dbname))
 		except Exception, e:
 			self.logger.error("DHCP/Radius Sync: doSyncDHCPRadius %s" % e)
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
-			if radCon:
-				if dbtype == "pg":
-					radCon.close()
-				elif dbtype == "my":
-					# @TODO
-					self.logger.warn("DHCP/Radius Sync: MySQL not handled")
 
-			self.decrThreadNb()
-
+		self.decrThreadNb()
 	
 	def loadMACList(self):
 		self.subnetList = {}
 		
 		# We load required subnets from cache and IPM
-		pgres = self.zeyeDB.Select("z_eye_dhcp_subnet_cache","netid","netid in (SELECT subnet FROM z_eye_radius_dhcp_import)")
+		pgres = self.zeyeDB.Select("z_eye_dhcp_subnet_cache","netid","netid in (SELECT dhcpsubnet FROM z_eye_radius_dhcp_import)")
 		for idx in pgres:
 			if idx[0] not in self.subnetList:
-				self.subnetList = []
+				self.subnetList[idx[0]] = []
 		
-		pgres = self.zeyeDB.Select("dhcp_subnet_v4_declared","netid","netid in (SELECT subnet FROM z_eye_radius_dhcp_import)")
+		pgres = self.zeyeDB.Select("z_eye_dhcp_subnet_v4_declared","netid","netid in (SELECT dhcpsubnet FROM z_eye_radius_dhcp_import)")
 		for idx in pgres:
 			if idx[0] not in self.subnetList:
-				self.subnetList = []
+				self.subnetList[idx[0]] = []
 		
 		for subnet in self.subnetList:
 			# Then we load all MAC addr informations (per subnet), from cache
-			pgres = self.zeyeDB.Select("z_eye_dhcp_ip_cache","macaddr","WHERE netid = '%s'" % subnet)
+			pgres = self.zeyeDB.Select("z_eye_dhcp_ip_cache","macaddr","netid = '%s'" % subnet)
 			for idx in pgres:
 				if idx[0] not in self.subnetList[subnet]:
 					self.subnetList[subnet].append(idx[0])
-			"""		
-			# And from IPM, we need to check if IP is in net
-			pgres = self.zeyeDB.Select("z_eye_dhcp_ip","macaddr","WHERE netid = '%s'" % subnet)
+
+			""" And from IPM, we need to
+			pgres = self.zeyeDB.Select("z_eye_dhcp_ip","macaddr","subnet = '%s'" % subnet)
 			pgres = pgcursor.fetchall()
 			for idx in pgres:
 				if idx[0] not in self.subnetList[subnet]:
 					self.subnetList[subnet].append(idx[0])
 			"""
+
 	
 	def loadRadiusList(self):
 		self.radiusList = {}

@@ -73,7 +73,10 @@ class ZEyeSQLMgr:
 		
 	def Select(self,tableName,fields,suffix=""):
 		if self.dbType == "pg":
-			self.dbCursor.execute("SELECT %s FROM %s %s" % (fields,tableName,suffix))
+			if suffix == "":
+				self.dbCursor.execute("SELECT %s FROM %s" % (fields,tableName))
+			else:
+				self.dbCursor.execute("SELECT %s FROM %s WHERE %s" % (fields,tableName,suffix))
 			return self.dbCursor.fetchall()
 		
 		return None

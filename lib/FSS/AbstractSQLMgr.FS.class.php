@@ -187,7 +187,7 @@
 			return $this->PDO->query($sql);
 		}
 
-		public function Fetch(&$query) {
+		public function Fetch(&$query,$shErr=true) {
 			if (!$query) {
 				echo FS::$iMgr->printError(sprintf("Query failed: '%s'",$this->sqlQuery));
 				return NULL;
