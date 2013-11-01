@@ -107,11 +107,11 @@
 							$path = $elem;
 							require(dirname(__FILE__)."/../../modules/".$path."/main.php");
 							$menuname = $module->getMenu();
-							if ($menuname && $module->getRulesClass()->canAccessToModule()) {
+							if ($menuname && $module->getRulesClass()->canAccessToModule() === true) {
 								if (!isset($menus[$menuname])) {
 									$menus[$menuname] = array();
 								}
-								if ($module->getRulesClass()->canAccessToModule()) {
+								if ($module->getRulesClass()->canAccessToModule() === true) {
 									$menus[$menuname][] = 
 										sprintf("<div class=\"menuItem\" onclick=\"loadInterface('&mod=%s');\">%s</div>",
 										$moduleid,$module->getModuleClass()->getMenuTitle());

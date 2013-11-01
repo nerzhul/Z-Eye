@@ -658,7 +658,7 @@
 			
 			$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
 			
-			$output = FS::$iMgr->js("function changeUForm() {
+			FS::$iMgr->js("function changeUForm() {
 				if (document.getElementsByName('utype')[0].value == 1) {
 					$('#userdf').show();
 				}
@@ -689,7 +689,7 @@
 				$('.attrli'+attridx).remove();
 			}");
 
-			$output .= FS::$iMgr->cbkForm("2");
+			$output = FS::$iMgr->cbkForm("2");
 			$output .= "<ul class=\"ulform\"><li>".
 				FS::$iMgr->select("utype",array("js" => "changeUForm()","label" => $this->loc->s("Auth-Type")));
 			$output .= FS::$iMgr->selElmt($this->loc->s("User"),1).

@@ -228,14 +228,14 @@
 			else if ($dbtype == "my") {
 				$this->dbDriver = "mysql";
 			}
-                        $this->dbName = $dbn;
-                        $this->dbPort = $dbport;
-                        $this->dbHost = $dbh;
-                        $this->dbUser = $dbu;
-                        $this->dbPass = $dbp;
+			$this->dbName = $dbn;
+			$this->dbPort = $dbport;
+			$this->dbHost = $dbh;
+			$this->dbUser = $dbu;
+			$this->dbPass = $dbp;
 			$this->dbType = $dbtype;
 			return 0;
-                }
+		}
 
 		public function BeginTr() {
 			return $this->PDO->beginTransaction();
