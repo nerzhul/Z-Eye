@@ -618,12 +618,13 @@
 			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
 			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
 			
-			FS::$iMgr->js("attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
+			FS::$iMgr->js("var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
+				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 				$this->raddbCondSelector().
 				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
 				FS::$iMgr->selElmt("check",1).
-				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">X</a></li>').insertAfter('#groupname');
+				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
+				FS::$iMgr->img("styles/images/cross.png",15,15)."</a></span><br />').insertAfter('#attrgrpn');
 				$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
 				$('#attrtarget'+attridx).val(attrtarget); attridx++;};
 				function delAttrElmt(attridx) {
@@ -638,16 +639,23 @@
 							break;
 					}
 				};");
-			$output = FS::$iMgr->cbkForm("3").
-				"<ul class=\"ulform\"><li>".FS::$iMgr->select("radgrptpl",array("js" => "addTemplAttributes()","label" => "Template")).
+			
+			$tempSelect = FS::$iMgr->select("radgrptpl",array("js" => "addTemplAttributes()")).
 				FS::$iMgr->selElmt($this->loc->s("None"),0).
-				FS::$iMgr->selElmt("VLAN",1).
-				"</select></li><li>".
-				FS::$iMgr->input("groupname","",20,40,$this->loc->s("Profilname"))."</li><li>".
-				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
+				FS::$iMgr->selElmt("VLAN",1)."</select>";
+				
+			$output = FS::$iMgr->cbkForm("3")."<table>".
+				FS::$iMgr->idxLines(array(
+					array("Profilname","groupname",array("type" => "idxedit",
+						"length" => "40", "edit" => false)),
+					array("Template","",array("type" => "raw", "value" => $tempSelect)),
+					array("Attributes","",array("type" => "raw", "value" => "<span id=\"attrgrpn\"></span>"))
+				)).
+				"<tr><td colspan=\"2\">".
 				FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
+				FS::$iMgr->button("newattr","Nouvel attribut","addAttrElmt('','','','')").
 				FS::$iMgr->submit("",$this->loc->s("Save")).
-				"</li></ul></form>";
+				"</td></tr></table></form>";
 			return $output;
 		}
 

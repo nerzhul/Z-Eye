@@ -254,7 +254,7 @@
 
 		public function label($for,$value,$class = "") {
 			return sprintf("<label class=\"%s\" for=\"%s\">%s</label>",
-				$class,$for,$value);
+				$class,$for,$this->getLocale($value));
 		}
 
 		public function tooltip($text) {
