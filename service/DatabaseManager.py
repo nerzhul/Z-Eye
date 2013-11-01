@@ -96,7 +96,15 @@ class ZEyeSQLMgr:
 				return pgres[0]
 		
 		return None
+		
+	def Insert(self,tableName,fields,values):
+		if self.dbType == "pg":
+			self.dbCursor.execute("INSERT INTO %s(%s) VALUES (%s)" % (tableName,fields,values))
 	
+	def Commit(self):
+		if self.dbType == "pg":
+			self.dbConn.commit()
+
 	def getRowCount(self):
 		if self.dbType == "pg":
 			return self.dbCursor.rowcount
