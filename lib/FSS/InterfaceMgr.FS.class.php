@@ -270,7 +270,7 @@
 		public function textarea($name, $def_value = "", $options=array()) {
 			$output = "";
 			if (isset($options["label"])) {
-				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]);
+				$output = $this->label($name,$options["label"]);
 			}
 			
 			$output = sprintf("%s<textarea name=\"%s\" id=\"%s\" style=\"width:%spx;height:%spx\" ",
@@ -295,10 +295,10 @@
 		public function input($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
 			if ($label) {
-				$output = sprintf("<label for=\"%s\">%s </label> ",$name,$label);
+				$output = $this->label($name,$label);
 			}
 			
-			$output .= sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" ",
+			$output = sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" ",
 				$output,$name,$name,$def_value,$size,$length);
 				
 			if ($tooltip) {
@@ -311,7 +311,7 @@
 		public function numInput($name, $def_value = "", $options = array()) {
 			$output = "";
 			if (isset($options["label"])) {
-				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]);
+				$output = $this->label($name,$options["label"]);
 			}
 			
 			$output = sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ",
@@ -327,7 +327,7 @@
 		public function IPInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL, $tooltip=NULL) {
 			$output = "";
             if ($label) {
-				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$label);
+				$output = $this->label($name,$label);
 			}
 			
 			$output = sprintf("<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:checkIP(this);\" ",
@@ -343,7 +343,7 @@
 		public function MacInput($name, $def_value = "", $size = 20, $length = 40, $label=NULL) {
 			$output = "";
             if ($label) {
-				$output = sprintf("<label for=\"%s\">%s</label> ",$name,$label);
+				$output = $this->label($name,$label);
 			}
 			return sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:checkMAC(this);\" />",
 				$output,$name,$name,$def_value,$size,$length);
@@ -404,13 +404,13 @@
 
 		public function password($name, $def_value = "", $label=NULL) {
 			return sprintf("%s<input type=\"password\" name=\"%s\" value=\"%s\" />",
-				$label ? sprintf("<label for=\"%s\">%s</label> ", $name, $label) : "",
+				$label ? $this->label($name, $label) : "",
 				$name, $def_value);
 		}
 
 		public function calendar($name, $def_value, $label=NULL) {
 			$output = sprintf("%s<input type=\"textbox\" value=\"%s\" name=\"%s\" id=\"%s\" size=\"20\" />",
-				$label ? sprintf("<label for=\"%s\">%s</label> ", $name, $label) : "",
+				$label ? $this->label($name, $label) : "",
 				$def_value, $name, $name);
 
 			$js = sprintf("$('#%s').datepicker($.datepicker.regional['fr']);
@@ -526,11 +526,13 @@
 			if (isset($options["type"])) {
 				switch($options["type"]) {
 					case "idxedit": 
-						if (isset($options["edit"]) && $options["edit"])
+						if (isset($options["edit"]) && $options["edit"]) {
 							$output .= $value.FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
-						else
+						}
+						else {
 							$output .= $this->input($name,$value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40),
-                                        			(isset($options["label"]) ? $options["label"] : NULL));
+								(isset($options["label"]) ? $options["label"] : NULL));
+						}
 						break;
 					case "idxipedit":
 						if (isset($options["edit"]) && $options["edit"])
