@@ -494,60 +494,38 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		login = self.radiusList[addr][port][dbname][0]
 		pwd = self.radiusList[addr][port][dbname][1]
 		
-		# DB can only be MySQL or PgSQL
-		if dbtype != "my" and dbtype != "pg":
-			self.logger.error("DHCP/Radius Sync: Warning %s is not a valid DB type" % dbtype)
-			self.decrThreadNb()
-			return
+		zdbMgr = ZEyeSQLMgr()
 		
-		radCon = None
-		pgsqlCon = None
 		try:
 			self.logger.debug("DHCP/Radius Sync: sync subnet '%s' with '%s:%s/%s'" % (subnet,addr,port,dbname))
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
-			if pgsqlCon == None:
+			if zdbMgr.initForZEye() == False:
 				self.logger.error("DHCP/Radius Sync: unable to connect to Z-Eye database" % (addr,port,dbname))
 				self.decrThreadNb()
 				return
 			
-			pgcursor = pgsqlCon.cursor()
+			radDBMgr = ZEyeSQLMgr()
+			if radDBMgr.configAndTryConnect(dbtype,addr,port,dbname,login,pwd) == False:
+				self.logger.error("DHCP/Radius Sync: unable to connect to %s:%s/%s" % (addr,port,dbname))
+				self.decrThreadNb()
+				return
 			
-			if dbtype == "pg":
-				radCon = PgSQL.connect(host=addr,user=login,password=pwd,database=dbname)
-				if radCon == None:
-					self.logger.error("DHCP/Radius Sync: unable to connect to %s:%s/%s" % (addr,port,dbname))
-					self.decrThreadNb()
-					return
-				
-				radCursor = radCon.cursor()
-				
+			maxId = radDBMgr.GetMax("radcheck","id")
+			if maxId == None:
 				maxId = 1
-				radCursor.execute("SELECT MAX(id) FROM radcheck")
-				radRes = radCursor.fetchone()
-				if radRes != None and radRes[0] != None:
-					maxId = radRes[0]
-				
-				for mac in self.subnetList[subnet]["mac"]:
-					maxId += 1
-					radCursor.execute("DELETE FROM radusergroup WHERE username = '%s'" % mac)
-					radCursor.execute("DELETE FROM radcheck WHERE username = '%s'" % mac)
-					radCursor.execute("INSERT INTO radusergroup(username,groupname,priority) VALUES ('%s','%s','0')" % (mac,groupname))
-					radCursor.execute("INSERT INTO radcheck(id,username,attribute,op,value) VALUES ('%s','%s','Auth-Type',':=','Accept')" % (maxId,mac))
-					
-				radCon.commit()
-				radCon.close()
-			elif dbtype == "my":
-				#@TODO
-				self.logger.warn("DHCP/Radius Sync: MySQL not handled")
 			
+			for mac in self.subnetList[subnet]["mac"]:
+				maxId += 1
+				radDBMgr.Delete("radusergroup","username = '%s'" % mac)
+				radDBMgr.Delete("radcheck","username = '%s'" % mac)
+				radDBMgr.Insert("radusergroup","username,groupname,priority","'%s','%s','0'" % (mac,groupname))
+				radDBMgr.Insert("radcheck","id,username,attribute,op,value","'%s','%s','Auth-Type',':=','Accept'" % (maxId,mac))
+				
+			radDBMgr.Commit()			
 			self.logger.debug("DHCP/Radius Sync: sync subnet '%s' with '%s:%s/%s' finished" % (subnet,addr,port,dbname))
 		except Exception, e:
 			self.logger.critical("DHCP/Radius Sync: doSyncDHCPRadius %s" % e)
 		finally:
-			if pgsqlCon:
-				pgsqlCon.close()
-
-		self.decrThreadNb()
+			self.decrThreadNb()
 	
 	def loadSubnetList(self):
 		self.subnetList = {}

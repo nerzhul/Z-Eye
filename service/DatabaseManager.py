@@ -33,7 +33,7 @@ class ZEyeSQLMgr:
 	dbType = ""
 	logger = None
 	
-	def __init__(self):
+	def __init__ (self):
 		self.dbHost = ""
 		self.dbPort = 0
 		self.dbName = ""
@@ -43,7 +43,7 @@ class ZEyeSQLMgr:
 		self.dbType = ""
 		self.logger = logging.getLogger("Z-Eye")
 		
-	def configAndTryConnect(self,dbType,dbHost,dbPort,dbName,dbLogin,dbPwd):
+	def configAndTryConnect (self, dbType, dbHost, dbPort, dbName, dbLogin, dbPwd):
 		if dbType != "my" and dbType != "pg":
 			return False
 	
@@ -58,7 +58,10 @@ class ZEyeSQLMgr:
 				return False
 			
 		elif dbType == "my":
-			self.logger.info("Database MySQL not supported")
+			self.logger.warn("MySQL Database not supported")
+			return False
+		else:
+			self.logger.warn("Database '%s' not supported" % dbType)
 			return False
 			
 		self.dbHost = dbHost
@@ -68,10 +71,10 @@ class ZEyeSQLMgr:
 		self.dbType = dbType
 		return True
 
-	def initForZEye(self):
+	def initForZEye (self):
 		return self.configAndTryConnect("pg",netdiscoCfg.pgHost,0,netdiscoCfg.pgDB,netdiscoCfg.pgUser,netdiscoCfg.pgPwd)
 		
-	def Select(self,tableName,fields,suffix=""):
+	def Select (self, tableName, fields, suffix = ""):
 		if self.dbType == "pg":
 			if suffix == "":
 				self.dbCursor.execute("SELECT %s FROM %s" % (fields,tableName))
@@ -81,14 +84,14 @@ class ZEyeSQLMgr:
 		
 		return None
 	
-	def GetOneField(self,tableName,fields,suffix):
+	def GetOneField (self, tableName, fields, suffix):
 		if self.dbType == "pg":
 			self.dbCursor.execute("SELECT %s FROM %s %s LIMIT 1" % (fields,tableName,suffix))
 			return self.dbCursor.fetchone()
 		
 		return None
 	
-	def GetOneData(self,tableName,field,suffix):
+	def GetOneData (self, tableName, field, suffix = ""):
 		if self.dbType == "pg":
 			self.dbCursor.execute("SELECT %s FROM %s %s LIMIT 1" % (field,tableName,suffix))
 			pgres = self.dbCursor.fetchone()
@@ -96,21 +99,34 @@ class ZEyeSQLMgr:
 				return pgres[0]
 		
 		return None
+	
+	def GetMax (self, tableName, field, suffix = ""):
+		if self.dbType == "pg":
+			return self.GetOneData(tableName,"MAX(%s)" % field,suffix)
 		
-	def Insert(self,tableName,fields,values):
+		return None
+		
+	def Insert (self, tableName, fields, values):
 		if self.dbType == "pg":
 			self.dbCursor.execute("INSERT INTO %s(%s) VALUES (%s)" % (tableName,fields,values))
+			
+	def Delete (self, tableName, suffix = ""):
+		if self.dbType == "pg":
+			if len(suffix) > 0:
+				self.dbCursor.execute("DELETE FROM %s WHERE %s" % (tableName,suffix))
+			else:
+				self.dbCursor.execute("DELETE FROM %s" % tableName)
 	
-	def Commit(self):
+	def Commit (self):
 		if self.dbType == "pg":
 			self.dbConn.commit()
 
-	def getRowCount(self):
+	def getRowCount (self):
 		if self.dbType == "pg":
 			return self.dbCursor.rowcount
 		return None
 	
-	def close(self):
+	def close (self):
 		if self.dbType == "pg" and self.dbConn != None:
 			self.dbConn.close()
 	
