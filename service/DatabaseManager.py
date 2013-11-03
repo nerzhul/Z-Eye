@@ -18,6 +18,7 @@
 """
 
 from pyPgSQL import PgSQL
+import pymysql
 
 import logging
 import netdiscoCfg
@@ -58,8 +59,15 @@ class ZEyeSQLMgr:
 				return False
 			
 		elif dbType == "my":
-			self.logger.warn("MySQL Database not supported")
-			return False
+			self.dbConn =  pymysql.connect(host=dbHost, port=dbPort, user=dbLogin, passwd=dbPwd, db=dbName)
+			if self.dbConn == None:
+				return False
+			
+			self.dbCursor = self.dbConn.cursor()
+			if self.dbCursor == None:
+				self.dbConn.close()
+				return False
+
 		else:
 			self.logger.warn("Database '%s' not supported" % dbType)
 			return False
@@ -75,7 +83,7 @@ class ZEyeSQLMgr:
 		return self.configAndTryConnect("pg",netdiscoCfg.pgHost,0,netdiscoCfg.pgDB,netdiscoCfg.pgUser,netdiscoCfg.pgPwd)
 		
 	def Select (self, tableName, fields, suffix = ""):
-		if self.dbType == "pg":
+		if self.dbType == "pg" or self.dbType == "my":
 			if suffix == "":
 				self.dbCursor.execute("SELECT %s FROM %s" % (fields,tableName))
 			else:
@@ -85,48 +93,58 @@ class ZEyeSQLMgr:
 		return None
 	
 	def GetOneField (self, tableName, fields, suffix):
-		if self.dbType == "pg":
-			self.dbCursor.execute("SELECT %s FROM %s %s LIMIT 1" % (fields,tableName,suffix))
+		if self.dbType == "pg" or self.dbType == "my":
+			if suffix == "":
+				self.dbCursor.execute("SELECT %s FROM %s LIMIT 1" % (fields,tableName))
+			else:
+				self.dbCursor.execute("SELECT %s FROM %s WHERE %s LIMIT 1" % (fields,tableName,suffix))
 			return self.dbCursor.fetchone()
 		
 		return None
 	
 	def GetOneData (self, tableName, field, suffix = ""):
-		if self.dbType == "pg":
-			self.dbCursor.execute("SELECT %s FROM %s %s LIMIT 1" % (field,tableName,suffix))
-			pgres = self.dbCursor.fetchone()
-			if pgres != None:
-				return pgres[0]
+		if self.dbType == "pg" or self.dbType == "my":
+			if suffix == "":
+				self.dbCursor.execute("SELECT %s FROM %s LIMIT 1" % (field,tableName))
+			else:
+				self.dbCursor.execute("SELECT %s FROM %s WHERE %s LIMIT 1" % (field,tableName,suffix))
+			res = self.dbCursor.fetchone()
+			if res != None:
+				return res[0]
 		
 		return None
 	
 	def GetMax (self, tableName, field, suffix = ""):
-		if self.dbType == "pg":
+		if self.dbType == "pg" or self.dbType == "my":
 			return self.GetOneData(tableName,"MAX(%s)" % field,suffix)
 		
 		return None
 		
 	def Insert (self, tableName, fields, values):
-		if self.dbType == "pg":
+		if self.dbType == "pg" or self.dbType == "my":
 			self.dbCursor.execute("INSERT INTO %s(%s) VALUES (%s)" % (tableName,fields,values))
 			
 	def Delete (self, tableName, suffix = ""):
-		if self.dbType == "pg":
+		if self.dbType == "pg" or self.dbType == "my":
 			if len(suffix) > 0:
 				self.dbCursor.execute("DELETE FROM %s WHERE %s" % (tableName,suffix))
 			else:
 				self.dbCursor.execute("DELETE FROM %s" % tableName)
 	
 	def Commit (self):
-		if self.dbType == "pg":
+		if self.dbType == "pg" or self.dbType == "my":
 			self.dbConn.commit()
 
 	def getRowCount (self):
-		if self.dbType == "pg":
+		if self.dbType == "pg" or self.dbType == "my":
 			return self.dbCursor.rowcount
 		return None
 	
 	def close (self):
-		if self.dbType == "pg" and self.dbConn != None:
-			self.dbConn.close()
+		if self.dbType == "pg" or self.dbType == "my":
+			if self.dbCursor != None:
+				self.dbCursor.close()
+				
+			if self.dbConn != None:
+				self.dbConn.close()
 	

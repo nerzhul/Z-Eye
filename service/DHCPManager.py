@@ -440,8 +440,8 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 	ipList = {}
 	
 	def __init__(self):
-		""" 1 min between two DHCP updates """
-		self.sleepingTimer = 300
+		""" 2 min between two syncs updates """
+		self.sleepingTimer = 120
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
