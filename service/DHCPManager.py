@@ -522,6 +522,8 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 				
 			radDBMgr.Commit()			
 			self.logger.debug("DHCP/Radius Sync: sync subnet '%s' with '%s:%s/%s' finished" % (subnet,addr,port,dbname))
+			radDBMgr.close()
+			zdbMgr.close()
 		except Exception, e:
 			self.logger.critical("DHCP/Radius Sync: doSyncDHCPRadius %s" % e)
 		finally:
