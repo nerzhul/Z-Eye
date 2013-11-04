@@ -509,12 +509,14 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 				self.decrThreadNb()
 				return
 			
+			# We must get the MAX id to create the new entries
 			maxId = radDBMgr.GetMax("radcheck","id")
 			if maxId == None:
 				maxId = 1
 			
 			for mac in self.subnetList[subnet]["mac"]:
 				maxId += 1
+				# We must improve it to don't create already existing entries
 				radDBMgr.Delete("radusergroup","username = '%s'" % mac)
 				radDBMgr.Delete("radcheck","username = '%s'" % mac)
 				radDBMgr.Insert("radusergroup","username,groupname,priority","'%s','%s','0'" % (mac,groupname))
