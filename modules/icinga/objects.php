@@ -379,8 +379,15 @@
 						else {
 							$output .= "green";
 						}
+						
+						$plugOut = $svalues["plugin_output"];
+						if (isset($svalues["long_plugin_output"]) && strlen($svalues["long_plugin_output"]) > 0) {
+							$plugOut .= "<br />".$svalues["long_plugin_output"];
+						}
+						$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
+						
 						$output .= ";\"><td>".$sensor."</td><td>".$outstate.
-							"</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
+							"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
 					}
 				}
 				else if ($hos == "hoststatus") {
@@ -409,8 +416,14 @@
 					else {
 						$output .= "green";
 					}
+					$plugOut = $hosvalues["plugin_output"];
+					if (isset($hosvalues["long_plugin_output"]) && strlen($hosvalues["long_plugin_output"]) > 0) {
+						$plugOut .= "<br />".$hosvalues["long_plugin_output"];
+					}
+					$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
+						
 					$output .= ";\"><td>".$this->loc->s("Availability")."</td><td>".$outstate.
-						"</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>"; 
+						"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
 				}
 			}
 			

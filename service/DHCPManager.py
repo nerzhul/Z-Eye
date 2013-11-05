@@ -552,7 +552,9 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 			pgres = self.zeyeDB.Select("z_eye_dhcp_ip_cache","macaddr","netid = '%s'" % subnet)
 			for idx in pgres:
 				if idx[0] not in self.subnetList[subnet]["mac"]:
-					self.subnetList[subnet]["mac"].append(idx[0])
+					fmtMac = re.sub(":","",idx[0])
+					fmtMac = re.sub("-","",fmtMac)
+					self.subnetList[subnet]["mac"].append(fmtMac.lower())
 			
 			for ip in self.ipList:
 				try:
@@ -566,7 +568,9 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		""" We load IPs from IPM """
 		pgres = self.zeyeDB.Select("z_eye_dhcp_ip","ip,macaddr","reserv = 't'")
 		for idx in pgres:
-			self.ipList[idx[0]] = idx[1]
+			fmtMac = re.sub(":","",idx[0])
+			fmtMac = re.sub("-","",fmtMac)
+			self.ipList[idx[0]] = fmtMac.lower()
 	
 	def loadRadiusList(self):
 		self.radiusList = {}

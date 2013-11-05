@@ -48,28 +48,32 @@ class ZEyeSQLMgr:
 		if dbType != "my" and dbType != "pg":
 			return False
 	
-		if dbType == "pg":
-			self.dbConn = PgSQL.connect(host=dbHost,user=dbLogin,password=dbPwd,database=dbName)
-			if self.dbConn == None:
-				return False
+		try:
+			if dbType == "pg":
+				self.dbConn = PgSQL.connect(host=dbHost,user=dbLogin,password=dbPwd,database=dbName)
+				if self.dbConn == None:
+					return False
+					
+				self.dbCursor = self.dbConn.cursor()
+				if self.dbCursor == None:
+					self.dbConn.close()
+					return False
 				
-			self.dbCursor = self.dbConn.cursor()
-			if self.dbCursor == None:
-				self.dbConn.close()
-				return False
-			
-		elif dbType == "my":
-			self.dbConn =  pymysql.connect(host=dbHost, port=dbPort, user=dbLogin, passwd=dbPwd, db=dbName)
-			if self.dbConn == None:
-				return False
-			
-			self.dbCursor = self.dbConn.cursor()
-			if self.dbCursor == None:
-				self.dbConn.close()
-				return False
+			elif dbType == "my":
+				self.dbConn =  pymysql.connect(host=dbHost, port=dbPort, user=dbLogin, passwd=dbPwd, db=dbName)
+				if self.dbConn == None:
+					return False
+				
+				self.dbCursor = self.dbConn.cursor()
+				if self.dbCursor == None:
+					self.dbConn.close()
+					return False
 
-		else:
-			self.logger.warn("Database '%s' not supported" % dbType)
+			else:
+				self.logger.warn("Database '%s' not supported" % dbType)
+				return False
+		except Exception, e:
+			self.logger.error("DBMgr: connection to DB %s:%s/%s failed: %s" % (dbHost,dbPort,dbName,e))
 			return False
 			
 		self.dbHost = dbHost

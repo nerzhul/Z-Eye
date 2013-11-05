@@ -1718,6 +1718,7 @@
 					if ($saddr && $sport && $sdbname) {
 						$this->log(0,"Remove Radius DB ".$sdbname."@".$saddr.":".$sport);
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$sdbname.$saddr.$sport)."');");
 					}
 					else
