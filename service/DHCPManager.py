@@ -568,7 +568,7 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		""" We load IPs from IPM """
 		pgres = self.zeyeDB.Select("z_eye_dhcp_ip","ip,macaddr","reserv = 't'")
 		for idx in pgres:
-			fmtMac = re.sub(":","",idx[0])
+			fmtMac = re.sub(":","",idx[1])
 			fmtMac = re.sub("-","",fmtMac)
 			self.ipList[idx[0]] = fmtMac.lower()
 	
