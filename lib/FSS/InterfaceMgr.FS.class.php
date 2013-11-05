@@ -441,7 +441,7 @@
 		}
 		
 		public function raddbCondSelectElmts($select = "") {
-			return	FS::$iMgr->selElmt("=","=",$select == "=").
+			return FS::$iMgr->selElmt("=","=",$select == "=").
 				FS::$iMgr->selElmt("==","==",$select == "==").
 				FS::$iMgr->selElmt(":=",":=",$select == ":=").
 				FS::$iMgr->selElmt("+=","+=",$select == "+=").

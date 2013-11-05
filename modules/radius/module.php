@@ -633,51 +633,59 @@
 					$('#userdf').hide();
 				}
 			}; var grpidx = 0; function addGrpForm() {
-				$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Profil")).
+				$('<span class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'").
 					FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
 				<a onclick=\"javascript:delGrpElmt('+grpidx+');\">".
 				FS::$iMgr->img("styles/images/cross.png",15,15).
-				"</a></li>').insertBefore('#formactions');
+				"</a><br /></span>').insertBefore('#radusrgrplist');
 				grpidx++;
 			}
 			function delGrpElmt(grpidx) {
 				$('.ugroupli'+grpidx).remove();
 			}
-			var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-			FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Attribut")." Op ".FS::$iMgr->select("attrop'+attridx+'").
+			var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
+			FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40)." Op ".FS::$iMgr->select("attrop'+attridx+'").
 			FS::$iMgr->raddbCondSelectElmts().
 			"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
 			FS::$iMgr->selElmt("check",1).
 			FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
 			FS::$iMgr->img("styles/images/cross.png",15,15).
-			"</a></li>').insertBefore('#formactions');
+			"</a><br /></span>').insertBefore('#frmattrid');
 			$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
 			$('#attrtarget'+attridx).val(attrtarget); attridx++;};
 			function delAttrElmt(attridx) {
 				$('.attrli'+attridx).remove();
 			}");
 
-			$output = FS::$iMgr->cbkForm("2");
-			$output .= "<ul class=\"ulform\"><li>".
-				FS::$iMgr->select("utype",array("js" => "changeUForm()","label" => $this->loc->s("Auth-Type")));
-			$output .= FS::$iMgr->selElmt($this->loc->s("User"),1).
+			$tempSelect = FS::$iMgr->select("utype",array("js" => "changeUForm()",)).
+				FS::$iMgr->selElmt($this->loc->s("User"),1).
 				FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2).
-			//$output .= FS::$iMgr->selElmt("Code PIN",3);
-				"</select></li><li>".
-				FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
-				FS::$iMgr->input("username","",20,40,$this->loc->s("User"))."</li><li>".
-				"<fieldset id=\"userdf\" style=\"border:0; padding:0; margin-left: -1px;\"><li>".
-				FS::$iMgr->password("pwd","",$this->loc->s("Password"))."</li><li>".
-				FS::$iMgr->select("upwdtype",array("label" => $this->loc->s("Pwd-Type"))).
+				"</select>";
+				
+			$pwdSelect = FS::$iMgr->select("upwdtype").
 				FS::$iMgr->selElmt("Cleartext-Password",1).
 				FS::$iMgr->selElmt("User-Password",2).
 				FS::$iMgr->selElmt("Crypt-Password",3).
 				FS::$iMgr->selElmt("MD5-Password",4).
 				FS::$iMgr->selElmt("SHA1-Password",5).
 				FS::$iMgr->selElmt("CHAP-Password",6).
-				"</select></li></li><li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
-				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','')").
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
+				"</select>";
+
+			$output = FS::$iMgr->cbkForm("2").
+				"<table>".FS::$iMgr->idxLines(array(
+				array("User","username",array("type" => "idxedit", "value" => "",
+						"length" => "40", "edit" => "" != "")),
+				array("Auth-Type","",array("type" => "raw", "value" => $tempSelect)),
+				array("Password","pwd",array("type" => "pwd")),
+				array("Pwd-Type","",array("type" => "raw", "value" => $pwdSelect)),
+				array("Groups","",array("type" => "raw", "value" => "<span id=\"radusrgrplist\"></span>")),
+				array("Attributes","",array("type" => "raw", "value" => "<span id=\"frmattrid\"></span>")),
+			)).
+				"<tr><td colspan=\"2\">".
+				FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
+				FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
+				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','');").
+				FS::$iMgr->submit("",$this->loc->s("Save"))."</td></tr></table></form>";
 			return $output;
 		}
 	
