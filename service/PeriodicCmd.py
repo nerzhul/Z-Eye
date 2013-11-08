@@ -46,7 +46,7 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 		self.logger.info("%s (periodic cmd) started" % self.processName)
 		
 		try:
-			subprocess.check_output(re.split(" ",self.processCmd),shell=True)
+			subprocess.check_output(self.processCmd,shell=True)
 		except Exception, e:
 			self.logger.critical("Port ID Caching: FATAL %s" % e)
 		

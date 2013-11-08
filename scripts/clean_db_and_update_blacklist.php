@@ -18,6 +18,7 @@
         */
         require_once(dirname(__FILE__)."/../lib/FSS/FS.main.php");
 
+FS::LoadFSModules();
 $snortDB = new AbstractSQLMgr();
 // Load snort keys for db config
 $dbname = FS::$dbMgr->GetOneData("z_eye_snortmgmt_keys","val","mkey = 'dbname'");
@@ -125,9 +126,8 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
 	$siglist .= "'COMMUNITY WEB-MISC mod_jrun overflow attempt','WEB-ATTACKS wget command attempt','WEB-ATTACKS ps command attempt','WEB-ATTACKS netcat command attempt','WEB-ATTACKS mail command attempt',";
 	$siglist .= "'WEB-MISC /etc/passwd','WEB-PHP /_admin access','WEB-PHP test.php access','WEB-PHP Mambo upload.php access','WEB-PHP Setup.php access','(portscan) Open Port','ICMP PING CyberKit 2.2 Windows',";
 	$siglist .= "'ICMP PING NMAP','MISC MS Terminal server request','WEB-MISC sqlmap SQL injection scan attempt'";
-	$sql = "select ip_src,timestamp from acid_event where sig_name in(".$siglist.") and timestamp < (".$sqlcalc.") group by ip_src,timestamp order by ip_src";
-	$query = pg_query($sql);
-        while($data = pg_fetch_array($query)) {
+	$query = $snortDB->Select("acid_event","ip_src,timestamp","sig_name in(".$siglist.") and timestamp < (".$sqlcalc.") group by ip_src,timestamp order by ip_src");
+    while($data = $snortDB->Fetch($query)) {
 		$count = $snortDB->Count("acid_event","cid","ip_src = '".$data["ip_src"]."' and timestamp < '".$sql_date."' and sig_name in('SSH Connection Attempt','BAD-TRAFFIC SSH brute force login attempt')");
                 $cssh = $count;
 
@@ -181,8 +181,8 @@ $snort_interval = 1; // nombres d'années pendant lesquelles on garde les enregi
 		$reportcount+=($cscan+$ctse+$cweb+$cnerr+$cssh);
         }
 
-	$query = $snortDB->Select("acid_event","timestamp","sig_name in('BAD-TRAFFIC SSH brute force login attempt','SSH Connection Attempt','(snort_decoder) WARNING: ICMP Original IP Header Not IPv4!','(snort decoder) IPV6 truncated header','(snort_decoder) WARNING: TCP Data Offset is less than 5!','(snort_decoder): Truncated Tcp Options','WEB-MISC sqlmap SQL injection scan attempt','WEB-MISC robots.txt access','MISC MS Terminal Server no encryption session initiation attempt','WEB-ATTACKS ps command attempt','WEB-ATTACKS netcat command attempt','WEB-ATTACKS mail command attempt','COMMUNITY WEB-PHP AppServ main.php appserv_root param access','WEB-MISC /etc/passwd','WEB-PHP /_admin access','WEB-PHP test.php access','WEB-PHP Mambo upload.php access','WEB-PHP Setup.php access','ICMP PING CyberKit 2.2 Windows','ICMP PING NMAP','(portscan) Open Port','MISC MS Terminal server request','COMMUNITY WEB-MISC Cisco IOS HTTP Router Management Service Infinite Loop DoS','COMMUNITY WEB-PHP thinkWMS index.php SQL injection attempt','WEB-MISC ICQ Webfront HTTP DOS','WEB-ATTACKS cc command attempt','WEB-MISC /doc/ access','WEB-MISC apache ?M=D directory list attempt','WEB-PHP Setup.php access','WEB-PHP remote include path','WEB-ATTACKS rm command attempt','WEB-MISC /.... access','WEB-MISC /etc/passwd','COMMUNITY WEB-MISC mod_jrun overflow attempt') and timestamp < '".$sql_date."'",array("group" => "timestamp, "order" => "timestamp")");
-	while($data = pg_fetch_array($query)) {
+	$query = $snortDB->Select("acid_event","timestamp","sig_name in('BAD-TRAFFIC SSH brute force login attempt','SSH Connection Attempt','(snort_decoder) WARNING: ICMP Original IP Header Not IPv4!','(snort decoder) IPV6 truncated header','(snort_decoder) WARNING: TCP Data Offset is less than 5!','(snort_decoder): Truncated Tcp Options','WEB-MISC sqlmap SQL injection scan attempt','WEB-MISC robots.txt access','MISC MS Terminal Server no encryption session initiation attempt','WEB-ATTACKS ps command attempt','WEB-ATTACKS netcat command attempt','WEB-ATTACKS mail command attempt','COMMUNITY WEB-PHP AppServ main.php appserv_root param access','WEB-MISC /etc/passwd','WEB-PHP /_admin access','WEB-PHP test.php access','WEB-PHP Mambo upload.php access','WEB-PHP Setup.php access','ICMP PING CyberKit 2.2 Windows','ICMP PING NMAP','(portscan) Open Port','MISC MS Terminal server request','COMMUNITY WEB-MISC Cisco IOS HTTP Router Management Service Infinite Loop DoS','COMMUNITY WEB-PHP thinkWMS index.php SQL injection attempt','WEB-MISC ICQ Webfront HTTP DOS','WEB-ATTACKS cc command attempt','WEB-MISC /doc/ access','WEB-MISC apache ?M=D directory list attempt','WEB-PHP Setup.php access','WEB-PHP remote include path','WEB-ATTACKS rm command attempt','WEB-MISC /.... access','WEB-MISC /etc/passwd','COMMUNITY WEB-MISC mod_jrun overflow attempt') and timestamp < '".$sql_date."'",array("group" => "timestamp", "order" => "timestamp"));
+	while($data = $snortDB->Fetch($query)) {
 		$count = $snortDB->Count("acid_event","cid","timestamp = '".$data["timestamp"]."' and sig_name in('SSH Connection Attempt','BAD-TRAFFIC SSH brute force login attempt')");
                 $nbssh = $count;
 
