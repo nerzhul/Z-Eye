@@ -138,7 +138,8 @@
 				$lang = $_SESSION["lang"];
 			}
 			
-			if(!$str || $str == "" || !isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
+			if(!$str || $str == "" || !$this->locales ||
+				!isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
 				return "String '".$str."' not found";
 			}
 				

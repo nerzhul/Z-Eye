@@ -997,13 +997,15 @@
 						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
-
+					
 					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
 						FS::$iMgr->ajaxEcho("err-db-conn-fail");
 						return;
 					}
+					
+					echo "TEST2";
 
 					// For Edition Only, don't delete acct records
 					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
@@ -1014,9 +1016,14 @@
 						if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
 							$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username = '".$username."'");
 						}
+						echo "TEST3";
 					}
+					
+					echo "TEST4";
+					
 					$userexist = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$username."'");
 					if (!$userexist || $edit == 1) {
+						echo "TEST5";
 						if ($utype == 1) {
 							switch($upwdtype) {
 								case 1: $attr = "Cleartext-Password"; $value = $upwd; break;
@@ -1039,7 +1046,15 @@
 							$attr = "Auth-Type";
 							$value = "Accept";
 						}
-						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username."','".$attr."',':=','".$value."'");
+						
+						// For pgsql compat
+						$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
+						$maxIdChk++;
+						$maxIdRep = $radSQLMgr->GetMax($this->raddbinfos["tradreply"],"id");
+						$maxIdRep++;
+						
+						$radSQLMgr->BeginTr();
+						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'".$maxIdChk."','".$username."','".$attr."',':=','".$value."'");
 						foreach ($_POST as $key => $value) {
 						if (preg_match("#^ugroup#",$key)) {
 								$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$value."'");
@@ -1047,43 +1062,47 @@
 									$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$value."'");
 								if ($groupfound) {
 									$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["tradusrgrp"],"groupname","username = '".$username."' AND groupname = '".$value."'");
-									if (!$usergroup)
+									if (!$usergroup) {
 										$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$value."','1'");
+									}
 								}
 							}
 						}
+
 						$attrTab = array();
 						foreach ($_POST as $key => $value) {
-								if (preg_match("#attrval#",$key)) {
-										$key = preg_replace("#attrval#","",$key);
-										if (!isset($attrTab[$key])) $attrTab[$key] = array();
-										$attrTab[$key]["val"] = $value;
-								}
-								else if (preg_match("#attrkey#",$key)) {
-										$key = preg_replace("#attrkey#","",$key);
-										if (!isset($attrTab[$key])) $attrTab[$key] = array();
-										$attrTab[$key]["key"] = $value;
-								}
-								else if (preg_match("#attrop#",$key)) {
-										$key = preg_replace("#attrop#","",$key);
-										if (!isset($attrTab[$key])) $attrTab[$key] = array();
-										$attrTab[$key]["op"] = $value;
-								}
-								else if (preg_match("#attrtarget#",$key)) {
-										$key = preg_replace("#attrtarget#","",$key);
-										if (!isset($attrTab[$key])) $attrTab[$key] = array();
-										$attrTab[$key]["target"] = $value;
-								}
+							if (preg_match("#attrval#",$key)) {
+								$key = preg_replace("#attrval#","",$key);
+								if (!isset($attrTab[$key])) $attrTab[$key] = array();
+								$attrTab[$key]["val"] = $value;
+							}
+							else if (preg_match("#attrkey#",$key)) {
+								$key = preg_replace("#attrkey#","",$key);
+								if (!isset($attrTab[$key])) $attrTab[$key] = array();
+								$attrTab[$key]["key"] = $value;
+							}
+							else if (preg_match("#attrop#",$key)) {
+								$key = preg_replace("#attrop#","",$key);
+								if (!isset($attrTab[$key])) $attrTab[$key] = array();
+								$attrTab[$key]["op"] = $value;
+							}
+							else if (preg_match("#attrtarget#",$key)) {
+								$key = preg_replace("#attrtarget#","",$key);
+								if (!isset($attrTab[$key])) $attrTab[$key] = array();
+								$attrTab[$key]["target"] = $value;
+							}
 						}
 						foreach ($attrTab as $attrKey => $attrEntry) {
-								if ($attrEntry["target"] == "2") {
-									$radSQLMgr->Insert($this->raddbinfos["tradreply"],"id,username,attribute,op,value","'','".$username.
-										"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
-								}
-								else if ($attrEntry["target"] == "1") {
-									$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username.
-										"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
-								}
+							if ($attrEntry["target"] == "2") {
+								$maxIdRep++;
+								$radSQLMgr->Insert($this->raddbinfos["tradreply"],"id,username,attribute,op,value","'".$maxIdRep."','".$username.
+									"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
+							}
+							else if ($attrEntry["target"] == "1") {
+								$maxIdChk++;
+								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'".$maxIdChk."','".$username.
+									"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
+							}
 						}
 
 						if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
@@ -1093,6 +1112,7 @@
 								$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration","'".$username."','".date("y-m-d",strtotime($expiretime))."'");
 							}
 						}
+						$radSQLMgr->CommitTr();
 					}
 					else {
 						$this->log(1,"Try to add user ".$username." but user already exists");
