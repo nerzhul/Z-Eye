@@ -480,7 +480,7 @@
 					FS::$iMgr->select("ugroup",array("label" => $this->loc->s("Profil"))).
 					FS::$iMgr->selElmt("","none").
 					$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->textarea("csvlist","",580,330,$this->loc->s("Userlist-CSV")).
-					"</li><li id=\"csvtooltip\">".$this->loc->s("mass-import-restriction")."</li><li>".
+					"</li><li id=\"csvtooltip\">".FS::$iMgr->tip("mass-import-restriction")."</li><li>".
 					FS::$iMgr->submit("","Importer")."</li></ul></form>";
 			}
 			else if ($sh == 4) {
