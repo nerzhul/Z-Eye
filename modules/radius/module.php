@@ -95,28 +95,32 @@
 				.$this->loc->s("Host")."</th><th>".$this->loc->s("Login")."</th><th></th><th></th></tr></thead>";
 
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,login,dbtype");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,login,dbtype,radalias");
 			while ($data = FS::$dbMgr->Fetch($query)) {
-				if ($found == false) $found = true;
-			$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dbname"].$data["addr"].$data["port"])."\"><td>".
-				FS::$iMgr->aLink($this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"], $data["addr"]);
-			$tmpoutput .= "</td><td>".$data["port"]."</td><td>";
-
-			switch($data["dbtype"]) {
-				case "my": $tmpoutput .= "MySQL"; break;
-				case "pg": $tmpoutput .= "PgSQL"; break;
-			}
-
-			$tmpoutput .= "</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>";
-			$tmpoutput .= "<td><div id=\"radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."\">".
-				FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>";
+				if ($found == false) {
+					$found = true;
+				}
 				
-            FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
-				$('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
-			
-			$tmpoutput .= "</td><td>".
-				FS::$iMgr->removeIcon("mod=".$this->mid."&act=14&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"],array("js" => true,
-					"confirm" => array($this->loc->s("confirm-remove-datasrc")."'".$data["dbname"]."@".$data["addr"].":".$data["port"]."'","Confirm","Cancel")))."</td></tr>";
+				$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dbname"].$data["addr"].$data["port"])."\"><td>".
+					FS::$iMgr->aLink($this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"], $data["addr"]);
+				$tmpoutput .= "</td><td>".$data["port"]."</td><td>";
+
+				switch($data["dbtype"]) {
+					case "my": $tmpoutput .= "MySQL"; break;
+					case "pg": $tmpoutput .= "PgSQL"; break;
+				}
+
+				$tmpoutput .= "</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>";
+				$tmpoutput .= "<td><div id=\"radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."\">".
+					FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>";
+					
+				FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
+					$('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
+				
+				$tmpoutput .= "</td><td>".
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=14&alias=".$data["radalias"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-datasrc")."'".$data["radalias"]."'",
+							"Confirm","Cancel")))."</td></tr>";
 			}
 			if ($found) {
 				$output .= $tmpoutput."</table>";
@@ -189,42 +193,50 @@
 			$output .= FS::$iMgr->cbkForm("13");
 
 			if (!$create) {
-				$output .= FS::$iMgr->hidden("saddr",$saddr);
-				$output .= FS::$iMgr->hidden("sport",$sport);
-				$output .= FS::$iMgr->hidden("sdbname",$sdbname);
-				$output .= FS::$iMgr->hidden("edit",1);
+				$output .= FS::$iMgr->hidden("saddr",$saddr).
+					FS::$iMgr->hidden("sport",$sport).
+					FS::$iMgr->hidden("sdbname",$sdbname).
+					FS::$iMgr->hidden("salias",$salias).
+					FS::$iMgr->hidden("edit",1);
 			}
 
 			$output .= "<table>";
 			if ($create) {
-				$output .= FS::$iMgr->idxLine("ip-addr-dns","saddr",array("value" => $saddr));
-				$output .= FS::$iMgr->idxLine("Port","sport",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port"));
-				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td class=\"ctrel\">".FS::$iMgr->select("sdbtype").
-					FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>";
-				$output .= FS::$iMgr->idxLine("db-name","sdbname",array("value" => $sdbname,"tooltip" => "tooltip-dbname"));
+				$output .= FS::$iMgr->idxLine("ip-addr-dns","saddr",array("value" => $saddr)).
+					FS::$iMgr->idxLine("Port","sport",array("value" => $sport, "type" => "num", "tooltip" => "tooltip-port")).
+					"<tr><td>".$this->loc->s("db-type")."</td><td class=\"ctrel\">".FS::$iMgr->select("sdbtype").
+					FS::$iMgr->selElmt("MySQL","my").FS::$iMgr->selElmt("PgSQL","pg")."</select></td></tr>".
+					FS::$iMgr->idxLine("db-name","sdbname",array("value" => $sdbname,"tooltip" => "tooltip-dbname"));
 			}
 			else {
-				$output .= "<tr><th>".$this->loc->s("ip-addr-dns")."</th><th>".$saddr."</th></tr>";
-				$output .= "<tr><td>".$this->loc->s("Port")."</td><td>".$sport."</td></tr>";
-				$output .= "<tr><td>".$this->loc->s("db-type")."</td><td>";
+				$dbtype = "";
 				switch($sdbtype) {
-					case "my": $output .= "MySQL"; break;
-					case "pg": $output .= "PgSQL"; break;
+					case "my": $dbtype = "MySQL"; break;
+					case "pg": $dbtype = "PgSQL"; break;
 				}
-				$output .= "</td></tr><tr><td>".$this->loc->s("db-name")."</td><td>".$sdbname."</td></tr>";
+				
+				$output .= FS::$iMgr->idxLine("ip-addr-dns","",array("type" => "raw", "value" => $saddr)).
+					FS::$iMgr->idxLine("Port","",array("type" => "raw", "value" => $sport)).
+					FS::$iMgr->idxLine("db-type","",array("type" => "raw", "value" => $dbtype)).
+					FS::$iMgr->idxLine("db-name","",array("type" => "raw", "value" => $sdbname));
 			}
-			$output .= FS::$iMgr->idxLine("User","slogin",array("value" => $slogin,"tooltip" => "tooltip-user"));
-			$output .= FS::$iMgr->idxLine("Password","spwd",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine("Password-repeat","spwd2",array("type" => "pwd"));
-			$output .= FS::$iMgr->idxLine("Alias","salias",array("value" => $salias,"tooltip" => "tooltip-alias"));
-			$output .= "<th colspan=2>".$this->loc->s("Tables")."</th>";
-			$output .= FS::$iMgr->idxLine("table-radcheck","tradcheck",array("value" => $tradcheck,"tooltip" => "tooltip-radcheck"));
-			$output .= FS::$iMgr->idxLine("table-radreply","tradreply",array("value" => $tradreply,"tooltip" => "tooltip-radreply"));
-			$output .= FS::$iMgr->idxLine("table-radgrpchk","tradgrpchk",array("value" => $tradgrpchk,"tooltip" => "tooltip-radgrpchk"));
-			$output .= FS::$iMgr->idxLine("table-radgrprep","tradgrprep",array("value" => $tradgrprep,"tooltip" => "tooltip-radgrprep"));
-			$output .= FS::$iMgr->idxLine("table-radusrgrp","tradusrgrp",array("value" => $tradusrgrp,"tooltip" => "tooltip-radusrgrp"));
-			$output .= FS::$iMgr->idxLine("table-radacct","tradacct",array("value" => $tradacct,"tooltip" => "tooltip-radacct"));
-			$output .= FS::$iMgr->tableSubmit("Save");
+			$output .= FS::$iMgr->idxLine("User","slogin",array("value" => $slogin,"tooltip" => "tooltip-user")).
+				FS::$iMgr->idxLine("Password","spwd",array("type" => "pwd")).
+				FS::$iMgr->idxLine("Password-repeat","spwd2",array("type" => "pwd"));
+			if ($create) {
+				$output .= FS::$iMgr->idxLine("Alias","salias",array("value" => $salias,"tooltip" => "tooltip-alias"));
+			}
+			else {
+				$output .= FS::$iMgr->idxLine("Alias","",array("type" => "raw", "value" => $salias));
+			}
+			$output .= "<th colspan=2>".$this->loc->s("Tables")."</th>".
+				FS::$iMgr->idxLine("table-radcheck","tradcheck",array("value" => $tradcheck,"tooltip" => "tooltip-radcheck")).
+				FS::$iMgr->idxLine("table-radreply","tradreply",array("value" => $tradreply,"tooltip" => "tooltip-radreply")).
+				FS::$iMgr->idxLine("table-radgrpchk","tradgrpchk",array("value" => $tradgrpchk,"tooltip" => "tooltip-radgrpchk")).
+				FS::$iMgr->idxLine("table-radgrprep","tradgrprep",array("value" => $tradgrprep,"tooltip" => "tooltip-radgrprep")).
+				FS::$iMgr->idxLine("table-radusrgrp","tradusrgrp",array("value" => $tradusrgrp,"tooltip" => "tooltip-radusrgrp")).
+				FS::$iMgr->idxLine("table-radacct","tradacct",array("value" => $tradacct,"tooltip" => "tooltip-radacct")).
+				FS::$iMgr->tableSubmit("Save");
 
 			return $output;
 		}
@@ -1658,19 +1670,40 @@
 					$tradusrgrp = FS::$secMgr->checkAndSecurisePostData("tradusrgrp");
 					$tradacct = FS::$secMgr->checkAndSecurisePostData("tradacct");
 
+					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) ||
+						!$sdbname) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+					
 					$sdbtype = "";
 					if ($edit) {
-						$sdbtype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","data","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+						// Check if DB exists
+						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login",
+							"radalias ='".$salias."' AND addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+							$this->log(1,"Radius DB not exists (".$sdbname."@".$saddr.":".$sport.")");
+							FS::$iMgr->ajaxEcho("err-not-exist");
+							return;
+						}
+						
+						$sdbtype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list",
+							"dbtype","radalias ='".$salias."'");
 					}
-					else $sdbtype = FS::$secMgr->checkAndSecurisePostData("sdbtype");
+					else {
+						$sdbtype = FS::$secMgr->checkAndSecurisePostData("sdbtype");
+					}
 
-					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname || !$sdbtype || !$slogin  || !$spwd || !$spwd2 ||
-						$spwd != $spwd2 || !$tradcheck || !$tradreply || !$tradgrpchk || !$tradgrprep || !$tradusrgrp || !$tradacct ||
-						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradcheck) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradacct) ||
-						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradreply) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) || 
-						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
+					if( !$sdbtype || !$slogin  || !$spwd || !$spwd2 ||
+						$spwd != $spwd2 || !$tradcheck || !$tradreply || !$tradgrpchk ||
+						!$tradgrprep || !$tradusrgrp || !$tradacct ||
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradcheck) ||
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradacct) ||
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradreply) ||
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) || 
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) ||
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
 						$this->log(2,"Some fields are missing or wrong for radius db adding");
-						FS::$iMgr->ajaxEcho("err-miss-data");
+						FS::$iMgr->ajaxEcho("err-bad-datas");
 						return;
 					}
 	
@@ -1683,13 +1716,6 @@
 					}
 						
 					if ($edit) {
-						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login",
-							"addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
-							$this->log(1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-							FS::$iMgr->ajaxEcho("err-not-exist");
-							return;
-						}
-
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
 					else {
@@ -1726,17 +1752,26 @@
 						return;
 					}
 
-					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");
-					$sport = FS::$secMgr->checkAndSecuriseGetData("pr");
-					$sdbname = FS::$secMgr->checkAndSecuriseGetData("db");
-					if ($saddr && $sport && $sdbname) {
-						$this->log(0,"Remove Radius DB ".$sdbname."@".$saddr.":".$sport);
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$sdbname.$saddr.$sport)."');");
+					$salias = FS::$secMgr->checkAndSecuriseGetData("alias");
+					if ($salias) {
+						if ($data = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname","radalias = '".$salias."'")) {
+							$saddr = $data["addr"];
+							$sport = $data["port"];
+							$sdbname = $data["dbname"];
+							
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list",
+								"radalias = '".$salias."'");
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import",
+								"addr = '".$data["addr"]."' AND port = '".$data["port"]."' AND dbname = '".$data["dbname"]."'");
+
+							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".
+								preg_replace("#[.]#","-",$$data["dbname"].$$data["addr"].$data["port"])."');");
+							
+							$this->log(0,"Remove Radius DB ".$salias. "(".$data["dbname"]."@".$data["addr"].":".$data["port"].")");
+							return;
+						}
 					}
-					else
-						FS::$iMgr->ajaxEcho("err-miss-data");
+					FS::$iMgr->ajaxEcho("err-bad-data");
 					return;
 				// Ping radius db
 				case 15:
