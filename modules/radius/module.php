@@ -293,9 +293,9 @@
 					FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>".
 					"<tr><td>".$this->loc->s("Validity")."</td><td>".
 					FS::$iMgr->radioList("validity",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1).
-					FS::$iMgr->calendar("startdate","",$this->loc->s("From"))."<br />".
+					FS::$iMgr->calendar("startdate","","From")."<br />".
 					FS::$iMgr->hourlist("limhours","limmins")."<br />".
-					FS::$iMgr->calendar("enddate","",$this->loc->s("To"))."<br />".
+					FS::$iMgr->calendar("enddate","","To")."<br />".
 					FS::$iMgr->hourlist("limhoure","limmine",23,59).
 					"</td></tr>".
 					FS::$iMgr->tableSubmit("Save").
@@ -325,9 +325,9 @@
 					$this->addGroupList($radSQLMgr)."</select></td></tr>".
 					"<tr><td>".$this->loc->s("Validity")."</td><td>".
 					FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1).
-					FS::$iMgr->calendar("startdate2","",$this->loc->s("From"))."<br />".
+					FS::$iMgr->calendar("startdate2","","From")."<br />".
 					FS::$iMgr->hourlist("limhours2","limmins2")."<br />".
-					FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />".
+					FS::$iMgr->calendar("enddate2","","To")."<br />".
 					FS::$iMgr->hourlist("limhoure2","limmine2",23,59).
 					"</td></tr>".
 					FS::$iMgr->tableSubmit("Save");
@@ -584,9 +584,9 @@
 				$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".
 					FS::$iMgr->select("profil").FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity",array(1,2),array("Toujours valide","Période"),1);
-				$output .= FS::$iMgr->calendar("startdate","",$this->loc->s("From"))."<br />";
+				$output .= FS::$iMgr->calendar("startdate","","From")."<br />";
 				$output .= FS::$iMgr->hourlist("limhours","limmins")."<br />";
-				$output .= FS::$iMgr->calendar("enddate","",$this->loc->s("To"))."<br />";
+				$output .= FS::$iMgr->calendar("enddate","","To")."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure","limmine",23,59);
 				$output .= "</td></tr>";
 				$output .= FS::$iMgr->tableSubmit("Save");
@@ -614,9 +614,9 @@
 					FS::$iMgr->select("profil2").FS::$iMgr->selElmt("","none").
 					$this->addGroupList($radSQLMgr)."</select></td></tr>";
 				$output .= "<tr><td>".$this->loc->s("Validity")."</td><td>".FS::$iMgr->radioList("validity2",array(1,2),array($this->loc->s("Already-valid"),$this->loc->s("Period")),1);
-				$output .= FS::$iMgr->calendar("startdate2","",$this->loc->s("From"))."<br />";
+				$output .= FS::$iMgr->calendar("startdate2","","From")."<br />";
 				$output .= FS::$iMgr->hourlist("limhours2","limmins2")."<br />";
-				$output .= FS::$iMgr->calendar("enddate2","",$this->loc->s("To"))."<br />";
+				$output .= FS::$iMgr->calendar("enddate2","","To")."<br />";
 				$output .= FS::$iMgr->hourlist("limhoure2","limmine2",23,59);
 				$output .= "</td></tr>";
 				$output .= FS::$iMgr->tableSubmit("Save");
