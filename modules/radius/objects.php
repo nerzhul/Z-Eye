@@ -29,11 +29,9 @@
 				return FS::$iMgr->printError($this->loc->s("err-no-right"));
 			}
 			
-			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
+			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 			
-			$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+			$radSQLMgr = $this->connectToRaddb($radalias);
 			if (!$radSQLMgr) {
 				return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
 			}
@@ -111,11 +109,11 @@
 			parent::__construct();
 		}
 		
-		protected function connectToRaddb($radhost,$radport,$raddb) {
+		protected function connectToRaddb($radalias) {
 			// Load some other useful datas from DB
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list",
-				"login,pwd,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
-				"addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+				"login,pwd,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct,radalias,addr,port,dbname",
+				"radalias='".$radalias."'");
 			if ($data = FS::$dbMgr->Fetch($query)) {
 				$this->raddbinfos = $data;
 			}
@@ -124,9 +122,12 @@
 				return NULL;
 
 			$radSQLMgr = new AbstractSQLMgr();
-			if ($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$raddb,$radport,$radhost,$this->raddbinfos["login"],$this->raddbinfos["pwd"]) == 0) {
-				if ($radSQLMgr->Connect() == NULL)
+			if ($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$this->raddbinfos["dbname"],
+				$this->raddbinfos["port"],$this->raddbinfos["addr"],$this->raddbinfos["login"],
+				$this->raddbinfos["pwd"]) == 0) {
+				if ($radSQLMgr->Connect() == NULL) {
 					return NULL; 
+				}
 			}
 			return $radSQLMgr;
 		}
