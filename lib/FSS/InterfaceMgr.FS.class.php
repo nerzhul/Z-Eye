@@ -508,13 +508,16 @@
 			);
 		}
 
-		public function cbkForm($link, $textid = "Modification",$raw = false) {
+		public function cbkForm($link, $textid = "Modification",$raw = false, $options=array()) {
 			if($raw == false) {
 				$link = sprintf("index.php?mod=%s&act=%s",
 					$this->cur_module->getModuleId(), $link);
 			}
-			return sprintf("<form action=\"%s\" method=\"POST\" onsubmit=\"return callbackForm('%s',this,{'snotif':'%s'});\" >",
-				$link,$link,FS::$secMgr->cleanForJS($this->getLocale($textid)));
+			if (!isset($options["method"]) || $options["method"] != "GET" && $options["method"] != "POST") {
+				$options["method"] = "POST";
+			}
+			return sprintf("<form action=\"%s\" method=\"%s\" onsubmit=\"return callbackForm('%s',this,{'snotif':'%s'});\" >",
+				$link,$options["method"],$link,FS::$secMgr->cleanForJS($this->getLocale($textid)));
 		}
 
 		public function idxLine($text,$name,$options = array()) {

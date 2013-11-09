@@ -60,7 +60,7 @@
 					"err-exist" => "Le groupe/utilisateur inscrit est déjà référencé !",
 					"err-exist2" => "Certains utilisateurs n'ont pas été ajoutés car déjà existants !",
 					"err-field-missing" => "Certains champs sont manquants ou invalides !",
-					"err-group-not-exists" => "Le profile '%s' n'existe pas",
+					"err-group-not-exists" => "Le profil '%s' n'existe pas",
 					"err-invalid-auth-server" => "Serveur d'authentification invalide !",
 					"err-invalid-tab" => "Onglet invalide !",
 					"err-invalid-table" => "La table référencée n'est pas valide !",
