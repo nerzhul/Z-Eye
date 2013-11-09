@@ -328,7 +328,7 @@
 				$output .= "<div id=\"adduserres\"></div>".
 					FS::$iMgr->cbkForm("10",array("id" => "adduser")).
 					"<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>".
-					FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
+					FS::$iMgr->hidden("ra",$radalias).
 					FS::$iMgr->idxLine($this->loc->s("Name")." *","radname",array("rawlabel" => true)).
 					FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname",array("rawlabel" => true)).
 					FS::$iMgr->idxLine($this->loc->s("Identifier")." *","radusername",array("rawlabel" => true)).
@@ -358,7 +358,7 @@
 				$output .= "<div id=\"adduserlistres\"></div>".
 					FS::$iMgr->cbkForm("11",array("id" => "adduserlist")).
 					"<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>".
-					FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
+					FS::$iMgr->hidden("ra",$radalias).
 					"<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
 					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
 					FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>".
@@ -411,9 +411,7 @@
 					}");
 					
 					$output .= FS::$iMgr->cbkForm("12",array("id" => "radf")).
-						FS::$iMgr->hidden("r",$this->raddbinfos["dbname"]).
-						FS::$iMgr->hidden("h",$this->raddbinfos["addr"]).
-						FS::$iMgr->hidden("p",$this->raddbinfos["port"]).
+						FS::$iMgr->hidden("ra",$radalias).
 						FS::$iMgr->select("uf",array("js" => "filterRadiusDatas()")).
 						FS::$iMgr->selElmt("--".$this->loc->s("Type")."--","",true).
 						FS::$iMgr->selElmt($this->loc->s("Mac-addr"),"mac").
@@ -505,9 +503,7 @@
 					$output .= FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2);
 					//$formoutput .= FS::$iMgr->selElmt("Code PIN",3);
 					$output .= "</select></li><li id=\"uptype\">".
-						FS::$iMgr->hidden("r",$this->raddbinfos["dbname"]).
-						FS::$iMgr->hidden("h",$this->raddbinfos["addr"]).
-						FS::$iMgr->hidden("p",$this->raddbinfos["port"]).
+						FS::$iMgr->hidden("ra",$radalias).
 						FS::$iMgr->select("upwdtype",array("label" => $this->loc->s("Pwd-Type"))).
 						FS::$iMgr->selElmt("Cleartext-Password",1).
 						FS::$iMgr->selElmt("User-Password",2).
@@ -538,9 +534,7 @@
 					if ($found) {
 						$found = 0;
 						$formoutput .= "</select></li><li>".
-							FS::$iMgr->hidden("r",$this->raddbinfos["dbname"]).
-							FS::$iMgr->hidden("h",$this->raddbinfos["addr"]).
-							FS::$iMgr->hidden("p",$this->raddbinfos["port"]).
+							FS::$iMgr->hidden("ra",$radalias).
 							FS::$iMgr->select("radgroup",array("label" => $this->loc->s("Radius-profile")));
 
 						$groups=array();
@@ -588,9 +582,7 @@
 				else if ($sh == 5) {
 					$output .= FS::$iMgr->h3("title-cleanusers").
 						FS::$iMgr->cbkForm("9")."<table>".
-						FS::$iMgr->hidden("r",$this->raddbinfos["dbname"]).
-						FS::$iMgr->hidden("h",$this->raddbinfos["addr"]).
-						FS::$iMgr->hidden("p",$this->raddbinfos["port"]).
+						FS::$iMgr->hidden("ra",$radalias);
 
 					$radexpenable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_options","optval",
 						"optkey = 'rad_expiration_enable' AND addr = '".$this->raddbinfos["addr"].
@@ -737,7 +729,7 @@
 				array("Attributes","",array("type" => "raw", "value" => "<span id=\"frmattrid\"></span>")),
 			)).
 				"<tr><td colspan=\"2\">".
-				FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
+				FS::$iMgr->hidden("ra",$radalias).
 				FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
 				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','');").
 				FS::$iMgr->submit("",$this->loc->s("Save"))."</td></tr></table></form>";
@@ -786,7 +778,7 @@
 					}
 					$tmpoutput .= "</td><td>".
 						(isset($expirationbuffer[$data["username"]]) ? $expirationbuffer[$data["username"]] : "Jamais").
-						"</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&ra=".$radalias.
+						"</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=4&ra=".$this->raddbinfos["radalias"].
 							"&user=".$data["username"],
 							array("js" => true,
 								"confirm" => array($this->loc->s("confirm-remove-user")."'".$data["username"]." ?'","Confirm","Cancel"))).
