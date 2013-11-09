@@ -903,18 +903,22 @@
 
 		private function connectToRaddb($radhost,$radport,$raddb) {
 			// Load some other useful datas from DB
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","login,pwd,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct","addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list",
+				"login,pwd,radalias,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
+				"addr='".$radhost."' AND port = '".$radport."' AND dbname='".$raddb."'");
 			if ($data = FS::$dbMgr->Fetch($query)) {
 				$this->raddbinfos = $data;
 			}
 
-			if ($this->raddbinfos["dbtype"] != "my" && $this->raddbinfos["dbtype"] != "pg")
+			if ($this->raddbinfos["dbtype"] != "my" && $this->raddbinfos["dbtype"] != "pg") {
 				return NULL;
+			}
 
 			$radSQLMgr = new AbstractSQLMgr();
 			if ($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$raddb,$radport,$radhost,$this->raddbinfos["login"],$this->raddbinfos["pwd"]) == 0) {
-				if ($radSQLMgr->Connect() == NULL)
-					return NULL; 
+				if ($radSQLMgr->Connect() == NULL) {
+					return NULL;
+				}
 			}
 			return $radSQLMgr;
 		}
@@ -1005,7 +1009,9 @@
 						$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
 						$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
 						$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
-						$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username = '".$username."'");
+						if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
+							$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username = '".$username."'");
+						}
 					}
 					$userexist = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$username."'");
 					if (!$userexist || $edit == 1) {
@@ -1078,10 +1084,13 @@
 								}
 						}
 
-						$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username = '".$username."'");
-						$expiretime = FS::$secMgr->checkAndSecurisePostData("expiretime");
-						if ($expiretime)
-							$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration","'".$username."','".date("y-m-d",strtotime($expiretime))."'");
+						if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
+							$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username = '".$username."'");
+							$expiretime = FS::$secMgr->checkAndSecurisePostData("expiretime");
+							if ($expiretime) {
+								$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration","'".$username."','".date("y-m-d",strtotime($expiretime))."'");
+							}
+						}
 					}
 					else {
 						$this->log(1,"Try to add user ".$username." but user already exists");
@@ -1205,7 +1214,9 @@
 					$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
-					$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username ='".$username."'");
+					if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
+						$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username ='".$username."'");
+					}
 					$radSQLMgr->Delete("radpostauth","username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradacct"],"username = '".$username."'");
 					$radSQLMgr->CommitTr();
@@ -1547,7 +1558,7 @@
 					
 					$radSQLMgr->BeginTr();
 					$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
-					$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
+					//$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
 					$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
 					$radSQLMgr->CommitTr();
 
@@ -1613,8 +1624,8 @@
 						$radSQLMgr->BeginTr();
 						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
 							"'','".$username."','Cleartext-Password',':=','".$password."'");
-						$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate",
-							"'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
+						/*$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate",
+							"'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");*/
 						$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
 						$radSQLMgr->CommitTr();
 
