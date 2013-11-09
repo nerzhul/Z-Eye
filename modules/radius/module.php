@@ -245,11 +245,11 @@
 			}
 			else {
 				$tmpoutput = FS::$iMgr->cbkForm("1").FS::$iMgr->select("radius",array("js" => "submit()"));
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,radalias");
 	               	        while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == 0) $found = 1;
 					$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
-					$tmpoutput .= FS::$iMgr->selElmt($radpath,$radpath,$rad == $radpath);
+					$tmpoutput .= FS::$iMgr->selElmt($data["radalias"]." (".$radpath.")",$radpath,$rad == $radpath);
 				}
 				if ($found) $output .= $tmpoutput."</select> ".FS::$iMgr->submit("",$this->loc->s("Administrate"))."</form>";
 				else $output .= FS::$iMgr->printDebug($this->loc->s("err-no-server"));
@@ -928,12 +928,6 @@
 					}
 					$rgObj = new radiusGroup();
 					return $rgObj->showForm($radentry);
-					/*$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-					$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-					$radport = FS::$secMgr->checkAndSecuriseGetData("p");
-					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
-					$radentrytype = FS::$secMgr->checkAndSecuriseGetData("radentrytype");
-					return $this->editRadiusEntry($raddb,$radhost,$radport,$radentry,$radentrytype);*/
 				default: return;
 			}
 		}
@@ -1236,7 +1230,7 @@
 					FS::$iMgr->ajaxEcho("Done");
 					$this->log(0,"Group '".$groupname."' removed");
 					return;
-
+				// Mass import
 				case 6:
 					$raddb = FS::$secMgr->checkAndSecurisePostData("r");
 					$radhost = FS::$secMgr->checkAndSecurisePostData("h");
@@ -1665,7 +1659,9 @@
 					$tradacct = FS::$secMgr->checkAndSecurisePostData("tradacct");
 
 					$sdbtype = "";
-					if ($edit) $sdbtype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","data","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					if ($edit) {
+						$sdbtype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","data","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					}
 					else $sdbtype = FS::$secMgr->checkAndSecurisePostData("sdbtype");
 
 					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) || !$sdbname || !$sdbtype || !$slogin  || !$spwd || !$spwd2 ||
@@ -1677,7 +1673,34 @@
 						FS::$iMgr->ajaxEcho("err-miss-data");
 						return;
 					}
+	
+					// @TODO: test table exist on db
 
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","radalias",
+						"radalias = '".$salias."' AND (addr != '".$saddr."' OR port != '".$sport."' OR dbname != '".$sdbname."')")) {
+						FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-alias-already-used"),$salias),"",true);
+						return;
+					}
+						
+					if ($edit) {
+						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login",
+							"addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+							$this->log(1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
+							FS::$iMgr->ajaxEcho("err-not-exist");
+							return;
+						}
+
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
+					}
+					else {
+						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login",
+							"addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
+							$this->log(1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
+							FS::$iMgr->ajaxEcho("err-exist");
+							return;
+						}
+					}
+					
 					$testDBMgr = new AbstractSQLMgr();
 					$testDBMgr->setConfig($sdbtype,$sdbname,$sport,$saddr,$slogin,$spwd);
 
@@ -1687,29 +1710,12 @@
 						return;
 					}
 					FS::$dbMgr->Connect();
-	
-					// @TODO: test table exist on db
-
-					if ($edit) {
-						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
-							$this->log(1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-							FS::$iMgr->ajaxEcho("err-not-exist");
-							return;
-						}
-
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
-					}
-					else {
-						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login","addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
-							$this->log(1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-							FS::$iMgr->ajaxEcho("err-exist");
-							return;
-						}
-					}
+					
 					$this->log(0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_db_list","addr,port,dbname,dbtype,login,pwd,radalias,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
-					"'".$saddr."','".$sport."','".$sdbname."','".$sdbtype."','".$slogin."','".$spwd."','".$salias."','".$tradcheck."','".$tradreply."','".$tradgrpchk."','".$tradgrprep."','".
-					$tradusrgrp."','".$tradacct."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_db_list",
+						"addr,port,dbname,dbtype,login,pwd,radalias,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
+						"'".$saddr."','".$sport."','".$sdbname."','".$sdbtype."','".$slogin."','".$spwd."','".$salias."','".$tradcheck."','".$tradreply."','".$tradgrpchk."','".$tradgrprep."','".
+						$tradusrgrp."','".$tradacct."'");
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					break;
 				// Remove radius db
