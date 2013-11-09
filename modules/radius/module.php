@@ -1224,7 +1224,6 @@
 					$radSQLMgr->CommitTr();
 					$this->log(0,"User '".$username."' removed");
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#rdu_".FS::$iMgr->formatHTMLId($username)."');");
-					//FS::$iMgr->redir("mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb,true);
 					return;
 				case 5: // group removal
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");

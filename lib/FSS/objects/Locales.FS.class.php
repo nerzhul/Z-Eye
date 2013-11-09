@@ -131,12 +131,16 @@
 		}
 
 		public function s($str) {
-			if(!isset($_SESSION["lang"]) || !isset($this->locales[$_SESSION["lang"]]))
+			if(!isset($_SESSION["lang"]) || !isset($this->locales[$_SESSION["lang"]])) {
 				$lang = Config::getDefaultLang();
-			else $lang = $_SESSION["lang"];
+			}
+			else {
+				$lang = $_SESSION["lang"];
+			}
 			
-			if(!$str || $str == "" || !isset($this->locales[$lang][$str]))
+			if(!$str || $str == "" || !isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
 				return "String '".$str."' not found";
+			}
 				
 			return $this->locales[$lang][$str];
 		}
