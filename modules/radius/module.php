@@ -714,17 +714,19 @@
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]))) {
 					$found = true;
 					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><thead><tr><th class=\"headerSortDown\">Id</th><th>Utilisateur</th><th>
-						Mot de passe</th><th>Groupes</th><th>Date d'expiration</th><th></th></tr></thead>";
+						Mot de passe</th><th>".$this->loc->s("Groups")."</th><th>Date d'expiration</th><th></th></tr></thead>";
 					if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
 						$query2 = $radSQLMgr->Select(PGDbConfig::getDbPrefix()."radusers","username,expiration","expiration > 0");
 						while ($data2 = $radSQLMgr->Fetch($query2)) {
-							if (!isset($expirationbuffer[$data2["username"]])) $expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
+							if (!isset($expirationbuffer[$data2["username"]])) {
+								$expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
+							}
 						}
 					}
 				}	
 				if (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-F]{12})$#i', $data["username"])
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"])) {
-					$tmpoutput .= "<tr><td>".$data["id"]."</td><td>".
+					$tmpoutput .= "<tr id=\"rdu_".FS::$iMgr->formatHTMLId($data["username"])."\"><td>".$data["id"]."</td><td>".
 						FS::$iMgr->opendiv(4,$data["username"],
 							array("lnkadd" => "h=".$radhost."&p=".$radport."&r=".$raddb."&radentrytype=1&radentry=".$data["username"])).
 								"</a></td><td>".$data["value"]."</td><td>";
@@ -1221,7 +1223,8 @@
 					$radSQLMgr->Delete($this->raddbinfos["tradacct"],"username = '".$username."'");
 					$radSQLMgr->CommitTr();
 					$this->log(0,"User '".$username."' removed");
-					FS::$iMgr->redir("mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb,true);
+					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#rdu_".FS::$iMgr->formatHTMLId($username)."');");
+					//FS::$iMgr->redir("mod=".$this->mid."&h=".$radhost."&p=".$radport."&r=".$raddb,true);
 					return;
 				case 5: // group removal
 					$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
