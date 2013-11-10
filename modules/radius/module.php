@@ -564,26 +564,8 @@
 						"optkey = 'rad_expiration_enable' AND addr = '".$this->raddbinfos["addr"].
 						"' AND port = '".$this->raddbinfos["port"].
 						"' AND dbname = '".$this->raddbinfos["dbname"]."'");
-						
-					$radexptable = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_options","optval",
-						"optkey = 'rad_expiration_table' AND addr = '".$this->raddbinfos["addr"].
-						"' AND port = '".$this->raddbinfos["port"].
-						"' AND dbname = '".$this->raddbinfos["dbname"]."'");
-						
-					$radexpuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_options","optval",
-						"optkey = 'rad_expiration_user_field' AND addr = '".$this->raddbinfos["addr"].
-						"' AND port = '".$this->raddbinfos["port"].
-						"' AND dbname = '".$this->raddbinfos["dbname"]."'");
-						
-					$radexpdate = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_options","optval",
-						"optkey = 'rad_expiration_date_field' AND addr = '".$this->raddbinfos["addr"].
-						"' AND port = '".$this->raddbinfos["port"].
-						"' AND dbname = '".$this->raddbinfos["dbname"]."'");
 
 					$output .= FS::$iMgr->idxLine("enable-autoclean","cleanradsqlenable", array("value" => ($radexpenable == 1),"type" => "chk")).
-						FS::$iMgr->idxLine("SQL-table","cleanradsqltable",array("value" => $radexptable,"tooltip" => "tooltip-ac-sqltable")).
-						FS::$iMgr->idxLine("user-field","cleanradsqluserfield",array("value" => $radexpuser,"tooltip" => "tooltip-ac-sqluserfield")).
-						FS::$iMgr->idxLine("expiration-field","cleanradsqlexpfield",array("value" => $radexpdate,"tooltip" => "tooltip-ac-sqlexpirationfield")).
 						FS::$iMgr->tableSubmit("Save");
 				}
 				else if ($sh == 6) {
@@ -646,6 +628,16 @@
 			$tmpoutput = "";
 			$expirationbuffer = array();
 			
+			if ($this->hasExpirationEnabled()) {
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_user_expiration",
+					"username,expiration_date","radalias = '".$this->raddbinfos["radalias"]."'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (!isset($expirationbuffer[$data["username"]])) {
+						$expirationbuffer[$data["username"]] = date("d/m/Y h:i",strtotime($data["expiration_date"]));
+					}
+				}
+			}
+			
 			$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"id,username,value",
 				"attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')".
 				($ug ? " AND username IN (SELECT username FROM radusergroup WHERE groupname = '".$ug."')" : ""));
@@ -653,23 +645,17 @@
 				if (!$found && (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]) 
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]))) {
 					$found = true;
-					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><thead><tr><th class=\"headerSortDown\">Id</th><th>Utilisateur</th><th>
-						Mot de passe</th><th>".$this->loc->s("Groups")."</th><th>Date d'expiration</th><th></th></tr></thead>";
-					if ($this->hasExpirationEnabled()) {
-						$query2 = $radSQLMgr->Select(PGDbConfig::getDbPrefix()."radusers","username,expiration","expiration > 0");
-						while ($data2 = $radSQLMgr->Fetch($query2)) {
-							if (!isset($expirationbuffer[$data2["username"]])) {
-								$expirationbuffer[$data2["username"]] = date("d/m/y h:i",strtotime($data2["expiration"]));
-							}
-						}
-					}
+					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><thead><tr><th class=\"headerSortDown\">Id</th><th>".
+						$this->loc->s("User")."</th><th>".
+						$this->loc->s("Password")."</th><th>".$this->loc->s("Groups")."</th><th>".
+						$this->loc->s("Expiration-Date")."</th><th></th></tr></thead>";
 				}	
 				if (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-F]{12})$#i', $data["username"])
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"])) {
 					$tmpoutput .= "<tr id=\"rdu_".FS::$iMgr->formatHTMLId($data["username"])."\"><td>".$data["id"]."</td><td>".
 						FS::$iMgr->opendiv(6,$data["username"],
 							array("lnkadd" => "ra=".$this->raddbinfos["radalias"].
-								"&radentrytype=1&radentry=".$data["username"])).
+								"&radentry=".$data["username"])).
 								"</a></td><td>".$data["value"]."</td><td>";
 					$query2 = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"groupname","username = '".$data["username"]."'");
 					$found2 = 0;
@@ -911,7 +897,8 @@
 					$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
 					if ($this->hasExpirationEnabled()) {
-						$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username ='".$username."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_user_expiration",
+							"radalias = '".$radalias."' AND username ='".$username."'");
 					}
 					$radSQLMgr->Delete("radpostauth","username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradacct"],"username = '".$username."'");
@@ -1186,31 +1173,13 @@
 					}
 
 					$cleanradenable = FS::$secMgr->checkAndSecurisePostData("cleanradsqlenable");
-					$cleanradtable = FS::$secMgr->checkAndSecurisePostData("cleanradsqltable");
-					$cleanradsqluserfield = FS::$secMgr->checkAndSecurisePostData("cleanradsqluserfield");
-					$cleanradsqlexpfield = FS::$secMgr->checkAndSecurisePostData("cleanradsqlexpfield");
-
-					if ($cleanradenable == "on" && (!$cleanradtable || !$cleanradsqluserfield || !$cleanradsqlexpfield)) {
-						$this->log(2,"Some fields are missing for radius cleanup table (data fields)");
-						FS::$iMgr->ajaxEchoNC("err-invalid-table");
-                        return;
-					}
-
-					if ($radSQLMgr->Count($cleanradtable,$cleanradsqluserfield) == NULL) {
-						$this->log(1,"Some fields are wrong for radius cleanup table");
-						FS::$iMgr->ajaxEchoNC("err-invalid-table");
-						return;
-					}
-
+					
 					$radhost = $this->raddbinfos["addr"];
 					$radport = $this->raddbinfos["port"];
 					$raddb = $this->raddbinfos["dbname"];
 					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_options","addr = '".$radhost."' AND port = '".$radport."' and dbname = '".$raddb."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_enable','".($cleanradenable == "on" ? 1 : 0)."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_table','".$cleanradtable."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_user_field','".$cleanradsqluserfield."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_options","addr,port,dbname,optkey,optval","'".$radhost."','".$radport."','".$raddb."','rad_expiration_date_field','".$cleanradsqlexpfield."'");
 					FS::$dbMgr->CommitTr();
 
 					$this->log(0,"Data Creation/Edition for radius cleanup table done (table: '".$cleanradtable."' userfield: '".$cleanradsqluserfield."' date field: '".$cleanradsqlexpfield."'");
@@ -1243,9 +1212,26 @@
 						echo FS::$iMgr->printError("err-field-missing");
 						return;
 					}
+					
+					// Add initial zeros
+					if ($limms < 10) {
+						$limms = "0".$limms;
+					}
+					
+					if ($limhs < 10) {
+						$limhs = "0".$limhs;
+					}
+					
+					if ($limme < 10) {
+						$limme = "0".$limme;
+					}
+					
+					if ($limhe < 10) {
+						$limhe = "0".$limhe;
+					}
 
-					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
-                    $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
+					$sdate = ($valid == 2 ? date("Y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
+                    $edate = ($valid == 2 ? date("Y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
 					if (strtotime($sdate) > strtotime($edate)) {
 						FS::$iMgr->ajaxEchoError("err-end-before-start");
 						return;
@@ -1278,6 +1264,11 @@
 					$radSQLMgr->BeginTr();
 					$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
 						"'".$maxIdChk."','".$username."','Cleartext-Password',':=','".$password."'");
+					if ($this->hasExpirationEnabled()) {
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_user_expiration",
+							"radalias,username,expiration_date,name,surname,start_date,creator,creation_date",
+							"'".$radalias."','".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
+					}
 					$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority",
 						"'".$username."','".$profil."',0");
 					$radSQLMgr->CommitTr();
@@ -1317,8 +1308,27 @@
 						echo FS::$iMgr->printError("err-field-missing");
 							return;
 					}
+					
+					// Add initial zeros
+					if ($limms < 10) {
+						$limms = "0".$limms;
+					}
+					
+					if ($limhs < 10) {
+						$limhs = "0".$limhs;
+					}
+					
+					if ($limme < 10) {
+						$limme = "0".$limme;
+					}
+					
+					if ($limhe < 10) {
+						$limhe = "0".$limhe;
+					}
+					
 					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
-			                $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
+			        $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
+			        
 					if (strtotime($sdate) > strtotime($edate)) {
 						echo FS::$iMgr->printError("err-end-before-start");
 						return;
@@ -1352,8 +1362,9 @@
 							"'".$maxIdChk."','".$username."','Cleartext-Password',':=','".$password."'");
 							
 						if ($this->hasExpirationEnabled()) {
-							$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate",
-								"'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_user_expiration",
+								"radalias,username,expiration_date,name,surname,start_date,creator,creation_date",
+								"'".$radalias."','".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
 						}
 						
 						$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
