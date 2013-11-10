@@ -658,7 +658,7 @@
 					$found = true;
 					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><thead><tr><th class=\"headerSortDown\">Id</th><th>Utilisateur</th><th>
 						Mot de passe</th><th>".$this->loc->s("Groups")."</th><th>Date d'expiration</th><th></th></tr></thead>";
-					if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],$this->raddbinfos["dbname"])) {
+					if ($this->hasExpirationEnabled()) {
 						$query2 = $radSQLMgr->Select(PGDbConfig::getDbPrefix()."radusers","username,expiration","expiration > 0");
 						while ($data2 = $radSQLMgr->Fetch($query2)) {
 							if (!isset($expirationbuffer[$data2["username"]])) {
@@ -748,9 +748,11 @@
 			return $radSQLMgr;
 		}
 
-		private function hasExpirationEnabled($radhost,$radport,$raddb) {
+		private function hasExpirationEnabled() {
 			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_options",
-				"optval","optkey = 'rad_expiration_enable' AND addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."'") == 1) {
+				"optval","optkey = 'rad_expiration_enable' AND addr = '".$this->raddbinfos["addr"].
+					"' AND port = '".$this->raddbinfos["port"].
+					"' AND dbname = '".$this->raddbinfos["dbname"]."'") == 1) {
 				return true;
 			}
 			return false;
@@ -911,7 +913,7 @@
 					$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
-					if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],$this->raddbinfos["dbname"])) {
+					if ($this->hasExpirationEnabled()) {
 						$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username ='".$username."'");
 					}
 					$radSQLMgr->Delete("radpostauth","username = '".$username."'");
@@ -1322,7 +1324,7 @@
 						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
 							"'','".$username."','Cleartext-Password',':=','".$password."'");
 							
-						if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],$this->raddbinfos["dbname"])) {
+						if ($this->hasExpirationEnabled()) {
 							$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate",
 								"'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
 						}
