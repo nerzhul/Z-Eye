@@ -464,7 +464,6 @@
 						$grouplist .= FS::$iMgr->selElmt($groups[$i],$groups[$i]);
 					}
 
-					$output .= FS::$iMgr->h3("title-mass-import");
 					FS::$iMgr->js("function changeUForm() {
 						if (document.getElementsByName('usertype')[0].value == 1) {
 							$('#uptype').show(); $('#csvtooltip').html(\"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br />Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</b>\");
@@ -476,11 +475,13 @@
 							$('#uptype').hide(); $('#csvtooltip').html('');
 						}
 					};");
-					$output .= FS::$iMgr->cbkForm("6");
-					$output .= "<ul class=\"ulform\"><li width=\"100%\">".
-						FS::$iMgr->select("usertype",array("js" => "changeUForm()","label" => "Type d'authentification"));
-					$output .= FS::$iMgr->selElmt($this->loc->s("User"),1);
-					$output .= FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2);
+					
+					$output .= FS::$iMgr->h3("title-mass-import").
+						FS::$iMgr->cbkForm("6").
+						"<ul class=\"ulform\"><li width=\"100%\">".
+						FS::$iMgr->select("usertype",array("js" => "changeUForm()","label" => "Type d'authentification")).
+						FS::$iMgr->selElmt($this->loc->s("User"),1).
+						FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2);
 					//$formoutput .= FS::$iMgr->selElmt("Code PIN",3);
 					$output .= "</select></li><li id=\"uptype\">".
 						FS::$iMgr->hidden("ra",$radalias).
@@ -494,7 +495,8 @@
 						"</select></li><li>".
 						FS::$iMgr->select("ugroup",array("label" => $this->loc->s("Profil"))).
 						FS::$iMgr->selElmt("","none").
-						$this->addGroupList($radSQLMgr)."</select></li><li>".FS::$iMgr->textarea("csvlist","",580,330,$this->loc->s("Userlist-CSV")).
+						$this->addGroupList($radSQLMgr)."</select></li><li>".
+						FS::$iMgr->textarea("csvlist","",580,330,$this->loc->s("Userlist-CSV")).
 						"</li><li id=\"csvtooltip\">".FS::$iMgr->tip("mass-import-restriction")."</li><li>".
 						FS::$iMgr->submit("","Importer")."</li></ul></form>";
 				}
@@ -985,6 +987,8 @@
 							$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$group."'");
 						}
 					}
+					
+					FS::$dbMgr->BeginTr();
 					if ($utype == 1) {
 						$userlist = str_replace('\r','\n',$userlist);
 						$userlist = str_replace('\n\n',"\n",$userlist);
@@ -1002,6 +1006,11 @@
 							}
 							$fmtuserlist[$tmp[0]] = $tmp[1];
 						}
+						
+						// For pgsql compat
+						$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
+						$maxIdChk++;
+				
 						$userfound = 0;
 						foreach ($fmtuserlist as $user => $upwd) {
 							switch($pwdtype) {
@@ -1017,13 +1026,18 @@
 										return;
 							}
 							if (!$radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$user."'")) {
-								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$user."','".$attr."',':=','".$value."'");
+								$maxIdChk++;
+								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
+									"'".$maxIdChk."','".$user."','".$attr."',':=','".$value."'");
 							}
 							
 							if ($groupfound) {
-								$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["tradusrgrp"],"groupname","username = '".$user."' AND groupname = '".$group."'");
-								if (!$usergroup)
-									$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$user."','".$group."','1'");
+								$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["tradusrgrp"],"groupname",
+									"username = '".$user."' AND groupname = '".$group."'");
+								if (!$usergroup) {
+									$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority",
+										"'".$user."','".$group."','1'");
+								}
 							}
 						}
 						if ($userfound) {
@@ -1054,13 +1068,20 @@
 							$userlist[$i] = preg_replace("#[:-]#","",$userlist[$i]);
 							$userlist[$i] = strtolower($userlist[$i]);
 						}
+						
+						// For pgsql compat
+						$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
+						$maxIdChk++;
+						
 						// Delete duplicate entries
 						$userlist = array_unique($userlist);
 						$userfound = 0;
 						$count = count($userlist);
 						for ($i=0;$i<$count;$i++) {
 							if (!$radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$userlist[$i]."'")) {
-								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$userlist[$i]."','Auth-Type',':=','Accept'");
+								$maxIdChk++;
+								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
+									"'".$maxIdChk."','".$userlist[$i]."','Auth-Type',':=','Accept'");
 							}
 							else {
 								$userfound = 1;
@@ -1080,6 +1101,7 @@
 						}
 						$this->log(0,"Mass import done (list:".$userlist." group: ".$group.")");
 					}
+					FS::$dbMgr->CommitTr();
 					FS::$iMgr->redir("mod=".$this->mid."&ra=".$radalias."&sh=3",true);
 					return;
 				case 7: // DHCP sync
