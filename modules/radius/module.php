@@ -66,7 +66,7 @@
 			}
 			if ($radalias) {
 				if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-					$output .= $this->showDelegTool($radalias,$raddb,$radhost,$radport);
+					$output .= $this->showDelegTool($radalias);
 				}
 				else {
 					$radSQLMgr = $this->connectToRaddb2($radalias);
@@ -74,14 +74,7 @@
 						$output .= FS::$iMgr->printError("err-db-conn-fail");
 						return $output;
 					}
-					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
-					$radentrytype = FS::$secMgr->checkAndSecuriseGetData("radentrytype");
-					if ($radentry && $radentrytype && ($radentrytype == 1 || $radentrytype == 2)) {
-						$output .= $this->editRadiusEntry($radSQLMgr,$radentry,$radentrytype);
-					}
-					else {
-						$output .= $this->showRadiusAdmin($radSQLMgr);
-					}
+					$output .= $this->showRadiusAdmin($radSQLMgr);
 		 		}
 			}
 			else if (isset($sh)) {
@@ -290,7 +283,7 @@
 			}
 			return $output;
 		}
-		private function showDelegTool($radalias,$raddb,$radhost,$radport) {
+		private function showDelegTool($radalias) {
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			if (!FS::isAjaxCall()) {
@@ -299,7 +292,7 @@
 					array(2,"mod=".$this->mid."&ra=".$radalias,$this->loc->s("mass-account"))),$sh);
 			}
 			else if (!$sh || $sh == 1) {
-				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+				$radSQLMgr = $this->connectToRaddb2($radalias);
 				if (!$radSQLMgr) {
 					return FS::$iMgr->printError("err-db-conn-fail");
 				}
@@ -330,9 +323,10 @@
 				});");
 			}
 			else if ($sh == 2) {
-				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
-				if (!$radSQLMgr)
+				$radSQLMgr = $this->connectToRaddb2($radalias);
+				if (!$radSQLMgr) {
 					return FS::$iMgr->printError("err-db-conn-fail");
+				}
 
 				$output .= "<div id=\"adduserlistres\"></div>".
 					FS::$iMgr->cbkForm("11",array("id" => "adduserlist")).
@@ -1223,7 +1217,7 @@
 					FS::$iMgr->redir("mod=".$this->mid."&ra=".$radalias."&sh=5",true);
 					return;
 				case 10: // account creation (deleg)
-					$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
+					$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 					$name = FS::$secMgr->checkAndSecurisePostData("radname");
 					$surname = FS::$secMgr->checkAndSecurisePostData("radsurname");
 					$username = FS::$secMgr->checkAndSecurisePostData("radusername");
@@ -1253,7 +1247,7 @@
 					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
                     $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
 					if (strtotime($sdate) > strtotime($edate)) {
-						echo FS::$iMgr->printError("err-end-before-start");
+						FS::$iMgr->ajaxEchoError("err-end-before-start");
 						return;
 					}
 
@@ -1274,13 +1268,18 @@
 						echo FS::$iMgr->printError("err-no-user");
 						return;
 					}
+					
+					// For pgsql compat
+					$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
+					$maxIdChk++;
 
 					$password = FS::$secMgr->genRandStr(8);
 					
 					$radSQLMgr->BeginTr();
-					$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'','".$username."','Cleartext-Password',':=','".$password."'");
-					//$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate","'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
-					$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
+					$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
+						"'".$maxIdChk."','".$username."','Cleartext-Password',':=','".$password."'");
+					$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority",
+						"'".$username."','".$profil."',0");
 					$radSQLMgr->CommitTr();
 
 					$this->log(0,"Creating delegated user '".$username."' with password '".$password."'. Account expiration: ".($valid == 2 ? $edate: "none"));
