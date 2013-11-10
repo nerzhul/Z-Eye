@@ -34,7 +34,7 @@
 			$this->modulename = "";
 		}
 
-		public function Load() { FS::$iMgr->printError("Unknown module !"); }
+		public function Load() { FS::$iMgr->printError("err-unk-module"); }
 		public function LoadForAndroid() { return "{'code': 7}"; }
 		public function handlePostDatas($act) {}
 

@@ -189,7 +189,7 @@
 
 		public function Fetch(&$query,$shErr=true) {
 			if (!$query) {
-				echo FS::$iMgr->printError(sprintf("Query failed: '%s'",$this->sqlQuery));
+				echo FS::$iMgr->printError(sprintf(FS::$iMgr->getLocale("err-sql-query-failed"),$this->sqlQuery),true);
 				return NULL;
 			}
 			return $query->fetch();

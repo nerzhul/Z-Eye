@@ -842,8 +842,13 @@
 			}
 		}
 
-		public function printError($msg) {
-			return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$msg);
+		public function printError($msg,$raw=false) {
+			if ($raw) {
+				return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$msg);
+			}
+			else {
+				return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$this->getLocale($msg));
+			}
 		}
 
 		public function printDebug($msg) {
