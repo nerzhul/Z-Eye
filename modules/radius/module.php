@@ -896,13 +896,13 @@
 					$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
-					if ($this->hasExpirationEnabled()) {
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_user_expiration",
-							"radalias = '".$radalias."' AND username ='".$username."'");
-					}
 					$radSQLMgr->Delete("radpostauth","username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradacct"],"username = '".$username."'");
 					$radSQLMgr->CommitTr();
+					
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_user_expiration",
+						"radalias = '".$radalias."' AND username ='".$username."'");
+						
 					$this->log(0,"User '".$username."' removed");
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#rdu_".FS::$iMgr->formatHTMLId($username)."');");
 					return;
