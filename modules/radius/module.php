@@ -891,7 +891,7 @@
 					FS::$iMgr->redir("mod=".$this->mid."&ra=".$radalias."&sh=2",true);
 					break;
 				case 4: // user removal
-					$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
+					$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 					$username = FS::$secMgr->checkAndSecuriseGetData("user");
 
 					if (!$radalias || !$username) {
@@ -921,7 +921,7 @@
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#rdu_".FS::$iMgr->formatHTMLId($username)."');");
 					return;
 				case 5: // group removal
-					$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
+					$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 					$groupname = FS::$secMgr->checkAndSecuriseGetData("group");
 
 					if (!$radalias || !$groupname) {
