@@ -17,6 +17,92 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
+	final class radiusUser extends radiusObject {
+		function __construct() {
+			parent::__construct();
+			$this->readRight = "rule-read-datas";
+			$this->writeRight = "rule-write-datas";
+		}
+		
+		public function showForm($groupname = "") {
+			if (!$this->canWrite()) {
+				return FS::$iMgr->printError("err-no-right");
+			}
+			
+			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
+			
+			$connOK = $this->connectToRaddb($radalias);
+			if (!$connOK) {
+				return FS::$iMgr->printError("err-db-conn-fail");
+			}
+			
+			FS::$iMgr->js("function changeUForm() {
+				if (document.getElementsByName('utype')[0].value == 1) {
+					$('#userdf').show();
+				}
+				else if (document.getElementsByName('utype')[0].value == 2) {
+					$('#userdf').hide();
+				}
+				else if (document.getElementsByName('utype')[0].value == 3) {
+					$('#userdf').hide();
+				}
+			}; var grpidx = 0; function addGrpForm() {
+				$('<span class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'").
+					FS::$iMgr->selElmt("","none").$this->addGroupList()."</select>
+				<a onclick=\"javascript:delGrpElmt('+grpidx+');\">".
+				FS::$iMgr->img("styles/images/cross.png",15,15).
+				"</a><br /></span>').insertBefore('#radusrgrplist');
+				grpidx++;
+			}
+			function delGrpElmt(grpidx) {
+				$('.ugroupli'+grpidx).remove();
+			}
+			var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
+			FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40)." Op ".FS::$iMgr->select("attrop'+attridx+'").
+			FS::$iMgr->raddbCondSelectElmts().
+			"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
+			FS::$iMgr->selElmt("check",1).
+			FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
+			FS::$iMgr->img("styles/images/cross.png",15,15).
+			"</a><br /></span>').insertBefore('#frmattrid');
+			$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
+			$('#attrtarget'+attridx).val(attrtarget); attridx++;};
+			function delAttrElmt(attridx) {
+				$('.attrli'+attridx).remove();
+			}");
+
+			$tempSelect = FS::$iMgr->select("utype",array("js" => "changeUForm()",)).
+				FS::$iMgr->selElmt($this->loc->s("User"),1).
+				FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2).
+				"</select>";
+				
+			$pwdSelect = FS::$iMgr->select("upwdtype").
+				FS::$iMgr->selElmt("Cleartext-Password",1).
+				FS::$iMgr->selElmt("User-Password",2).
+				FS::$iMgr->selElmt("Crypt-Password",3).
+				FS::$iMgr->selElmt("MD5-Password",4).
+				FS::$iMgr->selElmt("SHA1-Password",5).
+				FS::$iMgr->selElmt("CHAP-Password",6).
+				"</select>";
+
+			return FS::$iMgr->cbkForm("2").
+				"<table>".FS::$iMgr->idxLines(array(
+				array("User","username",array("type" => "idxedit", "value" => "",
+						"length" => "40", "edit" => "" != "")),
+				array("Auth-Type","",array("type" => "raw", "value" => $tempSelect)),
+				array("Password","pwd",array("type" => "pwd")),
+				array("Pwd-Type","",array("type" => "raw", "value" => $pwdSelect)),
+				array("Groups","",array("type" => "raw", "value" => "<span id=\"radusrgrplist\"></span>")),
+				array("Attributes","",array("type" => "raw", "value" => "<span id=\"frmattrid\"></span>")),
+			)).
+			"<tr><td colspan=\"2\">".
+			FS::$iMgr->hidden("ra",$radalias).
+			FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
+			FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','');").
+			FS::$iMgr->submit("",$this->loc->s("Save"))."</td></tr></table></form>";
+		}
+	};
+	
 	final class radiusGroup extends radiusObject {
 		function __construct() {
 			parent::__construct();
@@ -31,23 +117,23 @@
 			
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 			
-			$radSQLMgr = $this->connectToRaddb($radalias);
-			if (!$radSQLMgr) {
+			$connOK = $this->connectToRaddb($radalias);
+			if (!$connOK) {
 				return FS::$iMgr->printError("err-db-conn-fail");
 			}
 			
 			if ($groupname) {
-				$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");
+				$groupexist = $this->radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");
 				// If group is not in check attributes, look into reply attributes
 				if (!$groupexist) {
-					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
+					$groupexist = $this->radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
 				}
 				if (!$groupexist) {
 					return FS::$iMgr->printError(sprintf($this->loc->s("err-group-not-exists"),$groupname),true);
 				}
 				
-				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");
-				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
+				$attrcount = $this->radSQLMgr->Count($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");
+				$attrcount += $this->radSQLMgr->Count($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
 			}
 			
 			FS::$iMgr->js("var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
@@ -74,13 +160,13 @@
 			
 			if ($groupname) {
 				$attridx = 0;
-				$query = $radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"attribute,op,value","groupname = '".$groupname."'");
-				while ($data = $radSQLMgr->Fetch($query)) {
+				$query = $this->radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"attribute,op,value","groupname = '".$groupname."'");
+				while ($data = $this->radSQLMgr->Fetch($query)) {
 					FS::$iMgr->js("addAttrElmt('".$data["attribute"]."','".$data["value"]."','".$data["op"]."','1');");
 				}
 
-				$query = $radSQLMgr->Select($this->raddbinfos["tradgrprep"],"attribute,op,value","groupname = '".$groupname."'");
-				while ($data = $radSQLMgr->Fetch($query)) {
+				$query = $this->radSQLMgr->Select($this->raddbinfos["tradgrprep"],"attribute,op,value","groupname = '".$groupname."'");
+				while ($data = $this->radSQLMgr->Fetch($query)) {
 					FS::$iMgr->js("addAttrElmt('".$data["attribute"]."','".$data["value"]."','".$data["op"]."','2');");
 				}
 			}
@@ -97,7 +183,7 @@
 					array("Attributes","",array("type" => "raw", "value" => "<span id=\"attrgrpn\"></span>"))
 				)).
 				"<tr><td colspan=\"2\">".
-				FS::$iMgr->hidden("r",$raddb).FS::$iMgr->hidden("h",$radhost).FS::$iMgr->hidden("p",$radport).
+				FS::$iMgr->hidden("ra",$radalias).
 				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','')").
 				FS::$iMgr->submit("",$this->loc->s("Save")).
 				"</td></tr></table></form>";
@@ -121,17 +207,40 @@
 			if ($this->raddbinfos["dbtype"] != "my" && $this->raddbinfos["dbtype"] != "pg")
 				return NULL;
 
-			$radSQLMgr = new AbstractSQLMgr();
-			if ($radSQLMgr->setConfig($this->raddbinfos["dbtype"],$this->raddbinfos["dbname"],
+			$this->radSQLMgr = new AbstractSQLMgr();
+			if ($this->radSQLMgr->setConfig($this->raddbinfos["dbtype"],$this->raddbinfos["dbname"],
 				$this->raddbinfos["port"],$this->raddbinfos["addr"],$this->raddbinfos["login"],
 				$this->raddbinfos["pwd"]) == 0) {
-				if ($radSQLMgr->Connect() == NULL) {
+				if ($this->radSQLMgr->Connect() == NULL) {
 					return NULL; 
 				}
 			}
-			return $radSQLMgr;
+			return true;
 		}
 		
+		protected function addGroupList($selectEntry="") {
+			$output = "";
+			$groups=array();
+			$query = $this->radSQLMgr->Select($this->raddbinfos["tradgrpchk"],"distinct groupname");
+			while ($data = $this->radSQLMgr->Fetch($query)) {
+				if (!in_array($data["groupname"],$groups)) {
+					$groups[] = $data["groupname"];
+				}
+			}
+			$query = $this->radSQLMgr->Select($this->raddbinfos["tradgrprep"],"distinct groupname");
+			while ($data = $this->radSQLMgr->Fetch($query)) {
+				if (!in_array($data["groupname"],$groups)) {
+					$groups[] = $data["groupname"];
+				}
+			}
+			$count = count($groups);
+			for ($i=0;$i<$count;$i++) {
+				$output .= FS::$iMgr->selElmt($groups[$i],$groups[$i],($groups[$i] == $selectEntry));
+			}
+			return $output;
+		}
+		
+		protected $radSQLMgr;
 		protected $raddbinfos;
 	}
 ?>

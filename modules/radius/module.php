@@ -61,7 +61,7 @@
 						FS::$iMgr->setJSBuffer(1);
 						$output .= FS::$iMgr->opendiv(1,$this->loc->s("Manage-radius-db"));
 					}
-					$output .= $this->showRadiusList($rad);
+					$output .= $this->showRadiusList($radalias);
 				}
 			}
 			if ($radalias) {
@@ -641,81 +641,6 @@
 			return $output;
 		}
 
-		private function showUserForm() {
-			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
-			
-			$radSQLMgr = $this->connectToRaddb2($radalias);
-			if (!$radSQLMgr) {
-				return $this->loc->s("err-db-conn-fail");
-			}
-			
-			FS::$iMgr->js("function changeUForm() {
-				if (document.getElementsByName('utype')[0].value == 1) {
-					$('#userdf').show();
-				}
-				else if (document.getElementsByName('utype')[0].value == 2) {
-					$('#userdf').hide();
-				}
-				else if (document.getElementsByName('utype')[0].value == 3) {
-					$('#userdf').hide();
-				}
-			}; var grpidx = 0; function addGrpForm() {
-				$('<span class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'").
-					FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr)."</select>
-				<a onclick=\"javascript:delGrpElmt('+grpidx+');\">".
-				FS::$iMgr->img("styles/images/cross.png",15,15).
-				"</a><br /></span>').insertBefore('#radusrgrplist');
-				grpidx++;
-			}
-			function delGrpElmt(grpidx) {
-				$('.ugroupli'+grpidx).remove();
-			}
-			var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
-			FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40)." Op ".FS::$iMgr->select("attrop'+attridx+'").
-			FS::$iMgr->raddbCondSelectElmts().
-			"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40,"")." Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
-			FS::$iMgr->selElmt("check",1).
-			FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
-			FS::$iMgr->img("styles/images/cross.png",15,15).
-			"</a><br /></span>').insertBefore('#frmattrid');
-			$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
-			$('#attrtarget'+attridx).val(attrtarget); attridx++;};
-			function delAttrElmt(attridx) {
-				$('.attrli'+attridx).remove();
-			}");
-
-			$tempSelect = FS::$iMgr->select("utype",array("js" => "changeUForm()",)).
-				FS::$iMgr->selElmt($this->loc->s("User"),1).
-				FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2).
-				"</select>";
-				
-			$pwdSelect = FS::$iMgr->select("upwdtype").
-				FS::$iMgr->selElmt("Cleartext-Password",1).
-				FS::$iMgr->selElmt("User-Password",2).
-				FS::$iMgr->selElmt("Crypt-Password",3).
-				FS::$iMgr->selElmt("MD5-Password",4).
-				FS::$iMgr->selElmt("SHA1-Password",5).
-				FS::$iMgr->selElmt("CHAP-Password",6).
-				"</select>";
-
-			$output = FS::$iMgr->cbkForm("2").
-				"<table>".FS::$iMgr->idxLines(array(
-				array("User","username",array("type" => "idxedit", "value" => "",
-						"length" => "40", "edit" => "" != "")),
-				array("Auth-Type","",array("type" => "raw", "value" => $tempSelect)),
-				array("Password","pwd",array("type" => "pwd")),
-				array("Pwd-Type","",array("type" => "raw", "value" => $pwdSelect)),
-				array("Groups","",array("type" => "raw", "value" => "<span id=\"radusrgrplist\"></span>")),
-				array("Attributes","",array("type" => "raw", "value" => "<span id=\"frmattrid\"></span>")),
-			)).
-				"<tr><td colspan=\"2\">".
-				FS::$iMgr->hidden("ra",$radalias).
-				FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
-				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','');").
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</td></tr></table></form>";
-			return $output;
-		}
-	
 		private function showRadiusDatas($radSQLMgr) {
 			$found = false;
 			$output = "";
@@ -967,7 +892,9 @@
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
 				case 1: return $this->showRadiusServerMgmt();
-				case 2: return $this->showUserForm();
+				case 2: 
+					$ruObj = new radiusUser();
+					return $ruObj->showForm();
 				case 3:
 					$rgObj = new radiusGroup();
 					return $rgObj->showForm();
