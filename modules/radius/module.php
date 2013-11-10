@@ -1288,7 +1288,7 @@
 						($valid == 2 ? $this->loc->s("From")." ".$sdate." ".$this->loc->s("To")." ".$edate : $this->loc->s("Infinite"))."<hr><br />";
 					return;
 				case 11: // Rad deleg (massive)
-					$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
+					$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 					$typegen = FS::$secMgr->checkAndSecurisePostData("typegen");
 					$prefix = FS::$secMgr->checkAndSecurisePostData("prefix");
 					$nbacct = FS::$secMgr->checkAndSecurisePostData("nbacct");
@@ -1331,9 +1331,14 @@
 						return;
 					}
 
+					// For pgsql compat
+					$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
+					
 					$pdf = new PDFgen();
 					$pdf->SetTitle($this->loc->s("Account").": ".($valid == 1 ? $this->loc->s("Permanent") : $this->loc->s("Temporary")));
 					for ($i=0;$i<$nbacct;$i++) {
+						$maxIdChk++;
+						
 						$password = FS::$secMgr->genRandStr(8);
 						if ($typegen == 2) {
 							$username = $prefix.($i+1);
@@ -1344,7 +1349,7 @@
 
 						$radSQLMgr->BeginTr();
 						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
-							"'','".$username."','Cleartext-Password',':=','".$password."'");
+							"'".$maxIdChk."','".$username."','Cleartext-Password',':=','".$password."'");
 							
 						if ($this->hasExpirationEnabled()) {
 							$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate",

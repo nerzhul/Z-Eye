@@ -31,11 +31,12 @@
 	require_once("fpdf.php");
 
 	class PDFgen extends FPDF {
-		public function __construct() {}
+		public function __construct() {
+			parent::__construct();
+		}
 
 		public function Header() {
-			// Arial bold 15
-			$this->SetFont('helvetica','B',15);
+			$this->SetFont('helvetica','b',15);
 			// Title
 			$this->Cell(0,0,$this->title,0,0,'C');
 			// Line break
