@@ -350,7 +350,7 @@
 					"MAC-addr" => "MAC address",
 					"MAC-addr-iface" => "Interface MAC address",
 					"Match-MAC-addr" => "Match MAC address",
-					"menu-name" => "Z-Eye Engine",
+					"menu-name" => "Hypervision",
 					"menu-title" => "Network devices management",
 					"mod-in-progress" => "Modification...",
 					"Model" => "Model",
