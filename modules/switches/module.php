@@ -195,7 +195,7 @@
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
 					}
 					else
-						$output .= FS::$iMgr->printError("Les données demandées n'existent pas !");
+						$output .= FS::$iMgr->printError("err-bad-datas");
 				}
 				// Port Stats
 				else if ($sh == 2) {

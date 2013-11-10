@@ -899,7 +899,7 @@
 				$output .= $formoutput;
 			}
 			else {
-				$output .= FS::$iMgr->printError("Type d'entrée invalide !");
+				$output .= FS::$iMgr->printError("err-invalid-entry");
 			}
 			return $output;
 		}

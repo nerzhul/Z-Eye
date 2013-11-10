@@ -178,7 +178,7 @@
 					return $this->printError($this->getLocale("err-no-rights"));
 				}
 			}
-			return $this->printError($this->getLocale("err-unk-module"));
+			return $this->printError("err-unk-module");
 		}
 
 		public function getModuleByPath($path) {

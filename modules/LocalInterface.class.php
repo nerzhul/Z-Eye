@@ -116,21 +116,28 @@
 		public function showModule() {
 			$output = "";
 			$installlocked = file_get_contents(dirname(__FILE__)."/../config/LOCK");
-			if(!$installlocked)
+			if(!$installlocked) {
 				return $this->loadModule($this->getModuleIdByPath("install"));
+			}
 				
 			$module = FS::$secMgr->checkAndSecuriseGetData("mod");
-			if(!$module) $module = 0;
+			if(!$module) {
+				$module = 0;
+			}
 
-			if($module && !FS::$secMgr->isNumeric($module))
-				return $this->printError($this->getLocale("err-unk-module"));
+			if($module && !FS::$secMgr->isNumeric($module)) {
+				return $this->printError("err-unk-module");
+			}
 
-			if($module > 0)
+			if($module > 0) {
 				return $this->loadModule($module);
-			else if($module == 0)
+			}
+			else if($module == 0) {
 				return $this->loadModule($this->getModuleIdByPath("default"));
-			else
-				return $this->printError($this->getLocale("err-unk-module"));
+			}
+			else {
+				return $this->printError("err-unk-module");
+			}
 		}
 
 		public function linkIcon($link,$iconname,$options=array()) {
