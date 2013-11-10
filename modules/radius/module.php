@@ -31,10 +31,6 @@
 
 		public function Load() {
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
-			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
-			$rad = $raddb."@".$radhost.":".$radport;
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			$output = "";
 
@@ -68,24 +64,7 @@
 					$output .= $this->showRadiusList($rad);
 				}
 			}
-			if ($raddb && $radhost && $radport) {
-				if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
-					$output .= $this->showDelegTool($radalias,$raddb,$radhost,$radport);
-				}
-				else {
-					$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
-					if (!$radSQLMgr) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
-						return $output;
-					}
-					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
-					$radentrytype = FS::$secMgr->checkAndSecuriseGetData("radentrytype");
-					if ($radentry && $radentrytype && ($radentrytype == 1 || $radentrytype == 2)) {
-						$output .= $this->editRadiusEntry($radSQLMgr,$radentry,$radentrytype);
-					}
-		 		}
-			}
-			else if ($radalias) {
+			if ($radalias) {
 				if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
 					$output .= $this->showDelegTool($radalias,$raddb,$radhost,$radport);
 				}
@@ -663,11 +642,12 @@
 		}
 
 		private function showUserForm() {
-			$raddb = FS::$secMgr->checkAndSecuriseGetData("r");
-			$radhost = FS::$secMgr->checkAndSecuriseGetData("h");
-			$radport = FS::$secMgr->checkAndSecuriseGetData("p");
+			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 			
-			$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
+			$radSQLMgr = $this->connectToRaddb2($radalias);
+			if (!$radSQLMgr) {
+				return $this->loc->s("err-db-conn-fail");
+			}
 			
 			FS::$iMgr->js("function changeUForm() {
 				if (document.getElementsByName('utype')[0].value == 1) {
