@@ -101,7 +101,7 @@
 					"err-bad-datas" => "Données invalides",
 					"err-must-be-connected" => "Vous devez être connecté pour accéder à cette fonctionnalité",
 					"err-no-rights" => "Vous n'avez pas le droit de faire cela",
-					"err-sql-query-failed" => "Echec de la requête: '%s'"
+					"err-sql-query-failed" => "Echec de la requête: '%s'",
 					"err-unk-module" => "Module inconnu ",
 					"French" => "Français",
 					"hour" => "heure",
