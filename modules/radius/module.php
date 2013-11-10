@@ -434,8 +434,9 @@
 						$output .= "<table id=\"radgrp\" style=\"width:30%;\"><tr><th>".$this->loc->s("Group")."</th><th style=\"width:30%\">".
 							$this->loc->s("User-nb")."</th><th></th></tr>";
 						foreach ($groups as $key => $value) {
-							$output .= "<tr><td>".FS::$iMgr->opendiv(4,$key,
-								array("lnkadd" => "ra=".$radalias."&radentrytype=2&radentry=".$key))."</td><td>".$value."</td><td>".
+							$output .= "<tr id=\"rdg_".FS::$iMgr->formatHTMLId($key)."\"><td>".
+								FS::$iMgr->opendiv(4,$key,
+								array("lnkadd" => "ra=".$radalias."&radentry=".$key))."</td><td>".$value."</td><td>".
 								FS::$iMgr->removeIcon("mod=".$this->mid."&act=5&ra=".$radalias."&group=".$key,
 									array("js" => true,
 									"confirm" => array($this->loc->s("confirm-remove-group")."'".$key."'","Confirm","Cancel")))."</td></tr>";
@@ -947,7 +948,7 @@
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import","groupname = '".$groupname."'");
 
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#rdg_".FS::$iMgr->formatHTMLId($groupname)."');");
 					$this->log(0,"Group '".$groupname."' removed");
 					return;
 				// Mass import
