@@ -911,7 +911,7 @@
 					$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
-					if ($this->hasExpirationEnabled($radhost,$radport,$raddb)) {
+					if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],$this->raddbinfos["dbname"])) {
 						$radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username ='".$username."'");
 					}
 					$radSQLMgr->Delete("radpostauth","username = '".$username."'");
