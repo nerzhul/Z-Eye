@@ -50,6 +50,8 @@
 					"English" => "English",
 					"Error" => "Error",
 					"err-bad-datas" => "Invalid datas",
+					"err-devel" => "Development error !",
+					"err-devel-locale" => "Development error ! Please verify the following backtrace. A locale is miscalled.<br /><br />%s",
 					"err-must-be-connected" => "You must be logged to access to this functionnality",
 					"err-no-rights" => "You don't have rights to do that",
 					"err-sql-query-failed" => "Query failed: '%s'",
@@ -99,6 +101,8 @@
 					"English" => "Anglais",
 					"Error" => "Erreur",
 					"err-bad-datas" => "Données invalides",
+					"err-devel" => "Erreur de développement !",
+					"err-devel-locale" => "Erreur de développement ! Veuillez vérifier la backtrace ci-dessous, une locale est appelée de manière incorrecte.<br /><br />%s",
 					"err-must-be-connected" => "Vous devez être connecté pour accéder à cette fonctionnalité",
 					"err-no-rights" => "Vous n'avez pas le droit de faire cela",
 					"err-sql-query-failed" => "Echec de la requête: '%s'",
@@ -133,26 +137,36 @@
 		}
 
 		public function s($str) {
-			if(!isset($_SESSION["lang"]) || !isset($this->locales[$_SESSION["lang"]])) {
+			if (!isset($_SESSION["lang"]) || !isset($this->locales[$_SESSION["lang"]])) {
 				$lang = Config::getDefaultLang();
 			}
 			else {
 				$lang = $_SESSION["lang"];
 			}
 			
-			if(!$str || $str == "" || !$this->locales ||
+			if (is_array($str)) {
+				echo FS::$iMgr->printError(sprintf(FS::$iMgr->getLocale("err-devel-locale"),
+					FS::$iMgr->printDebugBacktrace()),true);
+				return "";
+			}
+			
+			if (!$str || $str == "" || !$this->locales ||
 				!isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
-				return "String '".$str."' not found";
+				return "String `".$str."` not found";
 			}
 				
 			return $this->locales[$lang][$str];
 		}
 		
 		protected function concat($moduleLocales=array()) {
-			if(!isset($moduleLocales["en"]))
+			if (!isset($moduleLocales["en"])) {
 				$modulesLocales["en"] = array();
-			if(!isset($moduleLocales["fr"]))
+			}
+			
+			if (!isset($moduleLocales["fr"])) {
 				$modulesLocales["fr"] = array();
+			}
+			
 			$this->locales["en"] = array_merge($this->locales["en"],$moduleLocales["en"]);
 			$this->locales["fr"] = array_merge($this->locales["fr"],$moduleLocales["fr"]);
 		}

@@ -854,6 +854,30 @@
 		public function printDebug($msg) {
 			return sprintf("<div id=\"debugContent\">%s: %s</div>",$this->getLocale("Notification"),$msg);
 		}
+		
+		public function printDebugBacktrace() {
+			$output = "<span style=\"text-align:left;display:block;\">";
+			
+			$bt = debug_backtrace();
+			$count = count($bt);
+			// Don't show this call
+			for ($i=1;$i<$count;$i++) {
+				$op = "";
+				if (isset($bt[$i]["type"])) {
+					$op = $bt[$i]["type"];
+				}
+				
+				$class = "";
+				if (isset($bt[$i]["class"])) {
+					$class = $bt[$i]["class"];
+				}
+				$output = sprintf("%s#%d %s%s%s() called at %s:%s<br />",$output,($i-1),$class,
+					$op,$bt[$i]["function"],$bt[$i]["file"],$bt[$i]["line"]);
+			}
+			
+			$output = sprintf("%s</span>",$output);
+			return $output;
+		}
 
 		public function getModuleIdByPath($path) {
 			if (isset($this->moduleIdBuf[$path])) {

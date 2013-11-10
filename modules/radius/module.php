@@ -389,7 +389,7 @@
 						});
 					}");
 					
-					$output .= FS::$iMgr->cbkForm("12",array("id" => "radf")).
+					$output .= FS::$iMgr->cbkForm("12","Modification",false,array("id" => "radf")).
 						FS::$iMgr->hidden("ra",$radalias).
 						FS::$iMgr->select("uf",array("js" => "filterRadiusDatas()")).
 						FS::$iMgr->selElmt("--".$this->loc->s("Type")."--","",true).
@@ -946,6 +946,7 @@
 
 					// For Edition Only, don't delete acct/user-group links
 					
+					$radSQLMgr->BeginTr();
 					if ($edit == 1) {
 						$radSQLMgr->Delete($this->raddbinfos["tradgrpchk"],"groupname = '".$groupname."'");
 						$radSQLMgr->Delete($this->raddbinfos["tradgrprep"],"groupname = '".$groupname."'");
@@ -999,6 +1000,10 @@
 					$idxChk = FS::$dbMgr->GetMax($this->raddbinfos["tradgrpchk"],"id");
 					
 					foreach ($attrTab as $attrKey => $attrValue) {
+						if (!isset($attrValue["op"])) {
+							FS::$iMgr->ajaxEcho("err-bad-datas");
+							return;
+						}
 						if ($attrValue["target"] == "2") {
 							$idxRep++;
 							$radSQLMgr->Insert($this->raddbinfos["tradgrprep"],"id,groupname,attribute,op,value",
@@ -1012,6 +1017,7 @@
 								"','".$attrValue["key"]."','".$attrValue["op"]."','".$attrValue["val"]."'");
 						}
 					}
+					$radSQLMgr->CommitTr();
 					$this->log(0,"Group '".$groupname."' edited/created");
 					FS::$iMgr->redir("mod=".$this->mid."&ra=".$radalias."&sh=2",true);
 					break;
