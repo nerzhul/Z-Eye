@@ -46,9 +46,9 @@
 			}
 
 			switch($err) {
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("err-exist")); break;
-				case 6: $output .= FS::$iMgr->printError($this->loc->s("err-invalid-table")); break;
-				case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")); break;
+				case 3: $output .= FS::$iMgr->printError("err-exist"); break;
+				case 6: $output .= FS::$iMgr->printError("err-invalid-table"); break;
+				case 7: $output .= FS::$iMgr->printError("err-bad-server"); break;
 			}
 
 			if (!FS::isAjaxCall()) {
@@ -71,7 +71,7 @@
 				else {
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
+						$output .= FS::$iMgr->printError("err-db-conn-fail");
 						return $output;
 					}
 					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
@@ -85,7 +85,7 @@
 		 		}
 			}
 			else if (isset($sh)) {
-				$output .= FS::$iMgr->printError($this->loc->s("err-invalid-tab"));
+				$output .= FS::$iMgr->printError("err-invalid-tab");
 			}
 
 			return $output;
@@ -158,7 +158,7 @@
 				$port = FS::$secMgr->checkAndSecuriseGetData("pr");
 				$dbname = FS::$secMgr->checkAndSecuriseGetData("db");
 				if (!$addr || $addr == "" || !$port || !FS::$secMgr->isNumeric($port) || !$dbname || $dbname == "") {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-db")." !");
+					$output .= FS::$iMgr->printError("err-no-db");
 					return $output;
 				}
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","radalias,login,pwd,dbtype,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
@@ -179,7 +179,7 @@
 					$tradacct = $data["tradacct"];
 				}
 				else {
-					$output .= FS::$iMgr->printError($this->loc->s("err-invalid-db")." !");
+					$output .= FS::$iMgr->printError("err-invalid-db");
 					return $output;
 				}
 			}
@@ -188,9 +188,9 @@
 				$output .= FS::$iMgr->aLink($this->mid, $this->loc->s("Return"))."<br />";
 				$err = FS::$secMgr->checkAndSecuriseGetData("err");
 				switch($err) {
-					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
-					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
-					case 7: $output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !"); break;
+					case 2: $output .= FS::$iMgr->printError("err-miss-bad-fields"); break;
+					case 3: $output .= FS::$iMgr->printError("err-server-exist"); break;
+					case 7: $output .= FS::$iMgr->printError("err-bad-server"); break;
 				}
 			}
 
@@ -301,7 +301,7 @@
 			else if (!$sh || $sh == 1) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
 				if (!$radSQLMgr) {
-					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
+					return FS::$iMgr->printError("err-db-conn-fail");
 				}
 
 				$output .= "<div id=\"adduserres\"></div>".
@@ -332,7 +332,7 @@
 			else if ($sh == 2) {
 				$radSQLMgr = $this->connectToRaddb($radhost,$radport,$raddb);
 				if (!$radSQLMgr)
-					return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
+					return FS::$iMgr->printError("err-db-conn-fail");
 
 				$output .= "<div id=\"adduserlistres\"></div>".
 					FS::$iMgr->cbkForm("11",array("id" => "adduserlist")).
@@ -355,7 +355,7 @@
 					FS::$iMgr->tableSubmit("Save");
 			}
 			else if ($sh && $sh > 2) {
-				$output .= FS::$iMgr->printError($this->loc->s("err-bad-tab"));
+				$output .= FS::$iMgr->printError("err-bad-tab");
 			}
 
 			return $output;
@@ -556,7 +556,7 @@
 						if ($found) $output .= $tmpoutput."</table>";
 					}
 					else
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-subnet-for-import"));
+						$output .= FS::$iMgr->printError("err-no-subnet-for-import");
 				}
 				else if ($sh == 5) {
 					$output .= FS::$iMgr->h3("title-cleanusers").
@@ -635,7 +635,7 @@
 					$output .= FS::$iMgr->tableSubmit("Save");
 				}
 				/*else {
-					return FS::$iMgr->printError($this->loc->s("err-bad-tab"));
+					return FS::$iMgr->printError("err-bad-tab");
 				}
 			}*/
 			return $output;
@@ -779,7 +779,7 @@
 			if ($radentrytype == 1) {
 				$userexist = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$radentry."'");
 				if (!$userexist) {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-user"));
+					$output .= FS::$iMgr->printError("err-no-user");
 					return $output;
 				}
 				$userpwd = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"value",
@@ -1558,7 +1558,7 @@
 
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for radius deleg (radius server)");
-						echo FS::$iMgr->printError($this->loc->s("err-invalid-auth-server"));
+						echo FS::$iMgr->printError("err-invalid-auth-server");
 						return;
 					}
 					if (!$name || !$surname || !$username || !$valid || !$profil || 
@@ -1566,14 +1566,14 @@
 						!FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate) 
 					))) {
 						$this->log(2,"Some fields are missing for radius deleg (datas)");
-						echo FS::$iMgr->printError($this->loc->s("err-field-missing"));
+						echo FS::$iMgr->printError("err-field-missing");
 						return;
 					}
 
 					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
                     $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
 					if (strtotime($sdate) > strtotime($edate)) {
-						echo FS::$iMgr->printError($this->loc->s("err-end-before-start"));
+						echo FS::$iMgr->printError("err-end-before-start");
 						return;
 					}
 
@@ -1591,7 +1591,7 @@
 					
 					if ($exist) {
 						$this->log(1,"User '".$username."' already exists (Deleg)");
-						echo FS::$iMgr->printError($this->loc->s("err-no-user"));
+						echo FS::$iMgr->printError("err-no-user");
 						return;
 					}
 
@@ -1624,7 +1624,7 @@
                     
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for massive creation (Deleg) (radius server)");
-						echo FS::$iMgr->printError($this->loc->s("err-invalid-auth-server"));
+						echo FS::$iMgr->printError("err-invalid-auth-server");
 						return;
 					}					
 
@@ -1635,13 +1635,13 @@
 						|| !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate)
 					))) {
 						$this->log(2,"Some fields are missing or invalid for massive creation (Deleg) (datas)");
-						echo FS::$iMgr->printError($this->loc->s("err-field-missing"));
+						echo FS::$iMgr->printError("err-field-missing");
 							return;
 					}
 					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
 			                $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
 					if (strtotime($sdate) > strtotime($edate)) {
-						echo FS::$iMgr->printError($this->loc->s("err-end-before-start"));
+						echo FS::$iMgr->printError("err-end-before-start");
 						return;
 					}
 

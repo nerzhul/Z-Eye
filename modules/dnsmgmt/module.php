@@ -138,7 +138,7 @@
 					"</form><div id=\"recordlist\"></div>";
 			}
 			else {
-				$output .= FS::$iMgr->printError($this->loc->s("no-data-found"));
+				$output .= FS::$iMgr->printError("no-data-found");
 			}
 
 			return $output;
@@ -283,7 +283,7 @@
 				$output .= "</table>";
 			}
 			else {
-				$output = FS::$iMgr->printError($this->loc->s("err-no-records"));
+				$output = FS::$iMgr->printError("err-no-records");
 			}
 			return $output;
 		}

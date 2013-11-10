@@ -53,13 +53,13 @@
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
 			if ($count < 1) {
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-					"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
+					"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")),true);
 				return $output;
 			} 
 
 			$netdiscoCfg = readNetdiscoConf();
 			if (!is_array($netdiscoCfg)) {
-				$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
+				$output .= FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf",true);
 				return $output;
 			}
 

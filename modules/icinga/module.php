@@ -77,7 +77,7 @@
 
 		private function showGeneralTab() {
 			FS::$iMgr->setURL("index.php?mod=".$this->mid."&sh=1");
-			$output = FS::$iMgr->printError($this->loc->s("not-implemented"));
+			$output = FS::$iMgr->printError("not-implemented");
 			
 			return $output;
 		}
@@ -86,7 +86,7 @@
 			FS::$iMgr->setURL("sh=2");
 			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			
 			$output = "";
@@ -172,7 +172,7 @@
 		private function showHostgroupsTab() {
 			FS::$iMgr->setURL("sh=3");
 			if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			$output = "";
 
@@ -244,7 +244,7 @@
 			FS::$iMgr->setURL("sh=4");
 			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 
 			$output = "";
@@ -380,7 +380,7 @@
 			FS::$iMgr->setURL("sh=5");
 			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			$output = "";
 			
@@ -494,7 +494,7 @@
 			FS::$iMgr->setURL("sh=6");
 			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			
 			$output = "";
@@ -590,7 +590,7 @@
 			FS::$iMgr->setURL("sh=7");
 			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			
 			$output = "";
@@ -644,7 +644,7 @@
 			FS::$iMgr->setURL("sh=8");
 			
 			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			
 			/*
@@ -771,8 +771,8 @@
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
-				case 1: return FS::$iMgr->printError($this->loc->s("err-no-timeperiod"));
-				case 2: return FS::$iMgr->printError($this->loc->s("err-no-contactgroups"));
+				case 1: return FS::$iMgr->printError("err-no-timeperiod");
+				case 2: return FS::$iMgr->printError("err-no-contactgroups");
 				case 3: 
 					$host = new icingaHost();
 					return $host->showForm();
@@ -783,13 +783,13 @@
 
 					$hostexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","");
 					if (!$hostexist) {
-						return FS::$iMgr->printError($this->loc->s("err-no-hosts"));
+						return FS::$iMgr->printError("err-no-hosts");
 					}
 					
 					return $this->showHostgroupForm();
 				case 5:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-						return $this->loc->s("err-no-rights");
+						return FS::$iMgr->printError("err-no-rights");
 					}
 						
 					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
@@ -797,7 +797,7 @@
 						return $this->showServiceForm();
 					}
 					
-					return FS::$iMgr->printError($this->loc->s("err-no-service"));
+					return FS::$iMgr->printError("err-no-service");
 				case 6:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 						return $this->loc->s("err-no-rights");
@@ -813,7 +813,7 @@
 						return $this->showContactForm();
 					}
 					else {
-						return FS::$iMgr->printError($this->loc->s("err-no-contact"));
+						return FS::$iMgr->printError("err-no-contact");
 					}
 				case 8:
 					$ctg = new icingaCtg();

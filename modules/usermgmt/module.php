@@ -34,7 +34,7 @@
 			$uid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$user."'");
 			$output = FS::$iMgr->h2("title-user-mod");
 			if (!$uid) {
-				$output .= FS::$iMgr->printError($this->loc->s("title-user-dont-exist"));
+				$output .= FS::$iMgr->printError("title-user-dont-exist");
 				return $output;
 			}
 			$output = FS::$iMgr->cbkForm("2").FS::$iMgr->tip("tip-password").

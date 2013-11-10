@@ -49,7 +49,7 @@
 				else if ($sh == 5)
 					$output .= $this->showSpringyMap();
 				else
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
+					$output .= FS::$iMgr->printError("err-no-tab");
 			}
 			return $output;
 		}
@@ -313,7 +313,7 @@
 				$output .= $tmpoutput;
 			}
 			else
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-node-found"));
+				$output .= FS::$iMgr->printError("err-no-node-found");
 
 			return $output;
 		}

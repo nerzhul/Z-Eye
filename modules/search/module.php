@@ -40,7 +40,7 @@
 				}
 				
 				if (!$search) {
-					return FS::$iMgr->printError($this->loc->s("err-no-search"));
+					return FS::$iMgr->printError("err-no-search");
 				}
 				return $this->findRefsAndShow($search);
 			}
@@ -87,7 +87,7 @@
 						}
 					}
 					else {
-						return $output.FS::$iMgr->printError($this->loc->s("err-no-res"));
+						return $output.FS::$iMgr->printError("err-no-res");
 					}
 				}
 							

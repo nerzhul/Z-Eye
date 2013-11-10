@@ -53,11 +53,11 @@
 
 		public function showForm($aclname = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 
 			if (!$this->Load($aclname)) {
-				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+				return FS::$iMgr->printError($this->errNotExists);
 			}
 
 			$ztsel = FS::$iMgr->select("zonetype"/*JS*/).
@@ -512,11 +512,11 @@
 
 		public function showForm($aclname = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 
 			if (!$this->Load($aclname)) {
-				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+				return FS::$iMgr->printError($this->errNotExists);
 			}
 
 			$output = FS::$iMgr->cbkForm("7")."<table>".
@@ -977,11 +977,11 @@
 
 		public function showForm($clustername = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 
 			if (!$this->Load($clustername)) {
-				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+				return FS::$iMgr->printError($this->errNotExists);
 			}
 
 			$acls = new dnsACL();
@@ -1511,11 +1511,11 @@
 
 		public function showForm($addr = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 
 			if (!$this->Load($addr)) {
-				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+				return FS::$iMgr->printError($this->errNotExists);
 			}
 
 			$tsiglistTransfer = (new dnsTSIGKey())->getSelect(
@@ -1915,11 +1915,11 @@
 
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 
 			if (!$this->Load($name)) {
-				return FS::$iMgr->printError($this->loc->s($this->errNotExists));
+				return FS::$iMgr->printError($this->errNotExists);
 			}
 
 			$output = FS::$iMgr->cbkForm("5")."<table>".

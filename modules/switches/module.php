@@ -63,7 +63,7 @@
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
 			if ($count < 1) {
 					$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-							"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
+							"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")),true);
 					return $output;
 			}
 
@@ -108,11 +108,11 @@
 			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$dip)) {
-				return FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+				return FS::$iMgr->printError("err-no-credentials");
 			}
 			switch($err) {
-				case 1:	$output .= FS::$iMgr->printError($this->loc->s("err-fail-mod-switch")." !"); break;
-				case 2: $output .= FS::$iMgr->printError($this->loc->s("err-bad-datas")); break;
+				case 1:	$output .= FS::$iMgr->printError("err-fail-mod-switch"); break;
+				case 2: $output .= FS::$iMgr->printError("err-bad-datas"); break;
 				default: break;
 			}
 			if (!FS::isAjaxCall()) {
@@ -192,7 +192,7 @@
 							$this->devapi->unsetPortId();
 						}
 						else
-							$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-cache"));
+							$output .= FS::$iMgr->printError("err-no-snmp-cache");
 					}
 					else
 						$output .= FS::$iMgr->printError("err-bad-datas");
@@ -200,7 +200,7 @@
 				// Port Stats
 				else if ($sh == 2) {
 					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readportstats") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readportstats")) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						$output .= FS::$iMgr->printError("err-no-rights");
 						return $output;
 					}
 					$file = file(dirname(__FILE__)."/../../datas/rrd/".$dip."_".$portid.".html");
@@ -223,13 +223,13 @@
 						$output .= "<br />".$filebuffer."<br /><center><span style=\"font-size: 9px;\">".$this->loc->s("generated-mrtg")."</span></center>";
 					}
 					else
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-port-bw")." !");
+						$output .= FS::$iMgr->printError("err-no-port-bw");
 				}
 				// Monitoring
 				else if ($sh == 3) {
 					if (!$this->hasDeviceWriteRight($snmprw,$dip) && 
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_writeportmon")) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						$output .= FS::$iMgr->printError("err-no-rights");
 						return $output;
 					}
 					$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","climit","device = '".$device."' AND port = '".$port."'");
@@ -250,14 +250,14 @@
 				}
 				else if ($sh == 4) {
 					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshportinfos") && !FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshportinfos")) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						$output .= FS::$iMgr->printError("err-no-rights");
 						return $output;
 					}
 
 					$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 					if (!$sshuser) {
 						$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
-							FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")));
+							FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")),true);
 						return $output;
 					}
 					
@@ -267,10 +267,10 @@
 						$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
 						if (FS::$secMgr->isNumeric($stdio) && $stdio > 0) {
 							switch($stdio) {
-								case 1: $output .= FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
-								case 2: $output .= FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
-								case 3: $output .= FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
-								case NULL: $output .= FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+								case 1: $output .= FS::$iMgr->printError("err-conn-fail"); break;
+								case 2: $output .= FS::$iMgr->printError("err-auth-fail"); break;
+								case 3: $output .= FS::$iMgr->printError("err-enable-auth-fail"); break;
+								case NULL: $output .= FS::$iMgr->printError("err-not-implemented"); break; 
 							}	
 							return $output;
 						}
@@ -301,7 +301,7 @@
 			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$device."'");
 			$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$dip)) { 
-				return FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+				return FS::$iMgr->printError("err-no-credentials");
 			}
 			if (!FS::isAjaxCall()) {
 				FS::$iMgr->showReturnMenu(true);
@@ -337,7 +337,7 @@
 				$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
 			} else {
 				if ($dip == NULL) {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-device"));
+					$output .= FS::$iMgr->printError("err-no-device");
 					return $output;
 				}
 
@@ -346,7 +346,7 @@
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswmodules") &&
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswdetails") && 
 						!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswdetails")) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						$output .= FS::$iMgr->printError("err-no-rights");
 						return $output;
 					}
 
@@ -823,7 +823,7 @@
 							FS::$iMgr->h3("title-retag");
 							
 						if ($err && $err == 1) {
-							$output .= FS::$iMgr->printError($this->loc->s("err-one-bad-value")." !");
+							$output .= FS::$iMgr->printError("err-one-bad-value");
 						}
 						$output .= FS::$iMgr->cbkForm("11&d=".$device).
 							$this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />".
@@ -926,7 +926,7 @@
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_readswvlans") && 
                                         	!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_readswvlans")) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-rights"));
+						$output .= FS::$iMgr->printError("err-no-rights");
 						return $output;
 					}
 					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
@@ -955,7 +955,7 @@
 						FS::$iMgr->jsSortTable("tvlanList");
 					}
 					else
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-vlan")." !");
+						$output .= FS::$iMgr->printError("err-no-vlan");
 					return $output;	
 				}
 				else if ($showmodule == 6) {
@@ -1151,12 +1151,12 @@
 						FS::$iMgr->jsSortTable("tportList");
 					}
 					else
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-device"));
+						$output .= FS::$iMgr->printError("err-no-device");
 					}
 					else if ($showmodule == 7) {
 						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_sshpwd") && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshpwd")) {
-							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+							return FS::$iMgr->printError("err-no-rights");
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						$output .= $this->loc->s("ssh-link-state").": ";
@@ -1178,12 +1178,12 @@
 					else if ($showmodule == 8) {
 						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowstart") && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowstart")) {
-							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+							return FS::$iMgr->printError("err-no-rights");
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
-								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7",$this->loc->s("Go")));
+								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7",$this->loc->s("Go")),true);
 							return $output;
 						}
 					
@@ -1193,10 +1193,10 @@
 							$stdio = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
 							if (FS::$secMgr->isNumeric($stdio) && $stdio > 0) {
 								switch($stdio) {
-									case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
-									case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
-									case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
-									default: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+									case 1: return FS::$iMgr->printError("err-conn-fail"); break;
+									case 2: return FS::$iMgr->printError("err-auth-fail"); break;
+									case 3: return FS::$iMgr->printError("err-enable-auth-fail"); break;
+									default: return FS::$iMgr->printError("err-not-implemented"); break; 
 								}	
 						}
 						$output .= "<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->showSSHStartCfg())."</pre>";
@@ -1205,12 +1205,12 @@
 					else if ($showmodule == 9) {
 						if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_sshshowrun") && 
 							!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_sshshowrun")) {
-							return FS::$iMgr->printError($this->loc->s("err-no-rights"));
+							return FS::$iMgr->printError("err-no-rights");
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {
 							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
-								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")));
+								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")),true);
 							return $output;
 						}
 					
@@ -1220,10 +1220,10 @@
 							$ret = $this->devapi->connectToDevice($dip,$sshuser,base64_decode($sshpwd),base64_decode($enablepwd));
 							if (FS::$secMgr->isNumeric($ret) && $ret > 0) {
 								switch($ret) {
-									case 1: return FS::$iMgr->printError($this->loc->s("err-conn-fail")); break;
-									case 2: return FS::$iMgr->printError($this->loc->s("err-auth-fail")); break;
-									case 3: return FS::$iMgr->printError($this->loc->s("err-enable-auth-fail")); break;
-									case NULL: return FS::$iMgr->printError($this->loc->s("err-not-implemented")); break; 
+									case 1: return FS::$iMgr->printError("err-conn-fail"); break;
+									case 2: return FS::$iMgr->printError("err-auth-fail"); break;
+									case 3: return FS::$iMgr->printError("err-enable-auth-fail"); break;
+									case NULL: return FS::$iMgr->printError("err-not-implemented"); break; 
 								}	
 							}
 							else 
@@ -1231,7 +1231,7 @@
 						}
 					}
 					else {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-tab"));
+						$output .= FS::$iMgr->printError("err-no-tab");
 					}
 				}
 				return $output;
@@ -1303,10 +1303,10 @@
 				$output = "";
 				$err = FS::$secMgr->checkAndSecuriseGetData("err");
 				switch($err) {
-					case 1: $output .= FS::$iMgr->printError($this->loc->s("err-some-backup-fail")); break;
-					case 2: $output .= FS::$iMgr->printError($this->loc->s("err-some-field-missing")); break;
-					case 3: $output .= FS::$iMgr->printError($this->loc->s("err-no-rights")); break;
-					case -1: $output .= FS::$iMgr->printSuccess($this->loc->s("done-with-success")); break;
+					case 1: $output .= FS::$iMgr->printError("err-some-backup-fail"); break;
+					case 2: $output .= FS::$iMgr->printError("err-some-field-missing"); break;
+					case 3: $output .= FS::$iMgr->printError("err-no-rights"); break;
+					case -1: $output .= FS::$iMgr->printSuccess("done-with-success"); break;
 					default: break;
 				}
 
@@ -1399,7 +1399,7 @@
 				}
 
 				if ($foundsw == 0 && $foundwif == 0) {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-device2"));
+					$output .= FS::$iMgr->printError("err-no-device2");
 				}
 
 				return $output;
@@ -1649,7 +1649,7 @@
 						$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 						if (!$device) {
 							$this->log(2,"Some fields are missing (vlan replacement, portlist)");
-							echo FS::$iMgr->printError($this->loc->s("err-no-device"));
+							echo FS::$iMgr->printError("err-no-device");
 							return;
 						}
 
@@ -1657,13 +1657,13 @@
 						$dip = $this->devapi->getDeviceIP();
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+							echo FS::$iMgr->printError("err-no-credentials");
 							return;	
 						}
 	
 						if (!$vlan || !FS::$secMgr->isNumeric($vlan)) {
 							$this->log(2,"Some fields are missing/wrong (vlan replacement, portlist)");
-							echo FS::$iMgr->printError($this->loc->s("err-vlan-fail")." !");
+							echo FS::$iMgr->printError("err-vlan-fail");
 							return;
 						}
 	
@@ -1676,7 +1676,7 @@
 							echo "</ul>";
 						}
 						else
-							FS::$iMgr->printError($this->loc->s("err-vlan-not-on-device"));
+							FS::$iMgr->printError("err-vlan-not-on-device");
 						return;
 					case 11: // Vlan replacement
 						$old = FS::$secMgr->checkAndSecurisePostData("oldvl");
@@ -1711,13 +1711,13 @@
 						if (!$device || !$trmode || ($trmode != 1 && $trmode != 2 && $trmode != 4 && $trmode != 5) ||
 							!$sip || !FS::$secMgr->isIP($sip) || !$filename || strlen($filename) == 0 || !$io || ($io != 1 && $io != 2)) {
 							$this->log(2,"Some fields are missing/wrong (backup statup-config)");
-							echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
+							echo FS::$iMgr->printError("err-bad-datas");
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+							echo FS::$iMgr->printError("err-no-credentials");
 							return;	
 						}
 						if ($trmode == 2 || $trmode == 4 || $trmode == 5) {
@@ -1725,7 +1725,7 @@
 							$password = FS::$secMgr->checkAndSecurisePostData("srvpwd");
 							if (!$username || $username == "" || !$password || $password == "") {
 								$this->log(2,"Some fields are missing/wrong (backup startup-confi)");
-								echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
+								echo FS::$iMgr->printError("err-bad-datas");
 								return;
 							}
 							if ($io == 1) {
@@ -1748,7 +1748,7 @@
 							}
 						} else {
 							$this->log(2,"Invalid export type '".$trmode."'");
-							FS::$iMgr->printError($this->loc->s("err-invalid-export"));
+							FS::$iMgr->printError("err-invalid-export");
 						}
 						return;
 					/*
@@ -1759,13 +1759,13 @@
 						$saveid = FS::$secMgr->checkAndSecuriseGetData("saveid");
 						if (!$device || !$saveid || !FS::$secMgr->isNumeric($saveid)) {
 							$this->log(2,"Some fields are missing/wrong (verify backup state)");
-							echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
+							echo FS::$iMgr->printError("err-bad-datas");
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+							echo FS::$iMgr->printError("err-no-credentials");
 							return;	
 						}
 						echo $this->devapi->getCopyState($saveid);
@@ -1775,13 +1775,13 @@
 						$saveid = FS::$secMgr->checkAndSecuriseGetData("saveid");
 						if (!$device || !$saveid || !FS::$secMgr->isNumeric($saveid)) {
 							$this->log(2,"Some fields are missing/wrong (verify backup error)");
-							echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
+							echo FS::$iMgr->printError("err-bad-datas");
 							return;
 						}
 						$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+							echo FS::$iMgr->printError("err-no-credentials");
 							return;	
 						}
 						$err = $this->devapi->getCopyError($saveid);
@@ -1804,14 +1804,14 @@
 						$device = FS::$secMgr->checkAndSecuriseGetData("d");
 						if (!$device) {
 							$this->log(2,"Some fields are missing/wrong (restore startup-config)");
-							echo FS::$iMgr->printError($this->loc->s("err-bad-datas")." !");
+							echo FS::$iMgr->printError("err-bad-datas");
 							return;
 						}
 						$this->devapi->setDevice($device);
 						$dip = $this->devapi->getDeviceIP();
 						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-							echo FS::$iMgr->printError($this->loc->s("err-no-credentials"));
+							echo FS::$iMgr->printError("err-no-credentials");
 							return;	
 						}
 						$this->log(0,"Launch restore startup-config for device '".$device."'");

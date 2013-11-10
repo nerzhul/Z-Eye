@@ -28,7 +28,7 @@
 			$output = "";
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 3: $output .= FS::$iMgr->printError($this->loc->s("fail-cron-wr")); break;
+				case 3: $output .= FS::$iMgr->printError("fail-cron-wr"); break;
 			}
 			$output .= $this->showMainConf();
 			return $output;

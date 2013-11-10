@@ -69,7 +69,7 @@
 				$output .= "</table>";
 				FS::$iMgr->jsSortTable("tlogList");
 			}
-			else $output .= FS::$iMgr->printError($this->loc->s("err-no-logs"));
+			else $output .= FS::$iMgr->printError("err-no-logs");
 			return $output;
 		}
 

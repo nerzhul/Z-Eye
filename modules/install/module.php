@@ -42,7 +42,7 @@
 			else {
 				$file = fopen(dirname(__FILE__)."/../../config/LOCK","w");
 				if (file_exists(dirname(__FILE__)."/../../config/LOCK") && !$file) {
-					$output .= FS::$iMgr->printError($this->loc->s("err-lock-write"));
+					$output .= FS::$iMgr->printError("err-lock-write");
 					return $output."</div>";
 				}
 				fwrite($file,"1");
@@ -113,7 +113,7 @@
 					$output .= $this->loc->s("text-finish")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Finish"),"loadStep3();")."</center>";
 					break;	
 				default:
-					return FS::$iMgr->printError($this->loc->s("err-step-invalid"));
+					return FS::$iMgr->printError("err-step-invalid");
 			}
 			return $output;
 		}

@@ -261,8 +261,12 @@
 						$output .= "<tr><td>".$data["timestamp"]."</td><td>".long2ip($data["ip_src"]).":".$data["layer4_sport"]."</td><td>".long2ip($data["ip_dst"]).":".$data["layer4_dport"].
 							"</td><td>".$data["sig_name"]."</td></tr>";
 					}
-					if ($found) $output .= "</table>";
-					else $output .= FS::$iMgr->printError($this->loc->s("No-alert-found"));
+					if ($found) {
+						$output .= "</table>";
+					}
+					else {
+						$output .= FS::$iMgr->printError("No-alert-found");
+					}
 				}
 			}
 			return $output;

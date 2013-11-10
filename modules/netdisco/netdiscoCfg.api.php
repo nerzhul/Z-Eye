@@ -32,8 +32,9 @@
 			$netdiscoCfg["snmptimeout"] = 1;
 			$netdiscoCfg["snmptry"] = 3;
 
-			if(!$file)
-				return FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf");
+			if(!$file) {
+				return FS::$iMgr->printError($this->loc->s("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf", true);
+			}
 
 			foreach ($file as $lineNumber => $buf) {
 				$buf = trim($buf);

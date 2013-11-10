@@ -52,7 +52,7 @@
 					"<div id=\"subnetrights\"></div>";
 			}
 			else {
-				return FS::$iMgr->printError($this->loc->s("err-no-subnet"));
+				return FS::$iMgr->printError("err-no-subnet");
 			}
 
 			return $output;
@@ -401,7 +401,7 @@
 				case "rangemgmt": return $this->loc->s("right-rangemgmt");
 				case "ipmgmt": return $this->loc->s("right-ipmgmt");
 				case "history": return $this->loc->s("right-history");
-				default: return FS::$iMgr->printError($this->loc->s("err-not-found"));
+				default: return FS::$iMgr->printError("err-not-found");
 			}
 		}
 

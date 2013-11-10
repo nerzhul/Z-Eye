@@ -50,7 +50,7 @@
 
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			$this->Load($name);
 
@@ -327,7 +327,7 @@
 			
 			$states = (new icingaBroker())->readStates();
 			if (!isset($states[$this->name])) {
-				return FS::$iMgr->printError($this->loc->s("err-no-sensor"));
+				return FS::$iMgr->printError("err-no-sensor");
 			}
 			
 			$totalSensors = 0;

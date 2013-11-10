@@ -42,7 +42,7 @@
 				$addr = FS::$secMgr->checkAndSecuriseGetData("bck");
 				$type = FS::$secMgr->checkAndSecuriseGetData("type");
 				if (!$addr || $addr == "" || !$type || !FS::$secMgr->isNumeric($type)) {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-server-get")." !");
+					$output .= FS::$iMgr->printError("err-no-server-get");
 					return $output;
 				}
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","login,pwd,path","addr = '".$addr."' AND type = '".$type."'");
@@ -54,7 +54,7 @@
 					$spath = $data["path"];
 				}
 				else {
-					$output .= FS::$iMgr->printError($this->loc->s("err-bad-server")." !");
+					$output .= FS::$iMgr->printError("err-bad-server");
 					return $output;
 				}
 				$output .= FS::$iMgr->aLink($this->mid, $this->loc->s("Return"))."<br />";
@@ -62,8 +62,8 @@
 
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			switch($err) {
-				case 1: $output .= FS::$iMgr->printError($this->loc->s("err-miss-bad-fields")." !"); break;
-				case 3: if ($create) $output .= FS::$iMgr->printError($this->loc->s("err-server-exist")." !"); break;
+				case 1: $output .= FS::$iMgr->printError("err-miss-bad-fields"); break;
+				case 3: if ($create) $output .= FS::$iMgr->printError("err-server-exist"); break;
 			}
 
 			$output .= FS::$iMgr->js("function arangeform() {
@@ -139,7 +139,7 @@
 			if ($found)
 				$output .= $tmpoutput."</table>";
 			else
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-backup-found")." !");
+				$output .= FS::$iMgr->printError("err-no-backup-found");
 			return $output;
 
 		}
@@ -380,7 +380,7 @@
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-                                        "<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")));
+                                        "<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")),true);
 			}
 			return $output;
 		}
@@ -595,7 +595,7 @@
 				case "portmod_dhcpsnooping": return $this->loc->s("Portmod-dhcpsnooping");
 				case "dhcpsnmgmt": return $this->loc->s("DHCP-Snooping-mgmt");
 				case "rmswitch": return $this->loc->s("Remove-Switch");
-				default: return FS::$iMgr->printError($this->loc->s("err-not-found"));
+				default: return FS::$iMgr->printError("err-not-found");
 			}
 		}
 

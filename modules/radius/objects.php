@@ -26,14 +26,14 @@
 		
 		public function showForm($groupname = "") {
 			if (!$this->canWrite()) {
-				return FS::$iMgr->printError($this->loc->s("err-no-right"));
+				return FS::$iMgr->printError("err-no-right");
 			}
 			
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
 			
 			$radSQLMgr = $this->connectToRaddb($radalias);
 			if (!$radSQLMgr) {
-				return FS::$iMgr->printError($this->loc->s("err-db-conn-fail"));
+				return FS::$iMgr->printError("err-db-conn-fail");
 			}
 			
 			if ($groupname) {
@@ -43,7 +43,7 @@
 					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
 				}
 				if (!$groupexist) {
-					return FS::$iMgr->printError(sprintf($this->loc->s("err-group-not-exists"),$groupname));
+					return FS::$iMgr->printError(sprintf($this->loc->s("err-group-not-exists"),$groupname),true);
 				}
 				
 				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");

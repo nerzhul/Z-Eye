@@ -44,7 +44,7 @@
 		private function editGroup($gname) {
 			$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 			if (!$gid) {
-				return FS::$iMgr->printError($this->loc->s("err-not-exist"));
+				return FS::$iMgr->printError("err-not-exist");
 			}
 
 			FS::$iMgr->showReturnMenu(true);
