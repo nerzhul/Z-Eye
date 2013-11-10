@@ -904,7 +904,7 @@
 
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
-						$this->log(2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
+						$this->log(2,"Unable to connect to radius database ".$radalias);
 						FS::$iMgr->ajaxEcho("err-db-conn-fail");
 						return;
 					}
