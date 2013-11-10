@@ -996,8 +996,8 @@
 						}
 					}
 					
-					$idxRep = FS::$dbMgr->GetMax($this->raddbinfos["tradgrprep"],"id");
-					$idxChk = FS::$dbMgr->GetMax($this->raddbinfos["tradgrpchk"],"id");
+					$idxRep = $radSQLMgr->GetMax($this->raddbinfos["tradgrprep"],"id");
+					$idxChk = $radSQLMgr->GetMax($this->raddbinfos["tradgrpchk"],"id");
 					
 					foreach ($attrTab as $attrKey => $attrValue) {
 						if (!isset($attrValue["op"])) {
