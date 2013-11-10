@@ -69,7 +69,8 @@
 					if (!$found) {
 						$found = true;
 					}
-					$netarray[$data["netid"]] = $data["netmask"];
+					$netarray[$data["netid"]] = sprintf("%s/%s (%s)",
+						$data["netid"],$data["netmask"],$this->loc->s("in-cache"));
 				}
 			}
 			
@@ -81,8 +82,16 @@
 					$found = true;
 				}
 				
-				$netarray[$data[$this->sqlAttrId]] = $data[$this->sqlAttrId]."/".$data["netmask"].
-					" (VLAN ".$data["vlanid"]." - ".$data["subnet_short_name"].")";
+				if ($data["vlanid"] != 0) {
+					$netarray[$data[$this->sqlAttrId]] = sprintf("%s/%s (VLAN %s - %s)",
+						$data[$this->sqlAttrId],$data["netmask"],
+						$data["vlanid"],$data["subnet_short_name"]);
+				}
+				else {
+					$netarray[$data[$this->sqlAttrId]] = sprintf("%s/%s (%s)",
+						$data[$this->sqlAttrId],$data["netmask"],
+						$data["subnet_short_name"]);
+				}
 			}
 			
 			ksort($netarray);

@@ -28,13 +28,13 @@
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("Search"));
 			$autosearch = FS::$secMgr->checkAndSecuriseGetData("term");
 			if ($autosearch) {
 				return $this->findRefsAndShow($autosearch,true);
 			}
 			else {
-					$search = FS::$secMgr->checkAndSecurisePostData("s");
+				FS::$iMgr->setTitle($this->loc->s("Search"));
+				$search = FS::$secMgr->checkAndSecurisePostData("s");
 				if (!$search) {
 					$search = FS::$secMgr->checkAndSecuriseGetData("s");
 				}
