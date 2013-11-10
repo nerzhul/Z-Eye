@@ -42,7 +42,7 @@
 			else {
 				$file = fopen(dirname(__FILE__)."/../../config/LOCK","w");
 				if (file_exists(dirname(__FILE__)."/../../config/LOCK") && !$file) {
-					$output .= FS::$iMgr->printError($this->lock->s("err-lock-write"));
+					$output .= FS::$iMgr->printError($this->loc->s("err-lock-write"));
 					return $output."</div>";
 				}
 				fwrite($file,"1");
