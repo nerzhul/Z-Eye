@@ -697,138 +697,6 @@
 			return $output;
 		}
 
-		private function editRadiusEntry($radSQLMgr,$radentry,$radentrytype) {
-			$output = "";
-			FS::$iMgr->showReturnMenu(true);
-
-			if ($radentrytype == 1) {
-				$userexist = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$radentry."'");
-				if (!$userexist) {
-					$output .= FS::$iMgr->printError("err-no-user");
-					return $output;
-				}
-				$userpwd = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"value",
-					"username = '".$radentry."' AND op = ':=' AND attribute IN('Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')");
-				if ($userpwd) {
-					$upwdtype = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"attribute","username = '".$radentry."' AND op = ':=' AND value = '".$userpwd."'");
-				}
-				$grpcount = $radSQLMgr->Count($this->raddbinfos["tradusrgrp"],"groupname","username = '".$radentry."'");
-				$attrcount = $radSQLMgr->Count($this->raddbinfos["tradcheck"],"username","username = '".$radentry."'");
-				$attrcount += $radSQLMgr->Count($this->raddbinfos["tradreply"],"username","username = '".$radentry."'");
-				FS::$iMgr->js("var grpidx = ".$grpcount."; 
-					function addGrpForm() {
-						$('<li class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'",array("label" => "Profil")).
-							FS::$iMgr->selElmt("","none").$this->addGroupList($radSQLMgr).
-							"</select> <a onclick=\"javascript:delGrpElmt('+grpidx+');\">".
-							FS::$iMgr->img("styles/images/cross.png",15,15).
-							"</a></li>').insertBefore('#formactions');
-						grpidx++;
-					}
-					function delGrpElmt(grpidx) {
-						$('.ugroupli'+grpidx).remove();
-					}
-					var attridx = ".$attrcount."; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<li class=\"attrli'+attridx+'\">".
-					FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Valeur".
-					FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." Op ".FS::$iMgr->select("attrop'+attridx+'").
-					FS::$iMgr->raddbCondSelectElmts().
-					"</select> Cible ".FS::$iMgr->select("attrtarget'+attridx+'").
-					FS::$iMgr->selElmt("check",1).
-					FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
-					FS::$iMgr->img("styles/images/cross.png",15,15).
-					"</a></li>').insertBefore('#formactions');
-					$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
-					$('#attrtarget'+attridx).val(attrtarget); attridx++;};
-					function delAttrElmt(attridx) {
-						$('.attrli'+attridx).remove();
-				}");
-
-				if (FS::$secMgr->isMacAddr($radentry) || preg_match('#^[0-9A-F]{12}$#i', $radentry)) {
-					$utype = 2;
-				}
-				else {
-					$utype = 1;
-				}
-				
-				$formoutput = FS::$iMgr->cbkForm("2").
-					FS::$iMgr->hidden("uedit",1).
-					FS::$iMgr->hidden("ra",$this->raddbinfos["radalias"]).
-					"<ul class=\"ulform\"><li>".FS::$iMgr->hidden("utype",$utype)."<b>".$this->loc->s("User-type").": </b>".
-					($utype == 1 ? "Normal" : $this->loc->s("Mac-addr")).
-					"</li><li>".
-					FS::$iMgr->hidden("username",$radentry)."</li>";
-				if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],$this->raddbinfos["dbname"])) {
-					$creadate = $radSQLMgr->GetOneData(PGDbConfig::getDbPrefix()."radusers","creadate","username='".$radentry."'");
-					$formoutput .= "<li><b>".$this->loc->s("Creation-date").": </b>".$creadate."</li>";
-				}
-				if ($utype == 1) {
-					$formoutput .= "<li><fieldset id=\"userdf\" style=\"border:0;\">";
-					$pwd = $radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"value","username = '".$radentry."' AND attribute = 'Cleartext-Password' AND op = ':='");
-					$formoutput .= FS::$iMgr->password("pwd",$pwd,$this->loc->s("Password"))."<br />".
-					FS::$iMgr->select("upwdtype",array("label" => $this->loc->s("Pwd-Type"))).
-					FS::$iMgr->selElmt("Cleartext-Password",1,($upwdtype && $upwdtype == "Cleartext-Password" ? true : false)).
-					FS::$iMgr->selElmt("User-Password",2,($upwdtype && $upwdtype == "User-Password" ? true : false)).
-					FS::$iMgr->selElmt("Crypt-Password",3,($upwdtype && $upwdtype == "Crypt-Password" ? true : false)).
-					FS::$iMgr->selElmt("MD5-Password",4,($upwdtype && $upwdtype == "MD5-Password" ? true : false)).
-					FS::$iMgr->selElmt("SHA1-Password",5,($upwdtype && $upwdtype == "SHA1-Password" ? true : false)).
-					FS::$iMgr->selElmt("CHAP-Password",6,($upwdtype && $upwdtype == "CHAP-Password" ? true : false)).
-					"</select></fieldset></li>";
-				}
-				
-				$query = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"groupname","username = '".$radentry."'");
-				$grpidx = 0;
-				while ($data = $radSQLMgr->Fetch($query)) {
-					$formoutput .= "<li class=\"ugroupli".$grpidx."\">".FS::$iMgr->select("ugroup".$grpidx,array("label" => $this->loc->s("Profil"))).
-					$this->addGroupList($radSQLMgr,$data["groupname"])."</select> <a onclick=\"javascript:delGrpElmt(".$grpidx.");\">".
-					FS::$iMgr->img("styles/images/cross.png",15,15).
-					"</a></li>";
-					$grpidx++;
-				}
-				$attridx = 0;
-				$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"attribute,op,value","username = '".$radentry."' AND attribute <> 'Cleartext-Password'");
-				while ($data = $radSQLMgr->Fetch($query)) {
-					if (!($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept")) {
-						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
-						FS::$iMgr->select("attrop".$attridx).
-						FS::$iMgr->raddbCondSelectElmts($data["op"]).
-						"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
-						FS::$iMgr->selElmt("check",1,true).
-						FS::$iMgr->selElmt("reply",2)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
-						FS::$iMgr->img("styles/images/cross.png",15,15)."</a></li>";
-						$attridx++;
-					}
-				}
-				
-				$query = $radSQLMgr->Select($this->raddbinfos["tradreply"],"attribute,op,value","username = '".$radentry."'");
-				while ($data = $radSQLMgr->Fetch($query)) {
-						$formoutput .= "<li class=\"attrli".$attridx."\">".FS::$iMgr->input("attrkey".$attridx,$data["attribute"],20,40,"Name")." Op ".
-						FS::$iMgr->select("attrop".$attridx).
-						FS::$iMgr->raddbCondSelectElmts($data["op"]).
-						"</select> Valeur".FS::$iMgr->input("attrval".$attridx,$data["value"],10,40)." Cible ".FS::$iMgr->select("attrtarget".$attridx).
-						FS::$iMgr->selElmt("check",1).
-						FS::$iMgr->selElmt("reply",2,true)."</select><a onclick=\"javascript:delAttrElmt(".$attridx.");\">".
-						FS::$iMgr->img("styles/images/cross.png",15,15)."</a></li>";
-						$attridx++;
-				}
-
-				// if expiration module is activated, show the options
-				if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],
-					$this->raddbinfos["dbname"])) {
-					$expdate = $radSQLMgr->GetOneData(PGDbConfig::getDbPrefix()."radusers","expiration","username='".$radentry."'");
-					$startdate = $radSQLMgr->GetOneData(PGDbConfig::getDbPrefix()."radusers","startdate","username='".$radentry."'");
-					$formoutput .= "<li>".FS::$iMgr->calendar("starttime",$startdate ? date("d-m-y",strtotime($startdate)) : "",$this->loc->s("Acct-start-date"))."</li>";
-					$formoutput .= "<li>".FS::$iMgr->calendar("expiretime",$expdate ? date("d-m-y",strtotime($expdate)) : "",$this->loc->s("Acct-expiration-date"))."</li>";
-				}
-				$formoutput .= "<li id=\"formactions\">".FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
-				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','')").
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</form></li></ul>";
-				$output .= $formoutput;
-			}
-			else {
-				$output .= FS::$iMgr->printError("err-invalid-entry");
-			}
-			return $output;
-		}
-
 		private function addGroupList($radSQLMgr,$selectEntry="") {
 			$output = "";
 			$groups=array();
@@ -906,19 +774,12 @@
 					$rgObj = new radiusGroup();
 					return $rgObj->showForm($radentry);
 				case 6:
-					$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
-					
-					$radSQLMgr = $this->connectToRaddb2($radalias);
-					if (!$radSQLMgr) {
-						$this->log(2,"Unable to connect to radius database ".$raddb."@".$radhost.":".$radport);
-						return $this->loc->s("err-db-conn-fail");
-					}
-					
 					$radentry = FS::$secMgr->checkAndSecuriseGetData("radentry");
 					if (!$radentry) {
 						return $this->loc->s("err-bad-datas");
 					}
-					return $this->editRadiusEntry($radSQLMgr,$radentry,1);
+					$ruObj = new radiusUser();
+					return $ruObj->showForm($radentry);
 				default: return;
 			}
 		}
@@ -961,7 +822,7 @@
 					}
 
 					// For Edition Only, don't delete acct records
-					$edit = FS::$secMgr->checkAndSecurisePostData("uedit");
+					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if ($edit == 1) {
 						$radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
 						$radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
@@ -985,14 +846,6 @@
 							}
 						}
 						else {
-							if ($utype == 2) {
-								if (!FS::$secMgr->isMacAddr($username) && !preg_match('#^[0-9A-F]{12}$#i', $username)) {
-									$this->log(2,"Wrong datas for user edition");
-									FS::$iMgr->ajaxEcho("err-bad-datas");
-			                        return;
-								}
-								$username = preg_replace("#[:]#","",$username);
-							}
 							$attr = "Auth-Type";
 							$value = "Accept";
 						}
@@ -1593,8 +1446,12 @@
 						$radSQLMgr->BeginTr();
 						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
 							"'','".$username."','Cleartext-Password',':=','".$password."'");
-						/*$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate",
-							"'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");*/
+							
+						if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],$this->raddbinfos["dbname"])) {
+							$radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration,name,surname,startdate,creator,creadate",
+								"'".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
+						}
+						
 						$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
 						$radSQLMgr->CommitTr();
 

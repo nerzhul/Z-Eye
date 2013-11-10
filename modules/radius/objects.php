@@ -24,7 +24,7 @@
 			$this->writeRight = "rule-write-datas";
 		}
 		
-		public function showForm($groupname = "") {
+		public function showForm($username = "") {
 			if (!$this->canWrite()) {
 				return FS::$iMgr->printError("err-no-right");
 			}
@@ -34,6 +34,24 @@
 			$connOK = $this->connectToRaddb($radalias);
 			if (!$connOK) {
 				return FS::$iMgr->printError("err-db-conn-fail");
+			}
+			
+			$pwdtype = "";
+			$utype = 1;
+			
+			if ($username) {
+				$userexist = $this->radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$username."'");
+				if (!$userexist) {
+					return FS::$iMgr->printError("err-no-user");
+				}
+				$userpwd = $this->radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"value",
+					"username = '".$username."' AND op = ':=' AND attribute IN('Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')");
+				if ($userpwd) {
+					$pwdtype = $this->radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"attribute","username = '".$username."' AND op = ':=' AND value = '".$userpwd."'");
+				}
+				$grpcount = $this->radSQLMgr->Count($this->raddbinfos["tradusrgrp"],"groupname","username = '".$username."'");
+				$attrcount = $this->radSQLMgr->Count($this->raddbinfos["tradcheck"],"username","username = '".$username."'");
+				$attrcount += $this->radSQLMgr->Count($this->raddbinfos["tradreply"],"username","username = '".$username."'");
 			}
 			
 			FS::$iMgr->js("function changeUForm() {
@@ -46,12 +64,13 @@
 				else if (document.getElementsByName('utype')[0].value == 3) {
 					$('#userdf').hide();
 				}
-			}; var grpidx = 0; function addGrpForm() {
+			}; var grpidx = 0; function addGrpForm(grpval='') {
 				$('<span class=\"ugroupli'+grpidx+'\">".FS::$iMgr->select("ugroup'+grpidx+'").
 					FS::$iMgr->selElmt("","none").$this->addGroupList()."</select>
 				<a onclick=\"javascript:delGrpElmt('+grpidx+');\">".
 				FS::$iMgr->img("styles/images/cross.png",15,15).
 				"</a><br /></span>').insertBefore('#radusrgrplist');
+				if(grpval != '') $('#ugroup'+grpidx).val(grpval);
 				grpidx++;
 			}
 			function delGrpElmt(grpidx) {
@@ -65,41 +84,89 @@
 			FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
 			FS::$iMgr->img("styles/images/cross.png",15,15).
 			"</a><br /></span>').insertBefore('#frmattrid');
-			$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(attrop);
+			$('#attrkey'+attridx).val(attrkey); $('#attrval'+attridx).val(attrval); $('#attrop'+attridx).val(''+attrop);
 			$('#attrtarget'+attridx).val(attrtarget); attridx++;};
 			function delAttrElmt(attridx) {
 				$('.attrli'+attridx).remove();
 			}");
+			
+			if ($username && (FS::$secMgr->isMacAddr($username) || preg_match('#^[0-9A-F]{12}$#i', $username))) {
+				$utype = 2;
+			}
+			
+			// Load attributes and groups
+			if ($username) {
+				$query = $this->radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"groupname","username = '".$username."'");
+				while ($data = $this->radSQLMgr->Fetch($query)) {
+					FS::$iMgr->js(sprintf("addGrpForm('%s');",$data["groupname"]));
+				}
+				$query = $this->radSQLMgr->Select($this->raddbinfos["tradcheck"],"attribute,op,value","username = '".$username."'");
+				while ($data = $this->radSQLMgr->Fetch($query)) {
+					// If mac addr, don't show the attribute for MAB
+					if ($utype == 2 && $data["attribute"] == "Auth-Type" && $data["op"] == ":=" && $data["value"] == "Accept") {
+						continue;
+					}
+					FS::$iMgr->js("addAttrElmt('".$data["attribute"]."','".$data["value"]."','".$data["op"]."','1');");
+				}
 
-			$tempSelect = FS::$iMgr->select("utype",array("js" => "changeUForm()",)).
-				FS::$iMgr->selElmt($this->loc->s("User"),1).
-				FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2).
-				"</select>";
+				$query = $this->radSQLMgr->Select($this->raddbinfos["tradreply"],"attribute,op,value","username = '".$username."'");
+				while ($data = $this->radSQLMgr->Fetch($query)) {
+					FS::$iMgr->js("addAttrElmt('".$data["attribute"]."','".$data["value"]."','".$data["op"]."','2');");
+				}
+			}
+
+			if ($username) {
+				if ($utype == 1) {
+					$tempSelect = $this->loc->s("User").FS::$iMgr->hidden("utype",$utype);
+				}
+				else if ($utype == 2) {
+					$tempSelect = $this->loc->s("Mac-addr").FS::$iMgr->hidden("utype",$utype);
+				}
+			}
+			else {
+				$tempSelect = FS::$iMgr->select("utype",array("js" => "changeUForm()",)).
+					FS::$iMgr->selElmt($this->loc->s("User"),1,$utype == 1).
+					FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2,$utype == 2).
+					"</select>";
+			}
 				
-			$pwdSelect = FS::$iMgr->select("upwdtype").
-				FS::$iMgr->selElmt("Cleartext-Password",1).
-				FS::$iMgr->selElmt("User-Password",2).
-				FS::$iMgr->selElmt("Crypt-Password",3).
-				FS::$iMgr->selElmt("MD5-Password",4).
-				FS::$iMgr->selElmt("SHA1-Password",5).
-				FS::$iMgr->selElmt("CHAP-Password",6).
-				"</select>";
+			if ($utype == 1) {
+				$pwdSelect = FS::$iMgr->select("upwdtype").
+					FS::$iMgr->selElmt("Cleartext-Password",1,$pwdtype == 1).
+					FS::$iMgr->selElmt("User-Password",2,$pwdtype == 2).
+					FS::$iMgr->selElmt("Crypt-Password",3,$pwdtype == 3).
+					FS::$iMgr->selElmt("MD5-Password",4,$pwdtype == 4).
+					FS::$iMgr->selElmt("SHA1-Password",5,$pwdtype == 5).
+					FS::$iMgr->selElmt("CHAP-Password",6,$pwdtype == 6).
+					"</select>";
+			}
 
-			return FS::$iMgr->cbkForm("2").
+			$output = FS::$iMgr->cbkForm("2").
 				"<table>".FS::$iMgr->idxLines(array(
-				array("User","username",array("type" => "idxedit", "value" => "",
-						"length" => "40", "edit" => "" != "")),
-				array("Auth-Type","",array("type" => "raw", "value" => $tempSelect)),
-				array("Password","pwd",array("type" => "pwd")),
-				array("Pwd-Type","",array("type" => "raw", "value" => $pwdSelect)),
+				array("User","username",array("type" => "idxedit", "value" => $username,
+						"length" => "40", "edit" => $username != "")),
+				array("Auth-Type","",array("type" => "raw", "value" => $tempSelect))
+			));
+			
+			// Show this field only if not a Mac Addr
+			if ($utype == 1) {
+				$output .= FS::$iMgr->idxLines(array(
+					array("Password","pwd",array("type" => "pwd")),
+					array("Pwd-Type","",array("type" => "raw", "value" => $pwdSelect)),
+				));
+			}
+			
+			$output .= FS::$iMgr->idxLines(array(
 				array("Groups","",array("type" => "raw", "value" => "<span id=\"radusrgrplist\"></span>")),
 				array("Attributes","",array("type" => "raw", "value" => "<span id=\"frmattrid\"></span>")),
 			)).
-			"<tr><td colspan=\"2\">".
-			FS::$iMgr->hidden("ra",$radalias).
-			FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
-			FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','');").
-			FS::$iMgr->submit("",$this->loc->s("Save"))."</td></tr></table></form>";
+				"<tr><td colspan=\"2\">".
+				FS::$iMgr->hidden("ra",$radalias).
+				FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
+				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','');").
+				FS::$iMgr->submit("",$this->loc->s("Save"))."</td></tr></table></form>";
+			
+			return $output;
 		}
 	};
 	
