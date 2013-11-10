@@ -168,6 +168,152 @@
 			
 			return $output;
 		}
+		
+		public function Modify() {
+			$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
+			$utype = FS::$secMgr->checkAndSecurisePostData("utype");
+			$username = FS::$secMgr->checkAndSecurisePostData("username");
+			$upwd = FS::$secMgr->checkAndSecurisePostData("pwd");
+			$upwdtype = FS::$secMgr->checkAndSecurisePostData("upwdtype");
+
+			// Check all fields
+			if (!$username || $username == "" || !$utype || !FS::$secMgr->isNumeric($utype) ||
+				$utype < 1 || $utype > 3 || 
+				($utype == 1 && (!$upwd || $upwd == "" || !$upwdtype || $upwdtype < 1 || $upwdtype > 6))) {
+				$this->log(2,"Some fields are missing for user edition");
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+
+			// if type 2: must be a mac addr
+			if ($utype == 2 && (!FS::$secMgr->isMacAddr($username) && !preg_match('#^[0-9A-F]{12}$#i', $username))) {
+				$this->log(2,"Wrong datas for user edition");
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			
+			$connOK = $this->connectToRaddb($radalias);
+			if (!$connOK) {
+				$this->log(2,"Unable to connect to radius database '".$radalias."'");
+				FS::$iMgr->ajaxEcho("err-db-conn-fail");
+				return;
+			}
+
+			$this->radSQLMgr->BeginTr();
+			
+			// For Edition Only, don't delete acct records
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+			if ($edit == 1) {
+				$this->radSQLMgr->Delete($this->raddbinfos["tradcheck"],"username = '".$username."'");
+				$this->radSQLMgr->Delete($this->raddbinfos["tradreply"],"username = '".$username."'");
+				$this->radSQLMgr->Delete($this->raddbinfos["tradusrgrp"],"username = '".$username."'");
+				if ($this->hasExpirationEnabled()) {
+					$this->radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username = '".$username."'");
+				}
+			}
+			
+			$userexist = $this->radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$username."'");
+			if (!$userexist || $edit == 1) {
+				if ($utype == 1) {
+					switch($upwdtype) {
+						case 1: $attr = "Cleartext-Password"; $value = $upwd; break;
+						case 2: $attr = "User-Password"; $value = $upwd; break;
+						case 3: $attr = "Crypt-Password"; $value = crypt($upwd); break;
+						case 4: $attr = "MD5-Password"; $value = md5($upwd); break;
+						case 5: $attr = "SHA1-Password"; $value = sha1($upwd); break;
+						case 6: $attr = "CHAP-Password"; $value = $upwd; break;
+					}
+				}
+				else {
+					$attr = "Auth-Type";
+					$value = "Accept";
+				}
+				
+				// For pgsql compat
+				$maxIdChk = $this->radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
+				$maxIdChk++;
+				$maxIdRep = $this->radSQLMgr->GetMax($this->raddbinfos["tradreply"],"id");
+				$maxIdRep++;
+				
+				$this->radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'".$maxIdChk."','".$username."','".$attr."',':=','".$value."'");
+				foreach ($_POST as $key => $value) {
+				if (preg_match("#^ugroup#",$key)) {
+						$groupfound = $this->radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$value."'");
+						
+						if (!$groupfound) {
+							$groupfound = $this->radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$value."'");
+						}
+						
+						if ($groupfound) {
+							$usergroup = $this->radSQLMgr->GetOneData($this->raddbinfos["tradusrgrp"],"groupname","username = '".$username."' AND groupname = '".$value."'");
+							if (!$usergroup) {
+								$this->radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$value."','1'");
+							}
+						}
+					}
+				}
+
+				$attrTab = array();
+				foreach ($_POST as $key => $value) {
+					if (preg_match("#attrval#",$key)) {
+						$key = preg_replace("#attrval#","",$key);
+						if (!isset($attrTab[$key])) $attrTab[$key] = array();
+						$attrTab[$key]["val"] = $value;
+					}
+					else if (preg_match("#attrkey#",$key)) {
+						$key = preg_replace("#attrkey#","",$key);
+						if (!isset($attrTab[$key])) $attrTab[$key] = array();
+						$attrTab[$key]["key"] = $value;
+					}
+					else if (preg_match("#attrop#",$key)) {
+						$key = preg_replace("#attrop#","",$key);
+						if (!isset($attrTab[$key])) $attrTab[$key] = array();
+						$attrTab[$key]["op"] = $value;
+					}
+					else if (preg_match("#attrtarget#",$key)) {
+						$key = preg_replace("#attrtarget#","",$key);
+						if (!isset($attrTab[$key])) $attrTab[$key] = array();
+						$attrTab[$key]["target"] = $value;
+					}
+				}
+				foreach ($attrTab as $attrKey => $attrEntry) {
+					if (!isset($attrEntry["op"])) {
+						FS::$iMgr->ajaxEcho("err-bad-datas");
+						return;
+					}
+
+					if ($attrEntry["target"] == "2") {
+						$maxIdRep++;
+						$this->radSQLMgr->Insert($this->raddbinfos["tradreply"],"id,username,attribute,op,value","'".$maxIdRep."','".$username.
+							"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
+					}
+					else if ($attrEntry["target"] == "1") {
+						$maxIdChk++;
+						$this->radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value","'".$maxIdChk."','".$username.
+							"','".$attrEntry["key"]."','".$attrEntry["op"]."','".$attrEntry["val"]."'");
+					}
+				}
+
+				if ($this->hasExpirationEnabled($this->raddbinfos["addr"],$this->raddbinfos["port"],
+					$this->raddbinfos["dbname"])) {
+					$this->radSQLMgr->Delete(PGDbConfig::getDbPrefix()."radusers","username = '".$username."'");
+					$expiretime = FS::$secMgr->checkAndSecurisePostData("expiretime");
+					if ($expiretime) {
+						$this->radSQLMgr->Insert(PGDbConfig::getDbPrefix()."radusers","username,expiration","'".$username."','".date("y-m-d",strtotime($expiretime))."'");
+					}
+				}
+				
+			}
+			else {
+				$this->log(1,"Try to add user ".$username." but user already exists");
+				FS::$iMgr->ajaxEchoNC("err-exist");
+				return;
+			}
+			$this->radSQLMgr->CommitTr();
+			
+			$this->log(0,"User '".$username."' edited/created");
+			FS::$iMgr->redir("mod=".$this->mid."&ra=".$radalias,true);
+		}
 	};
 	
 	final class radiusGroup extends radiusObject {
@@ -283,6 +429,16 @@
 				}
 			}
 			return true;
+		}
+		
+		protected function hasExpirationEnabled() {
+			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_options",
+				"optval","optkey = 'rad_expiration_enable' AND addr = '".$this->raddbinfos["addr"].
+					"' AND port = '".$this->raddbinfos["port"].
+					"' AND dbname = '".$this->raddbinfos["dbname"]."'") == 1) {
+				return true;
+			}
+			return false;
 		}
 		
 		protected function addGroupList($selectEntry="") {
