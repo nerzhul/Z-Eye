@@ -1099,7 +1099,7 @@
 							FS::$iMgr->ajaxEchoNC("err-exist2");
 							return;
 						}
-						$this->log(0,"Mass import done (list:".$userlist." group: ".$group.")");
+						$this->log(0,"Mass import done (group: ".$group.")");
 					}
 					FS::$dbMgr->CommitTr();
 					FS::$iMgr->redir("mod=".$this->mid."&ra=".$radalias."&sh=3",true);
