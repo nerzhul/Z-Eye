@@ -36,9 +36,6 @@
 			$this->scheduleclass = NULL;
 		}
 		
-		public function handlePostDatas() {}
-		public function getIfaceElmt() {}
-		
 		public function setModuleId($mid) { $this->mid = $mid; }
 		public function getModuleId() { return $this->mid; }
 		public function getConfig() { return $this->conf; }
