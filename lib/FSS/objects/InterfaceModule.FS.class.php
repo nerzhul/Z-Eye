@@ -33,6 +33,7 @@
 			$this->locales = $locales;
 			$this->menu = "";
 			$this->menupriority = 0;
+			$this->scheduleclass = NULL;
 		}
 		
 		public function handlePostDatas() {}
@@ -49,8 +50,9 @@
 
 
 		protected $moduleclass;
-		protected $mid;
 		protected $rulesclass;
+		protected $scheduleclass;
+		protected $mid;
 		protected $locales;
 		protected $menu;
 		protected $menupriority;
