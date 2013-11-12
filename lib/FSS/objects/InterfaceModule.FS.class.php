@@ -30,29 +30,13 @@
 
 	abstract class InterfaceModule {
 		function __construct($locales) {
-			$this->locales = $locales;
-			$this->menu = "";
-			$this->menupriority = 0;
-			$this->scheduleclass = NULL;
+			
 		}
 		
-		public function setModuleId($mid) { $this->mid = $mid; }
-		public function getModuleId() { return $this->mid; }
-		public function getConfig() { return $this->conf; }
-		public function getModuleClass() { return $this->moduleclass; }
-		public function getRulesClass() { return $this->rulesclass; }
-		public function getLoc() { return $this->locales; }
-		public function getMenu() { return $this->menu; }
-		public function getMenuPriority() { return $this->menupriority; }
+		
 
 
-		protected $moduleclass;
-		protected $rulesclass;
-		protected $scheduleclass;
-		protected $mid;
-		protected $locales;
-		protected $menu;
-		protected $menupriority;
+		
 	};
 
 ?>

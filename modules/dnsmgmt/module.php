@@ -17,12 +17,19 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 	require_once(dirname(__FILE__)."/objects.php");
 
-	final class iDNSManager extends FSModule{
-		function __construct($locales) {
-			parent::__construct($locales);
+	if(!class_exists("iDNSManager")) {
+		
+	final class iDNSManager extends FSModule {
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lDNSManager();
+			$this->rulesclass = new rDNSMgmt($this->loc);
+			$this->menu = $this->loc->s("menu-name");
 			$this->modulename = "dnsmgmt";
 		}
 
@@ -539,4 +546,8 @@
 			}
 		}
 	};
+	
+	}
+	
+	$module = new iDNSManager();
 ?>

@@ -29,11 +29,14 @@
         */
 
 	abstract class FSModule {
-		function __construct($locales) {
-			$this->loc = $locales;
+		function __construct() {
+			$this->loc = "";
 			$this->modulename = "";
+			$this->menu = "";
+			$this->menupriority = 0;
+			$this->scheduleclass = NULL;
+			$this->rulesclass = NULL;
 		}
-
 
 		public function Load() { FS::$iMgr->printError("err-unk-module"); }
 		public function LoadForAndroid() { return "{'code': 7}"; }
@@ -51,9 +54,20 @@
 			}
 			FS::$log->i($user,$this->modulename,$level,$str);
 		}
+		
+		public function getRulesClass() { return $this->rulesclass; }
+		public function getMenu() { return $this->menu; }
+		public function getMenuPriority() { return $this->menupriority; }
 
 		protected $mid;
-		protected $loc;
 		protected $modulename;
+		
+		protected $loc;
+		
+		protected $rulesclass;
+		protected $scheduleclass;
+		
+		protected $menu;
+		protected $menupriority;
 	}
 ?>

@@ -50,7 +50,7 @@
 					break;
 				case 5: // special case: disconnect user
 					if ($module = FS::$iMgr->getModuleByPath("connect")) {
-						$module->getModuleClass()->Disconnect(true);
+						$module->Disconnect(true);
 						echo FS::$iMgr->renderJS();
 					}
 					break;

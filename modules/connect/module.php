@@ -17,11 +17,17 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
-	final class iConnect extends FSModule{
-		function __construct($locales) {
-			parent::__construct($locales);
+	if(!class_exists("iConnect")) {
+		
+	final class iConnect extends FSModule {
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lConnect();
+			$this->rulesclass = new rConnect($this->loc);
 			$this->modulename = "connect";
 		}
 
@@ -237,4 +243,8 @@
 			}
 		}
 	};
+	
+	}
+	
+	$module = new iConnect();
 ?>

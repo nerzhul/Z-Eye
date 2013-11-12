@@ -17,14 +17,20 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../dnsmgmt/objects.php");
 	require_once(dirname(__FILE__)."/../ipmanager/objects.php");
 	require_once(dirname(__FILE__)."/../switches/objects.php");
 
+	if(!class_exists("iSearch")) {
+		
 	final class iSearch extends FSModule {
-		function __construct($locales) { 
-			parent::__construct($locales);
+		function __construct() { 
+			parent::__construct();
 			$this->modulename = "search";
+			$this->loc = new lSearch();
+			$this->rulesclass = new rSearch($this->loc);
 		}
 
 		public function Load() {
@@ -402,4 +408,8 @@
 			}
 		}
 	};
+	
+	}
+	
+	$module = new iSearch();
 ?>

@@ -17,12 +17,19 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
+	if(!class_exists("iGroupMgmt")) {
+		
 	final class iGroupMgmt extends FSModule {
-		function __construct($locales) {
-			parent::__construct($locales);
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lGroupMgmt();
 			$this->modulename = "groupmgmt";
+			$this->rulesclass = new rGroupMgmt($this->loc);
+			$this->menu = $this->loc->s("menu-name");
 		}
 
 		public function Load() {
@@ -93,7 +100,7 @@
 					$dir2 = opendir($dirpath);
 					while ($elem2 = readdir($dir2)) {
 						if (is_file($dirpath."/".$elem2) && $elem2 == "rules.php") {
-							require($dirpath."/main.php");
+							require($dirpath."/module.php");
 
 							$tmpoutput = $module->getRulesClass()->showMgmtInterface($activerules);
 							if (strlen($tmpoutput) > 0) {
@@ -208,4 +215,8 @@
 			}
 		}
 	};
+	
+	}
+	
+	$module = new iGroupMgmt();
 ?>
