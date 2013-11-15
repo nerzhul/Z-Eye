@@ -1,0 +1,2 @@
+RedirectPermanent /index.html /index.php
+RedirectPermanent /index.htm /index.php

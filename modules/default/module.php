@@ -23,7 +23,7 @@
 	
 	if(!class_exists("iDefault")) {
 		
-	final class iDefault extends FSModule{
+	final class iDefault extends FSModule {
 		function __construct() {
 			parent::__construct();
 			$this->loc = new lDefault();

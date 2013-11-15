@@ -141,7 +141,9 @@
 			$moduleid = 0;
 			while(($elem = readdir($dir))) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
-				if (is_dir($dirpath)) $moduleid++;
+				if (is_dir($dirpath)) {
+					$moduleid++;
+				}
 				if (is_dir($dirpath) && $moduleid == $id) {
 					$dir2 = opendir($dirpath);
 					while(($elem2 = readdir($dir2))) {
