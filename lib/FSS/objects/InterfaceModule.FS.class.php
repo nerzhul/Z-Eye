@@ -33,6 +33,7 @@
 			$this->locales = $locales;
 			$this->menu = "";
 			$this->menupriority = 0;
+			$this->taskclass = NULL;
 		}
 		
 		public function handlePostDatas() {}
@@ -47,10 +48,10 @@
 		public function getMenu() { return $this->menu; }
 		public function getMenuPriority() { return $this->menupriority; }
 
-
-		protected $moduleclass;
 		protected $mid;
+		protected $moduleclass;
 		protected $rulesclass;
+		protected $taskclass;
 		protected $locales;
 		protected $menu;
 		protected $menupriority;
