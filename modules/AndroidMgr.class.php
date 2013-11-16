@@ -43,7 +43,7 @@
 					$enmon = "false";
 					$cm = FS::$iMgr->getModuleByPath("usersettings");
 					if ($cm) {
-						$enmon = $cm->getModuleClass()->getMonitorOption();
+						$enmon = $cm->getMonitorOption();
 					}
 					echo json_encode(array("code" => AndroidMgr::$ZEYECODE_REQUEST_OK, "monitor_allowed" => $enmon, "serverinfos_allowed" => true,
 						"search_allowed" => true));

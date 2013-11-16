@@ -16,10 +16,18 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
+	
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
+	
+	if(!class_exists("iSnortMgmt")) {
 
 	final class iSnortMgmt extends FSModule {
-		function __construct($locales) {
-			parent::__construct($locales);
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lSnort();
+			$this->rulesclass = new rSnortMgmt($this->loc);
+			$this->menu = $this->loc->s("menu-name");
 			$this->modulename = "snortmgmt";
 		}
 
@@ -1161,4 +1169,8 @@ preprocessor http_inspect_server: server default \\\n
 			}
 		}
 	};
+	
+	}
+	
+	$module = new iSnortMgmt();
 ?>

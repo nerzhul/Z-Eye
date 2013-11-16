@@ -17,11 +17,18 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../netdisco/netdiscoCfg.api.php");
 	
+	if(!class_exists("iSNMPMgmt")) {
+	
 	final class iSNMPMgmt extends FSModule {
-		function __construct($locales) {
-			parent::__construct($locales);
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lSNMPmgmt();
+			$this->rulesclass = new rSNMPmgmt($this->loc);
+			$this->menu = $this->loc->s("menu-name");
 			$this->modulename = "snmpmgmt";
 		}
 		
@@ -209,4 +216,8 @@
 			}
 		}
 	};
+	
+	}
+	
+	$module = new iSNMPmgmt();
 ?>

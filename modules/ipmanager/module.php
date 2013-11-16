@@ -17,13 +17,20 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 	require_once(dirname(__FILE__)."/objects.php");
 
-	final class iIPManager extends FSModule{
-		function __construct($locales) {
-			parent::__construct($locales);
+	if(!class_exists("iIPManager")) {
+		
+	final class iIPManager extends FSModule {
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lIPManager();
 			$this->modulename = "ipmanager";
+			$this->rulesclass = new rIPManager($this->loc);
+			$this->menu = $this->loc->s("menu-name");
 		}
 
 		public function Load() {
@@ -2665,4 +2672,8 @@
 			}
 		}
 	};
+	
+	}
+	
+	$module = new iIPManager();
 ?>

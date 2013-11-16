@@ -17,11 +17,19 @@
         * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
         */
 
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../icinga/icingaBroker.api.php");
 	
-	final class iDefault extends FSModule{
-		function __construct($locales) {
-			parent::__construct($locales);
+	if(!class_exists("iDefault")) {
+		
+	final class iDefault extends FSModule {
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lDefault();
+			$this->rulesclass = new rDefault($this->loc);
+			$this->menu = $this->loc->s("menu-name");
+			
 			$this->icingaAPI = new icingaBroker();
 			$this->BWtotalscore = 0;
 		}
@@ -519,4 +527,8 @@
 
 		private $icingaAPI;
 	};
+	
+	}
+	
+	$module = new iDefault();
 ?>

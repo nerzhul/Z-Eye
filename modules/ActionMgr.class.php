@@ -41,7 +41,7 @@
 						if(is_dir($dirpath) && /*$elem == $mod_path*/$moduleid == $mid) {
 							$dir2 = opendir($dirpath);
 							while(($elem2 = readdir($dir2)) && $found == false) {
-								if(is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+								if(is_file($dirpath."/".$elem2) && $elem2 == "module.php")
 									$found = true;
 									$mod_path = $elem;
 							}
@@ -53,7 +53,7 @@
 						return;
 					}
 
-					require_once(dirname(__FILE__)."/".$mod_path."/main.php");
+					require_once(dirname(__FILE__)."/".$mod_path."/module.php");
 					
 					$ruleAccess = $module->getRulesClass()->canAccessToModule();
 					if($ruleAccess === false) {
@@ -69,9 +69,9 @@
 							FS::$iMgr->getLocale("err-must-be-connected")));
 					}
 					else {
-						FS::$iMgr->setCurrentModule($module->getModuleClass());
-						$module->getModuleClass()->setModuleId($mid);
-						$module->getModuleClass()->handlePostDatas($act);
+						FS::$iMgr->setCurrentModule($module);
+						$module->setModuleId($mid);
+						$module->handlePostDatas($act);
 					}
 
 					echo FS::$iMgr->renderJS();

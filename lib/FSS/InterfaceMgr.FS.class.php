@@ -103,9 +103,9 @@
 					$moduleid++;
 					$dir2 = opendir($dirpath);
 					while($elem2 = readdir($dir2)) {
-						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php") {
+						if (is_file($dirpath."/".$elem2) && $elem2 == "module.php") {
 							$path = $elem;
-							require(dirname(__FILE__)."/../../modules/".$path."/main.php");
+							require(dirname(__FILE__)."/../../modules/".$path."/module.php");
 							$menuname = $module->getMenu();
 							if ($menuname && $module->getRulesClass()->canAccessToModule() === true) {
 								if (!isset($menus[$menuname])) {
@@ -114,7 +114,7 @@
 								if ($module->getRulesClass()->canAccessToModule() === true) {
 									$menus[$menuname][] = 
 										sprintf("<div class=\"menuItem\" onclick=\"loadInterface('&mod=%s');\">%s</div>",
-										$moduleid,$module->getModuleClass()->getMenuTitle());
+										$moduleid,$module->getMenuTitle());
 								}
 							}
 						}
@@ -141,11 +141,13 @@
 			$moduleid = 0;
 			while(($elem = readdir($dir))) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
-				if (is_dir($dirpath)) $moduleid++;
+				if (is_dir($dirpath)) {
+					$moduleid++;
+				}
 				if (is_dir($dirpath) && $moduleid == $id) {
 					$dir2 = opendir($dirpath);
 					while(($elem2 = readdir($dir2))) {
-						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php")
+						if (is_file($dirpath."/".$elem2) && $elem2 == "module.php")
 							return $elem;
 					}
 				}
@@ -156,17 +158,17 @@
 
 		public function loadModule($id,$act=1) {
 			if ($path = $this->findModulePath($id)) {
-				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
+				require(dirname(__FILE__)."/../../modules/".$path."/module.php");
 				
 				$ruleAccess = $module->getRulesClass()->canAccessToModule();
 				// Bypass access for Android
 				if ($ruleAccess === true || $act == 3) {
-					$this->setCurrentModule($module->getModuleClass());
-					$module->getModuleClass()->setModuleId($id);
+					$this->setCurrentModule($module);
+					$module->setModuleId($id);
 					switch($act) {
-						case 1: default: return $module->getModuleClass()->Load(); break;
-						case 2: return $module->getModuleClass()->getIfaceElmt(); break;
-						case 3: return $module->getModuleClass()->LoadForAndroid(); break;
+						case 1: default: return $module->Load(); break;
+						case 2: return $module->getIfaceElmt(); break;
+						case 3: return $module->LoadForAndroid(); break;
 					}	
 				}
 				else if($ruleAccess === -1) {
@@ -183,7 +185,7 @@
 
 		public function getModuleByPath($path) {
 			if ($path = $this->findModulePath($this->getModuleIdByPath($path))) {
-				require(dirname(__FILE__)."/../../modules/".$path."/main.php");
+				require(dirname(__FILE__)."/../../modules/".$path."/module.php");
 				return $module;
 			}
 			return NULL;
@@ -893,7 +895,7 @@
 				if (is_dir($dirpath) && $elem == $path) {
 					$dir2 = opendir($dirpath);
 					while(($elem2 = readdir($dir2)) && $found == false) {
-						if (is_file($dirpath."/".$elem2) && $elem2 == "main.php") {
+						if (is_file($dirpath."/".$elem2) && $elem2 == "module.php") {
 							$this->moduleIdBuf[$path] = $moduleid;
 							return $moduleid;
 						}

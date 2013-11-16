@@ -16,13 +16,20 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-
+	
+	require_once(dirname(__FILE__)."/locales.php");
+	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/icingaBroker.api.php");
 	require_once(dirname(__FILE__)."/objects.php");
 
+	if(!class_exists("iIcinga")) {
+		
 	final class iIcinga extends FSModule {
-		function __construct($locales) {
-			parent::__construct($locales);
+		function __construct() {
+			parent::__construct();
+			$this->loc = new lIcinga();
+			$this->rulesclass = new rIcinga($this->loc);
+			$this->menu = $this->loc->s("menu-name");
 			$this->icingaAPI = new icingaBroker();
 		}
 
@@ -1497,4 +1504,8 @@
 
 		private $icingaAPI;
 	};
+	
+	}
+	
+	$module = new iIcinga();
 ?>
