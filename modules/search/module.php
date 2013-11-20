@@ -70,7 +70,7 @@
 				FS::$iMgr->setURL("s=".$search);
 				
 				$output = FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
-				if (FS::$secMgr->isMacAddr($search)) {
+				if (FS::$secMgr->isMacFragment($search)) {
 					$this->showMacAddrResults($search);
 				}
 				else if (FS::$secMgr->isIP($search)) {
@@ -100,7 +100,7 @@
 				$this->log(0,"searching '".$search."'");
 			}
 			else {
-				if (preg_match('#^([0-9A-F]{2}:)#i',$search) || preg_match('#([0-9A-F]{2}-)#i',$search)) {
+				if (FS::$secMgr->isMacFragment($search)) {
 					$this->showMacAddrResults($search,true);
 				}
 				else if (preg_match("#^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.#",$search)) {
@@ -362,7 +362,7 @@
 		private function showMacAddrResults($search,$autocomp=false) {
 			$search = strtolower(preg_replace("#[-]#",":",$search));
 
-			if (!$autocomp) {
+			if (!$autocomp && FS::$secMgr->isMacAddr($search)) {
 				if ($company = FS::$dbMgr->GetOneData("oui","company","oui = '".substr($search,0,8)."'")) {
 					FS::$searchMgr->addCompleteResult("Manufacturer",$company);
 				}

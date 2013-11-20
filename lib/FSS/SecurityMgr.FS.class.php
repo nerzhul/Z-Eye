@@ -192,8 +192,20 @@
 		}
 
 		public function isMacAddr($str) {
-			if (preg_match('#^([0-9A-F]{2}:){5}[0-9A-F]{2}$#i', $str) || preg_match('#^([0-9A-F]{2}-){5}[0-9A-F]{2}$#i', $str))
+			if (preg_match('#^([0-9A-F]{2}:){5}[0-9A-F]{2}$#i', $str) || 
+				preg_match('#^([0-9A-F]{2}-){5}[0-9A-F]{2}$#i', $str)) {
 				return true;
+			}
+
+			return false;
+		}
+		
+		public function isMacFragment($str) {
+			// Recognize a MAC Addr if where have a minimum of two mac address frags.
+			if (preg_match('#^([0-9A-F]{2}:){1,5}[0-9A-F]{2}$#i', $str) || 
+				preg_match('#^([0-9A-F]{2}-){1,5}[0-9A-F]{2}$#i', $str)) {
+				return true;
+			}
 
 			return false;
 		}

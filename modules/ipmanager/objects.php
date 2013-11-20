@@ -427,7 +427,7 @@
 				$found = false;
 				
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,macaddr,hostname,comment,reserv",
-					"ip = '".$search."' OR CAST(macaddr AS varchar) = '".$search."'");
+					"ip = '".$search."' OR CAST(macaddr AS varchar) ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
