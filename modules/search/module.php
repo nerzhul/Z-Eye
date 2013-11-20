@@ -360,7 +360,7 @@
 		}
 
 		private function showMacAddrResults($search,$autocomp=false) {
-			$search = preg_replace("#[-]#",":",$search);
+			$search = strtolower(preg_replace("#[-]#",":",$search));
 
 			if (!$autocomp) {
 				if ($company = FS::$dbMgr->GetOneData("oui","company","oui = '".substr($search,0,8)."'")) {
