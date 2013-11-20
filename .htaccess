@@ -1,3 +1,6 @@
 # Rewrite rules
 RewriteEngine on
 RewriteRule ^([0-9]+)/(.*)$ index.php?mod=$1&$2
+
+RedirectPermanent /index.html /index.php
+RedirectPermanent /index.htm /index.php
