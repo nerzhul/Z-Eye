@@ -23,6 +23,7 @@
 			$locales = array(
 				"fr" => array(
 					"Accounting" => "Accounting",
+					"Active?" => "Actif ?",
 					"active-reserv" => "Réservation activée",
 					"Address" => "Adresse",
 					"Alias" => "Alias",
@@ -119,6 +120,7 @@
 					"vlanid" => "ID de VLAN",
 				),
 				"en" => array(
+					"Active" => "Active ?",
 					"Accounting" => "Accounting",
 					"active-reserv" => "Reservation enabled",
 					"Address" => "Address",

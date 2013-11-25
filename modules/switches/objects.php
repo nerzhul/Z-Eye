@@ -371,13 +371,14 @@
 				$output = "";
 				$found = false;
 				
-				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last",
+				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last,active",
 					"domain ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
 						$output = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Node")."</th><th>".
-							$this->loc->s("Name")."</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("First-view")."</th><th>".$this->loc->s("Last-view")."</th></tr>";
+							$this->loc->s("Name")."</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("First-view")."</th><th>".
+							$this->loc->s("Last-view")."</th><th>".$this->loc->s("Active?")."</th></tr>";
 					}
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
@@ -386,7 +387,9 @@
 						FS::$iMgr->aLink($this->mid."&s=".$data["nbname"], $data["nbname"])."</td><td>".
 						($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ ".
 						FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).
-						"</td><td>".$fst[0]."</td><td>".$lst[0]."</td></tr>";
+						"</td><td>".$fst[0]."</td><td>".$lst[0]."</td><td>";
+					
+					$output = sprintf("%s%s</td></tr>",$output,($data["active"] == 't' ? $this->loc->s("Yes") : $this->loc->s("No")));
 					FS::$searchMgr->incResultCount();
 				}
 
@@ -397,7 +400,7 @@
 				$output = "";
 				$found = false;
 				
-				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last",
+				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last,active",
 					"host(ip) = '".$search."' OR nbname ILIKE '%".$search."%' OR CAST(mac AS varchar) ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
@@ -411,10 +414,15 @@
 					$lst = preg_split("#\.#",$data["time_last"]);
 
 					$output .= $this->loc->s("netbios-machine").": \\\\".FS::$iMgr->aLink($this->mid.
-						"&s=".$data["domain"], $data["domain"]);
-						"\\".FS::$iMgr->aLink($this->mid."&s=".$data["nbname"], $data["nbname"])."<br />";
+						"&s=".$data["domain"], $data["domain"]).
+						"\\".FS::$iMgr->aLink($this->mid."&s=".$data["nbname"], $data["nbname"])."<br />".
 						$this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
-						"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")";
+						
+					$output = sprintf("%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s %s)",
+						$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
+						$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
+					);
+					
 					FS::$searchMgr->incResultCount();
 				}
 				
@@ -452,7 +460,7 @@
 				
 				if ($lastmac) {
 					$output = "";
-					$query = FS::$dbMgr->Select("node","switch,port,time_first,time_last",
+					$query = FS::$dbMgr->Select($this->sqlTable,"switch,port,time_first,time_last,active",
 						"CAST(mac as varchar) ILIKE '".$lastmac."' AND active = 't'",
 						array("order" => "time_last","ordersens" => 1,"limit" => 1));
 					if ($data = FS::$dbMgr->Fetch($query)) {
@@ -473,7 +481,11 @@
 							$output .= "/ ".$this->loc->s("Plug")." ".$piece;
 						}
 						
-						$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+						$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s %s)<br />",
+							$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
+							$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
+						);
+					);
 						
 						FS::$searchMgr->incResultCount();
 						$this->storeSearchResult($output,"title-last-device");
@@ -483,7 +495,7 @@
 				$output = "";
 				$found = false;
 				
-				$query = FS::$dbMgr->Select($this->sqlTable,"switch,port,time_first,time_last",
+				$query = FS::$dbMgr->Select($this->sqlTable,"switch,port,time_first,time_last,active",
 					"CAST (mac AS varchar) ILIKE '%".$search."%'",
 					array("order" => "time_last","ordersens" => 2));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -503,7 +515,11 @@
 						($piece == NULL ? "" : " / Prise ".$piece);
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
-					$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Entre le ".$fst[0]." et le ".$lst[0].")<br />";
+					
+					$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s %s)<br />",
+						$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
+						$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
+					);
 					
 					FS::$searchMgr->incResultCount();
 				}

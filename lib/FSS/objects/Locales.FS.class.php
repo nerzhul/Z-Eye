@@ -66,6 +66,7 @@
 					"Modification" => "Modification",
 					"Modify" => "Modify",
 					"Name" => "Nom",
+					"No" => "No",
 					"None" => "None",
 					"Notification" => "Notification",
 					"OK" => "OK",
@@ -81,6 +82,7 @@
 					"separator" => "Separator",
 					"Settings" => "Settings",
 					"unknown" => "unknown",
+					"Yes" => "Yes",
 				),
 				"fr" => array(
 					"Action" => "Action",
@@ -117,6 +119,7 @@
 					"Modification" => "Modification",
 					"Modify" => "Modifier",
 					"Name" => "Nom",
+					"No" => "Non",
 					"None" => "Aucun",
 					"Notification" => "Notification",
 					"OK" => "OK",
@@ -132,6 +135,7 @@
 					"separator" => "Séparateur",
 					"Settings" => "Paramètres",
 					"unknown" => "inconnu",
+					"Yes" => "Oui",
 				)
 			);
 		}
