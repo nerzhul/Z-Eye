@@ -485,7 +485,6 @@
 							$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
 							$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
 						);
-					);
 						
 						FS::$searchMgr->incResultCount();
 						$this->storeSearchResult($output,"title-last-device");
