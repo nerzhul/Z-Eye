@@ -1921,6 +1921,7 @@
 
 						$this->log(0,"Remove device '".$device."' from Z-Eye");
 						FS::$iMgr->redir("mod=".$this->mid,true);
+						return;
 					case 18: // Device discovery
 						if (!FS::$sessMgr->hasRight("mrule_switches_discover")) {
 							$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");

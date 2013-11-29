@@ -481,9 +481,9 @@
 							$output .= "/ ".$this->loc->s("Plug")." ".$piece;
 						}
 						
-						$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s %s)<br />",
+						$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s%s)<br />",
 							$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
-							$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
+							$data["active"] == 't' ? " <b>".$this->loc->s("Active")."</b>" : ""
 						);
 						
 						FS::$searchMgr->incResultCount();
@@ -515,9 +515,9 @@
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 					
-					$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s %s)<br />",
+					$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s%s)<br />",
 						$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
-						$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
+						$data["active"] == 't' ? " <b>".$this->loc->s("Active")."</b>" : ""
 					);
 					
 					FS::$searchMgr->incResultCount();
