@@ -821,7 +821,7 @@
 		}
 		
 		public function setURL($url) {
-			$this->js(sprintf("window.history.pushState(document.documentElement.outerHTML, document.title, '/index.php?mod=%s%s');", 
+			$this->js(sprintf("addHistoryState(document.title, '/index.php?mod=%s%s');", 
 				$this->cur_module->getModuleId(),
 				strlen($url) > 0 ? "&".$url : ""));
 		}
