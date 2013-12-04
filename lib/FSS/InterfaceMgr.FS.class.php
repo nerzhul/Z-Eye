@@ -764,9 +764,12 @@
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			return sprintf("<li%s><a href=\"index.php?%s&at=2&sh=%s\">%s</a>",
+			return sprintf("<li%s><a href=\"index.php?%s&at=2&sh=%s%s\">%s</a>",
 				($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : ""),
-				$link,$shid,$label);
+				$link,$shid,
+				(FS::$secMgr->checkAndSecuriseGetData("nohist") ? "&nohist=1" : ""),
+				$label);
+				
 		}
 
 		public function tabPan($elmts = array(),$cursh) {
@@ -780,7 +783,7 @@
 			$output = sprintf("<div id=\"contenttabs\"><ul>%s</ul></div>",$output);
 			FS::$iMgr->js("$('#contenttabs').tabs({cache: false,
 				ajaxOptions: { error: function(xhr,status,index,anchor) {
-                        		$(anchor.hash).html(\"".$this->getLocale("fail-tab")."\");
+					$(anchor.hash).html(\"".$this->getLocale("fail-tab")."\");
 				}},
 				beforeLoad: function(event,ui) { $(ui.panel).html('<span class=\"loader\"></span>');}
 			});");
@@ -821,11 +824,14 @@
 		}
 		
 		public function setURL($url) {
-			$this->js(sprintf("addHistoryState(document.title, '/index.php?mod=%s%s','&mod=%s%s');", 
-				$this->cur_module->getModuleId(),
-				strlen($url) > 0 ? "&".$url : "",
-				$this->cur_module->getModuleId(),
-				strlen($url) > 0 ? "&".$url : ""));
+			// Nohist is needed to remove history loops
+			if (!FS::$secMgr->checkAndSecuriseGetData("nohist")) {
+				$this->js(sprintf("addHistoryState(document.title, '/index.php?mod=%s%s','&nohist=1&mod=%s%s');", 
+					$this->cur_module->getModuleId(),
+					strlen($url) > 0 ? "&".$url : "",
+					$this->cur_module->getModuleId(),
+					strlen($url) > 0 ? "&".$url : ""));
+			}
 		}
 
 		public function stylesheet($path) {
