@@ -144,9 +144,7 @@
 				}
 				
 				$output .= "</td><td>";
-				if ($data["template"] == "t") {
-				}
-				else {
+				if ($data["template"] != "t") {
 					$output .= FS::$iMgr->iconOpendiv("17","monitor",array("lnkadd" => "host=".$data["name"],
 						"iconsize" => 20));
 				}
@@ -265,17 +263,28 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"tsrvList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Host").
+					$output .= "<table id=\"tsrvList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name").
+						"</th><th></th><th>".$this->loc->s("Host").
 						"</th><th>".$this->loc->s("Hosttype")."</th><th>".$this->loc->s("Template")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"srv_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
+				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 					$output .= FS::$iMgr->opendiv(12,$data["name"],array("lnkadd" => "name=".$data["name"]));
-				else
+				}
+				else {
 					$output .= $data["name"];
+				}
 
+				$output .= "</td><td>";
+				
+				if ($data["template"] != "t") {
+					$output .= FS::$iMgr->iconOpendiv("18","monitor",array("lnkadd" => "srv=".$data["name"],
+						"iconsize" => 20));
+				}
+				
 				$output .= "</td><td>".$data["host"]."</td><td>";
+				
 				switch($data["hosttype"]) {
 					case 1: $output .= "Simple"; break;
 					case 2: $output .= "Groupe"; break;
@@ -900,6 +909,13 @@
 					}
 					$host = new icingaHost();
 					return $host->showSensors($name);
+				case 18:
+					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
+					if (!$name) {
+						return $this->loc->s("err-bad-datas");
+					}
+					$service = new icingaService();
+					return $service->showSensors($name);
 				default: return;
 			}
 		}

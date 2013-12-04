@@ -631,4 +631,185 @@
 		private $hostoptf;
 		private $hostopts;
 	};
+	
+	final class icingaService extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_services";
+			$this->readRight = "mrule_icinga_srv_write";
+			$this->writeRight = "mrule_icinga_srv_write";
+		}
+		
+		protected function Load($name = "") {
+			$this->name = $name;
+			
+			$this->hosttype = ""; $this->host = "";
+			$this->actcheck = true; $this->pascheck = true; $this->parcheck = true; $this->obsess = true; $this->freshness = false;
+			$this->notifen = true; $this->eventhdlen = true; $this->flapen = true; $this->failpreden = true; $this->perfdata = true;
+			$this->retstatus = true; $this->retnonstatus = true;
+			$this->checkcmd = ""; $this->checkperiod = ""; $this->checkintval = 3; $this->retcheckintval = 1; $this->maxcheck = 10;
+			$this->notifperiod = ""; $this->srvoptc = true; $this->srvoptw = true; $this->srvoptu = true; $this->srvoptr = true;
+			$this->srvoptf = true; $this->srvopts = true; 
+			$this->notifintval = 0; $this->ctg = "";
+			if ($name) {
+				$query = FS::$dbMgr->Select($this->sqlTable,"host,hosttype,ctg,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
+					retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
+					"name = '".$name."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->host = $data["host"];
+					$this->hosttype = $data["hosttype"];
+					$this->actcheck = ($data["actcheck"] == 't');
+					$this->pascheck = ($data["pascheck"] == 't');
+					$this->parcheck = ($data["parcheck"] == 't');
+					$this->obsess = ($data["obsess"] == 't');
+					$this->freshness = ($data["freshness"] == 't');
+					$this->notifen = ($data["notifen"] == 't');
+					$this->eventhdlen = ($data["eventhdlen"] == 't');
+					$this->flapen = ($data["flapen"] == 't');
+					$this->failpreden = ($data["failpreden"] == 't');
+					$this->perfdata = ($data["perfdata"] == 't');
+					$this->retstatus = ($data["retstatus"] == 't');
+					$this->retnonstatus = ($data["retnonstatus"] == 't');
+					$this->checkcmd = $data["checkcmd"];
+					$this->checkperiod = $data["checkperiod"];
+					$this->checkintval = $data["checkintval"];
+					$this->retcheckintval = $data["retcheckintval"];
+					$this->maxcheck = $data["maxcheck"];
+					$this->notifperiod = $data["notifperiod"];
+					$this->notifintval = $data["notifintval"];
+					$this->srvoptc = ($data["srvoptc"] == 't');
+					$this->srvoptw = ($data["srvoptw"] == 't');
+					$this->srvoptu = ($data["srvoptu"] == 't');
+					$this->srvoptr = ($data["srvoptr"] == 't');
+					$this->srvoptf = ($data["srvoptf"] == 't');
+					$this->srvopts = ($data["srvopts"] == 't');
+					$this->ctg = $data["ctg"];
+				}
+				else {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public function showSensors($sname) {
+			if (!$this->Load($sname)) {
+				return $this->loc->s("err-bad-datas");
+			}
+			
+			$states = (new icingaBroker())->readStates();
+			
+			$totalSensors = 0;
+			$totalPbs = 0;
+			$totalCrits = 0;
+			$totalWarns = 0;
+			
+			$output = "";
+			
+			foreach ($states as $host => $hos) {
+				foreach ($states[$host] as $hos => $hosvalues) {
+					if ($hos == "servicestatus") {
+						// Loop sensors
+						foreach ($hosvalues as $sensor => $svalues) {
+							// We only need this sensor
+							if ($sensor != $this->name) {
+								continue;
+							}
+							
+							$totalSensors++;
+							
+							$outstate = "";
+							$stylestate = "";
+							$timedown = $this->loc->s("Since-icinga-start");
+
+							if ($svalues["current_state"] == 1) {
+								$outstate = $this->loc->s("Warn");
+								if ($svalues["last_time_ok"]) {
+									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
+								}
+								$totalWarns++;
+								$totalPbs++;
+							}
+							else if ($svalues["current_state"] == 2) {
+								$outstate = $this->loc->s("Critical");
+								if ($svalues["last_time_ok"]) {
+									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
+								}
+
+								$totalCrits++;
+								$totalPbs++;
+							}
+							else {
+								$outstate = $this->loc->s("OK");
+							}
+							
+							$output .= "<tr style=\"background-color:";
+							if ($svalues["current_state"] == 1) {
+								$output .= "orange";
+							}
+							else if ($svalues["current_state"] == 2) {
+								$output .= "red";
+							}
+							else {
+								$output .= "green";
+							}
+							
+							$plugOut = $svalues["plugin_output"];
+							if (isset($svalues["long_plugin_output"]) && strlen($svalues["long_plugin_output"]) > 0) {
+								$plugOut .= "<br />".$svalues["long_plugin_output"];
+							}
+							$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
+							
+							$output .= ";\"><td>".$host."</td><td>".$outstate.
+								"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
+						}
+					}
+				}
+			}
+			
+			return sprintf("<table><b>%s</b>%s<br /><b>%s</b>%s (<b>%s</b>: %s / <b>%s</b>: %s)%s</table>",
+				$this->loc->s("total-sensors"), $totalSensors,
+				$this->loc->s("total-problems"), $totalPbs,
+				$this->loc->s("Critical"), $totalCrits,
+				$this->loc->s("Warn"), $totalWarns,
+				$output);
+		}
+		
+		private $name;
+		
+		private $host;
+		private $hosttype;
+		
+		private $actcheck;
+		private $pascheck;
+		private $parcheck;
+		private $obsess;
+		private $freshness;
+		
+		private $eventhdlen;
+		private $flapen;
+		private $failpreden;
+		private $perfdata;
+		private $retstatus;
+		private $retnonstatus;
+		private $checkcmd;
+		private $checkperiod;
+		private $checkintval;
+		private $retcheckintval;
+		private $maxcheck;
+		
+		private $notifen;
+		private $notifintval;
+		private $notifperiod;
+		private $srvoptc;
+		private $srvoptw;
+		private $srvoptu;
+		private $srvoptf;
+		private $srvopts;
+		private $srvoptr;
+		
+		private $ctg;
+		
+		private $template;
+	};
 ?>
