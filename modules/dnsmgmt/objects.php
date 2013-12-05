@@ -1370,7 +1370,7 @@
 						"'".$clustername."','any'");
 				}
 				else {
-					$count = count($tranfer);
+					$count = count($transfer);
 					for ($i=0;$i<$count;$i++) {
 						FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."dns_cluster_allow_transfer",$this->sqlAttrId.",aclname",
 							"'".$clustername."','".$transfer[$i]."'");
