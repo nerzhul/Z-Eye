@@ -87,8 +87,9 @@
 		}
 
 		public function sendCmd($cmd) {
-			if (!$this->conn || !$this->is_auth || !$this->stdio)
+			if (!$this->conn || !$this->is_auth || !$this->stdio) {
 				return false;
+			}
 
 			$output = "";
 			$output_arr = array();
@@ -114,10 +115,46 @@
 
 			return $output;
 		}
+		
+		public function isRemoteExists($path) {
+			if ($this->execCmd(sprintf("if [ -e \"%s\" ]; then echo -n '0'; else echo -n '1'; fi;",$path)) == "0") {
+				return true;
+			}
+			return false;
+		}
+		
+		public function isRemoteReadable($path) {
+			if ($this->execCmd(sprintf("if [ -r \"%s\" ]; then echo -n '0'; else echo -n '1'; fi;",$path)) == "0") {
+				return true;
+			}
+			return false;
+		}
+		
+		public function isRemoteExecutable($path) {
+			if ($this->execCmd(sprintf("if [ -x \"%s\" ]; then echo -n '0'; else echo -n '1'; fi;",$path)) == "0") {
+				return true;
+			}
+			return false;
+		}
+		
+		public function isRemoteWritable($path) {
+			if ($this->execCmd(sprintf("if [ -w \"%s\" ]; then echo -n '0'; else echo -n '1'; fi;",$path)) == "0") {
+				return true;
+			}
+			return false;
+		}
+		
+		public function isDirectory($path) {
+			if ($this->execCmd(sprintf("if [ -d \"%s\" ]; then echo -n '0'; else echo -n '1'; fi;",$path)) == "0") {
+				return true;
+			}
+			return false;
+		}
 
 		public function Close() {
-			if ($this->conn)
+			if ($this->conn) {
 				close($this->conn);
+			}
 		}
 		
 		private $conn;

@@ -89,7 +89,7 @@ class ZEyeSSHBroker():
 	def isRemoteExecutable(self,path):
 		if self.sshConn == None:
 			return None
-		res = self.sendCmd("if [ -d \"%s\" ]; then echo '0'; else echo '1'; fi;" % path)
+		res = self.sendCmd("if [ -x \"%s\" ]; then echo '0'; else echo '1'; fi;" % path)
 		res = re.sub("[\n\r]","",res)
 		if res == "0":
 			return True

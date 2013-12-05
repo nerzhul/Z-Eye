@@ -1707,6 +1707,26 @@
 				FS::$iMgr->ajaxEchoNC("err-bad-login");
 				return;
 			}
+			
+			if (!$ssh->isRemoteReable($namedpath)) {
+				FS::$iMgr->ajaxEchoNC("err-namedconf-not-readable");
+				return;
+			}
+			
+			if (!$ssh->isRemoteWritable($zeyenamedpath)) {
+				FS::$iMgr->ajaxEchoNC("err-z-eye-not-writable");
+				return;
+			}
+			
+			if (!$ssh->isDirectory($chrootnamed."/".$mzonepath)) {
+				FS::$iMgr->ajaxEchoNC("err-masterdir-not-readable");
+				return;
+			}
+			
+			if (!$ssh->isDirectory($chrootnamed."/".$szonepath)) {
+				FS::$iMgr->ajaxEchoNC("err-slavedir-not-readable");
+				return;
+			}
 		
 			$exists = $this->exists($saddr);
 			if ($edit) {	
