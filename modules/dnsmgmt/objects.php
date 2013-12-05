@@ -2079,11 +2079,13 @@
 				$output = "";
 				
 				if (FS::$secMgr->isDNSName($search)) {
-					$out = shell_exec("/usr/bin/dig ".$search);
-					if ($out != NULL) {
-						$output .= preg_replace("#[\n]#","<br />",$out);
-						FS::$searchMgr->incResultCount();
-						$this->storeSearchResult($output,"title-dns-resolution");
+					if (shell_exec("/usr/bin/dig +short ".$search." | /usr/bin/wc -l | /usr/bin/awk '{print $1}'" > 0)) {
+						$out = shell_exec("/usr/bin/dig ".$search);
+						if ($out != NULL) {
+							$output .= preg_replace("#[\n]#","<br />",$out);
+							FS::$searchMgr->incResultCount();
+							$this->storeSearchResult($output,"title-dns-resolution");
+						}
 					}
 				}
 				
