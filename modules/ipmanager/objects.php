@@ -96,7 +96,8 @@
 			
 			ksort($netarray);
 			foreach ($netarray as $netid => $value) {
-				$output .= FS::$iMgr->selElmt($value,$netid,in_array($netid,$selected));
+				$selectEl = (is_array($selected) ? in_array($netid,$selected) : $netid == $selected);
+				$output .= FS::$iMgr->selElmt($value,$netid,$selectEl);
 			}
 			
 			// If no elements found & no empty element
