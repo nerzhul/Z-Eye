@@ -35,17 +35,7 @@
 		public function Load() {
 			FS::$iMgr->setURL("");
 			FS::$iMgr->setTitle($this->loc->s("title-mgmt"));
-			$output = "";
-
-			if (!FS::isAjaxCall()) {
-				$gname = FS::$secMgr->checkAndSecuriseGetData("g");
-				$output = FS::$iMgr->h1("title-mgmt");
-				if ($gname)
-					$output .= $this->editGroup($gname);
-				else
-					$output .= $this->showMain();
-			}
-			return $output;
+			return FS::$iMgr->h1("title-mgmt").$this->showMain();
 		}
 
 		private function editGroup($gname) {
@@ -54,17 +44,16 @@
 				return FS::$iMgr->printError("err-not-exist");
 			}
 
-			FS::$iMgr->showReturnMenu(true);
-			$output = FS::$iMgr->h2($this->loc->s("title-edit")." '".$gname."'",true);
-			$output .= FS::$iMgr->cbkForm("3");
+			$output = "<b>".$this->loc->s("title-edit")." '".$gname."'</b>".
+				FS::$iMgr->cbkForm("3");
 			$rules = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
-			while ($data = FS::$dbMgr->Fetch($query))
+			while ($data = FS::$dbMgr->Fetch($query)) {
 				$rules[] = $data["rulename"];
-			$output .= $this->loadModuleRuleSets($rules);
-			$output .= FS::$iMgr->hidden("gid",$gid);
-			$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";
-			return $output;
+			}
+			return $output.$this->loadModuleRuleSets($rules).
+				FS::$iMgr->hidden("gid",$gid).
+				FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";
 		}
 
 		private function showMain() {
@@ -75,10 +64,11 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"groupList\"><thead><tr><th class=\"headerSortDown\">GID</th><th>".$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr></thead>";
+					$tmpoutput .= "<table id=\"groupList\"><thead><tr><th class=\"headerSortDown\">GID</th><th>".
+						$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr></thead>";
 				}
 				$tmpoutput .= "<tr id=\"gr".$data["gid"]."tr\"><td>".$data["gid"]."</td><td>".
-					FS::$iMgr->aLink($this->mid."&g=".$data["gname"], $data["gname"])."</td><td>".
+					FS::$iMgr->opendiv(2,$data["gname"],array("lnkadd" => "g=".$data["gname"]))."</td><td>".
 					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&gname=".$data["gname"],array("js" => true, 
 						"confirm" => array($this->loc->s("confirm-removegrp")."'".$data["gname"]."' ?","Confirm","Cancel")))."</td></tr>";
@@ -121,12 +111,12 @@
 		}
 
 		private function getGroupForm() {
-			$output = FS::$iMgr->cbkForm("1");
-			$output .= "<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname"));
-			$output .= FS::$iMgr->h2("title-opts");
-			$output .= $this->loadModuleRuleSets();
-                        $output .= "</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>";
-			$output .= "</ul></form>";
+			$output = FS::$iMgr->cbkForm("1").
+				"<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname")).
+				FS::$iMgr->h2("title-opts").
+				$this->loadModuleRuleSets().
+				"</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>".
+				"</ul></form>";
 			return $output;
 		}
 
@@ -134,6 +124,12 @@
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
 				case 1: return $this->getGroupForm();
+				case 2:
+					$gname = FS::$secMgr->checkAndSecuriseGetData("g");
+					if (!$gname) {
+						return $this->loc->s("err-bad-datas");
+					}
+					return $this->editGroup($gname);
 				default: return;
 			}
 		}
@@ -209,7 +205,7 @@
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
 					$this->log(0,"Group Id '".$gid."' edited");
-					FS::$iMgr->redir("mod=".$this->mid,true);
+					FS::$iMgr->ajaxEcho("Done");
 
 				default: break;
 			}
