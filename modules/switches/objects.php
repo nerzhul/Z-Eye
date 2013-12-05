@@ -58,37 +58,47 @@
 			else {
 				$output = "";
 				$found = false;
-				
 				// Device himself
-				$query = FS::$dbMgr->Select($this->sqlTable,"mac,ip,description,model",
-					"name ILIKE '".$search."' OR host(ip) = '".$search."' OR CAST(mac as varchar) ILIKE '%".$search."%'");
-				if ($data = FS::$dbMgr->Fetch($query)) {
-					$output = "<b>".$this->loc->s("Informations")."<i>: </i></b>".
-						FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$search, $search)." (";
+				$query = FS::$dbMgr->Select($this->sqlTable,"name,mac,ip,description,model",
+					"name ILIKE '".$search."%' OR host(ip) = '".$search."' OR CAST(mac as varchar) ILIKE '%".$search."%'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if ($found == false) {
+						$found = true;
+					}
+					
+					$output .= "<b>".$this->loc->s("Informations")."<i>: </i></b>".
+						FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$data["name"], $data["name"])." (";
+						
 					if (strlen($data["mac"]) > 0) {
 						$output .= FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"])." - ";
 					}
+					
 					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).")<br />";
 						"<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />";
-						"<b><i>".$this->loc->s("Description").": </i></b>".preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
+						"<b><i>".$this->loc->s("Description").": </i></b>".
+						preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
 						
-					$this->storeSearchResult($locoutput,"Network-device");
 					FS::$searchMgr->incResultCount();
 				}
 				
-				// VLAN on a device
-				$output = "";
+				if ($found) {
+					$this->storeSearchResult($output,"Network-device");
+				}
 				
+				// VLAN on a device
 				if (FS::$secMgr->isNumeric($search)) {
+					$output = "";
+					$found = false;
 					$query = FS::$dbMgr->Select($this->vlanTable,"ip,description","vlan = '".$search."'",array("order" => "ip"));
 					while ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found = false) {
+						if ($found == false) {
 							$found = true;
 						}
 						
 						if ($dname = FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$data["ip"]."'")) {
 							$output .= "<li> ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 								"&d=".$dname."&fltr=".$search, $dname)." (".$data["description"].")<br />";
+							FS::$searchMgr->incResultCount();
 						}
 					}
 					if ($found) {
