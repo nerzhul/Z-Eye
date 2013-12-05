@@ -37,7 +37,7 @@
 					FS::$searchMgr->addAR("vlan",$data["vlan"]);
 				}
 				
-				$query = FS::$dbMgr->Select($this->sqlTable,"name","name ILIKE '".$search."%'",
+				$query = FS::$dbMgr->Select($this->sqlTable,"name","name ILIKE '%".$search."%'",
 					array("order" => "name","limit" => "10","group" => "name"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("device",$data["name"]);
@@ -60,23 +60,23 @@
 				$found = false;
 				// Device himself
 				$query = FS::$dbMgr->Select($this->sqlTable,"name,mac,ip,description,model",
-					"name ILIKE '".$search."%' OR host(ip) = '".$search."' OR CAST(mac as varchar) ILIKE '%".$search."%'");
+					"name ILIKE '%".$search."%' OR host(ip) = '".$search."' OR CAST(mac as varchar) ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
 					}
 					
-					$output .= "<b>".$this->loc->s("Informations")."<i>: </i></b>".
-						FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$data["name"], $data["name"])." (";
+					$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$data["name"], $data["name"])." (";
 						
 					if (strlen($data["mac"]) > 0) {
 						$output .= FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"])." - ";
 					}
 					
-					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).")<br />";
-						"<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />";
+					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).")<br />".
+						"<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />".
 						"<b><i>".$this->loc->s("Description").": </i></b>".
-						preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"])."<br />";
+						preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"]).
+						FS::$iMgr->hr();
 						
 					FS::$searchMgr->incResultCount();
 				}
