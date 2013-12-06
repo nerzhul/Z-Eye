@@ -737,6 +737,7 @@
 			$netmask = ""; $vlanid = 0; $shortname = ""; $desc = "";
 			$router = ""; $domainname = ""; $dns1 = ""; $dns2 = "";
 			$mleasetime = 0; $dleasetime = 0;
+			$netidv6 = ""; $prefixlenv6 = 0;
 			if ($netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask,vlanid,subnet_desc,subnet_short_name,router,dns1,dns2,domainname,
 					mleasetime,dleasetime","netid = '".$netid."'");
@@ -751,11 +752,19 @@
 					$domainname = $data["domainname"];
 					$mleasetime = $data["mleasetime"];
 					$dleasetime = $data["dleasetime"];
+					
+					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared","netid,prefixlen","netidv4 = '".$netid."'");
+					if ($data2 = FS::$dbMgr->Fetch($query2)) {
+						$netidv6 = $data2["netid"];
+						$prefixlenv6 = $data2["prefixlen"];
+					}
 				}
 			}
 			$output = FS::$iMgr->cbkForm("7")."<table>".
 				FS::$iMgr->idxLine("netid","netid",array("value" => $netid,"type" => "idxipedit", "length" => 16, "edit" => $netid != "")).
 				FS::$iMgr->idxLine("netmask","netmask",array("value" => $netmask,"length" => 16, "type" => "ip")).
+				FS::$iMgr->idxLine("netidv6","netidv6",array("value" => $netidv6,"length" => 40, "tooltip" => "tooltip-ipv6")).
+				FS::$iMgr->idxLine("prefixlen","prefixlen",array("value" => $prefixlenv6,"length" => 3, "type" => "num", "tooltip" => "tooltip-prefixlen")).
 				FS::$iMgr->idxLine("vlanid","vlanid",array("value" => $vlanid,"length" => 4, "type" => "num", "tooltip" => "tooltip-vlanid")).
 				FS::$iMgr->idxLine("subnet-shortname","shortname",array("value" => $shortname,"length" => 32, "tooltip" => "tooltip-shortname")).
 				FS::$iMgr->idxLine("subnet-desc","desc",array("value" => $desc,"length" => 128, "tooltip" => "tooltip-desc"));
@@ -1650,6 +1659,8 @@
 
 					$netid = FS::$secMgr->checkAndSecurisePostData("netid");
 					$netmask = FS::$secMgr->checkAndSecurisePostData("netmask");
+					$netidv6 = FS::$secMgr->checkAndSecurisePostData("netidv6");
+					$prefixlen = FS::$secMgr->checkAndSecurisePostData("prefixlen");
 					$vlanid = FS::$secMgr->checkAndSecurisePostData("vlanid");
 					$desc = FS::$secMgr->checkAndSecurisePostData("desc");
 					$shortname = FS::$secMgr->checkAndSecurisePostData("shortname");
@@ -1680,6 +1691,14 @@
 					
 					if (!$mleasetime) {
 						$mleasetime = 0;
+					}
+					
+					// @TODO check if IPv6 network is used elsewhere
+					if ($netidv6 && !$prefixlen || $prefixlen && !$netidv6 || !FS::$secMgr->isIPv6NetworkAddr($netidv6) || 
+						!FS::$secMgr->isNumeric($prefixlen) || $prefixlen < 1 || $prefixlen > 126) {
+							$this->log(2,"Add/Edit subnet: subnet '".$netid."': invalid IPv6 infos");
+							FS::$iMgr->ajaxEcho("err-subnet-bad-ipv6-infos");
+							return;
 					}
 
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$netid."'");
@@ -1751,6 +1770,7 @@
 					FS::$dbMgr->BeginTr();
 					if ($edit) {
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared","netidv4 = '".$netid."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","netid = '".$netid."'");
 						FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."dns_acl_network","netid = '".$netid."'");
@@ -1758,6 +1778,11 @@
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid,netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname,dleasetime,mleasetime",
 						"'".$netid."','".$netmask."','".$vlanid."','".$shortname."','".$desc."','".$router."','".$dns1."','".$dns2."','".$domainname."','".$dleasetime."','".$mleasetime."'");
 
+					if ($netidv6 && $prefixlen) {
+						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared","netid,prefixlen,netidv4",
+						"'".$netidv6."','".$prefixlen."','".$netid."'");
+					}
+					
 					if ($subnetclusters) {
 						$count = count($subnetclusters);
 						for ($i=0;$i<$count;$i++) {

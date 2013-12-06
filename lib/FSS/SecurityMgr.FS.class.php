@@ -168,7 +168,14 @@
 		}
 
 		public function isIPv6($str) {
-			if (preg_match("#^([0-9A-F]{4}:){5}[0-9A-F]{4}$#",$str))
+			if (preg_match("#^([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}$#i",$str))
+				return true;
+
+			return false;
+		}
+		
+		public function isIPv6NetworkAddr($str) {
+			if (preg_match("#^([0-9a-f]{1,4}:){1,7}:$#i",$str))
 				return true;
 
 			return false;
@@ -185,7 +192,7 @@
 		}
 
 		public function isDNSAddr($str) {
-			if (preg_match("#^[a-z][a-z0-9.-]{1,}[a-z0-9]{2,}$#",$str))
+			if (preg_match("#^[a-z][a-z0-9.-]{1,}[a-z0-9]{2,}$#i",$str))
 				return true;
 
 			return false;

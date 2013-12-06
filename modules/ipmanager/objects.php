@@ -21,6 +21,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared";
+			$this->sqlTablev6 = PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared";
 			$this->sqlAttrId = "netid";
 			$this->readRight = "mrule_ipmgmt_subnetmgmt";
 			$this->writeRight = "mrule_ipmgmt_subnetmgmt";
@@ -123,6 +124,8 @@
 			$this->domainname = "";
 			$this->maxleasetime = 0;
 			$this->defaultleasetime = 0;
+			$this->netidv6 = "";
+			$this->prefixlenv6 = 0;
 
 			if ($this->netid) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"netmask,vlanid,subnet_short_name,subnet_desc,router,dns1,dns2,domainname,mleasetime,dleasetime",
@@ -142,6 +145,12 @@
 					$this->netCalc = new FSNetwork();
 					$this->netCalc->setNetAddr($this->netid);
 					$this->netCalc->setNetMask($this->netmask);
+					
+					$query2 = FS::$dbMgr->Select($this->sqlTablev6,"netid,prefixlen","netidv4 = '".$this->netid."'");
+					if ($data2 = FS::$dbMgr->Fetch($query2)) {
+						$this->netidv6 = $data2["netid"];
+						$this->prefixlenv6 = $data2["prefixlen"];
+					}
 					return true;
 				}
 				return false;
@@ -245,6 +254,8 @@
 		
 		private $netid;
 		private $netmask;
+		private $netidv6;
+		private $prefixlenv6;
 		private $vlanid;
 		private $shortname;
 		private $desc;

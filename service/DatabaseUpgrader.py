@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1320"
+	nextDBVersion = "1322"
 	pgsqlCon = None
 	logger = None
 
@@ -237,6 +237,12 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1319":
 				self.tryCreateTable("z_eye_radius_user_expiration","radalias varchar(256) NOT NULL, username varchar(64) NOT NULL, expiration_date timestamp NOT NULL, start_date timestamp NOT NULL, name varchar(64), surname varchar(64), creator varchar(64) NOT NULL, creation_date timestamp NOT NULL, PRIMARY KEY(radalias,username)")
 				self.setDBVersion("1320")
+			if self.dbVersion == "1320":
+				self.tryCreateTable("z_eye_dhcp_subnet_v6_declared","netid varchar(40), prefixlen varchar(3), vlanid int unique, PRIMARY KEY(netid,prefixlen)")
+				self.setDBVersion("1321")
+			if self.dbVersion == "1321":
+				self.tryAddColumn("z_eye_dhcp_subnet_v6_declared","netidv4","varchar(16) unique")
+				self.setDBVersion("1322")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
