@@ -502,7 +502,7 @@
 					"tooltip-leasepath" => "Path to dhcpd lease database, often /var/db/dhcpd.leases",
 					"tooltip-max-age" => "Max delay (in days) before advertise for old datas.<br />0 = No verification",
 					"tooltip-max-lease-time" => "Max duration (in seconds) for DHCP leases (minimum: 60secs)",
-					"tooltip-prefixlen" => "It's a value between 1 and 126 (included)"
+					"tooltip-prefixlen" => "It's a value between 1 and 126 (included)",
 					"tooltip-reservconfpath" => "For future usage. Path to a writeable file for dhcp reservations.",
 					"tooltip-router" => "The default gateway is the client's router",
 					"tooltip-shortname" => "An alias for the DHCP subnet to identify it",
