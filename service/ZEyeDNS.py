@@ -27,6 +27,7 @@ import dns.query
 import dns.resolver
 import dns.zone
 from dns.exception import DNSException
+import dns.tsigkeyring
 
 import logging
 import netdiscoCfg
@@ -811,6 +812,8 @@ class DNSManager(ZEyeUtil.Thread):
 class RecordCollector(ZEyeUtil.Thread):
 	pgcursor = None
 	serversZones = {}
+	tsigList = {}
+	serverList = {}
 
 	def __init__(self):
 		""" 5 min between two refresh """
@@ -833,8 +836,11 @@ class RecordCollector(ZEyeUtil.Thread):
 
 			pgcursor2.execute("DELETE FROM z_eye_dns_zone_record_cache WHERE zonename = '%s' AND server = '%s'" % (zone,server))
 
+			kn = self.tsigList[self.serverList[server]][0]
+			kr = dns.tsigkeyring.from_text({kn : self.tsigList[self.serverList[server]][2]})
+
 			# Transfer zone
-			qzone = dns.zone.from_xfr(dns.query.xfr(server,zone))
+			qzone = dns.zone.from_xfr(dns.query.xfr(server,zone,keyring=kr))
 			for rectype in ["A","AAAA","CNAME","TXT","SRV","PTR","NS","SOA","MX"]:
 				for (name, ttl, rdata) in qzone.iterate_rdatas(rectype):
 					pgcursor2.execute("INSERT INTO z_eye_dns_zone_record_cache (zonename,record,rectype,recval,ttl,server) VALUES ('%s','%s','%s','%s','%s','%s')" % (zone,name,rectype,rdata,ttl,server))
@@ -856,7 +862,9 @@ class RecordCollector(ZEyeUtil.Thread):
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			self.pgcursor = pgsqlCon.cursor()
-			self.loadServersAndZones()
+			self.loadServerList()
+			self.loadServerZones()
+			self.loadTSIGList()
 			try:
 				for server in self.serversZones:
 					for zone in self.serversZones[server]:
@@ -870,6 +878,8 @@ class RecordCollector(ZEyeUtil.Thread):
 		except PgSQL.Error, e:
 			self.logger.critical("DNS-Record-Collector: Pgsql Error %s" % e)
 			return
+		except Exception, e:
+			self.logger.critical("DNS-Record-Collector: FATAL %s" % e)
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
@@ -882,8 +892,19 @@ class RecordCollector(ZEyeUtil.Thread):
 
 		totaltime = datetime.datetime.now() - starttime 
 		self.logger.info("DNS Records collect done (time: %s)" % totaltime)
+		
+	def loadServerList(self):
+		self.serverList = {}
 
-	def loadServersAndZones(self):
+		# Only load servers in clusters
+		self.pgcursor.execute("SELECT addr,tsigtransfer FROM z_eye_dns_servers WHERE addr IN (SELECT server FROM z_eye_dns_cluster_masters) OR addr IN (SELECT server FROM z_eye_dns_cluster_slaves) OR addr IN (SELECT server FROM z_eye_dns_cluster_caches)")
+		pgres = self.pgcursor.fetchall()
+		for idx in pgres:
+			# Only load if all required fields are populated
+			if idx[1] != None and idx[1] != "":
+				self.serverList[idx[0]] = (idx[1])
+
+	def loadServerZones(self):
 		self.serversZones = {}
 		# Load zones but not some special system zones
 		self.pgcursor.execute("SELECT server,zonename FROM z_eye_dns_zone_cache WHERE zonename NOT IN ('.','localhost','127.in-addr.arpa','1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa')")
@@ -892,3 +913,12 @@ class RecordCollector(ZEyeUtil.Thread):
 			if idx[0] not in self.serversZones:
 				self.serversZones[idx[0]] = []
 			self.serversZones[idx[0]].append(idx[1])
+			
+	def loadTSIGList(self):
+		self.tsigList = {}
+
+		self.pgcursor.execute("SELECT keyalias,keyid,keyalgo,keyvalue FROM z_eye_dns_tsig")
+		pgres = self.pgcursor.fetchall()
+		for idx in pgres:
+			self.tsigList[idx[0]] = (idx[1],idx[2],idx[3])
+			
