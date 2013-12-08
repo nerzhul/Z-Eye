@@ -690,27 +690,47 @@
 					$found = 1;
 					$output .= $this->showDeclaredNetTableHead();
 				}
-				$output .= $this->tableDeclaredNetEntry($data["netid"],$data["netmask"],$data["subnet_desc"],$data["subnet_short_name"],$data["vlanid"]);
+				$netv6 = "";
+				$prefixlen = 0;
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared",
+					"netid,prefixlen","netidv4 = '".$data["netid"]."'");
+				if ($data2 = FS::$dbMgr->Fetch($query2)) {
+					$netv6 = $data2["netid"];
+					$prefixlen = $data2["prefixlen"];
+				}
+				$output .= $this->tableDeclaredNetEntry($data["netid"],$data["netmask"],$data["subnet_desc"],
+					$data["subnet_short_name"],$data["vlanid"],$netv6,$prefixlen);
 			}
-			if ($found) $output .= "</table>".FS::$iMgr->jsSortTable("declsubnettable");
+			if ($found) {
+				$output .= "</table>".FS::$iMgr->jsSortTable("declsubnettable");
+			}
 			$output .= "</div>";
 			return $output;
 		}
 
 		private function showDeclaredNetTableHead() {
-			return "<table id=\"declsubnettable\"><thead id=\"declsubnethead\"><tr><th>".$this->loc->s("netid")."/".$this->loc->s("netmask")."</th><th>".
-				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th>
+			return "<table id=\"declsubnettable\"><thead id=\"declsubnethead\"><tr><th>".
+				$this->loc->s("netid")."/".$this->loc->s("netmask")."</th><th>".
+				$this->loc->s("netidv6")."</th><th>".
+				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".
+				$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th>
 				<th>".$this->loc->s("dhcp-clusters")."</th><th></th></tr></thead>";
 		}
 
-		private function tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid) {
+		private function tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid,$netidv6,$prefixlenv6) {
 			$net = new FSNetwork();
 			$net->SetNetAddr($netid);
 			$net->SetNetMask($netmask);
 			$net->CalcCIDR();
 			$output = "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
-				"/".$netmask." (/".$net->getCIDR().")</td><td>".$vlanid."</td><td>".
-				($net->getMaxHosts()-2)."</td><td>".$shortname."</td><td>".$desc."</td><td>";
+				"/".$netmask." (/".$net->getCIDR().")</td><td>";
+				
+			if ($netidv6 != "" && $prefixlenv6 != 0) {
+				$output .= $netidv6."/".$prefixlenv6;
+			}
+				
+			$output .= "</td><td>".$vlanid."</td><td>".
+				($net->getMaxHosts()-1)."</td><td>".$shortname."</td><td>".$desc."</td><td>";
 			
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
@@ -1811,7 +1831,8 @@
 					if ($edit) {
 						$js = "hideAndRemove('#ds".FS::$iMgr->formatHTMLId($netid)."tr'); setTimeout(function(){";
 					}
-					$jscontent = $this->tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid);
+					$jscontent = $this->tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,
+						$vlanid,$netidv6,$prefixlen);
 					$js .= "$('".FS::$secMgr->cleanForJS($jscontent)."').insertAfter('#declsubnethead');";
 					if ($edit) {
 						$js .= "},1200);";
