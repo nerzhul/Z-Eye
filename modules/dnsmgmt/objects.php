@@ -1708,7 +1708,7 @@
 				return;
 			}
 			
-			if (!$ssh->isRemoteReable($namedpath)) {
+			if (!$ssh->isRemoteReadable($namedpath)) {
 				FS::$iMgr->ajaxEchoNC("err-namedconf-not-readable");
 				return;
 			}
