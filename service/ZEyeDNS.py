@@ -306,8 +306,9 @@ class DNSManager(ZEyeUtil.Thread):
 								We add Z-Eye TSIG key, if present
 								"""
 								if tsigtransfer != None and tsigtransfer != "" and tsigtransfer in self.tsigList:
-									transferBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
-									queryBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
+									transferBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0]
+									queryBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0]
+									updateBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0]
 
 								"""
 								Now we load real ACLs
