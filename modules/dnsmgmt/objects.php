@@ -154,8 +154,8 @@
 						$output .= FS::$iMgr->hr();
 					}
 					
-					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"]."<br />".
-						$this->loc->s("Zone-type");
+					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"]."<br /><b>".
+						$this->loc->s("Zone-type")."</b>: ";
 					switch ($data["zonetype"]) {
 						case 1:
 							$output .= $this->loc->s("Classic");
