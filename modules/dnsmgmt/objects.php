@@ -438,7 +438,7 @@
 				return;
 			} 
 
-			$zonename = FS::$secMgr->checkAndSecurisePostData("zonename");
+			$zonename = FS::$secMgr->checkAndSecuriseGetData("zonename");
 
 			if (!$zonename) {
 				FS::$iMgr->ajaxEcho("err-bad-datas");
