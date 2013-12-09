@@ -988,6 +988,7 @@ label { float: left; font-weight: bold; text-align: left; }
 .select2-container .select2-choice {
     display: block;
     height: 26px;
+    min-width: 200px;
     padding: 0 0 0 8px;
     overflow: hidden;
     position: relative;
@@ -1236,6 +1237,7 @@ label { float: left; font-weight: bold; text-align: left; }
 /* results */
 .select2-results {
     max-height: 200px;
+    min-width: 200px;
     padding: 0 0 0 4px;
     margin: 4px 4px 4px 0;
     position: relative;
@@ -1343,7 +1345,7 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-locked { padding: 3px 5px 3px 5px !important; }
-.select2-container-multi .select2-choices { min-height: 26px; min-width: 90px; }
+.select2-container-multi .select2-choices { min-height: 26px; min-width: 210px; }
 
 .select2-container-multi.select2-container-active .select2-choices {
     border: 1px solid #A41723;
