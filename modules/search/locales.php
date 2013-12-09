@@ -32,6 +32,7 @@
 					"attribution-type" => "Type d'attribution",
 					"Between" => "Entre le",
 					"Bytes" => "Octets",
+					"Classic" => "Classique",
 					"comment" => "Commentaire",
 					"Description" => "Description",
 					"Device" => "Equipement",
@@ -47,6 +48,7 @@
 					"err-no-res" => "Aucun résultat trouvé",
 					"err-no-search" => "Pas de données à rechercher",
 					"First-view" => "Première vue",
+					"Forward-only" => "Uniquement relai",
 					"Groups" => "Groupes",
 					"inactive-reserv" => "Réservation inactive",
 					"Informations" => "Informations",
@@ -102,6 +104,7 @@
 					"title-dns-records" => "Enregistrements DNS",
 					"title-dns-resolution" => "Résolution DNS",
 					"title-dns-server" => "Serveur(s) DNS",
+					"title-dns-zone" => "Zone DNS",
 					"title-ip-addr" => "Adresses IP",
 					"title-last-device" => "Dernier équipement",
 					"title-mac-addr" => "Adresses MAC",
@@ -119,6 +122,7 @@
 					"Username" => "Nom d'utilisateur",
 					"Validity" => "Validité",
 					"vlanid" => "ID de VLAN",
+					"Zone-type" => "Type de zone",
 				),
 				"en" => array(
 					"Active" => "Active",
@@ -131,6 +135,7 @@
 					"attribution-type" => "Attribution type",
 					"Between" => "Between",
 					"Bytes" => "Bytes",
+					"Classic" => "Classic",
 					"comment" => "Comment",
 					"Description" => "Description",
 					"Device" => "Device",
@@ -145,6 +150,7 @@
 					"err-no-res" => "No result found",
 					"err-no-search" => "No data to find",
 					"First-view" => "First seend",
+					"Forward-only" => "Forward only",
 					"Groups" => "Groups",
 					"inactive-reserv" => "Reservation disabled",
 					"Informations" => "Informations",
@@ -198,6 +204,7 @@
 					"title-dns-records" => "DNS records",
 					"title-dns-resolution" => "DNS resolutions",
 					"title-dns-server" => "DNS server(s)",
+					"title-dns-zone" => "DNS Zone",
 					"title-ip-addr" => "IP addresses",
 					"title-last-device" => "Last device",
 					"title-mac-addr" => "MAC addresses",
@@ -215,6 +222,7 @@
 					"Username" => "Username",
 					"Validity" => "Validity",
 					"vlanid" => "VLAN ID",
+					"Zone-type" => "Zone type",
 				)
 			);
 			$this->concat($locales);
