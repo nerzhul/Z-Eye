@@ -289,7 +289,17 @@
 								$style = "background-color: #FF8888;"; break;
 							default: $style = ""; break;
 						}
-						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
+						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">";
+						if ($recordtype != "SOA") {
+							$output .= FS::$iMgr->opendiv(12,$recordname,
+								array("lnkadd" => "zn=".$dnszone2."&recname=".$recordname."&rectype=".$recordtype.
+									"&recvalue=".$recordval)
+							);
+						}
+						else {
+							$output .= $recordname;
+						}
+						$output .= "</td><td>".$recordtype."</td><td>";
 						if ($recordtype == "A" || $recordtype == "AAAA") {
 							$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$recordval, $recordval);
 						}
@@ -428,12 +438,11 @@
 					$recname = FS::$secMgr->checkAndSecuriseGetData("recname");
 					$rectype = FS::$secMgr->checkAndSecuriseGetData("rectype");
 					$recvalue = FS::$secMgr->checkAndSecuriseGetData("recvalue");
-					$recttl = FS::$secMgr->checkAndSecuriseGetData("recttl");
-					if (!$zonename && !$recname && !$rectype && !$recvalue && !$recttl) {
+					if (!$zonename && !$recname && !$rectype && !$recvalue) {
 						return $this->loc->s("err-bad-datas");
 					}
 					$dnsRecord = new dnsRecord();
-					return $dnsRecord->showForm($zonename,$recname,$rectype,$recvalue,$recttl);
+					return $dnsRecord->showForm($zonename,$recname,$rectype,$recvalue);
 				default: return;
 			}
 		}

@@ -2207,22 +2207,30 @@
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			}
-				
-			$selRT = FS::$iMgr->select("rectype").
-				FS::$iMgr->selElmt("A","A",$rectype == "A").
-				FS::$iMgr->selElmt("AAAA","AAAA",$rectype == "AAAA").
-				FS::$iMgr->selElmt("CNAME","CNAME",$rectype == "CNAME").
-				FS::$iMgr->selElmt("MX","MX",$rectype == "MX").
-				FS::$iMgr->selElmt("SRV","SRV",$rectype == "SRV").
-				FS::$iMgr->selElmt("TXT","TXT",$rectype == "TXT").
-				FS::$iMgr->selElmt("NS","NS",$rectype == "NS").
-				FS::$iMgr->selElmt("PTR","PTR",$rectype == "PTR").
-				"</select>";
+			
+			$selRT = "";
+			if ($rectype == "") {
+				$selRT = FS::$iMgr->select("rectype").
+					FS::$iMgr->selElmt("A","A",$rectype == "A").
+					FS::$iMgr->selElmt("AAAA","AAAA",$rectype == "AAAA").
+					FS::$iMgr->selElmt("CNAME","CNAME",$rectype == "CNAME").
+					FS::$iMgr->selElmt("MX","MX",$rectype == "MX").
+					FS::$iMgr->selElmt("SRV","SRV",$rectype == "SRV").
+					FS::$iMgr->selElmt("TXT","TXT",$rectype == "TXT").
+					FS::$iMgr->selElmt("NS","NS",$rectype == "NS").
+					FS::$iMgr->selElmt("PTR","PTR",$rectype == "PTR").
+					"</select>";
+			}
+			else {
+				$selRT = $rectype.FS::$iMgr->hidden("rectype",$rectype).
+					FS::$iMgr->hidden("orecval",$recval);
+			}
 				
 			$output = sprintf("%s<table>%s%s</table></form>",
 				FS::$iMgr->cbkForm("13"),
 				FS::$iMgr->idxLines(array(
-					array("Record","recname",array("type" => "idxedit", "value" => $recname)),
+					array("Record","recname",array("type" => "idxedit", "value" => $recname,
+						"edit" => $rectype != "")),
 					array("DNS-zone","",array("type" => "raw", 
 						"value" => $zonename.FS::$iMgr->hidden("zonename",$zonename))),
 					array("Record-Type","rectype",array("type" => "raw", "value" => $selRT)),
@@ -2246,12 +2254,13 @@
 			$recttl = FS::$secMgr->checkAndSecurisePostData("recttl");
 			$recvalue = FS::$secMgr->checkAndSecurisePostData("recval");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+			$oldvalue = FS::$secMgr->checkAndSecurisePostData("orecval");
 			
 			if (!$zonename || !FS::$secMgr->isDNSName($zonename) ||
 				!$record || !FS::$secMgr->isDNSName($record) ||
 				!$recttl || !FS::$secMgr->isNumeric($recttl) ||
 				!$rectype || !$recvalue || !FS::$secMgr->isDNSRecordCoherent($rectype,$recvalue) ||
-				$edit && $edit != 1) {
+				$edit && ($edit != 1 || !$oldvalue)) {
 				FS::$iMgr->ajaxEchoNC("err-bad-datas");
 				return;
 			}
@@ -2294,8 +2303,8 @@
 					}
 					fwrite($file,sprintf("server %s\n",$data2["server"]));
 					if ($edit) {
-						fwrite($file,sprintf("update delete %s.%s %s %s\n",
-							$record,$zonename,$rectype,$recvalue));
+						fwrite($file,sprintf("update delete %s.%s. %s %s\n",
+							$record,$zonename,$rectype,$oldvalue));
 					}
 					fwrite($file,sprintf("update add %s.%s. %s %s %s\nsend\n",
 						$record,$zonename,$recttl,$rectype,$recvalue));
@@ -2363,7 +2372,7 @@
 						return;
 					}
 					fwrite($file,sprintf("server %s\n",$data2["server"]));
-					fwrite($file,sprintf("update delete %s.%s %s %s\nsend\n",
+					fwrite($file,sprintf("update delete %s.%s. %s %s\nsend\n",
 						$record,$zonename,$rectype,$recvalue));
 					
 					fclose($file);
