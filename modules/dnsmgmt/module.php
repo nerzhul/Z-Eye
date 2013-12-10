@@ -290,7 +290,7 @@
 							default: $style = ""; break;
 						}
 						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">";
-						if ($recordtype != "SOA") {
+						if ($recordtype != "SOA" && $recordname != "@") {
 							$output .= FS::$iMgr->opendiv(12,$recordname,
 								array("lnkadd" => "zn=".$dnszone2."&recname=".$recordname."&rectype=".$recordtype.
 									"&recvalue=".$recordval)
