@@ -566,7 +566,7 @@ class DNSManager(ZEyeUtil.Thread):
 							Verify if zone file exists on master servers. If not exists create a basic file
 							Not needed for slaves. Zonefile is created when transfer if not exists on slave servers.
 							"""
-							if ssh.isRemoteExists("%s/%s" % (mzonepath,zone)) == False:
+							if ssh.isRemoteExists("%s/%s/%s" % (chrootpath,mzonepath,zone)) == False:
 								# SOA record
 								ttlRefresh = self.zoneList[zone][8]
 								if ttlRefresh == 0:
@@ -593,7 +593,17 @@ class DNSManager(ZEyeUtil.Thread):
 										for slave in slaveList:
 											zonefile += "\t\t\tNS\t%s.\n" % self.serverList[slave][7]
 								zonefile += "\n$ORIGIN %s.\n" % zone
-								ssh.sendCmd("echo '%s' > %s/%s" % (zonefile,mzonepath,zone))
+								ssh.sendCmd("echo '%s' > %s/%s/%s" % (zonefile,chrootpath,mzonepath,zone))
+								ssh.sendCmd("echo 1 > /tmp/dnsrestart")
+								self.logger.info("DNSManager: file for zone %s created on %s" % (zone,addr))
+						elif self.zoneList[zone][0] == 1 and srvType == 2:
+							"""
+							Verify if zone file exists on slave servers.
+							If not exists ask a service restart to load zone
+							"""
+							if ssh.isRemoteExists("%s/%s/%s" % (chrootpath,szonepath,zone)) == False:
+								ssh.sendCmd("echo 1 > /tmp/dnsrestart")
+								self.logger.info("DNSManager: file for zone %s inexistant on %s, asking named restart" % (zone,addr))
 								
 			# check md5 trace to see if subnet file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (zeyenamedpath,hashCmd))
