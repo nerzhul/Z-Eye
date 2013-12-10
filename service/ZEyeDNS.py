@@ -71,11 +71,7 @@ class DNSManager(ZEyeUtil.Thread):
 					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7],self.serverList[server][8],self.serverList[server][9]))
 		except Exception, e:
 			self.logger.critical("DNS Manager: %s" % e)
-			sys.exit(1);	
-
-		finally:
-			if pgsqlCon:
-				pgsqlCon.close()
+			sys.exit(1);
 
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
@@ -199,7 +195,7 @@ class DNSManager(ZEyeUtil.Thread):
 					algo = "hmac-sha256"
 				if algo != "":
 					cfgbuffer += "key \"%s\" {\n\talgorithm %s;\n\tsecret \"%s\";\n};\n" % (self.tsigList[tsig][0],algo,self.tsigList[tsig][2])	
-
+					
 			# Write ACLS
 			for acl in self.aclList:
 				tmpcfgbuffer = ""
@@ -212,9 +208,13 @@ class DNSManager(ZEyeUtil.Thread):
 				for tsig in self.aclList[acl][3]:
 					tmpcfgbuffer += "\tkey \"%s\";\n" % tsig
 				for dnsname in self.aclList[acl][4]:
-					dnsanswer = dns.resolver.query(dnsname,'A')
-					for rdata in dnsanswer:
-						tmpcfgbuffer += "\t%s;\n" % rdata.address
+					# We need to catch exception. If exception, name not resolvable
+					try:
+						dnsanswer = dns.resolver.query(dnsname,'A')
+						for rdata in dnsanswer:
+							tmpcfgbuffer += "\t%s;\n" % rdata.address
+					except DNSException, e:
+						self.logger.error("DNS Manager/doConfigDNS: unable to resolve name %s" % dnsname)
 
 				if len(tmpcfgbuffer) > 0:
 					cfgbuffer += "acl \"%s\" {\n%s};\n" % (acl,tmpcfgbuffer)
@@ -595,7 +595,6 @@ class DNSManager(ZEyeUtil.Thread):
 								zonefile += "\n$ORIGIN %s.\n" % zone
 								ssh.sendCmd("echo '%s' > %s/%s" % (zonefile,mzonepath,zone))
 								
-
 			# check md5 trace to see if subnet file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (zeyenamedpath,hashCmd))
 			tmpmd52 = subprocess.check_output(["/sbin/md5","-qs","%s\n" % cfgbuffer])
@@ -603,12 +602,10 @@ class DNSManager(ZEyeUtil.Thread):
 				ssh.sendCmd("echo '%s' > %s" % (cfgbuffer,zeyenamedpath))
 				ssh.sendCmd("echo 1 > /tmp/dnsrestart")
 				self.logger.info("DNSManager: configuration modified on %s" % addr)
-				
-
+			
 			ssh.close()
-
 		except Exception, e:
-			self.logger.critical("DNS Manager: %s" % e)
+			self.logger.critical("DNS Manager/doConfigDNS: %s" % e)
 		finally:
 			self.decrThreadNb()
 
