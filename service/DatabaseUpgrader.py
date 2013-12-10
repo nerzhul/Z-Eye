@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1322"
+	nextDBVersion = "1324"
 	pgsqlCon = None
 	logger = None
 
@@ -243,6 +243,12 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1321":
 				self.tryAddColumn("z_eye_dhcp_subnet_v6_declared","netidv4","varchar(16) unique")
 				self.setDBVersion("1322")
+			if self.dbVersion == "1322":
+				self.tryAlterColumn("z_eye_dns_zone_record_cache","record","TYPE varchar(256)")
+				self.setDBVersion("1323")
+			if self.dbVersion == "1323":
+				self.tryAlterColumn("z_eye_dns_zone_record_cache","recval","TYPE varchar(256)")
+				self.setDBVersion("1324")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

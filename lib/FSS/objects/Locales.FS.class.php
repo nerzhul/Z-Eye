@@ -81,6 +81,7 @@
 					"semi-colon" => "Semi-colon (;)",
 					"separator" => "Separator",
 					"Settings" => "Settings",
+					"Type" => "Type",
 					"unknown" => "unknown",
 					"Yes" => "Yes",
 				),
@@ -134,6 +135,7 @@
 					"semi-colon" => "Point-virgule (;)",
 					"separator" => "Séparateur",
 					"Settings" => "Paramètres",
+					"Type" => "Type",
 					"unknown" => "inconnu",
 					"Yes" => "Oui",
 				)

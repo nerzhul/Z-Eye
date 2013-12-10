@@ -27,6 +27,7 @@ import dns.query
 import dns.resolver
 import dns.zone
 from dns.exception import DNSException
+import dns.tsigkeyring
 
 import logging
 import netdiscoCfg
@@ -67,7 +68,7 @@ class DNSManager(ZEyeUtil.Thread):
 					self.loadClusterList(pgcursor)
 					self.loadZoneList(pgcursor)
 
-					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7],self.serverList[server][8]))
+					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7],self.serverList[server][8],self.serverList[server][9]))
 		except Exception, e:
 			self.logger.critical("DNS Manager: %s" % e)
 			sys.exit(1);	
@@ -85,7 +86,7 @@ class DNSManager(ZEyeUtil.Thread):
 		totaltime = datetime.datetime.now() - starttime
 		self.logger.info("DNS Management task done (time: %s)" % totaltime)
 
-	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer):
+	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer,tsigupdate):
 		self.incrThreadNb()
 
 		cfgbuffer = ""
@@ -138,19 +139,31 @@ class DNSManager(ZEyeUtil.Thread):
 					if len(self.clusterList[cluster][4]) > 0:
 						tmpcfgbuffer += "\tallow-transfer {\n"
 						for acl in self.clusterList[cluster][4]:
-							if acl == "none" or acl == "any":
+							# Only write non if no tsig transfer key
+							if acl == "none":
+								if tsigtransfer == "":
+									tmpcfgbuffer += "\t\t%s;\n" % acl
+							elif acl == "any":
 								tmpcfgbuffer += "\t\t%s;\n" % acl
 							else:
 								tmpcfgbuffer += "\t\t\"%s\";\n" % acl
+						if tsigtransfer != "":
+							tmpcfgbuffer += "\t\tkey \"%s\";\n" % self.tsigList[tsigtransfer][0]
 						tmpcfgbuffer += "\t};\n"
 
 					if len(self.clusterList[cluster][5]) > 0:
 						tmpcfgbuffer += "\tallow-update {\n"
 						for acl in self.clusterList[cluster][5]:
-							if acl == "none" or acl == "any":
+							# Only write non if no tsig update key
+							if acl == "none":
+								if tsigupdate == "":
+									tmpcfgbuffer += "\t\tkey \"%s\";\n" % tsigupdate
+							elif acl == "any":
 								tmpcfgbuffer += "\t\t%s;\n" % acl
 							else:
 								tmpcfgbuffer += "\t\t\"%s\";\n" % acl
+						if tsigupdate != "":
+							tmpcfgbuffer += "\t\tkey \"%s\";\n" % self.tsigList[tsigupdate][0]
 						tmpcfgbuffer += "\t};\n"
 
 					if len(self.clusterList[cluster][6]) > 0:
@@ -293,8 +306,9 @@ class DNSManager(ZEyeUtil.Thread):
 								We add Z-Eye TSIG key, if present
 								"""
 								if tsigtransfer != None and tsigtransfer != "" and tsigtransfer in self.tsigList:
-									transferBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
-									queryBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0];
+									transferBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0]
+									queryBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0]
+									updateBuf += "\t\tkey %s;\n" % self.tsigList[tsigtransfer][0]
 
 								"""
 								Now we load real ACLs
@@ -602,12 +616,12 @@ class DNSManager(ZEyeUtil.Thread):
 		self.serverList = {}
 
 		# Only load servers in clusters
-		pgcursor.execute("SELECT addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer FROM z_eye_dns_servers WHERE addr IN (SELECT server FROM z_eye_dns_cluster_masters) OR addr IN (SELECT server FROM z_eye_dns_cluster_slaves) OR addr IN (SELECT server FROM z_eye_dns_cluster_caches)")
+		pgcursor.execute("SELECT addr,sshuser,sshpwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer,tsigupdate FROM z_eye_dns_servers WHERE addr IN (SELECT server FROM z_eye_dns_cluster_masters) OR addr IN (SELECT server FROM z_eye_dns_cluster_slaves) OR addr IN (SELECT server FROM z_eye_dns_cluster_caches)")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
 			# Only load if all required fields are populated
 			if idx[1] != None and idx[2] != None and idx[4] != None and idx[5] != None and idx[6] != None and idx[7] != None and idx[8] != None:
-				self.serverList[idx[0]] = (idx[1],idx[2],idx[3],idx[4],idx[5],idx[6],idx[7],idx[8],idx[9])
+				self.serverList[idx[0]] = (idx[1],idx[2],idx[3],idx[4],idx[5],idx[6],idx[7],idx[8],idx[9],idx[10])
 
 	def loadClusterList(self,pgcursor):
 		self.clusterList = {}
@@ -799,6 +813,8 @@ class DNSManager(ZEyeUtil.Thread):
 class RecordCollector(ZEyeUtil.Thread):
 	pgcursor = None
 	serversZones = {}
+	tsigList = {}
+	serverList = {}
 
 	def __init__(self):
 		""" 5 min between two refresh """
@@ -821,8 +837,11 @@ class RecordCollector(ZEyeUtil.Thread):
 
 			pgcursor2.execute("DELETE FROM z_eye_dns_zone_record_cache WHERE zonename = '%s' AND server = '%s'" % (zone,server))
 
+			kn = self.tsigList[self.serverList[server]][0]
+			kr = dns.tsigkeyring.from_text({kn : self.tsigList[self.serverList[server]][2]})
+
 			# Transfer zone
-			qzone = dns.zone.from_xfr(dns.query.xfr(server,zone))
+			qzone = dns.zone.from_xfr(dns.query.xfr(server,zone,keyring=kr))
 			for rectype in ["A","AAAA","CNAME","TXT","SRV","PTR","NS","SOA","MX"]:
 				for (name, ttl, rdata) in qzone.iterate_rdatas(rectype):
 					pgcursor2.execute("INSERT INTO z_eye_dns_zone_record_cache (zonename,record,rectype,recval,ttl,server) VALUES ('%s','%s','%s','%s','%s','%s')" % (zone,name,rectype,rdata,ttl,server))
@@ -844,7 +863,9 @@ class RecordCollector(ZEyeUtil.Thread):
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			self.pgcursor = pgsqlCon.cursor()
-			self.loadServersAndZones()
+			self.loadServerList()
+			self.loadServerZones()
+			self.loadTSIGList()
 			try:
 				for server in self.serversZones:
 					for zone in self.serversZones[server]:
@@ -858,6 +879,8 @@ class RecordCollector(ZEyeUtil.Thread):
 		except PgSQL.Error, e:
 			self.logger.critical("DNS-Record-Collector: Pgsql Error %s" % e)
 			return
+		except Exception, e:
+			self.logger.critical("DNS-Record-Collector: FATAL %s" % e)
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
@@ -870,8 +893,19 @@ class RecordCollector(ZEyeUtil.Thread):
 
 		totaltime = datetime.datetime.now() - starttime 
 		self.logger.info("DNS Records collect done (time: %s)" % totaltime)
+		
+	def loadServerList(self):
+		self.serverList = {}
 
-	def loadServersAndZones(self):
+		# Only load servers in clusters
+		self.pgcursor.execute("SELECT addr,tsigtransfer FROM z_eye_dns_servers WHERE addr IN (SELECT server FROM z_eye_dns_cluster_masters) OR addr IN (SELECT server FROM z_eye_dns_cluster_slaves) OR addr IN (SELECT server FROM z_eye_dns_cluster_caches)")
+		pgres = self.pgcursor.fetchall()
+		for idx in pgres:
+			# Only load if all required fields are populated
+			if idx[1] != None and idx[1] != "":
+				self.serverList[idx[0]] = (idx[1])
+
+	def loadServerZones(self):
 		self.serversZones = {}
 		# Load zones but not some special system zones
 		self.pgcursor.execute("SELECT server,zonename FROM z_eye_dns_zone_cache WHERE zonename NOT IN ('.','localhost','127.in-addr.arpa','1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa')")
@@ -880,3 +914,12 @@ class RecordCollector(ZEyeUtil.Thread):
 			if idx[0] not in self.serversZones:
 				self.serversZones[idx[0]] = []
 			self.serversZones[idx[0]].append(idx[1])
+			
+	def loadTSIGList(self):
+		self.tsigList = {}
+
+		self.pgcursor.execute("SELECT keyalias,keyid,keyalgo,keyvalue FROM z_eye_dns_tsig")
+		pgres = self.pgcursor.fetchall()
+		for idx in pgres:
+			self.tsigList[idx[0]] = (idx[1],idx[2],idx[3])
+			

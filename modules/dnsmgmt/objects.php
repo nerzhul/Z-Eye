@@ -154,8 +154,8 @@
 						$output .= FS::$iMgr->hr();
 					}
 					
-					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"]."<br />".
-						$this->loc->s("Zone-type");
+					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"]."<br /><b>".
+						$this->loc->s("Zone-type")."</b>: ";
 					switch ($data["zonetype"]) {
 						case 1:
 							$output .= $this->loc->s("Classic");
@@ -438,7 +438,7 @@
 				return;
 			} 
 
-			$zonename = FS::$secMgr->checkAndSecurisePostData("zonename");
+			$zonename = FS::$secMgr->checkAndSecuriseGetData("zonename");
 
 			if (!$zonename) {
 				FS::$iMgr->ajaxEcho("err-bad-datas");
@@ -1708,7 +1708,7 @@
 				return;
 			}
 			
-			if (!$ssh->isRemoteReable($namedpath)) {
+			if (!$ssh->isRemoteReadable($namedpath)) {
 				FS::$iMgr->ajaxEchoNC("err-namedconf-not-readable");
 				return;
 			}
@@ -2198,6 +2198,30 @@
 					}
 				}
 			}
+		}
+		
+		public function showForm($zonename, $recname = "", $rectype = "", $recval = "") {
+			
+			$selRT = FS::$iMgr->select("rectype").
+				FS::$iMgr->selElmt("A","A",$rectype == "A").
+				FS::$iMgr->selElmt("AAAA","AAAA",$rectype == "AAAA").
+				FS::$iMgr->selElmt("CNAME","CNAME",$rectype == "CNAME").
+				FS::$iMgr->selElmt("MX","MX",$rectype == "MX").
+				FS::$iMgr->selElmt("SRV","SRV",$rectype == "SRV").
+				FS::$iMgr->selElmt("TXT","TXT",$rectype == "TXT").
+				FS::$iMgr->selElmt("NS","NS",$rectype == "NS").
+				FS::$iMgr->selElmt("PTR","PTR",$rectype == "PTR").
+				"</select>";
+				
+			$output = sprintf("<table>%s%s</table>",
+				FS::$iMgr->idxLines(array(
+					array("Record","recname",array("type" => "idxedit", "value" => $recname)),
+					array("Record-Type","rectype",array("type" => "raw", "value" => $selRT)),
+					array("Value","recval",array("value" => $recval)),
+				)),
+				FS::$iMgr->aeTableSubmit($zonename != "")
+			);
+			return $output;
 		}
 	};
 ?>

@@ -241,7 +241,11 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($first) {
 					$first = false;
-					$output .= FS::$iMgr->h3("Zone: ".$dnszone,true)."<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
+					$output .= FS::$iMgr->h3("Zone: ".$dnszone,true);
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_zones","zonename","zonename = '".$dnszone."'")) {
+						$output .= FS::$iMgr->opendiv(11,$this->loc->s("Add-Record"),array("lnkadd" => "zn=".$dnszone));
+					}
+					$output .= "<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
 						$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
 				}
 				if (!isset($dnsrecords[$data["record"]])) 
@@ -384,6 +388,24 @@
 
 					$dnsZone = new dnsZone();
 					return $dnsZone->showForm($zonename);
+				case 11:
+					$zonename = FS::$secMgr->checkAndSecuriseGetData("zn");
+					if (!$zonename) {
+						return $this->loc->s("err-bad-datas");
+					}
+					
+					$dnsRecord = new dnsRecord();
+					return $dnsRecord->showForm($zonename);
+				case 12:
+					$zonename = FS::$secMgr->checkAndSecuriseGetData("zn");
+					$recname = FS::$secMgr->checkAndSecuriseGetData("recname");
+					$rectype = FS::$secMgr->checkAndSecuriseGetData("rectype");
+					$recvalue = FS::$secMgr->checkAndSecuriseGetData("recvalue");
+					if (!$zonename && !$recname && !$rectype && !$recvalue) {
+						return $this->loc->s("err-bad-datas");
+					}
+					$dnsRecord = new dnsRecord();
+					return $dnsRecord->showForm($zonename,$recname,$rectype,$recvalue);
 				default: return;
 			}
 		}
