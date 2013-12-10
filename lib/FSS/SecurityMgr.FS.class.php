@@ -75,13 +75,51 @@
 		}
 
 		public function isDNSName($str) {
-			if (preg_match("#^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-])*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$#", $str)) {
+			if (preg_match("#^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-])*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\.{0,1}$#", $str)) {
 				return true;
 			}
 
 			return false;
 		}
 
+		public function isDNSRecordCoherent($recordtype,$recordvalue) {
+			if ($recordtype == "A" && $this->isIP($recordvalue) ||
+				$recordtype == "AAAA" && $this->isIPv6($recordvalue) ||
+				$recordtype == "CNAME" && $this->isDNSName($recordvalue) ||
+				$recordtype == "TXT" && strlen($recordvalue) > 0 ||
+				$recordtype == "NS" && $this->isDNSName($recordvalue) ||
+				$recordtype == "PTR" && $this->isDNSName($recordvalue)) {
+				return true;
+			}
+			
+			if ($recordtype == "MX") {
+				$mxval = preg_split(" ",$recordvalue);
+				if (count($mxval) != 2) {
+					return false;
+				}
+				
+				if (!$this->isNumeric($maxval[0]) || !$this->isDNSName($maxval[1])) {
+					return false;
+				}
+				return true;
+			}
+			
+			if ($recordtype == "SRV") {
+				$srvval = preg_split(" ",$recordvalue);
+				if (count($srvval) != 4) {
+					return false;
+				}
+				
+				if (!$this->isNumeric($srvval[0]) || !$this->isNumeric($srvval[1]) ||
+					!$this->isNumeric($srvval[2]) || !$this->isDNSName($srvval[3])) {
+					return false;
+				}
+				
+				return true;
+			}
+			
+			return false;
+		}
 		public function getDNSNameList($buffer) {
 			$tmparr = explode("\r\n",$buffer);
 			$count = count($tmparr);

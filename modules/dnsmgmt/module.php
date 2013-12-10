@@ -235,18 +235,33 @@
 			}
 			
 			$first = true;
+			$administrable = false;
+			$dnszone2 = $dnszone;
 			$dnsrecords = array();
+			
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server","zonename = '".$dnszone."'".$rectypef,
 				array("order" => "zonename,record","ordersens" => 2));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($first) {
 					$first = false;
 					$output .= FS::$iMgr->h3("Zone: ".$dnszone,true);
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_zones","zonename","zonename = '".$dnszone."'")) {
-						$output .= FS::$iMgr->opendiv(11,$this->loc->s("Add-Record"),array("lnkadd" => "zn=".$dnszone));
+					
+					// We must use DNS zone without the ending dot
+					
+					if (preg_match("#(.*)\.$#",$dnszone)) {
+						$dnszone2 = substr($dnszone,0,strlen($dnszone)-1);
+					}
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_zones",
+						"zonename","zonename = '".$dnszone2."'")) {
+						$output .= FS::$iMgr->opendiv(11,$this->loc->s("Add-Record"),array("lnkadd" => "zn=".$dnszone2));
+						$administrable = true;
 					}
 					$output .= "<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
-						$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
+						$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th>";
+					if ($administrable) {
+						$output .= "<th></th>";
+					}
+					$output .= "</tr></thead>";
 				}
 				if (!isset($dnsrecords[$data["record"]])) 
 					$dnsrecords[$data["record"]] = array();
@@ -275,15 +290,27 @@
 							default: $style = ""; break;
 						}
 						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">".$recordname."</td><td>".$recordtype."</td><td>";
-						if ($recordtype == "A" || $recordtype == "AAAA")
+						if ($recordtype == "A" || $recordtype == "AAAA") {
 							$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$recordval, $recordval);
-						else
+						}
+						else {
 							$output .= $recordval;
+						}
 						$output .= "</td><td>";
 						$count = count($servers);
 						for ($i=0;$i<$count;$i++) {
 							$output .= $servers[$i];
 							if ($i != count($servers)) $output .= "<br />";
+						}
+						if ($administrable) {
+							$output .= sprintf("<td>%s</td>",
+								$recordtype != "SOA" ? 
+									FS::$iMgr->removeIcon("mod=".$this->mid."&act=14&zn=".$dnszone2.
+									"&rc=".$recordname."&rct=".$recordtype."rcv=".$recordval,
+									array("js" => true, "confirm" => 
+										array($this->loc->s("confirm-remove-record")."'".
+											$recordname."' ?","Confirm","Cancel")))
+									: "");
 						}
 						$output .= "</td></tr>";
 					}
@@ -401,11 +428,12 @@
 					$recname = FS::$secMgr->checkAndSecuriseGetData("recname");
 					$rectype = FS::$secMgr->checkAndSecuriseGetData("rectype");
 					$recvalue = FS::$secMgr->checkAndSecuriseGetData("recvalue");
-					if (!$zonename && !$recname && !$rectype && !$recvalue) {
+					$recttl = FS::$secMgr->checkAndSecuriseGetData("recttl");
+					if (!$zonename && !$recname && !$rectype && !$recvalue && !$recttl) {
 						return $this->loc->s("err-bad-datas");
 					}
 					$dnsRecord = new dnsRecord();
-					return $dnsRecord->showForm($zonename,$recname,$rectype,$recvalue);
+					return $dnsRecord->showForm($zonename,$recname,$rectype,$recvalue,$recttl);
 				default: return;
 			}
 		}
@@ -564,6 +592,15 @@
 				case 12:
 					$zone = new dnsZone();
 					$zone->Remove();
+					return;
+				// Add/Modify record
+				case 13:
+					$record = new dnsRecord();
+					$record->Modify();
+					return;
+				case 14:
+					$record = new dnsRecord();
+					$record->Remove();
 					return;
 			}
 		}

@@ -93,8 +93,9 @@
 		
 		function writeNetdiscoConf($dns,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$firstnode) {
 			$file = fopen("/usr/local/etc/netdisco/netdisco.conf","w+");
-			if(!$file)
+			if(!$file) {
 				return 1;
+			}
 			fwrite($file,"# ---- General Settings ----\n");
 			fwrite($file,"domain = ".$dns."\n");
 			fwrite($file,"home = /usr/local/share/netdisco\n");

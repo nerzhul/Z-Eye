@@ -336,7 +336,7 @@ class DNSManager(ZEyeUtil.Thread):
 								
 								# And we write ACLs
 								if len(transferBuf) > 0:
-									tmpcfgbuffer += "\tallow-transfer {\n%s\t};\n" % transferBuf
+									tmpcfgbuffer += "\tallow-transfer {\n%s\t\t127.0.0.1;\n\t\t::1;\n\t};\n" % transferBuf
 								if len(updateBuf) > 0:
 									tmpcfgbuffer += "\tallow-update {\n%s\t};\n" % updateBuf 
 								if len(queryBuf) > 0:

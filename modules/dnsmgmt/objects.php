@@ -2054,6 +2054,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dns_zone_record_cache";
+			$this->readRight = "mrule_dnsmgmt_read";
+			$this->writeRight = "mrule_dnsmgmt_write";
 		}
 		
 		public function search($search, $autocomplete = false) {
@@ -2200,8 +2202,12 @@
 			}
 		}
 		
-		public function showForm($zonename, $recname = "", $rectype = "", $recval = "") {
-			
+		public function showForm($zonename, $recname = "", $rectype = "", $recval = "", $recttl = 86400) {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			}
+				
 			$selRT = FS::$iMgr->select("rectype").
 				FS::$iMgr->selElmt("A","A",$rectype == "A").
 				FS::$iMgr->selElmt("AAAA","AAAA",$rectype == "AAAA").
@@ -2213,15 +2219,125 @@
 				FS::$iMgr->selElmt("PTR","PTR",$rectype == "PTR").
 				"</select>";
 				
-			$output = sprintf("<table>%s%s</table>",
+			$output = sprintf("%s<table>%s%s</table></form>",
+				FS::$iMgr->cbkForm("13"),
 				FS::$iMgr->idxLines(array(
 					array("Record","recname",array("type" => "idxedit", "value" => $recname)),
+					array("DNS-zone","",array("type" => "raw", 
+						"value" => $zonename.FS::$iMgr->hidden("zonename",$zonename))),
 					array("Record-Type","rectype",array("type" => "raw", "value" => $selRT)),
+					array("Record-TTL","recttl",array("type" => "num", "value" => $recttl)),
 					array("Value","recval",array("value" => $recval)),
 				)),
 				FS::$iMgr->aeTableSubmit($zonename != "")
 			);
 			return $output;
+		}
+		
+		public function Modify() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			}
+			
+			$zonename = FS::$secMgr->checkAndSecurisePostData("zonename");
+			$record = FS::$secMgr->checkAndSecurisePostData("recname");
+			$rectype = FS::$secMgr->checkAndSecurisePostData("rectype");
+			$recttl = FS::$secMgr->checkAndSecurisePostData("recttl");
+			$recvalue = FS::$secMgr->checkAndSecurisePostData("recval");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+			
+			if (!$zonename || !FS::$secMgr->isDNSName($zonename) ||
+				!$record || !FS::$secMgr->isDNSName($record) ||
+				!$recttl || !FS::$secMgr->isNumeric($recttl) ||
+				!$rectype || !$recvalue || !FS::$secMgr->isDNSRecordCoherent($rectype,$recvalue) ||
+				$edit && $edit != 1) {
+				FS::$iMgr->ajaxEchoNC("err-bad-datas");
+				return;
+			}
+			
+			// Now we send updates to all masters of the cluster
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_clusters",
+				"clustername","zonename = '".$zonename."'");
+			while ($data = FS::$dbMgr->Fetch($query)) {
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_cluster_masters",
+					"server","clustername = '".$data["clustername"]."'");
+				while ($data2 = FS::$dbMgr->Fetch($query2)) {
+					$date = date("Ymdhis");
+					$cmd = "";
+					
+					// Load TSIG keys
+					if ($tsigka = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_servers",
+						"tsigupdate","addr = '".$data2["server"]."'")) {
+						$tsigkid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_tsig",
+							"keyid","keyalias = '".$tsigka."'");
+						$tsigkv = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_tsig",
+							"keyvalue","keyalias = '".$tsigka."'");
+						if ($tsigkid && $tsigkv) {
+							$cmd = sprintf("/usr/bin/nsupdate -y %s:%s %s",
+								$tsigkid, $tsigkv, "/tmp/dnsrecmod-".$date);
+						}
+						else {
+							FS::$iMgr->ajaxEchoError("err-tsig-key-id-invalid");
+							return;
+						}
+					}
+					else {
+						$cmd = sprintf("/usr/bin/nsupdate %s",
+							"/tmp/dnsrecmod-".$date);
+					}
+					
+					
+					$file = fopen("/tmp/dnsrecmod-".$date,"w+");
+					if (!$file) {
+						FS::$iMgr->ajaxEchoError("err-unable-write-file");
+						return;
+					}
+					fwrite($file,sprintf("server %s\n",$data2["server"]));
+					if ($edit) {
+						fwrite($file,sprintf("update delete %s.%s %s %s\n",
+							$record,$zonename,$rectype,$recvalue));
+					}
+					fwrite($file,sprintf("update add %s.%s. %s %s %s\nsend\n",
+						$record,$zonename,$recttl,$rectype,$recvalue));
+					
+					fclose($file);
+					
+					shell_exec($cmd);
+				}
+			}
+			FS::$iMgr->ajaxEcho("Done");
+		}
+		
+		public function Remove() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			}
+			
+			$zonename = FS::$secMgr->checKAndSecuriseGetData("zn");
+			$record = FS::$secMgr->checkAndSecuriseGetData("rc");
+			$rectype = FS::$secMgr->checkAndSecuriseGetData("rct");
+			$recvalue = FS::$secMgr->checkAndSecuriseGetData("rcv");
+			
+			if (!$zonename || !FS::$secMgr->isDNSName($zonename) ||
+				!$record || !FS::$secMgr->isDNSName($record) ||
+				!$rectype || !$recvalue || !FS::$secMgr->isDNSRecordCoherent($rectype,$recvalue)) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			
+			$date = date("Ymdhis");
+			$file = fopen("/tmp/dnsrecmod-".$date,"w+");
+			if (!$file) {
+				FS::$iMgr->ajaxEchoError("err-unable-write-file");
+				return;
+			}
+			fwrite($file,sprintf("update delete %s.%s %s %s",
+				$record,$zonename,$rectype,$recvalue));
+			
+			fclose($file);
+			FS::$iMgr->ajaxEcho("Done");
 		}
 	};
 ?>
