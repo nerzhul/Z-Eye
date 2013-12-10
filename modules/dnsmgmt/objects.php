@@ -2287,7 +2287,6 @@
 							"/tmp/dnsrecmod-".$date);
 					}
 					
-					
 					$file = fopen("/tmp/dnsrecmod-".$date,"w+");
 					if (!$file) {
 						FS::$iMgr->ajaxEchoError("err-unable-write-file");
@@ -2327,16 +2326,51 @@
 				return;
 			}
 			
-			$date = date("Ymdhis");
-			$file = fopen("/tmp/dnsrecmod-".$date,"w+");
-			if (!$file) {
-				FS::$iMgr->ajaxEchoError("err-unable-write-file");
-				return;
+			// Now we send remove to all masters of the cluster
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_clusters",
+				"clustername","zonename = '".$zonename."'");
+			while ($data = FS::$dbMgr->Fetch($query)) {
+				$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_cluster_masters",
+					"server","clustername = '".$data["clustername"]."'");
+				while ($data2 = FS::$dbMgr->Fetch($query2)) {
+					$date = date("Ymdhis");
+					$cmd = "";
+					
+					// Load TSIG keys
+					if ($tsigka = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_servers",
+						"tsigupdate","addr = '".$data2["server"]."'")) {
+						$tsigkid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_tsig",
+							"keyid","keyalias = '".$tsigka."'");
+						$tsigkv = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_tsig",
+							"keyvalue","keyalias = '".$tsigka."'");
+						if ($tsigkid && $tsigkv) {
+							$cmd = sprintf("/usr/bin/nsupdate -y %s:%s %s",
+								$tsigkid, $tsigkv, "/tmp/dnsrecmod-".$date);
+						}
+						else {
+							FS::$iMgr->ajaxEchoError("err-tsig-key-id-invalid");
+							return;
+						}
+					}
+					else {
+						$cmd = sprintf("/usr/bin/nsupdate %s",
+							"/tmp/dnsrecmod-".$date);
+					}
+					
+					$file = fopen("/tmp/dnsrecmod-".$date,"w+");
+					if (!$file) {
+						FS::$iMgr->ajaxEchoError("err-unable-write-file");
+						return;
+					}
+					fwrite($file,sprintf("server %s\n",$data2["server"]));
+					fwrite($file,sprintf("update delete %s.%s %s %s\nsend\n",
+						$record,$zonename,$rectype,$recvalue));
+					
+					fclose($file);
+					
+					shell_exec($cmd);
+				}
 			}
-			fwrite($file,sprintf("update delete %s.%s %s %s",
-				$record,$zonename,$rectype,$recvalue));
-			
-			fclose($file);
 			FS::$iMgr->ajaxEcho("Done");
 		}
 	};
