@@ -123,7 +123,7 @@
 					"Read-port-stats" => "Reading<br />(port stats)",
 					"Read-ssh-portinfos" => "Reading port informations (via SSH)",
 					"Read-ssh-showstart" => "Reading startup configuration (via SSH)",
-					"Read-ssh-showstart" => "Reading running configuration (via SSH)",
+					"Read-ssh-showrun" => "Reading running configuration (via SSH)",
 					"Read-switch-details" => "Reading<br />(device features)",
 					"Read-switch-modules" => "Reading<br />(device modules list)",
 					"Read-switch-vlan" => "Reading<br />(device vlan list)",
