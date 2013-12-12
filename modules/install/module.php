@@ -178,13 +178,19 @@
 						return;
 					}
 					$user = new User();
-	                                $user->setUsername($username);
-        	                        $user->setSubName($surname);
-                	                $user->setName($name);
-                                	$user->setMail($mail);
+					$user->setUsername($username);
+					$user->setSubName($surname);
+					$user->setName($name);
+					$user->setMail($mail);
 					$user->Create(1);
 					$user->changePassword($pwd);
 
+					FS::$dbMgr->BeginTr();
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."groups","gid,gname,description",
+						"'1','Superuser','Superuser group'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."user_group","gid,uid",
+						"'1','1'");
+					FS::$dbMgr->CommitTr();
 					echo "0";
 					return;
 				case 2:
