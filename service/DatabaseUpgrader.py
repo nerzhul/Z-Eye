@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1401"
+	nextDBVersion = "1402"
 	pgsqlCon = None
 	logger = None
 
@@ -264,6 +264,10 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1400":
 				self.tryAddColumn("z_eye_switch_infos","room","varchar(64)")
 				self.setDBVersion("1401")
+			if self.dbVersion == "1401":
+				self.tryAddColumn("z_eye_dns_clusters","dnssec_enable","bool")
+				self.tryAddColumn("z_eye_dns_clusters","dnssec_validation","bool")
+				self.setDBVersion("1402")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

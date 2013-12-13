@@ -979,6 +979,10 @@
 			if (!$this->canRead()) {
 				return FS::$iMgr->printError("err-no-right");
 			}
+			
+			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_servers","addr")) {
+				return FS::$iMgr->printError("err-one-dns-server-required");
+			}
 
 			if (!$this->Load($clustername)) {
 				return FS::$iMgr->printError($this->errNotExists);
@@ -1017,6 +1021,9 @@
 						array("allow-notify","",array("type" => "raw", "value" => $notifylist)),
 						array("allow-update","",array("type" => "raw", "value" => $updatelist)),
 						array("allow-query","",array("type" => "raw", "value" => $querylist)),
+						array("enable-dnssec","dnssecen",array("type" => "chk", "value" => $this->dnssecEnable)),
+						array("enable-dnssec-validation","dnssecval",
+							array("type" => "chk", "value" => $this->dnssecValidate)),
 				)).
 				FS::$iMgr->aeTableSubmit($clustername == "");
 
@@ -1094,9 +1101,12 @@
 			$this->notifyAcls = array("none");
 			$this->updateAcls = array("none");
 			$this->queryAcls = array("any");
+			$this->dnssecEnable = false;
+			$this->dnssecValidate = false;
 
 			if ($this->clustername) {
-				$query = FS::$dbMgr->Select($this->sqlTable,"description",$this->sqlAttrId."= '".$this->clustername."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,"description,dnssec_enable,dnssec_validation",
+					$this->sqlAttrId."= '".$this->clustername."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->description = $data["description"];
 
@@ -1137,6 +1147,8 @@
 						$this->queryAcls = array("none");
 					}
 
+					$this->dnssecEnable = ($data["dnssec_enable"] == 't');
+					$this->dnssecValidate = ($data["dnssec_validation"] == 't');
 					return true;
 				}
 				return false;
@@ -1171,6 +1183,8 @@
 			$notify = FS::$secMgr->checkAndSecurisePostData("notify");
 			$update = FS::$secMgr->checkAndSecurisePostData("update");
 			$query = FS::$secMgr->checkAndSecurisePostData("query");
+			$dnssecEnable = FS::$secMgr->checkAndSecurisePostData("dnssecen");
+			$dnssecValidate = FS::$secMgr->checkAndSecurisePostData("dnssecval");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 			if (!$clustername || !$description || $masters && !is_array($masters) ||
@@ -1317,7 +1331,9 @@
 			if ($edit) {
 				$this->removeFromDB($clustername);
 			}
-			FS::$dbMgr->Insert($this->sqlTable,$this->sqlAttrId.",description","'".$clustername."','".$description."'");
+			FS::$dbMgr->Insert($this->sqlTable,$this->sqlAttrId.",description,dnssec_enable,dnssec_validation",
+				"'".$clustername."','".$description."','".($dnssecEnable == true ? 't' : 'f')."','".
+				($dnssecValidate == true ? 't' : 'f')."'");
 
 			$count = count($masters);
 			for ($i=0;$i<$count;$i++) {
@@ -1476,6 +1492,8 @@
 		private $notifyAcls;
 		private $updateAcls;
 		private $queryAcls;
+		private $dnssecEnable;
+		private $dnssecValidate;
 	}
 			
 	final class dnsServer extends FSMObj {

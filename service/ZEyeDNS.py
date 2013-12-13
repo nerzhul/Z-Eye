@@ -153,7 +153,7 @@ class DNSManager(ZEyeUtil.Thread):
 							# Only write non if no tsig update key
 							if acl == "none":
 								if tsigupdate == "":
-									tmpcfgbuffer += "\t\tkey \"%s\";\n" % tsigupdate
+									tmpcfgbuffer += "\t\t%s;\n" % acl
 							elif acl == "any":
 								tmpcfgbuffer += "\t\t%s;\n" % acl
 							else:
@@ -180,6 +180,16 @@ class DNSManager(ZEyeUtil.Thread):
 							elif acl != "none":
 								tmpcfgbuffer += "\t\t\"%s\";\n" % acl
 						tmpcfgbuffer += "\t};\n"
+						
+					if self.clusterList[cluster][8] == True:
+						tmpcfgbuffer += "\tdnssec-enable yes;\n"
+					else:
+						tmpcfgbuffer += "\tdnssec-enable no;\n"
+						
+					if self.clusterList[cluster][9] == True:
+						tmpcfgbuffer += "\tdnssec-validation yes;\n"
+					else:
+						tmpcfgbuffer += "\tdnssec-validation no;\n"
 
 					if len(tmpcfgbuffer) > 0:
 						cfgbuffer += "options {\n\tversion\"\";\n\tlisten-on { any; };\n\tlisten-on-v6 { any; };\n%s};\n" % tmpcfgbuffer
@@ -634,7 +644,7 @@ class DNSManager(ZEyeUtil.Thread):
 		self.clusterList = {}
 
 		# We only load DNS cluster attached to a zone
-		pgcursor.execute("SELECT clustername FROM z_eye_dns_clusters WHERE clustername IN (SELECT clustername FROM z_eye_dns_zone_clusters)")
+		pgcursor.execute("SELECT clustername,dnssec_enable,dnssec_validation FROM z_eye_dns_clusters WHERE clustername IN (SELECT clustername FROM z_eye_dns_zone_clusters)")
 		pgres = pgcursor.fetchall()
 		for idx in pgres:
 			tmpMasters = []
@@ -698,7 +708,7 @@ class DNSManager(ZEyeUtil.Thread):
 				if idx2[0] in self.aclList.keys() or idx2[0] == "none" or idx2[0] == "any":
 					tmpACLQuery.append(idx2[0])
 
-			self.clusterList[idx[0]] = (tmpMasters,tmpSlaves,tmpCaches,tmpACLRecurse,tmpACLTransfer,tmpACLUpdate,tmpACLNotify,tmpACLQuery)
+			self.clusterList[idx[0]] = (tmpMasters,tmpSlaves,tmpCaches,tmpACLRecurse,tmpACLTransfer,tmpACLUpdate,tmpACLNotify,tmpACLQuery,idx[1],idx[2])
 
 	def loadACLList(self,pgcursor):
 		self.aclList = {}
