@@ -2103,6 +2103,11 @@
 						$netDev = new netDevice();
 						$netDev->modifyBuilding();
 						return;
+					// Room Fast edit
+					case 28:
+						$netDev = new netDevice();
+						$netDev->modifyRoom();
+						return;
 				default: break;
 			}
 		}

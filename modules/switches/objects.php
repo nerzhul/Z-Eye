@@ -24,8 +24,6 @@
 			$this->infoTable = PGDbConfig::getDbPrefix()."switch_infos";
 			$this->vlanTable = "device_vlan";
 			$this->readRight = "mrule_switches_read";
-			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");
-				$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
 		}
 		
 		public function Load($device = "") {
@@ -171,7 +169,7 @@
 				$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
 				"</th><th>".$this->loc->s("MAC-addr")."</th><th>".
 				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".
-				$this->loc->s("Building")."</th><th>".
+				$this->loc->s("Building")."</th><th>".$this->loc->s("Room")."</th><th>".
 				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb").
 				"</th><th>".$this->loc->s("State")."</th>";
 			
@@ -186,6 +184,7 @@
 				$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
 				"</th><th>".$this->loc->s("Model")."</th><th>".
 				$this->loc->s("OS")."</th><th>".$this->loc->s("Building")."</th><th>".
+				$this->loc->s("Room")."</th><th>".
 				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb")."</th>";
 				
 			if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
@@ -193,12 +192,14 @@
 			}
 			$outputwifi .= "</tr></thead>";
 
-			$query = FS::$dbMgr->Select("device","name,ip,os,model,os_ver,location,serial","",array("order" => "name"));
+			$query = FS::$dbMgr->Select("device","name,ip,mac,os,model,os_ver,location,serial","",array("order" => "name"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				// Rights: show only reading/writing switches
 				$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");
 				$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
 				$building = FS::$dbMgr->GetOneData($this->infoTable,"building","device = '".$data["name"]."'");
+				$room = FS::$dbMgr->GetOneData($this->infoTable,"room","device = '".$data["name"]."'");
+				
 				if (!$this->canReadOrWriteRight($snmpro,$snmprw,$data["ip"])) {
 					continue;
 				}
@@ -229,6 +230,25 @@
 						$outputwifi .= $building;
 					}
 							
+					$outputwifi .= "</td><td>";
+					
+					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+						$convname = preg_replace("#\/#","-",$data["name"]);
+						$convname = preg_replace("#\.#","-",$convname);
+						$outputwifi .= "<div id=\"devroom_".$convname."\">".
+							"<a onclick=\"javascript:modifyRoom('#devroom_".$convname." a',false);\">".
+							"<div id=\"devroom_".$convname."l\" class=\"modroom\">".
+							($room == "" ? $this->loc->s("Modify") : $room).
+							"</div></a><a style=\"display: none;\">".
+							FS::$iMgr->input("devroom-".$convname,$room,10,10).
+							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#devroom_".$convname.
+								"',true,'".$data["name"]."','devroom-".$convname."');").
+							"</a></div>";
+					}
+					else {
+						$outputwifi .= $room;
+					}
+					
 					$outputwifi .= "</td><td>".$data["location"]."</td><td>".
 						$data["serial"]."</td>";
 					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
@@ -262,6 +282,25 @@
 						$outputswitch .= $building;
 					}
 					
+					$outputswitch .= "</td><td>";
+					
+					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+						$convname = preg_replace("#\/#","-",$data["name"]);
+						$convname = preg_replace("#\.#","-",$convname);
+						$outputswitch .= "<div id=\"devroom_".$convname."\">".
+							"<a onclick=\"javascript:modifyRoom('#devroom_".$convname." a',false);\">".
+							"<div id=\"devroom_".$convname."l\" class=\"modroom\">".
+							($room == "" ? $this->loc->s("Modify") : $room).
+							"</div></a><a style=\"display: none;\">".
+							FS::$iMgr->input("devroom-".$convname,$room,10,10).
+							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#devroom_".$convname.
+								"',true,'".$data["name"]."','devroom-".$convname."');").
+							"</a></div>";
+					}
+					else {
+						$outputswitch .= $room;
+					}
+					
 					$outputswitch .= "</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
 						<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
 						FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
@@ -285,6 +324,12 @@
 				FS::$iMgr->js("function modifyBuilding(src,sbmit,device_,building_) {
 					if (sbmit == true) {
 					$.post('index.php?at=3&mod=".$this->mid."&act=27', { device: device_, building: document.getElementsByName(building_)[0].value }, function(data) {
+					$(src+'l').html(data); $(src+' a').toggle();
+					}); }
+					else $(src).toggle(); }
+					function modifyRoom(src,sbmit,device_,room_) {
+					if (sbmit == true) {
+					$.post('index.php?at=3&mod=".$this->mid."&act=28', { device: device_, room: document.getElementsByName(room_)[0].value }, function(data) {
 					$(src+'l').html(data); $(src+' a').toggle();
 					}); }
 					else $(src).toggle(); }");
@@ -326,12 +371,14 @@
 				FS::$iMgr->ajaxEcho("err-no-rights");
 				return;	
 			}
+			
 			if (FS::$dbMgr->GetOneData($this->infoTable,"device","device = '".$device."'")) {
 				FS::$dbMgr->Update($this->infoTable,"building = '".$building."'","device = '".$device."'");
 			}
 			else {
 				FS::$dbMgr->Insert($this->infoTable,"device,building","'".$device."','".$building."'");
 			}
+			
 			if ($building) {
 				echo $building;
 			}
@@ -339,6 +386,42 @@
 				FS::$iMgr->ajaxEcho("Modify");
 			}
 			$this->log(0,"Set building for '".$device."' to '".$building."'");
+			return;
+		}
+		
+		public function modifyRoom() {
+			$device = FS::$secMgr->checkAndSecurisePostData("device");
+			$room = FS::$secMgr->checkAndSecurisePostData("room");
+			if (!$device || $room === NULL) {
+				$this->log(2,"Some fields are missing (room fast edit)");
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			
+			if (!$this->Load($device)) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-rights");
+				return;	
+			}
+			
+			if (FS::$dbMgr->GetOneData($this->infoTable,"device","device = '".$device."'")) {
+				FS::$dbMgr->Update($this->infoTable,"room = '".$room."'","device = '".$device."'");
+			}
+			else {
+				FS::$dbMgr->Insert($this->infoTable,"device,room","'".$device."','".$room."'");
+			}
+			
+			if ($room) {
+				echo $room;
+			}
+			else {
+				FS::$iMgr->ajaxEcho("Modify");
+			}
+			$this->log(0,"Set room for '".$device."' to '".$room."'");
 			return;
 		}
 		

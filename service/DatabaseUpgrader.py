@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1400"
+	nextDBVersion = "1401"
 	pgsqlCon = None
 	logger = None
 
@@ -261,6 +261,9 @@ class ZEyeDBUpgrade():
 			if self.dbVersion < "1400":
 				self.tryCreateTable("z_eye_switch_infos","device varchar(128) NOT NULL, building varchar(64) NOT NULL, PRIMARY KEY(device)")
 				self.setDBVersion("1400")
+			if self.dbVersion == "1400":
+				self.tryAddColumn("z_eye_switch_infos","room","varchar(64)")
+				self.setDBVersion("1401")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
