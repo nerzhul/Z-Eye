@@ -21,8 +21,53 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = "device";
+			$this->infoTable = PGDbConfig::getDbPrefix()."switch_infos";
 			$this->vlanTable = "device_vlan";
 			$this->readRight = "mrule_switches_read";
+			$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");
+				$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
+		}
+		
+		public function Load($device = "") {
+			$this->device = $device;
+			$this->ip = "";
+			$this->dnsName = "";
+			$this->building = "";
+			$this->snmpLocation = "";
+			$this->serial = "";
+			$this->model = "";
+			$this->os = "";
+			$this->osVer = "";
+			$this->snmpro = "";
+			$this->snmprw = "";
+			
+			if ($this->device != "") {
+				$query = FS::$dbMgr->Select($this->sqlTable,"ip,serial,model,os,os_ver,dns,location",
+					"name = '".$device."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->ip = $data["ip"];
+					$this->dnsName = $data["dns"];
+					$this->snmpLocation = $data["location"];
+					$this->serial = $data["serial"];
+					$this->model = $data["model"];
+					$this->os = $data["os"];
+					$this->osVer = $data["os_ver"];
+					
+					$this->snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
+						"snmpro","device = '".$this->device."'");
+					$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
+						"snmprw","device = '".$this->device."'");
+					$query2 = FS::$dbMgr->Select($this->infoTable,"building",
+						"device = '".$this->device."'");
+					if ($data2 = FS::$dbMgr->Fetch($query2)) {
+						$this->building = $data2["building"];
+					}
+				}
+				else {
+					return false;
+				}
+			}
+			return true;
 		}
 		
 		public function search($search, $autocomplete = false) {
@@ -107,6 +152,226 @@
 				}
 			}
 		}
+		
+		public function showList() {
+			FS::$iMgr->setURL("");
+			
+			$output = "";
+			$foundsw = false;
+			$foundwif = false;
+			$showtitle = true;
+			
+			if (FS::$sessMgr->hasRight("mrule_switches_discover")) {
+				$showtitle = false;
+				$output .= FS::$iMgr->h2("title-global-fct").
+					FS::$iMgr->opendiv(1,$this->loc->s("Discover-device"),array("line" => true));
+			}
+
+			$outputswitch = "<table id=\"dev\"><thead><tr><th class=\"headerSortDown\">".
+				$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
+				"</th><th>".$this->loc->s("MAC-addr")."</th><th>".
+				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".
+				$this->loc->s("Building")."</th><th>".
+				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb").
+				"</th><th>".$this->loc->s("State")."</th>";
+			
+			if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+				$outputswitch .= "<th></th>";
+			}
+			
+			$outputswitch .= "</tr></thead>";
+
+			$outputwifi = FS::$iMgr->h2("title-WiFi-AP").
+				"<table id=\"dev2\"><thead><tr><th class=\"headerSortDown\">".
+				$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
+				"</th><th>".$this->loc->s("Model")."</th><th>".
+				$this->loc->s("OS")."</th><th>".$this->loc->s("Building")."</th><th>".
+				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb")."</th>";
+				
+			if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+				$outputwifi .= "<th></th>";
+			}
+			$outputwifi .= "</tr></thead>";
+
+			$query = FS::$dbMgr->Select("device","name,ip,os,model,os_ver,location,serial","",array("order" => "name"));
+			while ($data = FS::$dbMgr->Fetch($query)) {
+				// Rights: show only reading/writing switches
+				$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");
+				$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
+				$building = FS::$dbMgr->GetOneData($this->infoTable,"building","device = '".$data["name"]."'");
+				if (!$this->canReadOrWriteRight($snmpro,$snmprw,$data["ip"])) {
+					continue;
+				}
+
+				// Split WiFi and Switches
+				if (preg_match("#AIR#",$data["model"])) {
+					if ($foundwif == false) {
+						$foundwif = true;
+					}
+					$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\">".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
+						"</td><td>".$data["ip"]."</td><td>".
+						$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>";
+					
+					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+						$convname = preg_replace("#\/#","-",$data["name"]);
+						$convname = preg_replace("#\.#","-",$convname);
+						$outputwifi .= "<div id=\"devbding_".$convname."\">".
+							"<a onclick=\"javascript:modifyBuilding('#devbding_".$convname." a',false);\">".
+							"<div id=\"devbding_".$convname."l\" class=\"modbuilding\">".
+							($building == "" ? $this->loc->s("Modify") : $building).
+							"</div></a><a style=\"display: none;\">".
+							FS::$iMgr->input("devbding-".$convname,$building,10,10).
+							FS::$iMgr->button("Save","OK","javascript:modifyBuilding('#devbding_".$convname.
+								"',true,'".$data["name"]."','devbding-".$convname."');").
+							"</a></div>";
+					}
+					else {
+						$outputwifi .= $building;
+					}
+							
+					$outputwifi .= "</td><td>".$data["location"]."</td><td>".
+						$data["serial"]."</td>";
+					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+						$outputwifi .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
+					}
+					$outputwifi .= "</tr>";
+				}
+				else {
+					if ($foundsw == false) {
+						$foundsw = true;
+					}
+					$outputswitch .= "<tr><td>".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
+						"</td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>".
+						$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>";
+					
+					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+						$convname = preg_replace("#\/#","-",$data["name"]);
+						$convname = preg_replace("#\.#","-",$convname);
+						$outputswitch .= "<div id=\"devbding_".$convname."\">".
+							"<a onclick=\"javascript:modifyBuilding('#devbding_".$convname." a',false);\">".
+							"<div id=\"devbding_".$convname."l\" class=\"modbuilding\">".
+							($building == "" ? $this->loc->s("Modify") : $building).
+							"</div></a><a style=\"display: none;\">".
+							FS::$iMgr->input("devbding-".$convname,$building,10,10).
+							FS::$iMgr->button("Save","OK","javascript:modifyBuilding('#devbding_".$convname.
+								"',true,'".$data["name"]."','devbding-".$convname."');").
+							"</a></div>";
+					}
+					else {
+						$outputswitch .= $building;
+					}
+					
+					$outputswitch .= "</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
+						<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
+						FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
+						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td>";
+						
+					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+						$outputswitch .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
+						"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
+					}
+					$outputswitch .= "</tr>";
+				}
+			}
+			if ($foundsw || $foundwif) {
+				if (FS::$sessMgr->hasRight("mrule_switches_globalsave") || FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
+					if ($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
+					// Openable divs
+					$output .= FS::$iMgr->opendiv(2,$this->loc->s("Advanced-Functions"));
+				}
+				$output .= FS::$iMgr->h2("title-router-switch");
+				
+				FS::$iMgr->js("function modifyBuilding(src,sbmit,device_,building_) {
+					if (sbmit == true) {
+					$.post('index.php?at=3&mod=".$this->mid."&act=27', { device: device_, building: document.getElementsByName(building_)[0].value }, function(data) {
+					$(src+'l').html(data); $(src+' a').toggle();
+					}); }
+					else $(src).toggle(); }");
+			}
+
+			if ($foundsw) {
+				$output .= $outputswitch.
+					"</table>";
+				FS::$iMgr->jsSortTable("dev");
+			}
+			if ($foundwif) {
+				$output .= $outputwifi.
+					"</table>";
+				FS::$iMgr->jsSortTable("dev2");
+			}
+
+			if (!$foundsw && !$foundwif) {
+				$output .= FS::$iMgr->printError("err-no-device2");
+			}
+
+			return $output;
+		}
+		
+		public function modifyBuilding() {
+			$device = FS::$secMgr->checkAndSecurisePostData("device");
+			$building = FS::$secMgr->checkAndSecurisePostData("building");
+			if (!$device || $building === NULL) {
+				$this->log(2,"Some fields are missing (building fast edit)");
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			
+			if (!$this->Load($device)) {
+				FS::$iMgr->ajaxEcho("err-bad-datas");
+				return;
+			}
+			
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-rights");
+				return;	
+			}
+			if (FS::$dbMgr->GetOneData($this->infoTable,"device","device = '".$device."'")) {
+				FS::$dbMgr->Update($this->infoTable,"building = '".$building."'","device = '".$device."'");
+			}
+			else {
+				FS::$dbMgr->Insert($this->infoTable,"device,building","'".$device."','".$building."'");
+			}
+			if ($building) {
+				echo $building;
+			}
+			else {
+				FS::$iMgr->ajaxEcho("Modify");
+			}
+			$this->log(0,"Set building for '".$device."' to '".$building."'");
+			return;
+		}
+		
+		protected function canWrite() {
+			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_write") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->ip."_write")) {
+				return false;
+			}
+			return true;
+		}
+		
+		private function canReadOrWriteRight($snmpro, $snmprw, $dip) {
+			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
+				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+				return false;
+			}
+			return true;
+		}
+		
+		private $ip;
+		private $dnsName;
+		private $building;
+		private $snmpLocation;
+		private $serial;
+		private $model;
+		private $os;
+		private $osVer;
+		private $snmpro;
+		private $snmprw;
+		
+		private $infoTable;
 		private $vlanTable;
 	};
 	

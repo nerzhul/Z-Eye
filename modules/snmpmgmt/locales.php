@@ -67,7 +67,7 @@
 					"Read" => "Read",
 					"Save" => "Save",
 					"snmp-community" => "SNMP community",
-					"SNMP-communities" => "SNMP communities",
+					"snmp-communities" => "SNMP communities",
 					"snmp-conf" => "SNMP configuration ",
 					"snmp-read" => "Reading communities",
 					"snmp-timeout" => "Requests timeout",

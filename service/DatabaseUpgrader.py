@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1324"
+	nextDBVersion = "1400"
 	pgsqlCon = None
 	logger = None
 
@@ -255,6 +255,18 @@ class ZEyeDBUpgrade():
 			self.logger.critical("DBUpgrade: %s" % e)
 			print "PgSQL Error: %s" % e
 			sys.exit(1);
+			
+	def do14Upgrade(self):
+		try:
+			if self.dbVersion < "1400":
+				self.tryCreateTable("z_eye_switch_infos","device varchar(128) NOT NULL, building varchar(64) NOT NULL, PRIMARY KEY(device)")
+				self.setDBVersion("1400")
+		except PgSQL.Error, e:
+			if self.pgsqlCon:
+				self.pgsqlCon.close()
+			self.logger.critical("DBUpgrade: %s" % e)
+			print "PgSQL Error: %s" % e
+			sys.exit(1);
 
 	def doUpgrade(self):
 		print "DB Upgrade needed, we perform this upgrade for you..."
@@ -271,6 +283,10 @@ class ZEyeDBUpgrade():
 		# Upgrades for Z-Eye 1.3 series
 		if self.dbVersion <= "1399":
 			self.do13Upgrade()
+			
+		# Upgrades for Z-Eye 1.4 series
+		if self.dbVersion <= "1499":
+			self.do14Upgrade()
 
 		print "DB Upgrade done."
 		self.logger.info("DB Upgrade Done.")

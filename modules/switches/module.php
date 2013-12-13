@@ -78,12 +78,16 @@
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
 			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$filter = FS::$secMgr->checkAndSecuriseGetData("fltr");
-			if ($port != NULL && $device != NULL)
+			if ($port != NULL && $device != NULL) {
 				$output .= $this->showPortInfos();
-			else if ($device != NULL)
+			}
+			else if ($device != NULL) {
 				$output .= $this->showDeviceInfos();
-			else
-				$output .= $this->showDeviceList();
+			}
+			else {
+				$netDev = new netDevice();
+				$output .= $netDev->showList();
+			}
 
 			return $output;
 		}
@@ -108,7 +112,7 @@
 
 		private function showPortInfos() {
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
-		        $port = FS::$secMgr->checkAndSecuriseGetData("p");
+			$port = FS::$secMgr->checkAndSecuriseGetData("p");
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
@@ -1306,113 +1310,6 @@
 				);
 			}
 
-			protected function showDeviceList() {
-				FS::$iMgr->setURL("");
-				$output = "";
-				$err = FS::$secMgr->checkAndSecuriseGetData("err");
-				switch($err) {
-					case 1: $output .= FS::$iMgr->printError("err-some-backup-fail"); break;
-					case 2: $output .= FS::$iMgr->printError("err-some-field-missing"); break;
-					case 3: $output .= FS::$iMgr->printError("err-no-rights"); break;
-					case -1: $output .= FS::$iMgr->printSuccess("done-with-success"); break;
-					default: break;
-				}
-
-				$showtitle = true;
-				if (FS::$sessMgr->hasRight("mrule_switches_discover")) {
-					$showtitle = false;
-					$output .= FS::$iMgr->h2("title-global-fct");
-					$output .= FS::$iMgr->opendiv(1,$this->loc->s("Discover-device"),array("line" => true));
-				}
-
-				$foundsw = 0;
-				$foundwif = 0;
-				$outputswitch = "<table id=\"dev\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
-					"</th><th>".$this->loc->s("MAC-addr")."</th><th>".
-					$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb").
-					"</th><th>".$this->loc->s("State")."</th>";
-				if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-					$outputswitch .= "<th></th>";
-				}
-				$outputswitch .= "</tr></thead>";
-
-				$outputwifi = FS::$iMgr->h2("title-WiFi-AP").
-					"<table id=\"dev2\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
-					"</th><th>".$this->loc->s("Model")."</th><th>".
-					$this->loc->s("OS")."</th><th>".$this->loc->s("Place")."</th><th>".$this->loc->s("Serialnb")."</th>";
-				if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-					$outputwifi .= "<th></th>";
-				}
-				$outputwifi .= "</tr></thead>";
-
-				$query = FS::$dbMgr->Select("device","*","",array("order" => "name"));
-				while ($data = FS::$dbMgr->Fetch($query)) {
-					// Rights: show only reading/writing switches
-					$snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$data["name"]."'");
-					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
-					if (!$this->hasDeviceReadOrWriteRight($snmpro,$snmprw,$data["ip"])) 
-						continue;
-
-					// Split WiFi and Switches
-					if (preg_match("#AIR#",$data["model"])) {
-						if ($foundwif == 0) {
-							$foundwif = 1;
-						}
-						$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\">".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
-							"</td><td>".$data["ip"]."</td><td>".
-							$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".
-							$data["serial"]."</td>";
-						if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-							$outputwifi .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
-							"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
-						}
-						$outputwifi .= "</tr>";
-					}
-					else {
-						if ($foundsw == 0) {
-							$foundsw = 1;
-						}
-						$outputswitch .= "<tr><td>".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
-							"</td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>".
-							$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
-							<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
-							FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
-							$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td>";
-						if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-							$outputswitch .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
-							"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
-						}
-						$outputswitch .= "</tr>";
-					}
-				}
-				if ($foundsw != 0 || $foundwif != 0) {
-					if (FS::$sessMgr->hasRight("mrule_switches_globalsave") || FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
-						if ($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
-						// Openable divs
-						$output .= FS::$iMgr->opendiv(2,$this->loc->s("Advanced-Functions"));
-					}
-				}
-				if ($foundsw != 0 || $foundwif != 0)
-					$output .= FS::$iMgr->h2("title-router-switch");
-
-				if ($foundsw != 0) {
-					$output .= $outputswitch;
-					$output .= "</table>";
-					FS::$iMgr->jsSortTable("dev");
-				}
-				if ($foundwif != 0) {
-					$output .= $outputwifi;
-					$output .= "</table>";
-					FS::$iMgr->jsSortTable("dev2");
-				}
-
-				if ($foundsw == 0 && $foundwif == 0) {
-					$output .= FS::$iMgr->printError("err-no-device2");
-				}
-
-				return $output;
-			}
-
 			private function showAdvancedFunctions() {
 				$output = "";
 				if (FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
@@ -2200,6 +2097,11 @@
 					case 26:
 						$netRoom = new netRoom();
 						$netRoom->FastModify();					
+						return;
+					// Building Fast edit
+					case 27:
+						$netDev = new netDevice();
+						$netDev->modifyBuilding();
 						return;
 				default: break;
 			}
