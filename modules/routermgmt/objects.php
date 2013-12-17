@@ -16,33 +16,4 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-
-	require_once(dirname(__FILE__)."/locales.php");
-	require_once(dirname(__FILE__)."/rules.php");
-	require_once(dirname(__FILE__)."/objects.php");
-	
-	if(!class_exists("iRouterMgmt")) {
-		
-	final class iRouterMgmt extends FSModule {
-		function __construct() {
-			parent::__construct();
-			$this->loc = new lRouterMgmt();
-			$this->rulesclass = new rRouterMgmt($this->loc);
-			$this->menu = $this->loc->s("menu-name");
-		}
-
-		public function Load() {
-			FS::$iMgr->setTitle("Router-Management");
-			return $this->showMain();
-		}
-
-		private function showMain() {
-			$output = "";
-			return $output;
-		}
-	};
-	
-	}
-	
-	$module = new iRouterMgmt();
 ?>
