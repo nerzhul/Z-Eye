@@ -381,6 +381,10 @@
 					$groups = FS::$secMgr->checkAndSecurisePostData("ugroup");
 					$count = count($groups);
 					for ($i=0;$i<$count;$i++) {
+						if (!isset($groups[$i]) || $groups[$i] == "") {
+							continue;
+						}
+						
 						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$groups[$i]."'");
 						if (!$exist) {
 							$this->log(1,"Try to add user ".$uid." to inexistant group '".$groups[$i]."'");

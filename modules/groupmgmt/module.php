@@ -112,7 +112,7 @@
 
 		private function getGroupForm() {
 			$output = FS::$iMgr->cbkForm("1").
-				"<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,$this->loc->s("Groupname")).
+				"<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,"Groupname").
 				FS::$iMgr->h2("title-opts").
 				$this->loadModuleRuleSets().
 				"</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>".

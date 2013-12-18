@@ -176,7 +176,7 @@
 					return "";
 				}
 				else {
-					return $this->printError($this->getLocale("err-no-rights"));
+					return $this->printError("err-no-rights");
 				}
 			}
 			return $this->printError("err-unk-module");
