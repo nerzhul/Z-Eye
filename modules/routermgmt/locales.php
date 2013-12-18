@@ -22,10 +22,12 @@
 			parent::__construct();
 			$locales = array(
 				"fr" => array(
+					"declare-router" => "Déclarer un routeur",
 					"menu-name" => "Moteur Z-Eye",
 					"menu-title" => "Gestion des routeurs",
 				),
 				"en" => array(
+					"declare-router" => "Declare a router",
 					"menu-name" => "Z-Eye Engine",
 					"menu-title" => "Router manager",
 				)

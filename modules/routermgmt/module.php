@@ -32,13 +32,38 @@
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle("Router-Management");
+			FS::$iMgr->setTitle("menu-name");
 			return $this->showMain();
 		}
 
 		private function showMain() {
+			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
+
+			if (!FS::isAjaxCall()) {
+				$output .= FS::$iMgr->h1("menu-name");
+
+				$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("Interface-Management"));
+				$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("Declare-Router"));
+				$output .= FS::$iMgr->tabPan($tabs,$sh);
+			}
+			else {
+				switch($sh) {
+					case 1: $output .= $this->showRouterDeclaration(); break;
+					case 2: $output .= $this->showIfaceMgmt(); break;
+				}
+			}
 			return $output;
+		}
+		
+		private function showIfaceMgmt() {
+		}
+		
+		private function showRouterDeclaration() {
+			FS::$iMgr->setURL("sh=1");
+			FS::$iMgr->setTitle($this->loc->s("menu-name")." > ".$this->loc->s("Declare-Router"));
+			$router = new routerObj();
+			return $router->renderAll();
 		}
 	};
 	
