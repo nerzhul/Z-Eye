@@ -203,8 +203,10 @@
 				// List servers where the data is
 				$iparray[ip2long($data2["ip"])]["servers"][] = $data2["server"];
 				if (strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
-					$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
-					$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+					$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
+						array("order" => "time_last","ordersens" => 2));
+					$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
+						array("order" => "time_last","ordersens" => 2));
 					if ($sw && $port) {
 						$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
 						$iparray[ip2long($data2["ip"])]["port"] = $port;
@@ -224,8 +226,10 @@
 				if ($iparray[ip2long($data2["ip"])]["switch"] == "") {
 					// if there is a MAC address only
 					if (strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
-						$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
-						$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."'",array("order" => "time_last","ordersens" => 2));
+						$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
+							array("order" => "time_last","ordersens" => 2));
+						$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
+							array("order" => "time_last","ordersens" => 2));
 						if ($sw && $port) {
 							$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
 							$iparray[ip2long($data2["ip"])]["port"] = $port;

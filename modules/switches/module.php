@@ -432,351 +432,470 @@
 					return $output;
 				}
 				else if ($showmodule == 3) {
-					$query = FS::$dbMgr->Select("device_module","parent,index,description,name,hw_ver,type,serial,fw_ver,sw_ver,model","ip ='".$dip."'",array("order" => "parent,name"));
-					$found = 0;
-					$devmod = array();
+					$portBuf = array();
+					
+					// We cache port and POE states for switch/stack
+					$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."'");
 					while ($data = FS::$dbMgr->Fetch($query)) {
-						if ($found == 0) $found = 1;
-						if (!isset($devmod[$data["parent"]])) $devmod[$data["parent"]] = array();
-						$idx = count($devmod[$data["parent"]]);
-						$devmod[$data["parent"]][$idx] = array();
-						$devmod[$data["parent"]][$idx]["idx"] = $data["index"];
-						$devmod[$data["parent"]][$idx]["desc"] = $data["description"];
-						$devmod[$data["parent"]][$idx]["name"] = $data["name"];
-						$devmod[$data["parent"]][$idx]["hwver"] = $data["hw_ver"];
-						$devmod[$data["parent"]][$idx]["type"] = $data["type"];
-						$devmod[$data["parent"]][$idx]["serial"] = $data["serial"];
-						$devmod[$data["parent"]][$idx]["model"] = $data["model"];
-						$devmod[$data["parent"]][$idx]["fwver"] = $data["fw_ver"];
-						$devmod[$data["parent"]][$idx]["swver"] = $data["sw_ver"];
+						// Ignore VLAN and Port-Channel interfaces
+						if (preg_match("#unrouted#",$data["port"]) || preg_match("#Port-channel#",$data["port"]) ||
+						preg_match("#Vlan#",$data["port"])) {
+							continue;
+						}
+						$portSplit = preg_split("#/#",$data["port"]);
+						$slot = "";
+						
+						$slotType = 0;
+						$portSpeed = "";
+						
+						$count = count($portSplit);
+						
+						switch ($count) {
+							case 2: $slotType = 1; break;
+							case 3: $slotType = 2; break;
+						}
+						
+						// If count isn't correct, it's not handled then skip
+						if ($slotType != 1 && $slotType != 2) {
+							continue;
+						}
+						
+						// Speed is important to deduce port places on the switch
+						if (preg_match("#^FastEthernet#", $portSplit[0])) {
+							$portSpeed = "FastEthernet";
+							$slot = preg_replace("#FastEthernet#","", $portSplit[0]);
+						}
+						else if (preg_match("#^GigabitEthernet#", $portSplit[0])) {
+							$portSpeed = "GigabitEthernet";
+							$slot = preg_replace("#GigabitEthernet#","", $portSplit[0]);
+						}
+						else if (preg_match("#^TenGigabitEthernet#", $portSplit[0])) {
+							$portSpeed = "TenGigabitEthernet";
+							$slot = preg_replace("#TenGigabitEthernet#","", $portSplit[0]);
+						}
+						
+						if (!isset($portBuf[$slot])) {
+							$portBuf[$slot] = array("slottype" => $slotType, "ports" => array());
+						}
+						
+						if ($slotType == 1) {
+							if (!isset($portBuf[$slot]["ports"][$portSpeed])) {
+								$portBuf[$slot]["ports"][$portSpeed] = array();
+							}
+							
+							$portBuf[$slot]["ports"][$portSpeed][$portSplit[1]] = array("poe" => 0);
+							
+							if ($data["up_admin"] == "down") {
+								$portBuf[$slot]["ports"][$portSpeed][$portSplit[1]]["up"] = 0;
+							}
+							else if ($data["up_admin"] == "up" && $data["up"] == "down") {
+								$portBuf[$slot]["ports"][$portSpeed][$portSplit[1]]["up"] = 1;
+							}
+							else if ($data["up"] == "up") {
+								$portBuf[$slot]["ports"][$portSpeed][$portSplit[1]]["up"] = 2;
+							}
+							else {
+								$portBuf[$slot]["ports"][$portSpeed][$portSplit[1]]["up"] = 3;
+							}
+						}
+						else if ($slotType == 2) {
+							if (!isset($portBuf[$slot]["ports"][$portSplit[1]])) {
+								$portBuf[$slot]["ports"][$portSplit[1]] = array();
+							}
+							
+							if (!isset($portBuf[$slot]["ports"][$portSplit[1]][$portSpeed])) {
+								$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed] = array();
+							}
+							
+							$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]] = array("poe" => 0);
+							
+							if ($data["up_admin"] == "down") {
+								$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]]["up"] = 0;
+							}
+							else if ($data["up_admin"] == "up" && $data["up"] == "down") {
+								$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]]["up"] = 1;
+							}
+							else if ($data["up"] == "up") {
+								$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]]["up"] = 2;
+							}
+							else {
+								$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]]["up"] = 3;
+							}
+						}
+						
+						$query2 = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port = '".$data["port"]."'");
+						if ($data2 = FS::$dbMgr->Fetch($query2)) {
+							switch($data2["class"]) {
+								case "class0": 
+									if ($slotType == 1) {
+										$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed]["poe"] = 0; 
+									}
+									else if ($slotType == 2) {
+										$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]]["poe"] = 0;
+									}
+									break;
+								case "class2":
+									if ($slotType == 1) {
+										$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed]["poe"] = 1; 
+									}
+									else if ($slotType == 2) {
+										$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]]["poe"] = 1;
+									}
+									break;
+								case "class3":
+									if ($slotType == 1) {
+										$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed]["poe"] = 2; 
+									}
+									else if ($slotType == 2) {
+										$portBuf[$slot]["ports"][$portSplit[1]][$portSpeed][$portSplit[2]]["poe"] = 2;
+									}
+									break;
+							}
+						}
 					}
-					if ($found == 1) {
-						$output .= FS::$iMgr->h3("frontview");
-						$output .= "<script>
-							/*
-							* 48 ports + 4 uplinks
-							*/
-							var sw48p4x = [34,33,63,62,93,92,123,121,153,151,183,181,222,222,251,251,281,281,311,311,341,341,371,371,
-								410,411,439,440,469,470,499,499,529,529,558,559,599,600,628,629,658,659,688,689,718,718,747,748];
-							var sw48p4y = [12,102,12,102,12,102,12,102,12,102,12,102,13,101,13,101,13,101,13,101,13,102,13,102,
-								13,101,13,101,13,101,13,101,13,101,13,101,14,101,14,101,14,101,14,101,14,101,14,101];
-							var sw2448p4 = [[816,15],[817,101],[846,15],[847,101]];
-							var sw2448p4b = [[783,101],[813,101],[844,101],[874,101]];
-							// poe
-							var sw48poe4x = [29,29,59,59,89,89,118,118,148,148,178,178,217,217,247,247,277,277,307,307,336,336,366,366,
-							406,406,436,436,466,466,495,495,525,525,555,555,595,595,625,625,655,655,685,685,714,714,743,743];
-							var sw48poe4py = 85;
-							var sw48poe4iy = 51;
-
-							function drawContext(obj,type,ptab,gptab,poetab) {
-								var canvas = document.getElementById(obj);
-								var context = canvas.getContext(\"2d\");
-								context.fillStyle = \"rgba(0,118,176,0)\";
-								context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-								context.translate(context.canvas.width/2, context.canvas.height/2);
-								context.translate(-context.canvas.width/2, -context.canvas.height/2);
-								context.beginPath();
-								context.moveTo(-2,-2);
-								context.lineTo(892,-2);
-								context.lineTo(892,119);
-								context.lineTo(-2,119);
-								context.lineTo(-2,-2);
-								context.closePath(); // complete custom shape
-
-								context.moveTo(0,0);
-								var img = new Image();
-								img.onload = function() {
-									context.drawImage(img, 0,0,892,119);
-									var startIdx = 0; var stopULIdx = sw2448p4.length; 
-									var normportX = sw48p4x; var normportY = sw48p4y;
-									var trunkport = sw2448p4;
-									var poeX = sw48poe4x; var poePY = sw48poe4py; var poeIMPY = sw48poe4iy;
-									switch(type) { 
-										case 2:	startIdx = 24; stopULIdx = 2; break;
-										case 3: startIdx = 24; trunkport = sw2448p4b; break; 
+					
+					$output .= FS::$iMgr->h3("frontview");
+					
+					FS::$iMgr->js("var sw48p4x = [34,33,63,62,93,92,123,121,153,151,183,181,222,222,251,251,281,281,311,311,341,341,371,371,410,411,439,440,469,470,499,499,529,529,558,559,599,600,628,629,658,659,688,689,718,718,747,748];
+						var sw48p4y = [12,102,12,102,12,102,12,102,12,102,12,102,13,101,13,101,13,101,13,101,13,102,13,102,13,101,13,101,13,101,13,101,13,101,13,101,14,101,14,101,14,101,14,101,14,101,14,101];
+						var sw2448p4 = [[816,15],[817,101],[846,15],[847,101]];
+						var sw2448p4b = [[783,101],[813,101],[844,101],[874,101]];
+						var sw48poe4x = [29,29,59,59,89,89,118,118,148,148,178,178,217,217,247,247,277,277,307,307,336,336,366,366,406,406,436,436,466,466,495,495,525,525,555,555,595,595,625,625,655,655,685,685,714,714,743,743];
+						var sw48poe4py = 85;
+						var sw48poe4iy = 51;
+						
+						function drawContext(obj,type,ptab,gptab,poetab) {
+							var canvas = document.getElementById(obj);
+							var context = canvas.getContext(\"2d\");
+							context.fillStyle = \"rgba(0,118,176,0)\";
+							context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+							context.translate(context.canvas.width/2, context.canvas.height/2);
+							context.translate(-context.canvas.width/2, -context.canvas.height/2);
+							context.beginPath();
+							context.moveTo(-2,-2);
+							context.lineTo(892,-2);
+							context.lineTo(892,119);
+							context.lineTo(-2,119);
+							context.lineTo(-2,-2);
+							context.closePath();
+							context.moveTo(0,0);
+							
+							var img = new Image;
+							
+							img.onload = function() {
+								context.drawImage(img, 0,0,892,119);
+								var startIdx = 0; var stopULIdx = sw2448p4.length; 
+								var normportX = sw48p4x; var normportY = sw48p4y;
+								var trunkport = sw2448p4;
+								var poeX = sw48poe4x; var poePY = sw48poe4py; var poeIMPY = sw48poe4iy;
+								switch(type) { 
+									case 2:	startIdx = 24; stopULIdx = 2; break;
+									case 3: startIdx = 24; trunkport = sw2448p4b; break; 
+								}
+								for (i=startIdx;i<normportX.length;i++) {
+									curptab = ptab[i];
+									if (startIdx > 0) curptab = ptab[i-startIdx]; 
+									if (curptab == 0)
+										context.fillStyle = \"rgba(200, 0, 0, 0.6)\";
+									else if (curptab == 1)
+										context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
+									else if (curptab == 2)
+										context.fillStyle = \"rgba(0, 255, 50, 0.9)\";
+									else
+										context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
+									context.fillRect(normportX[i], normportY[i], 7, 7);
+									context.fillStyle = \"rgba(200, 200, 0, 1)\";
+									if (startIdx > 0) {
+										if (poetab[i-startIdx] == 1)
+											context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
+										else if (poetab[i-startIdx] == 2)
+											context.fillText(\"15.0\",poeX[i]-2, (i%2 == 0 ? poeIMPY : poePY));
 									}
-									for (i=startIdx;i<normportX.length;i++) {
-										curptab = ptab[i];
-										if (startIdx > 0) curptab = ptab[i-startIdx]; 
-										if (curptab == 0)
-											context.fillStyle = \"rgba(200, 0, 0, 0.6)\";
-										else if (curptab == 1)
-											context.fillStyle = \"rgba(255, 150, 0, 0.0)\";
-										else if (curptab == 2)
-											context.fillStyle = \"rgba(0, 255, 50, 0.9)\";
-										else
+									else {
+										if (poetab[i] == 1)
+											context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
+										else if (poetab[i] == 2)
+											context.fillText(\"15.0\",poeX[i]-2, (i%2 == 0 ? poeIMPY : poePY));
+									}
+								}
+								for (i=0;i<stopULIdx;i++) {
+									if (gptab[i] == 0)
+											context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
+									else if (gptab[i] == 1)
+											context.fillStyle = \"rgba(255, 150, 0, 1.0)\";
+									else if (gptab[i] == 2)
+											context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
+									else
 											context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-										context.fillRect(normportX[i], normportY[i], 7, 7);
-										context.fillStyle = \"rgba(200, 200, 0, 1)\";
-										if (startIdx > 0) {
-											if (poetab[i-startIdx] == 1)
-												context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
-											else if (poetab[i-startIdx] == 2)
-												context.fillText(\"15.0\",poeX[i]-2, (i%2 == 0 ? poeIMPY : poePY));
-											/*else
-												context.fillText(\"0.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));*/
-										}
-										else {
-											if (poetab[i] == 1)
-												context.fillText(\"7.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));
-											else if (poetab[i] == 2)
-												context.fillText(\"15.0\",poeX[i]-2, (i%2 == 0 ? poeIMPY : poePY));
-											/*else
-												context.fillText(\"0.0\",poeX[i], (i%2 == 0 ? poeIMPY : poePY));*/
-										}
+									if (stopULIdx == 2) {
+										if (i == 0)
+											context.fillRect(trunkport[i+1][0], trunkport[i+1][1], 7, 7);
+										else
+											context.fillRect(trunkport[i+2][0], trunkport[i+2][1], 7, 7);
 									}
-									for (i=0;i<stopULIdx;i++) {
-										if (gptab[i] == 0)
-												context.fillStyle = \"rgba(255, 0, 0, 0.6)\";
-										else if (gptab[i] == 1)
-												context.fillStyle = \"rgba(255, 150, 0, 1.0)\";
-										else if (gptab[i] == 2)
-												context.fillStyle = \"rgba(0, 255, 50, 0.6)\";
-										else
-												context.fillStyle = \"rgba(255, 150, 0, 0.6)\";
-										if (stopULIdx == 2) {
-											if (i == 0)
-												context.fillRect(trunkport[i+1][0], trunkport[i+1][1], 7, 7);
-											else
-												context.fillRect(trunkport[i+2][0], trunkport[i+2][1], 7, 7);
-										}
-										else
-											context.fillRect(trunkport[i][0], trunkport[i][1], 7, 7);
+									else {
+										context.fillRect(trunkport[i][0], trunkport[i][1], 7, 7);
 									}
 								}
-								switch(type) {
-									case 1:	img.src = '/styles/images/Switch48-4.png'; break;
-									case 2:	img.src = '/styles/images/Switch24-2-r.png'; break;
-									case 3: img.src = '/styles/images/Switch24-2-r2.png'; break;
-								}
+							};
+							
+							switch(type) {
+								case 1:	img.src = '/styles/images/Switch48-4.png'; break;
+								case 2:	img.src = '/styles/images/Switch24-2-r.png'; break;
+								case 3: img.src = '/styles/images/Switch24-2-r2.png'; break;
+							}}");
+					
+					sort($portBuf);
+					
+					foreach ($portBuf as $slot => $ports) {
+						$renderType = 0;
+						$portNb = 0;
+						$portList = NULL;
+						$slotTypeCount = 0;
+						if ($ports["slottype"] == 1) {
+							foreach ($ports["ports"] as $pt => $values) {
+								$portNb += count($values);
 							}
-						</script>";
-						$swlist = $this->getDeviceSwitches($devmod,1);
-						$swlist = preg_split("#\/#",$swlist);
-						$countsw = count($swlist)-1;
-						for ($i=$countsw;$i>=0;--$i) {
-							switch($swlist[$i]) {
-								case "WS-C3750-48P": case "WS-C3750-48TS": case "WS-C3750-48PS": case "WS-C3750G-48TS": case "WS-C3750-48PS": { // 100 Mbits switches
-									$poearr = array();
-									// POE States
-									$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										switch($data["class"]) {
-											case "class0": $poearr[$pid] = 0; break;
-											case "class2": $poearr[$pid] = 1; break;
-											case "class3": $poearr[$pid] = 2; break;
-										}
-									}
 
-									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'",array("order" => "port"));
-									$arr_res = array();
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										if (preg_match("#unrouted#",$data["port"]))
-											continue;
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										if ($data["up_admin"] == "down")
-											$arr_res[$pid] = 0;
-										else if ($data["up_admin"] == "up" && $data["up"] == "down")
-											$arr_res[$pid] = 1;
-										else if ($data["up"] == "up")
-											$arr_res[$pid] = 2;
-										else
-											$arr_res[$pid] = 3;
-									}
-	
-									uksort($arr_res,"strnatcasecmp");
-									$count = count($arr_res);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $arr_res[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; var gptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'",array("order" => "port"));
-									$arr_res = array();
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										if (preg_match("#unrouted#",$data["port"]))
-											continue;
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										if ($data["up_admin"] == "down")
-											$arr_res[$pid] = 0;
-										else if ($data["up_admin"] == "up" && $data["up"] == "down")
-											$arr_res[$pid] = 1;
-										else if ($data["up"] == "up")
-											$arr_res[$pid] = 2;
-										else
-											$arr_res[$pid] = 3;
-									}
-	
-									uksort($arr_res,"strnatcasecmp");
-									$count = count($arr_res);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $arr_res[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; var poetab = [";
-									$count = count($poearr);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $poearr[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; drawContext('canvas_".($i+1)."',1,ptab,gptab,poetab);</script>";
-									break;
-								}
-								case "WS-C3750-24TS": case "WS-C3750G-24TS": case "WS-C3750G-24WS": case "WS-C3750G-24T": case "WS-C3750-FS":
-								case "WS-C3750-24PS": case "WS-C3750-24P": // 100 Mbits switches
-									$poearr = array();
-									// POE States
-									$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port LIKE 'FastEthernet".($i+1)."/0/%'");
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										switch($data["class"]) {
-											case "class0": $poearr[$pid] = 0; break;
-											case "class2": $poearr[$pid] = 1; break;
-											case "class3": $poearr[$pid] = 2; break;
-										}
-									}
-	
-									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'FastEthernet".($i+1)."/0/%'",array("order" => "port"));
-									$arr_res = array();
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										if (preg_match("#unrouted#",$data["port"]))
-											continue;
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										if ($data["up_admin"] == "down")
-											$arr_res[$pid] = 0;
-										else if ($data["up_admin"] == "up" && $data["up"] == "down")
-											$arr_res[$pid] = 1;
-										else if ($data["up"] == "up")
-											$arr_res[$pid] = 2;
-										else
-											$arr_res[$pid] = 3;
-									}
-
-									uksort($arr_res,"strnatcasecmp");
-									$count = count($arr_res);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $arr_res[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; var gptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port LIKE 'GigabitEthernet".($i+1)."/0/%'",array("order" => "port"));
-									$arr_res = array();
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										if (preg_match("#unrouted#",$data["port"]))
-											continue;
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										if ($data["up_admin"] == "down")
-											$arr_res[$pid] = 0;
-										else if ($data["up_admin"] == "up" && $data["up"] == "down")
-											$arr_res[$pid] = 1;
-										else if ($data["up"] == "up")
-											$arr_res[$pid] = 2;
-										else
-											$arr_res[$pid] = 3;
-									}
-	
-									uksort($arr_res,"strnatcasecmp");
-									$count = count($arr_res);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $arr_res[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; var powport = [";
-									$count = count($poearr);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $poearr[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; drawContext('canvas_".($i+1)."',2,ptab,gptab,powport);</script>";
-									break;
-								case "WS-C2960S-24TS-L": // Gbit switches
-									$poearr = array();
-									$portlist = "";
-									for ($j=1;$j<25;$j++) {
-										$portlist .= "'GigabitEthernet".($i+1)."/0/".$j."'";
-										if ($j < 24)
-											$portlist .= ",";
-									}
-									// POE States
-									$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'  AND port IN (".$portlist.")");
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										switch($data["class"]) {
-											case "class0": $poearr[$pid] = 0; break;
-											case "class2": $poearr[$pid] = 1; break;
-											case "class3": $poearr[$pid] = 2; break;
-										}
-									}
-	
-									$output .= "<canvas id=\"canvas_".($i+1)."\" width=\"892\" height=\"119\"></canvas><script> var ptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN (".$portlist.")",array("order" => "port"));
-									$arr_res = array();
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										if (preg_match("#unrouted#",$data["port"]))
-											continue;
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										if ($data["up_admin"] == "down")
-											$arr_res[$pid] = 0;
-										else if ($data["up_admin"] == "up" && $data["up"] == "down")
-											$arr_res[$pid] = 1;
-										else if ($data["up"] == "up")
-											$arr_res[$pid] = 2;
-										else
-											$arr_res[$pid] = 3;
-									}
-	
-									uksort($arr_res,"strnatcasecmp");
-									$count = count($arr_res);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $arr_res[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; var gptab = [";
-									$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."' AND port IN ('GigabitEthernet".($i+1)."/0/25', 'GigabitEthernet".($i+1)."/0/26',
-											'GigabitEthernet".($i+1)."/0/27','GigabitEthernet".($i+1)."/0/28')",array("order" => "port"));
-									$arr_res = array();
-									while ($data = FS::$dbMgr->Fetch($query)) {
-										if (preg_match("#unrouted#",$data["port"]))
-											continue;
-										$pid = preg_split("#\/#",$data["port"]);
-										$pid = $pid[2];
-										if ($data["up_admin"] == "down")
-											$arr_res[$pid] = 0;
-										else if ($data["up_admin"] == "up" && $data["up"] == "down")
-											$arr_res[$pid] = 1;
-										else if ($data["up"] == "up")
-											$arr_res[$pid] = 2;
-										else
-											$arr_res[$pid] = 3;
-									}
-	
-									uksort($arr_res,"strnatcasecmp");
-									$count = count($arr_res);
-									for ($j=25;$j<=(25+$count);$j++) {
-										$output .= $arr_res[$j];
-										if ($j < (24+$count)) $output .= ",";
-									}
-									$output .= "]; var powport = [";
-									$count = count($poearr);
-									for ($j=1;$j<=$count;$j++) {
-										$output .= $poearr[$j];
-										if ($j < $count) $output .= ",";
-									}
-									$output .= "]; drawContext('canvas_".($i+1)."',3,ptab,gptab,powport);</script>";
-									break;
-								default: break;
+							$portList = $ports["ports"];
+							
+							$slotTypeCount = count($portList);
+							
+							if (($portNb == 24 || $portNb == 48) && $slotTypeCount != 1) {
+								$output .= $slot." unhandled";
 							}
+						}
+						else if($ports["slottype"] == 2) {
+							// We only handle A/0/B form at this time
+							foreach ($ports["ports"][0] as $pt => $values) {
+								$portNb += count($values);
+							}
+							
+							$portList = $ports["ports"][0];
+							
+							$slotTypeCount = count($portList);
+							
+							if (($portNb == 24 || $portNb == 48) && $slotTypeCount != 1) {
+								$output .= $slot." unhandled";
+							}
+						}
+						else {
+							// If slottype is incorrect, don't handle it
+							$output .= $slot." unhandled";
+							continue;
+						}
+						
+						// First buffer is main ports. Secondary buffer is uplink ports
+						$pbuf = "";
+						$pbuf2 = "";
+						$poebuf = "";
+						
+						switch ($portNb) {
+							case 24:
+							case 26:
+							case 28:
+							case 48:
+							case 50:
+							case 52:
+								// If FastEthernet ports are present
+								if (array_key_exists("FastEthernet", $portList)) {
+									
+									$fect = count($portList["FastEthernet"]);
+									
+									// If there is 24 or 48 FastEthernet ports
+									if ($fect == 24 || $fect == 48) {
+										for ($i=1;$i<=$fect;$i++) {
+											$pbuf .= $portList["FastEthernet"][$i]["up"];
+											$poebuf .= $portList["FastEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+									}
+									// If its a fully FastEthernet switch with 2 FastEthernet uplinks
+									else if ($fect == 26 || $fect == 50) {
+										for ($i=1;$i<=$fect-2;$i++) {
+											$pbuf .= $portList["FastEthernet"][$i]["up"];
+											$poebuf .= $portList["FastEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+										
+										for ($i=$fect-1;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["FastEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+									// If its a fully FastEthernet switch with 4 FastEthernet uplinks
+									else if ($fect == 28 || $fect == 52) {
+										for ($i=1;$i<=$fect-4;$i++) {
+											$pbuf .= $portList["FastEthernet"][$i]["up"];
+											$poebuf .= $portList["FastEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+										
+										for ($i=$fect-3;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["FastEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+								}
+								
+								// If GigabitEthernet ports are present
+								if (array_key_exists("GigabitEthernet", $portList)) {
+									$fect = count($portList["GigabitEthernet"]);
+									
+									// If there is 24 or 48 GigabitEthernet ports
+									if ($fect == 24 || $fect == 48) {
+										for ($i=1;$i<=$fect;$i++) {
+											$pbuf .= $portList["GigabitEthernet"][$i]["up"];
+											$poebuf .= $portList["GigabitEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+									}
+									// If its a fully GigabitEthernet switch with 2 GigabitEthernet uplinks
+									else if($fect == 26 || $fect == 50) {
+										for ($i=1;$i<=$fect-2;$i++) {
+											$pbuf .= $portList["GigabitEthernet"][$i]["up"];
+											$poebuf .= $portList["GigabitEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+										
+										for ($i=$fect-1;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["GigabitEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+									// If its a fully GigabitEthernet switch with 4 GigabitEthernet uplinks
+									else if ($fect == 28 || $fect == 52) {
+										for ($i=1;$i<=$fect-4;$i++) {
+											$pbuf .= $portList["GigabitEthernet"][$i]["up"];
+											$poebuf .= $portList["GigabitEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+										
+										for ($i=$fect-3;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["GigabitEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+									// If there is only 2 or 4 GigabitEthernet ports, it's uplinks
+									else if ($fect == 2 || $fect == 4) {
+										for ($i=1;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["GigabitEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+								}
+								
+								// If TenGigabitEthernet ports are present
+								if (array_key_exists("TenGigabitEthernet", $portList)) {
+									$fect = count($portList["TenGigabitEthernet"]);
+									
+									// If there is 24 or 48 TenGigabitEthernet ports
+									if ($fect == 24 || $fect == 48) {
+										for ($i=1;$i<=$fect;$i++) {
+											$pbuf .= $portList["TenGigabitEthernet"][$i]["up"];
+											$poebuf .= $portList["TenGigabitEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+									}
+									// If its a fully TenGigabitEthernet switch with 2 TenGigabitEthernet uplinks
+									else if($fect == 26 || $fect == 50) {
+										for ($i=1;$i<=$fect-2;$i++) {
+											$pbuf .= $portList["TenGigabitEthernet"][$i]["up"];
+											$poebuf .= $portList["TenGigabitEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+										
+										for ($i=$fect-1;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["TenGigabitEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+									// If its a fully TenGigabitEthernet switch with 4 TenGigabitEthernet uplinks
+									else if ($fect == 28 || $fect == 52) {
+										for ($i=1;$i<=$fect-4;$i++) {
+											$pbuf .= $portList["TenGigabitEthernet"][$i]["up"];
+											$poebuf .= $portList["TenGigabitEthernet"][$i]["poe"];
+											if ($i < $fect) {
+												$pbuf .= ",";
+												$poebuf .= ",";
+											}
+										}
+										
+										for ($i=$fect-3;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["TenGigabitEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+									// If there is only 2 or 4 TenGigabitEthernet ports, it's uplinks
+									else if ($fect == 2 || $fect == 4) {
+										for ($i=1;$i<=$fect;$i++) {
+											$pbuf2 .= $portList["TenGigabitEthernet"][$i]["up"];
+											if ($i < $fect) {
+												$pbuf2 .= ",";
+											}
+										}
+									}
+								}
+								
+								$switchType = 0;
+						
+								switch ($portNb) {
+									case 24: break;
+									case 26: $switchType = 3; break;
+									case 28: $switchType = 2; break;
+									case 48: break;
+									case 50: break;
+									case 52: $switchType = 1; break;
+										
+								}
+								
+								$output .= sprintf("<canvas id=\"canvas_%s\" width=\"892\" height=\"119\"></canvas>",
+									$slot);
+								
+								FS::$iMgr->js(sprintf("var ptab = [%s]; var gptab = [%s]; var poetab = [%s]; drawContext('canvas_%s',%d,ptab,gptab,poetab);",
+									$pbuf, $pbuf2, $poebuf, $slot, $switchType));
+								break;
+							default: 
+								$output .= FS::$iMgr->printError(sprintf($this->loc->s("err-unhandled-port-number"),$portNb, $slot), true);
+								break;
 						}
 					}
 					return $output;			
@@ -1249,106 +1368,106 @@
 				return $output;
 			}
 
-			private function showDeviceModules($devmod,$idx,$level=10) {
-				if ($level == 0)
-					return "";
-				if (!isset($devmod[$idx])) return "";
-				$output = "";
-				$count = count($devmod[$idx]);
-				for ($i=0;$i<$count;$i++) {
-					$output .= "<tr><td>" .$devmod[$idx][$i]["desc"]."</td><td>".$devmod[$idx][$i]["name"]."</td><td>";
+		private function showDeviceModules($devmod,$idx,$level=10) {
+			if ($level == 0)
+				return "";
+			if (!isset($devmod[$idx])) return "";
+			$output = "";
+			$count = count($devmod[$idx]);
+			for ($i=0;$i<$count;$i++) {
+				$output .= "<tr><td>" .$devmod[$idx][$i]["desc"]."</td><td>".$devmod[$idx][$i]["name"]."</td><td>";
 
-					$output .= $devmod[$idx][$i]["type"];
+				$output .= $devmod[$idx][$i]["type"];
 
-					$output .= "</td><td>";
-					if (strlen($devmod[$idx][$i]["hwver"]) > 0)
-						$output .= "hw: ".$devmod[$idx][$i]["hwver"];
+				$output .= "</td><td>";
+				if (strlen($devmod[$idx][$i]["hwver"]) > 0)
+					$output .= "hw: ".$devmod[$idx][$i]["hwver"];
 
-					$output .= "</td><td>";
+				$output .= "</td><td>";
 
-					if (strlen($devmod[$idx][$i]["fwver"]) > 0)
-						$output .= "fw: ".$devmod[$idx][$i]["fwver"];
+				if (strlen($devmod[$idx][$i]["fwver"]) > 0)
+					$output .= "fw: ".$devmod[$idx][$i]["fwver"];
 
-					$output .= "</td><td>";
+				$output .= "</td><td>";
 
-					if (strlen($devmod[$idx][$i]["swver"]) > 0)
-						$output .= "sw: ".$devmod[$idx][$i]["swver"];
+				if (strlen($devmod[$idx][$i]["swver"]) > 0)
+					$output .= "sw: ".$devmod[$idx][$i]["swver"];
 
-					$output .= "</td><td>";
+				$output .= "</td><td>";
 
-					if (strlen($devmod[$idx][$i]["serial"]) > 0)
-						$output .= "serial: ".$devmod[$idx][$i]["serial"];
+				if (strlen($devmod[$idx][$i]["serial"]) > 0)
+					$output .= "serial: ".$devmod[$idx][$i]["serial"];
 
-					$output .= "</td><td>";
-					if (strlen($devmod[$idx][$i]["model"]) > 0)
-						$output .= $devmod[$idx][$i]["model"];
+				$output .= "</td><td>";
+				if (strlen($devmod[$idx][$i]["model"]) > 0)
+					$output .= $devmod[$idx][$i]["model"];
 
-					$output .= "</td></tr>";
+				$output .= "</td></tr>";
 
-					if ($idx != 0)
-						$output .= $this->showDeviceModules($devmod,$devmod[$idx][$i]["idx"],$level-1);
-				}
-				return $output;
+				if ($idx != 0)
+					$output .= $this->showDeviceModules($devmod,$devmod[$idx][$i]["idx"],$level-1);
+			}
+			return $output;
+		}
+
+		private function getDeviceSwitches($devmod,$idx) {
+			if (!isset($devmod[$idx])) return "";
+			$output = "";
+			$count = count($devmod[$idx]);
+			for ($i=0;$i<$count;$i++) {
+				$output .= $devmod[$idx][$i]["desc"];
+				if ($i+1<$count) $output .= "/";
+			}
+			return $output;
+		}
+
+		private function showDeviceDiscovery() {
+			return sprintf("%s<ul class=\"ulform\"><li>%s</li><li>%s</li></ul></form>",
+				FS::$iMgr->cbkForm("18"),
+				FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:"),
+				FS::$iMgr->Submit("",$this->loc->s("Discover"))
+			);
+		}
+
+		private function showAdvancedFunctions() {
+			$output = "";
+			if (FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
+				// Write all devices button
+				$output .= FS::$iMgr->cbkForm("20").
+					FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
+			}
+			if (FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
+				$rightsok = true;
+				// Backup all devices button
+				$output .= FS::$iMgr->cbkForm("21").
+					FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
 			}
 
-			private function getDeviceSwitches($devmod,$idx) {
-				if (!isset($devmod[$idx])) return "";
-				$output = "";
-				$count = count($devmod[$idx]);
-				for ($i=0;$i<$count;$i++) {
-					$output .= $devmod[$idx][$i]["desc"];
-					if ($i+1<$count) $output .= "/";
-				}
-				return $output;
+			if (FS::$sessMgr->hasRight("mrule_switches_import_plugs")) {
+				$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt($this->loc->s("comma"),",").
+					FS::$iMgr->selElmt($this->loc->s("semi-colon"),";")."</select>";
+				
+				$output .= FS::$iMgr->h3("title-import-plug-room").
+					FS::$iMgr->tip("tip-import-plug-room").
+					FS::$iMgr->cbkForm("25")."<table>".
+					FS::$iMgr->idxLines(array(
+						array("CSV-content","csv",array("type" => "area", "width" => 600)),
+						array("separator","sep",array("type" => "raw", "value" => $selOutput)),
+						array("Replace-?","repl",array("type" => "chk"))
+					)).
+					FS::$iMgr->tableSubmit("Import");
 			}
+			return $output;
+		}
 
-			private function showDeviceDiscovery() {
-				return sprintf("%s<ul class=\"ulform\"><li>%s</li><li>%s</li></ul></form>",
-					FS::$iMgr->cbkForm("18"),
-					FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:"),
-					FS::$iMgr->Submit("",$this->loc->s("Discover"))
-				);
+		public function getIfaceElmt() {
+			$el = FS::$secMgr->checkAndSecuriseGetData("el");
+			switch($el) {
+				case 1: return $this->showDeviceDiscovery();
+				case 2: return $this->showAdvancedFunctions();
+				default: return;
 			}
-
-			private function showAdvancedFunctions() {
-				$output = "";
-				if (FS::$sessMgr->hasRight("mrule_switches_globalsave")) {
-					// Write all devices button
-					$output .= FS::$iMgr->cbkForm("20").
-						FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
-				}
-				if (FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
-					$rightsok = true;
-					// Backup all devices button
-					$output .= FS::$iMgr->cbkForm("21").
-						FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
-				}
-
-				if (FS::$sessMgr->hasRight("mrule_switches_import_plugs")) {
-					$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt($this->loc->s("comma"),",").
-						FS::$iMgr->selElmt($this->loc->s("semi-colon"),";")."</select>";
-					
-					$output .= FS::$iMgr->h3("title-import-plug-room").
-						FS::$iMgr->tip("tip-import-plug-room").
-						FS::$iMgr->cbkForm("25")."<table>".
-						FS::$iMgr->idxLines(array(
-							array("CSV-content","csv",array("type" => "area", "width" => 600)),
-							array("separator","sep",array("type" => "raw", "value" => $selOutput)),
-							array("Replace-?","repl",array("type" => "chk"))
-						)).
-						FS::$iMgr->tableSubmit("Import");
-				}
-				return $output;
-			}
-
-			public function getIfaceElmt() {
-				$el = FS::$secMgr->checkAndSecuriseGetData("el");
-				switch($el) {
-					case 1: return $this->showDeviceDiscovery();
-					case 2: return $this->showAdvancedFunctions();
-					default: return;
-				}
-			}
+		}
 
 			public function handlePostDatas($act) {
 				switch($act) {
