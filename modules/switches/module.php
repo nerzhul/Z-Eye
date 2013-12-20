@@ -566,6 +566,11 @@
 						var sw48poe4py = 85;
 						var sw48poe4iy = 51;
 						
+						var sw24p0x = [84,113,143,172,202,232,273,302,332,362,392,422,462,491,521,550,580,610,651,680,710,740,769,799];
+						var sw24p0y = [12,12,12,12,12,12,13,13,13,13,13,13,13,13,13,13,13,13,14,14,14,14,14,14];
+						var sw24poe0x = [80,110,140,169,199,229,268,298,328,358,387,417,457,487,517,546,576,606,646,676,706,736,765,794];
+						var sw24poe0y = 85;
+						
 						function drawContext(obj,type,ptab,gptab,poetab) {
 							var canvas = document.getElementById(obj);
 							var context = canvas.getContext(\"2d\");
@@ -594,6 +599,7 @@
 									case 2:	startIdx = 24; stopULIdx = 2; break;
 									case 3: startIdx = 24; trunkport = sw2448p4b; break;
 									case 4: trunkport = 0; poeX = sw48poe0x; normportX = sw48p0x; break;
+									case 5: trunkport = 0; poeX = sw24poe0x; poePY = sw24poe0y; poeIMPY = sw24poe0y; normportX = sw24p0x; normportY = sw24p0y; break;
 								}
 								for (i=startIdx;i<normportX.length;i++) {
 									curptab = ptab[i];
@@ -647,6 +653,7 @@
 								case 2:	img.src = '/styles/images/Switch24-2-r.png'; break;
 								case 3: img.src = '/styles/images/Switch24-2-r2.png'; break;
 								case 4:	img.src = '/styles/images/Switch48-0.png'; break;
+								case 5:	img.src = '/styles/images/Switch24-0.png'; break;
 							}}");
 					
 					ksort($portBuf);
@@ -882,7 +889,7 @@
 								$switchType = 0;
 						
 								switch ($portNb) {
-									case 24: break;
+									case 24: $switchType = 5; break;
 									case 26: $switchType = 3; break;
 									case 28: $switchType = 2; break;
 									case 48: $switchType = 4; break;
@@ -891,7 +898,8 @@
 										
 								}
 								
-								$output .= sprintf("<canvas id=\"canvas_%s\" width=\"892\" height=\"119\"></canvas>",
+								$output .= FS::$iMgr->h3(sprintf("Slot '%s'",$slot),true).
+									sprintf("<canvas id=\"canvas_%s\" width=\"892\" height=\"119\"></canvas>",
 									$slot);
 								
 								FS::$iMgr->js(sprintf("var ptab = [%s]; var gptab = [%s]; var poetab = [%s]; drawContext('canvas_%s',%d,ptab,gptab,poetab);",
