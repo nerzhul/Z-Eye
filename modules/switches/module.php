@@ -435,7 +435,7 @@
 					$portBuf = array();
 					
 					// We cache port and POE states for switch/stack
-					$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."'");
+					$query = FS::$dbMgr->Select("device_port","port,up,up_admin","ip ='".$dip."'",array("order" => "port"));
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						// Ignore VLAN and Port-Channel interfaces
 						if (preg_match("#unrouted#",$data["port"]) || preg_match("#Port-channel#",$data["port"]) ||
@@ -649,7 +649,7 @@
 								case 4:	img.src = '/styles/images/Switch48-0.png'; break;
 							}}");
 					
-					sort($portBuf);
+					ksort($portBuf);
 					
 					foreach ($portBuf as $slot => $ports) {
 						$renderType = 0;
