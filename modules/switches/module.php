@@ -557,10 +557,12 @@
 					$output .= FS::$iMgr->h3("frontview");
 					
 					FS::$iMgr->js("var sw48p4x = [34,33,63,62,93,92,123,121,153,151,183,181,222,222,251,251,281,281,311,311,341,341,371,371,410,411,439,440,469,470,499,499,529,529,558,559,599,600,628,629,658,659,688,689,718,718,747,748];
+						var sw48p0x = [85,84,114,113,144,143,174,172,204,202,234,232,273,273,302,302,332,332,362,362,392,392,422,422,461,462,490,491,520,521,550,550,580,580,609,610,650,651,679,680,709,710,739,740,769,769,798,799];
 						var sw48p4y = [12,102,12,102,12,102,12,102,12,102,12,102,13,101,13,101,13,101,13,101,13,102,13,102,13,101,13,101,13,101,13,101,13,101,13,101,14,101,14,101,14,101,14,101,14,101,14,101];
 						var sw2448p4 = [[816,15],[817,101],[846,15],[847,101]];
 						var sw2448p4b = [[783,101],[813,101],[844,101],[874,101]];
 						var sw48poe4x = [29,29,59,59,89,89,118,118,148,148,178,178,217,217,247,247,277,277,307,307,336,336,366,366,406,406,436,436,466,466,495,495,525,525,555,555,595,595,625,625,655,655,685,685,714,714,743,743];
+						var sw48poe0x = [80,80,110,110,140,140,169,169,199,199,229,229,268,268,298,298,328,328,358,358,387,387,417,417,457,457,487,487,517,517,546,546,576,576,606,606,646,646,676,676,706,706,736,736,765,765,794,794];
 						var sw48poe4py = 85;
 						var sw48poe4iy = 51;
 						
@@ -590,7 +592,8 @@
 								var poeX = sw48poe4x; var poePY = sw48poe4py; var poeIMPY = sw48poe4iy;
 								switch(type) { 
 									case 2:	startIdx = 24; stopULIdx = 2; break;
-									case 3: startIdx = 24; trunkport = sw2448p4b; break; 
+									case 3: startIdx = 24; trunkport = sw2448p4b; break;
+									case 4: trunkport = 0; poeX = sw48poe0x; normportX = sw48p0x; break;
 								}
 								for (i=startIdx;i<normportX.length;i++) {
 									curptab = ptab[i];
@@ -643,6 +646,7 @@
 								case 1:	img.src = '/styles/images/Switch48-4.png'; break;
 								case 2:	img.src = '/styles/images/Switch24-2-r.png'; break;
 								case 3: img.src = '/styles/images/Switch24-2-r2.png'; break;
+								case 4:	img.src = '/styles/images/Switch48-0.png'; break;
 							}}");
 					
 					sort($portBuf);
@@ -881,7 +885,7 @@
 									case 24: break;
 									case 26: $switchType = 3; break;
 									case 28: $switchType = 2; break;
-									case 48: break;
+									case 48: $switchType = 4; break;
 									case 50: break;
 									case 52: $switchType = 1; break;
 										
