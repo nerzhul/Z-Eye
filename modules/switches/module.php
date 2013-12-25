@@ -1987,7 +1987,7 @@
 						
 						for ($i=0;$i<$count;$i++) {
 							$dip = $ipldst[$i];
-							echo $dip;
+
 							exec("/usr/local/bin/netdisco -d ".$dip);
 
 							$snmpro = array();
@@ -2025,7 +2025,7 @@
 							}
 							$this->log(0,"Discovery launched for device '".$dip."'");
 						}
-						//FS::$iMgr->redir("mod=".$this->mid,true);
+						FS::$iMgr->redir("mod=".$this->mid,true);
 						return;
 					case 19: // device status
 						$dip = FS::$secMgr->getPost("dip","i4");
