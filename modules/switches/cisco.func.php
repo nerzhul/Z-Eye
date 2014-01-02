@@ -31,15 +31,20 @@
 			return FS::$iMgr->idxLine("Shutdown","shut",array("value" => ($state == 2),"type" => "chk", "tooltip" => "tooltip-shut"));
 		}
 
-		public function handleState($logvals) {
-			$port = FS::$secMgr->checkAndSecurisePostData("port");
-			$shut = FS::$secMgr->checkAndSecurisePostData("shut");
+		public function handleState($logvals, $port = "", $shut = -1) {
+			if ($port == "") {
+				$port = FS::$secMgr->checkAndSecurisePostData("port");
+			}
+			if ($shut == -1) {
+				$shut = FS::$secMgr->checkAndSecurisePostData("shut");
+			}
 
 			$portstate = $this->getPortState();
 
 			// If it's same state do nothing
-			if($portstate == ($shut == "on" ? 2 : 1))
+			if($portstate == ($shut == "on" ? 2 : 1)) {
 				return;
+			}
 
 			$logvals["hostmode"]["src"] = $portstate;
 			if($this->setPortState($shut == "on" ? 2 : 1) != 0) {
@@ -699,8 +704,9 @@
 
 		public function handleSaveCfg() {
 			$wr = FS::$secMgr->checkAndSecurisePostData("wr");
-			if($wr == "on")
+			if($wr == "on") {
 				$this->writeMemory();
+			}
 		}
 
 		public function checkFields() {
@@ -724,8 +730,9 @@
 		}
 		
 		public function setPortState($value) {
-			if($value != 1 && $value != 2)
+			if($value != 1 && $value != 2) {
 				return NULL;
+			}
 
 			return $this->setFieldForPortWithPID("ifAdminStatus","i",$value);
 		}
@@ -741,8 +748,8 @@
 		*/
 
 		public function getPortMtu() {
-                        return $this->getFieldForPortWithPID("ifMtu");
-                }
+			return $this->getFieldForPortWithPID("ifMtu");
+		}
 
 		public function setPortDuplex($value) {
 			if($value < 1 || $value > 4)

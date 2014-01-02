@@ -33,7 +33,7 @@
 		*/
 
 		public function showStateOpts() { return ""; }
-		public function handleState($logvals) {}
+		public function handleState($logvals, $port = "", $shut = -1) {}
 
 		public function showSpeedOpts() { return ""; }
 		public function handleSpeed($logvals) {}

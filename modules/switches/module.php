@@ -42,8 +42,10 @@
 			$this->modulename = "switches";
 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");
-			if (FS::isAjaxCall() && !$device)
+			if (FS::isAjaxCall() && !$device) {
 				$device = FS::$secMgr->checkAndSecurisePostData("sw");
+			}
+			
 			if ($device) {
 				$this->vendor = FS::$dbMgr->GetOneData("device","vendor","name = '".$device."'");
 				switch($this->vendor) {
@@ -1109,8 +1111,9 @@
 						$poearr = array();
 						// POE States
 						$query = FS::$dbMgr->Select("device_port_power","port,class","ip = '".$dip."'");
-						while ($data = FS::$dbMgr->Fetch($query))
+						while ($data = FS::$dbMgr->Fetch($query)) {
 							$poearr[$data["port"]] = $data["class"];
+						}
 					}
 
 					$plugAndRoomsarr = array();
@@ -1135,10 +1138,21 @@
 						}); }
 						else $(src).toggle(); }");
 					}
-					$tmpoutput = "<table id=\"tportList\"><thead><tr><th class=\"headerSortDown\">".
-						FS::$iMgr->aLink($this->mid."&d=".$device."&od=port", "Port")."</th><th>";
-					$tmpoutput .= $this->loc->s("Description")."</th>
+					
+					
+					$tmpoutput = FS::$iMgr->cbkForm("29").FS::$iMgr->hidden("sw", $device).
+						"<table id=\"tportList\"><thead><tr>";
+					
+					if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && 
+						FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+						$tmpoutput .= "<th></th>";
+					}
+					
+					$tmpoutput .= "<th class=\"headerSortDown\">".
+						FS::$iMgr->aLink($this->mid."&d=".$device."&od=port", "Port")."</th><th>".
+						$this->loc->s("Description")."</th>
 						<th>".$this->loc->s("Plug")."</th><th>".$this->loc->s("Room")."</th><th>Up (Link/Admin)</th>";
+						
 					if ($iswif == false) {
 						$tmpoutput .= "<th>".$this->loc->s("Duplex")." (Link/Admin)</th>";
 					}
@@ -1165,7 +1179,16 @@
 						$convport = preg_replace("#\/#","-",$data["port"]);
 						$plug = (isset($plugAndRoomsarr[$data["port"]]) ? $plugAndRoomsarr[$data["port"]][0] : "");
 						$room = (isset($plugAndRoomsarr[$data["port"]]) ? $plugAndRoomsarr[$data["port"]][1] : "");
-						$tmpoutput2 = "<tr id=\"".$convport."\"><td>".
+						$tmpoutput2 = "<tr id=\"".$convport."\">";
+						
+						if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && 
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+							$pid = $this->devapi->getPortId($data["port"]);
+							$tmpoutput2 .= sprintf("<td>%s</td>",
+								FS::$iMgr->check(FS::$iMgr->formatHTMLId("pmm_".$pid)));
+						}
+					
+						$tmpoutput2 .= "<td>".
 							FS::$iMgr->aLink($this->mid."&d=".$device."&p=".$data["port"], $data["port"])."</td><td>";
 
 						// Editable Desc
@@ -1289,8 +1312,18 @@
 					}
 
 					if ($found != 0) {
-						$output .= $tmpoutput;
-						$output .= "</table>";
+						$output .= $tmpoutput."</table>";
+						
+						if (FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") && 
+							FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+							$output .= FS::$iMgr->select("swact").
+								FS::$iMgr->selElmt($this->loc->s("Shutdown-ports"),1).
+								FS::$iMgr->selElmt($this->loc->s("Switchon-ports"),2).
+								"</select><br />".
+								FS::$iMgr->check("wr").$this->loc->s("Save-switch")."<br />".
+								FS::$iMgr->submit("",$this->loc->s("Send"))."</form>";
+						}
+							
 						FS::$iMgr->jsSortTable("tportList");
 					}
 					else
@@ -1627,8 +1660,9 @@
 
 						$this->devapi->handleState($logvals);
 
-						if ($this->devapi->handleVoiceVlan($logvals) != 0)
+						if ($this->devapi->handleVoiceVlan($logvals) != 0) {
 							return;
+						}
 
 						$logvals["desc"]["src"] = $this->devapi->getPortDesc();
 						$this->devapi->setPortDesc($desc);
@@ -2238,6 +2272,70 @@
 					case 28:
 						$netDev = new netDevice();
 						$netDev->modifyRoom();
+						return;
+					// Massive port modification
+					case 29:
+						$sw = FS::$secMgr->checkAndSecurisePostData("sw");
+						$swact = FS::$secMgr->checkAndSecurisePostData("swact");
+						if (!$sw || !$swact) {
+							$this->log(2,"Some fields are missing (massive port modification)");
+							FS::$iMgr->ajaxEcho("err-bad-datas");
+							return;
+						}
+
+						$this->devapi->setDevice($sw);
+						$dip = $this->devapi->getDeviceIP();
+
+						$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$sw."'");
+						if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
+							FS::$iMgr->ajaxEcho("err-no-credentials");
+							return;	
+						}
+						
+						// Now we search all concerned ports
+						foreach ($_POST as $key => $value) {
+							if (!preg_match("#^pmm_#",$key)) {
+								continue;
+							}
+							
+							$pid = preg_replace("#pmm_#","",$key);
+							
+							if (!FS::$secMgr->isNumeric($pid) || $pid == -1) {
+								$this->log(2,sprintf("Some fields are missing (massive port modification). PID '%s' is incorrect", $pid));
+								FS::$iMgr->ajaxEcho("err-bad-datas");
+								return;
+							}
+							
+							$portname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_id_cache",
+								"portname", "device = '".$sw."' AND pid = '".$pid."'");
+							
+							if (!$portname) {
+								continue;
+							}
+							
+							$this->devapi->setPortId($pid);
+							
+							switch ($swact) {
+								// Shutdown ports
+								case 1:
+									$this->log(0,"shutdown port ".$portname." (".$pid.") on ".$sw);
+									$this->devapi->handleState(array(), $portname, "on");
+									break;
+								// Switch on ports
+								case 2:
+									$this->log(0,"switch on port ".$portname." (".$pid.") on ".$sw);
+									$this->devapi->handleState(array(), $portname, "off");
+									break;
+								default:
+									FS::$iMgr->ajaxEcho("err-unknown-action");
+									return;
+							}
+						}
+						
+						// Save if needed
+						$this->devapi->handleSaveCfg();
+						
+						FS::$iMgr->ajaxEcho("Done");
 						return;
 				default: break;
 			}
