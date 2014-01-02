@@ -1467,10 +1467,12 @@
 		}
 
 		private function showDeviceDiscovery() {
-			return sprintf("%s<ul class=\"ulform\"><li>%s</li><li>%s</li></ul></form>",
+			return sprintf("%s%s<table>%s%s</form>",
+				FS::$iMgr->tip("tip-discover-devices"),
 				FS::$iMgr->cbkForm("18"),
-				FS::$iMgr->IPInput("dip","",20,40,"Adresse IP:"),
-				FS::$iMgr->Submit("",$this->loc->s("Discover"))
+				FS::$iMgr->idxLine("IP-addr","iplist",array("width" => 400,
+					"height" => "200", "type" => "area")),
+				FS::$iMgr->tableSubmit("Discover")
 			);
 		}
 
@@ -1990,41 +1992,73 @@
 							FS::$iMgr->ajaxEcho("err-no-rights");
 							return;
 						}
-						$dip = FS::$secMgr->getPost("dip","i4");
-						if (!$dip) {
+						$iplist = FS::$secMgr->checkAndSecurisePostData("iplist");
+						if (!$iplist) {
 							$this->log(2,"Some fields are missing (device discovery)");
 							FS::$iMgr->ajaxEcho("err-bad-datas");
 							return;
 						}
-						exec("/usr/local/bin/netdisco -d ".$dip);
-
-						$devro = "";
-						$devrw = "";
-						$snmpro = array();
-						$snmprw = array();
-
-						loadNetdiscoCommunities($snmpro,$snmprw);
-						$devname = FS::$dbMgr->GetOneData("device","name","ip = '".$dip."'");
-
-						$foundro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$devname."'");
-						$foundrw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$devname."'");
-						if ($foundro && checkSnmp($dip,$foundro) == 0)
-							$devro = $foundro;
-						if ($foundrw && checkSnmp($dip,$foundrw) == 0)
-							$devrw = $foundrw;
-
-						for ($i=0;$i<count($snmpro) && $devro == "";$i++) {
-							if (checkSnmp($dip,$snmpro[$i]) == 0)
-							       $devro = $snmpro[$i];
+						
+						$iplsrc = preg_replace("#[\r]#","",$iplist);
+						$iplsrc = preg_split("#[\n]#",$iplsrc);
+						$count = count($iplsrc);
+						$ipldst = array();
+						
+						for ($i=0;$i<$count;$i++) {
+							if ($iplsrc[$i] == "") {
+								continue;
+							}
+							
+							if (!FS::$secMgr->isIP($iplsrc[$i])) {
+								FS::$iMgr->ajaxEchoNC(sprintf($this->loc->s("err-bad-ip"),$iplsrc[$i]),"",true);
+								return;
+							}
+							
+							$ipldst[] = $iplsrc[$i];
 						}
+						
+						$count = count($ipldst);
+						
+						for ($i=0;$i<$count;$i++) {
+							$dip = $ipldst[$i];
 
-						for ($i=0;$i<count($snmprw) && $devrw == "";$i++) {
-							if (checkSnmp($dip,$snmprw[$i]) == 0)
-								$devrw = $snmprw[$i];
+							exec("/usr/local/bin/netdisco -d ".$dip);
+
+							$snmpro = array();
+							$snmprw = array();
+
+							loadNetdiscoCommunities($snmpro,$snmprw);
+							
+							if ($devname = FS::$dbMgr->GetOneData("device","name","ip = '".$dip."'")) {
+								$devro = "";
+								$devrw = "";
+								$foundro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$devname."'");
+								$foundrw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$devname."'");
+								if ($foundro && checkSnmp($dip,$foundro) == 0) {
+									$devro = $foundro;
+								}
+								if ($foundrw && checkSnmp($dip,$foundrw) == 0) {
+									$devrw = $foundrw;
+								}
+
+								for ($i=0;$i<count($snmpro) && $devro == "";$i++) {
+									if (checkSnmp($dip,$snmpro[$i]) == 0)
+										   $devro = $snmpro[$i];
+								}
+
+								for ($i=0;$i<count($snmprw) && $devrw == "";$i++) {
+									if (checkSnmp($dip,$snmprw[$i]) == 0)
+										$devrw = $snmprw[$i];
+								}
+								if ($foundro != $devro && strlen($devro) > 0 || 
+									$foundrw != $devrw && strlen($devrw) > 0) {
+									FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_cache",
+										"device,snmpro,snmprw",
+										"'".$devname."','".$devro."','".$devrw."'");
+								}
+							}
+							$this->log(0,"Discovery launched for device '".$dip."'");
 						}
-						if ($foundro != $devro && strlen($devro) > 0 || $foundrw != $devrw && strlen($devrw) > 0)
-							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_cache","device,snmpro,snmprw","'".$devname."','".$devro."','".$devrw."'");
-						$this->log(0,"Launch discovering for device '".$dip."'");
 						FS::$iMgr->redir("mod=".$this->mid,true);
 						return;
 					case 19: // device status
