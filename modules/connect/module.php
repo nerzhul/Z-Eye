@@ -225,8 +225,6 @@
 				}
 				$js = "loadWindowHead(); loadMainContainer('');unlockScreen(true); setMaxIdleTimer('-1');";
 				FS::$iMgr->ajaxEcho("Done",$js);
-				
-				
 			}
 		}
 

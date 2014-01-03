@@ -59,14 +59,14 @@
 			}
             $output .= $this->loadMenus();
 
-			if(FS::$sessMgr->isConnected()) {
+			if (FS::$sessMgr->isConnected()) {
 				$output .= $this->showUserForm().
 					$this->showSearchForm();
 				// Also load inactivityTimer here.
 				FS::$iMgr->js("setMaxIdleTimer('".FS::$sessMgr->getIdleTimer()."');");
 			}
 
-			if(!FS::$sessMgr->isConnected()) {
+			if (!FS::$sessMgr->isConnected()) {
 				// Connect button which open Login Container
 				$output .= "<div id=\"menuStack\" onclick=\"return openLogin();\">".
 					"<div id=\"menuTitle\"><a href=\"#\">Connexion</a>".

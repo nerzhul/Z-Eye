@@ -144,7 +144,7 @@
 			return ldap_add($this->connection,$dn,$attributes);
 		}
 
-		public function modifyEntry($dn,$attributes) {
+		public function modifyEntry($dn,$attributes,$nodelete=false) {
 			if (!$this->connection)
 				die("LDAP Not Connected: addEntry fail");
 			if (!is_array($attributes)/* || !FS::$secMgr->isLDAPDN($dn)*/)
@@ -197,7 +197,7 @@
 					$infosRemove[$key] = array();
 			}
 			// Remove useless attributes is there is something to remove
-			if (count($infosRemove) > 0) {
+			if ($nodelete == false && count($infosRemove) > 0) {
 				if (!$this->modDelete($dn,$infosRemove))
 					return false;
 			}
