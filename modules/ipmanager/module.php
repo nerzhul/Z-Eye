@@ -2064,10 +2064,28 @@
 					$ipopts = FS::$secMgr->checkAndSecurisePostData("ipopts");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
-					if (!$ip || !FS::$secMgr->isIP($ip) || $mac && !FS::$secMgr->isMacAddr($mac) || $hostname && !FS::$secMgr->isHostname($hostname) ||
-						$reserv && $reserv != "on" || $comment && strlen($comment) > 500 || $edit && $edit != 1) {
+					if (!$ip || !FS::$secMgr->isIP($ip) ||
+						$reserv && $reserv != "on" || $edit && $edit != 1) {
 						$this->log(2,"Edit IP informations: bad datas given");
 						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						return;
+					}
+					
+					if ($mac && !FS::$secMgr->isMacAddr($mac)) {
+						$this->log(2,sprintf("Edit IP informations: bad mac '%s' given",$mac));
+						FS::$iMgr->ajaxEchoNC(sprintf($this->loc->s("err-bad-mac-addr"),$mac),"",true);
+						return;
+					}
+					
+					if ($hostname && !FS::$secMgr->isHostname($hostname)) {
+						$this->log(2,sprintf("Edit IP informations: bad hostname '%s' given",$hostname));
+						FS::$iMgr->ajaxEchoNC(sprintf($this->loc->s("err-bad-hostname"),$hostname),"",true);
+						return;
+					}
+					
+					if ($comment && strlen($comment) > 500) {
+						$this->log(2,sprintf("Edit IP informations: comment length too long",$comment));
+						FS::$iMgr->ajaxEchoNC(sprintf($this->loc->s("err-comment-too-long"),$comment),"",true);
 						return;
 					}
 
