@@ -235,6 +235,12 @@
 				return false;
 			return ldap_mod_del($this->connection,$dn,$attributes);
 		}
+		
+		public function normalizeFilter($filter) {
+			$filter = preg_replace("#[(]#","\(",$filter);
+			$filter = preg_replace("#[)]#","\)",$filter);
+			return $filter;
+		}
 
 		public function IsConnected() { return $this->isConnected; }
 
