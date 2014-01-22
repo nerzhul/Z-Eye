@@ -135,7 +135,7 @@ div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:b
 	background-image: -moz-linear-gradient(center top , #050505 0px, #232323 100%);
 	background-image: -o-linear-gradient(center top , #050505 0px, #232323 100%);
 	background-image: -webkit-linear-gradient(center top , #050505 0px, #232323 100%);
-	background-image: -ms-linear-gradient(center top , #050505 0px, #232323 100%);
+	background-image: -ms-linear-gradient(#050505, #232323);
 	font-weight: bold;
 }
 
