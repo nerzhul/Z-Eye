@@ -567,6 +567,7 @@
 					case "pwd": $output .= $this->password($name,$value); break;
 					case "color": $output .= $this->colorInput($name,$value); break;
 					case "area": $output .= $this->textarea($name,$value, $options); break;
+					case "calendar": $output .= $this->calendar($name, $value); break;
 					// Raw type, to normalize all non idxLine entries
 					case "raw": $output .= $value; break;
 					default: break;
