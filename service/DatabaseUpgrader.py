@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1402"
+	nextDBVersion = "1403"
 	pgsqlCon = None
 	logger = None
 
@@ -268,6 +268,9 @@ class ZEyeDBUpgrade():
 				self.tryAddColumn("z_eye_dns_clusters","dnssec_enable","bool")
 				self.tryAddColumn("z_eye_dns_clusters","dnssec_validation","bool")
 				self.setDBVersion("1402")
+			if self.dbVersion == "1402":
+				self.tryAddColumn("z_eye_dhcp_ip","expiration_date","date")
+				self.setDBVersion("1403")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

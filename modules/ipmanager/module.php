@@ -1069,21 +1069,28 @@
 			}
 			$mac = ""; $hostname = ""; $comment = ""; $reserv = false;
 			if ($ip) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment,reserv","ip = '".$ip."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment,reserv,expiration_date","ip = '".$ip."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$mac = $data["macaddr"];
 					$hostname = $data["hostname"];
 					$comment = $data["comment"];
 					$reserv = $data["reserv"] == 't';
+					$expiration = $data["expiration_date"];
+					if ($expiration) {
+						$expirationtmp = preg_split("#[-]#",$expiration);
+						$expiration = sprintf("%s-%s-%s",$expirationtmp[2],$expirationtmp[1],$expirationtmp[0]);
+					}
 				}
 			}
 			$output = FS::$iMgr->tip("tip-reserv").FS::$iMgr->cbkForm("11")."<table>".
-				FS::$iMgr->idxLine("IP-Addr","ip",array("value" => $ip,"type" => "idxedit", "edit" => $ip != "")).
-				FS::$iMgr->idxLine("Reserv","reserv",array("value" => $reserv,"type" => "chk", "tooltip" => "tooltip-ip-reserv")).
-				FS::$iMgr->idxLine("MAC-Addr","mac",array("value" => $mac)).
-				FS::$iMgr->idxLine("Hostname","hostname",array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")).
-				FS::$iMgr->idxLine("Comment","comment",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment"));
-
+				FS::$iMgr->idxLines(array(
+					array("IP-Addr","ip",array("value" => $ip,"type" => "idxedit", "edit" => $ip != "")),
+					array("Reserv","reserv",array("value" => $reserv,"type" => "chk", "tooltip" => "tooltip-ip-reserv")),
+					array("MAC-Addr","mac",array("value" => $mac)),
+					array("Hostname","hostname",array("value" => $hostname, "tooltip" => "tooltip-ip-hostname")),
+					array("Comment","comment",array("type" => "area", "length" => 500, "height" => "140", "value" => $comment, "tooltip" => "tooltip-ip-comment")),
+					array("Expiration","expiration",array("type" => "calendar", "value" => $expiration, "tooltip" => "tooltip-ip-expiration"))
+				));
 			/*
 			* Option groups associated to IP(if there is option groups)
 			*/
@@ -1573,16 +1580,17 @@
 					}
 					$ssh = new SSH($saddr,22);
 					
-                                        if (!$ssh->Connect()) {
+                    if (!$ssh->Connect()) {
 						$this->loc->s(1,"Add/edit DHCP server: ssh connection failed to '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-ssh-conn-failed");
-                                                return;
-                                        }
+                        return;
+                    }
+                    
 					if (!$ssh->Authenticate($slogin,$spwd)) {
 						$this->loc->s(1,"Add/edit DHCP server: ssh connection failed for '".$slogin."'@'".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-ssh-auth-failed");
-                                                return;
-                                        }
+                        return;
+                    }
 
 					/*
 					* We try to read files
@@ -1590,30 +1598,30 @@
 					if ($ssh->execCmd("if [ -r ".$dhcpdpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
 						$this->log(1,"Add/edit DHCP server: Unable to read file '".$dhcpdpath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$dhcpdpath."'";
-                                                return;
+                        return;
 					}
 
 					// dhcpd.leases
-                                        if ($ssh->execCmd("if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-                                                $this->logt(1,"Add/edit DHCP server: Unable to read file '".$leasepath."' on '".$saddr."'");
+                    if ($ssh->execCmd("if [ -r ".$leasepath." ]; then; echo 0; else; echo 1; fi;") != 0) {
+                        $this->logt(1,"Add/edit DHCP server: Unable to read file '".$leasepath."' on '".$saddr."'");
 						FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$leasepath."'";
-                                                return;
-                                        }
+						return;
+                    }
 
 					if ($reservconfpath && strlen($reservconfpath) > 0) {
-                                        	if ($ssh->execCmd("if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;")!= 0) {
-                                                	$this->log(1,"Add/edit DHCP server: Unable to read file '".$reservconfpath."' on '".$saddr."'");
+						if ($ssh->execCmd("if [ -r ".$reservconfpath." -a -w ".$reservconfpath." ]; then; echo 0; else; echo 1; fi;")!= 0) {
+							$this->log(1,"Add/edit DHCP server: Unable to read file '".$reservconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$reservconfpath."'";
-        	                                        return;
-                	                        }
+							return;
+                	     }
 					}
 
 					if ($subnetconfpath && strlen($subnetconfpath) > 0) {
-                                        	if ($ssh->execCmd("if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
-                                                	$this->log(1,"Add/edit DHCP server: Unable to read file '".$subnetconfpath."' on '".$saddr."'");
+						if ($ssh->execCmd("if [ -r ".$subnetconfpath." -a -w ".$subnetconfpath." ]; then; echo 0; else; echo 1; fi;") != 0) {
+							$this->log(1,"Add/edit DHCP server: Unable to read file '".$subnetconfpath."' on '".$saddr."'");
 							FS::$iMgr->ajaxEchoNC("err-unable-read")." '".$subnetconfpath."'";
-        	                                        return;
-                	                        }
+							return;
+                	    }
 					}
 
 					$osname = preg_replace("#[\n\r]#","",$ssh->execCmd("uname -srm"));
@@ -2062,6 +2070,7 @@
 					$reserv = FS::$secMgr->checkAndSecurisePostData("reserv");
 					$comment = FS::$secMgr->checkAndSecurisePostData("comment");
 					$ipopts = FS::$secMgr->checkAndSecurisePostData("ipopts");
+					$expiration = FS::$secMgr->checkAndSecurisePostData("expiration");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if (!$ip || !FS::$secMgr->isIP($ip) ||
@@ -2171,14 +2180,29 @@
 							}
 						}
 					}
+					
+					if ($expiration) {
+						if (!preg_match("#[0-9]{2}-[0-9]{2}-[0-9]{4}#",$expiration)) {
+							FS::$iMgr->ajaxEchoNC("err-expiration-date-invalid");
+							return;
+						}
+						$expirationtmp = preg_split("#[-]#",$expiration);
+						$expiration = sprintf("%s/%s/%s",$expirationtmp[1],$expirationtmp[0],$expirationtmp[2]);
+					}
 
 					FS::$dbMgr->BeginTr();
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ip","ip = '".$ip."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_ipv4_optgroups","ipaddr = '".$ip."'");
 					if ($mac || $hostname || $comment || $reserv) {
-						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv","'".$ip."','".$mac."','".$hostname."','".
-							$comment."','".($reserv ? 't':'f')."'");
+						if ($expiration) {
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv,expiration_date","'".$ip."','".$mac."','".$hostname."','".
+								$comment."','".($reserv ? 't':'f')."','".$expiration."'");
+						}
+						else {
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv,expiration_date","'".$ip."','".$mac."','".$hostname."','".
+								$comment."','".($reserv ? 't':'f')."'");
+						}
 					}
 					if ($ipopts) {
 						$count = count($ipopts);
