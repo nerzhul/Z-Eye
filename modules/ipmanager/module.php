@@ -2200,7 +2200,7 @@
 								$comment."','".($reserv ? 't':'f')."','".$expiration."'");
 						}
 						else {
-							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv,expiration_date","'".$ip."','".$mac."','".$hostname."','".
+							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv","'".$ip."','".$mac."','".$hostname."','".
 								$comment."','".($reserv ? 't':'f')."'");
 						}
 					}

@@ -587,3 +587,47 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 			else:
 				self.logger.error("DHCP/Radius Sync: %s is not a valid DB type (%s:%s/%s)" % (idx[0],idx[1],idx[2]))
 
+class ZEyeDHCPCleaner(ZEyeUtil.Thread):
+	zeyeDB = None
+	radiusList = {}
+	subnetList = {}
+	ipList = {}
+	
+	def __init__(self):
+		""" 2 min between two syncs updates """
+		self.sleepingTimer = 86400
+		ZEyeUtil.Thread.__init__(self)
+
+	def run(self):
+		self.logger.info("DHCP cleaner launched")
+		while True:
+			self.cleanOldDHCPEntries()
+			# We launch cleanup tommorow at midnight
+			tommorow = datetime.datetime.now().replace(hour=0,minute=0,second=0) + datetime.timedelta(days=1)
+			tommorow_interval = int(tommorow.strftime('%s')) - int(datetime.datetime.now().strftime('%s'))
+			time.sleep(tommorow_interval)
+	
+	def cleanOldDHCPEntries(self):
+		self.logger.info("DHCP cleaner started")
+		starttime = datetime.datetime.now()
+		try:
+			self.zeyeDB = ZEyeSQLMgr()
+			self.zeyeDB.initForZEye()
+			# Cleanup old reservations
+			self.zeyeDB.Delete("z_eye_dhcp_ip","expiration_date < now()")
+			self.zeyeDB.Commit()
+		except Exception, e:
+			self.logger.critical("DHCP cleaner: %s" % e)
+			sys.exit(1);
+		finally:
+			if self.zeyeDB != None:
+				self.zeyeDB.close()
+		
+		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
+		time.sleep(1)
+		while self.getThreadNb() > 0:
+			self.logger.debug("DHCP cleaner: waiting %d threads" % self.getThreadNb())
+			time.sleep(1)
+
+		totaltime = datetime.datetime.now() - starttime
+		self.logger.info("DHCP cleaner done (time: %s)" % totaltime)
