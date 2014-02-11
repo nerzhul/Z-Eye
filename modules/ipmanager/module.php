@@ -1067,7 +1067,12 @@
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
-			$mac = ""; $hostname = ""; $comment = ""; $reserv = false;
+			$mac = "";
+			$hostname = "";
+			$comment = "";
+			$reserv = false;
+			$expiration = "";
+			
 			if ($ip) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment,reserv,expiration_date","ip = '".$ip."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
@@ -2182,11 +2187,20 @@
 					}
 					
 					if ($expiration) {
-						if (!preg_match("#[0-9]{2}-[0-9]{2}-[0-9]{4}#",$expiration)) {
+						if (!preg_match("#^[0-9]{2}-[0-9]{2}-[0-9]{4}$#",$expiration)) {
 							FS::$iMgr->ajaxEchoNC("err-expiration-date-invalid");
 							return;
 						}
+						
 						$expirationtmp = preg_split("#[-]#",$expiration);
+						
+						$expirationtime = strtotime(sprintf("%s-%s-%s",$expirationtmp[0],$expirationtmp[1],$expirationtmp[2]));
+						$nowtime = strtotime(sprintf("%s-%s-%s",date("d"),date("m"),date("Y")));
+						if ($expirationtime < $nowtime) {
+							FS::$iMgr->ajaxEchoNC("err-expiration-date-must-be-today-or-more");
+							return;
+						}
+						
 						$expiration = sprintf("%s/%s/%s",$expirationtmp[1],$expirationtmp[0],$expirationtmp[2]);
 					}
 
