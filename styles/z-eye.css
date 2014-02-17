@@ -23,8 +23,14 @@
 * Some icons comes from Gnome-Shell
 */
 
+html, body { overflow: hidden; margin: 0; height: 100%; }
 body { background-color: #5e0000; font-family: Verdana,Arial,sans-serif; background-attachment: fixed; font-size: 12px;
 background-image: linear-gradient(#000,#3e0000); background-image: -ms-linear-gradient(#000,#3e0000); background-image: -o-linear-gradient(#000,#3e0000); background-image: -webkit-linear-gradient(#000,#3e0000);
+}
+
+#main_wrapper {
+        overflow-y: scroll;
+        height: 100%;
 }
 
 #main {
@@ -70,7 +76,6 @@ select { min-width: 50px; }
 	background-color: black;
 	opacity: 0.9;
 	z-index: 1000;
-	margin-left: -8px;
 }
 
 #notification {

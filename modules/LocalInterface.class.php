@@ -30,7 +30,7 @@
 			$installlocked = file_get_contents(dirname(__FILE__)."/../config/LOCK");
 
 			$output = $this->header().$this->popupContainer().$this->loginContainer().
-				"<div id=\"tooltip\"></div><div id=\"main\">".$this->showModule()."</div>";
+				"<div id=\"tooltip\"></div><div id=\"main_wrapper\"><div id=\"main\">".$this->showModule()."</div></div>";
 
 			if($installlocked) {
 				$output .= $this->showWindowHead();
