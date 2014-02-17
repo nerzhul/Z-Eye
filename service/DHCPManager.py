@@ -285,7 +285,10 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 									if self.customOptsList[options[0]][1] == "text":
 										reservBuf += "\toption %s \"%s\";\n" % (options[0],ZEyeUtil.addslashes(options[1]))
 									else:
-										reservBuf += "\toption %s %s;\n" % (options[0],options[1])
+										if options[0] == "next-server":
+											reservBuf += "\t%s %s;\n" % (options[0],options[1])
+										else:
+											reservBuf += "\toption %s %s;\n" % (options[0],options[1])
 							reservBuf += "}\n"
 	
 			
