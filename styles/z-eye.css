@@ -101,6 +101,15 @@ select { min-width: 50px; }
 	background-color: rgba(0,0,0,0.9);
 }
 
+
+#footer {
+	width:100%;
+	display: none;
+	bottom: 0;
+	z-index: 950;
+	height: 20px;
+}
+
 #menuStack, #hstslide { display:inline-block; }
 
 div#menuStack div.menupopup { display: none; border-radius:0 0 2px 2px;}
@@ -110,12 +119,6 @@ div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:b
 .menupopup, .userpopup {
 	position: absolute;
 	display: block;
-	background-color: #050505;
-	background-image: linear-gradient(#232323, #050505);
-	background-image: -moz-linear-gradient(#232323, #050505);
-	background-image: -o-linear-gradient(#232323, #050505);
-	background-image: -webkit-linear-gradient(#232323, #050505);
-	background-image: -ms-linear-gradient(#232323, #050505);
 	border-bottom: 1px solid #111;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
 }
@@ -124,11 +127,6 @@ div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:b
 	display: inline-block;
 	padding: 12px 6px 12px 6px;
 	margin-top: 1px;
-	background-image: -moz-linear-gradient(#232323, #050505);
-	background-image: -moz-linear-gradient(#232323, #050505);
-	background-image: -o-linear-gradient(#232323, #050505);
-	background-image: -webkit-linear-gradient(#232323, #050505);
-	background-image: -ms-linear-gradient(#232323, #050505);
 	vertical-align: center;
 	cursor: pointer;
 	min-width: 105px;
@@ -136,23 +134,13 @@ div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:b
 }
 
 #menuTitle:hover {
-	background-image: linear-gradient(center top , #050505 0px, #232323 100%);
-	background-image: -moz-linear-gradient(center top , #050505 0px, #232323 100%);
-	background-image: -o-linear-gradient(center top , #050505 0px, #232323 100%);
-	background-image: -webkit-linear-gradient(center top , #050505 0px, #232323 100%);
-	background-image: -ms-linear-gradient(#050505, #232323);
 	font-weight: bold;
 }
 
 .menuItem { padding:10px; width: 150px; cursor: pointer;}
-.menuItem:hover, .userItem:hover { background-color: #000; font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
+.menuItem:hover, .userItem:hover { font-weight: bold; overflow: hidden; box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.2) inset;}
 
 .searchButton {
-	background-image: linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -moz-linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -ms-linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -o-linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -webkit-linear-gradient(#FAFAFA, #DCDCDC);
 	border: 1px solid #CCC;
 	vertical-align: center;
 	height: 26px;
@@ -160,14 +148,6 @@ div#menuStack:hover div.menupopup, div#menuStack:hover div.userpopup { display:b
 	cursor: pointer;
 	margin-left: 4px;
 	margin-top: 2px;
-}
-
-.searchButton:hover {
-	background-image: linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -moz-linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -ms-linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -o-linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -webkit-linear-gradient(#DCDCDC, #FAFAFA);	
 }
 
 input {
@@ -228,8 +208,6 @@ p#banner {
 	box-shadow: -5px 5px 15px 5px;
 	border-radius: 5px 5px 5px 5px;
 }
-
-#footer { width:100%; margin:auto; margin-top:3px; font-size:9px; color:#999; text-align:center; }
 
 #menu {
 	padding: 5px;
@@ -323,11 +301,6 @@ canvas { display: inline-block; }
 }
 
 .buttonStyle {
-	background-image: linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -moz-linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -ms-linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -o-linear-gradient(#FAFAFA, #DCDCDC);
-	background-image: -webkit-linear-gradient(#FAFAFA, #DCDCDC);
 	border: 1px solid #CCC;
 	vertical-align: center;
 	height: 31px;
@@ -337,14 +310,6 @@ canvas { display: inline-block; }
 	margin-right: 4px;
 	padding: 5px 10px;
 	font-weight: bold;
-}
-
-.buttonStyle:hover {
-	background-image: linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -moz-linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -ms-linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -o-linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -webkit-linear-gradient(#DCDCDC, #FAFAFA);
 }
 
 .debugMsg { color:blue; font-weight:100; }
@@ -400,12 +365,6 @@ canvas { display: inline-block; }
 	margin-right: auto;
 	opacity: 0.97;
 	color: white;
-	background-color: #050505;
-	background-image: -linear-gradient(#232323, #050505);
-	background-image: -moz-linear-gradient(#232323, #050505);
-	background-image: -o-linear-gradient(#232323, #050505);
-	background-image: -webkit-linear-gradient(#232323, #050505);
-	background-image: -ms-linear-gradient(#232323, #050505);
 }
 
 #logform:hover { opacity: 0.95; }
@@ -421,11 +380,6 @@ canvas { display: inline-block; }
 	display: inline-block;
 	padding: 12px 6px 12px 6px;
 	margin-top: 1px;
-	background-image: -moz-linear-gradient(#232323, #050505);
-	background-image: -moz-linear-gradient(#232323, #050505);
-	background-image: -o-linear-gradient(#232323, #050505);
-	background-image: -webkit-linear-gradient(#232323, #050505);
-	background-image: -ms-linear-gradient(#232323, #050505);
 	vertical-align: center;
 	cursor: pointer;
 	width: auto;
@@ -562,24 +516,22 @@ label { float: left; font-weight: bold; text-align: left; }
 .ui-dialog .ui-dialog-buttonpane button {
 	margin: .5em .4em .5em 0;
 	cursor: pointer;
-	background-image: -moz-linear-gradient(center top , #FAFAFA 0px, #DCDCDC 100%);
-        border: 1px solid #CCC;
-        vertical-align: center;
-        height: 28px;
-        margin-top: 10px;
-        border-radius: 3px;
-        cursor: pointer;
+	border: 1px solid #CCC;
+	vertical-align: center;
+	height: 28px;
+	margin-top: 10px;
+	border-radius: 3px;
+	cursor: pointer;
 }
 .ui-dialog .ui-dialog-buttonpane button:hover {
 	margin: .5em .4em .5em 0;
 	cursor: pointer;
-	background-image: -moz-linear-gradient(center top , #DCDCDC 0px, #FAFAFA 100%);
-        border: 1px solid #CCC;
-        vertical-align: center;
-        height: 28px;
-        margin-top: 10px;
-        border-radius: 3px;
-        cursor: pointer;
+	border: 1px solid #CCC;
+	vertical-align: center;
+	height: 28px;
+	margin-top: 10px;
+	border-radius: 3px;
+	cursor: pointer;
 }
 .ui-dialog .ui-resizable-se {
 	width: 12px;
@@ -1489,4 +1441,44 @@ disabled look for disabled choices in the results dropdown
       background-size: 60px 40px !important;
   }
   .select2-search input { background-position: 100% -21px !important; }
+}
+
+/* 
+ * Backgrounds
+ */
+#logform, #menutitle, .menupopup, .userpopup, .userMenu {
+	background-color: #050505;
+	background-image: -linear-gradient(#232323, #050505);
+	background-image: -moz-linear-gradient(#232323, #050505);
+	background-image: -o-linear-gradient(#232323, #050505);
+	background-image: -webkit-linear-gradient(#232323, #050505);
+	background-image: -ms-linear-gradient(#232323, #050505);
+}
+
+#menuTitle:hover {
+	background-image: linear-gradient(#050505, #232323);
+	background-image: -moz-linear-gradient(#050505, #232323);
+	background-image: -o-linear-gradient(#050505, #232323);
+	background-image: -webkit-linear-gradient(#050505, #232323);
+	background-image: -ms-linear-gradient(#050505, #232323);
+}
+
+.menuItem:hover, .userItem:hover {
+	background-color: black;
+}
+
+.buttonStyle, .searchButton, .ui-dialog .ui-dialog-buttonpane button {
+	background-image: linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -moz-linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -ms-linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -o-linear-gradient(#FAFAFA, #DCDCDC);
+	background-image: -webkit-linear-gradient(#FAFAFA, #DCDCDC);
+}
+
+.buttonStyle:hover, .searchButton:hover, .ui-dialog .ui-dialog-buttonpane button:hover {
+	background-image: linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -moz-linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -ms-linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -o-linear-gradient(#DCDCDC, #FAFAFA);
+	background-image: -webkit-linear-gradient(#DCDCDC, #FAFAFA);	
 }

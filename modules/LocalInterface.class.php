@@ -35,7 +35,7 @@
 			if($installlocked) {
 				$output .= $this->showWindowHead();
 			}
-			$output .= $this->notifContainer().$this->copyrightContainer();
+			$output .= $this->notifContainer().$this->bottomContainer();
 			return $output;
 		}
 
@@ -47,9 +47,8 @@
 			return "<div id=\"notification\"><div id=\"subnotification\"></div></div>";
 		}
 
-		private function copyrightContainer() {
-			return "<div id=\"footer\"><center>Designed and Coded by Loïc BLOT, CNRS - Copyright 2010-".date('Y')
-				.", All rights Reserved</center></div>";
+		private function bottomContainer() {
+			return "<div id=\"footer\"></div>";
 		}
 
 		public function showWindowHead() {
