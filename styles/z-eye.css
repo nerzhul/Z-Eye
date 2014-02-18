@@ -104,10 +104,19 @@ select { min-width: 50px; }
 
 #footer {
 	width:100%;
-	display: none;
 	bottom: 0;
 	z-index: 950;
-	height: 20px;
+	height: 30px;
+	position: fixed;
+	color: white;
+}
+
+#footer #copyright {
+	margin: 8px;
+}
+
+#footer #content {
+	display: none;
 }
 
 #menuStack, #hstslide { display:inline-block; }
@@ -1446,7 +1455,7 @@ disabled look for disabled choices in the results dropdown
 /* 
  * Backgrounds
  */
-#logform, #menutitle, .menupopup, .userpopup, .userMenu {
+#logform, #menutitle, .menupopup, .userpopup, .userMenu, #footer {
 	background-color: #050505;
 	background-image: -linear-gradient(#232323, #050505);
 	background-image: -moz-linear-gradient(#232323, #050505);

@@ -48,7 +48,8 @@
 		}
 
 		private function bottomContainer() {
-			return "<div id=\"footer\"></div>";
+			return "<div id=\"footer\"><div id=\"copyright\">by Loïc BLOT, CNRS - Copyright 2010-".date('Y').
+				"</div><div id=\"content\"></div></div>";
 		}
 
 		public function showWindowHead() {
