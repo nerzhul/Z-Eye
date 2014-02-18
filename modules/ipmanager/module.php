@@ -147,13 +147,7 @@
 			$netobj->setNetAddr($netid);
 			$netobj->setNetMask($netmask);
 
-			// Bufferize switch list
-			$switchlist = array();
-
-			$query2 = FS::$dbMgr->Select("device","ip,name");
-			while ($data2 = FS::$dbMgr->Fetch($query2)) {
-				$switchlist[$data2["ip"]] = $data2["name"];
-			}
+			$this->loadSwitchList();
 
 			// for Z-Eye ipmanager request. Not the better idea, i think 
 			$iplist = "";
@@ -170,8 +164,6 @@
 				*/
 				$iparray[$i]["distrib"] = 0;
 				$iparray[$i]["servers"] = array();
-				$iparray[$i]["switch"] = "";
-				$iparray[$i]["port"] = "";
 				$iparray[$i]["comment"] = "";
 	
 				if ($iplist != "") $iplist .= ",";
@@ -202,17 +194,6 @@
 				}
 				// List servers where the data is
 				$iparray[ip2long($data2["ip"])]["servers"][] = $data2["server"];
-				if (strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
-					$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
-						array("order" => "time_last","ordersens" => 2));
-					$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
-						array("order" => "time_last","ordersens" => 2));
-					if ($sw && $port) {
-						$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
-						$iparray[ip2long($data2["ip"])]["port"] = $port;
-					}
-				}
-
 			}
 
 			$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","ip,macaddr,hostname,comment,reserv","ip IN (".$iplist.")");
@@ -221,21 +202,6 @@
 				$iparray[ip2long($data2["ip"])]["host"] = $data2["hostname"];
 				$iparray[ip2long($data2["ip"])]["comment"] = preg_replace("#[\r\n]#","<br />",$data2["comment"]);
 				$iparray[ip2long($data2["ip"])]["distrib"] = ($data2["reserv"] == 't' ? 5 : $iparray[ip2long($data2["ip"])]["distrib"]);
-
-				// search only if we haven't search on the previous loop
-				if ($iparray[ip2long($data2["ip"])]["switch"] == "") {
-					// if there is a MAC address only
-					if (strlen($iparray[ip2long($data2["ip"])]["mac"]) > 0 && strlen($iparray[ip2long($data2["ip"])]["switch"]) == 0) {
-						$sw = FS::$dbMgr->GetOneData("node","switch","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
-							array("order" => "time_last","ordersens" => 2));
-						$port = FS::$dbMgr->GetOneData("node","port","mac = '".$iparray[ip2long($data2["ip"])]["mac"]."' AND active = 't'",
-							array("order" => "time_last","ordersens" => 2));
-						if ($sw && $port) {
-							$iparray[ip2long($data2["ip"])]["switch"] = $switchlist[$sw];
-							$iparray[ip2long($data2["ip"])]["port"] = $port;
-						}
-					}
-				}
 			}
 
 
@@ -305,8 +271,8 @@
 				}
 				
 				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\">".
-					$this->showIPLine(long2ip($key),$rstate,$value["mac"],$value["host"],$value["comment"],$netid,
-						$value["switch"],$value["port"],$value["ltime"],$value["servers"],$value["distrib"],
+					$this->showIPLine(long2ip($key),$rstate,$value["mac"],$value["host"],$value["comment"],
+						$netid,$value["ltime"],$value["servers"],$value["distrib"],
 						$subnetLinkedToCluster).
 					"</tr>";
 			}
@@ -335,7 +301,13 @@
 			return $output;
 		}
 		
-		private function showIPLine($ip,$rstate,$mac,$hostname,$comment,$subnet,$switch,$port,$leasetime="",$servers=array(),$distrib=0,$clusterLink=false) {
+		private function showIPLine($ip,$rstate,$mac,$hostname,$comment,
+			$subnet,$leasetime="",$servers=array(),
+			$distrib=0,$clusterLink=false) {
+				
+			$switch = "";
+			$port = "";
+			
 			$rstateId = "sb".FS::$iMgr->formatHTMLId($ip)."rsttd";
 			$output = "<td>".FS::$iMgr->opendiv(7,$ip,array("lnkadd" => "ip=".$ip)).
 				"</td><td>".FS::$iMgr->searchIcon($ip)."</td><td id=\"".$rstateId."\">".$rstate;
@@ -351,9 +323,24 @@
 				);
 					
 			}
+			$output .= "</td><td>";
+			if (strlen($mac) > 0) {
+				$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$mac, $mac);
+			}
+			
 			$output .= "</td><td>".
-				FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$mac, $mac)."</td><td>".
 				$hostname."</td><td>".$comment."</td><td>";
+			
+			// If we have a MAC address, then show the switch
+			if (strlen($mac) > 0) {
+				$switch = FS::$dbMgr->GetOneData("node","switch","mac = '".$mac."' AND active = 't'",
+					array("order" => "time_last","ordersens" => 2));
+				$port = FS::$dbMgr->GetOneData("node","port","mac = '".$mac."' AND active = 't'",
+					array("order" => "time_last","ordersens" => 2));
+				if ($switch) {
+					$switch = $this->switchList[$switch];
+				}
+			}
 			// Show switch column only of a switch is here
 			if ($switch) {
 				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
@@ -1311,6 +1298,16 @@
 
 			FS::$dbMgr->CommitTr();
 		}
+		
+		private function loadSwitchList() {
+			// Bufferize switch list
+			$this->switchList = array();
+
+			$query2 = FS::$dbMgr->Select("device","ip,name");
+			while ($data2 = FS::$dbMgr->Fetch($query2)) {
+				$this->switchList[$data2["ip"]] = $data2["name"];
+			}
+		}
 
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
@@ -2230,8 +2227,20 @@
 					$this->calculateRanges($netinfos[0],$netobj);
 
 					$this->log(0,"Edit IP informations: informations edited for IP '".$ip."'");
+					
+					/* @TODO: only modify the right Line
+					 * $js = "$('#sb".FS::$iMgr->formatHTMLId(long2ip($ip))."tr').html('".
+						FS::$secMgr->cleanForJS(
+							$this->showIPLine($ip,$rstate,$mac,$hostname,$comment,
+								$subnet,$leasetime="",
+								$servers=array(),$distrib=0,$clusterLink=false)
+						).
+					"');";*/
+
+							
 					// Maybe replace only the concerned tr and also the graph ? 
 					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
+					
 					FS::$iMgr->ajaxEcho("Done",$js);
 					return;
 				// Add/Edit Custom Option
@@ -2777,6 +2786,8 @@
 					return;
 			}
 		}
+		
+		private $switchList;
 	};
 	
 	}
