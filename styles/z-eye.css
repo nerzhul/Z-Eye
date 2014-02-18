@@ -517,6 +517,11 @@ label { float: left; font-weight: bold; text-align: left; }
 	outline: 0;
 	border-radius: 4px;
 }
+.dialog-show {
+	max-height: 90%;
+	max-width: 90%;
+	overflow: auto;
+}
 .no-close .ui-dialog-titlebar a { display: none; }
 .ui-dialog .ui-dialog-titlebar {
 	padding: .4em 1em;
