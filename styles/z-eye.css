@@ -83,7 +83,7 @@ select { min-width: 50px; }
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
-	bottom: 0;
+	bottom: 30px;
 	font-weight: bold;
 	color: white;
 	width: 100%;
