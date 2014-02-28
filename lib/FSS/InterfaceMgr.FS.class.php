@@ -134,6 +134,30 @@
 			}
 			return $output;
 		}
+		
+		public function loadFooterPlugins() {
+			$found = false;
+			$moduleid = 0;
+
+			$dir = opendir(dirname(__FILE__)."/../../modules/");
+			while($elem = readdir($dir)) {
+				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
+				if (is_dir($dirpath)) {
+					$moduleid++;
+					$dir2 = opendir($dirpath);
+					while($elem2 = readdir($dir2)) {
+						if (is_file($dirpath."/".$elem2) && $elem2 == "module.php") {
+							$path = $elem;
+							require(dirname(__FILE__)."/../../modules/".$path."/module.php");
+							
+							if ($module->getRulesClass()->canAccessToModule() === true) {
+								$module->loadFooterPlugin();
+							}
+						}
+					}
+				}
+			}
+		}
 
 		private function findModulePath($id) {
 			$dir = opendir(dirname(__FILE__)."/../../modules/");

@@ -40,6 +40,7 @@
 
 		public function Load() { FS::$iMgr->printError("err-unk-module"); }
 		public function LoadForAndroid() { return "{'code': 7}"; }
+		public function loadFooterPlugin() {}
 		public function handlePostDatas($act) {}
 		public function getIfaceElmt() {}
 

@@ -57,6 +57,7 @@
 			if($this->showRetMenu) {
 				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\" onclick=\"javascript:history.back()\">Retour</div></div>";
 			}
+			
             $output .= $this->loadMenus();
 
 			if (FS::$sessMgr->isConnected()) {
@@ -74,6 +75,8 @@
 			}
 
 			$output .= "</div></div>";
+			
+			$this->loadFooterPlugins();
 
 			return $output;
 		}
