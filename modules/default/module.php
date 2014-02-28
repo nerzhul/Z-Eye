@@ -370,9 +370,37 @@
 			$attacklist=array();
 			$scannb = 0;
 			$atknb = 0;
-                        while ($data = FS::$dbMgr->Fetch($query)) {
-				if (!$atkfound) $atkfound = 1;
-                                if (preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
+			while ($data = FS::$dbMgr->Fetch($query)) {
+				if (!$atkfound) {
+					$atkfound = 1;
+				}
+				if (preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
+				if (!isset($attacklist[$data["ip_src"]])) {
+					$attacklist[$data["ip_src"]] = array();
+				}
+
+				if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
+					$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
+				}
+
+				if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
+					$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
+				}
+				else {
+					$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
+				}
+
+				if (!isset($sigarray[$data["ip_src"]])) {
+					$sigarray[$data["ip_src"]]=array();
+					$sigarray[$data["ip_src"]]["scan"]=0;
+					$sigarray[$data["ip_src"]]["atk"]=1;
+				}
+				else
+					$sigarray[$data["ip_src"]]["atk"]++;
+					$atknb++;
+				}
+				else if (preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) || 
+					preg_match("#Open Port#",$data["sig_name"]) || preg_match("#MISC MS Terminal server#",$data["sig_name"])) {
 					if (!isset($attacklist[$data["ip_src"]])) {
 						$attacklist[$data["ip_src"]] = array();
 					}
@@ -389,63 +417,39 @@
 					}
 
 					if (!isset($sigarray[$data["ip_src"]])) {
-                                                $sigarray[$data["ip_src"]]=array();
-                                                $sigarray[$data["ip_src"]]["scan"]=0;
-                                                $sigarray[$data["ip_src"]]["atk"]=1;
-                                        }
-                                        else
-                                                $sigarray[$data["ip_src"]]["atk"]++;
-					$atknb++;
-				}
-                                else if (preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) || 
-					preg_match("#Open Port#",$data["sig_name"]) || preg_match("#MISC MS Terminal server#",$data["sig_name"])) {
-					if (!isset($attacklist[$data["ip_src"]])) {
-						$attacklist[$data["ip_src"]] = array();
-					}
-
-                                        if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
-						$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
-					}
-
-                                        if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
-						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
-					}
-                                        else {
-						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
-					}
-
-                                        if (!isset($sigarray[$data["ip_src"]])) {
-                                                $sigarray[$data["ip_src"]]=array();
+						$sigarray[$data["ip_src"]]=array();
 						$sigarray[$data["ip_src"]]["scan"]=0;
 						$sigarray[$data["ip_src"]]["atk"]=1;
 					}
-                                        else
-                                                $sigarray[$data["ip_src"]]["atk"]++;
+					else {
+						$sigarray[$data["ip_src"]]["atk"]++;
+					}
 					$atknb++;
-                                }
-                                else if (!preg_match("#ICMP PING NMAP#",$data["sig_name"])) {
+				}
+				else if (!preg_match("#ICMP PING NMAP#",$data["sig_name"])) {
 					if (!isset($attacklist[$data["ip_src"]])) {
 						$attacklist[$data["ip_src"]] = array();
 					}
 
-                                        if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
+					if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
 						$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
 					}
 
-                                        if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
+					if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
 						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
 					}
-                                        else {
+					else {
 						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
 					}
 
 					if (!isset($sigarray[$data["ip_src"]])) {
-                                                $sigarray[$data["ip_src"]]=array();
-                                                $sigarray[$data["ip_src"]]["scan"]=0;
-                                                $sigarray[$data["ip_src"]]["atk"]=1;
-                                        }
-                                        else
-                                                $sigarray[$data["ip_src"]]["atk"]++;
+						$sigarray[$data["ip_src"]]=array();
+						$sigarray[$data["ip_src"]]["scan"]=0;
+						$sigarray[$data["ip_src"]]["atk"]=1;
+					}
+					else {
+						$sigarray[$data["ip_src"]]["atk"]++;
+					}
 					$atknb++;
 				}
 				else {
@@ -453,27 +457,29 @@
 						$attacklist[$data["ip_src"]] = array();
 					}
 
-                                        if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
+					if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]])) {
 						$attacklist[$data["ip_src"]][$data["ip_dst"]] = array();
 					}
 
-                                        if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
+					if (!isset($attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]])) {
 						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]] = 1;
 					}
-                                        else {
+					else {
 						$attacklist[$data["ip_src"]][$data["ip_dst"]][$data["sig_name"]]++;
 					}
 
 					$scannb++;
 					if (!isset($sigarray[$data["ip_src"]])) {
-                                                $sigarray[$data["ip_src"]]=array();
+						$sigarray[$data["ip_src"]]=array();
 						$sigarray[$data["ip_src"]]["atk"]=0;
-                                                $sigarray[$data["ip_src"]]["scan"]=1;
-                                        }
-                                        else
-                                                $sigarray[$data["ip_src"]]["scan"]++;
+						$sigarray[$data["ip_src"]]["scan"]=1;
+					}
+					else {
+						$sigarray[$data["ip_src"]]["scan"]++;
+					}
+					$scannb++;
 				}
-                        }
+			}
 
 			$menace = 0;
 			foreach ($sigarray as $key => $value) {
@@ -497,7 +503,7 @@
 				}
 			}
 
-                        if ($atkfound) $output .= $tmpoutput."</table>";
+           if ($atkfound) $output .= $tmpoutput."</table>";
 			$this->SECscore = 10000-$scannb-2*$atknb;
 			if ($this->SECscore < 0) $this->SECscore = 0;
 			if ($this->SECscore < 10000) {

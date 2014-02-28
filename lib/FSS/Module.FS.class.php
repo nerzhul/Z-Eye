@@ -40,7 +40,6 @@
 
 		public function Load() { FS::$iMgr->printError("err-unk-module"); }
 		public function LoadForAndroid() { return "{'code': 7}"; }
-		public function loadFooterPlugin() {}
 		public function handlePostDatas($act) {}
 		public function getIfaceElmt() {}
 
@@ -59,7 +58,56 @@
 		public function getRulesClass() { return $this->rulesclass; }
 		public function getMenu() { return $this->menu; }
 		public function getMenuPriority() { return $this->menupriority; }
+		
+		// Footer Plugin
+		public function loadFooterPlugin() {}
+		
+		/*
+		 * The title is the label on the footer bar
+		 * Content is a clickable element (NOT IMPLEMENTED)
+		 */
+		protected function registerFooterPlugin($title,$content) {
+			$this->removeFooterPlugin();
+			FS::$iMgr->js(
+				sprintf("$('<div id=\"footer_%s\"><div id=\"footerPluginTitle\">%s</div><div id=\"footerPluginContent\">%s</div></div>').appendTo('#footer #content');",
+					$this->genFooterPluginName(),
+					FS::$secMgr->cleanForJS($title),
+					FS::$secMgr->cleanForJS($content)
+				)
+			);
+		}
+		
+		protected function removeFooterPlugin() {
+			FS::$iMgr->js(
+				sprintf("$('#footer_%s').remove();",
+					$this->genFooterPluginName()
+				)
+			);
+		}
+		
+		protected function setFooterPluginTitle($title) {
+			FS::$iMgr->js(
+				sprintf("$('#footer_%s #footerPluginTitle').html('%s');",
+					$this->genFooterPluginName(),
+					FS::$secMgr->cleanForJS($title)
+				)
+			);
+		}
+		
+		protected function setFooterPluginContent($content) {
+			FS::$iMgr->js(
+				sprintf("$('#footer_%s #footerPluginContent').html('%s');",
+					$this->genFooterPluginName(),
+					FS::$secMgr->cleanForJS($content)
+				)
+			);
+		}
+		
+		private function genFooterPluginName() {
+			return FS::$iMgr->formatHTMLId($this->modulename);
+		}
 
+		// Attributes
 		protected $mid;
 		protected $modulename;
 		

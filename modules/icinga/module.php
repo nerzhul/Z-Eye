@@ -27,6 +27,7 @@
 	final class iIcinga extends FSModule {
 		function __construct() {
 			parent::__construct();
+			$this->modulename = "icinga";
 			$this->loc = new lIcinga();
 			$this->rulesclass = new rIcinga($this->loc);
 			$this->menu = $this->loc->s("menu-name");
@@ -782,6 +783,140 @@
 				return true;
 
 			return false;
+		}
+		
+				
+		function loadFooterPlugin() {
+			// Only users with icinga read right can use this module
+			if (FS::$sessMgr->hasRight("mrule_icinga_read")) {
+				$pluginTitle = $this->loc->s("Monitor");
+				$pluginContent = "";
+				
+				// First we look at sensor problems
+				
+				$totalIcingaSensors = 0;
+				$totalIcingaWarns = 0;
+				$totalIcingaCrits = 0;
+				$totalIcingaHS = 0;
+
+				$iStates = $this->icingaAPI->readStates(
+					array("plugin_output","current_state","current_attempt",
+						"state_type","last_time_ok","last_time_up"));
+
+				// Loop hosts
+				foreach ($iStates as $host => $hostvalues) {
+					// Loop types
+					foreach ($hostvalues as $hos => $hosvalues) {
+						if ($hos == "servicestatus") {
+							// Loop sensors
+							foreach ($hosvalues as $sensor => $svalues) {
+								$totalIcingaSensors++;
+								if ($svalues["current_state"] > 0) {
+									if ($svalues["current_state"] == 1) {
+										$totalIcingaWarns++;
+									}
+									else if ($svalues["current_state"] == 2) {
+										$totalIcingaCrits++;
+									}
+										
+									$totalIcingaHS++;
+								}
+							}
+						}
+						else if ($hos == "hoststatus") {
+							$totalIcingaSensors++;
+							if ($hosvalues["current_state"] > 0) {
+								$totalIcingaHS++;
+
+								if ($hosvalues["current_state"] == 1) {
+									$totalIcingaCrits++;
+								}
+							}
+						}
+					}
+				}
+				
+				// If there are bad sensors
+				if ($totalIcingaHS > 0) {
+					// If there are crits
+					if ($totalIcingaCrits > 0) {
+						$pluginTitle = sprintf("%s: %s/%s %s",
+							$this->loc->s("Services"),
+							$totalIcingaHS,
+							$totalIcingaSensors,
+							FS::$iMgr->img("/styles/images/monitor-crit.png",15,15)
+						);
+					}
+					// If we have only warns
+					else {
+						$pluginTitle = sprintf("%s: %s/%s %s",
+							$this->loc->s("Services"),
+							$totalIcingaHS,
+							$totalIcingaSensors,
+							FS::$iMgr->img("/styles/images/monitor-warn.png",15,15)
+						);
+					}
+				}
+				// No icinga error
+				else {
+					$pluginTitle = sprintf("%s: %s/%s %s",
+							$this->loc->s("Services"),
+							$totalIcingaHS,
+							$totalIcingaSensors,
+							FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
+						);
+				}
+				
+				$this->SECtotalscore = 10000;
+
+				// Load snort keys for db config
+				$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
+				if ($dbname == "") {
+					$dbname = "snort";
+				}
+				$dbhost = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbhost'");
+				if ($dbhost == "") {
+					$dbhost = "localhost";
+				}
+				$dbuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbuser'");
+				if ($dbuser == "") {
+					$dbuser = "snort";
+				}
+				$dbpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbpwd'");
+				if ($dbpwd == "") {
+					$dbpwd = "snort";
+				}
+				
+				$snortDB = new AbstractSQLMgr();
+				if ($snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd) == 0) {
+					$snortDB->Connect();
+				}
+				$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0'",
+					array("group" => "ip_src,ip_dst,sig_name,timestamp","order" => "timestamp","ordersens" => 1));
+				
+				$scannb = 0;
+				$atknb = 0;
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
+						$atknb++;
+					}
+					else if (preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) || 
+						preg_match("#Open Port#",$data["sig_name"]) || preg_match("#MISC MS Terminal server#",$data["sig_name"])) {
+						$atknb++;
+					}
+					else if (!preg_match("#ICMP PING NMAP#",$data["sig_name"])) {
+						$atknb++;
+					}
+					else {
+						$scannb++;
+					}
+				}
+				$securityScore = 10000-$scannb-2*$atknb;
+				FS::$dbMgr->Connect();
+				
+				$this->registerFooterPlugin($pluginTitle, $pluginContent);
+			}
+			
 		}
 
 		public function getIfaceElmt() {

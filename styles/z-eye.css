@@ -113,10 +113,21 @@ select { min-width: 50px; }
 
 #footer #copyright {
 	margin: 8px;
+	float: left;
 }
 
 #footer #content {
+	float: right;
+}
+
+#footerPluginTitle {
+	padding: 8px;
+	cursor: pointer;
+}
+
+#footerPluginContent {
 	display: none;
+	cursor: pointer;
 }
 
 #menuStack, #hstslide { display:inline-block; }
