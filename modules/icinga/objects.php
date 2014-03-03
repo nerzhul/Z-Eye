@@ -325,115 +325,7 @@
 				return $this->loc->s("err-bad-datas");
 			}
 			
-			$states = (new icingaBroker())->readStates();
-			if (!isset($states[$this->name])) {
-				return FS::$iMgr->printError("err-no-sensor");
-			}
-			
-			$totalSensors = 0;
-			$totalPbs = 0;
-			$totalCrits = 0;
-			$totalWarns = 0;
-			
-			$output = "<table>";
-			
-			// Loop types
-			foreach ($states[$name] as $hos => $hosvalues) {
-				if ($hos == "servicestatus") {
-					// Loop sensors
-					foreach ($hosvalues as $sensor => $svalues) {
-						$totalSensors++;
-						
-						$outstate = "";
-						$stylestate = "";
-						$timedown = $this->loc->s("Since-icinga-start");
-
-						if ($svalues["current_state"] == 1) {
-							$outstate = $this->loc->s("Warn");
-							if ($svalues["last_time_ok"]) {
-								$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
-							}
-							$totalWarns++;
-							$totalPbs++;
-						}
-						else if ($svalues["current_state"] == 2) {
-							$outstate = $this->loc->s("Critical");
-							if ($svalues["last_time_ok"]) {
-								$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
-							}
-
-							$totalCrits++;
-							$totalPbs++;
-						}
-						else {
-							$outstate = $this->loc->s("OK");
-						}
-						
-						$output .= "<tr style=\"background-color:";
-						if ($svalues["current_state"] == 1) {
-							$output .= "orange";
-						}
-						else if ($svalues["current_state"] == 2) {
-							$output .= "red";
-						}
-						else {
-							$output .= "green";
-						}
-						
-						$plugOut = $svalues["plugin_output"];
-						if (isset($svalues["long_plugin_output"]) && strlen($svalues["long_plugin_output"]) > 0) {
-							$plugOut .= "<br />".$svalues["long_plugin_output"];
-						}
-						$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
-						
-						$output .= ";\"><td>".$sensor."</td><td>".$outstate.
-							"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
-					}
-				}
-				else if ($hos == "hoststatus") {
-					$totalSensors++;
-						
-					$outstate = "";
-					$stylestate = "";
-					$timedown = $this->loc->s("Since-icinga-start");
-
-					if ($hosvalues["current_state"] == 1) {
-						$outstate = $this->loc->s("Down");
-						if ($hosvalues["last_time_up"])
-							$timedown = FSTimeMgr::timeSince($hosvalues["last_time_up"]);
-
-						$totalCrits++;
-						$totalPbs++;
-					}
-					else {
-						$outstate = $this->loc->s("Up");
-					}
-					
-					$output .= "<tr style=\"background-color:";
-					if ($hosvalues["current_state"] == 1) {
-						$output .= "red";
-					}
-					else {
-						$output .= "green";
-					}
-					$plugOut = $hosvalues["plugin_output"];
-					if (isset($hosvalues["long_plugin_output"]) && strlen($hosvalues["long_plugin_output"]) > 0) {
-						$plugOut .= "<br />".$hosvalues["long_plugin_output"];
-					}
-					$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
-						
-					$output .= ";\"><td>".$this->loc->s("Availability")."</td><td>".$outstate.
-						"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
-				}
-			}
-			
-			$output = "<b>".$this->loc->s("total-sensors")."</b>".$totalSensors."<br />".
-				"<b>".$this->loc->s("total-problems")."</b>".$totalPbs.
-				" ("."<b>".$this->loc->s("Critical")."</b>: ".$totalCrits." / <b>".
-				$this->loc->s("Warn")."</b>: ".$totalWarns.")".$output;
-				
-			$output .= "</table>";
-			return $output;
+			return (new icingaSensor())->showReport($name);
 		}
 		
 		public function Modify() {
@@ -811,5 +703,130 @@
 		private $ctg;
 		
 		private $template;
+	};
+	
+	final class icingaSensor extends FSMObj {
+		function __construct() {
+			parent::__construct();
+		}
+		
+		public function showReport($hostFilter="") {
+			$states = (new icingaBroker())->readStates();
+			if ($hostFilter && !isset($states[$hostFilter])) {
+				return FS::$iMgr->printError("err-no-sensor");
+			}
+			
+			$totalSensors = 0;
+			$totalPbs = 0;
+			$totalCrits = 0;
+			$totalWarns = 0;
+			
+			$output = "<table>";
+			
+			// Loop types
+			foreach ($states as $name => $gvalues) {
+				// If there is a host filter, show only this host
+				if ($hostFilter && $hostFilter != $name) {
+					continue;
+				}
+				
+				foreach ($states[$name] as $hos => $hosvalues) {
+					if ($hos == "servicestatus") {
+						// Loop sensors
+						foreach ($hosvalues as $sensor => $svalues) {
+							$totalSensors++;
+							
+							$outstate = "";
+							$stylestate = "";
+							$timedown = $this->loc->s("Since-icinga-start");
+
+							if ($svalues["current_state"] == 1) {
+								$outstate = $this->loc->s("Warn");
+								if ($svalues["last_time_ok"]) {
+									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
+								}
+								$totalWarns++;
+								$totalPbs++;
+							}
+							else if ($svalues["current_state"] == 2) {
+								$outstate = $this->loc->s("Critical");
+								if ($svalues["last_time_ok"]) {
+									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
+								}
+
+								$totalCrits++;
+								$totalPbs++;
+							}
+							else {
+								$outstate = $this->loc->s("OK");
+							}
+							
+							$output .= "<tr style=\"background-color:";
+							if ($svalues["current_state"] == 1) {
+								$output .= "orange";
+							}
+							else if ($svalues["current_state"] == 2) {
+								$output .= "red";
+							}
+							else {
+								$output .= "green";
+							}
+							
+							$plugOut = $svalues["plugin_output"];
+							if (isset($svalues["long_plugin_output"]) && strlen($svalues["long_plugin_output"]) > 0) {
+								$plugOut .= "<br />".$svalues["long_plugin_output"];
+							}
+							$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
+							
+							$output .= ";\"><td>".$sensor."</td><td>".$outstate.
+								"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
+						}
+					}
+					else if ($hos == "hoststatus") {
+						$totalSensors++;
+							
+						$outstate = "";
+						$stylestate = "";
+						$timedown = $this->loc->s("Since-icinga-start");
+
+						if ($hosvalues["current_state"] == 1) {
+							$outstate = $this->loc->s("Down");
+							if ($hosvalues["last_time_up"])
+								$timedown = FSTimeMgr::timeSince($hosvalues["last_time_up"]);
+
+							$totalCrits++;
+							$totalPbs++;
+						}
+						else {
+							$outstate = $this->loc->s("Up");
+						}
+						
+						$output .= "<tr style=\"background-color:";
+						if ($hosvalues["current_state"] == 1) {
+							$output .= "red";
+						}
+						else {
+							$output .= "green";
+						}
+						$plugOut = $hosvalues["plugin_output"];
+						if (isset($hosvalues["long_plugin_output"]) && strlen($hosvalues["long_plugin_output"]) > 0) {
+							$plugOut .= "<br />".$hosvalues["long_plugin_output"];
+						}
+						$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
+							
+						$output .= ";\"><td>".$this->loc->s("Availability")."</td><td>".$outstate.
+							"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
+					}
+				}
+			}
+			
+			$output = "<b>".$this->loc->s("total-sensors")."</b>".$totalSensors."<br />".
+				"<b>".$this->loc->s("total-problems")."</b>".$totalPbs.
+				" ("."<b>".$this->loc->s("Critical")."</b>: ".$totalCrits." / <b>".
+				$this->loc->s("Warn")."</b>: ".$totalWarns.")".$output;
+				
+			$output .= "</table>";
+			return $output;
+		}
 	};
 ?>
