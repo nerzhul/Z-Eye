@@ -102,23 +102,27 @@
 		}
 
 		public function Close() {
+			if (isset($_SESSION["uid"])) {
+				unset($_SESSION["uid"]);
+			}
 			session_destroy();
 		}
 
 		private function connectDBIfNot() {
 			if (!$this->dbMgr) {
 				$this->dbMgr = new AbstractSQLMgr();
-                $this->dbMgr->initForZEye();
+				$this->dbMgr->initForZEye();
 			}
 
 			if (!$this->dbMgr->isPDOOK()) {
-                $this->dbMgr->Connect();
+				$this->dbMgr->Connect();
 			}
 		}
 		
 		public function InitSessionIfNot() {
-			if (!isset($_SESSION["uid"]))
+			if (!isset($_SESSION["uid"])) {
 				$_SESSION["uid"] = 0;
+			}
 		}
 
 		public function isConnected() {
