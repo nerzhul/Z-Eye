@@ -1,4 +1,5 @@
-# Rewrite rules
+Require all granted
+
 RewriteEngine on
 RewriteRule ^([0-9]+)/(.*)$ index.php?mod=$1&$2
 
