@@ -102,7 +102,9 @@
 		}
 
 		public function Close() {
-			unset($_SESSION["uid"]);
+			if (isset($_SESSION["uid"])) {
+				unset($_SESSION["uid"]);
+			}
 			session_destroy();
 		}
 
@@ -113,13 +115,14 @@
 			}
 
 			if (!$this->dbMgr->isPDOOK()) {
-                $this->dbMgr->Connect();
+				$this->dbMgr->Connect();
 			}
 		}
 		
 		public function InitSessionIfNot() {
-			if (!isset($_SESSION["uid"]))
+			if (!isset($_SESSION["uid"])) {
 				$_SESSION["uid"] = 0;
+			}
 		}
 
 		public function isConnected() {
