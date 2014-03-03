@@ -55,7 +55,6 @@
 		FS::$iMgr->stylesheet("/styles/z-eye.css");
 		FS::$iMgr->jsinc("/lib/jQuery/req.min.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jquery.jqzoom.js");
-		FS::$iMgr->jsinc("/lib/jQuery/jquery.tablesorter.js");
 		FS::$iMgr->jsinc("/lib/jQuery/jquery.colorpicker.js");
 		FS::$iMgr->jsinc("/lib/jQuery/springy.js");
 		FS::$iMgr->jsinc("/lib/jQuery/springyui.js");
