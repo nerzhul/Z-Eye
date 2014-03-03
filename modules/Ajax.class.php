@@ -27,11 +27,13 @@
 		public function handle() {
 			$type = FS::$secMgr->checkAndSecuriseGetData("at");
 			switch($type) {
-				case 1: // menu
+				// menu
+				case 1: 
 					$mod = FS::$secMgr->checkAndSecuriseGetData("mid");
 					echo FS::$iMgr->showWindowHead();
 					break;
-				case 2: // module
+				// module
+				case 2: 
 					$mod = FS::$secMgr->checkAndSecuriseGetData("mod");
 					if($mod == 0) {
 						$mod = FS::$iMgr->getModuleIdByPath("default");
@@ -39,20 +41,28 @@
 					echo FS::$iMgr->loadModule($mod);
 					echo FS::$iMgr->renderJS();
 					break;
-				case 3: // Action Handler
+				// Action Handler
+				case 3:
 					$aMgr = new ActionMgr();
 					$aMgr->DoAction(FS::$secMgr->checkAndSecuriseGetData("act"));
 					break;
-				case 4: // module: getIfaceElmt()
+				// module: getIfaceElmt()
+				case 4: 
 					$mod = FS::$secMgr->checkAndSecuriseGetData("mod");
 					echo FS::$iMgr->loadModule($mod,2);
 					echo FS::$iMgr->renderJS();
 					break;
-				case 5: // special case: disconnect user
+				// special case: disconnect user
+				case 5:
 					if ($module = FS::$iMgr->getModuleByPath("connect")) {
 						$module->Disconnect(true);
 						echo FS::$iMgr->renderJS();
 					}
+					break;
+				// Reload all footer plugins
+				case 6:
+					FS::$iMgr->loadFooterPlugins();
+					echo FS::$iMgr->renderJS();
 					break;
 				default: $this->honeyPot(); break;
 			}
