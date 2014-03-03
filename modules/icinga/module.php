@@ -46,7 +46,7 @@
 			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-icinga");
 				$panElmts = array();
-				//$panElmts[] = array(1,"mod=".$this->mid,$this->loc->s("General"));
+				$panElmts[] = array(1,"mod=".$this->mid,$this->loc->s("General"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_host_write"))
 					$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("Hosts"));
 				if (FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
@@ -85,9 +85,7 @@
 
 		private function showGeneralTab() {
 			FS::$iMgr->setURL("index.php?mod=".$this->mid."&sh=1");
-			$output = FS::$iMgr->printError("not-implemented");
-			
-			return $output;
+			return (new icingaSensor())->showReport();
 		}
 
 		private function showHostsTab() {
@@ -842,7 +840,7 @@
 					if ($totalIcingaCrits > 0) {
 						$pluginTitle = sprintf("%s: %s/%s %s",
 							$this->loc->s("Services"),
-							$totalIcingaHS,
+							$totalIcingaSensors - $totalIcingaHS,
 							$totalIcingaSensors,
 							FS::$iMgr->img("/styles/images/monitor-crit.png",15,15)
 						);
@@ -851,7 +849,7 @@
 					else {
 						$pluginTitle = sprintf("%s: %s/%s %s",
 							$this->loc->s("Services"),
-							$totalIcingaHS,
+							$totalIcingaSensors - $totalIcingaHS,
 							$totalIcingaSensors,
 							FS::$iMgr->img("/styles/images/monitor-warn.png",15,15)
 						);
@@ -861,7 +859,7 @@
 				else {
 					$pluginTitle = sprintf("%s: %s/%s %s",
 							$this->loc->s("Services"),
-							$totalIcingaHS,
+							$totalIcingaSensors - $totalIcingaHS,
 							$totalIcingaSensors,
 							FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
 						);

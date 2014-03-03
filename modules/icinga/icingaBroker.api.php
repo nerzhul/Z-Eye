@@ -78,6 +78,7 @@
 					}
 				}
 			}
+			ksort($stateBuf);
 			return $stateBuf;
 		}
 

@@ -724,13 +724,17 @@
 			$output = "<table>";
 			
 			// Loop types
-			foreach ($states as $name => $gvalues) {
+			foreach ($states as $host => $gvalues) {
 				// If there is a host filter, show only this host
 				if ($hostFilter && $hostFilter != $name) {
 					continue;
 				}
 				
-				foreach ($states[$name] as $hos => $hosvalues) {
+				ksort($states[$host]);
+				
+				$showHostname = true;
+				
+				foreach ($states[$host] as $hos => $hosvalues) {
 					if ($hos == "servicestatus") {
 						// Loop sensors
 						foreach ($hosvalues as $sensor => $svalues) {
@@ -778,7 +782,18 @@
 							}
 							$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
 							
-							$output .= ";\"><td>".$sensor."</td><td>".$outstate.
+							$output .= ";\"><td>";
+							
+							/*
+							 * If no host filter we need to see the node
+							 * We only show the host name when it's the first sensor
+							 */
+							
+							if ($hostFilter == "") {
+								$output .= ($showHostname ? $host : "")."</td><td>";
+							}
+							
+							$output .= $sensor."</td><td>".$outstate.
 								"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
 						}
 					}
@@ -814,9 +829,21 @@
 						}
 						$plugOut = preg_replace("#\\\n#","<br />",$plugOut);
 							
-						$output .= ";\"><td>".$this->loc->s("Availability")."</td><td>".$outstate.
+						$output .= ";\"><td>";
+						
+						/*
+						 * If no host filter we need to see the node
+						 * We only show the host name when it's the first sensor
+						 */
+						
+						if ($hostFilter == "") {
+							$output .= ($showHostname ? $host : "")."</td><td>";
+						}
+						
+						$output .= $this->loc->s("Availability")."</td><td>".$outstate.
 							"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
 					}
+					$showHostname = false;
 				}
 			}
 			
