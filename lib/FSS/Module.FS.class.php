@@ -69,7 +69,7 @@
 		protected function registerFooterPlugin($title,$content) {
 			$this->removeFooterPlugin();
 			FS::$iMgr->js(
-				sprintf("$('<div id=\"footer_%s\"><div id=\"footerPluginTitle\">%s</div><div id=\"footerPluginContent\">%s</div></div>').appendTo('#footer #content');",
+				sprintf("$('<div id=\"footer_%s\" style=\"float: right;\"><div id=\"footerPluginTitle\">%s</div><div id=\"footerPluginContent\">%s</div></div>').appendTo('#footer #content');",
 					$this->genFooterPluginName(),
 					FS::$secMgr->cleanForJS($title),
 					FS::$secMgr->cleanForJS($content)

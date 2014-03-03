@@ -25,6 +25,7 @@
 	final class iSecReport extends FSModule {
 		function __construct() {
 			parent::__construct();
+			$this->modulename = "securityreport";
 			$this->loc = new lSecReport();
 			$this->rulesclass = new rSecurityReport($this->loc);
 			$this->menu = $this->loc->s("menu-name");
@@ -280,6 +281,86 @@
 				}
 			}
 			return $output;
+		}
+		
+		public function loadFooterPlugin() {
+			// Only users with icinga read right can use this module
+			if (FS::$sessMgr->hasRight("mrule_securityreport_read")) {
+				$pluginTitle = $this->loc->s("Security");
+				$pluginContent = "";
+				
+				// Load snort keys for db config
+				$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
+				if ($dbname == "") {
+					$dbname = "snort";
+				}
+				$dbhost = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbhost'");
+				if ($dbhost == "") {
+					$dbhost = "localhost";
+				}
+				$dbuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbuser'");
+				if ($dbuser == "") {
+					$dbuser = "snort";
+				}
+				$dbpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbpwd'");
+				if ($dbpwd == "") {
+					$dbpwd = "snort";
+				}
+				
+				$snortDB = new AbstractSQLMgr();
+				if ($snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd) == 0) {
+					$snortDB->Connect();
+				}
+				$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0'",
+					array("group" => "ip_src,ip_dst,sig_name,timestamp","order" => "timestamp","ordersens" => 1));
+				
+				$scannb = 0;
+				$atknb = 0;
+				while ($data = FS::$dbMgr->Fetch($query)) {
+					if (preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
+						$atknb++;
+					}
+					else if (preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) || 
+						preg_match("#Open Port#",$data["sig_name"]) || preg_match("#MISC MS Terminal server#",$data["sig_name"])) {
+						$atknb++;
+					}
+					else if (!preg_match("#ICMP PING NMAP#",$data["sig_name"])) {
+						$atknb++;
+					}
+					else {
+						$scannb++;
+					}
+				}
+				$securityScore = round((10000-$scannb-2*$atknb)/100);
+				FS::$dbMgr->Connect();
+				
+				// If score < 50%: critical
+				if ($securityScore < 50) {
+					$pluginTitle = sprintf("%s: %s%% %s",
+						$this->loc->s("Security"),
+						$securityScore,
+						FS::$iMgr->img("/styles/images/monitor-crit.png",15,15)
+					);
+				}
+				// If score < 93%: warn
+				else if ($securityScore < 93) {
+					$pluginTitle = sprintf("%s: %s%% %s",
+						$this->loc->s("Security"),
+						$securityScore,
+						FS::$iMgr->img("/styles/images/monitor-warn.png",15,15)
+					);
+				}
+				// 
+				else {
+					$pluginTitle = sprintf("%s: %s%% %s",
+						$this->loc->s("Security"),
+						$securityScore,
+						FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
+					);
+				}
+
+				$this->registerFooterPlugin($pluginTitle, $pluginContent);
+			}
 		}
 		
 		public function handlePostDatas($act) {
