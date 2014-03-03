@@ -426,9 +426,12 @@
 		}
 
 		public function password($name, $def_value = "", $label=NULL) {
-			return sprintf("%s<input type=\"password\" name=\"%s\" value=\"%s\" />",
+			return sprintf("%s<input type=\"password\" id=\"%s\" name=\"%s\" value=\"%s\" />",
 				$label ? $this->label($name, $label) : "",
-				$name, $def_value);
+				$name,
+				$name,
+				$def_value
+			);
 		}
 
 		public function calendar($name, $def_value, $label=NULL) {
