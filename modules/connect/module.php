@@ -209,6 +209,7 @@
 			$this->setLoginResult("result-ok-load",true);
 			$js = "loadWindowHead();loadMainContainer('".$url."');closeLogin();";
 			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->loadFooterPlugins();
 		}
 
 		public function Disconnect($loginForm=false) {
@@ -226,6 +227,7 @@
 				$js = "loadWindowHead(); loadMainContainer('');unlockScreen(true); setMaxIdleTimer('-1');";
 				FS::$iMgr->ajaxEcho("Done",$js);
 			}
+			FS::$iMgr->loadFooterPlugins();
 		}
 
 		public function handlePostDatas($act) {

@@ -36,6 +36,10 @@
 				$output .= $this->showWindowHead();
 			}
 			$output .= $this->notifContainer().$this->bottomContainer();
+			
+			if ($installlocked) {
+				$this->loadFooterPlugins();
+			}
 			return $output;
 		}
 
@@ -75,8 +79,6 @@
 			}
 
 			$output .= "</div></div>";
-			
-			$this->loadFooterPlugins();
 
 			return $output;
 		}

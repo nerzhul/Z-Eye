@@ -102,6 +102,7 @@
 		}
 
 		public function Close() {
+			unset($_SESSION["uid"]);
 			session_destroy();
 		}
 

@@ -88,7 +88,7 @@ select { min-width: 50px; }
 	color: white;
 	width: 100%;
 	display: none;
-	z-index: 3000;
+	z-index: 2500;
 }
 
 #subnotification {
@@ -105,7 +105,7 @@ select { min-width: 50px; }
 #footer {
 	width:100%;
 	bottom: 0;
-	z-index: 950;
+	z-index: 1600;
 	height: 30px;
 	position: fixed;
 	color: white;
@@ -351,7 +351,7 @@ canvas { display: inline-block; }
 	top: 0;
 	left: 0;
 	position: fixed;
-	z-index: 2500;
+	z-index: 1500;
 	text-align: center;
 	font-size: 14px;
 	background-image: linear-gradient(#8A0000, #4A0000); background-image: -webkit-linear-gradient(#8A0000, #4A0000); background-color: #4A0000; 

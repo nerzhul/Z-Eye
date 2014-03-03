@@ -916,7 +916,6 @@
 				
 				$this->registerFooterPlugin($pluginTitle, $pluginContent);
 			}
-			
 		}
 
 		public function getIfaceElmt() {

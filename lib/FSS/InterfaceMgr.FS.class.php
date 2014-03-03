@@ -136,14 +136,12 @@
 		}
 		
 		public function loadFooterPlugins() {
-			$found = false;
-			$moduleid = 0;
-
+			FS::$iMgr->js("clearFooterPlugins();");
+			
 			$dir = opendir(dirname(__FILE__)."/../../modules/");
 			while($elem = readdir($dir)) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
 				if (is_dir($dirpath)) {
-					$moduleid++;
 					$dir2 = opendir($dirpath);
 					while($elem2 = readdir($dir2)) {
 						if (is_file($dirpath."/".$elem2) && $elem2 == "module.php") {
