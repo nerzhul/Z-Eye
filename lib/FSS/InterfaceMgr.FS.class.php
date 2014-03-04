@@ -702,10 +702,11 @@
 			return $output;
 		}
 
-		public function selElmt($name,$value,$selected = false) {
+		public function selElmt($name,$value,$selected = false,$disabled = false) {
 			return sprintf("<option value=\"%s\"%s>%s</option>",
 				$value,
 				$selected ? " selected=\"selected\"" : "",
+				$disabled ? " disabled=\"disabled\"" : "",
 				$name);
 		}
 
