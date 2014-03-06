@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1404"
+	nextDBVersion = "1405"
 	pgsqlCon = None
 	logger = None
 
@@ -275,6 +275,11 @@ class ZEyeDBUpgrade():
 				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-host-by-email'")
 				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $ HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-service-by-email'")
 				self.setDBVersion("1404")
+			if self.dbVersion == "1404":
+				self.tryAddColumn("z_eye_icinga_commands","cmd_comment","text")
+				self.tryAddColumn("z_eye_icinga_commands","syscmd","bool DEFAULT 'f'")
+				self.rawRequest("UPDATE z_eye_icinga_commands set syscmd = 't' WHERE name IN ('notify-host-by-email','notify-service-by-email','process-host-perfdata','process-service-perfdata')")
+				self.setDBVersion("1405")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

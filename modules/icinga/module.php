@@ -671,7 +671,7 @@
 			 * Command table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd","",array("order" => "name"));
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd,syscmd","",array("order" => "name"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
@@ -679,16 +679,25 @@
 				}
 				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
+				// If we can write and it's not a system command
+				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write") && $data["syscmd"] != 't') {
 					$output .= FS::$iMgr->opendiv(16,$data["name"],array("lnkadd" => "name=".$data["name"]));
-				else
+				}
+				else {
 					$output .= $data["name"];
+				}
 
 				$output .= "</td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
-					$output .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&cmd=".$data["name"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-command")."'".$data["name"]."' ?","Confirm","Cancel")))."</td>";
+				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+					$output .= "<td>";
+					// If it's not a system command, then we can remove it
+					if ($data["syscmd"] != 't') {
+						$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&cmd=".$data["name"],array("js" => true,
+							"confirm" => array($this->loc->s("confirm-remove-command")."'".$data["name"]."' ?","Confirm","Cancel")));
+					}
+					$output .= "</td>";
+				}
 
 				$output .= "</tr>";
 			}
@@ -700,16 +709,24 @@
 		}
 
 		private function showCommandForm($name="") {
-			$value = "";
+			$command = "";
+			$comment = "";
 			if ($name) {
-				$value = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$name."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","cmd,cmd_comment","name = '".$name."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$command = $data["cmd"];
+					$comment = $data["cmd_comment"];
+				}
 			}
 	
 			return FS::$iMgr->cbkForm("1").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
 				FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname")).
-				FS::$iMgr->idxLine("Command","cmd",array("type" => "area", "value" => $value,
-					"length" => 1024, "size" => 30, "tooltip" => "tooltip-cmd")).
+				FS::$iMgr->idxLine("Command","cmd",array("type" => "area", "value" => $command,
+					"length" => 1024, "size" => 30, "height" => "150",
+					"tooltip" => "tooltip-cmd")).
+				FS::$iMgr->idxLine("Comment","comment",array("type" => "area", "value" => $comment,
+					"length" => 512, "size" => 30, "height" => "100")).
 				FS::$iMgr->aeTableSubmit($name == "");
 		}
 
@@ -1015,6 +1032,7 @@
 
 					$cmdname = FS::$secMgr->checkAndSecurisePostData("name");
 					$cmd = FS::$secMgr->checkAndSecurisePostData("cmd");
+					$comment = FS::$secMgr->checkAndSecurisePostData("comment");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					
 					if (!$cmdname || !$cmd || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$cmdname) || $edit && $edit != 1) {
@@ -1033,6 +1051,13 @@
 						return;
 					}
 					
+					// Verify if it's a system command and forbid if it's a system command		
+					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","syscmd","name = '".$cmdname."'");
+					if ($sysCmd == 't') {
+						FS::$iMgr->ajaxEcho("err-cannot-modify-system-command");
+						return;
+					}
+					
 					$tmpcmd = preg_replace("#\\\$USER1\\\$#","/usr/local/libexec/nagios/",$cmd);
 					$tmpcmd = preg_split("#[ ]#",$tmpcmd);
 					$out = "";
@@ -1042,8 +1067,12 @@
 						return;
 					} 
 
-					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");	
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd","'".$cmdname."','".$cmd."'");
+					if ($edit) {
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");
+					}
+					
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd,cmd_comment",
+						"'".$cmdname."','".$cmd."','".$comment."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEcho("err-fail-writecfg");
 						return;
@@ -1066,6 +1095,13 @@
 					
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
 						FS::$iMgr->ajaxEchoNC("err-data-not-exist");
+						return;
+					}
+
+					// Verify if it's a system command and forbid if it's a system command		
+					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","syscmd","name = '".$cmdname."'");
+					if ($sysCmd == 't') {
+						FS::$iMgr->ajaxEcho("err-cannot-modify-system-command");
 						return;
 					}
 					
