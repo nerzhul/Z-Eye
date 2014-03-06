@@ -33,7 +33,7 @@ import netdiscoCfg
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1403"
+	nextDBVersion = "1404"
 	pgsqlCon = None
 	logger = None
 
@@ -271,6 +271,10 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1402":
 				self.tryAddColumn("z_eye_dhcp_ip","expiration_date","date")
 				self.setDBVersion("1403")
+			if self.dbVersion == "1403":
+				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-host-by-email'")
+				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $ HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-service-by-email'")
+				self.setDBVersion("1404")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
