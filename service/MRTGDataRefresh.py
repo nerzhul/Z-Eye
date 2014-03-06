@@ -35,12 +35,15 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 		""" 5 mins between two refresh """
 		self.sleepingTimer = 5*60
 		self.MRTGcd = MRTGcd
+		self.myName = "MRTG Data Refresher"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("MRTG Data Refresher launched")
+		self.launchCmd()
 		while True:
+			self.setRunning(True)
 			self.launchRefreshProcess()
+			self.setRunning(False)
 			time.sleep(self.sleepingTimer)
 
 	def refreshMRTG(self,filename,blackhole):
@@ -53,7 +56,6 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 			self.decrThreadNb()
 
 	def launchRefreshProcess(self):
-		self.setRunning(True)
 		while self.SNMPcc.isRunning():
 			self.logger.debug("MRTG-Datas-Refresh: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
@@ -61,8 +63,6 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 		while self.MRTGcd.isRunning():
 			self.logger.debug("MRTG-Datas-Refresh: MRTG Config discovery is running, waiting 10 seconds")
 			time.sleep(10)
-		
-		starttime = datetime.datetime.now()
 		
 		try:
 			self.logger.info("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
@@ -83,7 +83,3 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 			
 		except Exception, e:
 			self.logger.critical("MRTG Data Refresher: %s" % e)
-
-		self.setRunning(False)
-		totaltime = datetime.datetime.now() - starttime 
-		self.logger.info("MRTG datas refresh done (time: %s)" % totaltime)

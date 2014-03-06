@@ -24,10 +24,11 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 
 	def __init__(self):
 		self.sleepingTimer = 15
+		self.myName = "ServiceMgr"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("ServiceMgr launched")
+		self.launchCmd()
 		while True:
 			self.setRunning(True)
 			self.restartIcinga()

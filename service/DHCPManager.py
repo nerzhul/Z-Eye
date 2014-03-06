@@ -447,10 +447,11 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 	def __init__(self):
 		""" 2 min between two syncs updates """
 		self.sleepingTimer = 120
+		self.myName = "DHCP/Radius Sync"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("DHCP/Radius Sync launched")
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.syncDHCPAndRadius()
@@ -458,8 +459,6 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 	
 	def syncDHCPAndRadius(self):
-		self.logger.info("DHCP/Radius Sync started")
-
 		try:
 			self.zeyeDB = ZEyeSQLMgr()
 			self.zeyeDB.initForZEye()
@@ -484,9 +483,6 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		while self.getThreadNb() > 0:
 			self.logger.debug("DHCP/Radius Sync: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
-
-		totaltime = datetime.datetime.now() - self.runStartTime
-		self.logger.info("DHCP/Radius Sync done (time: %s)" % totaltime)
 
 	def doSyncDHCPRadius(self,dbname,addr,port,groupname,subnet):
 		self.incrThreadNb()
@@ -603,10 +599,11 @@ class ZEyeDHCPCleaner(ZEyeUtil.Thread):
 	def __init__(self):
 		""" 2 min between two syncs updates """
 		self.sleepingTimer = 86400
+		self.myName = "DHCP Cleaner"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("DHCP cleaner launched")
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.cleanOldDHCPEntries()
@@ -618,7 +615,6 @@ class ZEyeDHCPCleaner(ZEyeUtil.Thread):
 			time.sleep(tommorow_interval)
 	
 	def cleanOldDHCPEntries(self):
-		self.logger.info("DHCP cleaner started")
 		try:
 			self.zeyeDB = ZEyeSQLMgr()
 			self.zeyeDB.initForZEye()
@@ -637,6 +633,3 @@ class ZEyeDHCPCleaner(ZEyeUtil.Thread):
 		while self.getThreadNb() > 0:
 			self.logger.debug("DHCP cleaner: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
-
-		totaltime = datetime.datetime.now() - self.runStartTime 
-		self.logger.info("DHCP cleaner done (time: %s)" % totaltime)

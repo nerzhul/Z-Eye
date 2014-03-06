@@ -28,10 +28,11 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 	def __init__(self):
 		""" 15 min between two netdisco updates """
 		self.sleepingTimer = 900
+		self.myName = "Netdisco Data Refresher"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("Netdisco Data Refresher launched")
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchRefresh()
@@ -39,8 +40,6 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 
 	def launchRefresh(self):
-		self.logger.info("Netdisco Data Refresher started")
-		
 		try:		
 			self.zeyeDB = ZEyeSQLMgr()	
 			self.zeyeDB.initForZEye()
@@ -61,9 +60,6 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 		while self.getThreadNb() > 0:
 			self.logger.debug("Netdisco Data Refresher: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
-
-		totaltime = datetime.datetime.now() - self.runStartTime
-		self.logger.info("Netdisco Data Refresher done (time: %s)" % totaltime)
 
 	def doRefreshDevice(self,device):
 		self.incrThreadNb()

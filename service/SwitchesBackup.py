@@ -37,10 +37,11 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 		""" 24 hours between two backups """
 		self.sleepingTimer = 24*60*60
 		self.SNMPcc = SNMPcc
+		self.myName = "Switches backup"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("Switch backup process launched")
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchRegularBackup()
@@ -52,8 +53,6 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 			self.logger.debug("Switches-backup: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
-		self.logger.info("Switches backup started")
-		starttime = datetime.datetime.now()
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
@@ -97,9 +96,6 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 		while self.getThreadNb() > 0:
 			self.logger.debug("Switches backup waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
-
-		totaltime = datetime.datetime.now() - self.runStartTime 
-		self.logger.info("Switches backup done (time: %s)" % totaltime)
 
 	def doBackup(self,ip,devname,devcom,addr,path):
 		self.incrThreadNb()

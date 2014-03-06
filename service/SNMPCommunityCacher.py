@@ -45,10 +45,11 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 	def __init__(self):
 		""" 1 hour between two discover """
 		self.sleepingTimer = 60*60
+		self.myName = "SNMP communities caching"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("SNMP communities caching launched")
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchSNMPCaching()
@@ -61,8 +62,6 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		self.dev_mutex.release()
 
 	def launchSNMPCaching(self):
-		self.logger.info("SNMP communities caching started")
-		
 		try:
 			self.pgcon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			self.pgcursor = self.pgcon.cursor()
@@ -92,9 +91,6 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		finally:
 			if self.pgcon:
 				self.pgcon.close()
-
-		totaltime = datetime.datetime.now() - self.runStartTime
-		self.logger.info("SNMP communities caching done (time: %s)" % totaltime)
 
 	def testCommunity(self,SNMPB,comm):
 		if SNMPB.snmpget(comm,"1.3.6.1.6.3.1.1.6.1.0") != -1:

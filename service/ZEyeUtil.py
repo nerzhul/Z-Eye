@@ -83,8 +83,10 @@ class Thread(threading.Thread):
 		
 		if runStatus == True:
 			self.runStartTime = datetime.datetime.now()
+			self.startMsg()
+		else:
+			self.endMsg()
 		
-	
 	def isRunning(self):
 		rs = True
 		self.runningMutex.acquire()
@@ -92,3 +94,12 @@ class Thread(threading.Thread):
 		self.runningMutex.release()
 		return rs
 
+	def launchMsg(self):
+		self.logger.info("%s launched" % self.myName)
+		
+	def startMsg(self):
+		self.logger.info("%s started" % self.myName)
+	
+	def endMsg(self):
+		totaltime = datetime.datetime.now() - self.runStartTime 
+		self.logger.info("%s done (time: %s)" % (self.myName,totaltime))

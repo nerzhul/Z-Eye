@@ -32,10 +32,11 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 		self.startTimer = start
 		self.processName = pname
 		self.processCmd = cmd
+		self.myName = "%s (periodic cmd)" % pname
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("%s (periodic cmd) process launched" % self.processName)
+		self.launchMsg()
 		time.sleep(self.startTimer)
 		while True:
 			self.setRunning(True)
@@ -44,12 +45,7 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 
 	def launchCmd(self):
-		self.logger.info("%s (periodic cmd) started" % self.processName)
-		
 		try:
 			subprocess.check_output(self.processCmd,shell=True)
 		except Exception, e:
-			self.logger.critical("Port ID Caching: FATAL %s" % e)
-		
-		totaltime = datetime.datetime.now() - self.runStartTime 
-		self.logger.info("%s (periodic cmd) done (time: %s)" % (self.processName,totaltime))
+			self.logger.critical("%s: FATAL %s" % (self.processName,e))

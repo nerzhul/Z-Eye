@@ -33,11 +33,11 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 		""" 1 hour between two refresh """
 		self.sleepingTimer = 60*60
 		self.SNMPcc = SNMPcc
-
+		self.myName = "Switch Port ID Caching"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("Switches Port ID caching launched")
+		self.launchCmd()
 		while True:
 			self.setRunning(True)
 			self.launchCachingProcess()
@@ -98,7 +98,6 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			self.logger.debug("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
-		self.logger.info("Port ID caching started")
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost, user=netdiscoCfg.pgUser, password=netdiscoCfg.pgPwd, database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
@@ -135,7 +134,3 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			while self.getThreadNb() > 0:
 				self.logger.debug("Port-ID-Caching: waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
-
-			totaltime = datetime.datetime.now() - self.runStartTime 
-			self.logger.info("Port ID caching done (time: %s)" % totaltime)
-

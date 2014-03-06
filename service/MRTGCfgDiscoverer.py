@@ -32,10 +32,11 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 		""" 30 mins between two discover """
 		self.sleepingTimer = 30*60
 		self.SNMPcc = SNMPcc
+		self.myName = "MRTG Config Discoverer"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("MRTG Config discoverer launched")
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchCfgGenerator()
@@ -82,9 +83,6 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 		while self.getThreadNb() > 0:
 			self.logger.debug("MRTG configuration discovery waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
-
-		totaltime = datetime.datetime.now() - self.runStartTime 
-		self.logger.info("MRTG configuration discovery done (time: %s)" % totaltime)
 
 	def fetchMRTGInfos(self,ip,devname,devcom):
 		self.incrThreadNb()
