@@ -19,7 +19,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import threading, logging
+import threading, logging, datetime
 from threading import Lock
 
 def getCIDR(netmask):
@@ -45,6 +45,7 @@ class Thread(threading.Thread):
 	# For threading sync
 	runStatus = False
 	runningMutex = Lock()
+	runStartTime = 0
 
 	# Timers
 	sleepingTimer = 0
@@ -79,6 +80,10 @@ class Thread(threading.Thread):
 		self.runningMutex.acquire()
 		self.runStatus = runStatus
 		self.runningMutex.release()
+		
+		if runStatus == True:
+			self.runStartTime = datetime.datetime.now()
+		
 	
 	def isRunning(self):
 		rs = True

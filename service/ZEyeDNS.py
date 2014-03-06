@@ -50,13 +50,14 @@ class DNSManager(ZEyeUtil.Thread):
 	def run(self):
 		self.logger.info("DNS Manager launched")
 		while True:
+			self.setRunning(True)
 			self.launchDNSManagement()
+			self.setRunning(False)
 			time.sleep(self.sleepingTimer)
 
 	def launchDNSManagement(self):
-		self.setRunning(True)
 		self.logger.info("DNS Management task started")
-		starttime = datetime.datetime.now()
+
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
@@ -81,8 +82,8 @@ class DNSManager(ZEyeUtil.Thread):
 			self.logger.debug("DNS Manager: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
-		self.setRunning(False)
-		totaltime = datetime.datetime.now() - starttime
+		
+		totaltime = datetime.datetime.now() - self.runStartTime
 		self.logger.info("DNS Management task done (time: %s)" % totaltime)
 
 	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer,tsigupdate):
@@ -845,7 +846,9 @@ class RecordCollector(ZEyeUtil.Thread):
 	def run(self):
 		self.logger.info("DNS Record collector launched")
 		while True:
+			self.setRunning(True)
 			self.launchCachingProcess()
+			self.setRunning(False)
 			time.sleep(self.sleepingTimer)
 
 	def collectRecords(self,server,zone):
@@ -878,7 +881,6 @@ class RecordCollector(ZEyeUtil.Thread):
 			self.decrThreadNb()
 
 	def launchCachingProcess(self):
-		starttime = datetime.datetime.now()
 		self.logger.info("DNS Records collect started")
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
@@ -911,7 +913,7 @@ class RecordCollector(ZEyeUtil.Thread):
 			self.logger.debug("DNS-Record-Collector: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
-		totaltime = datetime.datetime.now() - starttime 
+		totaltime = datetime.datetime.now() - self.runStartTime 
 		self.logger.info("DNS Records collect done (time: %s)" % totaltime)
 		
 	def loadServerList(self):

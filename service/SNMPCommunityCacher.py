@@ -50,7 +50,9 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 	def run(self):
 		self.logger.info("SNMP communities caching launched")
 		while True:
+			self.setRunning(True)
 			self.launchSNMPCaching()
+			self.setRunning(False)
 			time.sleep(self.sleepingTimer)
 
 	def setDevCommunities(self,name,snmpro,snmprw):
@@ -60,8 +62,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 
 	def launchSNMPCaching(self):
 		self.logger.info("SNMP communities caching started")
-		starttime = datetime.datetime.now()
-		self.setRunning(True)
+		
 		try:
 			self.pgcon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			self.pgcursor = self.pgcon.cursor()
@@ -92,8 +93,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 			if self.pgcon:
 				self.pgcon.close()
 
-		self.setRunning(False)
-		totaltime = datetime.datetime.now() - starttime
+		totaltime = datetime.datetime.now() - self.runStartTime
 		self.logger.info("SNMP communities caching done (time: %s)" % totaltime)
 
 	def testCommunity(self,SNMPB,comm):
