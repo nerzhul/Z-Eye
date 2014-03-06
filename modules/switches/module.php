@@ -918,14 +918,16 @@
 					$err = FS::$secMgr->checkAndSecuriseGetData("err");
 					if (FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_dhcpsnmgmt") ||
 						FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_dhcpsnmgmt")) { 
-						$output .= FS::$iMgr->h3("title-dhcpsnooping");
-						$output .= FS::$iMgr->cbkForm("24&d=".$device,array("id" => "dhcpsnfrm"));
+						$output .= FS::$iMgr->h3("title-dhcpsnooping").
+							FS::$iMgr->cbkForm("24&d=".$device,"Modification",false,array("id" => "dhcpsnfrm"));
+						
 						$enable = $this->devapi->getDHCPSnoopingStatus();
 						$opt82 = $this->devapi->getDHCPSnoopingOpt82();
 						$match = $this->devapi->getDHCPSnoopingMatchMAC();
-						$output .= $this->loc->s("Enable")." ".FS::$iMgr->check("enable",array("tooltip" => "tooltip-dhcpsnoopingen", "check" => $enable == 1))."<br />";
-						$output .= $this->loc->s("Use-DHCP-opt-82")." ".FS::$iMgr->check("opt82",array("tooltip" => "tooltip-dhcpsnoopingopt", "check" => $opt82 == 1))."<br />";
-						$output .= $this->loc->s("Match-MAC-addr")." ".FS::$iMgr->check("matchmac",array("tooltip" => "tooltip-dhcpsnoopingmatch", "check" => $match == 1))."<br />";
+						
+						$output .= $this->loc->s("Enable")." ".FS::$iMgr->check("enable",array("tooltip" => "tooltip-dhcpsnoopingen", "check" => $enable == 1))."<br />".
+							$this->loc->s("Use-DHCP-opt-82")." ".FS::$iMgr->check("opt82",array("tooltip" => "tooltip-dhcpsnoopingopt", "check" => $opt82 == 1))."<br />".
+							$this->loc->s("Match-MAC-addr")." ".FS::$iMgr->check("matchmac",array("tooltip" => "tooltip-dhcpsnoopingmatch", "check" => $match == 1))."<br />";
 
 						$vlanlist = array();
 						$query = FS::$dbMgr->Select("device_vlan","vlan,description","ip = '".$dip."'");
