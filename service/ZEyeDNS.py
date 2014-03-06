@@ -44,6 +44,7 @@ class DNSManager(ZEyeUtil.Thread):
 	def __init__(self):
 		""" 1 min between two DNS updates """
 		self.sleepingTimer = 60
+		self.myName = "DNS Manager"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):

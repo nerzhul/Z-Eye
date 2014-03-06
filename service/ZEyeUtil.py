@@ -41,15 +41,18 @@ class Thread(threading.Thread):
 	threadCounterMutex = Lock()
 	threadCounter = 0
 	max_threads = 30
-
-	sleepingTimer = 0
-	startTime = 0
-	
-	logger = None
 	
 	# For threading sync
 	runStatus = False
 	runningMutex = Lock()
+
+	# Timers
+	sleepingTimer = 0
+	startTimer = 0
+	
+	# Naming
+	logger = None
+	myName = "UNK-Thread-Name"
 
 	def __init__(self):
 		threading.Thread.__init__(self)
