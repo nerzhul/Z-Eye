@@ -19,7 +19,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, re, sys, time, thread, threading, subprocess, logging
+import datetime, os, re, sys, time, thread, threading, subprocess, logging
 from threading import Lock
 
 import ZEyeUtil
@@ -32,11 +32,10 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 		""" 30 mins between two discover """
 		self.sleepingTimer = 30*60
 		self.SNMPcc = SNMPcc
-
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.write("MRTG Config discoverer launched")
+		self.logger.info("MRTG Config discoverer launched")
 		while True:
 			self.launchCfgGenerator()
 			time.sleep(self.sleepingTimer)

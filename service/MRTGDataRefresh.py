@@ -19,7 +19,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import datetime, time, os,re, subprocess, thread, threading, logging
+import datetime, time, os, re, subprocess, thread, threading, logging
 from threading import Lock
 
 import ZEyeUtil
@@ -61,8 +61,8 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 			self.logger.info("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
 
 			_dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
-			for file in _dir:
-				filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+file
+			for _file in _dir:
+				filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+_file
 				# Launch only if it's a .cfg, recent MRTG create .ok files
 				if(os.path.isfile(filename) and re.search("cfg$",filename) != None):
 					while self.getThreadNb() >= self.max_threads:
