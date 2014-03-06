@@ -46,7 +46,6 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 			self.setRunning(True)
 			self.launchRegularBackup()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def launchRegularBackup(self):
 		while self.SNMPcc.isRunning():
@@ -90,12 +89,11 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
-
-		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
-		time.sleep(1)
-		while self.getThreadNb() > 0:
-			self.logger.debug("Switches backup waiting %d threads" % self.getThreadNb())
+			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
+			while self.getThreadNb() > 0:
+				self.logger.debug("Switches backup waiting %d threads" % self.getThreadNb())
+				time.sleep(1)
 
 	def doBackup(self,ip,devname,devcom,addr,path):
 		self.incrThreadNb()

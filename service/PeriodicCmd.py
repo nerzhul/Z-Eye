@@ -42,7 +42,6 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 			self.setRunning(True)
 			self.launchCmd()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def launchCmd(self):
 		try:

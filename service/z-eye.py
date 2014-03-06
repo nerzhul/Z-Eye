@@ -33,7 +33,7 @@ from DatabaseUpgrader import ZEyeDBUpgrade
 from DHCPManager import ZEyeDHCPManager, ZEyeDHCPRadiusSyncer, ZEyeDHCPCleaner
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
 from NetdiscoManager import ZEyeNetdiscoDataRefresher
-import ZEyeDNS
+from ZEyeDNS import DNSManager, RecordCollector
 import netdiscoCfg
 
 class ZEyeDaemon(Daemon.Daemon):
@@ -64,9 +64,10 @@ class ZEyeDaemon(Daemon.Daemon):
 		ZEyeDHCPCleaner().start()
 		ZEyeDHCPManager().start()
 		ZEyeDHCPRadiusSyncer().start()
-		ZEyeDNS.DNSManager().start()
-		ZEyeDNS.RecordCollector().start()
-		
+			
+		DNSManager().start()
+		RecordCollector().start()
+
 		while True:
 			time.sleep(1)
 
@@ -91,7 +92,11 @@ if __name__ == "__main__":
 			ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Starting Z-Eye daemon"
 			logger.info("Starting Z-Eye daemon")
-			daemon.start()
+			
+			if netdiscoCfg.daemon == True:
+				daemon.start()
+			else:
+				daemon.run()
 		elif 'stop' == sys.argv[1]:
 			print "Stopping Z-Eye daemon"
 			logger.info("Stopping Z-Eye daemon")

@@ -41,7 +41,6 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 			self.setRunning(True)
 			self.launchCfgGenerator()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def launchCfgGenerator(self):
 		while self.SNMPcc.isRunning():

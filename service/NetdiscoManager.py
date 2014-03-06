@@ -37,7 +37,6 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 			self.setRunning(True)
 			self.launchRefresh()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def launchRefresh(self):
 		try:		
@@ -54,11 +53,10 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 		finally:
 			if self.zeyeDB != None:
 				self.zeyeDB.close()
-
-		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
-		time.sleep(1)
-		while self.getThreadNb() > 0:
-			self.logger.debug("Netdisco Data Refresher: waiting %d threads" % self.getThreadNb())
+			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
+			time.sleep(1)
+			while self.getThreadNb() > 0:
+				self.logger.debug("Netdisco Data Refresher: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 	def doRefreshDevice(self,device):

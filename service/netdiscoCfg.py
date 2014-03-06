@@ -26,3 +26,4 @@ pgUser = "netdisco"
 pgPwd = "dbpassword"
 pgDB = "netdisco"
 logLevel = logging.INFO
+daemon = True

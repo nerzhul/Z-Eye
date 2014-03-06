@@ -37,12 +37,11 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.launchCmd()
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchCachingProcess()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def fetchSNMPInfos(self,ip,devname,devcom,vendor):
 		self.incrThreadNb()

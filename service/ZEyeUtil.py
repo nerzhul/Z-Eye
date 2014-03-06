@@ -19,7 +19,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import threading, logging, datetime
+import threading, logging, datetime, time
 from threading import Lock
 
 def getCIDR(netmask):
@@ -86,6 +86,7 @@ class Thread(threading.Thread):
 			self.startMsg()
 		else:
 			self.endMsg()
+			time.sleep(self.sleepingTimer)
 		
 	def isRunning(self):
 		rs = True

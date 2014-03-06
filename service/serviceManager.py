@@ -34,7 +34,6 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 			self.restartIcinga()
 			self.restartSnort()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def restartIcinga(self):
 		if os.path.exists("/tmp/icinga_restart"):

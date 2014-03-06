@@ -48,12 +48,11 @@ class DNSManager(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.launchCmd()
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchDNSManagement()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def launchDNSManagement(self):
 		try:
@@ -68,17 +67,16 @@ class DNSManager(ZEyeUtil.Thread):
 					self.loadACLList(pgcursor)
 					self.loadClusterList(pgcursor)
 					self.loadZoneList(pgcursor)
-
 					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7],self.serverList[server][8],self.serverList[server][9]))
 		except Exception, e:
 			self.logger.critical("DNS Manager: %s" % e)
 			sys.exit(1);
-
-		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
-		time.sleep(1)
-		while self.getThreadNb() > 0:
-			self.logger.debug("DNS Manager: waiting %d threads" % self.getThreadNb())
+		finally:
+			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
+			while self.getThreadNb() > 0:
+				self.logger.debug("DNS Manager: waiting %d threads" % self.getThreadNb())
+				time.sleep(1)
 
 	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer,tsigupdate):
 		self.incrThreadNb()
@@ -753,7 +751,6 @@ class DNSManager(ZEyeUtil.Thread):
 
 			self.aclList[idx[0]] = (tmpIPs,tmpNetworks,tmpACLs,tmpTSIGs,tmpDNSNames)
 
-
 	def loadTSIGList(self,pgcursor):
 		self.tsigList = {}
 
@@ -838,12 +835,11 @@ class RecordCollector(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.launchCmd()
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchCachingProcess()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def collectRecords(self,server,zone):
 		self.incrThreadNb()
@@ -899,12 +895,11 @@ class RecordCollector(ZEyeUtil.Thread):
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
-
-		# We must wait 1 sec, else threadCounter == 0 because of fast algo
-		time.sleep(1)
-		while self.getThreadNb() > 0:
-			self.logger.debug("DNS-Record-Collector: waiting %d threads" % self.getThreadNb())
+			# We must wait 1 sec, else threadCounter == 0 because of fast algo
 			time.sleep(1)
+			while self.getThreadNb() > 0:
+				self.logger.debug("DNS-Record-Collector: waiting %d threads" % self.getThreadNb())
+				time.sleep(1)
 
 	def loadServerList(self):
 		self.serverList = {}

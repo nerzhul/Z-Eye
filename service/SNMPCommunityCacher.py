@@ -54,7 +54,6 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 			self.setRunning(True)
 			self.launchSNMPCaching()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def setDevCommunities(self,name,snmpro,snmprw):
 		self.dev_mutex.acquire()

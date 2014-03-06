@@ -39,12 +39,11 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.launchCmd()
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.launchRefreshProcess()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 
 	def refreshMRTG(self,filename,blackhole):
 		self.incrThreadNb()

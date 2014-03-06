@@ -53,18 +53,17 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 	def __init__(self):
 		""" 1 min between two DHCP updates """
 		self.sleepingTimer = 60
+		self.myName = "DHCP Manager"
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.logger.info("DHCP Manager launched")
+		self.launchMsg()
 		while True:
+			self.setRunning(True)
 			self.launchDHCPManagement()
-			time.sleep(self.sleepingTimer)
+			self.setRunning(False)
 
 	def launchDHCPManagement(self):
-		self.setRunning(True)
-		self.logger.info("DHCP Management task started")
-		starttime = datetime.datetime.now()
 		try:
 			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			pgcursor = pgsqlCon.cursor()
@@ -91,15 +90,10 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
-
-		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
-		time.sleep(1)
-		while self.getThreadNb() > 0:
+			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
-
-		self.setRunning(False)
-		totaltime = datetime.datetime.now() - starttime
-		self.logger.info("DHCP Management task done (time: %s)" % totaltime)
+			while self.getThreadNb() > 0:
+				time.sleep(1)
 
 	def doConfigDHCP(self,addr,user,pwd,reservpath,subnetpath):
 		self.incrThreadNb()
@@ -456,7 +450,6 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 			self.setRunning(True)
 			self.syncDHCPAndRadius()
 			self.setRunning(False)
-			time.sleep(self.sleepingTimer)
 	
 	def syncDHCPAndRadius(self):
 		try:
@@ -477,12 +470,11 @@ class ZEyeDHCPRadiusSyncer(ZEyeUtil.Thread):
 		finally:
 			if self.zeyeDB != None:
 				self.zeyeDB.close()
-		
-		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
-		time.sleep(1)
-		while self.getThreadNb() > 0:
-			self.logger.debug("DHCP/Radius Sync: waiting %d threads" % self.getThreadNb())
+			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
+			while self.getThreadNb() > 0:
+				self.logger.debug("DHCP/Radius Sync: waiting %d threads" % self.getThreadNb())
+				time.sleep(1)
 
 	def doSyncDHCPRadius(self,dbname,addr,port,groupname,subnet):
 		self.incrThreadNb()
