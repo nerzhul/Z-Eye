@@ -37,6 +37,7 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 
 	def launchRefresh(self):
+		self.setRunning(True)
 		self.logger.info("Netdisco Data Refresher started")
 		starttime = datetime.datetime.now()
 		
@@ -61,6 +62,7 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 			self.logger.debug("Netdisco Data Refresher: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
+		self.setRunning(False)
 		totaltime = datetime.datetime.now() - starttime
 		self.logger.info("Netdisco Data Refresher done (time: %s)" % totaltime)
 

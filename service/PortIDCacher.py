@@ -44,7 +44,6 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 
 	def fetchSNMPInfos(self,ip,devname,devcom,vendor):
 		self.incrThreadNb()
-
 		try:
 			text = ""
 			if vendor == "cisco":
@@ -93,7 +92,8 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 		self.decrThreadNb()
 
 	def launchCachingProcess(self):
-		while self.SNMPcc.isRunning == True:
+		self.setRunning(True)
+		while self.SNMPcc.isRunning():
 			self.logger.debug("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
@@ -136,6 +136,7 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 				self.logger.debug("Port-ID-Caching: waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
+			self.setRunning(False)
 			totaltime = datetime.datetime.now() - starttime 
 			self.logger.info("Port ID caching done (time: %s)" % totaltime)
 

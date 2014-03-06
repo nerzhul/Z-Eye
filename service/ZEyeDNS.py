@@ -53,6 +53,7 @@ class DNSManager(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 
 	def launchDNSManagement(self):
+		self.setRunning(True)
 		self.logger.info("DNS Management task started")
 		starttime = datetime.datetime.now()
 		try:
@@ -79,6 +80,7 @@ class DNSManager(ZEyeUtil.Thread):
 			self.logger.debug("DNS Manager: waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
+		self.setRunning(False)
 		totaltime = datetime.datetime.now() - starttime
 		self.logger.info("DNS Management task done (time: %s)" % totaltime)
 

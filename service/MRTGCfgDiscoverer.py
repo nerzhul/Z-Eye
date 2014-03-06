@@ -41,7 +41,9 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 
 	def launchCfgGenerator(self):
-		while self.SNMPcc.isRunning == True:
+		self.setRunning(True)
+		
+		while self.SNMPcc.isRunning():
 			self.logger.debug("MRTG-Config-Discovery: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
@@ -81,6 +83,7 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 			self.logger.debug("MRTG configuration discovery waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
+		self.setRunning(False)
 		totaltime = datetime.datetime.now() - starttime
 		self.logger.info("MRTG configuration discovery done (time: %s)" % totaltime)
 

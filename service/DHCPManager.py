@@ -62,6 +62,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 
 	def launchDHCPManagement(self):
+		self.setRunning(True)
 		self.logger.info("DHCP Management task started")
 		starttime = datetime.datetime.now()
 		try:
@@ -96,6 +97,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 		while self.getThreadNb() > 0:
 			time.sleep(1)
 
+		self.setRunning(False)
 		totaltime = datetime.datetime.now() - starttime
 		self.logger.info("DHCP Management task done (time: %s)" % totaltime)
 

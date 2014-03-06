@@ -46,8 +46,15 @@ class ZEyeDaemon(Daemon.Daemon):
 		"""
 		time.sleep(1)
 
-		ZEyeMRTGDiscoverer(SNMPcc).start()
-		ZEyeMRTGDataRefresher().start()
+		MRTGDiscoveryTask = ZEyeMRTGDiscoverer(SNMPcc)
+		MRTGDiscoveryTask.start()
+		
+		"""
+		We wait 1 second to let MRTG discoverer start and block other SNMP using processes
+		"""
+		time.sleep(1)
+		
+		ZEyeMRTGDataRefresher(MRTGDiscoveryTask).start()
 		ZEyePeriodicCmd(15*60,40,"Netdisco device discovery","/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()
 		ZEyeSwitchesPortIDCacher(SNMPcc).start()
 		ZEyeSwitchesBackup(SNMPcc).start()

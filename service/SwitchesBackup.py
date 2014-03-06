@@ -46,8 +46,9 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 			time.sleep(self.sleepingTimer)
 
 	def launchRegularBackup(self):
-		while self.SNMPcc.isRunning == True:
-			self.logger.info("Switches-backup: SNMP community caching is running, waiting 10 seconds")
+		self.setRunning(True)
+		while self.SNMPcc.isRunning():
+			self.logger.debug("Switches-backup: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
 		self.logger.info("Switches backup started")
@@ -96,6 +97,7 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 			self.logger.debug("Switches backup waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
+		self.setRunning(False)
 		totaltime = datetime.datetime.now() - starttime
 		self.logger.info("Switches backup done (time: %s)" % totaltime)
 

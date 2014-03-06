@@ -37,7 +37,8 @@ def addslashes(s):
 	return s
 
 class Thread(threading.Thread):
-	tc_mutex = Lock()
+	# sub thread counter
+	threadCounterMutex = Lock()
 	threadCounter = 0
 	max_threads = 30
 
@@ -45,25 +46,41 @@ class Thread(threading.Thread):
 	startTime = 0
 	
 	logger = None
+	
+	# For threading sync
+	runStatus = False
+	runningMutex = Lock()
 
 	def __init__(self):
 		threading.Thread.__init__(self)
 		self.logger = logging.getLogger("Z-Eye")
 
 	def incrThreadNb(self):
-		self.tc_mutex.acquire()
+		self.threadCounterMutex.acquire()
 		self.threadCounter += 1
-		self.tc_mutex.release()
+		self.threadCounterMutex.release()
 
 	def decrThreadNb(self):
-		self.tc_mutex.acquire()
+		self.threadCounterMutex.acquire()
 		self.threadCounter = self.threadCounter - 1
-		self.tc_mutex.release()
+		self.threadCounterMutex.release()
 
 	def getThreadNb(self):
 		val = 0
-		self.tc_mutex.acquire()
+		self.threadCounterMutex.acquire()
 		val = self.threadCounter
-		self.tc_mutex.release()
+		self.threadCounterMutex.release()
 		return val
+	
+	def setRunning(self,runStatus):
+		self.runningMutex.acquire()
+		self.runStatus = runStatus
+		self.runningMutex.release()
+	
+	def isRunning(self):
+		rs = True
+		self.runningMutex.acquire()
+		rs = self.runStatus
+		self.runningMutex.release()
+		return rs
 

@@ -29,8 +29,10 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 	def run(self):
 		self.logger.info("ServiceMgr launched")
 		while True:
+			self.setRunning(True)
 			self.restartIcinga()
 			self.restartSnort()
+			self.setRunning(False)
 			time.sleep(self.sleepingTimer)
 
 	def restartIcinga(self):

@@ -34,8 +34,6 @@ SNMP cache is used by some other modules to not use DB and improve perfs
 """
 
 class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
-	isRunning = False
-
 	pgcon = None
 	pgcursor = None
 	dev_mutex = Lock()
@@ -63,7 +61,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 	def launchSNMPCaching(self):
 		self.logger.info("SNMP communities caching started")
 		starttime = datetime.datetime.now()
-		self.isRunning = True
+		self.setRunning(True)
 		try:
 			self.pgcon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
 			self.pgcursor = self.pgcon.cursor()
@@ -94,7 +92,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 			if self.pgcon:
 				self.pgcon.close()
 
-		self.isRunning = False
+		self.setRunning(False)
 		totaltime = datetime.datetime.now() - starttime
 		self.logger.info("SNMP communities caching done (time: %s)" % totaltime)
 
