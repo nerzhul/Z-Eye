@@ -55,7 +55,7 @@ class ZEyeMRTGDataRefresher(ZEyeUtil.Thread):
 			self.decrThreadNb()
 
 	def launchRefreshProcess(self):
-		while self.SNMPcc.isRunning():
+		while self.MRTGcd.isRunning():
 			self.logger.debug("MRTG-Datas-Refresh: SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 		
