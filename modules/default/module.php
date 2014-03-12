@@ -120,9 +120,8 @@
 						foreach ($hosvalues as $sensor => $svalues) {
 							$this->totalicinga++;
 							if ($svalues["current_state"] > 0) {
-								$outstate = "";
-								$stylestate = "";
 								$timedown = $this->loc->s("Since-icinga-start");
+								$bgcolor = "orange";
 
 								// Initialize host error array
 								if (!isset($problems[$host])) {
@@ -137,26 +136,33 @@
 								}
 
 								if ($svalues["current_state"] == 1) {
-									$outstate = $this->loc->s("WARN");
-									$stylestate = "color: orange; font-size: 18px;";
-									if ($svalues["last_time_ok"])
+									if ($svalues["last_time_ok"]) {
 										$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
+									}
 									$problems[$host][2]++;
 									$this->warnicinga++;
+									
+									$bgcolor = "orange";
 								}
 								else if ($svalues["current_state"] == 2) {
-									$outstate = $this->loc->s("CRITICAL");
-									$stylestate = "color: red; font-size: 20px;";
-									if ($svalues["last_time_ok"])
+									if ($svalues["last_time_ok"]) {
 										$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
+									}
 
 									$problems[$host][3]++;
 									$this->criticinga++;
+									
+									$bgcolor = "red";
 								}
 									
 								$this->hsicinga++;
-								$problems[$host][1] .= "<tr><td>".$sensor."</td><td style=\"".$stylestate."\">".$outstate.
-	                                "</td><td>".$timedown."</td><td>".$svalues["plugin_output"]."</td></tr>"; 
+								
+								$problems[$host][1] .= sprintf(
+									"<tr style=\"background-color:%s;\"><td>%s</td>
+									<td>%s</td><td>%s</td></tr>",
+	                                $bgcolor, $sensor, $timedown,
+	                                $svalues["plugin_output"]
+								);
 										
 							}
 						}
@@ -165,8 +171,7 @@
 						$this->totalicinga++;
 						if ($hosvalues["current_state"] > 0) {
 							$this->hsicinga++;
-							$outstate = "";
-							$stylestate = "";
+							$bgcolor = "orange";
 							$timedown = $this->loc->s("Since-icinga-start");
 
 							// Initialize host error array
@@ -180,45 +185,59 @@
 								*/
 								$problems[$host] = array($host,"",0,0);
 							}
-
+							
 							if ($hosvalues["current_state"] == 1) {
-								$outstate = $this->loc->s("DOWN");
-								$stylestate = "color: red; font-size: 20px;";
 								if ($hosvalues["last_time_up"])
 									$timedown = FSTimeMgr::timeSince($hosvalues["last_time_up"]);
 
 								$problems[$host][3]++;
 								$this->criticinga++;
+								
+								$bgcolor = "red";
 							}
-							$problems[$host][1] .= "<tr><td>".$this->loc->s("Availability")."</td><td style=\"".$stylestate."\">".$outstate.
-	                            "</td><td>".$timedown."</td><td>".$hosvalues["plugin_output"]."</td></tr>"; 
+							
+							$problems[$host][1] .= sprintf(
+								"<tr style=\"background-color:%s;\"><td>%s</td>
+								<td>%s</td><td>%s</td></tr>",
+	                            $bgcolor, $this->loc->s("Availability"),
+	                            $timedown,
+	                            $hosvalues["plugin_output"]
+							);
 						}
 					}
 				}
 			}
 
 			if ($this->hsicinga > 0) {
+				$output .= "<table>";
 				foreach ($problems as $key => $values) {
-					// Rewrite label
-					$problems[$key][0] .= ": ".($problems[$key][2]+$problems[$key][3])." ".$this->loc->s("alert-s")." (";
+					// Create the host Label
+					$label = $problems[$key][0].": ".
+						($problems[$key][2]+$problems[$key][3])." ".
+						$this->loc->s("alert-s")." (";
 
+					$bgcolor = "orange";
+					
 					if ($problems[$key][2] > 0) {
-						$problems[$key][0] .= $problems[$key][2]." ".$this->loc->s("warning-s");
+						$label .= $problems[$key][2]." ".$this->loc->s("warning-s");
 					}
 
 					if ($problems[$key][3] > 0) {
 						if ($problems[$key][2] > 0) {
-							$problems[$key][0] .= " / ";
+							$label .= " / ";
 						}
-						$problems[$key][0] .= $problems[$key][3]." ".$this->loc->s("critical-s");
+						$label .= $problems[$key][3]." ".$this->loc->s("critical-s");
+						$bgcolor = "red";
 					}
-					$problems[$key][0] .= ")";
-
-					// Write proper table
-					$problems[$key][1] = "<table>".$problems[$key][1]."</table>";
+					$label .= ")";
+					
+					$output .= sprintf("<tr style=\"background-color:%s;
+						font-size:14px;font-weight:bold;\">
+						<td colspan=\"3\">%s</td></tr>%s",
+						$bgcolor, $label, $values[1]);
 				}
-
-				$output .= FS::$iMgr->accordion("icingapb",$problems)."</table>";		
+				
+				$output .= "</table>";
 
 				$js = "";
 
