@@ -29,23 +29,19 @@ background-image: linear-gradient(#000,#3e0000); background-image: -ms-linear-gr
 }
 
 #main_wrapper {
-        overflow-y: scroll;
-        height: 100%;
-}
-
-#main {
+	overflow-y: scroll;
+	height: 100%;
 	background-color: rgba(245, 245, 245, 0.94);
 	background-image: url('/styles/images/z_eye_logo_HD.png');
 	background-repeat: no-repeat;
 	background-position: center center;
+}
+
+#main {
 	height: auto;
 	margin: -8px 0 0;
 	padding: 50px 45px 45px;
-	border-radius: 0px 0px 4px 4px;
-	-webkit-box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.7);
-	box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.7);
 	text-align: center;
-	min-height: 600px;
 }
 
 h1, h2 { color:white; border-radius:2px 0px 0px 2px; margin:30px -45px 30px 0; padding:3px; padding-left: 40px; text-align: left; }
@@ -468,6 +464,8 @@ label { float: left; font-weight: bold; text-align: left; }
 #searchres h3 { padding-left: 15px; }
 #searchres li { margin-bottom: 10px; }
 #searchres li:hover { background-color: rgba(245, 235, 235, 0.94); }
+
+#speedreport { min-width: 750px; width: 48%; margin: 1%; float: left; }
 
 .loader { height: 32px; background-repeat: no-repeat; background-image: url('/styles/images/loader.gif'); width: 32px; margin: 30px; display: inline-block; }
 

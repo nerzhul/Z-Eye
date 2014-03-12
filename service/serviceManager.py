@@ -28,7 +28,7 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 		ZEyeUtil.Thread.__init__(self)
 
 	def run(self):
-		self.launchCmd()
+		self.launchMsg()
 		while True:
 			self.setRunning(True)
 			self.restartIcinga()

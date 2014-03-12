@@ -454,11 +454,13 @@
 					}
 							
 					if (strlen($data["hostname"]) > 0) {
-						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".
+						$data["hostname"]."<br />";
 					}
 
 					if (strlen($data["macaddr"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".FS::$iMgr->aLink($this->mid.
+						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".
+							FS::$iMgr->aLink($this->mid.
 							"&s=".$data["macaddr"], $data["macaddr"])."<br />";
 					}
 
@@ -490,7 +492,9 @@
 					}
 					$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
 					if (strlen($data["ip"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-ip")."</b>: ".$data["ip"]."<br />";
+						$output .= "<b>".$this->loc->s("link-ip")."</b>: ".
+							FS::$iMgr->aLink($this->mid.
+								"&s=".$data["ip"], $data["ip"])."<br />";
 					}
 					
 					if (strlen($data["macaddr"]) > 0) {

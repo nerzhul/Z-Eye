@@ -66,6 +66,10 @@
 				$alerts["icinga"][0] .= "<br />".($this->hsicinga)." ".
 					$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors");
 			}
+			
+			$output .= "<div id=\"speedreport\">".
+				FS::$iMgr->accordion("icingarep",$alerts).
+				"</div>";
 
 			$netbuffer = $this->showNetworkReporting();
 			// Fake score for BW if there is now results
@@ -73,15 +77,29 @@
 				$this->BWtotalscore = 100;
 				$this->BWscore = 100;
 			}
-			$alerts["net"] = array("<b>".$this->loc->s("state-net")."</b> ".FS::$iMgr->progress("nhealth",
-				$this->BWscore,$this->BWtotalscore),$netbuffer);
+			
+			$alerts = array();
+			$alerts["net"] = array("<b>".$this->loc->s("state-net")."</b> ".
+				FS::$iMgr->progress("nhealth",
+					$this->BWscore,$this->BWtotalscore),$netbuffer);
 
+			$output .= "<div id=\"speedreport\">".
+				FS::$iMgr->accordion("netrep",$alerts).
+				"</div>";
+			
+			$alerts = array();
 			$secbuffer = $this->showSecurityReporting();
-			$alerts["sec"] = array("<b>".$this->loc->s("state-security")."</b> ".FS::$iMgr->progress("sechealth",
-				$this->SECscore,$this->SECtotalscore),$secbuffer);
+			$alerts["sec"] = array("<b>".$this->loc->s("state-security")."</b> ".
+				FS::$iMgr->progress("sechealth",
+					$this->SECscore,$this->SECtotalscore),$secbuffer);
 
-			$output .= FS::$iMgr->accordion("alertreport",$alerts);
-			if (!FS::isAjaxCall()) $output .= "</div>";
+			$output .= "<div id=\"speedreport\">".
+				FS::$iMgr->accordion("secrep",$alerts).
+				"</div>";
+				
+			if (!FS::isAjaxCall()) {
+				$output .= "</div>";
+			}
 
 			return $output;
 		}
