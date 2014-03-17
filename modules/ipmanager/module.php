@@ -1728,8 +1728,10 @@
 					}
 					
 					// @TODO check if IPv6 network is used elsewhere
-					if ($netidv6 && !$prefixlen || $prefixlen && !$netidv6 || !FS::$secMgr->isIPv6NetworkAddr($netidv6) || 
-						!FS::$secMgr->isNumeric($prefixlen) || $prefixlen < 1 || $prefixlen > 126) {
+					if ($prefixlen && (!$netidv6 ||	!FS::$secMgr->isNumeric($prefixlen)) ||
+						$netidv6 && 
+							(!$prefixlen || !FS::$secMgr->isIPv6NetworkAddr($netidv6) ||
+							$prefixlen < 1 || $prefixlen > 126)) {
 							$this->log(2,"Add/Edit subnet: subnet '".$netid."': invalid IPv6 infos");
 							FS::$iMgr->ajaxEcho("err-subnet-bad-ipv6-infos");
 							return;
