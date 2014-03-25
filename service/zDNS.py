@@ -20,7 +20,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, sys, thread, subprocess, string, time, commands, re
+import sys, thread, subprocess, string, time, commands, re
 
 import dns.query
 import dns.resolver

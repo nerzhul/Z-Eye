@@ -17,7 +17,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import datetime, sys, re, time, thread, subprocess
+import sys, re, time, thread, subprocess
 
 import ZEyeUtil, zConfig
 from DatabaseManager import ZEyeSQLMgr
