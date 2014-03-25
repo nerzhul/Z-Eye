@@ -856,4 +856,104 @@
 			return $output;
 		}
 	};
+	
+	final class icingaTimePeriod extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_timeperiods";
+			$this->readRight = "mrule_icinga_tp_write";
+			$this->writeRight = "mrule_icinga_tp_write";
+		}
+		
+		protected function Load($name = "") {
+			// @TODO
+		}
+		
+		public function getSelect($name, $selected) {
+			return FS::$iMgr->select($name).
+				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","name",
+					array("labelfield" => "alias",
+						"selected" => array($selected),
+						"sqlopts" => array("order" => "alias"))).
+				"</select>";
+		}
+	};
+			
+	final class icingaNotificationStrategy extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_notif_strategy";
+			$this->readRight = "mrule_icinga_notif_write";
+			$this->writeRight = "mrule_icinga_notif_write";
+		}
+		
+		protected function Load($name = "") {
+			$this->name = $name;
+			
+			$this->alias = "";
+			$this->interval = 0; $this->period = "";
+			$this->upDownEvent = true; $this->criticalEvent = true;
+			$this->warningEvent = true; $this->unavailableEvent = true;
+			$this->flappingEvent = true; $this->recoveryEvent = true;
+			$this->scheduledEvent = true;
+			
+			if ($name) {
+				$query = FS::$dbMgr->Select($this->sqlTable,"alias, interval, period, ev_updown, ev_crit, ev_warn, ev_unavailable, ev_flap, ev_recovery, ev_scheduled",
+					"name = '".$name."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->alias = $data["alias"];
+					$this->interval = $data["interval"];
+					$this->period = $data["period"];
+					$this->upDownEvent = ($data["ev_updown"] == 't');
+					$this->criticalEvent = ($data["ev_crit"] == 't');
+					$this->warningEvent = ($data["ev_warn"] == 't');
+					$this->unavailableEvent = ($data["ev_unavailable"] == 't');
+					$this->flappingEvent = ($data["ev_flap"] == 't');
+					$this->recoveryEvent = ($data["ev_recovery"] == 't');
+					$this->scheduledEvent = ($data["ev_scheduled"] == 't');
+				}
+				else {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public function showForm($name = "") {
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError("err-no-right");
+			}
+			$this->Load($name);
+
+			$tpSelect = (new icingaTimePeriod())->getSelect("period", $this->period);
+			
+			return FS::$iMgr->cbkForm("22")."<table>".
+				FS::$iMgr->idxLines(array(
+					array("srvoptcrit","srvoptc",array("value" => $this->criticalEvent,"type" => "chk")),
+					array("srvoptwarn","srvoptw",array("value" => $this->warningEvent,"type" => "chk")),
+					array("srvoptunreach","srvoptu",array("value" => $this->unavailableEvent,"type" => "chk")),
+					array("srvoptrec","srvoptr",array("value" => $this->recoveryEvent,"type" => "chk")),
+					array("srvoptflap","srvoptf",array("value" => $this->flappingEvent,"type" => "chk")),
+					array("srvoptsched","srvopts",array("value" => $this->scheduledEvent,"type" => "chk")),
+					array("notif-interval","interval",array("value" => $this->interval, "type" => "num")),
+					array("notifperiod","",array("value" => $tpSelect, "type" => "raw"))
+				)).
+				FS::$iMgr->aeTableSubmit($this->name != "");
+		}
+		
+		private $name;
+		private $alias;
+		
+		private $interval;
+		private $period;
+		
+		// Boolean values
+		private $upDownEvent;
+		private $criticalEvent;
+		private $warningEvent;
+		private $unavailableEvent;
+		private $flappingEvent;
+		private $recoveryEvent;
+		private $scheduledEvent;
+	};
 ?>

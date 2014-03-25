@@ -33,7 +33,7 @@ import zConfig
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1405"
+	nextDBVersion = "1406"
 	pgsqlCon = None
 	logger = None
 
@@ -283,6 +283,9 @@ class ZEyeDBUpgrade():
 				self.tryAddColumn("z_eye_icinga_commands","syscmd","bool DEFAULT 'f'")
 				self.rawRequest("UPDATE z_eye_icinga_commands set syscmd = 't' WHERE name IN ('notify-host-by-email','notify-service-by-email','process-host-perfdata','process-service-perfdata')")
 				self.setDBVersion("1405")
+			if self.dbVersion == "1405":
+				self.tryCreateTable("z_eye_icinga_notif_strategy","name varchar(64) NOT NULL, alias varchar(64) NOT NULL, interval INT NOT NULL, period VARCHAR(64) NOT NULL, ev_updown boolean NOT NULL, ev_crit boolean NOT NULL, ev_warn boolean NOT NULL, ev_unavailable boolean NOT NULL, ev_flap boolean NOT NULL, ev_recovery boolean NOT NULL, ev_scheduled boolean NOT NULL, PRIMARY KEY(name)")
+				self.setDBVersion("1406")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
@@ -314,14 +317,26 @@ class ZEyeDBUpgrade():
 		self.logger.info("DB Upgrade Done.")
 
 	def fixDBConsistence(self):
+		consistenceError = False
+		
 		pgcursor = self.pgsqlCon.cursor()
 		pgcursor.execute("SELECT count(*) FROM z_eye_icinga_commands WHERE name IN ('notify-host-by-email','notify-service-by-email','process-host-perfdata','process-service-perfdata')")
 		pgres = pgcursor.fetchone()
 		if pgres[0] != 4:
-			self.logger.info("Some Icinga system sensors are missing or wrong. Fixing")
+			consistenceError = True
+			self.logger.debug("Fixing icinga system commands")
+			self.rawRequest("DELETE FROM z_eye_icinga_commands WHERE name IN ('notify-host-by-email','notify-service-by-email','process-host-perfdata','process-service-perfdata')")
 			self.rawRequest("INSERT INTO z_eye_icinga_commands VALUES ('notify-host-by-email','/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$','','t')")
 			self.rawRequest("INSERT INTO z_eye_icinga_commands VALUES ('notify-service-by-email','/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $ HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$','','t')")
 			# @TODO: add missing sensors
+		
+		if consistenceError == True:
+			print "Some system DB entries have been fixed"
+			self.logger.warn("Some system DB entries have been fixed")
+		else:
+			print "System DB entries are OK"
+			self.logger.info("System DB entries are OK")
+			
 
 	def rawRequest(self,request):
 		try:

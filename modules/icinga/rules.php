@@ -27,6 +27,7 @@
 				array($this->loc->s("rule-modify-cmd"),			"mrule_icinga_cmd_write"),
 				array($this->loc->s("rule-modify-ctg"),			"mrule_icinga_ctg_write"),
 				array($this->loc->s("rule-modify-contact"),		"mrule_icinga_ct_write"),
+				array($this->loc->s("rule-modify-notif"),		"mrule_icinga_notif_write"),
 				array($this->loc->s("rule-modify-timeperiod"),		"mrule_icinga_tp_write"),
 				array($this->loc->s("rule-modify-service"),		"mrule_icinga_srv_write"),
 				array($this->loc->s("rule-modify-hg"),			"mrule_icinga_hg_write"),

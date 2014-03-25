@@ -47,20 +47,38 @@
 				$output .= FS::$iMgr->h1("title-icinga");
 				$panElmts = array();
 				$panElmts[] = array(1,"mod=".$this->mid,$this->loc->s("General"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_host_write"))
+				if (FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
 					$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("Hosts"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+				}
+				
+				if (FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 					$panElmts[] = array(3,"mod=".$this->mid,$this->loc->s("Hostgroups"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write"))
+				}
+				
+				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 					$panElmts[] = array(4,"mod=".$this->mid,$this->loc->s("Services"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+				}
+				
+				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 					$panElmts[] = array(5,"mod=".$this->mid,$this->loc->s("Timeperiods"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+				}
+				
+				if (FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
+					$panElmts[] = array(9,"mod=".$this->mid,$this->loc->s("Notification-strategies"));
+				}
+				
+				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 					$panElmts[] = array(6,"mod=".$this->mid,$this->loc->s("Contacts"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+				}
+				
+				if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
 					$panElmts[] = array(7,"mod=".$this->mid,$this->loc->s("Contactgroups"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write"))
+				}
+				
+				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 					$panElmts[] = array(8,"mod=".$this->mid,$this->loc->s("Commands"));
+				}
+				
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				return $output;
 			}
@@ -78,7 +96,8 @@
 				case 6: $output .= $this->showContactsTab(); break;
 				case 7: $output .= $this->showContactgroupsTab(); break;
 				case 8: $output .= $this->showCommandTab(); break;
-				// @TODO: case 9: service group
+				case 9: $output .= $this->showNotificationStrategiesTab(); break;
+				// @TODO: case 10: service group
 			}
 			return $output;
 		}
@@ -346,9 +365,9 @@
 				}
 			}
 			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("16");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-			$output .= FS::$iMgr->idxLine("is-template","istemplate",array("value" => false,"type" => "chk"));
+			$output = FS::$iMgr->cbkForm("16").
+				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				FS::$iMgr->idxLine("is-template","istemplate",array("value" => false,"type" => "chk"));
 			//$output .= template list
 
 			// Global
@@ -356,38 +375,41 @@
 			// @ TODO support hostlist
 			$output .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false,($hosttype && $host ? array($hosttype."$".$host) : array()))."</td></tr>";
 
-			$output .= FS::$iMgr->idxLine("active-check-en","actcheck",array("value" => $actcheck,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("passive-check-en","pascheck",array("value" => $pascheck,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("parallel-check","parcheck",array("value" => $parcheck,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("obs-over-srv","obsess",array("value" => $obsess,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("check-freshness","freshness",array("value" => $freshness,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("notif-en","notifen",array("value" => $notifen,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("eventhdl-en","eventhdlen",array("value" => $eventhdlen,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("flap-en","flapen",array("value" => $flapen,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("failpredict-en","failpreden",array("value" => $failpreden,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("perfdata","perfdata",array("value" => $perfdata,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("retainstatus","retstatus",array("value" => $retstatus,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("retainnonstatus","retnonstatus",array("value" => $retnonstatus,"type" => "chk"));
+			$output .= FS::$iMgr->idxLines(array(
+				array("active-check-en","actcheck",array("value" => $actcheck,"type" => "chk")),
+				array("passive-check-en","pascheck",array("value" => $pascheck,"type" => "chk")),
+				array("parallel-check","parcheck",array("value" => $parcheck,"type" => "chk")),
+				array("obs-over-srv","obsess",array("value" => $obsess,"type" => "chk")),
+				array("check-freshness","freshness",array("value" => $freshness,"type" => "chk")),
+				array("notif-en","notifen",array("value" => $notifen,"type" => "chk")),
+				array("eventhdl-en","eventhdlen",array("value" => $eventhdlen,"type" => "chk")),
+				array("flap-en","flapen",array("value" => $flapen,"type" => "chk")),
+				array("failpredict-en","failpreden",array("value" => $failpreden,"type" => "chk")),
+				array("perfdata","perfdata",array("value" => $perfdata,"type" => "chk")),
+				array("retainstatus","retstatus",array("value" => $retstatus,"type" => "chk")),
+				array("retainnonstatus","retnonstatus",array("value" => $retnonstatus,"type" => "chk"))
+			));
 
 			// Checks
-			$output .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd",$checkcmd)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("checkperiod")."</td><td>".$this->getTimePeriodList("checkperiod",$checkperiod)."</td></tr>";
-			$output .= FS::$iMgr->idxLine("check-interval","checkintval",array("value" => $checkintval, "type" => "num"));
-			$output .= FS::$iMgr->idxLine("retry-check-interval","retcheckintval",array("value" => $retcheckintval, "type" => "num"));
-			$output .= FS::$iMgr->idxLine("max-check","maxcheck",array("value" => $maxcheck, "type" => "num"));
-
-			// Notifications
-			$output .= "<tr><td>".$this->loc->s("notifperiod")."</td><td>".$this->getTimePeriodList("notifperiod",$notifperiod)."</td></tr>";
-			$output .= FS::$iMgr->idxLine("srvoptcrit","srvoptc",array("value" => $srvoptc,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("srvoptwarn","srvoptw",array("value" => $srvoptw,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("srvoptunreach","srvoptu",array("value" => $srvoptu,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("srvoptrec","srvoptr",array("value" => $srvoptr,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("srvoptflap","srvoptf",array("value" => $srvoptf,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("srvoptsched","srvopts",array("value" => $srvopts,"type" => "chk"));
-			$output .= FS::$iMgr->idxLine("notif-interval","notifintval",array("value" => $notifintval, "type" => "num"));
-			// @ TODO support for contact not only contactlist
-			$output .= "<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$ctg)."</td></tr>";
-			$output .= FS::$iMgr->aeTableSubmit($name == "");
+			$output .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd",$checkcmd)."</td></tr>".
+				"<tr><td>".$this->loc->s("checkperiod")."</td><td>".(new icingaTimePeriod())->getSelect("checkperiod",$checkperiod)."</td></tr>".
+				FS::$iMgr->idxLines(array(
+					array("check-interval","checkintval",array("value" => $checkintval, "type" => "num")),
+					array("retry-check-interval","retcheckintval",array("value" => $retcheckintval, "type" => "num")),
+					array("max-check","maxcheck",array("value" => $maxcheck, "type" => "num"))
+				)).
+				"<tr><td>".$this->loc->s("notifperiod")."</td><td>".(new icingaTimePeriod())->getSelect("notifperiod",$notifperiod)."</td></tr>".
+				FS::$iMgr->idxLines(array(
+					array("srvoptcrit","srvoptc",array("value" => $srvoptc,"type" => "chk")),
+					array("srvoptwarn","srvoptw",array("value" => $srvoptw,"type" => "chk")),
+					array("srvoptunreach","srvoptu",array("value" => $srvoptu,"type" => "chk")),
+					array("srvoptrec","srvoptr",array("value" => $srvoptr,"type" => "chk")),
+					array("srvoptflap","srvoptf",array("value" => $srvoptf,"type" => "chk")),
+					array("srvoptsched","srvopts",array("value" => $srvopts,"type" => "chk")),
+					array("notif-interval","notifintval",array("value" => $notifintval, "type" => "num"))
+				)).
+				"<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$ctg)."</td></tr>".
+				FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
 
@@ -582,7 +604,7 @@
 			//$output .= template list
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name).
 				FS::$iMgr->idxLine("Email","mail",array("value" => $mail)).
-				"<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".$this->getTimePeriodList("srvnotifperiod",$srvnotifperiod)."</td></tr>".
+				"<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".(new icingaTimePeriod())->getSelect("srvnotifperiod",$srvnotifperiod)."</td></tr>".
 				FS::$iMgr->idxLine("srvoptcrit","srvoptc",array("value" => $srvoptc,"type" => "chk")).
 				FS::$iMgr->idxLine("srvoptwarn","srvoptw",array("value" => $srvoptw,"type" => "chk")).
 				FS::$iMgr->idxLine("srvoptunreach","srvoptu",array("value" => $srvoptu,"type" => "chk")).
@@ -590,7 +612,7 @@
 				FS::$iMgr->idxLine("srvoptflap","srvoptf",array("value" => $srvoptf,"type" => "chk")).
 				FS::$iMgr->idxLine("srvoptsched","srvopts",array("value" => $srvopts,"type" => "chk")).
 				"<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd",$srvnotifcmd)."</td></tr>".
-				"<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".$this->getTimePeriodList("hostnotifperiod",$hostnotifperiod)."</td></tr>".
+				"<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".(new icingaTimePeriod())->getSelect("hostnotifperiod",$hostnotifperiod)."</td></tr>".
 				FS::$iMgr->idxLine("hostoptdown","hostoptd",array("value" => $hostoptd,"type" => "chk")).
 				FS::$iMgr->idxLine("hostoptunreach","hostoptu",array("value" => $hostoptu,"type" => "chk")).
 				FS::$iMgr->idxLine("hostoptrec","hostoptr",array("value" => $hostoptr,"type" => "chk")).
@@ -651,6 +673,47 @@
 			if ($found) {
 				$output .= "</table>";
 				FS::$iMgr->jsSortTable("tctgList");
+			}
+			return $output;
+		}
+		
+		private function showNotificationStrategiesTab() {
+			FS::$iMgr->setURL("sh=9");
+			
+			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+				return FS::$iMgr->printError("err-no-right");
+			}
+			
+			/*
+			 * Ajax new command
+			 */
+			$output = FS::$iMgr->opendiv(19,$this->loc->s("new-strategy"));
+
+			/*
+			 * Command table
+			 */
+			$found = false;
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_notif_strategy","name,alias","",array("order" => "name"));
+			while ($data = FS::$dbMgr->Fetch($query)) {
+				if (!$found) {
+					$found = true;
+					$output .= "<table id=\"tcmdList\"><thead><tr><th class=\"headerSortDown\">".
+						$this->loc->s("Name")."</th><th>".
+						$this->loc->s("Alias")."</th><th></th></tr></thead>";
+				}
+				$output .= "<tr id=\"notifstr_".preg_replace("#[. ]#","-",$data["name"])."\"><td>".
+					FS::$iMgr->opendiv(19,$data["name"],array("lnkadd" => "name=".$data["name"])).
+					"</td><td>".$data["alias"]."</td><td>";
+					FS::$iMgr->removeIcon("mod=".$this->mid."&act=23&notifstr=".$data["name"],
+						array("js" => true,
+							"confirm" => array($this->loc->s("confirm-remove-notif-strategy")."'".$data["name"]."' ?", "Confirm","Cancel")
+						)
+					).
+					"</td></tr>";
+			}
+			if ($found) {
+				$output .= "</table>";
+				FS::$iMgr->jsSortTable("tcmdList");
 			}
 			return $output;
 		}
@@ -730,13 +793,6 @@
 				FS::$iMgr->aeTableSubmit($name == "");
 		}
 
-		public function getTimePeriodList($name,$select = "") {
-			return FS::$iMgr->select($name).
-				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","name",
-					array("labelfield" => "alias", "selected" => array($select),"sqlopts" => array("order" => "alias"))).
-				"</select>";
-		}
-
 		public function genCommandList($name,$tocheck = NULL) {
 			return FS::$iMgr->select($name).
 				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name",
@@ -799,7 +855,6 @@
 
 			return false;
 		}
-		
 				
 		public function loadFooterPlugin() {
 			// Only users with icinga read right can use this module
@@ -933,6 +988,10 @@
 						return FS::$iMgr->printError("err-no-timeperiod");
 					}
 				case 8:
+					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+						return $this->loc->s("err-no-rights");
+					}
+					
 					$ctg = new icingaCtg();
 					return $ctg->showForm();
 				case 9: return $this->showCommandForm();
@@ -1017,6 +1076,13 @@
 					}
 					$service = new icingaService();
 					return $service->showSensors($name);
+				case 19:
+					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
+						return $this->loc->s("err-no-rights");
+					}
+					
+					$ins = new icingaNotificationStrategy();
+					return $ins->showForm();
 				default: return;
 			}
 		}
@@ -1634,6 +1700,12 @@
 						return;
 					}
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#hg_".preg_replace("#[. ]#","-",$name)."');");
+					return;
+				// Add/Edit notification strategy
+				case 22:
+					return;
+				// Remove notification strategy
+				case 23:
 					return;
 			}
 		}
