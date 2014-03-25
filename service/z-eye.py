@@ -26,7 +26,7 @@ import Daemon
 from PeriodicCmd import ZEyePeriodicCmd
 from PortIDCacher import ZEyeSwitchesPortIDCacher
 from SwitchesBackup import ZEyeSwitchesBackup
-from serviceManager import ZEyeServiceMgr
+from zServiceMgr import ServiceMgr
 from DatabaseUpgrader import ZEyeDBUpgrade
 from zDHCP import DHCPManager, DHCPRadiusSyncer, DHCPCleaner
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
@@ -57,7 +57,7 @@ class ZEyeDaemon(Daemon.Daemon):
 		ZEyePeriodicCmd(15*60,40,"Netdisco device discovery","/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()
 		ZEyeSwitchesPortIDCacher(SNMPcc).start()
 		ZEyeSwitchesBackup(SNMPcc).start()
-		ZEyeServiceMgr().start()	
+		ServiceMgr().start()	
 		ZEyeNetdiscoDataRefresher().start()
 
 		DHCPCleaner().start()

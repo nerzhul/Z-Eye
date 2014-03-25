@@ -18,9 +18,9 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import os, re, time, threading, logging, ZEyeUtil
+import os, re, ZEyeUtil
 
-class ZEyeServiceMgr(ZEyeUtil.Thread):
+class ServiceMgr(ZEyeUtil.Thread):
 
 	def __init__(self):
 		self.sleepingTimer = 15
@@ -42,7 +42,7 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 				rf = icingaFile.read()
 				rf = re.sub("\n","",rf)
 				if rf == "1":
-					self.logger.info("ServiceMgr restarted Icinga")
+					self.logInfo("Restarted Icinga")
 					cmd = "service icinga restart"
 					pipe = os.popen(cmd, 'r')
 					text = pipe.read()
@@ -57,7 +57,7 @@ class ZEyeServiceMgr(ZEyeUtil.Thread):
 				rf = snortFile.read()
 				rf = re.sub("\n","",rf)
 				if rf == "1":
-					self.logger.info("ServiceMgr restarted SNORT")
+					self.logInfo("Restarted SNORT")
 					cmd = "service snort restart"
 					pipe = os.popen(cmd, 'r')
 					text = pipe.read()
