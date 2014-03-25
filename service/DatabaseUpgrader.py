@@ -47,6 +47,9 @@ class ZEyeDBUpgrade():
 			print "No upgrade required !"
 			self.logger.info("No database upgrade required !")
 
+		# Check some system informations and fix it
+		self.fixDBConsistence()
+		
 		if(self.pgsqlCon):
 			self.pgsqlCon.close()
 
@@ -272,8 +275,8 @@ class ZEyeDBUpgrade():
 				self.tryAddColumn("z_eye_dhcp_ip","expiration_date","date")
 				self.setDBVersion("1403")
 			if self.dbVersion == "1403":
-				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-host-by-email'")
-				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $ HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$' WHERE cmd = 'notify-service-by-email'")
+				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$' WHERE name = 'notify-host-by-email'")
+				self.rawRequest("UPDATE z_eye_icinga_commands set cmd = '/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $ HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$' WHERE name = 'notify-service-by-email'")
 				self.setDBVersion("1404")
 			if self.dbVersion == "1404":
 				self.tryAddColumn("z_eye_icinga_commands","cmd_comment","text")
@@ -309,6 +312,16 @@ class ZEyeDBUpgrade():
 
 		print "DB Upgrade done."
 		self.logger.info("DB Upgrade Done.")
+
+	def fixDBConsistence(self):
+		pgcursor = self.pgsqlCon.cursor()
+		pgcursor.execute("SELECT count(*) FROM z_eye_icinga_commands WHERE name IN ('notify-host-by-email','notify-service-by-email','process-host-perfdata','process-service-perfdata')")
+		pgres = pgcursor.fetchone()
+		if pgres[0] != 4:
+			self.logger.info("Some Icinga system sensors are missing or wrong. Fixing")
+			self.rawRequest("INSERT INTO z_eye_icinga_commands VALUES ('notify-host-by-email','/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$','','t')")
+			self.rawRequest("INSERT INTO z_eye_icinga_commands VALUES ('notify-service-by-email','/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $ HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$','','t')")
+			# @TODO: add missing sensors
 
 	def rawRequest(self,request):
 		try:

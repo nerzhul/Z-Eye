@@ -914,7 +914,7 @@
 						return $this->showServiceForm();
 					}
 					
-					return FS::$iMgr->printError("err-no-service");
+					return FS::$iMgr->printError("err-no-timeperiods");
 				case 6:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 						return $this->loc->s("err-no-rights");
@@ -930,7 +930,7 @@
 						return $this->showContactForm();
 					}
 					else {
-						return FS::$iMgr->printError("err-no-contact");
+						return FS::$iMgr->printError("err-no-timeperiod");
 					}
 				case 8:
 					$ctg = new icingaCtg();
