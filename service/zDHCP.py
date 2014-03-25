@@ -296,7 +296,7 @@ class DHCPManager(ZEyeUtil.Thread):
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (subnetBuf,subnetpath))
 				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
-				self.logger.info("DHCP Manager: subnets modified on %s" % addr)
+				self.logInfo("subnets modified on %s, asking dhcpd restart" % addr)
 			
 			# check md5 trace to see if reserv file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (reservpath,hashCmd))
@@ -304,11 +304,11 @@ class DHCPManager(ZEyeUtil.Thread):
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (reservBuf,reservpath))
 				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
-				self.logger.info("DHCP Manager: reservations modified on %s" % addr)
+				self.logInfo("reservations modified on %s, asking dhcpd restart" % addr)
 
 			ssh.close()
 		except Exception, e:
-			self.logger.critical("DHCP Manager: %s" % e)
+			self.logCritical(e)
 		finally:
 			self.decrThreadNb()
 
@@ -464,7 +464,7 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 					if len(idx[0]) > 0 and len(idx[1]) > 0 and idx[2] != 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
 						thread.start_new_thread(self.doSyncDHCPRadius,(idx[0],idx[1],idx[2],idx[3],idx[4]))
 		except Exception, e:
-			self.logger.critical("DHCP/Radius Sync: %s" % e)
+			self.logCritical(e)
 			sys.exit(1);
 		finally:
 			if self.zeyeDB != None:
@@ -472,7 +472,7 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				self.logger.debug("DHCP/Radius Sync: waiting %d threads" % self.getThreadNb())
+				self.logDebug("waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
 	def doSyncDHCPRadius(self,dbname,addr,port,groupname,subnet):
@@ -480,7 +480,7 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 		
 		# We test if Radius has been loaded
 		if addr not in self.radiusList or port not in self.radiusList[addr] or dbname not in self.radiusList[addr][port]:
-			self.logger.error("DHCP/Radius Sync: Warning %s cannot be sync with radius (%s:%s/%s). Radius not exists" % (subnet,addr,port,dbname))
+			self.logError("Warning %s cannot be sync with radius (%s:%s/%s). Radius not exists" % (subnet,addr,port,dbname))
 			self.decrThreadNb()
 			return
 		
@@ -491,15 +491,15 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 		zdbMgr = ZEyeSQLMgr()
 		
 		try:
-			self.logger.debug("DHCP/Radius Sync: sync subnet '%s' with '%s:%s/%s'" % (subnet,addr,port,dbname))
+			self.logDebug("sync subnet '%s' with '%s:%s/%s'" % (subnet,addr,port,dbname))
 			if zdbMgr.initForZEye() == False:
-				self.logger.error("DHCP/Radius Sync: unable to connect to Z-Eye database" % (addr,port,dbname))
+				self.logError("unable to connect to Z-Eye database" % (addr,port,dbname))
 				self.decrThreadNb()
 				return
 			
 			radDBMgr = ZEyeSQLMgr()
 			if radDBMgr.configAndTryConnect(dbtype,addr,port,dbname,login,pwd) == False:
-				self.logger.error("DHCP/Radius Sync: unable to connect to %s:%s/%s" % (addr,port,dbname))
+				self.logError("unable to connect to %s:%s/%s" % (addr,port,dbname))
 				self.decrThreadNb()
 				return
 			
@@ -517,11 +517,11 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 				radDBMgr.Insert("radcheck","id,username,attribute,op,value","'%s','%s','Auth-Type',':=','Accept'" % (maxId,mac))
 				
 			radDBMgr.Commit()			
-			self.logger.debug("DHCP/Radius Sync: sync subnet '%s' with '%s:%s/%s' finished" % (subnet,addr,port,dbname))
+			self.logDebug("sync subnet '%s' with '%s:%s/%s' finished" % (subnet,addr,port,dbname))
 			radDBMgr.close()
 			zdbMgr.close()
 		except Exception, e:
-			self.logger.critical("DHCP/Radius Sync: doSyncDHCPRadius %s" % e)
+			self.logCritical("doSyncDHCPRadius %s" % e)
 		finally:
 			self.decrThreadNb()
 	
@@ -558,7 +558,7 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 						if self.ipList[ip] not in self.subnetList[subnet]["mac"]:
 							self.subnetList[subnet]["mac"].append(self.ipList[ip])
 				except Exception, e:
-					self.logger.error("DHCP/Radius Sync: loadSubnetList/Network %s" % e)
+					self.logError("loadSubnetList/Network %s" % e)
 					
 	def loadIPList(self):
 		""" We load IPs from IPM """
@@ -579,7 +579,7 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 			if idx[5] == "pg" or idx[5] == "my":
 				self.radiusList[idx[0]][idx[1]][idx[2]] = (idx[3],idx[4],idx[5])
 			else:
-				self.logger.error("DHCP/Radius Sync: %s is not a valid DB type (%s:%s/%s)" % (idx[0],idx[1],idx[2]))
+				self.logError("%s is not a valid DB type (%s:%s/%s)" % (idx[0],idx[1],idx[2]))
 
 class DHCPCleaner(ZEyeUtil.Thread):
 	zeyeDB = None
@@ -613,7 +613,7 @@ class DHCPCleaner(ZEyeUtil.Thread):
 			self.zeyeDB.Delete("z_eye_dhcp_ip","expiration_date < now()")
 			self.zeyeDB.Commit()
 		except Exception, e:
-			self.logger.critical("DHCP cleaner: %s" % e)
+			self.logCritical(e)
 			sys.exit(1);
 		finally:
 			if self.zeyeDB != None:
@@ -622,5 +622,5 @@ class DHCPCleaner(ZEyeUtil.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
-			self.logger.debug("DHCP cleaner: waiting %d threads" % self.getThreadNb())
+			self.logDebug("waiting %d threads" % self.getThreadNb())
 			time.sleep(1)

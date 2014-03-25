@@ -30,7 +30,7 @@ from zServiceMgr import ServiceMgr
 from DatabaseUpgrader import ZEyeDBUpgrade
 from zDHCP import DHCPManager, DHCPRadiusSyncer, DHCPCleaner
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
-from NetdiscoManager import ZEyeNetdiscoDataRefresher
+from zNetdisco import NetdiscoDataRefresher
 from zDNS import DNSManager, RecordCollector
 from zMRTG import MRTGDiscoverer, MRTGDataRefresher
 import zConfig
@@ -58,7 +58,7 @@ class ZEyeDaemon(Daemon.Daemon):
 		ZEyeSwitchesPortIDCacher(SNMPcc).start()
 		ZEyeSwitchesBackup(SNMPcc).start()
 		ServiceMgr().start()	
-		ZEyeNetdiscoDataRefresher().start()
+		NetdiscoDataRefresher().start()
 
 		DHCPCleaner().start()
 		DHCPManager().start()

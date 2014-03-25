@@ -17,12 +17,12 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import datetime, sys, re, time, thread, threading, subprocess, logging
-from threading import Lock
+import datetime, sys, re, time, thread, subprocess
+
 import ZEyeUtil, zConfig
 from DatabaseManager import ZEyeSQLMgr
 
-class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
+class NetdiscoDataRefresher(ZEyeUtil.Thread):
 	zeyeDB = None
 	
 	def __init__(self):
@@ -48,7 +48,7 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 				if len(idx[0]) > 0:
 					thread.start_new_thread(self.doRefreshDevice,(idx[0],))
 		except Exception, e:
-			self.logger.critical("Netdisco Data Refresher: %s" % e)
+			self.logCritical(e)
 			sys.exit(1);	
 		finally:
 			if self.zeyeDB != None:
@@ -56,12 +56,12 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				self.logger.debug("Netdisco Data Refresher: waiting %d threads" % self.getThreadNb())
+				self.logDebug("waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 	def doRefreshDevice(self,device):
 		self.incrThreadNb()
-		self.logger.debug("Netdisco Data Refresher: refresh device %s" % device)
+		self.logDebug("refresh device %s" % device)
 		
 		# We refresh all datas
 		try:
@@ -78,9 +78,9 @@ class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):
 			subprocess.check_output(cmd,shell=True)
 			
 		except Exception, e:
-			self.logger.critical("Netdisco Data Refresher: %s (device %s)" % (e,device))
+			self.logCritical("%s (device %s)" % (e,device))
 			self.decrThreadNb()
 			return
 		
-		self.logger.debug("Netdisco Data Refresher: device %s refreshed" % device)
+		self.logDebug("device %s refreshed" % device)
 		self.decrThreadNb()
