@@ -1575,9 +1575,10 @@
 				
 				// No device
 				if ($deviceCount == 0) {
+					// Then 100% OK
 					$pluginTitle = sprintf("%s: %s%% %s",
 						$this->loc->s("Network"),
-						($BWscore/$BWtotalscore*100),
+						100,
 						FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
 					);
 				}
