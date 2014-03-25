@@ -454,12 +454,18 @@
 			
 			for ($i=0;$i<24;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-				$output = sprintf("%s%s",$output, $this->selElmt($txt,$i,$hselect == $i));
+				$output = sprintf("%s%s",
+					$output,
+					$this->selElmt($txt,$i,$hselect == $i)
+				);
 			}
 			$output .= "</select> h ".$this->select($mname);
 			for ($i=0;$i<60;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
-				$output = sprintf("%s%s",$output, $this->selElmt($txt,$i,$mselect == $i));
+				$output = sprintf("%s%s",
+					$output,
+					$this->selElmt($txt,$i,$mselect == $i)
+				);
 			}
 			$output = sprintf("%s</select>", $output);
 
@@ -703,7 +709,7 @@
 		}
 
 		public function selElmt($name,$value,$selected = false,$disabled = false) {
-			return sprintf("<option value=\"%s\"%s>%s</option>",
+			return sprintf("<option value=\"%s\"%s%s>%s</option>",
 				$value,
 				$selected ? " selected=\"selected\"" : "",
 				$disabled ? " disabled=\"disabled\"" : "",
