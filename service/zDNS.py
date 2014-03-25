@@ -69,13 +69,13 @@ class DNSManager(ZEyeUtil.Thread):
 					self.loadZoneList(pgcursor)
 					thread.start_new_thread(self.doConfigDNS,(server,self.serverList[server][0],self.serverList[server][1],self.serverList[server][2],self.serverList[server][3],self.serverList[server][4],self.serverList[server][5],self.serverList[server][6],self.serverList[server][7],self.serverList[server][8],self.serverList[server][9]))
 		except Exception, e:
-			self.logger.critical("DNS Manager: %s" % e)
+			self.logCritical(e)
 			sys.exit(1);
 		finally:
 			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				self.logger.debug("DNS Manager: waiting %d threads" % self.getThreadNb())
+				self.logDebug("waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
 	def doConfigDNS(self,addr,user,pwd,namedpath,chrootpath,mzonepath,szonepath,zeyenamedpath,nsfqdn,tsigtransfer,tsigupdate):
@@ -96,7 +96,7 @@ class DNSManager(ZEyeUtil.Thread):
 			# We get the remote OS for some commands
 			remoteOs = ssh.getRemoteOS()
 			if remoteOs != "Linux" and remoteOs != "FreeBSD" and remoteOs != "OpenBSD":
-				self.logger.error("DNS Manager: %s OS (on %s) is not supported" % (remoteOs,addr))
+				self.logError("%s OS (on %s) is not supported" % (remoteOs,addr))
 				self.decrThreadNb()
 				return
 
@@ -111,10 +111,15 @@ class DNSManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % zeyenamedpath)
 
 			if ssh.isRemoteWritable(zeyenamedpath) == False:
-				self.logger.error("DNS Manager: %s (on %s) is not writable" % (zeyenamedpath,addr))
+				self.logError("%s (on %s) is not writable, no DNS configuration will be done on this server" % (zeyenamedpath,addr))
 				self.decrThreadNb()
 				return
 
+			if ssh.isRemoteWritable("/tmp/dnsrestart") == False:
+				self.logError("/tmp/dnsrestart (on %s) is not writable, no DNS configuration will be done on this server" % (zeyenamedpath,addr))
+				self.decrThreadNb()
+				return
+				
 			# Write options
 			for cluster in self.clusterList:
 				if addr in self.clusterList[cluster][0] or addr in self.clusterList[cluster][1] or addr in self.clusterList[cluster][2]:
@@ -220,7 +225,7 @@ class DNSManager(ZEyeUtil.Thread):
 						for rdata in dnsanswer:
 							tmpcfgbuffer += "\t%s;\n" % rdata.address
 					except DNSException, e:
-						self.logger.error("DNS Manager/doConfigDNS: unable to resolve name %s" % dnsname)
+						self.logError("unable to resolve name %s" % dnsname)
 
 				if len(tmpcfgbuffer) > 0:
 					cfgbuffer += "acl \"%s\" {\n%s};\n" % (acl,tmpcfgbuffer)
@@ -599,9 +604,13 @@ class DNSManager(ZEyeUtil.Thread):
 										for slave in slaveList:
 											zonefile += "\t\t\tNS\t%s.\n" % self.serverList[slave][7]
 								zonefile += "\n$ORIGIN %s.\n" % zone
-								ssh.sendCmd("echo '%s' > %s/%s/%s" % (zonefile,chrootpath,mzonepath,zone))
-								ssh.sendCmd("echo 1 > /tmp/dnsrestart")
-								self.logger.info("DNSManager: file for zone %s created on %s" % (zone,addr))
+								
+								if ssh.isRemoteWritable("%s/%s/%s" % (chrootpath,mzonepath,zone)) == False:
+									self.logError("Unable to write zonefile %s on server %s. Please ensure %s/%s/%s is writable !" % (zone,addr,chrootpath,mzonepath,zone))
+								else:
+									ssh.sendCmd("echo '%s' > %s/%s/%s" % (zonefile,chrootpath,mzonepath,zone))
+									ssh.sendCmd("echo 1 > /tmp/dnsrestart")
+									self.logInfo("file for zone %s created on %s" % (zone,addr))
 						elif self.zoneList[zone][0] == 1 and srvType == 2:
 							"""
 							Verify if zone file exists on slave servers.
@@ -609,7 +618,7 @@ class DNSManager(ZEyeUtil.Thread):
 							"""
 							if ssh.isRemoteExists("%s/%s/%s" % (chrootpath,szonepath,zone)) == False:
 								ssh.sendCmd("echo 1 > /tmp/dnsrestart")
-								self.logger.info("DNSManager: file for zone %s inexistant on %s, asking named restart" % (zone,addr))
+								self.logInfo("file for zone %s inexistant on %s (slave), asking named restart" % (zone,addr))
 								
 			# check md5 trace to see if subnet file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (zeyenamedpath,hashCmd))
@@ -617,11 +626,11 @@ class DNSManager(ZEyeUtil.Thread):
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (cfgbuffer,zeyenamedpath))
 				ssh.sendCmd("echo 1 > /tmp/dnsrestart")
-				self.logger.info("DNSManager: configuration modified on %s" % addr)
+				self.logInfo("configuration modified on %s" % addr)
 			
 			ssh.close()
 		except Exception, e:
-			self.logger.critical("DNS Manager/doConfigDNS: %s" % e)
+			self.logCritical("DNS Manager/doConfigDNS: %s" % e)
 		finally:
 			self.decrThreadNb()
 
@@ -861,12 +870,12 @@ class RecordCollector(ZEyeUtil.Thread):
 
 			pgsqlCon2.commit()
 		except PgSQL.Error, e:
-			self.logger.critical("DNS-Record-Collector: %s" % e)
+			self.logCritical(e)
 		except DNSException, e:
 			# If an exption occurs, it's possible it's a not allowed transfer
-			self.logger.error("DNS-Record-Collector: DNSException on zone '%s' on server '%s'. Please check DNS server logs, transfer seems to be forbidden or server is not accessible" % (zone,server))
+			self.logError("DNSException on zone '%s' on server '%s'. Please check DNS server logs, transfer seems to be forbidden or server is not accessible" % (zone,server))
 		except Exception, e:
-			self.logger.critical("DNS-Record-Collector: FATAL %s" % e)
+			self.logCritical("FATAL %s" % e)
 		finally:
 			self.decrThreadNb()
 
@@ -885,20 +894,20 @@ class RecordCollector(ZEyeUtil.Thread):
 				""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 				time.sleep(1)
 			except StandardError, e:
-				self.logger.critical("DNS-Record-Collector: %s" % e)
+				self.logCritical(e)
 				
 		except PgSQL.Error, e:
-			self.logger.critical("DNS-Record-Collector: Pgsql Error %s" % e)
+			self.logCritical("Pgsql Error %s" % e)
 			return
 		except Exception, e:
-			self.logger.critical("DNS-Record-Collector: FATAL %s" % e)
+			self.logCritical("FATAL %s" % e)
 		finally:
 			if pgsqlCon:
 				pgsqlCon.close()
 			# We must wait 1 sec, else threadCounter == 0 because of fast algo
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				self.logger.debug("DNS-Record-Collector: waiting %d threads" % self.getThreadNb())
+				self.logDebug("waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
 	def loadServerList(self):

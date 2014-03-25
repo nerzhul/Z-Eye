@@ -18,8 +18,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, re, sys, time, thread, threading, subprocess, logging
-from threading import Lock
+import datetime, re, sys, time, thread, subprocess
 from ipcalc import Network
 
 import ZEyeUtil, zConfig
@@ -84,7 +83,7 @@ class DHCPManager(ZEyeUtil.Thread):
 					if len(idx[1]) > 0 and len(idx[2]) > 0 and len(idx[3]) > 0 and len(idx[4]) > 0:
 						thread.start_new_thread(self.doConfigDHCP,(idx[0],idx[1],idx[2],idx[3],idx[4]))
 		except Exception, e:
-			self.logger.critical("DHCP Manager: %s" % e)
+			self.logCritical(e)
 			sys.exit(1);	
 
 		finally:
@@ -120,7 +119,7 @@ class DHCPManager(ZEyeUtil.Thread):
 			# We get the remote OS for some commands
 			remoteOs = ssh.getRemoteOS()
 			if remoteOs != "Linux" and remoteOs != "FreeBSD" and remoteOs != "OpenBSD":
-				self.logger.error("DHCP Manager: %s OS (on %s) is not supported" % (remoteOs,addr))
+				self.logError("%s OS (on %s) is not supported" % (remoteOs,addr))
 				self.decrThreadNb()
 				return
 
@@ -135,7 +134,7 @@ class DHCPManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % reservpath)
 
 			if ssh.isRemoteWritable(reservpath) == False:
-				self.logger.error("DHCP Manager: %s (on %s) is not writable" % (reservpath,addr))
+				self.logError("%s (on %s) is not writable" % (reservpath,addr))
 				self.decrThreadNb()
 				return
 		
@@ -143,7 +142,7 @@ class DHCPManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % subnetpath)
 
 			if ssh.isRemoteWritable(subnetpath) == False:
-				self.logger.error("DHCP Manager: %s (on %s) is not writable" % (subnetpath,addr))
+				self.logError("%s (on %s) is not writable" % (subnetpath,addr))
 				self.decrThreadNb()
 				return
 		
@@ -151,7 +150,7 @@ class DHCPManager(ZEyeUtil.Thread):
 				ssh.sendCmd("touch %s" % "/tmp/dhcprestart")
 
 			if ssh.isRemoteWritable("/tmp/dhcprestart") == False:
-				self.logger.error("DHCP Manager: %s (on %s) is not writable" % ("/tmp/dhcprestart",addr))
+				self.logError("%s (on %s) is not writable" % ("/tmp/dhcprestart",addr))
 				self.decrThreadNb()
 				return
 			
