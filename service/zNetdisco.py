@@ -57,7 +57,7 @@ class NetdiscoDataRefresher(ZEyeUtil.Thread):
 			time.sleep(1)
 			while self.getThreadNb() > 0:
 				self.logDebug("waiting %d threads" % self.getThreadNb())
-			time.sleep(1)
+				time.sleep(1)
 
 	def doRefreshDevice(self,device):
 		self.incrThreadNb()

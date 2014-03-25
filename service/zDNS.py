@@ -20,8 +20,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, sys, thread, subprocess, string, time, commands, threading, re
-from threading import Lock
+import datetime, sys, thread, subprocess, string, time, commands, re
 
 import dns.query
 import dns.resolver
@@ -114,9 +113,12 @@ class DNSManager(ZEyeUtil.Thread):
 				self.logError("%s (on %s) is not writable, no DNS configuration will be done on this server" % (zeyenamedpath,addr))
 				self.decrThreadNb()
 				return
+				
+			if ssh.isRemoteExists("/tmp/dnsrestart") == False:
+				ssh.sendCmd("touch /tmp/dnsrestart")
 
 			if ssh.isRemoteWritable("/tmp/dnsrestart") == False:
-				self.logError("/tmp/dnsrestart (on %s) is not writable, no DNS configuration will be done on this server" % (zeyenamedpath,addr))
+				self.logError("/tmp/dnsrestart (on %s) is not writable, no DNS configuration will be done on this server" % addr)
 				self.decrThreadNb()
 				return
 				
@@ -605,8 +607,9 @@ class DNSManager(ZEyeUtil.Thread):
 											zonefile += "\t\t\tNS\t%s.\n" % self.serverList[slave][7]
 								zonefile += "\n$ORIGIN %s.\n" % zone
 								
+								
 								if ssh.isRemoteWritable("%s/%s/%s" % (chrootpath,mzonepath,zone)) == False:
-									self.logError("Unable to write zonefile %s on server %s. Please ensure %s/%s/%s is writable !" % (zone,addr,chrootpath,mzonepath,zone))
+									self.logError("Unable to write zonefile on server %s. Please ensure %s/%s/%s is writable !" % (addr,chrootpath,mzonepath,zone))
 								else:
 									ssh.sendCmd("echo '%s' > %s/%s/%s" % (zonefile,chrootpath,mzonepath,zone))
 									ssh.sendCmd("echo 1 > /tmp/dnsrestart")
@@ -630,7 +633,7 @@ class DNSManager(ZEyeUtil.Thread):
 			
 			ssh.close()
 		except Exception, e:
-			self.logCritical("DNS Manager/doConfigDNS: %s" % e)
+			self.logCritical("doConfigDNS: %s" % e)
 		finally:
 			self.decrThreadNb()
 
