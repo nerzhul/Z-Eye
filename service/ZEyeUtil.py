@@ -119,6 +119,9 @@ class Thread(threading.Thread):
 
 	def logWarn(self, msg):
 		self.logger.warn("%s: %s" % (self.myName,msg))
+		
+	def logError(self, msg):
+		self.logger.error("%s: %s" % (self.myName,msg))
 
 	def logCritical(self, msg):
 		self.logger.critical("%s: %s" % (self.myName,msg))

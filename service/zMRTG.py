@@ -20,8 +20,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, os, re, sys, time, thread, threading, subprocess, logging
-from threading import Lock
+import datetime, os, re, sys, time, thread, subprocess
 
 import ZEyeUtil
 import zConfig
@@ -45,11 +44,10 @@ class MRTGDiscoverer(ZEyeUtil.Thread):
 
 	def launchCfgGenerator(self):
 		while self.SNMPcc.isRunning():
-			self.logger.debug("MRTG-Config-Discovery: SNMP community caching is running, waiting 10 seconds")
+			self.logDebug("SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
-		self.logger.info("MRTG configuration discovery started")
-		starttime = datetime.datetime.now()
+		self.launchMsg()
 		try:
 			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
@@ -63,15 +61,15 @@ class MRTGDiscoverer(ZEyeUtil.Thread):
 
 					# Only launch process if SNMP cache is ok
 					if devcom == None:
-						self.logger.error("MRTG-Config-Discovery: No read community found for %s" % devname)
+						self.logError("No read community found for %s" % devname)
 					else:
 						thread.start_new_thread(self.fetchMRTGInfos,(devip,devname,devcom))
 			except StandardError, e:
-				self.logger.critical("MRTG-Config-Discovery: %s" % e)
+				self.logCritical(e)
 				return
 				
 		except PgSQL.Error, e:
-			self.logger.critical("MRTG-Config-Discovery: FATAL PgSQL %s" % e)
+			self.logCritical("FATAL PgSQL %s" % e)
 			sys.exit(1);	
 
 		finally:
@@ -81,7 +79,7 @@ class MRTGDiscoverer(ZEyeUtil.Thread):
 		# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 		time.sleep(1)
 		while self.getThreadNb() > 0:
-			self.logger.debug("MRTG configuration discovery waiting %d threads" % self.getThreadNb())
+			self.logDebug("MRTG configuration discovery waiting %d threads" % self.getThreadNb())
 			time.sleep(1)
 
 	def fetchMRTGInfos(self,ip,devname,devcom):
@@ -94,7 +92,7 @@ class MRTGDiscoverer(ZEyeUtil.Thread):
 			cfgfile.writelines(text)
 			cfgfile.close()
 		except Exception, e:
-			self.logger.debug("MRTG-Config-Discovery: %s" % e)
+			self.logDebug(e)
 		finally:
 			self.decrThreadNb()
 
@@ -124,21 +122,21 @@ class MRTGDataRefresher(ZEyeUtil.Thread):
 		try:
 			subprocess.check_output(["/usr/local/bin/perl", "/usr/local/bin/mrtg", "%s" % filename])
 		except Exception, e:
-			self.logger.critical("MRTG Data Refresher: FATAL %s" % e)
+			self.logCritical("FATAL %s" % e)
 		finally:
 			self.decrThreadNb()
 
 	def launchRefreshProcess(self):
 		while self.MRTGcd.isRunning():
-			self.logger.debug("MRTG-Datas-Refresh: SNMP community caching is running, waiting 10 seconds")
+			self.logDebug("SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 		
 		while self.MRTGcd.isRunning():
-			self.logger.debug("MRTG-Datas-Refresh: MRTG Config discovery is running, waiting 10 seconds")
+			self.logDebug("MRTG Config discovery is running, waiting 10 seconds")
 			time.sleep(10)
 		
 		try:
-			self.logger.info("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
+			self.logInfo("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
 
 			_dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
 			for _file in _dir:
@@ -155,4 +153,4 @@ class MRTGDataRefresher(ZEyeUtil.Thread):
 				time.sleep(1)
 			
 		except Exception, e:
-			self.logger.critical("MRTG Data Refresher: %s" % e)
+			self.logCritical(e)
