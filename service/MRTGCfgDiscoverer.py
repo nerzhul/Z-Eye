@@ -23,7 +23,7 @@ import datetime, os, re, sys, time, thread, threading, subprocess, logging
 from threading import Lock
 
 import ZEyeUtil
-import netdiscoCfg
+import zConfig
 
 class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 	SNMPcc = None
@@ -50,7 +50,7 @@ class ZEyeMRTGDiscoverer(ZEyeUtil.Thread):
 		self.logger.info("MRTG configuration discovery started")
 		starttime = datetime.datetime.now()
 		try:
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT ip,name FROM device ORDER BY ip")
 			try:

@@ -19,7 +19,7 @@
 
 import datetime, sys, re, time, thread, threading, subprocess, logging
 from threading import Lock
-import ZEyeUtil, netdiscoCfg
+import ZEyeUtil, zConfig
 from DatabaseManager import ZEyeSQLMgr
 
 class ZEyeNetdiscoDataRefresher(ZEyeUtil.Thread):

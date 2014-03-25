@@ -27,7 +27,7 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
 
 import ZEyeUtil
-import netdiscoCfg
+import zConfig
 from SNMPBroker import ZEyeSNMPBroker
 
 class ZEyeSwitchesBackup(ZEyeUtil.Thread):
@@ -53,7 +53,7 @@ class ZEyeSwitchesBackup(ZEyeUtil.Thread):
 			time.sleep(10)
 
 		try:
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT type,addr,path,login,pwd FROM z_eye_save_device_servers")
 			try:

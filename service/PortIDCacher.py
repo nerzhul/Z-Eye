@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+* Copyright (C) 2010-2014 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ from pyPgSQL import PgSQL
 import datetime, sys, thread, subprocess, string, time, commands, threading, logging
 from threading import Lock
 
-import netdiscoCfg
+import zConfig
 import ZEyeUtil
 
 class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
@@ -52,7 +52,7 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			elif vendor == "dell":
 				text = subprocess.check_output(["/usr/local/bin/snmpwalk","-v","2c","-c","%s" % devcom,"%s" % ip,"ifName"])
 			
-			pgsqlCon2 = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon2 = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor2 = pgsqlCon2.cursor()
 			stopSwIDSearch = 0
 			pgcursor2.execute("DELETE FROM z_eye_port_id_cache WHERE device = '%s'" % devname)
@@ -98,7 +98,7 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			time.sleep(10)
 
 		try:
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost, user=netdiscoCfg.pgUser, password=netdiscoCfg.pgPwd, database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=zConfig.pgHost, user=zConfig.pgUser, password=zConfig.pgPwd, database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT ip,name,vendor FROM device ORDER BY ip")
 			try:

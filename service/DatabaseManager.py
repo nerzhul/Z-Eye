@@ -21,7 +21,7 @@ from pyPgSQL import PgSQL
 import pymysql
 
 import logging
-import netdiscoCfg
+import zConfig
 
 class ZEyeSQLMgr:
 	dbHost = ""
@@ -84,7 +84,7 @@ class ZEyeSQLMgr:
 		return True
 
 	def initForZEye (self):
-		return self.configAndTryConnect("pg",netdiscoCfg.pgHost,0,netdiscoCfg.pgDB,netdiscoCfg.pgUser,netdiscoCfg.pgPwd)
+		return self.configAndTryConnect("pg",zConfig.pgHost,0,zConfig.pgDB,zConfig.pgUser,zConfig.pgPwd)
 		
 	def Select (self, tableName, fields, suffix = ""):
 		if self.dbType == "pg" or self.dbType == "my":

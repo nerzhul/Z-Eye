@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+* Copyright (C) 2010-2014 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ from dns.exception import DNSException
 import dns.tsigkeyring
 
 import logging
-import netdiscoCfg
+import zConfig
 import ZEyeUtil
 from SSHBroker import ZEyeSSHBroker
 
@@ -56,7 +56,7 @@ class DNSManager(ZEyeUtil.Thread):
 
 	def launchDNSManagement(self):
 		try:
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			self.loadServerList(pgcursor)
 			# Only load servers in clusters
@@ -845,7 +845,7 @@ class RecordCollector(ZEyeUtil.Thread):
 		self.incrThreadNb()
 
 		try:
-			pgsqlCon2 = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon2 = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor2 = pgsqlCon2.cursor()
 
 			pgcursor2.execute("DELETE FROM z_eye_dns_zone_record_cache WHERE zonename = '%s' AND server = '%s'" % (zone,server))
@@ -872,7 +872,7 @@ class RecordCollector(ZEyeUtil.Thread):
 
 	def launchCachingProcess(self):
 		try:
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			self.pgcursor = pgsqlCon.cursor()
 			self.loadServerList()
 			self.loadServerZones()

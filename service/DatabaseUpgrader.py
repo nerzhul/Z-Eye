@@ -22,7 +22,7 @@
 from pyPgSQL import PgSQL
 import sys, re, logging
 
-import netdiscoCfg
+import zConfig
 
 """
 * Version nomenclature for DB is:
@@ -426,7 +426,7 @@ class ZEyeDBUpgrade():
 
 	def getDBVersion(self):
 		try:
-			self.pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			self.pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = self.pgsqlCon.cursor()
 			pgcursor.execute("SELECT count(*) FROM pg_tables WHERE tablename='z_eye_db_version'")
 			pgres = pgcursor.fetchone()

@@ -34,7 +34,7 @@ from DHCPManager import ZEyeDHCPManager, ZEyeDHCPRadiusSyncer, ZEyeDHCPCleaner
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
 from NetdiscoManager import ZEyeNetdiscoDataRefresher
 from ZEyeDNS import DNSManager, RecordCollector
-import netdiscoCfg
+import zConfig
 
 class ZEyeDaemon(Daemon.Daemon):
 	def run(self):
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 	formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s')
 	handler.setFormatter(formatter)
 	logger.addHandler(handler) 
-	logger.setLevel(netdiscoCfg.logLevel)
+	logger.setLevel(zConfig.logLevel)
         
 	if len(sys.argv) == 2:
 		if 'start' == sys.argv[1]:
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 			print "Starting Z-Eye daemon"
 			logger.info("Starting Z-Eye daemon")
 			
-			if netdiscoCfg.daemon == True:
+			if zConfig.daemon == True:
 				daemon.start()
 			else:
 				daemon.run()

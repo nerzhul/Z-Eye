@@ -24,7 +24,7 @@ from threading import Lock
 
 import logging
 import ZEyeUtil
-import netdiscoCfg
+import zConfig
 from SNMPBroker import ZEyeSNMPBroker
 
 """
@@ -62,7 +62,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 
 	def launchSNMPCaching(self):
 		try:
-			self.pgcon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			self.pgcon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			self.pgcursor = self.pgcon.cursor()
 			self.pgcursor.execute("SELECT ip,name FROM device ORDER BY ip")
 			try:

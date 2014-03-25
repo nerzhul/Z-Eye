@@ -22,7 +22,7 @@ import datetime, re, sys, time, thread, threading, subprocess, logging
 from threading import Lock
 from ipcalc import Network
 
-import ZEyeUtil, netdiscoCfg
+import ZEyeUtil, zConfig
 from DatabaseManager import ZEyeSQLMgr
 from SSHBroker import ZEyeSSHBroker
 
@@ -65,7 +65,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 
 	def launchDHCPManagement(self):
 		try:
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT addr,sshuser,sshpwd,reservconfpath,subnetconfpath FROM z_eye_dhcp_servers")
 			pgres = pgcursor.fetchall()
@@ -102,7 +102,7 @@ class ZEyeDHCPManager(ZEyeUtil.Thread):
 		reservBuf = ""
 		try:
 			# One pgsql connection per thread
-			pgsqlCon = PgSQL.connect(host=netdiscoCfg.pgHost,user=netdiscoCfg.pgUser,password=netdiscoCfg.pgPwd,database=netdiscoCfg.pgDB)
+			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
 			pgcursor.execute("SELECT clustername FROM z_eye_dhcp_cluster WHERE dhcpaddr = '%s'" % addr)
 			pgres = pgcursor.fetchall()
