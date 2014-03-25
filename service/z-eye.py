@@ -23,8 +23,6 @@ import sys, time, logging
 
 import Daemon
 
-from MRTGCfgDiscoverer import ZEyeMRTGDiscoverer
-from MRTGDataRefresh import ZEyeMRTGDataRefresher
 from PeriodicCmd import ZEyePeriodicCmd
 from PortIDCacher import ZEyeSwitchesPortIDCacher
 from SwitchesBackup import ZEyeSwitchesBackup
@@ -33,7 +31,8 @@ from DatabaseUpgrader import ZEyeDBUpgrade
 from DHCPManager import ZEyeDHCPManager, ZEyeDHCPRadiusSyncer, ZEyeDHCPCleaner
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
 from NetdiscoManager import ZEyeNetdiscoDataRefresher
-from ZEyeDNS import DNSManager, RecordCollector
+from zDNS import DNSManager, RecordCollector
+from zMRTG import MRTGDiscoverer, MRTGDataRefresher
 import zConfig
 
 class ZEyeDaemon(Daemon.Daemon):
@@ -46,7 +45,7 @@ class ZEyeDaemon(Daemon.Daemon):
 		"""
 		time.sleep(1)
 
-		MRTGDiscoveryTask = ZEyeMRTGDiscoverer(SNMPcc)
+		MRTGDiscoveryTask = MRTGDiscoverer(SNMPcc)
 		MRTGDiscoveryTask.start()
 		
 		"""
@@ -54,7 +53,7 @@ class ZEyeDaemon(Daemon.Daemon):
 		"""
 		time.sleep(1)
 		
-		ZEyeMRTGDataRefresher(MRTGDiscoveryTask).start()
+		MRTGDataRefresher(MRTGDiscoveryTask).start()
 		ZEyePeriodicCmd(15*60,40,"Netdisco device discovery","/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()
 		ZEyeSwitchesPortIDCacher(SNMPcc).start()
 		ZEyeSwitchesBackup(SNMPcc).start()
