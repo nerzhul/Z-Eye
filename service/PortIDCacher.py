@@ -20,8 +20,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, sys, thread, subprocess, string, time, commands, threading, logging
-from threading import Lock
+import sys, thread, subprocess, string, time
 
 import zConfig
 import ZEyeUtil
@@ -88,13 +87,13 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			pgcursor2.close()
 			pgsqlCon2.close()
 		except Exception, e:
-			self.logger.critical("Port ID Caching: %s" % e)
+			self.logCritical(e)
 
 		self.decrThreadNb()
 
 	def launchCachingProcess(self):
 		while self.SNMPcc.isRunning():
-			self.logger.debug("Port-ID-Caching: SNMP community caching is running, waiting 10 seconds")
+			self.logDebug("SNMP community caching is running, waiting 10 seconds")
 			time.sleep(10)
 
 		try:
@@ -113,16 +112,16 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 
 					devcom = self.SNMPcc.getReadCommunity(devname)
 					if devcom == None:
-						self.logger.error("Port-ID-Caching: No read community found for %s" % devname)
+						self.logError("No read community found for %s" % devname)
 					else:
 						thread.start_new_thread(self.fetchSNMPInfos,(devip,devname,devcom,vendor))
 				""" Wait 1 second to lock program, else if script is too fast,it exists without discovering"""
 				time.sleep(1)
 			except StandardError, e:
-				self.logger.critical("Port-ID-Caching: %s" % e)
+				self.logCritical(e)
 				
 		except PgSQL.Error, e:
-			self.logger.critical("Port-ID-Caching: Pgsql Error %s" % e)
+			self.logCritical("Pgsql Error %s" % e)
 			return
 		finally:
 			if pgsqlCon:
@@ -131,5 +130,5 @@ class ZEyeSwitchesPortIDCacher(ZEyeUtil.Thread):
 			# We must wait 1 sec, else threadCounter == 0 because of fast algo
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				self.logger.debug("Port-ID-Caching: waiting %d threads" % self.getThreadNb())
+				self.logDebug("waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
