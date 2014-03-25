@@ -47,4 +47,4 @@ class ZEyePeriodicCmd(ZEyeUtil.Thread):
 		try:
 			subprocess.check_output(self.processCmd,shell=True)
 		except Exception, e:
-			self.logger.critical("%s: FATAL %s" % (self.processName,e))
+			self.logCritical(e)

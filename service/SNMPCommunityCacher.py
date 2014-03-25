@@ -19,10 +19,9 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, re, sys, time, thread, subprocess, threading
+import re, sys, time, thread, subprocess
 from threading import Lock
 
-import logging
 import ZEyeUtil
 import zConfig
 from SNMPBroker import ZEyeSNMPBroker
@@ -73,18 +72,18 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 					for idx in pgres:
 						thread.start_new_thread(self.searchCommunities,(idx[0],idx[1]))
 			except StandardError, e:
-				self.logger.critical("SNMP-Communities-Caching: %s" % e)
+				self.logCritical(e)
 
 			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
 			time.sleep(1)
 			while self.getThreadNb() > 0:
-				self.logger.debug("SNMP communities caching waiting %d threads" % self.getThreadNb())
+				self.logDebug("waiting %d threads" % self.getThreadNb())
 				time.sleep(1)
 
 			# All threads have finished, now we can write cache to DB
 			self.registerCommunities()
 		except PgSQL.Error, e:
-			self.logger.critical("SNMP-Communities-Caching: FATAL PgSQL %s" % e)
+			self.logCritical("FATAL PgSQL %s" % e)
 			sys.exit(1);	
 
 		finally:
@@ -128,7 +127,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 
 			self.setDevCommunities(name,foundro,foundrw)
 		except Exception, e:
-			self.logger.critical("SNMP-Communities-Caching: search %s" % e)
+			self.logCritical("FATAL Error on searchCommunities %s" % e)
 		finally:
 			self.decrThreadNb()
 

@@ -59,6 +59,8 @@ class Thread(threading.Thread):
 		threading.Thread.__init__(self)
 		self.logger = logging.getLogger("Z-Eye")
 
+	# Thread numbering
+	
 	def incrThreadNb(self):
 		self.threadCounterMutex.acquire()
 		self.threadCounter += 1
@@ -75,6 +77,8 @@ class Thread(threading.Thread):
 		val = self.threadCounter
 		self.threadCounterMutex.release()
 		return val
+	
+	# Running states 
 	
 	def setRunning(self,runStatus):
 		self.runningMutex.acquire()
@@ -95,6 +99,8 @@ class Thread(threading.Thread):
 		self.runningMutex.release()
 		return rs
 
+	# Service messages
+	
 	def launchMsg(self):
 		self.logger.info("%s launched" % self.myName)
 		
@@ -104,3 +110,15 @@ class Thread(threading.Thread):
 	def endMsg(self):
 		totaltime = datetime.datetime.now() - self.runStartTime 
 		self.logger.info("%s done (time: %s)" % (self.myName,totaltime))
+	
+	def logDebug(self, msg):
+		self.logger.debug("%s: %s" % (self.myName,msg))
+	
+	def logInfo(self, msg):
+		self.logger.info("%s: %s" % (self.myName,msg))
+
+	def logWarn(self, msg):
+		self.logger.warn("%s: %s" % (self.myName,msg))
+
+	def logCritical(self, msg):
+		self.logger.critical("%s: %s" % (self.myName,msg))

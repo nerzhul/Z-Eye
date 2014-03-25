@@ -28,7 +28,7 @@ from PortIDCacher import ZEyeSwitchesPortIDCacher
 from SwitchesBackup import ZEyeSwitchesBackup
 from serviceManager import ZEyeServiceMgr
 from DatabaseUpgrader import ZEyeDBUpgrade
-from DHCPManager import ZEyeDHCPManager, ZEyeDHCPRadiusSyncer, ZEyeDHCPCleaner
+from zDHCP import DHCPManager, DHCPRadiusSyncer, DHCPCleaner
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
 from NetdiscoManager import ZEyeNetdiscoDataRefresher
 from zDNS import DNSManager, RecordCollector
@@ -60,9 +60,9 @@ class ZEyeDaemon(Daemon.Daemon):
 		ZEyeServiceMgr().start()	
 		ZEyeNetdiscoDataRefresher().start()
 
-		ZEyeDHCPCleaner().start()
-		ZEyeDHCPManager().start()
-		ZEyeDHCPRadiusSyncer().start()
+		DHCPCleaner().start()
+		DHCPManager().start()
+		DHCPRadiusSyncer().start()
 			
 		DNSManager().start()
 		RecordCollector().start()
