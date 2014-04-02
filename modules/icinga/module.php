@@ -1703,9 +1703,13 @@
 					return;
 				// Add/Edit notification strategy
 				case 22:
+					$icingaNotifStr = new icingaNotificationStrategy();
+					$icingaNotifStr->Modify();
 					return;
 				// Remove notification strategy
 				case 23:
+					$icingaNotifStr = new icingaNotificationStrategy();
+					$icingaNotifStr->Remove();
 					return;
 			}
 		}

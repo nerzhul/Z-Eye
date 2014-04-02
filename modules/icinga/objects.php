@@ -919,6 +919,112 @@
 			return true;
 		}
 		
+		public function Modify() {
+			if(!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			}
+			
+			$name = FS::$secMgr->getPost("name","w");
+			$alias = FS::$secMgr->checkAndSecurisePostData("alias");
+			$hostoptd = FS::$secMgr->checkAndSecurisePostData("hostoptd");
+			$srvoptc = FS::$secMgr->checkAndSecurisePostData("srvoptc");
+			$srvoptw = FS::$secMgr->checkAndSecurisePostData("srvoptw");
+			$srvoptu = FS::$secMgr->checkAndSecurisePostData("srvoptu");
+			$srvoptr = FS::$secMgr->checkAndSecurisePostData("srvoptr");
+			$srvoptf = FS::$secMgr->checkAndSecurisePostData("srvoptf");
+			$srvopts = FS::$secMgr->checkAndSecurisePostData("srvopts");
+			$interval = FS::$secMgr->checkAndSecurisePostData("interval");
+			$period = FS::$secMgr->checkAndSecurisePostData("period");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+			
+			if (!$name || !$alias || !$period || $interval === NULL ||
+				!FS::$secMgr->isNumeric($interval)) {
+				echo FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}
+			
+			// Now verify datas
+			if($edit) {
+				if(!FS::$dbMgr->GetOneData($this->sqlTable,"name",
+					"name = '".$name."'")) {
+					FS::$iMgr->ajaxEcho("err-data-not-exist");
+					return;
+				}
+			}
+			else {
+				if(FS::$dbMgr->GetOneData($this->sqlTable,"name",
+					"name = '".$name."'")) {
+					FS::$iMgr->ajaxEchoNC("err-data-exist");
+					return;
+				}
+			}
+			
+			// Check if TP exists
+			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix().
+				"icinga_timeperiods","name","name = '".$period."'")) {
+				FS::$iMgr->ajaxEcho(
+					$this->loc->s("err-timeperiod-not-exists"), $period),
+					"",false);
+				return;
+			}
+			
+			FS::$dbMgr->BeginTr();
+			
+			if($edit) {
+				FS::$dbMgr->Delete($this->sqlTable,"name = '".$name."'");
+			}
+			
+			FS::$dbMgr->Insert($this->sqlTable,"name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled",
+				"'".$name."','".$alias."','".$interval."','".$period."','".
+				($hostoptd == "on" ? 't' : 'f')."','".($srvoptc == "on" ? 't' : 'f')."','".
+				($srvoptw == "on" ? 't' : 'f')."','".($srvoptu == "on" ? 't' : 'f')."','".
+				($srvoptf == "on" ? 't' : 'f')."','".($srvoptr == "on" ? 't' : 'f')."','".
+				($srvopts == "on" ? 't' : 'f'));
+				
+			FS::$dbMgr->CommitTr();
+			
+			$icingaAPI = new icingaBroker();
+			
+			// Write icinga configuration
+			if(!$icingaAPI->writeConfiguration()) {
+				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				return;
+			}
+			
+			FS::$iMgr->redir("mod=".$this->mid."&sh=9",true);
+		}
+		
+		public function Remove() {
+			if(!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			}
+			
+			$name = FS::$secMgr->checkAndSecuriseGetData("name");
+			
+			if(!FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$name."'")) {
+				FS::$iMgr->ajaxEcho("err-data-not-exist");
+				return;
+			}
+			
+			$this->removeFromDB($name);
+
+			$icingaAPI = new icingaBroker();
+			if(!$icingaAPI->writeConfiguration()) {
+				FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
+				return;
+			}
+			
+			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#notifstr_".preg_replace("#[. ]#","-",$name)."');");
+		}
+		
+		protected function removeFromDB($name) {
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete($this->sqlTable,"name = '".$name."'");
+			FS::$dbMgr->CommitTr();
+		}
+		
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
 				return FS::$iMgr->printError("err-no-right");
@@ -929,6 +1035,9 @@
 			
 			return FS::$iMgr->cbkForm("22")."<table>".
 				FS::$iMgr->idxLines(array(
+					array("Name","name",array("type" => "idxedit", "value" => $this->name, "length" => 60, "size" => 30)),
+					array("Alias","alias",array("value" => $this->alias, "length" => 60, "size" => 30)),
+					array("hostoptdown","hostoptd",array("value" => $this->upDownEvent,"type" => "chk")),
 					array("srvoptcrit","srvoptc",array("value" => $this->criticalEvent,"type" => "chk")),
 					array("srvoptwarn","srvoptw",array("value" => $this->warningEvent,"type" => "chk")),
 					array("srvoptunreach","srvoptu",array("value" => $this->unavailableEvent,"type" => "chk")),
