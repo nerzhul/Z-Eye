@@ -34,41 +34,44 @@
 	require_once(dirname(__FILE__)."/modules/AndroidMgr.class.php");
 
 	//$start_time = microtime(true);
+	
+	if (FS::checkPHPDependencies()) {
 
-	FS::LoadFSModules();
+		FS::LoadFSModules();
 
-	FS::$sessMgr->Start();
+		FS::$sessMgr->Start();
 
-	if (FS::isAJAXCallNoHack()) {
-		FS::$ajaxMgr->handle();
+		if (FS::isAJAXCallNoHack()) {
+			FS::$ajaxMgr->handle();
+		}
+		else if (FS::isAndroidCall()) {
+			$aMgr = new AndroidMgr();
+			$aMgr->Work();
+		}
+		else if (FS::isActionToDo()) {
+			$aMgr = new ActionMgr();
+			$aMgr->DoAction(FS::$secMgr->checkAndSecuriseGetData("act"));
+		}
+		else {
+			FS::$sessMgr->InitSessionIfNot();
+			FS::$iMgr->stylesheet("/styles/z-eye.css");
+			FS::$iMgr->jsinc("/lib/jQuery/req.min.js");
+			FS::$iMgr->jsinc("/lib/jQuery/jquery.jqzoom.js");
+			FS::$iMgr->jsinc("/lib/jQuery/jquery.colorpicker.js");
+			FS::$iMgr->jsinc("/lib/jQuery/springy.js");
+			FS::$iMgr->jsinc("/lib/jQuery/springyui.js");
+			FS::$iMgr->jsinc("/lib/FSS/js/FSS.js");
+			FS::$iMgr->jsinc("/lib/Sigma/sigma.min.js");
+
+			echo FS::$iMgr->content();
+			echo FS::$iMgr->renderJS();
+			echo FS::$iMgr->footer();
+		}
+		/* For optimize times
+		$end_time = microtime(true);
+			$script_time = $end_time - $start_time;
+		echo $script_time; */
+
+		FS::UnloadFSModules();
 	}
-	else if (FS::isAndroidCall()) {
-		$aMgr = new AndroidMgr();
-		$aMgr->Work();
-	}
-	else if (FS::isActionToDo()) {
-		$aMgr = new ActionMgr();
-		$aMgr->DoAction(FS::$secMgr->checkAndSecuriseGetData("act"));
-	}
-	else {
-		FS::$sessMgr->InitSessionIfNot();
-		FS::$iMgr->stylesheet("/styles/z-eye.css");
-		FS::$iMgr->jsinc("/lib/jQuery/req.min.js");
-		FS::$iMgr->jsinc("/lib/jQuery/jquery.jqzoom.js");
-		FS::$iMgr->jsinc("/lib/jQuery/jquery.colorpicker.js");
-		FS::$iMgr->jsinc("/lib/jQuery/springy.js");
-		FS::$iMgr->jsinc("/lib/jQuery/springyui.js");
-		FS::$iMgr->jsinc("/lib/FSS/js/FSS.js");
-		FS::$iMgr->jsinc("/lib/Sigma/sigma.min.js");
-
-		echo FS::$iMgr->content();
-		echo FS::$iMgr->renderJS();
-		echo FS::$iMgr->footer();
-	}
-	/* For optimize times
-	$end_time = microtime(true);
-        $script_time = $end_time - $start_time;
-	echo $script_time; */
-
-	FS::UnloadFSModules();
 ?>

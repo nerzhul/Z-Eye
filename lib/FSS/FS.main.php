@@ -44,11 +44,85 @@
 	require_once(dirname(__FILE__)."/Time".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/ModuleObject".CLASS_EXT);
 
-	if (Config::enableSNMP())
+	if (Config::enableSNMP()) {
 		require_once(dirname(__FILE__)."/SNMP".CLASS_EXT);
+	}
 
 	class FS {
 		function __construct() {}
+		
+		public static function checkPHPDependencies() {
+			if (!extension_loaded('gd')) {
+				echo sprintf("Fail to launch %s. php5-gd extension isn't present.. Please install php5-gd extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('json')) {
+				echo sprintf("Fail to launch %s. php5-json extension isn't present.. Please install php5-json extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			if (!extension_loaded('ldap')) {
+				echo sprintf("Fail to launch %s. php5-ldap extension isn't present.. Please install php5-ldap extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('mysql')) {
+				echo sprintf("Fail to launch %s. php5-mysql extension isn't present.. Please install php5-mysql extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('pdo')) {
+				echo sprintf("Fail to launch %s. php5-pdo extension isn't present.. Please install php5-pdo extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('pdo_mysql')) {
+				echo sprintf("Fail to launch %s. php5-pdo_mysql extension isn't present.. Please install php5-pdo_mysql extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('pdo_pgsql')) {
+				echo sprintf("Fail to launch %s. php5-pdo_pgsql extension isn't present.. Please install php5-pdo_pgsql extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('pgsql')) {
+				echo sprintf("Fail to launch %s. php5-pgsql extension isn't present.. Please install php5-pgsql extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('session')) {
+				echo sprintf("Fail to launch %s. php5-session extension isn't present.. Please install php5-session extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			if (!extension_loaded('snmp')) {
+				echo sprintf("Fail to launch %s. php5-snmp extension isn't present.. Please install php5-snmp extension",
+					config::getWebsiteName()
+				);
+				return false;
+			}
+			
+			return true;
+		}
 
 		public static function LoadFSModules() {
 			// AbstractSQL connector
