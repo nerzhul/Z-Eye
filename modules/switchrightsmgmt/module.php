@@ -209,13 +209,13 @@
 			}
 			if ($found) {
 				if ($ip == "") {
-					$output .= FS::$iMgr->cbkForm("index.php?mod=".$this->mid."&sh=2",array("id" => "swfform"));
+					$output .= FS::$iMgr->cbkForm("?mod=".$this->mid."&sh=2",array("id" => "swfform"));
 					$output .= FS::$iMgr->select("ip",array("js" => "filterSw()"));
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSw()")."</form>";
 					$output .= FS::$iMgr->js("function filterSw() {
 							$('#swfdiv').fadeOut('slow',function() {
-								$.post('index.php?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
+								$.post('?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
 									$('#swfdiv').html(data);
 								});
 						});
@@ -368,13 +368,13 @@
 			}
 			if ($found) {
 				if ($community == "") {
-					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&sh=1",array("id" => "snmpfform"));
+					$output .= FS::$iMgr->form("?mod=".$this->mid."&sh=1",array("id" => "snmpfform"));
 					$output .= FS::$iMgr->select("snmp",array("js" => "filterSNMP()"));
 					$output .= $formoutput;
 					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSNMP()")."</form>";
 					$output .= FS::$iMgr->js("function filterSNMP() {
         	                                $('#snmpfdiv').fadeOut('fast',function() {
-	                                       		$.post('index.php?mod=".$this->mid."&at=2&sh=1', $('#snmpfform').serialize(), function(data) {
+	                                       		$.post('?mod=".$this->mid."&at=2&sh=1', $('#snmpfform').serialize(), function(data) {
                                         	                $('#snmpfdiv').html(data);
                         	                        });
 						});

@@ -952,7 +952,7 @@
 						$js = "function searchports() {
 							waitingPopup('".$this->loc->s("search-ports")."...');
 							var ovlid = document.getElementsByName('oldvl')[0].value;
-							$.get('index.php?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
+							$.get('?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
 							$('#vlplist').html(data); unlockScreen(true); });
 							return false; };
 							function checkTagForm() {
@@ -987,7 +987,7 @@
 						// Common JS WARN: it's only for CISCO
 						$output .= FS::$iMgr->js("function checkCopyState(copyId) {
 							setTimeout(function() {
-								$.post('index.php?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
+								$.post('?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
 									if (data == 2) {
 										$('#subpop').html('".$this->loc->s("Copy-in-progress")." ...');
 										checkCopyState(copyId);
@@ -997,7 +997,7 @@
 										setTimeout(function() { unlockScreen(true); },1000);
 									}
 									else if (data == 4) {
-										$.post('index.php?at=3&mod=".$this->mid."&act=14&d=".$device."&saveid='+copyId, function(data) {
+										$.post('?at=3&mod=".$this->mid."&act=14&d=".$device."&saveid='+copyId, function(data) {
 											$('#subpop').html('".$this->loc->s("Fail")." !<br />Cause: '+data); 
 										});
 										setTimeout(function() { unlockScreen(true); },5000);
@@ -1021,7 +1021,7 @@
 						$js .= "$('#slogin').hide(); }};";
 						$js .= "function sendbackupreq() {";
 						$js .= "waitingPopup('".$this->loc->s("req-sent")."...');";
-						$js .= "$.post('index.php?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
+						$js .= "$.post('?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
 						srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
 						io: document.getElementsByName('io')[0].value },
 						function(data) { 
@@ -1055,7 +1055,7 @@
 						// Copy startup-config -> running-config
 						$output .= FS::$iMgr->js("function restorestartupconfig() {
 							waitingPopup('".$this->loc->s("req-sent")."...');
-						$.post('index.php?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
+						$.post('?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) { 
 							var copyId = data;
 							$('#subpop').html('".$this->loc->s("restore-in-progress")."...');
 							checkCopyState(copyId);
@@ -1129,13 +1129,13 @@
 						// Script pour modifier le nom de la prise
 						FS::$iMgr->js("function modifyPlug(src,sbmit,sw_,swport_,swpr_) {
 						if (sbmit == true) {
-						$.post('index.php?at=3&mod=".$this->mid."&d=".$device."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) {
+						$.post('?at=3&mod=".$this->mid."&d=".$device."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) {
 						$(src+'l').html(data); $(src+' a').toggle();
 						}); }
 						else $(src).toggle(); }
 						function modifyRoom(src,sbmit,sw_,swport_,swproom_) {
 						if (sbmit == true) {
-						$.post('index.php?at=3&mod=".$this->mid."&d=".$device."&act=26', { sw: sw_, swport: swport_, room: document.getElementsByName(swproom_)[0].value }, function(data) {
+						$.post('?at=3&mod=".$this->mid."&d=".$device."&act=26', { sw: sw_, swport: swport_, room: document.getElementsByName(swproom_)[0].value }, function(data) {
 						$(src+'l').html(data); $(src+' a').toggle();
 						}); }
 						else $(src).toggle(); }");

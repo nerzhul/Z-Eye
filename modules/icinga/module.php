@@ -103,7 +103,7 @@
 		}
 
 		private function showGeneralTab() {
-			FS::$iMgr->setURL("index.php?mod=".$this->mid."&sh=1");
+			FS::$iMgr->setURL("?mod=".$this->mid."&sh=1");
 			return (new icingaSensor())->showReport();
 		}
 

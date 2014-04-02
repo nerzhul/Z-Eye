@@ -225,7 +225,7 @@
 		
 		public function aLink($link,$label,$raw=false) {
 			return sprintf("<a href=\"%s\">%s</a>",
-				$raw ? $link : sprintf("index.php?mod=%s",$link),
+				$raw ? $link : sprintf("?mod=%s",$link),
 				$label
 			);
 		}
@@ -387,7 +387,7 @@
 				(isset($options["length"]) ? $options["length"] : 40), (isset($options["label"]) ? $options["label"] : NULL),
 				(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
 				
-			$this->js(sprintf("$('#%s').autocomplete({source: 'index.php?mod=%s&at=2',minLength: 3});",
+			$this->js(sprintf("$('#%s').autocomplete({source: '?mod=%s&at=2',minLength: 3});",
 				$name,$this->getModuleIdByPath("search")));
 			return $output;
 		}
@@ -542,7 +542,7 @@
 
 		public function cbkForm($link, $textid = "Modification",$raw = false, $options=array()) {
 			if($raw == false) {
-				$link = sprintf("index.php?mod=%s&act=%s",
+				$link = sprintf("?mod=%s&act=%s",
 					$this->cur_module->getModuleId(), $link);
 			}
 			if (!isset($options["method"]) || $options["method"] != "GET" && $options["method"] != "POST") {
@@ -797,7 +797,7 @@
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			return sprintf("<li%s><a href=\"index.php?%s&at=2&sh=%s%s\">%s</a>",
+			return sprintf("<li%s><a href=\"?%s&at=2&sh=%s%s\">%s</a>",
 				($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : ""),
 				$link,$shid,
 				(FS::$secMgr->checkAndSecuriseGetData("nohist") ? "&nohist=1" : ""),
@@ -859,7 +859,7 @@
 		public function setURL($url) {
 			// Nohist is needed to remove history loops
 			if (!FS::$secMgr->checkAndSecuriseGetData("nohist")) {
-				$this->js(sprintf("addHistoryState(document.title, '/index.php?mod=%s%s','&nohist=1&mod=%s%s');", 
+				$this->js(sprintf("addHistoryState(document.title, '/?mod=%s%s','&nohist=1&mod=%s%s');", 
 					$this->cur_module->getModuleId(),
 					strlen($url) > 0 ? "&".$url : "",
 					$this->cur_module->getModuleId(),
@@ -877,10 +877,10 @@
 
 		public function redir($link,$js=false) {
 			if ($js && FS::isAjaxCall()) {
-				$this->js("window.location.href=\"index.php?".$link."\";");
+				$this->js("window.location.href=\"?".$link."\";");
 			}
 			else {
-				header("Location: index.php?".$link);
+				header("Location: /?".$link);
 			}
 		}
 

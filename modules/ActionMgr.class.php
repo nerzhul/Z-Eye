@@ -49,7 +49,7 @@
 					}
 
 					if($found == false) {
-						header("Location: index.php");
+						header("Location: /");
 						return;
 					}
 
@@ -61,7 +61,7 @@
 							FS::$iMgr->ajaxEcho("err-no-rights");
 						}
 						else {
-							header("Location: index.php");
+							header("Location: /");
 						}
 					}
 					else if($ruleAccess === -1) {

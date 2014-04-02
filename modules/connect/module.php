@@ -68,7 +68,9 @@
 			}
 
 			$url = FS::$secMgr->checkAndSecurisePostData("redir");
-			if ($url == NULL || $url == "index.php") $url = "m-0.html";
+			if ($url == NULL || $url == "index.php") {
+				$url = "/";
+			}
 			$url = preg_replace("#^/index\.php\?#","",$url);
 
 			if ($ldapok) {

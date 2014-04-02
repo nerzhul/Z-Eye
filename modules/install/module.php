@@ -73,7 +73,7 @@
 				case 0:
 					$output .= FS::$iMgr->js("function loadStep1() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
-						$.post('index.php?mod=".$this->mid."&at=2&step=1', function(data) {
+						$.post('?mod=".$this->mid."&at=2&step=1', function(data) {
 							$('#installer').html(data);
 							});
 						}");
@@ -83,12 +83,12 @@
 				case 1:
 					FS::$iMgr->js("function loadStep2() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
-						$.post('index.php?mod=".$this->mid."&at=2&step=2', function(data) {
+						$.post('?mod=".$this->mid."&at=2&step=2', function(data) {
 							$('#installer').html(data);
 							});
 						};
 						function sendAdmCfg() {
-						$.post('index.php?mod=".$this->mid."&act=1',$('#admcfg').serialize(), function(data) {
+						$.post('?mod=".$this->mid."&act=1',$('#admcfg').serialize(), function(data) {
 							if (data == 0) loadStep2();
 							else if (data == 1) { ".$this->showNotification($this->loc->s("err-fields-missing"),5000)." } 
 							else if (data == 2) { ".$this->showNotification($this->loc->s("err-username-invalid"),5000)." } 
@@ -115,8 +115,8 @@
 				case 2:
 					FS::$iMgr->js("function loadStep3() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
-						$.post('index.php?mod=".$this->mid."&act=2', function(data) {
-							window.location = '/index.php'; });
+						$.post('?mod=".$this->mid."&act=2', function(data) {
+							window.location = '/'; });
 					}");
 					$output .= FS::$iMgr->h2("title-install-finished");
 					$output .= $this->loc->s("text-finish")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Finish"),"loadStep3();")."</center>";

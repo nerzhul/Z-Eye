@@ -303,7 +303,7 @@
 					
 					$outputswitch .= "</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
 						<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
-						FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
+						FS::$iMgr->js("$.post('?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
 						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td>";
 						
 					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
@@ -323,13 +323,13 @@
 				
 				FS::$iMgr->js("function modifyBuilding(src,sbmit,device_,building_) {
 					if (sbmit == true) {
-					$.post('index.php?at=3&mod=".$this->mid."&act=27', { device: device_, building: document.getElementsByName(building_)[0].value }, function(data) {
+					$.post('?at=3&mod=".$this->mid."&act=27', { device: device_, building: document.getElementsByName(building_)[0].value }, function(data) {
 					$(src+'l').html(data); $(src+' a').toggle();
 					}); }
 					else $(src).toggle(); }
 					function modifyRoom(src,sbmit,device_,room_) {
 					if (sbmit == true) {
-					$.post('index.php?at=3&mod=".$this->mid."&act=28', { device: device_, room: document.getElementsByName(room_)[0].value }, function(data) {
+					$.post('?at=3&mod=".$this->mid."&act=28', { device: device_, room: document.getElementsByName(room_)[0].value }, function(data) {
 					$(src+'l').html(data); $(src+' a').toggle();
 					}); }
 					else $(src).toggle(); }");

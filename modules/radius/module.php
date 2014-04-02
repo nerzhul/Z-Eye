@@ -118,7 +118,7 @@
 				$tmpoutput .= "<td><div id=\"radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."\">".
 					FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>";
 					
-				FS::$iMgr->js("$.post('index.php?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
+				FS::$iMgr->js("$.post('?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
 					$('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
 				
 				$tmpoutput .= "</td><td>".
@@ -324,7 +324,7 @@
 
 					FS::$iMgr->js("$('#adduser').submit(function(event) {
 					event.preventDefault();
-					$.post('index.php?mod=".$this->mid."&at=3&ra=".$radalias."&act=10', $('#adduser').serialize(), function(data) {
+					$.post('?mod=".$this->mid."&at=3&ra=".$radalias."&act=10', $('#adduser').serialize(), function(data) {
 						$('#adduserres').html(data);
 					});
 				});");
@@ -384,7 +384,7 @@
 					// Filtering
 					FS::$iMgr->js("function filterRadiusDatas() {
 						$('#radd').fadeOut();
-						$.post('index.php?mod=".$this->mid."&act=12', $('#radf').serialize(), function(data) {
+						$.post('?mod=".$this->mid."&act=12', $('#radf').serialize(), function(data) {
 						$('#radd').html(data);
 						$('#radd').fadeIn();
 						});
@@ -577,7 +577,7 @@
 				}
 				else if ($sh == 6) {
 					$output .= "<div id=\"adduserres\"></div>";
-					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&ra=".$radalias."&act=10",array("id" => "adduser"));
+					$output .= FS::$iMgr->form("?mod=".$this->mid."&ra=".$radalias."&act=10",array("id" => "adduser"));
 					$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>Valeur</th></tr>";
 					$output .= FS::$iMgr->idxLine($this->loc->s("Name")." *","radname",array("rawlabel" => true));
 					$output .= FS::$iMgr->idxLine($this->loc->s("Subname")." *","radsurname",array("rawlabel" => true));
@@ -594,20 +594,22 @@
 
 					FS::$iMgr->js("$('#adduser').submit(function(event) {
 						event.preventDefault();
-						$.post('index.php?mod=".$this->mid."&at=3&ra=".$radalias."&act=10', $('#adduser').serialize(), function(data) {
+						$.post('?mod=".$this->mid."&at=3&ra=".$radalias."&act=10', $('#adduser').serialize(), function(data) {
 							$('#adduserres').html(data);
 						});
 					});");
 				}
 				else if ($sh == 7) {
 					$output .= "<div id=\"adduserlistres\"></div>";
-					$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&ra=".$radalias.
-						"&act=11",array("id" => "adduserlist"));
-					$output .= "<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>";
-					$output .= "<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
-					FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
-						FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>";
-					$output .= FS::$iMgr->idxLine($this->loc->s("Account-nb")." *","nbacct",array("size" => 4,"length" => 4, "type" => "num","rawlabel" => true));
+					$output .= FS::$iMgr->form("?mod=".$this->mid."&ra=".$radalias.
+						"&act=11",array("id" => "adduserlist")).
+						"<table><tr><th>".$this->loc->s("entitlement")."</th><th>".$this->loc->s("Value")."</th></tr>".
+						"<tr><td>".$this->loc->s("Generation-type")."</td><td style=\"text-align: left;\">".
+						FS::$iMgr->radio("typegen",1,false,$this->loc->s("random-name"))."<br />".
+						FS::$iMgr->radio("typegen",2,false,$this->loc->s("Prefix")." ").FS::$iMgr->input("prefix","")."</td></tr>".
+						FS::$iMgr->idxLine($this->loc->s("Account-nb")." *",
+							"nbacct",array("size" => 4,"length" => 4,
+								"type" => "num","rawlabel" => true));
 					$output .= "<tr><td>".$this->loc->s("Profil")."</td><td>".
 						FS::$iMgr->select("profil2").FS::$iMgr->selElmt("","none").
 						$this->addGroupList($radSQLMgr)."</select></td></tr>";

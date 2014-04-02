@@ -425,18 +425,22 @@
 
 			$output = FS::$iMgr->js("function historyDateChange() {
 				hideAndEmpty('#hstcontent'); 
-				$.post('index.php?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
+				$.post('?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
 					$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
 				}); };");
 
-			$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>";
-			$output .= FS::$iMgr->form("index.php?mod=".$this->mid."&act=4",array("id" => "hstfrm"));
-			$output .= FS::$iMgr->hidden("filter",$filter);
+			$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>".
+				FS::$iMgr->form("?mod=".$this->mid."&act=4",array("id" => "hstfrm")).
+				FS::$iMgr->hidden("filter",$filter);
+
 			$date = FS::$dbMgr->GetMin(PGDbConfig::getDbPrefix()."dhcp_subnet_history","collecteddate");
-			if (!$date) $date = "now";
+			if (!$date) {
+				$date = "now";
+			}
 			$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
-			$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1"));
-			$output .= FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
+
+			$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1")).
+				FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
 			return $output;
 		}
 

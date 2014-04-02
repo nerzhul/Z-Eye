@@ -88,7 +88,7 @@
 				FS::$iMgr->img("styles/images/LogoHD.png",446,214).
 				"</header><div id=\"loginCbk\"></div><div id=\"loginMsg\">".
 				$this->getLocale("Connect-to")." ".Config::getWebsiteName()."</div><div>".
-				FS::$iMgr->cbkForm("index.php?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection",true).
+				FS::$iMgr->cbkForm("?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection",true).
 				$this->input("loginuname","").
 				$this->password("loginupwd","").
 				$this->hidden("redir",$_SERVER["REQUEST_URI"]).
@@ -105,7 +105,7 @@
 				$this->getLocale("Settings")."</div>".
 				"<div class=\"menuItem\" onclick=\"confirmPopup('".FS::$secMgr->cleanForJS($this->getLocale("confirm-disconnect")).
 				"','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',".
-				"'index.php?mod=".$this->getModuleIdByPath("connect")."&act=2',{});\">".
+				"'?mod=".$this->getModuleIdByPath("connect")."&act=2',{});\">".
 				$this->getLocale("Disconnection").
 				"</div></div></div>";
 		}
@@ -114,7 +114,7 @@
 			return sprintf("<div id=\"menuStack\"><div id=\"search\">%s%s<button class=\"searchButton\" type=\"submit\">".
 				"<img src=\"styles/images/search.png\" width=\"15px\" height=\"15px\" /></button></form>".
 				"</div></div>",
-				$this->cbkForm("index.php?mod=".$this->getModuleIdByPath("search")."&act=1","Searching...",true),
+				$this->cbkForm("?mod=".$this->getModuleIdByPath("search")."&act=1","Searching...",true),
 				$this->autoComplete("s",array("size" => 30,"length" => 60)));
 		}
 
@@ -158,11 +158,11 @@
 					$jsarr .= ($jsarr != "{" ? "," : "")."'lock': true";
 					$output .= "onclick=\"confirmPopup('".FS::$secMgr->cleanForJS($options["confirm"][0])."','".
 						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][1]))."','".
-						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][2]))."','index.php?".
+						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][2]))."','?".
 						FS::$secMgr->cleanForJS($link)."'";
 				}
 				else {
-					$output .= "onclick=\"callbackLink('index.php?".FS::$secMgr->cleanForJS($link)."'";
+					$output .= "onclick=\"callbackLink('?".FS::$secMgr->cleanForJS($link)."'";
 				}
 				$jsarr .= "}";
 				if($jsarr != "{}")
@@ -170,7 +170,7 @@
 				$output .= ");\" ";
 			}
 			else {
-				$output .= "href=\"index.php?".$link."\"";
+				$output .= "href=\"?".$link."\"";
 			}
 			$output .= ">".FS::$iMgr->img("styles/images/".$iconname.".png",15,15,"",$options)."</a>";
 			return $output;

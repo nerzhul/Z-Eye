@@ -94,13 +94,13 @@
 				FS::$iMgr->setURL("sh=1");
 				FS::$iMgr->js("function filterAppLogs() {
 					$('#logd').fadeOut();
-					$.post('index.php?mod=".$this->mid."&act=1', $('#logf').serialize(), function(data) {
+					$.post('?mod=".$this->mid."&act=1', $('#logf').serialize(), function(data) {
 						$('#logd').html(data);
 						$('#logd').fadeIn();
 						});
 					}");
 				
-				$output = FS::$iMgr->form("index.php?mod=".$this->mid."&act=1",array("id" => "logf"));
+				$output = FS::$iMgr->form("?mod=".$this->mid."&act=1",array("id" => "logf"));
 				$output .= FS::$iMgr->select("uf",array("js" => "filterAppLogs()"));
 				$output .= FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs","_user","",array("order" => "_user","ordersens" => 2,"group" => "_user"));
