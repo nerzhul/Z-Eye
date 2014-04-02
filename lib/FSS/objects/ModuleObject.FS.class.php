@@ -38,7 +38,7 @@
 		}
 
 		public function renderAll() { return ""; }
-		public function showForm() { return ""; }
+		public function showForm($name = "") { return ""; }
 
 		protected function Load($id = "") {}
 

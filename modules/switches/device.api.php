@@ -368,11 +368,11 @@
 			return NULL;
 		}
 
-		public function setDHCPSnoopingMatchMAC() {
+		public function setDHCPSnoopingMatchMAC($value) {
 			return NULL;
 		}
 
-		public function getDHCPSnoopingVlans($dip,$community) {
+		public function getDHCPSnoopingVlans() {
 			return NULL;
 		}
 
@@ -392,7 +392,7 @@
 			return "";
 		}		
 
-		public function showSSHRunCfg($stdio) {
+		public function showSSHRunCfg() {
 			return "";
 		}
 

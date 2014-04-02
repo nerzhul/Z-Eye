@@ -1490,22 +1490,24 @@
                         return $this->setField("1.3.6.1.4.1.9.9.380.1.1.4.0","i",$value);
                 }
 
-                public function getDHCPSnoopingMatchMAC() {
-                        $state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.6.0");
-                        $state = explode(" ",$state);
-                        if(count($state) != 2)
-                                return NULL;
+		public function getDHCPSnoopingMatchMAC() {
+			$state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.6.0");
+			$state = explode(" ",$state);
+			if(count($state) != 2) {
+				return NULL;
+			}
 
-                        $state = $state[1];
-                        return $state;
-                }
+			$state = $state[1];
+			return $state;
+		}
 
-                public function setDHCPSnoopingMatchMAC($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                        	return -1;
+		public function setDHCPSnoopingMatchMAC($value) {
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2) {
+				return -1;
+			}
 
-                        return $this->setField("1.3.6.1.4.1.9.9.380.1.1.6.0","i",$value);
-                }
+			return $this->setField("1.3.6.1.4.1.9.9.380.1.1.6.0","i",$value);
+		}
 
 		public function getDHCPSnoopingVlans() {
 			if($this->devip == "" || $this->snmpro == "")

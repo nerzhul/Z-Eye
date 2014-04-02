@@ -2220,11 +2220,29 @@
 			}
 		}
 		
-		public function showForm($zonename, $recname = "", $rectype = "", $recval = "", $recttl = 86400) {
+		public function showForm($zonename = "") {
 			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
 			}
+			
+			$recname = FS::$secMgr->checkAndSecuriseGetData("recname");
+			$rectype = FS::$secMgr->checkAndSecuriseGetData("rectype");
+			$recval = FS::$secMgr->checkAndSecuriseGetData("recvalue");
+			
+			if (!$recname) {
+				$recname = "";
+			}
+			
+			if (!$rectype) {
+				$rectype = "";
+			}
+			
+			if (!$recval) {
+				$recval = "";
+			}
+			
+			$recttl = 86400;
 			
 			$selRT = "";
 			if ($rectype == "") {

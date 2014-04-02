@@ -291,7 +291,7 @@
 						}
 						$output .= "<tr style=\"$style\"><td style=\"padding: 2px\">";
 						if ($recordtype != "SOA" && $recordname != "@") {
-							$output .= FS::$iMgr->opendiv(12,$recordname,
+							$output .= FS::$iMgr->opendiv(11,$recordname,
 								array("lnkadd" => "zn=".$dnszone2."&recname=".$recordname."&rectype=".$recordtype.
 									"&recvalue=".$recordval)
 							);
@@ -433,16 +433,6 @@
 					
 					$dnsRecord = new dnsRecord();
 					return $dnsRecord->showForm($zonename);
-				case 12:
-					$zonename = FS::$secMgr->checkAndSecuriseGetData("zn");
-					$recname = FS::$secMgr->checkAndSecuriseGetData("recname");
-					$rectype = FS::$secMgr->checkAndSecuriseGetData("rectype");
-					$recvalue = FS::$secMgr->checkAndSecuriseGetData("recvalue");
-					if (!$zonename && !$recname && !$rectype && !$recvalue) {
-						return $this->loc->s("err-bad-datas");
-					}
-					$dnsRecord = new dnsRecord();
-					return $dnsRecord->showForm($zonename,$recname,$rectype,$recvalue);
 				default: return;
 			}
 		}

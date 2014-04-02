@@ -419,14 +419,14 @@
 			}
 			
 			if(!(new icingaTimePeriod())->exists($checkperiod)) {
-				FS::$iMgr->ajaxEcho(
+				FS::$iMgr->ajaxEcho(sprintf(
 					$this->loc->s("err-timeperiod-not-exists"), $checkperiod),
 					"",false);
 				return;
 			}
 
 			if(!(new icingaTimePeriod())->exists($notifperiod)) {
-				FS::$iMgr->ajaxEcho(
+				FS::$iMgr->ajaxEcho(sprintf(
 					$this->loc->s("err-timeperiod-not-exists"), $notifperiod),
 					"",false);
 				return;;
@@ -874,8 +874,10 @@
 			// @TODO
 		}
 		
-		public function getSelect($name, $selected) {
-			return FS::$iMgr->select($name).
+		public function getSelect($options = array()) {
+			$selected = (isset($options["selected"]) ? $options["selected"] : array("none"));
+			
+			return FS::$iMgr->select($options["name"]).
 				FS::$iMgr->selElmtFromDB($this->sqlTable,"name",
 					array("labelfield" => "alias",
 						"selected" => array($selected),
@@ -968,7 +970,7 @@
 			
 			// Check if TP exists
 			if(!(new icingaTimePeriod())->exists($period)) {
-				FS::$iMgr->ajaxEcho(
+				FS::$iMgr->ajaxEcho(sprintf(
 					$this->loc->s("err-timeperiod-not-exists"), $period),
 					"",false);
 				return;
@@ -1036,7 +1038,11 @@
 			}
 			$this->Load($name);
 
-			$tpSelect = (new icingaTimePeriod())->getSelect("period", $this->period);
+			$tpSelect = (new icingaTimePeriod())->getSelect(
+				array("name" => "period",
+					"selected" => $this->period
+				)
+			);
 			
 			return FS::$iMgr->cbkForm("22")."<table>".
 				FS::$iMgr->idxLines(array(
