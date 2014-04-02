@@ -418,14 +418,18 @@
 				return;
 			}
 			
-			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$checkperiod."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+			if(!(new icingaTimePeriod())->exists($checkperiod)) {
+				FS::$iMgr->ajaxEcho(
+					$this->loc->s("err-timeperiod-not-exists"), $checkperiod),
+					"",false);
 				return;
 			}
 
-			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$notifperiod."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
-				return;
+			if(!(new icingaTimePeriod())->exists($notifperiod)) {
+				FS::$iMgr->ajaxEcho(
+					$this->loc->s("err-timeperiod-not-exists"), $notifperiod),
+					"",false);
+				return;;
 			}
 
 			FS::$dbMgr->BeginTr();
@@ -861,6 +865,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_timeperiods";
+			$this->sqlAttrId = "name";
 			$this->readRight = "mrule_icinga_tp_write";
 			$this->writeRight = "mrule_icinga_tp_write";
 		}
@@ -871,7 +876,7 @@
 		
 		public function getSelect($name, $selected) {
 			return FS::$iMgr->select($name).
-				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_timeperiods","name",
+				FS::$iMgr->selElmtFromDB($this->sqlTable,"name",
 					array("labelfield" => "alias",
 						"selected" => array($selected),
 						"sqlopts" => array("order" => "alias"))).
@@ -883,6 +888,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_notif_strategy";
+			$this->sqlAttrId = "name";
 			$this->readRight = "mrule_icinga_notif_write";
 			$this->writeRight = "mrule_icinga_notif_write";
 		}
@@ -961,8 +967,7 @@
 			}
 			
 			// Check if TP exists
-			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix().
-				"icinga_timeperiods","name","name = '".$period."'")) {
+			if(!(new icingaTimePeriod())->exists($period)) {
 				FS::$iMgr->ajaxEcho(
 					$this->loc->s("err-timeperiod-not-exists"), $period),
 					"",false);
