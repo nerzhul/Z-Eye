@@ -702,8 +702,8 @@
 						$this->loc->s("Alias")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"notifstr_".preg_replace("#[. ]#","-",$data["name"])."\"><td>".
-					FS::$iMgr->opendiv(19,$data["name"],array("lnkadd" => "name=".$data["name"])).
-					"</td><td>".$data["alias"]."</td><td>";
+					FS::$iMgr->opendiv(20,$data["name"],array("lnkadd" => "name=".$data["name"])).
+					"</td><td>".$data["alias"]."</td><td>".
 					FS::$iMgr->removeIcon("mod=".$this->mid."&act=23&notifstr=".$data["name"],
 						array("js" => true,
 							"confirm" => array($this->loc->s("confirm-remove-notif-strategy")."'".$data["name"]."' ?", "Confirm","Cancel")
@@ -1083,6 +1083,18 @@
 					
 					$ins = new icingaNotificationStrategy();
 					return $ins->showForm();
+				case 20:
+					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
+						return $this->loc->s("err-no-rights");
+					}
+					
+					$name = FS::$secMgr->checkAndSecuriseGetData("name");
+					if (!$name) {
+						return $this->loc->s("err-bad-datas");
+					}
+					
+					$ins = new icingaNotificationStrategy();
+					return $ins->showForm($name);
 				default: return;
 			}
 		}

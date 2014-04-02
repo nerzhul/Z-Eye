@@ -79,7 +79,7 @@
 			if(!$this->canWrite()) {
 				FS::$iMgr->ajaxEcho("err-no-right");
 				return;
-			} 
+			}
 
 			$name = FS::$secMgr->getPost("name","w");
 			$alias = FS::$secMgr->checkAndSecurisePostData("alias");
@@ -987,7 +987,7 @@
 				($hostoptd == "on" ? 't' : 'f')."','".($srvoptc == "on" ? 't' : 'f')."','".
 				($srvoptw == "on" ? 't' : 'f')."','".($srvoptu == "on" ? 't' : 'f')."','".
 				($srvoptf == "on" ? 't' : 'f')."','".($srvoptr == "on" ? 't' : 'f')."','".
-				($srvopts == "on" ? 't' : 'f'));
+				($srvopts == "on" ? 't' : 'f')."'");
 				
 			FS::$dbMgr->CommitTr();
 			
@@ -1036,6 +1036,7 @@
 			if (!$this->canRead()) {
 				return FS::$iMgr->printError("err-no-right");
 			}
+			
 			$this->Load($name);
 
 			$tpSelect = (new icingaTimePeriod())->getSelect(
@@ -1046,7 +1047,9 @@
 			
 			return FS::$iMgr->cbkForm("22")."<table>".
 				FS::$iMgr->idxLines(array(
-					array("Name","name",array("type" => "idxedit", "value" => $this->name, "length" => 60, "size" => 30)),
+					array("Name","name",array("type" => "idxedit", 
+						"value" => $this->name, "length" => 60,
+						"size" => 30, "edit" => $name != "")),
 					array("Alias","alias",array("value" => $this->alias, "length" => 60, "size" => 30)),
 					array("hostoptdown","hostoptd",array("value" => $this->upDownEvent,"type" => "chk")),
 					array("srvoptcrit","srvoptc",array("value" => $this->criticalEvent,"type" => "chk")),
