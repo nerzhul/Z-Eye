@@ -1008,7 +1008,7 @@
 				return;
 			}
 			
-			$name = FS::$secMgr->checkAndSecuriseGetData("name");
+			$name = FS::$secMgr->checkAndSecuriseGetData("notifstr");
 			
 			if(!FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$name."'")) {
 				FS::$iMgr->ajaxEcho("err-data-not-exist");
