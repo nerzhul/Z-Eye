@@ -290,7 +290,12 @@
 
 			// Checks
 				array("alivecommand","",array("type" => "raw", "value" => $this->mod->genCommandList("checkcommand",$this->checkcmd))),
-				array("checkperiod","",array("type" => "raw", "value" => $this->mod->getTimePeriodList("checkperiod",$this->checkperiod))),
+				array("checkperiod","",array("type" => "raw", 
+					"value" => (new icingaTimePeriod)->getSelect(array(
+						"name" => "checkperiod",
+						"selected" => $this->checkperiod
+					))
+				)),
 				array("check-interval","checkintval",array("value" => $this->checkintval, "type" => "num")),
 				array("retry-check-interval","retcheckintval",array("value" => $this->retcheckintval, "type" => "num")),
 				array("max-check","maxcheck",array("value" => $this->maxcheck, "type" => "num")),
@@ -305,7 +310,12 @@
 
 			// Notifications
 				array("notif-en","notifen",array("value" => $this->notifen,"type" => "chk")),
-				array("notifperiod","",array("type" => "raw", "value" => $this->mod->getTimePeriodList("notifperiod",$this->notifperiod))),
+				array("notifperiod","",array("type" => "raw",
+					"value" => (new icingaTimePeriod)->getSelect(array(
+						"name" => "notifperiod",
+						"selected" => $this->notifperiod
+					))
+				)),
 				array("notif-interval","notifintval",array("value" => $this->notifintval, "type" => "num")),
 				array("hostoptdown","hostoptd",array("value" => $this->hostoptd,"type" => "chk")),
 				array("hostoptunreach","hostoptu",array("value" => $this->hostoptu,"type" => "chk")),
