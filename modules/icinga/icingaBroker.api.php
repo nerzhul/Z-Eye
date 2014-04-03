@@ -1,6 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+	* Copyright (C) 2010-2014 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -17,7 +17,11 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	class icingaBroker {
+	final class icingaBroker {
+		function __construct() {
+			$this->notificationStrategies = array();
+		}
+		
 		public function readStates($filter = array()) {
 			$stateFile = file("/var/spool/icinga/status.dat");
 			if(!$stateFile)
@@ -83,6 +87,9 @@
 		}
 
 		public function writeConfiguration() {
+			// We load notification strategies, we need it
+			$this->loadNotificationStrategies();
+			
 			$path = dirname(__FILE__)."/../../datas/icinga-config/";
 				
 			/*
@@ -338,59 +345,101 @@
 			 */
 			 
 			$file = fopen($path."services.cfg","w+");
-			if(!$file)
+			if(!$file) {
 				return false;
+			}
+			
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
-			retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptf,srvopts,notifintval,ctg,srvoptr",
+			retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notif_strategy,ctg",
 			"template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				fwrite($file,"define service {\n\tservice_description\t".$data["name"]."\n\tcheck_command\t".$data["checkcmd"]."\n\t");
-				if($data["hosttype"] == 1)
+				$sanitizedName = preg_replace("#[']#"," ",$data["name"]);
+				fwrite($file,"define service {\n\tservice_description\t".$sanitizedName."\n\tcheck_command\t".$data["checkcmd"]."\n\t");
+				if($data["hosttype"] == 1) {
 					fwrite($file,"host_name\t".$data["host"]);
-				else
+				}
+				else {
 					fwrite($file,"hostgroup_name\t".$data["host"]);
+				}
+				
 				fwrite($file,"\n\tcheck_period\t".$data["checkperiod"]."\n\tcheck_interval\t".$data["checkintval"]."\n\tretry_interval\t".$data["retcheckintval"]."\n\t");
 				fwrite($file,"max_check_attempts\t".$data["maxcheck"]."\n\tevent_handler_enabled\t".($data["eventhdlen"] == "t" ? 1 : 0)."\n\tflap_detection_enabled\t".($data["flapen"] == "t" ? 1 : 0));
 				fwrite($file,"\n\tfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tprocess_perf_data\t".($data["perfdata"] == "t" ? 1 : 0)."\n\tretain_status_information\t");
 				fwrite($file,($data["retstatus"] == "t" ? 1 : 0)."\n\tretain_nonstatus_information\t".($data["retnonstatus"] == "t" ? 1 : 0)."\n\tnotifications_enabled\t".($data["notifen"] == "t" ? 1 : 0));
-				fwrite($file,"\n\tnotification_period\t".$data["notifperiod"]."\n\tnotification_interval\t".$data["notifintval"]."\n\tactive_checks_enabled\t".($data["actcheck"] == "t" ? 1 : 0));
+				fwrite($file,"\n\tactive_checks_enabled\t".($data["actcheck"] == "t" ? 1 : 0));
 				fwrite($file,"\n\tpassive_checks_enabled\t".($data["pascheck"] == "t" ? 1 : 0)."\n\tobsess_over_service\t".($data["obsess"] == "t" ? 1 : 0)."\n\tcheck_freshness\t".($data["freshness"] == "t" ? 1 : 0));
 				fwrite($file,"\n\tfailure_prediction_enabled\t".($data["failpreden"] == "t" ? 1 : 0)."\n\tparallelize_check\t".($data["parcheck"] == "t" ? 1 : 0)."\n\tcontact_groups\t".$data["ctg"]."\n\t");
 				
-				$found = false;
-				if($data["srvoptc"] == "t") {
-					if(!$found) fwrite($file,"notification_options\t");
-					fwrite($file,"c");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["srvoptw"] == "t") {
-					if(!$found) fwrite($file,"notification_options\t");
-					fwrite($file,"w");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["srvoptu"] == "t") {
-					if(!$found) fwrite($file,"notification_options\t");
-					fwrite($file,"u");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["srvoptr"] == "t") {
-					if(!$found) fwrite($file,"notification_options\t");
-					fwrite($file,"r");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["srvoptf"] == "t") {
-					if(!$found) fwrite($file,"notification_options\t");
-					fwrite($file,"f");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["srvopts"] == "t") {
-					if(!$found) fwrite($file,"notification_options\t");
-					fwrite($file,"s");
+				if (isset($this->notificationStrategies[$data["notif_strategy"]])) {
+					fwrite($file,"\tnotification_interval\t".$this->notificationStrategies[$data["notif_strategy"]]["interval"]);
+					fwrite($file,"\n\tnotification_period\t".$this->notificationStrategies[$data["notif_strategy"]]["period"]."\n\t");
+					
+					$found = false;
+					
+					if($this->notificationStrategies[$data["notif_strategy"]]["ev_crit"] == "t") {
+						if(!$found) {
+							fwrite($file,"notification_options\t");
+						}
+						fwrite($file,"c");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["notif_strategy"]]["ev_warn"] == "t") {
+						if(!$found) {
+							fwrite($file,"notification_options\t");
+						}
+						fwrite($file,"w");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["notif_strategy"]]["ev_unavailable"] == "t") {
+						if(!$found) {
+							fwrite($file,"notification_options\t");
+						}
+						fwrite($file,"u");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["notif_strategy"]]["ev_recovery"] == "t") {
+						if(!$found) fwrite($file,"notification_options\t");
+						fwrite($file,"r");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["notif_strategy"]]["ev_flap"] == "t") {
+						if(!$found) {
+							fwrite($file,"notification_options\t");
+						}
+						fwrite($file,"f");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["notif_strategy"]]["ev_scheduled"] == "t") {
+						if(!$found) {
+							fwrite($file,"notification_options\t");
+						}
+						fwrite($file,"s");
+					}
 				}
 				fwrite($file,"\n}\n\n");
 			}
@@ -408,5 +457,13 @@
 			
 			return true;
 		}
+		private function loadNotificationStrategies() {
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_notif_strategy","name, alias, interval, period, ev_updown, ev_crit, ev_warn, ev_unavailable, ev_flap, ev_recovery, ev_scheduled");
+			while($data = FS::$dbMgr->Fetch($query)) {
+				$this->notificationStrategies[$data["name"]] = $data;
+			}
+		}
+		
+		private $notificationStrategies;
 	}
 ?>
