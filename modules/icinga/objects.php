@@ -1171,6 +1171,18 @@
 				return;
 			}
 			
+			if ($hostUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts",
+				"name","notif_strategy = '".$name."'")) {
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-host"),$name,$hostUsed),"",true);
+				return;
+			}
+			
+			if ($srvUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services",
+				"name","notif_strategy = '".$name."'")) {
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-service"),$name,$srvUsed),"",true);
+				return;
+			}
+			
 			$this->removeFromDB($name);
 
 			$icingaAPI = new icingaBroker();
