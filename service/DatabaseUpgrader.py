@@ -33,7 +33,7 @@ import zConfig, ZEyeUtil
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1408"
+	nextDBVersion = "1409"
 	pgsqlCon = None
 	logger = None
 
@@ -358,6 +358,15 @@ class ZEyeDBUpgrade():
 				self.tryDropColumn("z_eye_icinga_services","srvopts")
 				self.tryDropColumn("z_eye_icinga_services","srvoptr")
 				self.setDBVersion("1408")
+			if self.dbVersion == "1408":
+				self.tryDropColumn("z_eye_icinga_hosts","notifperiod")
+				self.tryDropColumn("z_eye_icinga_hosts","notifintval")
+				self.tryDropColumn("z_eye_icinga_hosts","hostoptd")
+				self.tryDropColumn("z_eye_icinga_hosts","hostoptu")
+				self.tryDropColumn("z_eye_icinga_hosts","hostoptr")
+				self.tryDropColumn("z_eye_icinga_hosts","hostoptf")
+				self.tryDropColumn("z_eye_icinga_hosts","hostopts")
+				self.setDBVersion("1409")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

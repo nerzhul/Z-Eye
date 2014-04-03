@@ -187,12 +187,12 @@
 			$this->maxcheck = 10;
 			$this->eventhdlen = true; $this->flapen = true; $this->failpreden = true; $this->perfdata = true;
 			$this->retstatus = true; $this->retnonstatus = true;
-			$this->notifen = true; $this->notifperiod = ""; $this->notifintval = 0; $this->ctg = "";
-			$this->hostoptd = true; $this->hostoptu = true; $this->hostoptr = true; $this->hostoptf = true; $this->hostopts = true;
+			$this->notifen = true; $this->notifstrategy = "";
 
 			if($name) {
 				$query = FS::$dbMgr->Select($this->sqlTable,
-					"dname,alias,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid","name = '".$name."'");
+					"dname,alias,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
+					perfdata,retstatus,retnonstatus,notifen,contactgroup,template,iconid,notif_strategy","name = '".$name."'");
 				if($data = FS::$dbMgr->Fetch($query)) {
 					$this->dname = $data["dname"];
 					$this->alias = $data["alias"];
@@ -209,15 +209,9 @@
 					$this->perfdata = ($data["perfdata"] == 't');	
 					$this->retstatus = ($data["retstatus"] == 't');	
 					$this->retnonstatus = ($data["retnonstatus"] == 't');	
-					$this->notifen = ($data["notifen"] == 't');	
-					$this->notifperiod = $data["notifperiod"];
-					$this->notifintval = $data["notifintval"];
 					$this->ctg = $data["contactgroup"];	
-					$this->hostoptd = $data["hostoptd"];
-					$this->hostoptu = $data["hostoptu"];
-					$this->hostoptr = $data["hostoptr"];
-					$this->hostoptf = $data["hostoptf"];
-					$this->hostopts = $data["hostopts"];
+					$this->notifen = ($data["notifen"] == 't');	
+					$this->notifstrategy = $data["notif_strategy"];
 				}
 				else {
 					return false;
@@ -273,7 +267,10 @@
 				$output2 .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"],in_array($data["name"],$this->parentlist));
 			}
 
-			if($countElmt/4 < 4) $countElmt = 16;
+			if($countElmt/4 < 4) {
+				$countElmt = 16;
+			}
+			
 			$output .= FS::$iMgr->select("parent",array("multi" => true, "size" => round($countElmt/4))).
 				$output2."</select></td></tr>".
 				FS::$iMgr->idxLine("Address","addr",array("value" => $this->addr));
@@ -310,18 +307,11 @@
 
 			// Notifications
 				array("notif-en","notifen",array("value" => $this->notifen,"type" => "chk")),
-				array("notifperiod","",array("type" => "raw",
-					"value" => (new icingaTimePeriod)->getSelect(array(
-						"name" => "notifperiod",
-						"selected" => $this->notifperiod
-					))
-				)),
-				array("notif-interval","notifintval",array("value" => $this->notifintval, "type" => "num")),
-				array("hostoptdown","hostoptd",array("value" => $this->hostoptd,"type" => "chk")),
-				array("hostoptunreach","hostoptu",array("value" => $this->hostoptu,"type" => "chk")),
-				array("hostoptrec","hostoptr",array("value" => $this->hostoptr,"type" => "chk")),
-				array("hostoptflap","hostoptf",array("value" => $this->hostoptf,"type" => "chk")),
-				array("hostoptsched","hostopts",array("value" => $this->hostopts,"type" => "chk")),
+				array("Notification-strategy","",array("type" => "raw", "value" => 
+					(new icingaNotificationStrategy())->getSelect(array(
+					"name" => "notifstr",
+					"selected" => $this->notifstrategy
+				)))),
 				array("Contactgroups","",array("type" => "raw", "value" => $this->mod->genContactGroupsList("ctg",$this->ctg)))
 			));
 			// icon image
@@ -353,23 +343,18 @@
 			$addr = FS::$secMgr->checkAndSecurisePostData("addr");
 			$checkcommand = FS::$secMgr->checkAndSecurisePostData("checkcommand");
 			$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
-			$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 			$ctg = FS::$secMgr->getPost("ctg","w");
+			
 			if(!$name || (!FS::$secMgr->isDNSName($name) && !FS::$secMgr->isHostname($name)) || 
 				!$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
-				 !$notifperiod || !$ctg || $icon && !FS::$secMgr->isNumeric($icon) || $edit && $edit != 1) {
+				 !$ctg || $icon && !FS::$secMgr->isNumeric($icon) || $edit && $edit != 1) {
 				FS::$iMgr->ajaxEcho("err-bad-data");
 				return;
 			}
 		
 			// Checks
 			$tpl = FS::$secMgr->checkAndSecurisePostData("istemplate");
-			$hostoptd = FS::$secMgr->checkAndSecurisePostData("hostoptd");
-			$hostoptu = FS::$secMgr->checkAndSecurisePostData("hostoptu");
-			$hostoptr = FS::$secMgr->checkAndSecurisePostData("hostoptr");
-			$hostoptf = FS::$secMgr->checkAndSecurisePostData("hostoptf");
-			$hostopts = FS::$secMgr->checkAndSecurisePostData("hostopts");
 			$eventhdlen = FS::$secMgr->checkAndSecurisePostData("eventhdlen");
 			$flapen = FS::$secMgr->checkAndSecurisePostData("flapen");
 			$failpreden = FS::$secMgr->checkAndSecurisePostData("failpreden");
@@ -377,14 +362,14 @@
 			$retstatus = FS::$secMgr->checkAndSecurisePostData("retstatus");
 			$retnonstatus = FS::$secMgr->checkAndSecurisePostData("retnonstatus");
 			$notifen = FS::$secMgr->checkAndSecurisePostData("notifen");
+			$notifstr = FS::$secMgr->checkAndSecurisePostData("notifstr");
 			
 			// Numerics
 			$checkintval = FS::$secMgr->getPost("checkintval","n+");
 			$retcheckintval = FS::$secMgr->getPost("retcheckintval","n+");
 			$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
-			$notifintval = FS::$secMgr->getPost("notifintval","n+=");
 
-			if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL || $notifintval == NULL) {
+			if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL) {
 				FS::$iMgr->ajaxEcho("err-bad-data");
 				return;
 			}
@@ -401,6 +386,11 @@
 					FS::$iMgr->ajaxEchoNC("err-data-exist");
 					return;
 				}
+			}
+			
+			if (!(new icingaNotificationStrategy())->exists($notifstr)) {
+				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$notifstr),"",true);
+				return;
 			}
 			
 			if($parent && !in_array("none",$parent)) {
@@ -435,27 +425,22 @@
 				return;
 			}
 
-			if(!(new icingaTimePeriod())->exists($notifperiod)) {
-				FS::$iMgr->ajaxEcho(sprintf(
-					$this->loc->s("err-timeperiod-not-exists"), $notifperiod),
-					"",false);
-				return;;
-			}
-
 			FS::$dbMgr->BeginTr();
+			
 			if($edit) {
 				FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hosts","name = '".$name."'");
 			}
+			
 			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
-				failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid",
+				failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid,notif_strategy",
 				"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
-				($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".$notifperiod."','".
-				$notifintval."','".($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".
-				($hostopts == "on" ? 1 : 0)."','".$ctg."','".($tpl == "on" ? 1 : 0)."','".($icon ? $icon : 0)."'");
+				($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".
+				$ctg."','".($tpl == "on" ? 1 : 0)."','".($icon ? $icon : 0)."','".$notifstr."'");
 
 			if($edit) {
 				FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_host_parents","name = '".$name."'");
 			}
+			
 			if($parent && !in_array("none",$parent)) {
 				$count = count($parent);
 				for($i=0;$i<$count;$i++)
@@ -528,14 +513,9 @@
 		private $retnonstatus;
 
 		private $notifen;
-		private $notifperiod;
-		private $notifintval;
+		private $notifstrategy;
+		
 		private $ctg;
-		private $hostoptd;
-		private $hostoptu;
-		private $hostoptr;
-		private $hostoptf;
-		private $hostopts;
 	};
 	
 	final class icingaService extends FSMObj {
@@ -1173,13 +1153,15 @@
 			
 			if ($hostUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts",
 				"name","notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-host"),$name,$hostUsed),"",true);
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-host"),
+					$name,$hostUsed),"",true);
 				return;
 			}
 			
 			if ($srvUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services",
 				"name","notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-service"),$name,$srvUsed),"",true);
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-service"),
+					$name,$srvUsed),"",true);
 				return;
 			}
 			
