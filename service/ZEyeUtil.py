@@ -36,6 +36,13 @@ def addslashes(s):
 			s = s.replace(i, '\\'+i)
 	return s
 
+def addPgSlashes(s):
+	l = ["'"]
+	for i in l:
+		if i in s:
+			s = s.replace(i, '\''+i)
+	return s
+
 class Thread(threading.Thread):
 	# sub thread counter
 	threadCounterMutex = Lock()
