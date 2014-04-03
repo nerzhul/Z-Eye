@@ -598,6 +598,66 @@
 			return true;
 		}
 		
+		public function showForm($name = "") {
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError("err-no-right");
+			}
+			
+			$this->Load($name);
+
+			FS::$iMgr->setJSBuffer(1);
+			$output = FS::$iMgr->cbkForm("16").
+				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				FS::$iMgr->idxLines(array(
+				array("is-template","istemplate",array("value" => false,"type" => "chk")),
+				array("Description","desc",array("type" => "idxedit",
+					"value" => $name, "length" => 120,
+					"size" => 30, "edit" => $name != ""
+				)),
+				array("Host","",array("type" => "raw", "value" =>
+					$this->mod->getHostOrGroupList("host",false,($this->hosttype && $this->host ? array($this->hosttype."$".$this->host) : array()))
+				)),
+				array("active-check-en","actcheck",array("value" => $this->actcheck,"type" => "chk")),
+				array("passive-check-en","pascheck",array("value" => $this->pascheck,"type" => "chk")),
+				array("parallel-check","parcheck",array("value" => $this->parcheck,"type" => "chk")),
+				array("obs-over-srv","obsess",array("value" => $this->obsess,"type" => "chk")),
+				array("check-freshness","freshness",array("value" => $this->freshness,"type" => "chk")),
+				array("notif-en","notifen",array("value" => $this->notifen,"type" => "chk")),
+				array("eventhdl-en","eventhdlen",array("value" => $this->eventhdlen,"type" => "chk")),
+				array("flap-en","flapen",array("value" => $this->flapen,"type" => "chk")),
+				array("failpredict-en","failpreden",array("value" => $this->failpreden,"type" => "chk")),
+				array("perfdata","perfdata",array("value" => $this->perfdata,"type" => "chk")),
+				array("retainstatus","retstatus",array("value" => $this->retstatus,"type" => "chk")),
+				array("retainnonstatus","retnonstatus",array("value" => $this->retnonstatus,"type" => "chk")),
+				array("checkcmd","",array("type" => "raw", "value" =>
+					$this->mod->genCommandList("checkcmd",$this->checkcmd))),
+				array("checkperiod","",array("type" => "raw", "value" =>
+					(new icingaTimePeriod())->getSelect(array(
+						"name" => "checkperiod",
+						"selected" => $this->checkperiod
+				)))),
+				array("check-interval","checkintval",array("value" => $this->checkintval, "type" => "num")),
+				array("retry-check-interval","retcheckintval",array("value" => $this->retcheckintval, "type" => "num")),
+				array("max-check","maxcheck",array("value" => $this->maxcheck, "type" => "num")),
+				array("notifperiod","",array("type" => "raw", "value" => 
+					(new icingaTimePeriod())->getSelect(array(
+					"name" => "notifperiod",
+					"selected" => $this->notifperiod
+				)))),
+				array("srvoptcrit","srvoptc",array("value" => $this->srvoptc,"type" => "chk")),
+				array("srvoptwarn","srvoptw",array("value" => $this->srvoptw,"type" => "chk")),
+				array("srvoptunreach","srvoptu",array("value" => $this->srvoptu,"type" => "chk")),
+				array("srvoptrec","srvoptr",array("value" => $this->srvoptr,"type" => "chk")),
+				array("srvoptflap","srvoptf",array("value" => $this->srvoptf,"type" => "chk")),
+				array("srvoptsched","srvopts",array("value" => $this->srvopts,"type" => "chk")),
+				array("notif-interval","notifintval",array("value" => $this->notifintval, "type" => "num")),
+				array("Contactgroups","",array("type" => "raw", "value" =>
+					$this->mod->genContactGroupsList("ctg",$this->ctg)))
+				)).
+				FS::$iMgr->aeTableSubmit($name == "");
+			return $output;
+		}
+		
 		public function showSensors($sname) {
 			if (!$this->Load($sname)) {
 				return $this->loc->s("err-bad-datas");

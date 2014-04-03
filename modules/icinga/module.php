@@ -321,98 +321,6 @@
 			return $output;
 		}
 
-		private function showServiceForm($name = "") {
-			$hosttype = ""; $host = "";
-			$actcheck = true; $pascheck = true; $parcheck = true; $obsess = true; $freshness = false;
-			$notifen = true; $eventhdlen = true; $flapen = true; $failpreden = true; $perfdata = true; $retstatus = true; $retnonstatus = true;
-			$checkcmd = ""; $checkperiod = ""; $checkintval = 3; $retcheckintval = 1; $maxcheck = 10;
-			$notifperiod = ""; $srvoptc = true; $srvoptw = true; $srvoptu = true; $srvoptr = true; $srvoptf = true; $srvopts = true; 
-			$notifintval = 0; $ctg = "";
-			if ($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_services","host,hosttype,ctg,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
-					retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,ctg,template",
-					"name = '".$name."'");
-				if ($data = FS::$dbMgr->Fetch($query)) {
-					$host = $data["host"];
-					$hosttype = $data["hosttype"];
-					$actcheck = ($data["actcheck"] == 't');
-					$pascheck = ($data["pascheck"] == 't');
-					$parcheck = ($data["parcheck"] == 't');
-					$obsess = ($data["obsess"] == 't');
-					$freshness = ($data["freshness"] == 't');
-					$notifen = ($data["notifen"] == 't');
-					$eventhdlen = ($data["eventhdlen"] == 't');
-					$flapen = ($data["flapen"] == 't');
-					$failpreden = ($data["failpreden"] == 't');
-					$perfdata = ($data["perfdata"] == 't');
-					$retstatus = ($data["retstatus"] == 't');
-					$retnonstatus = ($data["retnonstatus"] == 't');
-					$checkcmd = $data["checkcmd"];
-					$checkperiod = $data["checkperiod"];
-					$checkintval = $data["checkintval"];
-					$retcheckintval = $data["retcheckintval"];
-					$maxcheck = $data["maxcheck"];
-					$notifperiod = $data["notifperiod"];
-					$notifintval = $data["notifintval"];
-					$srvoptc = ($data["srvoptc"] == 't');
-					$srvoptw = ($data["srvoptw"] == 't');
-					$srvoptu = ($data["srvoptu"] == 't');
-					$srvoptr = ($data["srvoptr"] == 't');
-					$srvoptf = ($data["srvoptf"] == 't');
-					$srvopts = ($data["srvopts"] == 't');
-					$ctg = $data["ctg"];
-					
-				}
-			}
-			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("16").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
-				FS::$iMgr->idxLine("is-template","istemplate",array("value" => false,"type" => "chk"));
-			//$output .= template list
-
-			// Global
-			$output .= FS::$iMgr->idxIdLine("Description","desc",$name,array("length" => 120, "size" => 30));
-			// @ TODO support hostlist
-			$output .= "<tr><td>".$this->loc->s("Host")."</td><td>".$this->getHostOrGroupList("host",false,($hosttype && $host ? array($hosttype."$".$host) : array()))."</td></tr>";
-
-			$output .= FS::$iMgr->idxLines(array(
-				array("active-check-en","actcheck",array("value" => $actcheck,"type" => "chk")),
-				array("passive-check-en","pascheck",array("value" => $pascheck,"type" => "chk")),
-				array("parallel-check","parcheck",array("value" => $parcheck,"type" => "chk")),
-				array("obs-over-srv","obsess",array("value" => $obsess,"type" => "chk")),
-				array("check-freshness","freshness",array("value" => $freshness,"type" => "chk")),
-				array("notif-en","notifen",array("value" => $notifen,"type" => "chk")),
-				array("eventhdl-en","eventhdlen",array("value" => $eventhdlen,"type" => "chk")),
-				array("flap-en","flapen",array("value" => $flapen,"type" => "chk")),
-				array("failpredict-en","failpreden",array("value" => $failpreden,"type" => "chk")),
-				array("perfdata","perfdata",array("value" => $perfdata,"type" => "chk")),
-				array("retainstatus","retstatus",array("value" => $retstatus,"type" => "chk")),
-				array("retainnonstatus","retnonstatus",array("value" => $retnonstatus,"type" => "chk"))
-			));
-
-			// Checks
-			$output .= "<tr><td>".$this->loc->s("checkcmd")."</td><td>".$this->genCommandList("checkcmd",$checkcmd)."</td></tr>".
-				"<tr><td>".$this->loc->s("checkperiod")."</td><td>".(new icingaTimePeriod())->getSelect("checkperiod",$checkperiod)."</td></tr>".
-				FS::$iMgr->idxLines(array(
-					array("check-interval","checkintval",array("value" => $checkintval, "type" => "num")),
-					array("retry-check-interval","retcheckintval",array("value" => $retcheckintval, "type" => "num")),
-					array("max-check","maxcheck",array("value" => $maxcheck, "type" => "num"))
-				)).
-				"<tr><td>".$this->loc->s("notifperiod")."</td><td>".(new icingaTimePeriod())->getSelect("notifperiod",$notifperiod)."</td></tr>".
-				FS::$iMgr->idxLines(array(
-					array("srvoptcrit","srvoptc",array("value" => $srvoptc,"type" => "chk")),
-					array("srvoptwarn","srvoptw",array("value" => $srvoptw,"type" => "chk")),
-					array("srvoptunreach","srvoptu",array("value" => $srvoptu,"type" => "chk")),
-					array("srvoptrec","srvoptr",array("value" => $srvoptr,"type" => "chk")),
-					array("srvoptflap","srvoptf",array("value" => $srvoptf,"type" => "chk")),
-					array("srvoptsched","srvopts",array("value" => $srvopts,"type" => "chk")),
-					array("notif-interval","notifintval",array("value" => $notifintval, "type" => "num"))
-				)).
-				"<tr><td>".$this->loc->s("Contactgroups")."</td><td>".$this->genContactGroupsList("ctg",$ctg)."</td></tr>".
-				FS::$iMgr->aeTableSubmit($name == "");
-			return $output;
-		}
-
 		private function showTimeperiodsTab() {
 			FS::$iMgr->setURL("sh=5");
 			
@@ -946,8 +854,7 @@
 				case 1: return FS::$iMgr->printError("err-no-timeperiod");
 				case 2: return FS::$iMgr->printError("err-no-contactgroups");
 				case 3: 
-					$host = new icingaHost();
-					return $host->showForm();
+					return (new icingaHost())->showForm();
 				case 4:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 						return $this->loc->s("err-no-rights");
@@ -966,7 +873,7 @@
 						
 					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 					if ($tpexist) {
-						return $this->showServiceForm();
+						return (new icingaService())->showForm();
 					}
 					
 					return FS::$iMgr->printError("err-no-timeperiods");
@@ -992,13 +899,11 @@
 						return $this->loc->s("err-no-rights");
 					}
 					
-					$ctg = new icingaCtg();
-					return $ctg->showForm();
+					return (new icingaCtg())->showForm();
 				case 9: return $this->showCommandForm();
 				case 10:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					$host = new icingaHost();
-					return $host->showForm($name);
+					return (new icingaHost())->showForm($name);
 				case 11:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 						return $this->loc->s("err-no-rights");
@@ -1020,7 +925,7 @@
 						return $this->loc->s("err-bad-datas");
 					}
 
-					return $this->showServiceForm($name);
+					return (new icingaService())->showForm($name);
 				case 13:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 						return $this->loc->s("err-no-rights");
@@ -1049,8 +954,7 @@
 						return $this->loc->s("err-bad-datas");
 					}
 
-					$ctg = new icingaCtg();
-					return $ctg->showForm($name);
+					return (new icingaCtg())->showForm($name);
 				case 16:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 						return $this->loc->s("err-no-rights");
@@ -1067,22 +971,20 @@
 					if (!$name) {
 						return $this->loc->s("err-bad-datas");
 					}
-					$host = new icingaHost();
-					return $host->showSensors($name);
+
+					return (new icingaHost())->showSensors($name);
 				case 18:
 					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if (!$name) {
 						return $this->loc->s("err-bad-datas");
 					}
-					$service = new icingaService();
-					return $service->showSensors($name);
+					return (new icingaService())->showSensors($name);
 				case 19:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 					
-					$ins = new icingaNotificationStrategy();
-					return $ins->showForm();
+					return (new icingaNotificationStrategy())->showForm();
 				case 20:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
 						return $this->loc->s("err-no-rights");
@@ -1093,8 +995,7 @@
 						return $this->loc->s("err-bad-datas");
 					}
 					
-					$ins = new icingaNotificationStrategy();
-					return $ins->showForm($name);
+					return (new icingaNotificationStrategy())->showForm($name);
 				default: return;
 			}
 		}
