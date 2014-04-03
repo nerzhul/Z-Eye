@@ -554,12 +554,10 @@
 			$this->notifen = true; $this->eventhdlen = true; $this->flapen = true; $this->failpreden = true; $this->perfdata = true;
 			$this->retstatus = true; $this->retnonstatus = true;
 			$this->checkcmd = ""; $this->checkperiod = ""; $this->checkintval = 3; $this->retcheckintval = 1; $this->maxcheck = 10;
-			$this->notifperiod = ""; $this->srvoptc = true; $this->srvoptw = true; $this->srvoptu = true; $this->srvoptr = true;
-			$this->srvoptf = true; $this->srvopts = true; 
-			$this->notifintval = 0; $this->ctg = "";
+			$this->ctg = "";
 			if ($name) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"host,hosttype,ctg,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
-					retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,
+					retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,
 					ctg,template,notif_strategy",
 					"name = '".$name."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
@@ -582,14 +580,6 @@
 					$this->checkintval = $data["checkintval"];
 					$this->retcheckintval = $data["retcheckintval"];
 					$this->maxcheck = $data["maxcheck"];
-					$this->notifperiod = $data["notifperiod"];
-					$this->notifintval = $data["notifintval"];
-					$this->srvoptc = ($data["srvoptc"] == 't');
-					$this->srvoptw = ($data["srvoptw"] == 't');
-					$this->srvoptu = ($data["srvoptu"] == 't');
-					$this->srvoptr = ($data["srvoptr"] == 't');
-					$this->srvoptf = ($data["srvoptf"] == 't');
-					$this->srvopts = ($data["srvopts"] == 't');
 					$this->ctg = $data["ctg"];
 					$this->notifstrategy = $data["notif_strategy"];
 				}
@@ -642,18 +632,6 @@
 				array("retry-check-interval","retcheckintval",array("value" => $this->retcheckintval, "type" => "num")),
 				array("max-check","maxcheck",array("value" => $this->maxcheck, "type" => "num")),
 				array("notif-en","notifen",array("value" => $this->notifen,"type" => "chk")),
-				/*array("notifperiod","",array("type" => "raw", "value" => 
-					(new icingaTimePeriod())->getSelect(array(
-					"name" => "notifperiod",
-					"selected" => $this->notifperiod
-				)))),
-				array("srvoptcrit","srvoptc",array("value" => $this->srvoptc,"type" => "chk")),
-				array("srvoptwarn","srvoptw",array("value" => $this->srvoptw,"type" => "chk")),
-				array("srvoptunreach","srvoptu",array("value" => $this->srvoptu,"type" => "chk")),
-				array("srvoptrec","srvoptr",array("value" => $this->srvoptr,"type" => "chk")),
-				array("srvoptflap","srvoptf",array("value" => $this->srvoptf,"type" => "chk")),
-				array("srvoptsched","srvopts",array("value" => $this->srvopts,"type" => "chk")),
-				array("notif-interval","notifintval",array("value" => $this->notifintval, "type" => "num")),*/
 				array("Notification-strategy","",array("type" => "raw", "value" => 
 					(new icingaNotificationStrategy())->getSelect(array(
 					"name" => "notifstr",
@@ -760,10 +738,9 @@
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 			$checkcmd = FS::$secMgr->checkAndSecurisePostData("checkcmd");
 			$checkperiod = FS::$secMgr->checkAndSecurisePostData("checkperiod");
-			//$notifperiod = FS::$secMgr->checkAndSecurisePostData("notifperiod");
 			$ctg = FS::$secMgr->getPost("ctg","w");
 
-			if (!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || /*!$notifperiod ||*/ !$ctg) {
+			if (!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$ctg) {
 				FS::$iMgr->ajaxEcho("err-bad-data");
 				return;
 			}
@@ -780,13 +757,6 @@
 					return;
 				}
 			}
-
-			/*$srvoptw = FS::$secMgr->checkAndSecurisePostData("srvoptw");
-			$srvoptc = FS::$secMgr->checkAndSecurisePostData("srvoptc");
-			$srvoptu = FS::$secMgr->checkAndSecurisePostData("srvoptu");
-			$srvoptr = FS::$secMgr->checkAndSecurisePostData("srvoptr");
-			$srvoptf = FS::$secMgr->checkAndSecurisePostData("srvoptf");
-			$srvopts = FS::$secMgr->checkAndSecurisePostData("srvopts");*/
 
 			$actcheck = FS::$secMgr->checkAndSecurisePostData("actcheck");
 			$pascheck = FS::$secMgr->checkAndSecurisePostData("pascheck");
@@ -807,9 +777,8 @@
 			$checkintval = FS::$secMgr->getPost("checkintval","n+");
 			$retcheckintval = FS::$secMgr->getPost("retcheckintval","n+");
 			$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
-			//$notifintval = FS::$secMgr->getPost("notifintval","n+=");
 
-			if ($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL /*|| $notifintval == NULL*/) {
+			if ($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL) {
 				echo $this->loc->s("err-bad-data");
 				return;
 			}
@@ -829,11 +798,6 @@
 				FS::$iMgr->ajaxEcho("err-bad-data");
 				return;
 			}
-
-			/*if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$notifperiod."'")) {
-				echo $this->loc->s("err-bad-data");
-				return;
-			}*/
 			
 			if (!(new icingaNotificationStrategy())->exists($notifstr)) {
 				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$notifstr),"",true);
@@ -854,12 +818,11 @@
 			}
 			
 			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_services","name,host,hosttype,actcheck,pascheck,parcheck,obsess,freshness,notifen,eventhdlen,flapen,failpreden,perfdata,
-				retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,"./*notifperiod,srvoptc,srvoptw,srvoptu,srvoptr,srvoptf,srvopts,notifintval,"*/"ctg,template,notif_strategy",
+				retstatus,retnonstatus,checkcmd,checkperiod,checkintval,retcheckintval,maxcheck,ctg,template,notif_strategy",
 				"'".$name."','".$mt[1]."','".$mt[0]."','".($actcheck == "on" ? 1 : 0)."','".($pascheck == "on" ? 1 : 0)."','".($parcheck == "on" ? 1 : 0)."','".($obsess == "on" ? 1 : 0).
 				"','".($freshness == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 				($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".$checkcmd."','".
-				$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','"./*$notifperiod."','".($srvoptc == "on" ? 1 : 0)."','".($srvoptw == "on" ? 1 : 0)."','".
-				($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".$notifintval."','".*/$ctg."','".
+				$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".$ctg."','".
 				($tpl == "on" ? 1 : 0)."','".$notifstr."'");
 
 			$icingaAPI = new icingaBroker();
@@ -895,14 +858,6 @@
 		private $maxcheck;
 		
 		private $notifen;
-		private $notifintval;
-		private $notifperiod;
-		private $srvoptc;
-		private $srvoptw;
-		private $srvoptu;
-		private $srvoptf;
-		private $srvopts;
-		private $srvoptr;
 		private $notifstrategy;
 		
 		private $ctg;

@@ -33,7 +33,7 @@ import zConfig, ZEyeUtil
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1407"
+	nextDBVersion = "1408"
 	pgsqlCon = None
 	logger = None
 
@@ -348,6 +348,16 @@ class ZEyeDBUpgrade():
 					self.rawRequest("UPDATE z_eye_icinga_services SET notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
 				
 				self.setDBVersion("1407")
+			if self.dbVersion == "1407":
+				self.tryDropColumn("z_eye_icinga_services","notifperiod")
+				self.tryDropColumn("z_eye_icinga_services","notifintval")
+				self.tryDropColumn("z_eye_icinga_services","srvoptc")
+				self.tryDropColumn("z_eye_icinga_services","srvoptw")
+				self.tryDropColumn("z_eye_icinga_services","srvoptu")
+				self.tryDropColumn("z_eye_icinga_services","srvoptf")
+				self.tryDropColumn("z_eye_icinga_services","srvopts")
+				self.tryDropColumn("z_eye_icinga_services","srvoptr")
+				self.setDBVersion("1408")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
