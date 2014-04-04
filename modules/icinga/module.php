@@ -460,10 +460,12 @@
 				}
 				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write"))
+				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 					$output .= FS::$iMgr->opendiv(14,$data["name"],array("lnkadd" => "name=".$data["name"]));
-				else
+				}
+				else {
 					$output .= $data["name"];
+				}
 
 				$output .= "</td><td>".$data["mail"]."</td>
 					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
@@ -508,25 +510,31 @@
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("7").
 				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
-				FS::$iMgr->idxLine("is-template","istemplate",array("value" => $template,"type" => "chk"));
-			//$output .= template list
-			$output .= FS::$iMgr->idxIdLine("Name","name",$name).
-				FS::$iMgr->idxLine("Email","mail",array("value" => $mail)).
-				"<tr><td>".$this->loc->s("srvnotifperiod")."</td><td>".(new icingaTimePeriod())->getSelect("srvnotifperiod",$srvnotifperiod)."</td></tr>".
-				FS::$iMgr->idxLine("srvoptcrit","srvoptc",array("value" => $srvoptc,"type" => "chk")).
-				FS::$iMgr->idxLine("srvoptwarn","srvoptw",array("value" => $srvoptw,"type" => "chk")).
-				FS::$iMgr->idxLine("srvoptunreach","srvoptu",array("value" => $srvoptu,"type" => "chk")).
-				FS::$iMgr->idxLine("srvoptrec","srvoptr",array("value" => $srvoptr,"type" => "chk")).
-				FS::$iMgr->idxLine("srvoptflap","srvoptf",array("value" => $srvoptf,"type" => "chk")).
-				FS::$iMgr->idxLine("srvoptsched","srvopts",array("value" => $srvopts,"type" => "chk")).
-				"<tr><td>".$this->loc->s("srvnotifcmd")."</td><td>".$this->genCommandList("srvnotifcmd",$srvnotifcmd)."</td></tr>".
-				"<tr><td>".$this->loc->s("hostnotifperiod")."</td><td>".(new icingaTimePeriod())->getSelect("hostnotifperiod",$hostnotifperiod)."</td></tr>".
-				FS::$iMgr->idxLine("hostoptdown","hostoptd",array("value" => $hostoptd,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptunreach","hostoptu",array("value" => $hostoptu,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptrec","hostoptr",array("value" => $hostoptr,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptflap","hostoptf",array("value" => $hostoptf,"type" => "chk")).
-				FS::$iMgr->idxLine("hostoptsched","hostopts",array("value" => $hostopts,"type" => "chk")).
-				"<tr><td>".$this->loc->s("hostnotifcmd")."</td><td>".$this->genCommandList("hostnotifcmd",$hostnotifcmd)."</td></tr>".
+				FS::$iMgr->idxLines(array(
+					array("Name","name",array("type" => "idxedit", "value" => $name, "edit" => $name != "")),
+					array("Email","mail",array("value" => $mail)),
+					array("srvnotifperiod","",array("type" => "raw", "value" => 
+						(new icingaTimePeriod())->getSelect(
+							array("name" => "srvnotifperiod", "selected" => $srvnotifperiod)))),
+					array("srvoptcrit","srvoptc",array("value" => $srvoptc,"type" => "chk")),
+					array("srvoptwarn","srvoptw",array("value" => $srvoptw,"type" => "chk")),
+					array("srvoptunreach","srvoptu",array("value" => $srvoptu,"type" => "chk")),
+					array("srvoptrec","srvoptr",array("value" => $srvoptr,"type" => "chk")),
+					array("srvoptflap","srvoptf",array("value" => $srvoptf,"type" => "chk")),
+					array("srvoptsched","srvopts",array("value" => $srvopts,"type" => "chk")),
+					array("srvnotifcmd","",array("type" => "raw", "value" =>
+						$this->genCommandList("srvnotifcmd",$srvnotifcmd))),
+					array("hostnotifperiod","",array("type" => "raw", "value" =>
+						(new icingaTimePeriod())->getSelect(array(
+							"name" => "hostnotifperiod", "selected" => $hostnotifperiod)))),
+					array("hostoptdown","hostoptd",array("value" => $hostoptd,"type" => "chk")),
+					array("hostoptunreach","hostoptu",array("value" => $hostoptu,"type" => "chk")),
+					array("hostoptrec","hostoptr",array("value" => $hostoptr,"type" => "chk")),
+					array("hostoptflap","hostoptf",array("value" => $hostoptf,"type" => "chk")),
+					array("hostoptsched","hostopts",array("value" => $hostopts,"type" => "chk")),
+					array("hostnotifcmd","",array("type" => "raw", "value" =>
+						$this->genCommandList("hostnotifcmd",$hostnotifcmd)))
+				)).
 				FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
