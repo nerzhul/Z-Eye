@@ -1,6 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+	* Copyright (C) 2010-2014 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -479,66 +479,6 @@
 			return $output;
 		}
 
-		private function showContactForm($name = "") {
-			$mail = ""; $template = false;
-			$srvnotifperiod = ""; $srvnotifcmd = "notify-service-by-email"; $srvoptc = true; $srvoptw = true; $srvoptu = true; $srvoptr = true; $srvoptf = true; $srvopts = true;
-			$hostnotifperiod = ""; $hostnotifcmd = "notify-host-by-email"; $hostoptd = true; $hostoptu = true; $hostoptr = true; $hostoptf = true; $hostopts = true;
-			if ($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","mail,template,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts,template",
-					"name = '".$name."'");
-				if ($data = FS::$dbMgr->Fetch($query)) {
-					$mail = $data["mail"];
-					$template = $data["template"] == 't';
-					$srvnotifperiod = $data["srvperiod"];
-					$srvnotifcmd = $data["srvcmd"];
-					$srvoptc = ($data["soptc"] == 't');
-					$srvoptw = ($data["soptw"] == 't');
-					$srvoptu = ($data["soptu"] == 't');
-					$srvoptr = ($data["soptr"] == 't');
-					$srvoptf = ($data["soptf"] == 't');
-					$srvopts = ($data["sopts"] == 't');
-					$hostnotifperiod = $data["hostperiod"];
-					$hostnotifcmd = $data["hostcmd"];
-					$hostoptd = ($data["hoptd"] == 't');
-					$hostoptu = ($data["hoptu"] == 't');
-					$hostoptr = ($data["hoptr"] == 't');
-					$hostoptf = ($data["hoptf"] == 't');
-					$hostopts = ($data["hopts"] == 't');
-				}
-			}
-
-			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("7").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
-				FS::$iMgr->idxLines(array(
-					array("Name","name",array("type" => "idxedit", "value" => $name, "edit" => $name != "")),
-					array("Email","mail",array("value" => $mail)),
-					array("srvnotifperiod","",array("type" => "raw", "value" => 
-						(new icingaTimePeriod())->getSelect(
-							array("name" => "srvnotifperiod", "selected" => $srvnotifperiod)))),
-					array("srvoptcrit","srvoptc",array("value" => $srvoptc,"type" => "chk")),
-					array("srvoptwarn","srvoptw",array("value" => $srvoptw,"type" => "chk")),
-					array("srvoptunreach","srvoptu",array("value" => $srvoptu,"type" => "chk")),
-					array("srvoptrec","srvoptr",array("value" => $srvoptr,"type" => "chk")),
-					array("srvoptflap","srvoptf",array("value" => $srvoptf,"type" => "chk")),
-					array("srvoptsched","srvopts",array("value" => $srvopts,"type" => "chk")),
-					array("srvnotifcmd","",array("type" => "raw", "value" =>
-						$this->genCommandList("srvnotifcmd",$srvnotifcmd))),
-					array("hostnotifperiod","",array("type" => "raw", "value" =>
-						(new icingaTimePeriod())->getSelect(array(
-							"name" => "hostnotifperiod", "selected" => $hostnotifperiod)))),
-					array("hostoptdown","hostoptd",array("value" => $hostoptd,"type" => "chk")),
-					array("hostoptunreach","hostoptu",array("value" => $hostoptu,"type" => "chk")),
-					array("hostoptrec","hostoptr",array("value" => $hostoptr,"type" => "chk")),
-					array("hostoptflap","hostoptf",array("value" => $hostoptf,"type" => "chk")),
-					array("hostoptsched","hostopts",array("value" => $hostopts,"type" => "chk")),
-					array("hostnotifcmd","",array("type" => "raw", "value" =>
-						$this->genCommandList("hostnotifcmd",$hostnotifcmd)))
-				)).
-				FS::$iMgr->aeTableSubmit($name == "");
-			return $output;
-		}
-
 		private function showContactgroupsTab() {
 			FS::$iMgr->setURL("sh=7");
 			
@@ -897,7 +837,7 @@
 					}
 
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias")) {
-						return $this->showContactForm();
+						return (new icingaContact)->showForm();
 					}
 					else {
 						return FS::$iMgr->printError("err-no-timeperiod");
@@ -955,7 +895,7 @@
 						return $this->loc->s("err-bad-datas");
 					}
 
-					return $this->showContactForm($name);
+					return (new icingaContact)->showForm($name);
 				case 15:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
@@ -1222,15 +1162,8 @@
 						return;
 					}
 					
-					// @ TODO forbid remove when used (service + host / groups ??)
-					
 					// Forbid remove if timeperiod is used
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","srvperiod = '".$tpname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-binary-used");
-						return;
-					}
-					
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","hostperiod = '".$tpname."'")) {
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_notif_strategy","name","period = '".$tpname."'")) {
 						FS::$iMgr->ajaxEchoNC("err-binary-used");
 						return;
 					}
@@ -1240,7 +1173,7 @@
 						return;
 					}
 					
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","notifperiod = '".$tpname."'")) {
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","checkperiod = '".$tpname."'")) {
 						FS::$iMgr->ajaxEchoNC("err-binary-used");
 						return;
 					}
@@ -1254,83 +1187,7 @@
 					return;
 				// Add/Edit contact
 				case 7:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-						echo $this->loc->s("err-no-right");
-						return;
-					} 
-
-					$name = FS::$secMgr->getPost("name","w");
-					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
-					$srvnotifperiod = FS::$secMgr->getPost("srvnotifperiod","w");
-					$srvnotifcmd = FS::$secMgr->checkAndSecurisePostData("srvnotifcmd");
-					$hostnotifperiod = FS::$secMgr->getPost("hostnotifperiod","w");
-					$hostnotifcmd = FS::$secMgr->checkAndSecurisePostData("hostnotifcmd");
-					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-					if (!$name || !$mail || preg_match("#[ ]#",$name) || !$srvnotifperiod || !$srvnotifcmd || !$hostnotifperiod || !$hostnotifcmd) {
-						echo $this->loc->s("err-bad-data");
-						return;
-					}	
-
-					$istpl = FS::$secMgr->checkAndSecurisePostData("istemplate");
-					$srvoptc = FS::$secMgr->checkAndSecurisePostData("srvoptc");
-					$srvoptw = FS::$secMgr->checkAndSecurisePostData("srvoptw");
-					$srvoptu = FS::$secMgr->checkAndSecurisePostData("srvoptu");
-					$srvoptr = FS::$secMgr->checkAndSecurisePostData("srvoptr");
-					$srvoptf = FS::$secMgr->checkAndSecurisePostData("srvoptf");
-					$srvopts = FS::$secMgr->checkAndSecurisePostData("srvopts");
-					$hostoptd = FS::$secMgr->checkAndSecurisePostData("hostoptd");
-					$hostoptu = FS::$secMgr->checkAndSecurisePostData("hostoptu");
-					$hostoptr = FS::$secMgr->checkAndSecurisePostData("hostoptr");
-					$hostoptf = FS::$secMgr->checkAndSecurisePostData("hostoptf");
-					$hostopts = FS::$secMgr->checkAndSecurisePostData("hostopts");
-
-					if ($edit) {
-						// If contact doesn't exist
-						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'")) {
-							echo $this->loc->s("err-data-not-exist");
-							return;
-						}
-					}
-					else {
-						// If contact exist
-						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","name = '".$name."'")) {
-							echo $this->loc->s("err-data-exist");
-							return;
-						}
-					}
-
-					// Timeperiods don't exist
-					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$srvnotifperiod."'")) {
-						echo $this->loc->s("err-bad-data");
-						return;
-					}
-
-					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$hostnotifperiod."'")) {
-						echo $this->loc->s("err-bad-data");
-						return;
-					}
-
-					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$srvnotifcmd."'")) {
-						echo $this->loc->s("err-bad-data");
-						return;
-					}
-
-					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$hostnotifcmd."'")) {
-						echo $this->loc->s("err-bad-data");
-						return;
-					}
-
-					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contacts","name = '".$name."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,template,srvperiod,srvcmd,hostperiod,hostcmd,soptc,soptw,soptu,soptr,soptf,sopts,hoptd,hoptu,hoptr,hoptf,hopts",
-						"'".$name."','".$mail."','".($istpl == "on" ? 1 : 0)."','".$srvnotifperiod."','".$srvnotifcmd."','".$hostnotifperiod."','".$hostnotifcmd."','".($srvoptc == "on" ? 1 : 0)."','".
-						($srvoptw == "on" ? 1 : 0)."','".($srvoptu == "on" ? 1 : 0)."','".($srvoptr == "on" ? 1 : 0)."','".($srvoptf == "on" ? 1 : 0)."','".($srvopts == "on" ? 1 : 0)."','".
-						($hostoptd == "on" ? 1 : 0)."','".($hostoptu == "on" ? 1 : 0)."','".($hostoptr == "on" ? 1 : 0)."','".($hostoptf == "on" ? 1 : 0)."','".($hostopts == "on" ? 1 : 0)."'");
-
-					if (!$this->icingaAPI->writeConfiguration()) {
-						echo $this->loc->s("err-fail-writecfg");
-						return;
-					}
-					FS::$iMgr->redir("mod=".$this->mid."&sh=6",true);
+					(new icingaContact())->Modify();
 					return;
 				// Delete contact
 				case 9:
@@ -1366,23 +1223,19 @@
 					return;
 				// Add/Edit contact group
 				case 10:
-					$ctg = new icingaCtg();
-					$ctg->Modify();
+					(new icingaCtg())->Modify();
 					return;
 				// Delete contact group
 				case 12:
-					$ctg = new icingaCtg();
-					$ctg->Remove();
+					(new icingaCtg())->Remove();
 					return;
 				// Add/Edit host
 				case 13:
-					$host = new IcingaHost();
-					$host->Modify();
+					(new IcingaHost())->Modify();
 					return;
 				// Remove host
 				case 15:
-					$host = new IcingaHost();
-					$host->Remove();
+					(new IcingaHost())->Remove();
 					return;
 				// Add/Edit service
 				case 16:
@@ -1517,13 +1370,11 @@
 					return;
 				// Add/Edit notification strategy
 				case 22:
-					$icingaNotifStr = new icingaNotificationStrategy();
-					$icingaNotifStr->Modify();
+					(new icingaNotificationStrategy())->Modify();
 					return;
 				// Remove notification strategy
 				case 23:
-					$icingaNotifStr = new icingaNotificationStrategy();
-					$icingaNotifStr->Remove();
+					(new icingaNotificationStrategy())->Remove();
 					return;
 			}
 		}

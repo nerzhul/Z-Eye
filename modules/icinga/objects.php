@@ -1,6 +1,6 @@
 <?php
 	/*
-	* Copyright (C) 2010-2013 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+	* Copyright (C) 2010-2014 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
 	*
 	* This program is free software; you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
@@ -16,6 +16,156 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
+	
+	final class icingaContact extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_contacts";
+			$this->sqlAttrId = "name";
+			$this->readRight = "mrule_icinga_ct_write";
+			$this->writeRight = "mrule_icinga_ct_write";
+		}
+		
+		protected function Load($name = "") {
+			$this->name = $name;
+			$this->mail = "";
+			$this->template = false;
+			$this->srvnotifcmd = "notify-service-by-email";
+			$this->hostnotifcmd = "notify-host-by-email";
+			$this->hostnotifstrategy = "";
+			$this->servicenotifstrategy = "";
+			
+			if ($name) {
+				$query = FS::$dbMgr->Select($this->sqlTable,"mail,template,srvcmd,hostcmd,template,host_notif_strategy,service_notif_strategy",
+					"name = '".$name."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->mail = $data["mail"];
+					$this->template = $data["template"] == 't';
+					$this->srvnotifcmd = $data["srvcmd"];
+					$this->hostnotifcmd = $data["hostcmd"];
+					$this->hostnotifstrategy = $data["host_notif_strategy"];
+					$this->servicenotifstrategy = $data["service_notif_strategy"];
+				}
+			}
+		}
+		
+		public function showForm($name = "") {
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError("err-no-right");
+			}
+			
+			$this->Load($name);
+			
+			return FS::$iMgr->cbkForm("7").
+				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				FS::$iMgr->idxLines(array(
+					array("Name","name",array("type" => "idxedit", "value" => $this->name, "edit" => $this->name != "")),
+					array("Email","mail",array("value" => $this->mail)),
+					array("Notification-strategy-services","",array("type" => "raw", "value" => 
+						(new icingaNotificationStrategy())->getSelect(array(
+							"name" => "snotifstr",
+							"selected" => $this->servicenotifstrategy
+					)))),
+					array("srvnotifcmd","",array("type" => "raw", "value" =>
+						$this->mod->genCommandList("srvnotifcmd",$this->srvnotifcmd))),
+					array("Notification-strategy-hosts","",array("type" => "raw", "value" => 
+						(new icingaNotificationStrategy())->getSelect(array(
+							"name" => "hnotifstr",
+							"selected" => $this->hostnotifstrategy
+					)))),
+					array("hostnotifcmd","",array("type" => "raw", "value" =>
+						$this->mod->genCommandList("hostnotifcmd",$this->hostnotifcmd)))
+				)).
+				FS::$iMgr->aeTableSubmit($name == "");
+		}
+		
+		public function Modify() {
+			if (!$this->canWrite()) {
+				FS::$iMgr->ajaxEcho("err-no-right");
+				return;
+			} 
+
+			$name = FS::$secMgr->getPost("name","w");
+			$mail = FS::$secMgr->checkAndSecurisePostData("mail");
+			$srvnotifcmd = FS::$secMgr->checkAndSecurisePostData("srvnotifcmd");
+			$hostnotifcmd = FS::$secMgr->checkAndSecurisePostData("hostnotifcmd");
+			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
+			$snotifstr = FS::$secMgr->checkAndSecurisePostData("snotifstr");
+			$hnotifstr = FS::$secMgr->checkAndSecurisePostData("hnotifstr");
+			$istpl = FS::$secMgr->checkAndSecurisePostData("istemplate");
+			
+			if (!$name || !$mail || preg_match("#[ ]#",$name) ||
+				!$srvnotifcmd ||
+				!$hostnotifcmd || !$snotifstr || !$hnotifstr) {
+				FS::$iMgr->ajaxEcho("err-bad-data");
+				return;
+			}	
+
+			if ($edit) {
+				// If contact doesn't exist
+				if (!$this->exists($name)) {
+					echo $this->loc->s("err-data-not-exist");
+					return;
+				}
+			}
+			else {
+				// If contact exist
+				if ($this->exists($name)) {
+					echo $this->loc->s("err-data-exist");
+					return;
+				}
+			}
+
+			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$srvnotifcmd."'")) {
+				echo $this->loc->s("err-bad-data");
+				return;
+			}
+
+			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$hostnotifcmd."'")) {
+				echo $this->loc->s("err-bad-data");
+				return;
+			}
+			
+			if (!(new icingaNotificationStrategy())->exists($hnotifstr)) {
+				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$hnotifstr),"",true);
+				return;
+			}
+			
+			if (!(new icingaNotificationStrategy())->exists($snotifstr)) {
+				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$snotifstr),"",true);
+				return;
+			}
+
+			FS::$dbMgr->BeginTr();
+			
+			if ($edit) {
+				FS::$dbMgr->Delete($this->sqlTable,"name = '".$name."'");
+			}
+			
+			FS::$dbMgr->Insert($this->sqlTable,
+				"name,mail,template,srvcmd,hostcmd,host_notif_strategy,service_notif_strategy",
+				"'".$name."','".$mail."','".($istpl == "on" ? 1 : 0)."','".
+				$srvnotifcmd."','".$hostnotifcmd."','".
+				$hnotifstr."','".$snotifstr."'");
+
+			FS::$dbMgr->CommitTr();
+			
+			$icingaAPI = new icingaBroker();
+			if (!$icingaAPI->writeConfiguration()) {
+				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				return;
+			}
+			FS::$iMgr->redir("mod=".$this->mid."&sh=6",true);
+		}
+		
+		private $name;
+		private $mail;
+		private $template;
+		private $servicenotifstrategy;
+		private $srvnotifcmd;
+		private $hostnotifstrategy;
+		private $hostnotifcmd;
+	}
 
 	final class icingaCtg extends FSMObj {
 		function __construct() {
@@ -1090,15 +1240,13 @@
 			
 			// Now verify datas
 			if($edit) {
-				if(!FS::$dbMgr->GetOneData($this->sqlTable,"name",
-					"name = '".$name."'")) {
+				if(!$this->exists($name)) {
 					FS::$iMgr->ajaxEcho("err-data-not-exist");
 					return;
 				}
 			}
 			else {
-				if(FS::$dbMgr->GetOneData($this->sqlTable,"name",
-					"name = '".$name."'")) {
+				if($this->exists($name)) {
 					FS::$iMgr->ajaxEchoNC("err-data-exist");
 					return;
 				}

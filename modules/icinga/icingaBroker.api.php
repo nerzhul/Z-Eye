@@ -112,80 +112,141 @@
 			$file = fopen($path."contacts.cfg","w+");
 			if(!$file)
 				return false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,srvperiod,srvcmd,hostperiod,hostcmd,hoptd,hoptu,hoptr,hoptf,hopts,soptc,soptw,soptu,soptr,soptf,sopts","template = 'f'");
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,srvcmd,hostcmd,host_notif_strategy,service_notif_strategy","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\tservice_notification_period\t".$data["srvperiod"]."\n\thost_notification_period\t".$data["hostperiod"]."\n\t");
+				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\tservice_notification_period\t".$data["srvperiod"]."\n\t");
 				fwrite($file,"service_notification_commands\t".$data["srvcmd"]."\n\thost_notification_commands\t".$data["hostcmd"]."\n\temail\t".$data["mail"]."\n\t");
 				
-				$found = false;
-				if($data["hoptd"] == "t") {
-					if(!$found) fwrite($file,"host_notification_options\t");
-					fwrite($file,"d");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["hoptu"] == "t") {
-					if(!$found) fwrite($file,"host_notification_options\t");
-					fwrite($file,"u");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["hoptr"] == "t") {
-					if(!$found) fwrite($file,"host_notification_options\t");
-					fwrite($file,"r");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["hoptf"] == "t") {
-					if(!$found) fwrite($file,"host_notification_options\t");
-					fwrite($file,"f");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["hopts"] == "t") {
-					if(!$found) fwrite($file,"host_notification_options\t");
-					fwrite($file,"s");
-					$found = true;
+				if (isset($this->notificationStrategies[$data["host_notif_strategy"]])) {
+					fwrite($file,"\n\thost_notification_period\t".$this->notificationStrategies[$data["host_notif_strategy"]]["period"]."\n\t");
+					
+					$found = false;
+					
+					if($this->notificationStrategies[$data["host_notif_strategy"]]["ev_updown"] == "t") {
+						if(!$found) {
+							fwrite($file,"host_notification_options\t");
+						}
+						fwrite($file,"d");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+
+					if($this->notificationStrategies[$data["host_notif_strategy"]]["ev_unavailable"] == "t") {
+						if(!$found) {
+							fwrite($file,"host_notification_options\t");
+						}
+						fwrite($file,"u");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["host_notif_strategy"]]["ev_recovery"] == "t") {
+						if(!$found) {
+							fwrite($file,"host_notification_options\t");
+						}
+						fwrite($file,"r");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["host_notif_strategy"]]["ev_flap"] == "t") {
+						if(!$found) {
+							fwrite($file,"host_notification_options\t");
+						}
+						fwrite($file,"f");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["host_notif_strategy"]]["ev_scheduled"] == "t") {
+						if(!$found) {
+							fwrite($file,"host_notification_options\t");
+						}
+						fwrite($file,"s");
+					}
 				}
 				
-				$found = false;
-				if($data["soptc"] == "t") {
-					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
-					fwrite($file,"c");
-					$found = true;
-				}
-				
-				if($found) fwrite($file,",");
-				if($data["soptw"] == "t") {
-					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
-					fwrite($file,"w");
-					$found = true;
-				}
-				
-				if($found) fwrite($file,",");
-				if($data["soptu"] == "t") {
-					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
-					fwrite($file,"u");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				
-				if($data["soptr"] == "t") {
-					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
-					fwrite($file,"r");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				
-				if($data["soptf"] == "t") {
-					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
-					fwrite($file,"f");
-					$found = true;
-				}
-				if($found) fwrite($file,",");
-				if($data["sopts"] == "t") {
-					if(!$found) fwrite($file,"\n\tservice_notification_options\t");
-					fwrite($file,"s");
+				if (isset($this->notificationStrategies[$data["service_notif_strategy"]])) {
+					fwrite($file,"\n\tservice_notification_period\t".$this->notificationStrategies[$data["service_notif_strategy"]]["period"]."\n\t");
+					
+					$found = false;
+					
+					if($this->notificationStrategies[$data["service_notif_strategy"]]["ev_crit"] == "t") {
+						if(!$found) {
+							fwrite($file,"service_notification_options\t");
+						}
+						fwrite($file,"c");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["service_notif_strategy"]]["ev_warn"] == "t") {
+						if(!$found) {
+							fwrite($file,"service_notification_options\t");
+						}
+						fwrite($file,"w");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["service_notif_strategy"]]["ev_unavailable"] == "t") {
+						if(!$found) {
+							fwrite($file,"service_notification_options\t");
+						}
+						fwrite($file,"u");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["service_notif_strategy"]]["ev_recovery"] == "t") {
+						if(!$found) fwrite($file,"tservice_notification_options\t");
+						fwrite($file,"r");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["service_notif_strategy"]]["ev_flap"] == "t") {
+						if(!$found) {
+							fwrite($file,"service_notification_options\t");
+						}
+						fwrite($file,"f");
+						$found = true;
+					}
+					
+					if($found) {
+						fwrite($file,",");
+					}
+					
+					if($this->notificationStrategies[$data["service_notif_strategy"]]["ev_scheduled"] == "t") {
+						if(!$found) {
+							fwrite($file,"service_notification_options\t");
+						}
+						fwrite($file,"s");
+					}
 				}
 				fwrite($file,"\n}\n\n");
 			}
