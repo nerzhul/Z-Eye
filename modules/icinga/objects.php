@@ -1313,6 +1313,20 @@
 				return;
 			}
 			
+			if ($ctUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
+				"name","host_notif_strategy = '".$name."'")) {
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-contact"),
+					$name,$ctUsed),"",true);
+				return;
+			}
+			
+			if ($ctUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
+				"name","service_notif_strategy = '".$name."'")) {
+				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-contact"),
+					$name,$ctUsed),"",true);
+				return;
+			}
+			
 			$this->removeFromDB($name);
 
 			$icingaAPI = new icingaBroker();
