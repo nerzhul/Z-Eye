@@ -959,12 +959,17 @@
 						return;
 					} 
 
+					FS::$dbMgr->BeginTr();
+					
 					if ($edit) {
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");
 					}
 					
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd,cmd_comment",
 						"'".$cmdname."','".$cmd."','".$comment."'");
+						
+					FS::$dbMgr->CommitTr();
+					
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEcho("err-fail-writecfg");
 						return;
