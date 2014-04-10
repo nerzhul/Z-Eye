@@ -97,11 +97,14 @@
 			 */
 			 
 			$file = fopen($path."commands.cfg","w+");
-			if(!$file)
+			if(!$file) {
 				return false;
+			}
+			
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd");
-			while($data = FS::$dbMgr->Fetch($query))
+			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define command {\n\tcommand_name\t".$data["name"]."\n\tcommand_line\t".$data["cmd"]."\n}\n\n");
+			}
 			
 			fclose($file);
 			
@@ -110,8 +113,10 @@
 			 */
 			 
 			$file = fopen($path."contacts.cfg","w+");
-			if(!$file)
+			if(!$file) {
 				return false;
+			}
+			
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,srvcmd,hostcmd,host_notif_strategy,service_notif_strategy","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\t");
@@ -271,8 +276,10 @@
 			 */
 			 
 			$file = fopen($path."timeperiods.cfg","w+");
-			if(!$file)
+			if(!$file) {
 				return false;
+			}
+			
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define timeperiod {\n\ttimeperiod_name\t".$data["name"]."\n\talias\t".$data["alias"]);
@@ -300,8 +307,10 @@
 			 */
 			 
 			$file = fopen($path."hosts.cfg","w+");
-			if(!$file)
+			if(!$file) {
 				return false;
+			}
+			
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,failpreden,
 			perfdata,retstatus,retnonstatus,notifen,contactgroup,iconid,notif_strategy","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
@@ -399,8 +408,10 @@
 			 */
 			
 			$file = fopen($path."hostgroups.cfg","w+");
-			if(!$file)
+			if(!$file) {
 				return false;
+			}
+			
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias");
 			while($data = FS::$dbMgr->Fetch($query)) {
 				fwrite($file,"define hostgroup {\n\thostgroup_name\t".$data["name"]."\n\talias\t".$data["alias"]);
@@ -541,8 +552,10 @@
 			 */
 			 
 			$file = fopen("/tmp/icinga_restart","w+");
-			if(!$file)
+			if(!$file) {
 				return false;
+			}
+			
 			fwrite($file,"1");
 			fclose($file);
 			
