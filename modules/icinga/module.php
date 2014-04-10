@@ -627,28 +627,6 @@
 			return $output;
 		}
 
-		private function showCommandForm($name="") {
-			$command = "";
-			$comment = "";
-			if ($name) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_commands","cmd,cmd_comment","name = '".$name."'");
-				if ($data = FS::$dbMgr->Fetch($query)) {
-					$command = $data["cmd"];
-					$comment = $data["cmd_comment"];
-				}
-			}
-	
-			return FS::$iMgr->cbkForm("1").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
-				FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30, "tooltip" => "tooltip-cmdname")).
-				FS::$iMgr->idxLine("Command","cmd",array("type" => "area", "value" => $command,
-					"length" => 1024, "size" => 30, "height" => "150",
-					"tooltip" => "tooltip-cmd")).
-				FS::$iMgr->idxLine("Comment","comment",array("type" => "area", "value" => $comment,
-					"length" => 512, "size" => 30, "height" => "100")).
-				FS::$iMgr->aeTableSubmit($name == "");
-		}
-
 		public function genCommandList($name,$tocheck = NULL) {
 			return FS::$iMgr->select($name).
 				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_commands","name",
@@ -842,13 +820,8 @@
 					else {
 						return FS::$iMgr->printError("err-no-timeperiod");
 					}
-				case 8:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-						return $this->loc->s("err-no-rights");
-					}
-					
-					return (new icingaCtg())->showForm();
-				case 9: return $this->showCommandForm();
+				case 8: return (new icingaCtg())->showForm();
+				case 9: return (new icingaCommand())->showForm();
 				case 10:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					return (new icingaHost())->showForm($name);
@@ -864,10 +837,6 @@
 
 					return $this->showHostgroupForm($name);
 				case 12:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-						return $this->loc->s("err-no-rights");
-					}
-
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
 						return $this->loc->s("err-bad-datas");
@@ -904,16 +873,12 @@
 
 					return (new icingaCtg())->showForm($name);
 				case 16:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-						return $this->loc->s("err-no-rights");
-					}
-
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
 						return $this->loc->s("err-bad-datas");
 					}
 
-					return $this->showCommandForm($name);
+					return (new icingaCommand())->showForm($name);
 				case 17:
 					$name = FS::$secMgr->checkAndSecuriseGetData("host");
 					if (!$name) {

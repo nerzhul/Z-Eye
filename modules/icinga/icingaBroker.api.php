@@ -114,7 +114,7 @@
 				return false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contacts","name,mail,srvcmd,hostcmd,host_notif_strategy,service_notif_strategy","template = 'f'");
 			while($data = FS::$dbMgr->Fetch($query)) {
-				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\tservice_notification_period\t".$data["srvperiod"]."\n\t");
+				fwrite($file,"define contact {\n\tcontact_name\t".$data["name"]."\n\t");
 				fwrite($file,"service_notification_commands\t".$data["srvcmd"]."\n\thost_notification_commands\t".$data["hostcmd"]."\n\temail\t".$data["mail"]."\n\t");
 				
 				if (isset($this->notificationStrategies[$data["host_notif_strategy"]])) {

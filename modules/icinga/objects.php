@@ -582,7 +582,7 @@
 			}
 			
 			FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,dname,addr,alivecommand,checkperiod,checkinterval,retrycheckinterval,maxcheck,eventhdlen,flapen,
-				failpreden,perfdata,retstatus,retnonstatus,notifen,notifperiod,notifintval,hostoptd,hostoptu,hostoptr,hostoptf,hostopts,contactgroup,template,iconid,notif_strategy",
+				failpreden,perfdata,retstatus,retnonstatus,notifen,contactgroup,template,iconid,notif_strategy",
 				"'".$name."','".$alias."','".$dname."','".$addr."','".$checkcommand."','".$checkperiod."','".$checkintval."','".$retcheckintval."','".$maxcheck."','".($eventhdlen == "on" ? 1 : 0)."','".($flapen == "on" ? 1 : 0)."','".
 				($failpreden == "on" ? 1 : 0)."','".($perfdata == "on" ? 1 : 0)."','".($retstatus == "on" ? 1 : 0)."','".($retnonstatus == "on" ? 1 : 0)."','".($notifen == "on" ? 1 : 0)."','".
 				$ctg."','".($tpl == "on" ? 1 : 0)."','".($icon ? $icon : 0)."','".$notifstr."'");
@@ -1171,7 +1171,66 @@
 				"</select>";
 		}
 	};
+	
+	final class icingaCommand extends FSMObj {
+		function __construct() {
+			parent::__construct();
+			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_commands";
+			$this->sqlAttrId = "name";
+			$this->readRight = "mrule_icinga_cmd_write";
+			$this->writeRight = "mrule_icinga_cmd_write";
+		}
+		
+		protected function Load($name = "") {
+			$this->name = $name;
 			
+			$this->cmd = "";
+			$this->comment = "";
+			$this->isSysCmd = false;
+			
+			if ($name) {
+				$query = FS::$dbMgr->Select($this->sqlTable,
+					"syscmd,cmd,cmd_comment","name = '".$name."'");
+				if ($data = FS::$dbMgr->Fetch($query)) {
+					$this->cmd = $data["cmd"];
+					$this->comment = $data["cmd_comment"];
+					$this->isSysCmd = ($data["syscmd"] == 't');
+				}
+			}
+		}
+		
+		public function showForm($name = "") {
+			if (!$this->canRead()) {
+				return FS::$iMgr->printError("err-no-right");
+			}
+			
+			$this->Load($name);
+			
+			return FS::$iMgr->cbkForm("1").
+				"<table><tr><th>".$this->loc->s("Option")."</th><th>".
+				$this->loc->s("Value")."</th></tr>".
+				FS::$iMgr->idxLines(array(
+					array("Name","name",array("type" => "idxedit",
+						"value" => $name,
+						"length" => 60, "size" => 30, 
+						"tooltip" => "tooltip-cmdname",
+						"edit" => $name != "")),
+					array("Command","cmd",array("type" => "area", 
+					"value" => $this->cmd,
+					"length" => 1024, "size" => 30, "height" => "150",
+					"tooltip" => "tooltip-cmd")),
+					array("Comment","comment",array("type" => "area",
+					"value" => $this->comment,
+					"length" => 512, "size" => 30, "height" => "100"))
+				)).
+				FS::$iMgr->aeTableSubmit($name == "");
+		}
+		
+		private $name;
+		private $isSysCmd;
+		private $cmd;
+		private $comment;
+	};	
 	final class icingaNotificationStrategy extends FSMObj {
 		function __construct() {
 			parent::__construct();
