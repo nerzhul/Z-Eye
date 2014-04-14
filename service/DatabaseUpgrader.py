@@ -302,12 +302,12 @@ class ZEyeDBUpgrade():
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'All'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
-					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_sheduled) VALUES ('All','Every time, every notification','0','24x7','t','t','t','t','t','t','t')")
+					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('All','Every time, every notification','0','24x7','t','t','t','t','t','t','t')")
 					
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'Nothing'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
-					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_sheduled) VALUES ('Nothing','No alert','0','24x7','f','f','f','f','f','f','f')")
+					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('Nothing','No alert','0','24x7','f','f','f','f','f','f','f')")
 				
 				# we add the strategy column to hosts
 				self.tryAddColumn("z_eye_icinga_hosts","notif_strategy","varchar(64) NOT NULL DEFAULT ''")
@@ -384,12 +384,12 @@ class ZEyeDBUpgrade():
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'All'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
-					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_sheduled) VALUES ('All','Every time, every notification','0','24x7','t','t','t','t','t','t','t')")
+					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('All','Every time, every notification','0','24x7','t','t','t','t','t','t','t')")
 					
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'Nothing'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
-					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_sheduled) VALUES ('Nothing','No alert','0','24x7','f','f','f','f','f','f','f')")
+					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('Nothing','No alert','0','24x7','f','f','f','f','f','f','f')")
 				
 				# we add the strategy column to contacts
 				self.tryAddColumn("z_eye_icinga_contacts","host_notif_strategy","varchar(64) NOT NULL DEFAULT ''")
