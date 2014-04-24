@@ -828,7 +828,8 @@
 		*/
 		public function opendiv($callid,$text1,$options=array()) {
 			return sprintf("<a href=\"#\" onclick=\"formPopup('%s','%s','%s');\">%s</a>%s",
-				$this->cur_module->getModuleId(),$callid,
+				(isset($options["moduleid"]) ? $options["moduleid"] : $this->cur_module->getModuleId()),
+				$callid,
 				(isset($options["lnkadd"]) ? $options["lnkadd"] : ""),
 				$text1,
 				(isset($options["line"]) && $options["line"]) ? "<br />" : "");
