@@ -19,6 +19,7 @@
 
 	require_once(dirname(__FILE__)."/../lib/FSS/User.FS.class.php");
 	require_once(dirname(__FILE__)."/../lib/FSS/SSH.FS.class.php");
+	require_once(dirname(__FILE__)."/../lib/FSS/modules/Network.FS.class.php");
 
 	class LocalInterface extends FSInterfaceMgr {
 		function __construct() {

@@ -245,11 +245,27 @@
 		}
 		
 		public function isIPIn($ip) {
-			return $netCalc->isUsableIP($ip);
+			return $this->netCalc->isUsableIP($ip);
 		}
 		
 		public function getNetCalc() {
 			return $this->netCalc;
+		}
+		
+		public function getNetId() {
+			return $this->netid;
+		}
+		
+		public function getNetmask() {
+			return $this->netmask;
+		}
+		
+		public function getVLANId() {
+			return $this->vlanid;
+		}
+		
+		public function getShortName() {
+			return $this->shortname;
 		}
 		
 		private $netid;
@@ -474,6 +490,24 @@
 					else {
 						$output .= $this->loc->s("inactive-reserv")."<br />";
 					}
+					
+					$this->ip = $data["ip"];
+					$subnet = $this->getSubnet();
+					if ($subnet != NULL) {
+						$output .= sprintf("<b>%s</b>: %s/%s (%s)<br />",
+							$this->loc->s("Network"),
+							$subnet->getNetId(),
+							$subnet->getNetmask(),
+							$subnet->getShortName()
+						);
+						
+						if ($subnet->getVLANId() != 0) {
+							$output .= sprintf("<b>%s</b>: %s<br />",
+								$this->loc->s("vlanid"),
+								$subnet->getVLANId()
+							);
+						}
+					}
 
 					FS::$searchMgr->incResultCount();
 				}
@@ -540,8 +574,9 @@
 						($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
 						
 					if ($data["distributed"] != 3 && $data["distributed"] != 4) {
-						$output .= $this->loc->s("Validity")." : ".$data["leasetime"];
+						$output .= $this->loc->s("Validity")." : ".$data["leasetime"]."<br />";
 					}
+					
 					FS::$searchMgr->incResultCount();
 				}
 		
@@ -782,6 +817,22 @@
 		
 		public function getIP() {
 			return $this->ip;
+		}
+		
+		private function getSubnet() {
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix().
+				"dhcp_subnet_v4_declared",
+				"netid","",
+				array("order" => "netid"));
+			while ($data = FS::$dbMgr->Fetch($query)) {
+				$subnetObj = new dhcpSubnet();
+				if ($subnetObj->Load($data["netid"]) &&
+					$subnetObj->isIPIn($this->ip)) {
+					return $subnetObj;
+				}
+			}
+			
+			return NULL;
 		}
 		
 		private $sqlCacheTable;
