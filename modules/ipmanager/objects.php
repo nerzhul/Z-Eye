@@ -509,13 +509,15 @@
 						}
 					}
 					
-					$output .= sprintf("<br />%s<br />",
-						FS::$iMgr->opendiv(7,
-							$this->loc->s("Modify-IPM-Infos"),
-							array("lnkadd" => "ip=".$this->ip,
-								"moduleid" => FS::$iMgr->getModuleIdByPath("ipmanager")
-							))
-					);
+					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+						$output .= sprintf("<br />%s<br />",
+							FS::$iMgr->opendiv(7,
+								$this->loc->s("Modify-IPM-Infos"),
+								array("lnkadd" => "ip=".$this->ip,
+									"moduleid" => FS::$iMgr->getModuleIdByPath("ipmanager")
+								))
+						);
+					}
 
 					FS::$searchMgr->incResultCount();
 				}
