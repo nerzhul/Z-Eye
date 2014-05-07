@@ -45,7 +45,7 @@
 		}
 
 		private function popupContainer() {
-			return "<div id=\"lock\"><div id=\"subpop\"></div></div>";
+			return "<div id=\"lock\"><div id=\"subpop\"></div><div id=\"loaderpop\"></div></div>";
 		}
 
 		private function notifContainer() {
