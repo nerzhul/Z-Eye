@@ -361,7 +361,10 @@
 						"</td><td style=\"background-color: ".$outcolor.";\">".$outputbw."</td></tr>";
 				}
 			}
-			if ($pbfound) $output .= $tmpoutput;
+			if ($pbfound) {
+				$output .= $tmpoutput;
+			}
+			
 			$output .= "</table>";
 			if ($pbfound) {
 				$this->BWtotalscore = $total*10;
@@ -388,17 +391,30 @@
 			
 			// Load snort keys for db config
 			$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
-			if ($dbname == "") $dbname = "snort";
+			if ($dbname == "") {
+				$dbname = "snort";
+			}
+			
 			$dbhost = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbhost'");
-			if ($dbhost == "") $dbhost = "localhost";
+			if ($dbhost == "") {
+				$dbhost = "localhost";
+			}
+			
 			$dbuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbuser'");
-			if ($dbuser == "") $dbuser = "snort";
+			if ($dbuser == "") {
+				$dbuser = "snort";
+			}
+			
 			$dbpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbpwd'");
-			if ($dbpwd == "") $dbpwd = "snort";
+			if ($dbpwd == "") {
+				$dbpwd = "snort";
+			}
 			
 			$snortDB = new AbstractSQLMgr();
-			if ($snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd) == 0)
+			if ($snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd) == 0) {
 				$snortDB->Connect();
+			}
+			
 			$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0'",
 				array("group" => "ip_src,ip_dst,sig_name,timestamp","order" => "timestamp","ordersens" => 1));
 			$tmpoutput .= "<table><tr><th>Source</th><th>Destination</th><th>Type</th></tr>";
@@ -541,9 +557,15 @@
 				}
 			}
 
-           if ($atkfound) $output .= $tmpoutput."</table>";
+			if ($atkfound) {
+				$output .= $tmpoutput."</table>";
+			}
+			
 			$this->SECscore = 10000-$scannb-2*$atknb;
-			if ($this->SECscore < 0) $this->SECscore = 0;
+			if ($this->SECscore < 0)  {
+				$this->SECscore = 0;
+			}
+			
 			if ($this->SECscore < 10000) {
 				FS::$iMgr->js("$('#accsech3').css('background-color','#4A0000');");
 				FS::$iMgr->js("$('#accsech3').css('background-image','linear-gradient(#4A0000, #8A0000)');");
