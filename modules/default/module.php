@@ -242,12 +242,12 @@
 				$js = "";
 
 				if (($this->hsicinga / $this->totalicinga) > 15.0 || $this->criticinga > 0) {
-					$js = 	"$('#accicingah3').css('background-color','#4A0000');".
+					$js = "$('#accicingah3').css('background-color','#4A0000');".
 						"$('#accicingah3').css('background-image','linear-gradient(#4A0000, #8A0000)');".
 						"$('#accicingah3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');";
 				}
 				else {
-					$js = 	"$('#accicingah3').css('background-color','#ff8e00');".
+					$js = "$('#accicingah3').css('background-color','#ff8e00');".
 						"$('#accicingah3').css('background-image','linear-gradient(#ff4e00, #ff8e00)');".
 						"$('#accicingah3').css('background-image','-webkit-linear-gradient(#ff4e00, #ff8e00)');";
 				}
@@ -255,9 +255,9 @@
 				FS::$iMgr->js($js);
 			}
 			else {
-				$js = 	"$('#accicingah3').css('background-color','#222');".
-					"$('#accicingah3').css('background-image','linear-gradient(#000, #333)');".
-					"$('#accicingah3').css('background-image','-webkit-linear-gradient(#000, #333)');";
+				$js = "$('#accicingah3').css('background-color','#008A00');".
+					"$('#accicingah3').css('background-image','linear-gradient(#004A00, #008A00)');".
+					"$('#accicingah3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');";
 				FS::$iMgr->js($js);
 			}
 				
@@ -371,9 +371,10 @@
 			}
 			else {
 				$this->BWtotalscore = -1;
-				FS::$iMgr->js("$('#accneth3').css('background-color','#008A00');");
-				FS::$iMgr->js("$('#accneth3').css('background-image','linear-gradient(#004A00, #008A00)');");
-				FS::$iMgr->js("$('#accneth3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');");
+				$js = "$('#accneth3').css('background-color','#008A00');".
+					"$('#accneth3').css('background-image','linear-gradient(#004A00, #008A00)');".
+					"$('#accneth3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');";
+				FS::$iMgr->js($js);
 			}
 			return $output;
 		}
@@ -550,9 +551,10 @@
 			}
 			else {
 				$this->BWtotalscore = -1;
-				FS::$iMgr->js("$('#accsech3').css('background-color','#008A00');");
-				FS::$iMgr->js("$('#accsech3').css('background-image','linear-gradient(#004A00, #008A00)');");
-				FS::$iMgr->js("$('#accsech3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');");
+				$js = "$('#accsech3').css('background-color','#008A00');".
+					"$('#accsech3').css('background-image','linear-gradient(#004A00, #008A00)');".
+					"$('#accsech3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');";
+				FS::$iMgr->js($js);
 			}
 			FS::$dbMgr->Connect();
 			return $output;
