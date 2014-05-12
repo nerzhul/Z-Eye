@@ -410,8 +410,9 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_ip";
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dhcp_ip_cache";
+			$this->sqlAttrId = "ip";
 			$this->readRight = "mrule_ipmanager_read";
-			$this->writeRight = "mrule_ipmmgmt_subnetmgmt";
+			$this->writeRight = "mrule_ipmmgmt_ipmgmt";
 		}
 		
 		public function search($search, $autocomplete = false) {
@@ -604,7 +605,9 @@
 			$this->comment = "";
 			
 			if ($this->ip) {
-				$query = FS::$dbMgr->Select($this->sqlTable,"macaddr,hostname,reserv,comment","ip = '".$this->ip."'");
+				$query = FS::$dbMgr->Select($this->sqlTable,
+					"macaddr,hostname,reserv,comment",
+					$this->sqlAttrId." = '".$this->ip."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->mac = $data["macaddr"];
 					$this->hostname = $data["hostname"];
@@ -617,6 +620,40 @@
 			return true;
 		}
 		
+		public function Remove() {
+			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+				$this->log(2,"Edit IP informations: no rights");
+				FS::$iMgr->ajaxEcho("err-no-rights");
+				return;
+			}
+
+			$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
+
+			if (!$ip || !FS::$secMgr->isIP($ip)) {
+				FS::$iMgr->ajaxEcho(sprintf(
+					$this->loc->s("err-bad-ip-addr"),$ip),"",true);
+				return;
+			}
+			
+			if (!$this->Load($ip) && !$this->LoadFromCache($ip)) {
+				FS::$iMgr->ajaxEcho(sprintf(
+					$this->loc->s("err-no-info-for-ip-addr"),$ip),"",true);
+				return;
+			}
+			
+			$this->removeFromDB($ip);
+						
+			FS::$iMgr->ajaxEcho("Done");
+		}
+		
+		protected function removeFromDB($ip) {
+			FS::$dbMgr->BeginTr();
+			FS::$dbMgr->Delete($this->sqlTable,$this->sqlAttrId." = '".$ip."'");
+			// Disabled, we need to keep the history
+			// FS::$dbMgr->Delete($this->sqlCacheTable,$this->sqlAttrId." = '".$ip."'");
+			FS::$dbMgr->CommitTr();
+		}
+		
 		private function LoadFromCache($ip = "") {
 			$this->ip = $ip;
 			$this->mac = "";
@@ -625,7 +662,9 @@
 			$this->comment = "";
 			
 			if ($this->ip) {
-				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr,hostname","ip = '".$this->ip."' AND distributed = '3'");
+				$query = FS::$dbMgr->Select($this->sqlCacheTable,
+					"macaddr,hostname",
+					$this->sqlAttrId." = '".$this->ip."' AND distributed = '3'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$this->mac = $data["macaddr"];
 					$this->hostname = $data["hostname"];
@@ -677,7 +716,8 @@
 			}
 			
 			FS::$dbMgr->BeginTr();
-			FS::$dbMgr->Delete($this->sqlTable,"ip = '".$this->ip."'");
+			FS::$dbMgr->Delete($this->sqlTable,
+				$this->sqlAttrId." = '".$this->ip."'");
 			FS::$dbMgr->Insert($this->sqlTable,"ip,macaddr,hostname,reserv,comment",
 				"'".$this->ip."','".$this->mac."','".$this->hostname."','t',''");
 			FS::$dbMgr->CommitTr();
@@ -816,9 +856,11 @@
 			foreach ($hostList as $hostname => $values) {
 				foreach($values as $IP => $mac) {
 					if ($repl == "on") {
-						FS::$dbMgr->Delete($this->sqlTable,"ip = '".$IP."' OR macaddr = '".$mac."' or hostname = '".$hostname."'");
+						FS::$dbMgr->Delete($this->sqlTable,
+							$this->sqlAttrId." = '".$IP."' OR macaddr = '".$mac."' or hostname = '".$hostname."'");
 					}
-					FS::$dbMgr->Insert($this->sqlTable,"ip,macaddr,hostname,reserv","'".$IP."','".$mac."','".$hostname."','t'");
+					FS::$dbMgr->Insert($this->sqlTable,
+						"ip,macaddr,hostname,reserv","'".$IP."','".$mac."','".$hostname."','t'");
 				}
 			}
 			FS::$dbMgr->CommitTr();

@@ -214,7 +214,7 @@
 			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th></th><th>".$this->loc->s("Status")."</th>
 				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>".$this->loc->s("Comment")."</th><th>".
 				$this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>".
-				$this->loc->s("Lease-end")."</th><th>".$this->loc->s("Servers")."</th></tr></thead>";
+				$this->loc->s("Lease-end")."</th><th>".$this->loc->s("Servers")."</th><th></th></tr></thead>";
 
 			foreach ($iparray as $key => $value) {
 				$rstate = "";
@@ -290,10 +290,22 @@
 							this.y+' ('+Math.round(this.percentage*100)/100+' %)'; }
 				}}},
 				series: [{ type: 'pie', data: [";
-			if ($used > 0) $js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
-			if ($reserv > 0) $js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
-			if ($fixedip > 0) $js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
-			if ($distrib > 0) $js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+			if ($used > 0) {
+				$js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
+			}
+			
+			if ($reserv > 0) {
+				$js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
+			}
+			
+			if ($fixedip > 0) {
+				$js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
+			}
+			
+			if ($distrib > 0) {
+				$js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+			}
+			
 			$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
 				}]});},300);";
 			FS::$iMgr->js($js);
@@ -320,8 +332,7 @@
 							$this->loc->s("confirm-import-reserv"),$ip),
 							"Import","Cancel")
 					)
-				);
-					
+				);	
 			}
 			$output .= "</td><td>";
 			if (strlen($mac) > 0) {
@@ -360,7 +371,11 @@
 				if ($i > 0) $output .= "<br />";
 				$output .= $servers[$i];
 			}
-			$output .= "</td>";
+			
+			$output .= "</td><td>".
+				FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&ip=".$ip,array("js" => true, "confirm" =>
+					array($this->loc->s("confirm-remove-reservation").$ip."' ?","Confirm","Cancel"))).
+				"</td>";
 			
 			return $output;
 		}
@@ -2789,6 +2804,10 @@
 						FS::$iMgr->js("$('#".$rstateId."').html('".FS::$secMgr->cleanForJS($this->loc->s("Reserved-by-ipmanager"))."');");
 						FS::$iMgr->ajaxEcho("Done");
 					}
+					return;
+				// Remove IP informations
+				case 21:
+					(new dhcpIP())->Remove();
 					return;
 			}
 		}
