@@ -315,7 +315,7 @@
 						if ($administrable) {
 							$output .= sprintf("<td>%s</td>",
 								$recordtype != "SOA" ? 
-									FS::$iMgr->removeIcon("act=14&zn=".$dnszone2.
+									FS::$iMgr->removeIcon(14,"zn=".$dnszone2.
 									"&rc=".$recordname."&rct=".$recordtype."&rcv=".$recordval,
 									array("js" => true, "confirm" => 
 										$this->loc->s("confirm-remove-record")."'".

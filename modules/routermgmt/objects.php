@@ -38,7 +38,8 @@
 				"odivnb" => 10,
 				"odivlink" => "zonename=",
 				"rmcol" => true,
-				"rmlink" => "act=12&zonename",
+				"rmlink" => "zonename",
+				"rmactid" => 12,
 				"rmconfirm" => "confirm-remove-zone",
 			));*/
 		}

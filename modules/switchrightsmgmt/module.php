@@ -141,7 +141,7 @@
 					case 5: $bcktype = "SFTP"; break;
 				}
 				$tmpoutput .= $bcktype."</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= FS::$iMgr->removeIcon("act=4&addr=".$data["addr"]."&type=".$data["type"],array("js" => true,
+				$tmpoutput .= FS::$iMgr->removeIcon(4,"addr=".$data["addr"]."&type=".$data["type"],array("js" => true,
 					"confirm" => $this->loc->s("confirm-remove-backupsrv")."'".$data["addr"]." (".$bcktype.")' ?"));
 				$tmpoutput .= "</center></td></tr>";
 			}
@@ -458,7 +458,7 @@
 		private function showRemoveSpan($type,$type2,$name,$id,$right,$snmpip) {
 			$confirm = ($type == "g" ? $this->loc->s("confirm-remove-groupright") : $this->loc->s("confirm-remove-userright"));
 			$output = "<span id=\"".$type.$id.$right.$type2."\">".$name." ".
-				FS::$iMgr->removeIcon("act=2&".$type."id=".$id."&".$type2."=".$snmpip."&right=".$right,
+				FS::$iMgr->removeIcon(2,$type."id=".$id."&".$type2."=".$snmpip."&right=".$right,
 					array("js" => true, "confirm" => $confirm."'".$name."' ?"))."<br /></span>";
 
 			return $output;

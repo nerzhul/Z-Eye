@@ -87,13 +87,23 @@
 			if (isset($options["odivlink"]))
 				$this->opendivLink = $options["odivlink"];	
 
-			if (isset($options["rmcol"]))
+			if (isset($options["rmcol"])) {
 				$this->removeColumn = $options["rmcol"];	
-			if (isset($options["rmconfirm"]))
-				$this->removeConfirm = $options["rmconfirm"];	
+			}
+			
+			if (isset($options["rmconfirm"])) {
+				$this->removeConfirm = $options["rmconfirm"];
+			}
+			
 			// enable remove link
-			if (isset($options["rmlink"]))
-				$this->removeLink = $options["rmlink"];	
+			if (isset($options["rmlink"])) {
+				$this->removeLink = $options["rmlink"];
+			}
+			
+			if (isset($options["rmactid"])) {
+				$this->removeActId = $options["rmactid"];	
+			}
+			
 			// multiple ID, need group in one line
 			if (isset($options["multiid"]))
 				$this->groupMultipleId = $options["multiid"];	
@@ -202,9 +212,12 @@
 				}
 
 				if ($this->removeColumn) {
-					$output = sprintf("%s<td>%s</td>",$output,FS::$iMgr->removeIcon($this->removeLink."=".$rowIdx,
-						array("js" => true, "confirm" =>
-						FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?")));
+					$output = sprintf("%s<td>%s</td>",$output,
+						FS::$iMgr->removeIcon($this->removeActId, 
+							$this->removeLink."=".$rowIdx,
+							array("js" => true, "confirm" =>
+							FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?"
+					)));
 				}
 				$output = sprintf("%s</tr>",$output);
 			}
@@ -361,6 +374,7 @@
 		// Remove related
 		private $removeColumn;
 		private $removeLink;
+		private $removeActId;
 		private $removeConfirm;
 		
 		// SQL related

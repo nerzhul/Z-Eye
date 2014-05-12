@@ -122,7 +122,7 @@
 					$('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
 				
 				$tmpoutput .= "</td><td>".
-					FS::$iMgr->removeIcon("act=14&alias=".$data["radalias"],
+					FS::$iMgr->removeIcon(14,"alias=".$data["radalias"],
 						array("js" => true,
 							"confirm" => $this->loc->s("confirm-remove-datasrc")."'".$data["radalias"]."'",
 					))."</td></tr>";
@@ -439,7 +439,7 @@
 							$output .= "<tr id=\"rdg_".FS::$iMgr->formatHTMLId($key)."\"><td>".
 								FS::$iMgr->opendiv(4,$key,
 								array("lnkadd" => "ra=".$radalias."&radentry=".$key))."</td><td>".$value."</td><td>".
-								FS::$iMgr->removeIcon("act=5&ra=".$radalias."&group=".$key,
+								FS::$iMgr->removeIcon(5,"ra=".$radalias."&group=".$key,
 									array("js" => true,
 									"confirm" => $this->loc->s("confirm-remove-group")."'".$key."'"))."</td></tr>";
 						}
@@ -554,7 +554,7 @@
 								$this->loc->s("Radius-profile")."</th><th></th></tr>";
 							}
 							$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dhcpsubnet"])."\"><td>".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td><td>".
-								FS::$iMgr->removeIcon("ra=".$radalias."&act=8&subnet=".$data["dhcpsubnet"],array("js" => true,
+								FS::$iMgr->removeIcon(8,"ra=".$radalias."&subnet=".$data["dhcpsubnet"],array("js" => true,
 									"confirm" => $this->loc->s("confirm-remove-subnetlink")."'".$data["dhcpsubnet"]."/".$data["groupname"]."'",
 								))."</td></tr>";
 						}
@@ -676,7 +676,7 @@
 					}
 					$tmpoutput .= "</td><td>".
 						(isset($expirationbuffer[$data["username"]]) ? $expirationbuffer[$data["username"]] : "Jamais").
-						"</td><td>".FS::$iMgr->removeIcon("act=4&ra=".$this->raddbinfos["radalias"].
+						"</td><td>".FS::$iMgr->removeIcon(4,"ra=".$this->raddbinfos["radalias"].
 							"&user=".$data["username"],
 							array("js" => true,
 								"confirm" => $this->loc->s("confirm-remove-user")."'".$data["username"]." ?'")).

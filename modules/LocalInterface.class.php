@@ -177,7 +177,7 @@
 			return $output;
 		}
 
-		public function removeIcon($link,$options=array()) {
+		public function removeIcon($actid, $link, $options=array()) {
 			/*
 			 * We override confirm option with an helper.
 			 * confirm only contain a text, we add delete button labels
@@ -191,8 +191,9 @@
 				);
 			}
 			
-			$link = sprintf("mod=%s&%s",
+			$link = sprintf("mod=%s&act=%s&%s",
 				$this->cur_module->getModuleId(),
+				$actid,
 				$link);
 				
 			return $this->linkIcon($link,"cross",$options);

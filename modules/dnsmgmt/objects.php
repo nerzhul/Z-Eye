@@ -40,7 +40,8 @@
 				"odivnb" => 10,
 				"odivlink" => "zonename=",
 				"rmcol" => true,
-				"rmlink" => "act=12&zonename",
+				"rmlink" => "zonename",
+				"rmactid" => 12,
 				"rmconfirm" => "confirm-remove-zone",
 			));
 		}
@@ -499,7 +500,8 @@
 				"odivnb" => 6,
 				"odivlink" => "aclname=",
 				"rmcol" => true,
-				"rmlink" => "act=8&aclname",
+				"rmlink" => "aclname",
+				"rmactid" => 8,
 				"rmconfirm" => "confirm-remove-acl",
 			));
 		}
@@ -964,7 +966,8 @@
 				"odivnb" => 8,
 				"odivlink" => "clustername=",
 				"rmcol" => true,
-				"rmlink" => "act=10&clustername",
+				"rmlink" => "clustername",
+				"rmactid" => 10,
 				"rmconfirm" => "confirm-remove-cluster",
 			));
 		}
@@ -1516,7 +1519,8 @@
 				"odivnb" => 2,
 				"odivlink" => "addr=",
 				"rmcol" => true,
-				"rmlink" => "act=4&addr",
+				"rmlink" => "addr",
+				"rmactid" => 4,
 				"rmconfirm" => "confirm-remove-server",
 			));
 		}
@@ -1855,7 +1859,8 @@
 				"odivnb" => 4,
 				"odivlink" => "keyalias=",
 				"rmcol" => true,
-				"rmlink" => "act=6&keyalias",
+				"rmlink" => "keyalias",
+				"rmactid" => 6,
 				"rmconfirm" => "confirm-remove-tsig",
 			));
 		}

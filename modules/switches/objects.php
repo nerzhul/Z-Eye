@@ -252,7 +252,7 @@
 					$outputwifi .= "</td><td>".$data["location"]."</td><td>".
 						$data["serial"]."</td>";
 					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-						$outputwifi .= "<td>".FS::$iMgr->removeIcon("act=17&device=".$data["name"],array("js" => true,
+						$outputwifi .= "<td>".FS::$iMgr->removeIcon(17,"device=".$data["name"],array("js" => true,
 						"confirm" => $this->loc->s("confirm-remove-device")."'".$data["name"]."'"))."</td>";
 					}
 					$outputwifi .= "</tr>";
@@ -307,7 +307,7 @@
 						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td>";
 						
 					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-						$outputswitch .= "<td>".FS::$iMgr->removeIcon("act=17&device=".$data["name"],array("js" => true,
+						$outputswitch .= "<td>".FS::$iMgr->removeIcon(17,"device=".$data["name"],array("js" => true,
 						"confirm" => $this->loc->s("confirm-remove-device")."'".$data["name"]."'"))."</td>";
 					}
 					$outputswitch .= "</tr>";

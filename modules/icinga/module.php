@@ -182,7 +182,7 @@
 					else $found2 = true;
 					$output .= $parentlist[$i];
 				}
-				$output .="</td><td>".FS::$iMgr->removeIcon("act=15&host=".$data["name"],array("js" => true,
+				$output .="</td><td>".FS::$iMgr->removeIcon(15,"host=".$data["name"],array("js" => true,
 					"confirm" => $this->loc->s("confirm-remove-host")."'".$data["name"]."' ?"))."</td></tr>";
 			}
 			if ($found) {
@@ -232,7 +232,7 @@
 					}
 					$output .= ")";
 				}
-				$output .= "</td><td>".FS::$iMgr->removeIcon("act=21&hg=".$data["name"],array("js" => true,
+				$output .= "</td><td>".FS::$iMgr->removeIcon(21,"hg=".$data["name"],array("js" => true,
 					"confirm" => $this->loc->s("confirm-remove-hostgroup")."'".$data["name"]."' ?"))."</td></tr>";
 			}
 			if ($found) {
@@ -311,7 +311,7 @@
 				$output .= "</td><td>";
 				if ($data["template"] == "t") $output .= $this->loc->s("Yes");
 				else $output .= $this->loc->s("No");
-				$output .= "</td><td>".FS::$iMgr->removeIcon("act=18&srv=".$data["name"],array("js" => true,
+				$output .= "</td><td>".FS::$iMgr->removeIcon(18,"srv=".$data["name"],array("js" => true,
 					"confirm" => $this->loc->s("confirm-remove-service")."'".$data["name"]."' ?"))."</td></tr>";
 			}
 			if ($found) {
@@ -377,7 +377,7 @@
 				if ($data["suhs"] != 0 || $data["sums"] != 0 || $data["suhe"] != 0 || $data["sume"] != 0)
 					$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
 					" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
-				$output .= "</td><td>".FS::$iMgr->removeIcon("act=6&tp=".$data["name"],array("js" => true,
+				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"tp=".$data["name"],array("js" => true,
 					"confirm" => $this->loc->s("confirm-remove-timeperiod")."'".$data["name"]."' ?"))."</td></tr>";
 			}
 			if ($found) {
@@ -469,7 +469,7 @@
 
 				$output .= "</td><td>".$data["mail"]."</td>
 					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
-					FS::$iMgr->removeIcon("act=9&ct=".$data["name"],array("js" => true,
+					FS::$iMgr->removeIcon(9,"ct=".$data["name"],array("js" => true,
 						"confirm" => $this->loc->s("confirm-remove-contact")."'".$data["name"]."' ?"))."</td></tr>";
 			}
 			if ($found) {
@@ -523,7 +523,7 @@
 					else $found2 = true;
 					$output .= $contacts[$i];
 				}
-				$output .= "</td><td>".FS::$iMgr->removeIcon("act=12&ctg=".$data["name"],array("js" => true,
+				$output .= "</td><td>".FS::$iMgr->removeIcon(12,"ctg=".$data["name"],array("js" => true,
 					"confirm" => $this->loc->s("confirm-remove-contactgroup")."'".$data["name"]."' ?"))."</td></tr>";
 			}
 			if ($found) {
@@ -560,7 +560,7 @@
 				$output .= "<tr id=\"notifstr_".preg_replace("#[. ]#","-",$data["name"])."\"><td>".
 					FS::$iMgr->opendiv(20,$data["name"],array("lnkadd" => "name=".$data["name"])).
 					"</td><td>".$data["alias"]."</td><td>".
-					FS::$iMgr->removeIcon("act=23&notifstr=".$data["name"],
+					FS::$iMgr->removeIcon(23,"notifstr=".$data["name"],
 						array("js" => true,
 							"confirm" => $this->loc->s("confirm-remove-notif-strategy")."'".$data["name"]."' ?"
 						)
@@ -612,7 +612,7 @@
 					$output .= "<td>";
 					// If it's not a system command, then we can remove it
 					if ($data["syscmd"] != 't') {
-						$output .= FS::$iMgr->removeIcon("act=2&cmd=".$data["name"],array("js" => true,
+						$output .= FS::$iMgr->removeIcon(2,"cmd=".$data["name"],array("js" => true,
 							"confirm" => $this->loc->s("confirm-remove-command")."'".$data["name"]."' ?"));
 					}
 					$output .= "</td>";

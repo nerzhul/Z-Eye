@@ -1033,7 +1033,7 @@
 			}
 			
 			$output .= "</td><td>".
-				FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&ip=".$ip,array("js" => true, "confirm" =>
+				FS::$iMgr->removeIcon(21,"ip=".$ip,array("js" => true, "confirm" =>
 					$this->loc->s("confirm-remove-reservation").$ip."' ?")).
 				"</td>";
 			
