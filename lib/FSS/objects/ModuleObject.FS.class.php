@@ -101,6 +101,12 @@
 				}
 			}
 		}
+		
+		/*
+		 * Generate a container to show on the default screen
+		 */
+		public function genDefaultScreenContainer() {
+		}
 
 		protected $loc;
 		protected $mod;

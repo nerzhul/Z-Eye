@@ -20,6 +20,7 @@
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../icinga/icingaBroker.api.php");
+	require_once(dirname(__FILE__)."/../icinga/objects.php");
 	
 	if(!class_exists("iDefault")) {
 		
@@ -47,7 +48,7 @@
 				{
 				$.get('?mod=".$this->mid."&at=2', function(data) {
 							$('#reports').fadeOut(1500,function() {
-						$('#reports').html(data);
+								$('#reports').html(data);
 								$('#reports').fadeIn(1500);
 					});
 						});
@@ -58,18 +59,7 @@
 	
 			$alerts = array();
 
-			$icingabuffer = $this->showIcingaReporting();
-			$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".
-				FS::$iMgr->progress("shealth",$this->totalicinga-$this->hsicinga,$this->totalicinga),$icingabuffer);
-
-			if ($this->hsicinga > 0) {
-				$alerts["icinga"][0] .= "<br />".($this->hsicinga)." ".
-					$this->loc->s("alert-on")." ".$this->totalicinga." ".$this->loc->s("sensors");
-			}
-			
-			$output .= "<div id=\"speedreport\">".
-				FS::$iMgr->accordion("icingarep",$alerts).
-				"</div>";
+			$output .= (new icingaSensor())->genDefaultScreenContainer();
 
 			$netbuffer = $this->showNetworkReporting();
 			// Fake score for BW if there is now results
@@ -101,166 +91,6 @@
 				$output .= "</div>";
 			}
 
-			return $output;
-		}
-
-		private function showIcingaReporting() {
-			$problems = array();
-			$output = "";	
-
-			$iStates = $this->icingaAPI->readStates(array("plugin_output","current_state","current_attempt","max_attempts",
-				"state_type","last_time_ok","last_time_up"));
-
-			// Loop hosts
-			foreach ($iStates as $host => $hostvalues) {
-				// Loop types
-				foreach ($hostvalues as $hos => $hosvalues) {
-					if ($hos == "servicestatus") {
-						// Loop sensors
-						foreach ($hosvalues as $sensor => $svalues) {
-							$this->totalicinga++;
-							if ($svalues["current_state"] > 0) {
-								$timedown = $this->loc->s("Since-icinga-start");
-								$bgcolor = "orange";
-
-								// Initialize host error array
-								if (!isset($problems[$host])) {
-									/*
-									* Fields:
-									* 1: label for accordion
-									* 2: accordion buffer for this entry
-									* 3: warning count
-									* 4: critical count
-									*/
-									$problems[$host] = array($host,"",0,0);
-								}
-
-								if ($svalues["current_state"] == 1) {
-									if ($svalues["last_time_ok"]) {
-										$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
-									}
-									$problems[$host][2]++;
-									$this->warnicinga++;
-									
-									$bgcolor = "orange";
-								}
-								else if ($svalues["current_state"] == 2) {
-									if ($svalues["last_time_ok"]) {
-										$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
-									}
-
-									$problems[$host][3]++;
-									$this->criticinga++;
-									
-									$bgcolor = "red";
-								}
-									
-								$this->hsicinga++;
-								
-								$problems[$host][1] .= sprintf(
-									"<tr style=\"background-color:%s;\"><td>%s</td>
-									<td>%s</td><td>%s</td></tr>",
-	                                $bgcolor, $sensor, $timedown,
-	                                $svalues["plugin_output"]
-								);
-										
-							}
-						}
-					}
-					else if ($hos == "hoststatus") {
-						$this->totalicinga++;
-						if ($hosvalues["current_state"] > 0) {
-							$this->hsicinga++;
-							$bgcolor = "orange";
-							$timedown = $this->loc->s("Since-icinga-start");
-
-							// Initialize host error array
-							if (!isset($problems[$host])) {
-								/*
-								* Fields:
-								* 1: label for accordion
-								* 2: accordion buffer for this entry
-								* 3: warning count
-								* 4: critical count
-								*/
-								$problems[$host] = array($host,"",0,0);
-							}
-							
-							if ($hosvalues["current_state"] == 1) {
-								if ($hosvalues["last_time_up"])
-									$timedown = FSTimeMgr::timeSince($hosvalues["last_time_up"]);
-
-								$problems[$host][3]++;
-								$this->criticinga++;
-								
-								$bgcolor = "red";
-							}
-							
-							$problems[$host][1] .= sprintf(
-								"<tr style=\"background-color:%s;\"><td>%s</td>
-								<td>%s</td><td>%s</td></tr>",
-	                            $bgcolor, $this->loc->s("Availability"),
-	                            $timedown,
-	                            $hosvalues["plugin_output"]
-							);
-						}
-					}
-				}
-			}
-
-			if ($this->hsicinga > 0) {
-				$output .= "<table>";
-				foreach ($problems as $key => $values) {
-					// Create the host Label
-					$label = $problems[$key][0].": ".
-						($problems[$key][2]+$problems[$key][3])." ".
-						$this->loc->s("alert-s")." (";
-
-					$bgcolor = "orange";
-					
-					if ($problems[$key][2] > 0) {
-						$label .= $problems[$key][2]." ".$this->loc->s("warning-s");
-					}
-
-					if ($problems[$key][3] > 0) {
-						if ($problems[$key][2] > 0) {
-							$label .= " / ";
-						}
-						$label .= $problems[$key][3]." ".$this->loc->s("critical-s");
-						$bgcolor = "red";
-					}
-					$label .= ")";
-					
-					$output .= sprintf("<tr style=\"background-color:%s;
-						font-size:14px;font-weight:bold;\">
-						<td colspan=\"3\">%s</td></tr>%s",
-						$bgcolor, $label, $values[1]);
-				}
-				
-				$output .= "</table>";
-
-				$js = "";
-
-				if (($this->hsicinga / $this->totalicinga) > 15.0 || $this->criticinga > 0) {
-					$js = "$('#accicingah3').css('background-color','#4A0000');".
-						"$('#accicingah3').css('background-image','linear-gradient(#4A0000, #8A0000)');".
-						"$('#accicingah3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');";
-				}
-				else {
-					$js = "$('#accicingah3').css('background-color','#ff8e00');".
-						"$('#accicingah3').css('background-image','linear-gradient(#ff4e00, #ff8e00)');".
-						"$('#accicingah3').css('background-image','-webkit-linear-gradient(#ff4e00, #ff8e00)');";
-				}
-
-				FS::$iMgr->js($js);
-			}
-			else {
-				$js = "$('#accicingah3').css('background-color','#008A00');".
-					"$('#accicingah3').css('background-image','linear-gradient(#004A00, #008A00)');".
-					"$('#accicingah3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');";
-				FS::$iMgr->js($js);
-			}
-				
 			return $output;
 		}
 
@@ -581,11 +411,6 @@
 			FS::$dbMgr->Connect();
 			return $output;
 		}
-
-		private $totalicinga;
-		private $hsicinga;
-		private $warnicinga;
-		private $criticinga;
 
 		private $BWtotalscore;
 		private $BWscore;
