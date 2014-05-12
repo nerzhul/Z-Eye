@@ -217,61 +217,33 @@
 				$this->loc->s("Lease-end")."</th><th>".$this->loc->s("Servers")."</th><th></th></tr></thead>";
 
 			foreach ($iparray as $key => $value) {
-				$rstate = "";
 				$style = "";
 				switch($value["distrib"]) {
-					case 1:
-						$rstate = $this->loc->s("Free");
-						$style = "background-color: #BFFFBF;";
-						$free++;
-						break;
-					case 2:
-						$rstate = $this->loc->s("Used");
-						$style = "background-color: #FF6A6A;";
-						$used++;
-						break;
-					case 3:
-						$rstate = $this->loc->s("Reserved");
-						$style = "background-color: #FFFF80;";
-						$reserv++;
-						break;
-					case 4:
-						$rstate = $this->loc->s("Distributed");
-						$style = "background-color: #BFFBFF;";
-						$distrib++;
-						break;
-					case 5:
-						$rstate = $this->loc->s("Reserved-by-ipmanager");
-						$style = "background-color: #FFFF80;";
-						$reserv++;
-						break;
-					case 6:
-						$rstate = $this->loc->s("Distributed-by-ipmanager");
-						$style = "background-color: #BFFBFF;";
-						$distrib++;
-						break;
+					case 1: $free++; break;
+					case 2: $used++; break;
+					case 3: case 5: $reserv++; break;
+					case 4: case 6: $distrib++; break;
 					default: {
-							$rstate = $this->loc->s("Free");
-							$style = "background-color: #BFFFBF;";
 							$mac = FS::$dbMgr->GetOneData("node_ip","mac","ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
 							if ($mac) {
 								$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
 								if ($data3 = FS::$dbMgr->Fetch($query3)) {
-									$rstate = $this->loc->s("Stuck-IP");
-									$style = "background-color: orange;";
 									$fixedip++;
 								}
-								else
+								else {
 									$free++;
+								}
 							}
-							else
+							else {
 								$free++;
+							}
 						}
 						break;
 				}
 				
-				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\" style=\"$style\">".
-					$this->showIPLine(long2ip($key),$rstate,$value["mac"],$value["host"],$value["comment"],
+				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\">".
+					(new dhcpIP())->genIPLineFull(long2ip($key),
+						$value["mac"],$value["host"],$value["comment"],
 						$netid,$value["ltime"],$value["servers"],$value["distrib"],
 						$subnetLinkedToCluster).
 					"</tr>";
@@ -310,73 +282,6 @@
 				}]});},300);";
 			FS::$iMgr->js($js);
 
-			return $output;
-		}
-		
-		private function showIPLine($ip,$rstate,$mac,$hostname,$comment,
-			$subnet,$leasetime="",$servers=array(),
-			$distrib=0,$clusterLink=false) {
-				
-			$switch = "";
-			$port = "";
-			
-			$rstateId = "sb".FS::$iMgr->formatHTMLId($ip)."rsttd";
-			$output = "<td>".FS::$iMgr->opendiv(7,$ip,array("lnkadd" => "ip=".$ip)).
-				"</td><td>".FS::$iMgr->searchIcon($ip)."</td><td id=\"".$rstateId."\">".$rstate;
-			
-			// Import option when subnet is distributed on a cluster and IP is only in the cache, not IPM
-			if ($distrib == 3 && $clusterLink) {
-				$output .= FS::$iMgr->linkIcon("mod=".$this->mid."&act=20&ip=".$ip."&subnet=".$subnet,"upload",
-					array("tooltip" => "tooltip-import-reserv", "js" => true,
-						"confirm" => array(sprintf(
-							$this->loc->s("confirm-import-reserv"),$ip),
-							"Import","Cancel")
-					)
-				);	
-			}
-			$output .= "</td><td>";
-			if (strlen($mac) > 0) {
-				$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$mac, $mac);
-			}
-			
-			$output .= "</td><td>".
-				$hostname."</td><td>".$comment."</td><td>";
-			
-			// If we have a MAC address, then show the switch
-			if (strlen($mac) > 0) {
-				$switch = FS::$dbMgr->GetOneData("node","switch","mac = '".$mac."' AND active = 't'",
-					array("order" => "time_last","ordersens" => 2));
-				$port = FS::$dbMgr->GetOneData("node","port","mac = '".$mac."' AND active = 't'",
-					array("order" => "time_last","ordersens" => 2));
-				if ($switch) {
-					$switch = $this->switchList[$switch];
-				}
-			}
-			// Show switch column only of a switch is here
-			if ($switch) {
-				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
-					"&d=".$switch, $switch) : "");
-			}
-					
-			$output .= "</td><td>";
-			
-			if ($switch) {
-				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
-					"&d=".$switch."&p=".$port, $port) : "");
-			}
-			
-			$output .= "</td><td>".$leasetime."</td><td>";
-			$count = count($servers);
-			for ($i=0;$i<$count;$i++) {
-				if ($i > 0) $output .= "<br />";
-				$output .= $servers[$i];
-			}
-			
-			$output .= "</td><td>".
-				FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&ip=".$ip,array("js" => true, "confirm" =>
-					array($this->loc->s("confirm-remove-reservation").$ip."' ?","Confirm","Cancel"))).
-				"</td>";
-			
 			return $output;
 		}
 		
@@ -2249,20 +2154,7 @@
 
 					$this->log(0,"Edit IP informations: informations edited for IP '".$ip."'");
 					
-					/* @TODO: only modify the right Line
-					 * $js = "$('#sb".FS::$iMgr->formatHTMLId(long2ip($ip))."tr').html('".
-						FS::$secMgr->cleanForJS(
-							$this->showIPLine($ip,$rstate,$mac,$hostname,$comment,
-								$subnet,$leasetime="",
-								$servers=array(),$distrib=0,$clusterLink=false)
-						).
-					"');";*/
-
-							
-					// Maybe replace only the concerned tr and also the graph ? 
-					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($netinfos[0])))."');";
-					
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEcho("Done",(new dhcpIP())->genIPLine($ip,true));
 					return;
 				// Add/Edit Custom Option
 				case 12:

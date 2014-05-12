@@ -268,11 +268,15 @@
 		}
 
 		public function renderJS() {
-			if (strlen($this->js_buffer[$this->js_buffer_idx]) > 0) {
-				return sprintf("<script type=\"text/javascript\">%s</script>",
-					$this->js_buffer[$this->js_buffer_idx]);
+			$jsBuf = "";
+			for ($i=0;$i<2;$i++) {
+				if (strlen($this->js_buffer[$i]) > 0) {
+					$jsBuf = sprintf("%s<script type=\"text/javascript\">%s</script>",
+						$jsBuf,
+						$this->js_buffer[$i]);
+				}
 			}
-			return "";
+			return $jsBuf;
 		}
 
 		public function label($for,$value,$class = "") {

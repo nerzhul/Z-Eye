@@ -413,6 +413,15 @@
 			$this->sqlAttrId = "ip";
 			$this->readRight = "mrule_ipmanager_read";
 			$this->writeRight = "mrule_ipmmgmt_ipmgmt";
+			
+			$this->ip = "";
+			$this->mac = "";
+			$this->hostname = "";
+			$this->reserv = "";
+			$this->comment = "";
+			$this->leasetime = "";
+			$this->distribState = 0;
+			$this->serverList = array();
 		}
 		
 		public function search($search, $autocomplete = false) {
@@ -613,6 +622,10 @@
 					$this->hostname = $data["hostname"];
 					$this->reserv = ($data["reserv"] == "t");
 					$this->comment = $data["comment"];
+					
+					if ($this->reserv == true) {
+						$this->distribState = 5;
+					}
 					return true;
 				}
 				return false;
@@ -635,26 +648,37 @@
 				return;
 			}
 			
-			if (!$this->Load($ip) && !$this->LoadFromCache($ip)) {
+			if (!$this->LoadFromCache($ip) && !$this->Load($ip)) {
 				FS::$iMgr->ajaxEcho(sprintf(
 					$this->loc->s("err-no-info-for-ip-addr"),$ip),"",true);
 				return;
 			}
 			
 			$this->removeFromDB($ip);
-						
-			FS::$iMgr->ajaxEcho("Done");
+			
+			// We cleanup the object datas
+			$this->mac = "";
+			$this->hostname = "";
+			$this->reserv = "";
+			$this->comment = "";
+			$this->leasetime = "";
+			$this->distribState = 0;
+			$this->serverList = array();
+			
+			// And reload datas from cache
+			$this->LoadFromCache($ip);
+			
+			FS::$iMgr->ajaxEcho("Done", $this->genIPLine($ip));
 		}
 		
 		protected function removeFromDB($ip) {
 			FS::$dbMgr->BeginTr();
 			FS::$dbMgr->Delete($this->sqlTable,$this->sqlAttrId." = '".$ip."'");
-			// Disabled, we need to keep the history
-			// FS::$dbMgr->Delete($this->sqlCacheTable,$this->sqlAttrId." = '".$ip."'");
+			FS::$dbMgr->Delete($this->sqlCacheTable,$this->sqlAttrId." = '".$ip."'");
 			FS::$dbMgr->CommitTr();
 		}
 		
-		private function LoadFromCache($ip = "") {
+		public function LoadFromCache($ip = "") {
 			$this->ip = $ip;
 			$this->mac = "";
 			$this->hostname = "";
@@ -663,12 +687,15 @@
 			
 			if ($this->ip) {
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,
-					"macaddr,hostname",
+					"macaddr,hostname,leasetime,distributed,server",
 					$this->sqlAttrId." = '".$this->ip."' AND distributed = '3'");
-				if ($data = FS::$dbMgr->Fetch($query)) {
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					$this->mac = $data["macaddr"];
 					$this->hostname = $data["hostname"];
 					$this->reserv = true;
+					$this->leasetime = $data["leasetime"];
+					$this->distribState = $data["distributed"];
+					$this->serverList[] = $data["server"];
 					return true;
 				}
 				return false;
@@ -867,6 +894,152 @@
 			return $subnetObj->getNetCalc();
 		}
 		
+		public function genIPLine($ip,$loadDatas = false) {
+			$subnetLinkedToCluster = false;
+			
+			if ($loadDatas == true) {
+				$this->LoadFromCache($ip);
+				$this->Load($ip);
+				
+				/*
+				 * We verify if subnet is linked to cluster
+				 * This permit to import reservation from cache
+				 */
+				$subnetObj = $this->getSubnet();
+				$this->subnetId = $subnetObj->getNetId();
+				$subnetLinkedToCluster = (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix().
+					"dhcp_subnet_cluster","subnet","subnet = '".$this->subnetId."'") != NULL);
+			}
+			
+			/*
+			 * Because we have loaded cache and informations before,
+			 * we can use the loaded datas
+			 * @TODO: finish to use the genIPFull arguments
+			 */
+			$output = $this->genIPLineFull($ip,$this->mac,
+				$this->hostname,$this->comment,"",$this->leasetime,
+				$this->serverList, $this->distribState, $subnetLinkedToCluster);			
+			return sprintf("$('#sb%str').html('%s');",
+				FS::$iMgr->formatHTMLId($ip),
+				addslashes($output));
+		}
+		
+		public function genIPLineFull($ip,$mac,$hostname,$comment,
+			$subnet, $leasetime="", $servers=array(), 
+			$distrib = 0, $clusterLink=false) {
+				
+			$switch = "";
+			$port = "";
+			$rstate = "";
+			
+			// This JS must be output before the table
+			FS::$iMgr->setJSBuffer(1);
+			switch($distrib) {
+				case 1:
+					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFFBF');");
+					$rstate = $this->loc->s("Free");
+					break;
+				case 2:
+					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#FF6A6A');");
+					$rstate = $this->loc->s("Used");
+					break;
+				case 3:
+					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#FFFF80');");
+					$rstate = $this->loc->s("Reserved");
+					break;
+				case 4:
+					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFBFF');");
+					$rstate = $this->loc->s("Distributed");
+					break;
+				case 5:
+					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#FFFF80');");
+					$rstate = $this->loc->s("Reserved-by-ipmanager");
+					break;
+				case 6:
+					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFBFF');");
+					$rstate = $this->loc->s("Distributed-by-ipmanager");
+					break;
+				default: {
+						FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFFBF');");
+						$rstate = $this->loc->s("Free");
+						$mac = FS::$dbMgr->GetOneData("node_ip","mac",
+							"ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
+						if ($mac) {
+							$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
+							if ($data3 = FS::$dbMgr->Fetch($query3)) {
+								FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('backgorund-color','orange');");
+								$rstate = $this->loc->s("Stuck-IP");
+							}
+						}
+					}
+					break;
+			}
+			FS::$iMgr->setJSBuffer(0);
+			
+			$rstateId = "sb".FS::$iMgr->formatHTMLId($ip)."rsttd";
+			$output = sprintf("<td>%s</td><td>%s</td><td id=\"%s\">%s",
+				FS::$iMgr->opendiv(7,$ip,array("lnkadd" => "ip=".$ip)),
+				FS::$iMgr->searchIcon($ip),
+				$rstateId,
+				$rstate
+			);
+			
+			// Import option when subnet is distributed on a cluster and IP is only in the cache, not IPM
+			if ($distrib == 3 && $clusterLink) {
+				$output .= FS::$iMgr->linkIcon("mod=".$this->mid."&act=20&ip=".$ip."&subnet=".$this->subnetId,"upload",
+					array("tooltip" => "tooltip-import-reserv", "js" => true,
+						"confirm" => array(sprintf(
+							$this->loc->s("confirm-import-reserv"),$ip),
+							"Import","Cancel")
+					)
+				);	
+			}
+			$output .= "</td><td>";
+			if (strlen($mac) > 0) {
+				$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$mac, $mac);
+			}
+			
+			$output .= "</td><td>".
+				$hostname."</td><td>".$comment."</td><td>";
+			
+			// If we have a MAC address, then show the switch
+			if (strlen($mac) > 0) {
+				$switch = FS::$dbMgr->GetOneData("node","switch","mac = '".$mac."' AND active = 't'",
+					array("order" => "time_last","ordersens" => 2));
+				$port = FS::$dbMgr->GetOneData("node","port","mac = '".$mac."' AND active = 't'",
+					array("order" => "time_last","ordersens" => 2));
+				if ($switch) {
+					$switch = $this->switchList[$switch];
+				}
+			}
+			// Show switch column only of a switch is here
+			if ($switch) {
+				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+					"&d=".$switch, $switch) : "");
+			}
+					
+			$output .= "</td><td>";
+			
+			if ($switch) {
+				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+					"&d=".$switch."&p=".$port, $port) : "");
+			}
+			
+			$output .= "</td><td>".$leasetime."</td><td>";
+			$count = count($servers);
+			for ($i=0;$i<$count;$i++) {
+				if ($i > 0) $output .= "<br />";
+				$output .= $servers[$i];
+			}
+			
+			$output .= "</td><td>".
+				FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&ip=".$ip,array("js" => true, "confirm" =>
+					array($this->loc->s("confirm-remove-reservation").$ip."' ?","Confirm","Cancel"))).
+				"</td>";
+			
+			return $output;
+		}
+		
 		public function getIP() {
 			return $this->ip;
 		}
@@ -888,11 +1061,18 @@
 		}
 		
 		private $sqlCacheTable;
+		
 		private $ip;
 		private $mac;
 		private $hostname;
 		private $reserv;
 		private $comment;
+		
+		private $leasetime;
+		private $distribState;
+		private $serverList;
+		
+		private $subnetId;
 	};
 	
 	final class dhcpCustomOption extends FSMObj {
