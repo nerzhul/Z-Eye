@@ -252,8 +252,8 @@
 					$outputwifi .= "</td><td>".$data["location"]."</td><td>".
 						$data["serial"]."</td>";
 					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-						$outputwifi .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
+						$outputwifi .= "<td>".FS::$iMgr->removeIcon("act=17&device=".$data["name"],array("js" => true,
+						"confirm" => $this->loc->s("confirm-remove-device")."'".$data["name"]."'"))."</td>";
 					}
 					$outputwifi .= "</tr>";
 				}
@@ -307,8 +307,8 @@
 						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td>";
 						
 					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
-						$outputswitch .= "<td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=17&device=".$data["name"],array("js" => true,
-						"confirm" => array($this->loc->s("confirm-remove-device")."'".$data["name"]."'","Confirm","Cancel")))."</td>";
+						$outputswitch .= "<td>".FS::$iMgr->removeIcon("act=17&device=".$data["name"],array("js" => true,
+						"confirm" => $this->loc->s("confirm-remove-device")."'".$data["name"]."'"))."</td>";
 					}
 					$outputswitch .= "</tr>";
 				}

@@ -1340,7 +1340,7 @@
 						$output .= $this->loc->s("ssh-link-state").": ";
 						if ($sshuser) {
 							$output .= "<span style=\"color: green;\">".$this->loc->s("Enabled")."</span> ";
-							$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=23&d=".$device);
+							$output .= FS::$iMgr->removeIcon("act=23&d=".$device);
 						}
 						else
 							$output .= "<span style=\"color: red;\">".$this->loc->s("Disabled")."</span>";

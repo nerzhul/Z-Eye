@@ -112,8 +112,8 @@
 					}
 					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"])).
 						"</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".
-						FS::$iMgr->removeIcon("mod=".$this->mid."&act=5&addr=".$data["addr"],array("js" => true,
-							"confirm" => array($this->loc->s("confirm-removedirectory")."'".$data["addr"]."' ?","Confirm","Cancel")))."</tr>";
+						FS::$iMgr->removeIcon("act=5&addr=".$data["addr"],array("js" => true,
+							"confirm" => $this->loc->s("confirm-removedirectory")."'".$data["addr"]."' ?"))."</tr>";
 				}
 			}
 			if ($found) {
@@ -143,8 +143,8 @@
 			}
 			$output .= "</td><td>".$subname."</td><td>".$name."</td><td>".$mail."</td><td>".$last_ip."</td><td>".$last_conn."</td><td>".$join_date."</td><td>";
 			if ($uid != 1) {
-				$output .= FS::$iMgr->removeIcon("mod=".$this->mid."&act=3&uid=".$uid,array("js" => true,
-					"confirm" => array($this->loc->s("confirm-removeuser")."'".$username."' ?","Confirm","Cancel")));
+				$output .= FS::$iMgr->removeIcon("act=3&uid=".$uid,array("js" => true,
+					"confirm" => $this->loc->s("confirm-removeuser")."'".$username."' ?"));
 			}
 			$output .= "</td></tr>";
 			return $output;

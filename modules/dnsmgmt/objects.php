@@ -40,7 +40,7 @@
 				"odivnb" => 10,
 				"odivlink" => "zonename=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=12&zonename",
+				"rmlink" => "act=12&zonename",
 				"rmconfirm" => "confirm-remove-zone",
 			));
 		}
@@ -499,7 +499,7 @@
 				"odivnb" => 6,
 				"odivlink" => "aclname=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=8&aclname",
+				"rmlink" => "act=8&aclname",
 				"rmconfirm" => "confirm-remove-acl",
 			));
 		}
@@ -964,7 +964,7 @@
 				"odivnb" => 8,
 				"odivlink" => "clustername=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=10&clustername",
+				"rmlink" => "act=10&clustername",
 				"rmconfirm" => "confirm-remove-cluster",
 			));
 		}
@@ -1516,7 +1516,7 @@
 				"odivnb" => 2,
 				"odivlink" => "addr=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=4&addr",
+				"rmlink" => "act=4&addr",
 				"rmconfirm" => "confirm-remove-server",
 			));
 		}
@@ -1855,7 +1855,7 @@
 				"odivnb" => 4,
 				"odivlink" => "keyalias=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=6&keyalias",
+				"rmlink" => "act=6&keyalias",
 				"rmconfirm" => "confirm-remove-tsig",
 			));
 		}

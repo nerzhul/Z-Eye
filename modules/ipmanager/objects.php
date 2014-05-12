@@ -37,7 +37,7 @@
 				"odivnb" => 1,
 				"odivlink" => "netid=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=8&netid",
+				"rmlink" => "act=8&netid",
 				"rmconfirm" => "confirm-remove-subnet",
 				"trpfx" => "ds",
 			));
@@ -1034,7 +1034,7 @@
 			
 			$output .= "</td><td>".
 				FS::$iMgr->removeIcon("mod=".$this->mid."&act=21&ip=".$ip,array("js" => true, "confirm" =>
-					array($this->loc->s("confirm-remove-reservation").$ip."' ?","Confirm","Cancel"))).
+					$this->loc->s("confirm-remove-reservation").$ip."' ?")).
 				"</td>";
 			
 			return $output;

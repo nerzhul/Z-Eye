@@ -307,13 +307,13 @@
 			$confirm = ($type == "g" ? $this->loc->s("confirm-remove-groupright") : $this->loc->s("confirm-remove-userright"));
 			if ($type2 == "subnet") {
 				$output = "<span id=\"".FS::$iMgr->formatHTMLId($type.$id.$right.$value2)."\">".$name." ".
-					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&".$type."id=".$id."&".$type2."=".$value2."&right=".$right,
-						array("js" => true, "confirm" => array($confirm."'".$name."' ?","Confirm","Cancel")))."<br /></span>";
+					FS::$iMgr->removeIcon("act=2&".$type."id=".$id."&".$type2."=".$value2."&right=".$right,
+						array("js" => true, "confirm" => $confirm."'".$name."' ?"))."<br /></span>";
 			}
 			else {
 				$output = "<span id=\"".$type.$id.$right.$type2."\">".$name." ".
-					FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&".$type."id=".$id."&".$type2."=".$value2."&right=".$right,
-						array("js" => true, "confirm" => array($confirm."'".$name."' ?","Confirm","Cancel")))."<br /></span>";
+					FS::$iMgr->removeIcon("act=2&".$type."id=".$id."&".$type2."=".$value2."&right=".$right,
+						array("js" => true, "confirm" => $confirm."'".$name."' ?"))."<br /></span>";
 			}
 
 			return $output;

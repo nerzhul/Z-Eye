@@ -177,7 +177,26 @@
 			return $output;
 		}
 
-		public function removeIcon($link,$options=array()) { return $this->linkIcon($link,"cross",$options); }
+		public function removeIcon($link,$options=array()) {
+			/*
+			 * We override confirm option with an helper.
+			 * confirm only contain a text, we add delete button labels
+			 * here
+			 */
+			if (isset($options["confirm"])) {
+				$options["confirm"] = array(
+					$options["confirm"],
+					"Confirm",
+					"Cancel"
+				);
+			}
+			
+			$link = sprintf("mod=%s&%s",
+				$this->cur_module->getModuleId(),
+				$link);
+				
+			return $this->linkIcon($link,"cross",$options);
+		}
 		public function searchIcon($search) { return $this->linkIcon("mod=".$this->getModuleIdByPath("search")."&s=".$search,"search"); }
 
 		public function showReturnMenu($show) { $this->showRetMenu = $show;}

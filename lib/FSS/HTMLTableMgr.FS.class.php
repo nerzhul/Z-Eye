@@ -204,7 +204,7 @@
 				if ($this->removeColumn) {
 					$output = sprintf("%s<td>%s</td>",$output,FS::$iMgr->removeIcon($this->removeLink."=".$rowIdx,
 						array("js" => true, "confirm" =>
-						array(FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?","Confirm","Cancel"))));
+						FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?")));
 				}
 				$output = sprintf("%s</tr>",$output);
 			}
@@ -240,7 +240,7 @@
 			if ($this->removeColumn) {
 				$output = sprintf("%s<td>%s</td>",$output,FS::$iMgr->removeIcon($this->removeLink."=".$sqlDatas[$this->sqlAttrId],
 					array("js" => true, "confirm" =>
-					array(FS::$iMgr->getLocale($this->removeConfirm)."'".$sqlDatas[$this->sqlAttrId]."' ?","Confirm","Cancel"))));
+					FS::$iMgr->getLocale($this->removeConfirm)."'".$sqlDatas[$this->sqlAttrId]."' ?")));
 			}
 
 			return sprintf("<tr id=\"%s%s%s\"><td>%s</td>%s</tr>",$this->trPrefix,FS::$iMgr->formatHTMLId($sqlDatas[$this->sqlAttrId]),

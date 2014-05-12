@@ -57,7 +57,7 @@
 				"odivnb" => 2,
 				"odivlink" => "name=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=2&snmp",
+				"rmlink" => "act=2&snmp",
 				"rmconfirm" => "confirm-remove-community",
 				"trpfx" => "sc"
 			));
@@ -88,8 +88,8 @@
 			FS::$iMgr->setJSBuffer(1);
 			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv(2,$name,array("lnkadd" => "name=".$name)).
 				"</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
-				FS::$iMgr->removeIcon("mod=".$this->mid."&act=2&snmp=".$name,array("js" => true, "confirm" => 
-					array($this->loc->s("confirm-remove-community")."'".$name."' ?","Confirm","Cancel")))."</td></tr>";
+				FS::$iMgr->removeIcon("act=2&snmp=".$name,array("js" => true, "confirm" => 
+					$this->loc->s("confirm-remove-community")."'".$name."' ?"))."</td></tr>";
 		}
 
 		public function getIfaceElmt() {
@@ -167,7 +167,7 @@
 						"odivnb" => 2,
 						"odivlink" => "name=",
 						"rmcol" => true,
-						"rmlink" => "mod=".$this->mid."&act=2&snmp",
+						"rmlink" => "act=2&snmp",
 						"rmconfirm" => "confirm-remove-community",
 						"attrlist" => array(array("snmp-community","name",""), array("Read","ro","b"),
 							array("Write","rw","b")),

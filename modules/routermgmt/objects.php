@@ -38,7 +38,7 @@
 				"odivnb" => 10,
 				"odivlink" => "zonename=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=12&zonename",
+				"rmlink" => "act=12&zonename",
 				"rmconfirm" => "confirm-remove-zone",
 			));*/
 		}

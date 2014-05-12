@@ -434,7 +434,7 @@
 				"odivnb" => 13,
 				"odivlink" => "optgroup=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=17&optgroup",
+				"rmlink" => "act=17&optgroup",
 				"rmconfirm" => "confirm-remove-option",
 				"trpfx" => "do",
 				"multiid" => true,
@@ -456,7 +456,7 @@
 				"odivnb" => 11,
 				"odivlink" => "optalias=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=15&optalias",
+				"rmlink" => "act=15&optalias",
 				"rmconfirm" => "confirm-remove-option",
 				"trpfx" => "do",
 				));
@@ -481,7 +481,7 @@
 				"odivnb" => 9,
 				"odivlink" => "optname=",
 				"rmcol" => true,
-				"rmlink" => "mod=".$this->mid."&act=13&optname",
+				"rmlink" => "act=13&optname",
 				"rmconfirm" => "confirm-remove-custom-option",
 				"trpfx" => "dco",
 				));
@@ -659,8 +659,8 @@
 
 			if (!$found) $output .= $this->loc->s("None");
 
-			$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=8&netid=".$netid,array("js" => true, "confirm" =>
-				array($this->loc->s("confirm-remove-declared-subnet").$netid."' ?","Confirm","Cancel"))).
+			$output .= "</td><td>".FS::$iMgr->removeIcon("act=8&netid=".$netid,array("js" => true, "confirm" =>
+				$this->loc->s("confirm-remove-declared-subnet").$netid."' ?")).
 				"</td></tr>";
 			return $output;
 		}
@@ -845,7 +845,7 @@
 
 				if (!$found) $output .= $this->loc->s("None");
 				
-				$output .= "</td><td>".FS::$iMgr->removeIcon("mod=".$this->mid."&act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
+				$output .= "</td><td>".FS::$iMgr->removeIcon("act=6&addr=".$data["addr"],array("js" => true, "confirm" =>
 					array($this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?","Confirm","Cancel"))).
 					"</td></tr>";
 			}
@@ -968,7 +968,7 @@
 			}
 
 			$output .= "</td><td>".
-				FS::$iMgr->removeIcon("mod=".$this->mid."&act=10&cluster=".$clustername,array("js" => true, "confirm" =>
+				FS::$iMgr->removeIcon("act=10&cluster=".$clustername,array("js" => true, "confirm" =>
 				array($this->loc->s("confirm-remove-cluster").$clustername."' ?<br />".$this->loc->s("confirm-remove-cluster2"),"Confirm","Cancel"))).
 				"</td></tr>";
 			return $output;
@@ -2232,7 +2232,7 @@
 						"odivnb" => 9,
 						"odivlink" => "optname=",
 						"rmcol" => true,
-						"rmlink" => "mod=".$this->mid."&act=13&optname",
+						"rmlink" => "act=13&optname",
 						"rmconfirm" => "confirm-remove-custom-option",
 						"trpfx" => "dco"
 					));
@@ -2416,7 +2416,7 @@
 						"odivnb" => 11,
 						"odivlink" => "optalias=",
 						"rmcol" => true,
-						"rmlink" => "mod=".$this->mid."&act=15&optalias",
+						"rmlink" => "act=15&optalias",
 						"rmconfirm" => "confirm-remove-option",
 						"trpfx" => "do",
 					));
@@ -2543,7 +2543,7 @@
 						"odivnb" => 13,
 						"odivlink" => "optgroup=",
 						"rmcol" => true,
-						"rmlink" => "mod=".$this->mid."&act=17&optgroup",
+						"rmlink" => "act=17&optgroup",
 						"rmconfirm" => "confirm-remove-option",
 						"trpfx" => "do",
 						"multiid" => true,
@@ -2589,7 +2589,7 @@
 						"odivnb" => 13,
 						"odivlink" => "optgroup=",
 						"rmcol" => true,
-						"rmlink" => "mod=".$this->mid."&act=17&optgroup",
+						"rmlink" => "act=17&optgroup",
 						"rmconfirm" => "confirm-remove-option",
 						"trpfx" => "do",
 						"multiid" => true,
