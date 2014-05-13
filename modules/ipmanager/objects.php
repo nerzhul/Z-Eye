@@ -963,7 +963,7 @@
 						FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFFBF');");
 						$rstate = $this->loc->s("Free");
 						$mac = FS::$dbMgr->GetOneData("node_ip","mac",
-							"ip = '".long2ip($key)."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
+							"ip = '".$ip."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
 						if ($mac) {
 							$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
 							if ($data3 = FS::$dbMgr->Fetch($query3)) {
