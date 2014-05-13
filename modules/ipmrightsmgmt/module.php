@@ -308,12 +308,18 @@
 			if ($type2 == "subnet") {
 				$output = "<span id=\"".FS::$iMgr->formatHTMLId($type.$id.$right.$value2)."\">".$name." ".
 					FS::$iMgr->removeIcon(2,$type."id=".$id."&".$type2."=".$value2."&right=".$right,
-						array("js" => true, "confirm" => $confirm."'".$name."' ?"))."<br /></span>";
+						array("js" => true,
+						"confirmtext" => $confirm,
+						"confirmval" => $name
+					))."<br /></span>";
 			}
 			else {
 				$output = "<span id=\"".$type.$id.$right.$type2."\">".$name." ".
 					FS::$iMgr->removeIcon(2,$type."id=".$id."&".$type2."=".$value2."&right=".$right,
-						array("js" => true, "confirm" => $confirm."'".$name."' ?"))."<br /></span>";
+						array("js" => true,
+							"confirmtext" => $confirm,
+							"confirmval" => $name
+						))."<br /></span>";
 			}
 
 			return $output;

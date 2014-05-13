@@ -124,7 +124,8 @@
 				$tmpoutput .= "</td><td>".
 					FS::$iMgr->removeIcon(14,"alias=".$data["radalias"],
 						array("js" => true,
-							"confirm" => $this->loc->s("confirm-remove-datasrc")."'".$data["radalias"]."'",
+							"confirmtext" => "confirm-remove-datasrc",
+							"confirmval" => $data["radalias"],
 					))."</td></tr>";
 			}
 			if ($found) {
@@ -441,7 +442,9 @@
 								array("lnkadd" => "ra=".$radalias."&radentry=".$key))."</td><td>".$value."</td><td>".
 								FS::$iMgr->removeIcon(5,"ra=".$radalias."&group=".$key,
 									array("js" => true,
-									"confirm" => $this->loc->s("confirm-remove-group")."'".$key."'"))."</td></tr>";
+									"confirmtext" => "confirm-remove-group",
+									"confirmval" => $key
+								))."</td></tr>";
 						}
 						$output .= "</table>";
 					}
@@ -555,7 +558,8 @@
 							}
 							$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dhcpsubnet"])."\"><td>".$data["dhcpsubnet"]."</td><td>".$data["groupname"]."</td><td>".
 								FS::$iMgr->removeIcon(8,"ra=".$radalias."&subnet=".$data["dhcpsubnet"],array("js" => true,
-									"confirm" => $this->loc->s("confirm-remove-subnetlink")."'".$data["dhcpsubnet"]."/".$data["groupname"]."'",
+									"confirmtext" => "confirm-remove-subnetlink",
+									"confirmval" => $data["dhcpsubnet"]."/".$data["groupname"]
 								))."</td></tr>";
 						}
 						if ($found) $output .= $tmpoutput."</table>";
@@ -679,7 +683,9 @@
 						"</td><td>".FS::$iMgr->removeIcon(4,"ra=".$this->raddbinfos["radalias"].
 							"&user=".$data["username"],
 							array("js" => true,
-								"confirm" => $this->loc->s("confirm-remove-user")."'".$data["username"]." ?'")).
+								"confirmtext" => "confirm-remove-user",
+								"confirmval" => $data["username"]
+							)).
 						"</td></tr>";
 				}
 			}

@@ -660,11 +660,15 @@
 				$output .= $data["clustername"];
 			}
 
-			if (!$found) $output .= $this->loc->s("None");
+			if (!$found) {
+				$output .= $this->loc->s("None");
+			}
 
-			$output .= "</td><td>".FS::$iMgr->removeIcon(8,"netid=".$netid,array("js" => true, "confirm" =>
-				$this->loc->s("confirm-remove-declared-subnet").$netid."' ?")).
-				"</td></tr>";
+			$output .= "</td><td>".FS::$iMgr->removeIcon(8,"netid=".$netid,array("js" => true,
+				"confirmtext" => "confirm-remove-declared-subnet",
+				"confirmval" => $netid
+			)).
+			"</td></tr>";
 			return $output;
 		}
 
@@ -848,9 +852,11 @@
 
 				if (!$found) $output .= $this->loc->s("None");
 				
-				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"addr=".$data["addr"],array("js" => true, "confirm" =>
-					$this->loc->s("confirm-remove-dhcp").$data["addr"]."' ?")).
-					"</td></tr>";
+				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"addr=".$data["addr"],array("js" => true,
+					"confirmtext" => "confirm-remove-dhcp",
+					"confirmval" => $data["addr"]
+				)).
+				"</td></tr>";
 			}
 			$output .= "</table>";
 			return $output;
@@ -963,16 +969,20 @@
 
 			$found = false;
 			for ($i=0;$i<count($members);$i++) {
-				if (!$found)
+				if (!$found) {
 					$found = true;
-				else
+				}
+				else {
 					$output .= "<br />";
+				}
 				$output .= $members[$i];
 			}
 
 			$output .= "</td><td>".
-				FS::$iMgr->removeIcon(10,"cluster=".$clustername,array("js" => true, "confirm" =>
-				$this->loc->s("confirm-remove-cluster").$clustername."' ?<br />".$this->loc->s("confirm-remove-cluster2"))).
+				FS::$iMgr->removeIcon(10,"cluster=".$clustername,array("js" => true,
+					"confirmtext" => "confirm-remove-cluster",
+					"confirmval" => $clustername
+				)).
 				"</td></tr>";
 			return $output;
 		}

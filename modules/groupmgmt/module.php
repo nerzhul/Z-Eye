@@ -70,8 +70,11 @@
 				$tmpoutput .= "<tr id=\"gr".$data["gid"]."tr\"><td>".$data["gid"]."</td><td>".
 					FS::$iMgr->opendiv(2,$data["gname"],array("lnkadd" => "g=".$data["gname"]))."</td><td>".
 					FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."user_group","gid","gid = '".$data["gid"]."'")."</td><td>".
-					FS::$iMgr->removeIcon(2,"gname=".$data["gname"],array("js" => true, 
-						"confirm" => $this->loc->s("confirm-removegrp")."'".$data["gname"]."' ?"))."</td></tr>";
+					FS::$iMgr->removeIcon(2,"gname=".$data["gname"],
+						array("js" => true, 
+							"confirmtext" => "confirm-removegrp",
+							"confirmval" => $data["gname"]
+						))."</td></tr>";
 			}
 			if ($found) {
 				$output .= $tmpoutput."</table>";

@@ -157,17 +157,22 @@
 				// Confirmation div
 				if(isset($options["confirm"]) && is_array($options["confirm"]) && count($options["confirm"]) == 3) {
 					$jsarr .= ($jsarr != "{" ? "," : "")."'lock': true";
-					$output .= "onclick=\"confirmPopup('".FS::$secMgr->cleanForJS($options["confirm"][0])."','".
-						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][1]))."','".
-						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][2]))."','?".
-						FS::$secMgr->cleanForJS($link)."'";
+					$output .= sprintf("onclick=\"confirmPopup('%s','%s','%s','?%s'",
+						FS::$secMgr->cleanForJS($options["confirm"][0]),
+						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][1])),
+						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][2])),
+						FS::$secMgr->cleanForJS($link)
+					);
 				}
 				else {
-					$output .= "onclick=\"callbackLink('?".FS::$secMgr->cleanForJS($link)."'";
+					$output .= sprintf("onclick=\"callbackLink('?%s'",
+						FS::$secMgr->cleanForJS($link)
+					);
 				}
 				$jsarr .= "}";
-				if($jsarr != "{}")
+				if($jsarr != "{}") {
 					$output .= ",".$jsarr;
+				}
 				$output .= ");\" ";
 			}
 			else {
@@ -183,9 +188,10 @@
 			 * confirm only contain a text, we add delete button labels
 			 * here
 			 */
-			if (isset($options["confirm"])) {
+			if (isset($options["confirmtext"]) && isset($options["confirmval"])) {
 				$options["confirm"] = array(
-					$options["confirm"],
+					sprintf(FS::$iMgr->getLocale($options["confirmtext"]),
+						$options["confirmval"]),
 					"Confirm",
 					"Cancel"
 				);

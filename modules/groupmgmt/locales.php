@@ -23,7 +23,7 @@
 			$locales = array(
 				"fr" => array(
 					"Add" => "Ajouter",
-					"confirm-removegrp" => "Êtes vous sûr de vouloir supprimer le groupe ",
+					"confirm-removegrp" => "Êtes vous sûr de vouloir supprimer le groupe '%s' ?",
 					"Delete" => "Supprimer",
 					"err-already-exist" => "Ce groupe existe déjà !",
 					"err-bad-data" => "Données invalides.",
@@ -42,7 +42,7 @@
 				),
 				"en" => array(
 					"Add" => "Add",
-					"confirm-removegrp" => "Are you sure to want to remove group ",
+					"confirm-removegrp" => "Are you sure to want to remove group '%s' ?",
 					"Delete" => "Remove",
 					"err-already-exist" => "This group already exists !",
 					"err-bad-data" => "Invalid data(s).",

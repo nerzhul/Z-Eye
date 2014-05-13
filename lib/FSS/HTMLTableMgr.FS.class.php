@@ -215,9 +215,12 @@
 					$output = sprintf("%s<td>%s</td>",$output,
 						FS::$iMgr->removeIcon($this->removeActId, 
 							$this->removeLink."=".$rowIdx,
-							array("js" => true, "confirm" =>
-							FS::$iMgr->getLocale($this->removeConfirm)."'".$rowIdx."' ?"
-					)));
+							array("js" => true, 
+								"confirmtext" => $this->removeConfirm,
+								"confirmval" => $rowIdx
+							)
+						)
+					);
 				}
 				$output = sprintf("%s</tr>",$output);
 			}

@@ -317,9 +317,10 @@
 								$recordtype != "SOA" ? 
 									FS::$iMgr->removeIcon(14,"zn=".$dnszone2.
 									"&rc=".$recordname."&rct=".$recordtype."&rcv=".$recordval,
-									array("js" => true, "confirm" => 
-										$this->loc->s("confirm-remove-record")."'".
-											$recordname."' ?"))
+									array("js" => true,
+										"confirmtext" => "confirm-remove-record",
+										"confirmval" => $recordname
+									))
 									: "");
 						}
 						$output .= "</td></tr>";

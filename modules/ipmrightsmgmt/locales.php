@@ -24,8 +24,8 @@
 				"fr" => array(
 					"Add" => "Ajouter",
 					"All" => "Tous",
-					"confirm-remove-groupright" => "Êtes vous sûr de vouloir supprimer ce droit pour le groupe ",
-					"confirm-remove-userright" => "Êtes vous sûr de vouloir supprimer ce droit pour l'utilisateur ",
+					"confirm-remove-groupright" => "Êtes vous sûr de vouloir supprimer ce droit pour le groupe '%s' ?",
+					"confirm-remove-userright" => "Êtes vous sûr de vouloir supprimer ce droit pour l'utilisateur '%s' ?",
 					"err-already-exist" => "Cet élément existe déjà", 
 					"err-bad-datas" => "Erreur sur la requête: certains champs sont manquants ou invalides",
 					"err-no-rights" => "Vous n'avez pas le droit de faire cela",
@@ -66,8 +66,8 @@
 				"en" => array(
 					"Add" => "Add",
 					"All" => "All",
-					"confirm-remove-groupright" => "Are you sure you want to remove right for group ",
-					"confirm-remove-userright" => "Are you sure you want to remove right for user ",
+					"confirm-remove-groupright" => "Are you sure you want to remove right for group '%s' ?",
+					"confirm-remove-userright" => "Are you sure you want to remove right for user '%s' ?",
 					"err-already-exist" => "This element already exists",
 					"err-bad-datas" => "Bad request: some fields are missing or wrong",
 					"err-no-rights" => "You don't have rights to do that",

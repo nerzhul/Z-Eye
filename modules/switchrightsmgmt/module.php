@@ -140,10 +140,12 @@
 					case 4: $bcktype = "SCP"; break;
 					case 5: $bcktype = "SFTP"; break;
 				}
-				$tmpoutput .= $bcktype."</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>";
-				$tmpoutput .= FS::$iMgr->removeIcon(4,"addr=".$data["addr"]."&type=".$data["type"],array("js" => true,
-					"confirm" => $this->loc->s("confirm-remove-backupsrv")."'".$data["addr"]." (".$bcktype.")' ?"));
-				$tmpoutput .= "</center></td></tr>";
+				$tmpoutput .= $bcktype."</td><td>".$data["path"]."</td><td>".$data["login"]."</td><td><center>".
+					FS::$iMgr->removeIcon(4,"addr=".$data["addr"]."&type=".$data["type"],array("js" => true,
+					"confirmtext" => "confirm-remove-backupsrv",
+					"confirmval" => $data["addr"]." (".$bcktype.")'"
+				)).
+				"</center></td></tr>";
 			}
 			if ($found)
 				$output .= $tmpoutput."</table>";
@@ -459,7 +461,10 @@
 			$confirm = ($type == "g" ? $this->loc->s("confirm-remove-groupright") : $this->loc->s("confirm-remove-userright"));
 			$output = "<span id=\"".$type.$id.$right.$type2."\">".$name." ".
 				FS::$iMgr->removeIcon(2,$type."id=".$id."&".$type2."=".$snmpip."&right=".$right,
-					array("js" => true, "confirm" => $confirm."'".$name."' ?"))."<br /></span>";
+					array("js" => true,
+						"confirmtext" => $confirm,
+						"confirmval" => $name
+					))."<br /></span>";
 
 			return $output;
 		}

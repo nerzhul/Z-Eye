@@ -182,8 +182,13 @@
 					else $found2 = true;
 					$output .= $parentlist[$i];
 				}
-				$output .="</td><td>".FS::$iMgr->removeIcon(15,"host=".$data["name"],array("js" => true,
-					"confirm" => $this->loc->s("confirm-remove-host")."'".$data["name"]."' ?"))."</td></tr>";
+				$output .= "</td><td>".
+					FS::$iMgr->removeIcon(15,"host=".$data["name"],
+						array("js" => true,
+						"confirmtext" => "confirm-remove-host",
+						"confirmval" => $data["name"]
+					)).
+					"</td></tr>";
 			}
 			if ($found) {
 				$output .= "</table>";
@@ -233,7 +238,9 @@
 					$output .= ")";
 				}
 				$output .= "</td><td>".FS::$iMgr->removeIcon(21,"hg=".$data["name"],array("js" => true,
-					"confirm" => $this->loc->s("confirm-remove-hostgroup")."'".$data["name"]."' ?"))."</td></tr>";
+					"confirmtext" => "confirm-remove-hostgroup",
+					"confirmval" => $data["name"]
+				))."</td></tr>";
 			}
 			if ($found) {
 				$output .= "</table>";
@@ -312,7 +319,9 @@
 				if ($data["template"] == "t") $output .= $this->loc->s("Yes");
 				else $output .= $this->loc->s("No");
 				$output .= "</td><td>".FS::$iMgr->removeIcon(18,"srv=".$data["name"],array("js" => true,
-					"confirm" => $this->loc->s("confirm-remove-service")."'".$data["name"]."' ?"))."</td></tr>";
+					"confirmtext" => "confirm-remove-service",
+					"confirmval" => $data["name"]
+				))."</td></tr>";
 			}
 			if ($found) {
 				$output .= "</table>";
@@ -356,29 +365,45 @@
 					$output .= $data["name"];
 
 				$output .= "</td><td>".$data["alias"]."</td><td>";
-				if ($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0)
+				if ($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0) {
 					$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].	
 					" ".$this->loc->s("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
-				if ($data["tuhs"] != 0 || $data["tums"] != 0 || $data["tuhe"] != 0 || $data["tume"] != 0)
+				}
+				
+				if ($data["tuhs"] != 0 || $data["tums"] != 0 || $data["tuhe"] != 0 || $data["tume"] != 0) {
 					$output .= $this->loc->s("Tuesday").	" - ".$this->loc->s("From")." ".($data["tuhs"] < 10 ? "0" : "").$data["tuhs"].	":".($data["tums"] < 10 ? "0" : "").$data["tums"].	
 					" ".$this->loc->s("To")." ".($data["tuhe"] < 10 ? "0" : "").$data["tuhe"].":".($data["tume"] < 10 ? "0" : "").$data["tume"]."<br />";
-				if ($data["whs"] != 0 || $data["wms"] != 0 || $data["whe"] != 0 || $data["wme"] != 0)	
+				}
+				
+				if ($data["whs"] != 0 || $data["wms"] != 0 || $data["whe"] != 0 || $data["wme"] != 0) {
 					$output .= $this->loc->s("Wednesday").	" - ".$this->loc->s("From")." ".($data["whs"] < 10 ? "0" : "").	$data["whs"].	":".($data["wms"] < 10 ? "0" : "").	$data["wms"].	
 					" ".$this->loc->s("To")." ".($data["whe"] < 10 ? "0" : "").	$data["whe"].":".($data["wme"] < 10 ? "0" : "").$data["wme"]."<br />";
-				if ($data["thhs"] != 0 || $data["thms"] != 0 || $data["thhe"] != 0 || $data["thme"] != 0)
+				}
+				
+				if ($data["thhs"] != 0 || $data["thms"] != 0 || $data["thhe"] != 0 || $data["thme"] != 0) {
 					$output .= $this->loc->s("Thursday").	" - ".$this->loc->s("From")." ".($data["thhs"] < 10 ? "0" : "").$data["thhs"].	":".($data["thms"] < 10 ? "0" : "").$data["thms"].
 					" ".$this->loc->s("To")." ".($data["thhe"] < 10 ? "0" : "").$data["thhe"].":".($data["thme"] < 10 ? "0" : "").$data["thme"]."<br />";
-				if ($data["fhs"] != 0 || $data["fms"] != 0 || $data["fhe"] != 0 || $data["fme"] != 0)
+				}
+				
+				if ($data["fhs"] != 0 || $data["fms"] != 0 || $data["fhe"] != 0 || $data["fme"] != 0) {
 					$output .= $this->loc->s("Friday").		" - ".$this->loc->s("From")." ".($data["fhs"] < 10 ? "0" : "").	$data["fhs"].	":".($data["fms"] < 10 ? "0" : "").	$data["fms"].
 					" ".$this->loc->s("To")." ".($data["fhe"] < 10 ? "0" : "").	$data["fhe"].":".($data["fme"] < 10 ? "0" : "").$data["fme"]."<br />";
-				if ($data["sahs"] != 0 || $data["sams"] != 0 || $data["sahe"] != 0 || $data["same"] != 0)
+				}
+				
+				if ($data["sahs"] != 0 || $data["sams"] != 0 || $data["sahe"] != 0 || $data["same"] != 0) {
 					$output .= $this->loc->s("Saturday").	" - ".$this->loc->s("From")." ".($data["sahs"] < 10 ? "0" : "").$data["sahs"].	":".($data["sams"] < 10 ? "0" : "").$data["sams"].
 					" ".$this->loc->s("To")." ".($data["sahe"] < 10 ? "0" : "").$data["sahe"].":".($data["same"] < 10 ? "0" : "").$data["same"]."<br />";
-				if ($data["suhs"] != 0 || $data["sums"] != 0 || $data["suhe"] != 0 || $data["sume"] != 0)
+				}
+				
+				if ($data["suhs"] != 0 || $data["sums"] != 0 || $data["suhe"] != 0 || $data["sume"] != 0) {
 					$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
 					" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
+				}
+				
 				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"tp=".$data["name"],array("js" => true,
-					"confirm" => $this->loc->s("confirm-remove-timeperiod")."'".$data["name"]."' ?"))."</td></tr>";
+					"confirmtext" => "confirm-remove-timeperiod",
+					"confirmval" => $data["name"]
+				))."</td></tr>";
 			}
 			if ($found) {
 				$output .= "</table>";
@@ -470,7 +495,9 @@
 				$output .= "</td><td>".$data["mail"]."</td>
 					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
 					FS::$iMgr->removeIcon(9,"ct=".$data["name"],array("js" => true,
-						"confirm" => $this->loc->s("confirm-remove-contact")."'".$data["name"]."' ?"))."</td></tr>";
+						"confirmtext" => "confirm-remove-contact",
+						"confirmval" => $data["name"]
+					))."</td></tr>";
 			}
 			if ($found) {
 				$output .= "</table>";
@@ -524,7 +551,9 @@
 					$output .= $contacts[$i];
 				}
 				$output .= "</td><td>".FS::$iMgr->removeIcon(12,"ctg=".$data["name"],array("js" => true,
-					"confirm" => $this->loc->s("confirm-remove-contactgroup")."'".$data["name"]."' ?"))."</td></tr>";
+					"confirmtext" => "confirm-remove-contactgroup",
+					"confirmval" => $data["name"]
+				))."</td></tr>";
 			}
 			if ($found) {
 				$output .= "</table>";
@@ -562,7 +591,8 @@
 					"</td><td>".$data["alias"]."</td><td>".
 					FS::$iMgr->removeIcon(23,"notifstr=".$data["name"],
 						array("js" => true,
-							"confirm" => $this->loc->s("confirm-remove-notif-strategy")."'".$data["name"]."' ?"
+							"confirmtext" => "confirm-remove-notif-strategy",
+							"confirmval" => $data["name"]
 						)
 					).
 					"</td></tr>";
@@ -613,7 +643,9 @@
 					// If it's not a system command, then we can remove it
 					if ($data["syscmd"] != 't') {
 						$output .= FS::$iMgr->removeIcon(2,"cmd=".$data["name"],array("js" => true,
-							"confirm" => $this->loc->s("confirm-remove-command")."'".$data["name"]."' ?"));
+							"confirmtext" => "confirm-remove-command",
+							"confirmval" => $data["name"]
+						));
 					}
 					$output .= "</td>";
 				}

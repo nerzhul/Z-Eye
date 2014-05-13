@@ -24,9 +24,9 @@
 				"fr" => array(
 					"Add" => "Ajouter",
 					"All" => "Tous",
-					"confirm-remove-backupsrv" => "Êtes vous sûr de vouloir supprimer le serveur de sauvegarde ",
-					"confirm-remove-groupright" => "Êtes vous sûr de vouloir supprimer ce droit pour le groupe ",
-					"confirm-remove-userright" => "Êtes vous sûr de vouloir supprimer ce droit pour l'utilisateur ",
+					"confirm-remove-backupsrv" => "Êtes vous sûr de vouloir supprimer le serveur de sauvegarde '%s' ?",
+					"confirm-remove-groupright" => "Êtes vous sûr de vouloir supprimer ce droit pour le groupe '%s' ?",
+					"confirm-remove-userright" => "Êtes vous sûr de vouloir supprimer ce droit pour l'utilisateur '%s' ?",
 					"device" => "Equipement",
 					"DHCP-Snooping-mgmt" => "Gestion du DHCP Snooping (équipement)",
 					"err-already-exist" => "Cet élément existe déjà", 

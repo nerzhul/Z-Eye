@@ -89,8 +89,10 @@
 			FS::$iMgr->setJSBuffer(1);
 			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv(2,$name,array("lnkadd" => "name=".$name)).
 				"</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
-				FS::$iMgr->removeIcon(2,"snmp=".$name,array("js" => true, "confirm" => 
-					$this->loc->s("confirm-remove-community")."'".$name."' ?"))."</td></tr>";
+				FS::$iMgr->removeIcon(2,"snmp=".$name,array("js" => true, 
+					"confirmtext" => "confirm-remove-community",
+					"confirmval" => $name
+				))."</td></tr>";
 		}
 
 		public function getIfaceElmt() {
