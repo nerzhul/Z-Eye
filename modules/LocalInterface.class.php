@@ -37,7 +37,7 @@
 				$output .= $this->showWindowHead();
 			}
 			$output .= $this->notifContainer().$this->bottomContainer();
-			
+
 			if ($installlocked) {
 				$this->loadFooterPlugins();
 			}
@@ -49,7 +49,7 @@
 		}
 
 		private function notifContainer() {
-			return "<div id=\"notification\"><div id=\"subnotification\"></div></div>";
+			return "<div id=\"notification\"><div id=\"subnotification\"><div id=\"notifIcon\"></div><div id=\"notifText\"></div></div></div>";
 		}
 
 		private function bottomContainer() {
@@ -62,7 +62,7 @@
 			if($this->showRetMenu) {
 				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\" onclick=\"javascript:history.back()\">Retour</div></div>";
 			}
-			
+
             $output .= $this->loadMenus();
 
 			if (FS::$sessMgr->isConnected()) {
@@ -83,7 +83,7 @@
 
 			return $output;
 		}
-		
+
 		private function loginContainer() {
 			return "<div id=\"login\" style=\"display:none;\"><div id=\"loginF\"><header>".
 				FS::$iMgr->img("styles/images/LogoHD.png",446,214).
@@ -125,7 +125,7 @@
 			if(!$installlocked) {
 				return $this->loadModule($this->getModuleIdByPath("install"));
 			}
-				
+
 			$module = FS::$secMgr->checkAndSecuriseGetData("mod");
 			if(!$module) {
 				$module = 0;
@@ -153,7 +153,7 @@
 				if(isset($options["snotif"])) {
 					$jsarr .= "'snotif': '".FS::$secMgr->cleanForJS($options["snotif"])."'";
 				}
-				
+
 				// Confirmation div
 				if(isset($options["confirm"]) && is_array($options["confirm"]) && count($options["confirm"]) == 3) {
 					$jsarr .= ($jsarr != "{" ? "," : "")."'lock': true";
@@ -196,12 +196,12 @@
 					"Cancel"
 				);
 			}
-			
+
 			$link = sprintf("mod=%s&act=%s&%s",
 				$this->cur_module->getModuleId(),
 				$actid,
 				$link);
-				
+
 			return $this->linkIcon($link,"cross",$options);
 		}
 		public function searchIcon($search) { return $this->linkIcon("mod=".$this->getModuleIdByPath("search")."&s=".$search,"search"); }

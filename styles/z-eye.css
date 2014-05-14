@@ -16,7 +16,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-/* 
+/*
 * Copyright (C) 2013 Jennifer Aouizerat <http://pixnart.fr/>
 * Z-Eye Logos are under CC BY-ND 3.0 licence
 * You can found copy of this licence at: http://creativecommons.org/licenses/by-nd/3.0/legalcode
@@ -54,7 +54,7 @@ select { min-width: 50px; }
 #contenttabs h1, #contenttabs h2 { margin-right: -18px; }
 
 #installer {
-	display: inline-block; 
+	display: inline-block;
 	width: 700px;
 	border: 1px solid;
 	background: #EEE;
@@ -74,6 +74,9 @@ select { min-width: 50px; }
 	display: none;
 }
 
+/*
+ * Notification element
+ */
 #notification {
 	position: fixed;
 	margin-left: auto;
@@ -90,13 +93,25 @@ select { min-width: 50px; }
 #subnotification {
 	border-radius: 10px 10px 0 0;
 	display: inline-block;
-	padding: 10px;
 	margin-left: 5px;
 	margin-right: 5px;
 	min-width: 420px;
 	background-color: rgba(0,0,0,0.9);
 }
 
+#notifIcon, #notifText { display: inline-block; }
+#notifText { padding: 10px; }
+#notifIcon {
+	padding: 10px;
+	background-position: center center;
+	height: 18px;
+	float: left;
+	margin-left: 20px;
+}
+.notifIconErr { background: url('/styles/images/cross.png') no-repeat; }
+.notifIconOK { background: url('/styles/images/okay.png') no-repeat; }
+
+.notifErrSpan { font-weight: bold; color: #B00; }
 
 #footer {
 	width:100%;
@@ -279,7 +294,7 @@ td {
 
 tr:hover td, td:hover { background-color: #CCE; }
 
-#hr { color:#999; border-top: 1px solid rgb(210,210,210); padding-bottom: 8px; margin-top: 8px;} 
+#hr { color:#999; border-top: 1px solid rgb(210,210,210); padding-bottom: 8px; margin-top: 8px;}
 
 /* Sort tables */
 thead:hover { cursor: pointer; }
@@ -291,8 +306,6 @@ a:hover { color: #F10; cursor: pointer; }
 
 canvas { display: inline-block; }
 #sigmap { background-color: #DDD; }
-
-#notifErr { font-weight: bold; color: #B00; }
 
 #errorContent {
 	font-weight: bold;
@@ -351,7 +364,7 @@ canvas { display: inline-block; }
 	z-index: 1500;
 	text-align: center;
 	font-size: 14px;
-	background-image: linear-gradient(#8A0000, #4A0000); background-image: -webkit-linear-gradient(#8A0000, #4A0000); background-color: #4A0000; 
+	background-image: linear-gradient(#8A0000, #4A0000); background-image: -webkit-linear-gradient(#8A0000, #4A0000); background-color: #4A0000;
 }
 
 #loginF { background-color: white; padding-top: 30px; min-height: 80%; }
@@ -569,7 +582,7 @@ label { float: left; font-weight: bold; text-align: left; }
 .ui-autocomplete .ui-state-focus { border:0; background: none; }
 .ui-autocomplete-over { background-color: #0A246A; color: white; }
 
-.colorpicker { 
+.colorpicker {
 	width: 356px;
 	height: 176px;
 	overflow: hidden;
@@ -1462,7 +1475,7 @@ disabled look for disabled choices in the results dropdown
   .select2-search input { background-position: 100% -21px !important; }
 }
 
-/* 
+/*
  * Backgrounds
  */
 #logform, #menutitle, .menupopup, .userpopup, .userMenu, #footer {
@@ -1499,5 +1512,5 @@ disabled look for disabled choices in the results dropdown
 	background-image: -moz-linear-gradient(#DCDCDC, #FAFAFA);
 	background-image: -ms-linear-gradient(#DCDCDC, #FAFAFA);
 	background-image: -o-linear-gradient(#DCDCDC, #FAFAFA);
-	background-image: -webkit-linear-gradient(#DCDCDC, #FAFAFA);	
+	background-image: -webkit-linear-gradient(#DCDCDC, #FAFAFA);
 }

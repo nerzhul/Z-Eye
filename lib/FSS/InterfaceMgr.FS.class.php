@@ -111,7 +111,7 @@
 									$menus[$menuname] = array();
 								}
 								if ($module->getRulesClass()->canAccessToModule() === true) {
-									$menus[$menuname][] = 
+									$menus[$menuname][] =
 										sprintf("<div class=\"menuItem\" onclick=\"loadInterface('&mod=%s');\">%s</div>",
 										$moduleid,$module->getMenuTitle());
 								}
@@ -127,17 +127,17 @@
 				for ($i=0;$i<count($elemts);$i++) {
 					$locoutput = sprintf("%s%s",$locoutput,$elemts[$i]);
 				}
-				
+
 				$output = sprintf("%s<div id=\"menuStack\"><div id=\"menuTitle\">%s</div>
 					<div class=\"menupopup\">%s</div></div>",
 					$output,$menuname,$locoutput);
 			}
 			return $output;
 		}
-		
+
 		public function loadFooterPlugins() {
 			FS::$iMgr->js("clearFooterPlugins();");
-			
+
 			$dir = opendir(dirname(__FILE__)."/../../modules/");
 			while($elem = readdir($dir)) {
 				$dirpath = dirname(__FILE__)."/../../modules/".$elem;
@@ -147,7 +147,7 @@
 						if (is_file($dirpath."/".$elem2) && $elem2 == "module.php") {
 							$path = $elem;
 							require(dirname(__FILE__)."/../../modules/".$path."/module.php");
-							
+
 							if ($module->getRulesClass()->canAccessToModule() === true) {
 								$module->loadFooterPlugin();
 							}
@@ -180,7 +180,7 @@
 		public function loadModule($id,$act=1) {
 			if ($path = $this->findModulePath($id)) {
 				require(dirname(__FILE__)."/../../modules/".$path."/module.php");
-				
+
 				$ruleAccess = $module->getRulesClass()->canAccessToModule();
 				// Bypass access for Android
 				if ($ruleAccess === true || $act == 3) {
@@ -190,7 +190,7 @@
 						case 1: default: return $module->Load(); break;
 						case 2: return $module->getIfaceElmt(); break;
 						case 3: return $module->LoadForAndroid(); break;
-					}	
+					}
 				}
 				else if($ruleAccess === -1) {
 					$this->js(sprintf("setLoginCbkMsg('<span style=\"color: red;\">%s</span>');openLogin();",
@@ -222,7 +222,7 @@
 			return sprintf("<div id=\"backarrow\"><a href=\"javascript:history.back()\">%s</a></div>",
 				FS::$iMgr->img("styles/back.png",32,32));
 		}
-		
+
 		public function aLink($link,$label,$raw=false) {
 			return sprintf("<a href=\"%s\">%s</a>",
 				$raw ? $link : sprintf("?mod=%s",$link),
@@ -299,11 +299,11 @@
 			if (isset($options["label"])) {
 				$output = $this->label($name,$options["label"]);
 			}
-			
+
 			$output = sprintf("%s<textarea name=\"%s\" id=\"%s\" style=\"width:%spx;height:%spx\" ",
 				$output,$name,$name,(isset($options["width"]) ? $options["width"] : 400),
 				(isset($options["height"]) ? $options["height"] : 300));
-				
+
 			if (isset($options["tooltip"])) {
 				$output = sprintf("%s%s",$output,$this->tooltip($options["tooltip"]));
 			}
@@ -324,14 +324,14 @@
 			if ($label) {
 				$output = $this->label($name,$label);
 			}
-			
+
 			$output = sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" ",
 				$output,$name,$name,$def_value,$size,$length);
-				
+
 			if ($tooltip) {
 				$output = sprintf("%s%s",$output,$this->tooltip($tooltip));
 			}
-			
+
 			return sprintf("%s />",$output);
 		}
 
@@ -340,14 +340,14 @@
 			if (isset($options["label"])) {
 				$output = $this->label($name,$options["label"]);
 			}
-			
+
 			$output = sprintf("%s<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:ReplaceNotNumeric(this);\" ",
 				$output,$name,$name,$def_value,(isset($options["size"]) ? $options["size"] : 20),(isset($options["length"]) ? $options["length"] : 40));
-				
+
 			if (isset($options["tooltip"])) {
 				$output = sprintf("%s%s",$output,$this->tooltip($options["tooltip"]));
 			}
-			
+
 			return sprintf("%s />",$output);
 		}
 
@@ -356,14 +356,14 @@
             if ($label) {
 				$output = $this->label($name,$label);
 			}
-			
+
 			$output = sprintf("<input type=\"textbox\" name=\"%s\" id=\"%s\" value=\"%s\" size=\"%s\" maxlength=\"%s\" onkeyup=\"javascript:checkIP(this);\" ",
 				$name,$name,$def_value,$size,$length);
-			
+
 			if ($tooltip) {
 				$output = sprintf("%s%s",$output,$this->tooltip($tooltip));
 			}
-			
+
 			return sprintf("%s />",$output);
 		}
 
@@ -390,7 +390,7 @@
 			$output = $this->input($name,"",(isset($options["size"]) ? $options["size"] : 20),
 				(isset($options["length"]) ? $options["length"] : 40), (isset($options["label"]) ? $options["label"] : NULL),
 				(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
-				
+
 			$this->js(sprintf("$('#%s').autocomplete({source: '?mod=%s&at=2',minLength: 3});",
 				$name,$this->getModuleIdByPath("search")));
 			return $output;
@@ -407,15 +407,15 @@
 				$('#%s').slider({ range: 'min', min: %s, max: %s,%sslide: function(event,ui) { $('#%s').val(%s);%s}});});",
 				$slidername, $min, $max,
 				isset($options["value"]) ? sprintf("value: %s,", $options["value"]) : "",
-				$name, 
+				$name,
 				isset($options["valoverride"]) ? $options["valoverride"] : "ui.value",
 				isset($options["hidden"]) ? sprintf("$('#%slabel').html(ui.value);", $name) : ""
 			);
 
 			$this->js($js);
-		
+
 			return sprintf("%s<div id=\"%s\" %s></div>%s",
-				$output, $slidername, 
+				$output, $slidername,
 				isset($options["width"]) ? sprintf("style=\"width: %s\"", $options["width"]) : "",
 				isset($options["hidden"]) ? sprintf("<br /><span id=\"%slabel\">%s</span>%s<br />",
 					$name,
@@ -445,7 +445,7 @@
 
 			$js = sprintf("$('#%s').datepicker($.datepicker.regional['fr']);
 				$('#%s').datepicker('option', 'dateFormat', 'dd-mm-yy');%s",
-				$name, $name, 
+				$name, $name,
 				$def_value ? sprintf("$('#%s').datepicker('setDate','%s');", $name, $def_value) : ""
 			);
 
@@ -455,7 +455,7 @@
 
 		public function hourlist($hname, $mname, $hselect=0, $mselect=0) {
 			$output = $this->select($hname);
-			
+
 			for ($i=0;$i<24;$i++) {
 				$txt = ($i < 10 ? "0".$i : $i);
 				$output = sprintf("%s%s",
@@ -475,7 +475,7 @@
 
 			return $output;
 		}
-		
+
 		public function raddbCondSelectElmts($select = "") {
 			return FS::$iMgr->selElmt("=","=",$select == "=").
 				FS::$iMgr->selElmt("==","==",$select == "==").
@@ -516,12 +516,12 @@
 				$label
 			);
 		}
-		
+
 		public function radioList($name,$values, $labels, $checkid = NULL) {
 			if (!is_array($values)) {
 				return "";
 			}
-			
+
 			$output = "";
 
 			$count = count($values);
@@ -535,8 +535,8 @@
 
 		public function form($link,$options=array()) {
 			return sprintf("<form action=\"%s\" %smethod=\"%s\"%s>",
-				$link, 
-				isset($options["id"]) && strlen($options["id"]) > 0 ? 
+				$link,
+				isset($options["id"]) && strlen($options["id"]) > 0 ?
 					sprintf("id=\"%s\" ",$options["id"]) : "",
 				isset($options["get"]) && $options["get"] ? "GET" : "POST",
 				isset($options["js"]) ?
@@ -580,7 +580,7 @@
 
 			if (isset($options["type"])) {
 				switch($options["type"]) {
-					case "idxedit": 
+					case "idxedit":
 						if (isset($options["edit"]) && $options["edit"]) {
 							$output .= $value.FS::$iMgr->hidden($name,$value).FS::$iMgr->hidden("edit",1);
 						}
@@ -633,7 +633,7 @@
 					FS::$iMgr->hidden($name,$value), FS::$iMgr->hidden("edit",1)
 				);
 			}
-			
+
 			return $this->idxLine($label,$name,"",$options);
 		}
 
@@ -681,7 +681,7 @@
 			$output = sprintf("%s<progress id=\"%s\" value=\"%s\" max=\"%s\"></progress><span id=\"prog%sval\"></span>",
 				$label ? sprintf("<label for=\"%s\">%s</label> ",$name,$label) : "",
 				$name, $value, $max, $name);
-				
+
 			$this->js(sprintf("eltBar = document.getElementById(\"%s\");
 				eltPct = document.getElementById(\"prog%sval\");
 				eltPct.innerHTML = ' ' + Math.floor(eltBar.position * 100) + \"%%\";",$name,$name));
@@ -691,17 +691,17 @@
 		public function select($name, $options = array()) {
 			$selId = preg_replace("#\[|\]#","",$name);
 			$multi = (isset($options["multi"]) && $options["multi"] == true);
-			
+
 			$this->js(sprintf("$('#%s').select2();",$name));
-			
+
 			return sprintf("%s<select name=\"%s%s\" id=\"%s\"%s%s%s%s%s>",
 				isset($options["label"]) ?
 					sprintf("<label for=\"%s\">%s</label> ",$name,$options["label"]) : "",
 				$name, ($multi ? "[]" : ""), $selId,
-				isset($options["js"]) ? 
+				isset($options["js"]) ?
 					sprintf(" onchange=\"javascript:%s;\" ",$options["js"]) : "",
 				$multi ? " multiple=\"multiple\" " : "",
-				isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]) ? 
+				isset($options["size"]) && FS::$secMgr->isNumeric($options["size"]) ?
 					sprintf(" size=\"%s\" ",$options["size"]) : "",
 				isset($options["style"]) ?
 					sprintf(" style=\"%s\" ",$style) : "",
@@ -722,7 +722,7 @@
 
 		public function selElmtFromDB($table,$valuefield,$options = array()) {
 			$output = "";
-			
+
 			$sqlopts = array();
 			$sqlcond = "";
 			$selected = array();
@@ -740,7 +740,7 @@
 				$sqlcond = $options["sqlcond"];
 			}
 
-			if (isset($options["labelfield"])) {	
+			if (isset($options["labelfield"])) {
 				$lf = $options["labelfield"];
 				$query = FS::$dbMgr->Select($table,$options["labelfield"].",".$valuefield,$sqlcond,$sqlopts);
 			}
@@ -761,7 +761,7 @@
 				$output = sprintf("<label for=\"%s\">%s</label> ",
 					$name,$options["label"]);
 			}
-			
+
 			return sprintf("%s<input type=\"checkbox\" name=\"%s\" id=\"%s\" %s%s />",
 				$output,$name,$name,
 				(isset($options["check"]) && $options["check"]) ? "checked " : "",
@@ -779,22 +779,22 @@
 				($id ? "id=\"".$id."\" " : "")
 			);
 		}
-		
+
 		public function imgWithZoom2($path,$title,$id,$bigpath="") {
 			$output = sprintf("<a href=\"%s\" id=\"%s\" title=\"%s\">%s</a>",
 				(strlen($bigpath) > 0 ? $bigpath : $path),
 				$id, $title,
 				FS::$iMgr->img($path,0,0,"jqzoom-img"));
-				
+
 			$this->js(sprintf("$('#%s').jqzoom({ zoomWidth: 400, zoomHeight: 320, alwaysOn: true, zoomType: 'drag'});",
 				$id));
 			return $output;
-		}	
+		}
 
 		public function upload($name) {
 			return sprintf("<input type=\"file\" name=\"%s\" />",$name);
 		}
-		
+
 		public function canvas($name, $width=480, $height=480) {
 			return sprintf("<canvas id=\"%s\" height=\"%s\" width=\"%s\">[Your browser doesn't support HTML5]</canvas>",
 				$name,$height,$width);
@@ -806,7 +806,7 @@
 				$link,$shid,
 				(FS::$secMgr->checkAndSecuriseGetData("nohist") ? "&nohist=1" : ""),
 				$label);
-				
+
 		}
 
 		public function tabPan($elmts = array(),$cursh) {
@@ -838,7 +838,7 @@
 				$text1,
 				(isset($options["line"]) && $options["line"]) ? "<br />" : "");
 		}
-		
+
 		public function iconOpendiv($callid,$iconname,$options=array()) {
 			$size = (isset($options["iconsize"]) && is_numeric($options["iconsize"])) ? $options["iconsize"] : 15;
 			return $this->opendiv($callid,$this->img("styles/images/".$iconname.".png",$size,$size),$options);
@@ -860,11 +860,11 @@
 			$this->js(sprintf("$('#%s').accordion({heightStyle: 'content'});",$accId));
 			return $output;
 		}
-		
+
 		public function setURL($url) {
 			// Nohist is needed to remove history loops
 			if (!FS::$secMgr->checkAndSecuriseGetData("nohist")) {
-				$this->js(sprintf("addHistoryState(document.title, '/?mod=%s%s','&nohist=1&mod=%s%s');", 
+				$this->js(sprintf("addHistoryState(document.title, '/?mod=%s%s','&nohist=1&mod=%s%s');",
 					$this->cur_module->getModuleId(),
 					strlen($url) > 0 ? "&".$url : "",
 					$this->cur_module->getModuleId(),
@@ -901,10 +901,10 @@
 		public function printDebug($msg) {
 			return sprintf("<div id=\"debugContent\">%s: %s</div>",$this->getLocale("Notification"),$msg);
 		}
-		
+
 		public function printDebugBacktrace() {
 			$output = "<span style=\"text-align:left;display:block;\">";
-			
+
 			$bt = debug_backtrace();
 			$count = count($bt);
 			// Don't show this call
@@ -913,7 +913,7 @@
 				if (isset($bt[$i]["type"])) {
 					$op = $bt[$i]["type"];
 				}
-				
+
 				$class = "";
 				if (isset($bt[$i]["class"])) {
 					$class = $bt[$i]["class"];
@@ -921,7 +921,7 @@
 				$output = sprintf("%s#%d %s%s%s() called at %s:%s<br />",$output,($i-1),$class,
 					$op,$bt[$i]["function"],$bt[$i]["file"],$bt[$i]["line"]);
 			}
-			
+
 			$output = sprintf("%s</span>",$output);
 			return $output;
 		}
@@ -953,7 +953,7 @@
 
 		protected function ajaxEcho($str,$js="",$raw=false,$options=array()) {
 			echo ($raw ? $str : $this->getLocale($str));
-			
+
 			if (isset($options["no-close"]) &&
 				$options["no-close"] === true) {
 				$js = sprintf("dontClosePopup();%s",$js);
@@ -962,26 +962,29 @@
 				$this->js($js);
 			}
 		}
-		
+
 		public function ajaxEchoError($str,$js="",$raw=false,$options=array()) {
+			$js = sprintf("%s%s", $js,
+				"setNotifIconToErr();"
+			);
 			$this->ajaxEcho(
-				sprintf("<span style=\"notifErr\">%s:</span> %s",
+				sprintf("<span class=\"notifErrSpan\">%s:</span> %s",
 					$this->getLocale("Error"),
 					$raw ? $str : $this->getLocale($str)),
 				$js, true, $options
 			);
 		}
-		
+
 		public function ajaxEchoErrorNC($str,$js="",$raw=false,$options=array()) {
 			$this->ajaxEchoError($str,$js,$raw,array("no-close" => true));
 		}
-		
+
 		public function ajaxEchoOK($str,$js="",$raw=false,$options=array()) {
-			$this->ajaxEcho(
-				sprintf("<span style=\"notifOK\"></span> %s",
-					$raw ? $str : $this->getLocale($str)),
-				$js, true, $options
+			$js = sprintf("%s%s", $js,
+				"setNotifIconToOK();"
 			);
+
+			$this->ajaxEcho($str, $js, $raw, $options);
 		}
 
 		public function getLocale($locid) {
@@ -1000,7 +1003,7 @@
 		public function getCurModule() { return $this->cur_module; }
 
 		public function setCurrentModule($module) { $this->cur_module = $module; }
-		public function setTitle($title) { 
+		public function setTitle($title) {
 			$this->title = $title;
 			if (FS::isAjaxCall()) {
 				$this->js(sprintf("document.title='%s%s';",

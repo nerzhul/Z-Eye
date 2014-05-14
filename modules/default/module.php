@@ -396,18 +396,21 @@
 				$this->SECscore = 0;
 			}
 			
+			$js = "";
 			if ($this->SECscore < 10000) {
-				FS::$iMgr->js("$('#accsech3').css('background-color','#4A0000');");
-				FS::$iMgr->js("$('#accsech3').css('background-image','linear-gradient(#4A0000, #8A0000)');");
-				FS::$iMgr->js("$('#accsech3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');");
+				$js = "$('#accsech3').css('background-color','#4A0000');".
+					"$('#accsech3').css('background-image','linear-gradient(#4A0000, #8A0000)');".
+					"$('#accsech3').css('background-image','-webkit-linear-gradient(#4A0000, #8A0000)');";
+				
 			}
 			else {
 				$this->BWtotalscore = -1;
 				$js = "$('#accsech3').css('background-color','#008A00');".
 					"$('#accsech3').css('background-image','linear-gradient(#004A00, #008A00)');".
 					"$('#accsech3').css('background-image','-webkit-linear-gradient(#004A00, #008A00)');";
-				FS::$iMgr->js($js);
 			}
+			
+			FS::$iMgr->js($js);
 			FS::$dbMgr->Connect();
 			return $output;
 		}
