@@ -976,7 +976,7 @@
 				sprintf("<span style=\"notifErr\">%s:</span> %s",
 					$this->loc->s("Error"),
 					$raw ? $str : $this->getLocale($str)),
-				$js,$ra
+				$js,$raw
 			);
 		}
 		
