@@ -137,7 +137,8 @@
 			 * Host table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,alias,addr,template","",array("order" => "name"));
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts",
+				"name,alias,addr,template","",array("order" => "name"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
@@ -352,7 +353,9 @@
 			 * Timeperiod table
 			 */
 			$found = false;
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods","name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume","",array("order" => "name"));
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_timeperiods",
+				"name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,thms,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume",
+				"",array("order" => "name"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
@@ -1282,7 +1285,7 @@
 				// Add/Edit hostgroup
 				case 19:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-						echo $this->loc->s("err-no-right");
+						FS::$iMgr->ajaxEcho("err-no-right");
 						return;
 					} 
 
@@ -1291,37 +1294,42 @@
 					$members = FS::$secMgr->checkAndSecurisePostData("members");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if (!$name || !$alias || preg_match("#[ ]#",$name)) {
-						echo $this->loc->s("err-bad-data");
+						FS::$iMgr->ajaxEcho("err-bad-data");
 						return;
 					}
 					
 					if ($edit) {
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
-							echo $this->loc->s("err-data-not-exist");
-                                                        return;
-                                                }
+							FS::$iMgr->ajaxEcho("err-data-not-exist");
+							return;
+						}
 					}
 					else {
 						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
-							echo $this->loc->s("err-data-exist");
+							FS::$iMgr->ajaxEchoNC("err-data-exist");
 							return;
 						}
 					}
 					
+					FS::$iMgr->BeginTr();
 					if ($members) {
 						$count = count($members);
 						for ($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if (count($mt) != 2 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$mt[1]."'")) {
-								echo $this->loc->s("err-bad-data");
+								FS::$iMgr->ajaxEcho("err-bad-data");
 								return;
 							}
 						}
-						if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name = '".$name."'");
+						if ($edit) {
+							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members",
+								"name = '".$name."'");
+						}
 						for ($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
-							if (count($mt) == 2 && ($mt[0] == 1 || $mt[0] == 2))
+							if (count($mt) == 2 && ($mt[0] == 1 || $mt[0] == 2)) {
 								FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","'".$name."','".$mt[1]."','".$mt[0]."'");
+							}
 						}
 					}
 					else {
@@ -1329,12 +1337,18 @@
 						return;
 					}
 
-					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups","name = '".$name."'");
+					if ($edit) {
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups","name = '".$name."'");
+					}
+					
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","'".$name."','".$alias."'");
+					FS::$iMgr->CommitTr();
+					
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEcho("err-fail-writecfg");
 						return;
 					}
+					
 					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					return;
 				// remove hostgroup
