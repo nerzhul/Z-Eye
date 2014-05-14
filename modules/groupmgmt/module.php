@@ -144,15 +144,18 @@
 					$gname = FS::$secMgr->checkAndSecurisePostData("gname");
 					if (!$gname) {
 						$this->log(2,"Some datas are missing when try to create group");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 					if ($exist) {
-						FS::$iMgr->ajaxEcho("err-already-exist");
+						FS::$iMgr->ajaxEchoError("err-already-exist");
 						$this->log(1,"The group ".$gname." already exists");
 						return;
 					}
+					
+					FS::$dbMgr->BeginTr();
+					
 					$gid = FS::$dbMgr->GetMax(PGDbConfig::getDbPrefix()."groups","gid")+1;
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."groups","gid,gname","'".$gid."','".$gname."'");
 					$rules = array();
@@ -164,6 +167,9 @@
 					foreach ($rules as $key => $value) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
+					
+					FS::$dbMgr->CommitTr();
+					
 					$this->log(0,"New group '".$gname."' added");
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
@@ -171,13 +177,13 @@
 				case 2:
 					$gname = FS::$secMgr->checkAndSecuriseGetData("gname");
 					if (!$gname) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						$this->log(2,"Some datas are missing when try to remove group");
 						return;
 					}
 					$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
 					if (!$gid) {
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						$this->log(1,"Unable to remove group '".$gname."', group doesn't exists");
 						return;
 					}
@@ -193,7 +199,7 @@
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
 					if (!$gid) {
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						$this->log(2,"Some datas are missing when try to edit group");
 						return;
 					}
@@ -203,10 +209,16 @@
 							$rules[$key] = $value;
 						   }
 					}
+					
+					FS::$dbMgr->BeginTr();
+					
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","gid = '".$gid."'");
 					foreach ($rules as $key => $value) {
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."group_rules","gid,rulename,ruleval","'".$gid."','".$key."','".$value."'");
 					}
+					
+					FS::$dbMgr->CommitTr();
+					
 					$this->log(0,"Group Id '".$gid."' edited");
 					FS::$iMgr->ajaxEcho("Done");
 
