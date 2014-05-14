@@ -1050,7 +1050,7 @@
 					}
 					else if ($utype == 2) {
 						if (preg_match("#[,]#",$userlist)) {
-							FS::$iMgr->ajaxEcho("err-bad-datas");
+							FS::$iMgr->ajaxEchoError("err-bad-datas");
 							return;
 						}
 						$userlist = str_replace('\r','\n',$userlist);
