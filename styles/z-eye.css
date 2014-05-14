@@ -100,7 +100,7 @@ select { min-width: 50px; }
 }
 
 #notifIcon, #notifText { display: inline-block; }
-#notifText { padding: 10px; }
+#notifText { padding: 10px; padding-left: 0px; }
 #notifIcon {
 	padding: 10px;
 	background-position: center center;
