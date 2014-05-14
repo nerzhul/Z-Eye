@@ -801,7 +801,7 @@
 		}
 
 		public function tabPanElmt($shid,$link,$label,$cursh) {
-			return sprintf("<li%s><a href=\"?%s&at=2&sh=%s%s\">%s</a>",
+			return sprintf("<li%s><a href=\"/?%s&at=2&sh=%s%s\">%s</a>",
 				($shid == $cursh ? " class=\"ui-tabs-active ui-state-active\"" : ""),
 				$link,$shid,
 				(FS::$secMgr->checkAndSecuriseGetData("nohist") ? "&nohist=1" : ""),

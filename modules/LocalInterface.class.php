@@ -176,9 +176,9 @@
 				$output .= ");\" ";
 			}
 			else {
-				$output .= "href=\"?".$link."\"";
+				$output .= "href=\"/?".$link."\"";
 			}
-			$output .= ">".FS::$iMgr->img("styles/images/".$iconname.".png",15,15,"",$options)."</a>";
+			$output .= ">".FS::$iMgr->img("/styles/images/".$iconname.".png",15,15,"",$options)."</a>";
 			return $output;
 		}
 

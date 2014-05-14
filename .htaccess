@@ -1,7 +1,12 @@
 Require all granted
 
 RewriteEngine on
-RewriteRule ^([0-9]+)/(.*)$ index.php?mod=$1&$2
+RewriteRule ^([0-9]+)/(.*)$ /index.php?mod=$1&$2 [L]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
 
 RedirectPermanent /index.html /index.php
 RedirectPermanent /index.htm /index.php
