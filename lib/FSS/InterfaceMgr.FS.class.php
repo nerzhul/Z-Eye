@@ -970,7 +970,7 @@
 		public function ajaxEchoError($str,$js="",$raw=false,$options=array()) {
 			$this->ajaxEcho(
 				sprintf("<span style=\"notifErr\">%s:</span> %s",
-					$this->loc->s("Error"),
+					$this->getLocale("Error"),
 					$raw ? $str : $this->getLocale($str)),
 				$js, true, $options
 			);
@@ -979,7 +979,6 @@
 		public function ajaxEchoOK($str,$js="",$raw=false,$options=array()) {
 			$this->ajaxEcho(
 				sprintf("<span style=\"notifOK\"></span> %s",
-					$this->loc->s("Error"),
 					$raw ? $str : $this->getLocale($str)),
 				$js, true, $options
 			);
