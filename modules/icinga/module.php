@@ -986,7 +986,7 @@
 					// Verify if it's a system command and forbid if it's a system command		
 					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","syscmd","name = '".$cmdname."'");
 					if ($sysCmd == 't') {
-						FS::$iMgr->ajaxEcho("err-cannot-modify-system-command");
+						FS::$iMgr->ajaxEchoError("err-cannot-modify-system-command");
 						return;
 					}
 					
@@ -995,7 +995,7 @@
 					$out = "";
 					exec("if [ -f ".$tmpcmd[0]." ] && [ -x ".$tmpcmd[0]." ]; then echo 0; else echo 1; fi;",$out);
 					if (!is_array($out) || count($out) != 1 || $out[0] != 0 || $this->isForbidCmd($tmpcmd[0])) {
-						FS::$iMgr->ajaxEcho("err-binary-not-found");
+						FS::$iMgr->ajaxEchoError("err-binary-not-found");
 						return;
 					} 
 
@@ -1011,7 +1011,7 @@
 					FS::$dbMgr->CommitTr();
 					
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEcho("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->redir("mod=".$this->mid."&sh=8",true);
@@ -1019,14 +1019,14 @@
 				// Remove command
 				case 2:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					} 
 
 					// @TODO forbid remove when use (host + service)
 					$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
 					if (!$cmdname) {
-						FS::$iMgr->ajaxEchoNC("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 					
@@ -1038,7 +1038,7 @@
 					// Verify if it's a system command and forbid if it's a system command		
 					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","syscmd","name = '".$cmdname."'");
 					if ($sysCmd == 't') {
-						FS::$iMgr->ajaxEcho("err-cannot-modify-system-command");
+						FS::$iMgr->ajaxEchoError("err-cannot-modify-system-command");
 						return;
 					}
 					
@@ -1149,7 +1149,7 @@
 						"'".$name."','".$alias."','".$mhs."','".$mms."','".$tuhs."','".$tums."','".$whs."','".$wms."','".$thhs."','".$thms."','".$fhs."','".$fms."','".$sahs."','".$sams."','".$suhs."','".$sums.
 						"','".$mhe."','".$mme."','".$tuhe."','".$tume."','".$whe."','".$wme."','".$thhe."','".$thme."','".$fhe."','".$fme."','".$sahe."','".$same."','".$suhe."','".$sume."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEcho("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->redir("mod=".$this->mid."&sh=5",true);
@@ -1157,7 +1157,7 @@
 				// Delete timeperiod
 				case 6:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					} 
 
@@ -1190,7 +1190,7 @@
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_timeperiods","name = '".$tpname."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#tp_".preg_replace("#[. ]#","-",$tpname)."');");
@@ -1202,31 +1202,31 @@
 				// Delete contact
 				case 9:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					} 
 
 					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
 					if (!$ctname) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 					
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$ctname."'")) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 					
 					// Forbid remove if in existing contact group
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name","member = '".$ctname."'")) {
-						FS::$iMgr->ajaxEcho("err-contact-used");
+						FS::$iMgr->ajaxEchoError("err-contact-used");
 						return;
 					}
 					
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contacts","name = '".$ctname."'");
 					
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEcho("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ct_".preg_replace("#[. ]#","-",$ctname)."');");
@@ -1254,19 +1254,19 @@
 				// remove service
 				case 18:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if (!$name) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 					
 					// Not exists
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","name = '".$name."'")) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 					
@@ -1277,7 +1277,7 @@
 					FS::$dbMgr->CommitTr();
 					
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEcho("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#srv_".preg_replace("#[. ]#","-",$name)."');");
@@ -1285,7 +1285,7 @@
 				// Add/Edit hostgroup
 				case 19:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					} 
 
@@ -1294,13 +1294,13 @@
 					$members = FS::$secMgr->checkAndSecurisePostData("members");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if (!$name || !$alias || preg_match("#[ ]#",$name)) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 					
 					if ($edit) {
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
-							FS::$iMgr->ajaxEcho("err-data-not-exist");
+							FS::$iMgr->ajaxEchoError("err-data-not-exist");
 							return;
 						}
 					}
@@ -1317,7 +1317,7 @@
 						for ($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
 							if (count($mt) != 2 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$mt[1]."'")) {
-								FS::$iMgr->ajaxEcho("err-bad-data");
+								FS::$iMgr->ajaxEchoError("err-bad-data");
 								return;
 							}
 						}
@@ -1345,7 +1345,7 @@
 					FS::$iMgr->CommitTr();
 					
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEcho("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
 					
@@ -1354,25 +1354,25 @@
 				// remove hostgroup
 				case 21:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					} 
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("hg");
 					if (!$name) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
 					// Not exists
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
 					// Used
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","host = '".$name."' AND hosttype = '2'")) {
-						FS::$iMgr->ajaxEcho("err-hg-used");
+						FS::$iMgr->ajaxEchoError("err-hg-used");
 						return;
 					}
 
@@ -1384,7 +1384,7 @@
 					FS::$dbMgr->CommitTr();
 
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEcho("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#hg_".preg_replace("#[. ]#","-",$name)."');");

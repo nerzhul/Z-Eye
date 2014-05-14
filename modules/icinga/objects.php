@@ -81,7 +81,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -97,42 +97,42 @@
 			if (!$name || !$mail || preg_match("#[ ]#",$name) ||
 				!$srvnotifcmd ||
 				!$hostnotifcmd || !$snotifstr || !$hnotifstr) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}	
 
 			if ($edit) {
 				// If contact doesn't exist
 				if (!$this->exists($name)) {
-					echo $this->loc->s("err-data-not-exist");
+					FS::$iMgr->ajaxEchoError("err-data-not-exist");
 					return;
 				}
 			}
 			else {
 				// If contact exist
 				if ($this->exists($name)) {
-					echo $this->loc->s("err-data-exist");
+					FS::$iMgr->ajaxEchoError("err-data-exist");
 					return;
 				}
 			}
 
 			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$srvnotifcmd."'")) {
-				echo $this->loc->s("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 
 			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$hostnotifcmd."'")) {
-				echo $this->loc->s("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			
 			if (!(new icingaNotificationStrategy())->exists($hnotifstr)) {
-				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$hnotifstr),"",true);
+				FS::$iMgr->ajaxEchoError(sprintf("err-notification-strategy-not-exists",$hnotifstr),"",true);
 				return;
 			}
 			
 			if (!(new icingaNotificationStrategy())->exists($snotifstr)) {
-				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$snotifstr),"",true);
+				FS::$iMgr->ajaxEchoError(sprintf("err-notification-strategy-not-exists",$snotifstr),"",true);
 				return;
 			}
 
@@ -152,7 +152,7 @@
 			
 			$icingaAPI = new icingaBroker();
 			if (!$icingaAPI->writeConfiguration()) {
-				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
 			FS::$iMgr->redir("mod=".$this->mid."&sh=6",true);
@@ -227,7 +227,7 @@
 
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			}
 
@@ -237,20 +237,20 @@
 			$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 			if(!$name || !$alias || !$cts || $cts == "") {
-				echo FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			
 			// ctg exists
 			if($edit) {
 				if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
-					echo FS::$iMgr->ajaxEcho("err-data-not-exist");
+					FS::$iMgr->ajaxEchoError("err-data-not-exist");
 					return;
 				}
 			}
 			else {
 				if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","alias","name = '".$name."'")) {
-					FS::$iMgr->ajaxEcho("err-data-exist");
+					FS::$iMgr->ajaxEchoError("err-data-exist");
 					return;
 				}
 			}
@@ -259,7 +259,7 @@
 			$count = count($cts);
 			for($i=0;$i<$count;$i++) {
 				if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$cts[$i]."'")) {
-					FS::$iMgr->ajaxEcho("err-bad-data");
+					FS::$iMgr->ajaxEchoError("err-bad-data");
 					return;
 				}
 			}
@@ -278,7 +278,7 @@
 
 			$icingaAPI = new icingaBroker();
 			if(!$icingaAPI->writeConfiguration()) {
-				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
 			FS::$iMgr->redir("mod=".$this->mid."&sh=7",true);
@@ -286,7 +286,7 @@
 
 		public function Remove() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -311,7 +311,7 @@
 
 			$icingaAPI = new icingaBroker();
 			if(!$icingaAPI->writeConfiguration()) {
-				FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
 			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ctg_".preg_replace("#[. ]#","-",$ctgname)."');");
@@ -480,7 +480,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -499,7 +499,7 @@
 			if(!$name || (!FS::$secMgr->isDNSName($name) && !FS::$secMgr->isHostname($name)) || 
 				!$alias || !$dname || !$addr || !$checkcommand || !$checkperiod ||
 				 !$ctg || $icon && !FS::$secMgr->isNumeric($icon) || $edit && $edit != 1) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 		
@@ -520,14 +520,14 @@
 			$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
 
 			if($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			
 			// Now verify datas
 			if($edit) {
 				if(!FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$name."'")) {
-					FS::$iMgr->ajaxEcho("err-data-not-exist");
+					FS::$iMgr->ajaxEchoError("err-data-not-exist");
 					return;
 				}
 			}
@@ -539,7 +539,7 @@
 			}
 			
 			if (!(new icingaNotificationStrategy())->exists($notifstr)) {
-				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$notifstr),"",true);
+				FS::$iMgr->ajaxEchoError(sprintf("err-notification-strategy-not-exists",$notifstr),"",true);
 				return;
 			}
 			
@@ -547,7 +547,7 @@
 				$count = count($parent);
 				for($i=0;$i<$count;$i++) {
 					if(!FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$parent[$i]."'")) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 				}
@@ -557,19 +557,19 @@
 				$count = count($hg);
 				for($i=0;$i<$count;$i++) {
 					if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$hg[$i]."'")) {
-						FS::$iMgr->ajaxEcho("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 				}
 			}
 
 			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$checkcommand."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			
 			if(!(new icingaTimePeriod())->exists($checkperiod)) {
-				FS::$iMgr->ajaxEcho(sprintf(
+				FS::$iMgr->ajaxEchoError(sprintf(
 					$this->loc->s("err-timeperiod-not-exists"), $checkperiod),
 					"",false);
 				return;
@@ -609,7 +609,7 @@
 			
 			$icingaAPI = new icingaBroker();
 			if(!$icingaAPI->writeConfiguration()) {
-				echo $this->loc->s("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
 			FS::$iMgr->redir("mod=".$this->mid."&sh=2",true);
@@ -617,19 +617,19 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
 			$name = FS::$secMgr->checkAndSecuriseGetData("host");
 			if(!$name) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 
 			// Not exists
 			if(!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","addr","name = '".$name."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 
@@ -637,7 +637,7 @@
 
 			$icingaAPI = new icingaBroker();
 			if(!$icingaAPI->writeConfiguration()) {
-				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
 			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#h_".preg_replace("#[. ]#","-",$name)."');");
@@ -859,7 +859,7 @@
 		
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			}
 
@@ -871,19 +871,19 @@
 			$ctg = FS::$secMgr->getPost("ctg","w");
 
 			if (!$name || preg_match("#[\(]|[\)]|[\[]|[\]]#",$name) || !$host || !$checkcmd || !$checkperiod || !$ctg) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 
 			if ($edit) {
 				if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","host","name = '".$name."'")) {
-					FS::$iMgr->ajaxEcho("err-data-not-exist");
+					FS::$iMgr->ajaxEchoError("err-data-not-exist");
 					return;
 				}
 			}
 			else {
 				if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","host","name = '".$name."'")) {
-					FS::$iMgr->ajaxEcho("err-data-exist");
+					FS::$iMgr->ajaxEchoError("err-data-exist");
 					return;
 				}
 			}
@@ -915,31 +915,31 @@
 			
 			$mt = preg_split("#[$]#",$host);
 			if (count($mt) != 2 || ($mt[0] != 1 && $mt[0] != 2)) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 
 			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","name","name = '".$checkcmd."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 
 			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","name = '".$checkperiod."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			
 			if (!(new icingaNotificationStrategy())->exists($notifstr)) {
-				FS::$iMgr->ajaxEcho(sprintf("err-notification-strategy-not-exists",$notifstr),"",true);
+				FS::$iMgr->ajaxEchoError(sprintf("err-notification-strategy-not-exists",$notifstr),"",true);
 				return;
 			}
 
 			if ($mt[0] == 1 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$mt[1]."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			if ($mt[0] == 2 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$mt[1]."'")) {
-				FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 
@@ -958,7 +958,7 @@
 			$icingaAPI = new icingaBroker();
 			
 			if (!$icingaAPI->writeConfiguration()) {
-				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
 			FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
@@ -1460,7 +1460,7 @@
 		
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			}
 			
@@ -1479,14 +1479,14 @@
 			
 			if (!$name || !$alias || !$period || $interval === NULL ||
 				!FS::$secMgr->isNumeric($interval)) {
-				echo FS::$iMgr->ajaxEcho("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			
 			// Now verify datas
 			if($edit) {
 				if(!$this->exists($name)) {
-					FS::$iMgr->ajaxEcho("err-data-not-exist");
+					FS::$iMgr->ajaxEchoError("err-data-not-exist");
 					return;
 				}
 			}
@@ -1499,7 +1499,7 @@
 			
 			// Check if TP exists
 			if(!(new icingaTimePeriod())->exists($period)) {
-				FS::$iMgr->ajaxEcho(sprintf(
+				FS::$iMgr->ajaxEchoError(sprintf(
 					$this->loc->s("err-timeperiod-not-exists"), $period),
 					"",false);
 				return;
@@ -1524,7 +1524,7 @@
 			
 			// Write icinga configuration
 			if(!$icingaAPI->writeConfiguration()) {
-				FS::$iMgr->ajaxEcho("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
 			
@@ -1533,41 +1533,41 @@
 		
 		public function Remove() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			}
 			
 			$name = FS::$secMgr->checkAndSecuriseGetData("notifstr");
 			
 			if(!FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$name."'")) {
-				FS::$iMgr->ajaxEcho("err-data-not-exist");
+				FS::$iMgr->ajaxEchoError("err-data-not-exist");
 				return;
 			}
 			
 			if ($hostUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts",
 				"name","notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-host"),
+				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-host"),
 					$name,$hostUsed),"",true);
 				return;
 			}
 			
 			if ($srvUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services",
 				"name","notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-service"),
+				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-service"),
 					$name,$srvUsed),"",true);
 				return;
 			}
 			
 			if ($ctUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
 				"name","host_notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-contact"),
+				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-contact"),
 					$name,$ctUsed),"",true);
 				return;
 			}
 			
 			if ($ctUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
 				"name","service_notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-notification-strategy-used-contact"),
+				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-contact"),
 					$name,$ctUsed),"",true);
 				return;
 			}
