@@ -636,20 +636,20 @@
 		public function Remove() {
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
 				$this->log(2,"Edit IP informations: no rights");
-				FS::$iMgr->ajaxEcho("err-no-rights");
+				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return;
 			}
 
 			$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
 
 			if (!$ip || !FS::$secMgr->isIP($ip)) {
-				FS::$iMgr->ajaxEcho(sprintf(
+				FS::$iMgr->ajaxEchoError(sprintf(
 					$this->loc->s("err-bad-ip-addr"),$ip),"",true);
 				return;
 			}
 			
 			if (!$this->LoadFromCache($ip) && !$this->Load($ip)) {
-				FS::$iMgr->ajaxEcho(sprintf(
+				FS::$iMgr->ajaxEchoError(sprintf(
 					$this->loc->s("err-no-info-for-ip-addr"),$ip),"",true);
 				return;
 			}
@@ -709,26 +709,26 @@
 
 			if (!$subnet || !$ip) {
 				$this->log(2,"Import IP from cache: bad datas");
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return false;
 			}
 			
 			$subnetObj = new dhcpSubnet();
 			if (!$subnetObj->Load($subnet)) {
 				$this->log(2,"Import IP from cache: invalid subnet");
-				FS::$iMgr->ajaxEcho("err-subnet-not-exists");
+				FS::$iMgr->ajaxEchoError("err-subnet-not-exists");
 				return false;
 			}
 			
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
 				$this->log(2,"Import IP from cache: no rights");
-				FS::$iMgr->ajaxEcho("err-no-rights");
+				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return false;
 			}
 			
 			if (!FS::$secMgr->isIP($ip)) {
 				$this->log(2,"Import IP from cache: bad IP");
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-ip"),
+				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-ip"),
 					$ip),"",true);
 				return false;
 			}
@@ -736,7 +736,7 @@
 			// @TODO
 			if (!$this->LoadFromCache($ip)) {
 				$this->log(2,"Import IP from cache: IP not in cache");
-				FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-not-in-cache"),
+				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-not-in-cache"),
 					$ip),"",true);
 				return false;
 				
@@ -759,26 +759,26 @@
 			$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 			
 			if (!$subnet || !$csv || !$sep || $sep != "," && $sep != ";") {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return false;
 			}
 			
 			$subnetObj = new dhcpSubnet();
 			if (!$subnetObj->Load($subnet)) {
-				FS::$iMgr->ajaxEcho("err-subnet-not-exists");
+				FS::$iMgr->ajaxEchoError("err-subnet-not-exists");
 				return false;
 			}
 			
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
 				$this->log(2,"Import IP via CSV: no rights");
-				FS::$iMgr->ajaxEcho("err-no-rights");
+				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return false;
 			}
 			
 			$csv = preg_replace("#[\r]#","",$csv);
 			$lines = preg_split("#[\n]#",$csv);
 			if (!$lines) {
-				FS::$iMgr->ajaxEcho("err-invalid-csv");
+				FS::$iMgr->ajaxEchoError("err-invalid-csv");
 				return false;
 			}
 			
@@ -793,31 +793,31 @@
 				
 				// Entry has 3 fields
 				if (count($entry) != 3) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
 					return false;
 				}
 				
 				if (!FS::$secMgr->isHostname($entry[0])) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-hostname"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-hostname"),
 						$entry[0]),"",true);
 					return false;
 				}
 				
 				if (!FS::$secMgr->isIP($entry[2])) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-ip"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-ip"),
 						$entry[2]),"",true);
 					return false;
 				}
 				
 				if (!FS::$secMgr->isMacAddr($entry[1])) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-mac"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-mac"),
 						$entry[1]),"",true);
 					return false;
 				}
 				
 				// Hostname must be unique in this import
 				if (isset($hostList[$entry[0]])) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry-multiple-hostname"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-hostname"),
 						$entry[0]),"",true);
 					return false;
 				}
@@ -825,21 +825,21 @@
 				// Hostname mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"hostname",
 					"hostname = '".$entry[0]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-hostname-already-used"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-hostname-already-used"),
 						$entry[0]),"",true);
 					return false;
 				}
 				
 				// IP must be in selected subnet
 				if (!$subnetObj->isIPIn($entry[2])) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-not-in-subnet"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-not-in-subnet"),
 						$entry[2],$subnet),"",true);
 					return false;
 				}
 				
 				// IP must be unique in this import
 				if (in_array($entry[2],$tmpIPList)) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry-multiple-ip"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-ip"),
 						$entry[2]),"",true);
 					return false;
 				}
@@ -847,7 +847,7 @@
 				// IP mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"ip",
 					"ip = '".$entry[2]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-ip-already-used"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-already-used"),
 						$entry[2]),"",true);
 					return false;
 				}
@@ -858,14 +858,14 @@
 				// MAC mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"macaddr",
 					"macaddr = '".$entry[1]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-mac-already-used"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-mac-already-used"),
 						$entry[1]),"",true);
 					return false;
 				}
 				
 				// MAC must be unique in this import
 				if (in_array($entry[1],$tmpMACList)) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry-multiple-mac"),
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-mac"),
 						$entry[1]),"",true);
 					return false;
 				}
