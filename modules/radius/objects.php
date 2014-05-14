@@ -181,21 +181,21 @@
 				$utype < 1 || $utype > 3 || 
 				($utype == 1 && (!$upwd || $upwd == "" || !$upwdtype || $upwdtype < 1 || $upwdtype > 6))) {
 				$this->log(2,"Some fields are missing for user edition");
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
 			// if type 2: must be a mac addr
 			if ($utype == 2 && (!FS::$secMgr->isMacAddr($username) && !preg_match('#^[0-9A-F]{12}$#i', $username))) {
 				$this->log(2,"Wrong datas for user edition");
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
 			$connOK = $this->connectToRaddb($radalias);
 			if (!$connOK) {
 				$this->log(2,"Unable to connect to radius database '".$radalias."'");
-				FS::$iMgr->ajaxEcho("err-db-conn-fail");
+				FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 				return;
 			}
 

@@ -960,24 +960,33 @@
 		}
 
 		public function ajaxEchoNC($str,$js="",$raw=false) {
-			echo ($raw ? $str : $this->getLocale($str));
-			
+			$js = "";
 			if(strlen($js) > 0) {
-				$this->js("dontClosePopup(); ".$js);
+				$js = sprintf("dontClosePopup();%s",$js);
 			}
 			else {
-				$this->js("dontClosePopup();");
+				$js = "dontClosePopup();";
 			}
+			
+			$this->ajaxEcho($str,$js,$raw);
 		}
 		
 		public function ajaxEchoError($str,$js="",$raw=false) {
-			echo sprintf("<span style=\"strErr\">%s:</span> %s",
-				$this->loc->s("Error"),
-				$raw ? $str : $this->getLocale($str));
-			
-			if(strlen($js) > 0) {
-				$this->js($js);
-			}
+			$this->ajaxEcho(
+				sprintf("<span style=\"notifErr\">%s:</span> %s",
+					$this->loc->s("Error"),
+					$raw ? $str : $this->getLocale($str)),
+				$js,$ra
+			);
+		}
+		
+		public function ajaxEchoOK($str,$js="",$raw=false) {
+			$this->ajaxEcho(
+				sprintf("<span style=\"notifOK\"></span> %s",
+					$this->loc->s("Error"),
+					$raw ? $str : $this->getLocale($str)),
+				$js,$raw
+			);
 		}
 
 		public function getLocale($locid) {

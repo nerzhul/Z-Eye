@@ -1061,7 +1061,9 @@
 						// Match & format mac addr
 						$count = count($userlist);
 						for ($i=0;$i<$count;$i++) {
-							if (!FS::$secMgr->isMacAddr($userlist[$i]) && !preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) && !preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
+							if (!FS::$secMgr->isMacAddr($userlist[$i]) &&
+								!preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) &&
+								!preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
 								$this->log(2,"Bad fields for Mass import (MAC addr)");
 								FS::$iMgr->ajaxEchoError("err-bad-datas");
 								return;
