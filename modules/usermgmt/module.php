@@ -245,7 +245,7 @@
 
 		private function SearchAndImportUser($username,$groups = array()) {
 			if (!$username) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			// If user already exists
@@ -295,7 +295,7 @@
 					return;
 				}
 			}
-			FS::$iMgr->ajaxEcho("err-user-not-found");
+			FS::$iMgr->ajaxEchoError("err-user-not-found");
 		}
 
 		public function getIfaceElmt() {
@@ -330,7 +330,7 @@
 				case 2: // edit user
 					if (!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
 						$this->log(2,"User tries to edit user but don't have rights !");
-						FS::$iMgr->ajaxEcho("err-no-rights");
+						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
 					}
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
@@ -410,7 +410,7 @@
 				case 3: // del user
 					if (!FS::$sessMgr->hasRight("mrule_usermgmt_write")) {
                         $this->log(2,"User tries to delete user but don't have rights");
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
                         return;
                     }
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
@@ -460,7 +460,7 @@
 					if ($edit) {
 						if (!$serv) {
 							$this->log(1,"Unable to edit LDAP ".$addr.":".$port.", not exists");
-							FS::$iMgr->ajaxEcho("err-ldap-not-exist");
+							FS::$iMgr->ajaxEchoError("err-ldap-not-exist");
 							return;
 						}
 					}
@@ -489,20 +489,21 @@
 				case 5: // LDAP remove
 					if (!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
                                                 $this->log(2,"User tries to remove ldap but don't have rights");
-						FS::$iMgr->ajaxEcho("err-no-right");
-                                                return;
-                                        }
+						FS::$iMgr->ajaxEchoError("err-no-right");
+						return;
+					}
+					
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if (!$addr) {
 						$this->log(2,"Some fields are missing for user management (LDAP remove)");
-						FS::$iMgr->ajaxEcho("err-invalid-bad-data");
+						FS::$iMgr->ajaxEchoError("err-invalid-bad-data");
 						return;
 					}
 
 					$serv = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr","addr = '".$addr."'");
 					if (!$serv) {
 						$this->log(1,"Unable to remove LDAP ".$addr.":".$port.", not exists");
-						FS::$iMgr->ajaxEcho("err-ldap-exist");
+						FS::$iMgr->ajaxEchoError("err-ldap-exist");
 						return;
 					}
 

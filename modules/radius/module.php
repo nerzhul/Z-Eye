@@ -803,14 +803,14 @@
 
 					if (!$groupname) {
 						$this->log(2,"Some fields are missing for group edition");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -871,7 +871,7 @@
 					
 					foreach ($attrTab as $attrKey => $attrValue) {
 						if (!isset($attrValue["op"])) {
-							FS::$iMgr->ajaxEcho("err-bad-datas");
+							FS::$iMgr->ajaxEchoError("err-bad-datas");
 							return;
 						}
 						if ($attrValue["target"] == "2") {
@@ -897,14 +897,14 @@
 
 					if (!$radalias || !$username) {
 						$this->log(2,"Some fields are missing user removal");
-						FS::$iMgr->ajaxEcho("err-delete");
+						FS::$iMgr->ajaxEchoError("err-delete");
 						return;
 					}
 
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database ".$radalias);
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -928,14 +928,14 @@
 
 					if (!$radalias || !$groupname) {
 						$this->log(2,"Some fields are missing for group removal");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -960,20 +960,20 @@
 
 					if (!$radalias) {
 						$this->log(2,"Some datas are missing for mass import");
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						return;
 					}
 
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
 					if (!$utype || $utype != 1 && $utype != 2 || !$userlist) {
 						$this->log(2,"Some datas are missing or invalid for mass import");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 
@@ -998,7 +998,7 @@
 							$tmp = preg_split("#[,]#",$userlist[$i]);
 							if (count($tmp) != 2 || preg_match("#[ ]#",$tmp[0])) {
 								$this->log(2,"Some datas are invalid for mass import");
-								FS::$iMgr->ajaxEcho("err-bad-datas");
+								FS::$iMgr->ajaxEchoError("err-bad-datas");
 								return;
 							}
 							$fmtuserlist[$tmp[0]] = $tmp[1];
@@ -1008,6 +1008,8 @@
 						$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
 						$maxIdChk++;
 				
+						FS::$dbMgr->BeginTr();
+						
 						$userfound = 0;
 						foreach ($fmtuserlist as $user => $upwd) {
 							switch($pwdtype) {
@@ -1019,7 +1021,7 @@
 								case 6: $attr = "CHAP-Password"; $value = $upwd; break;
 								default:
 										$this->log(2,"Bad password type for mass import");
-										FS::$iMgr->ajaxEcho("err-bad-datas");
+										FS::$iMgr->ajaxEchoError("err-bad-datas");
 										return;
 							}
 							if (!$radSQLMgr->GetOneData($this->raddbinfos["tradcheck"],"username","username = '".$user."'")) {
@@ -1037,6 +1039,8 @@
 								}
 							}
 						}
+						
+						FS::$dbMgr->CommitTr();
 						if ($userfound) {
 							$this->log(2,"Some users are already found for mass import");
                             FS::$iMgr->ajaxEchoNC("err-exist2");
@@ -1059,7 +1063,7 @@
 						for ($i=0;$i<$count;$i++) {
 							if (!FS::$secMgr->isMacAddr($userlist[$i]) && !preg_match('#^[0-9A-F]{12}$#i', $userlist[$i]) && !preg_match('#^([0-9A-F]{2}[-]){5}[0-9A-F]{2}$#i', $userlist[$i])) {
 								$this->log(2,"Bad fields for Mass import (MAC addr)");
-								FS::$iMgr->ajaxEcho("err-bad-datas");
+								FS::$iMgr->ajaxEchoError("err-bad-datas");
 								return;
 							}
 							$userlist[$i] = preg_replace("#[:-]#","",$userlist[$i]);
@@ -1108,20 +1112,20 @@
 
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for DHCP sync");
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						return;
 					}
 
 					if (!$radgroup || !$subnet || !FS::$secMgr->isIP($subnet)) {
 						$this->log(2,"Some fields are missing or invalid for DHCP sync");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -1132,14 +1136,14 @@
 
 					if (!$groupexist) {
 						$this->log(1,"Group '".$radgroup."' doesn't exist, can't bind DHCP to radius");
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						return;
 					}
 
 					$subnetexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netmask","netid = '".$subnet."'");
 					if (!$subnetexist) {
 						$this->log(1,"Subnet '".$subnet."' doesn't exist can't bind DHCP to radius");
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						return;
 					}
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_dhcp_import",
@@ -1159,13 +1163,13 @@
 
 					if (!$radalias) {
 						$this->log(2,"Some required fields are missing for DHCP sync removal");
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						return;
 					}
 
 					if (!$subnet) {
 						$this->log(2,"No subnet given to DHCP sync removal");
-						FS::$iMgr->ajaxEcho("err-miss-data");
+						FS::$iMgr->ajaxEchoError("err-miss-data");
 						return;
 					}
 
@@ -1184,7 +1188,7 @@
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -1256,7 +1260,7 @@
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -1353,7 +1357,7 @@
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -1399,14 +1403,14 @@
 					$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for radius filter entries (radius server)");
-						FS::$iMgr->ajaxEcho("err-invalid-table");
+						FS::$iMgr->ajaxEchoError("err-invalid-table");
 						return;
 					}
 
 					$radSQLMgr = $this->connectToRaddb2($radalias);
 					if (!$radSQLMgr) {
 						$this->log(2,"Unable to connect to radius database '".$radalias."'");
-						FS::$iMgr->ajaxEcho("err-db-conn-fail");
+						FS::$iMgr->ajaxEchoError("err-db-conn-fail");
 						return;
 					}
 
@@ -1416,7 +1420,7 @@
 				case 13:
 					if (!FS::$sessMgr->hasRight("mrule_radius_manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}
 
@@ -1438,7 +1442,7 @@
 
 					if(!$saddr || !$salias  || !$sport || !FS::$secMgr->isNumeric($sport) ||
 						!$sdbname) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 					
@@ -1448,7 +1452,7 @@
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login",
 							"radalias ='".$salias."' AND addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 							$this->log(1,"Radius DB not exists (".$sdbname."@".$saddr.":".$sport.")");
-							FS::$iMgr->ajaxEcho("err-not-exist");
+							FS::$iMgr->ajaxEchoError("err-not-exist");
 							return;
 						}
 						
@@ -1469,7 +1473,7 @@
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
 						$this->log(2,"Some fields are missing or wrong for radius db adding");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 	
@@ -1477,7 +1481,7 @@
 
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","radalias",
 						"radalias = '".$salias."' AND (addr != '".$saddr."' OR port != '".$sport."' OR dbname != '".$sdbname."')")) {
-						FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-alias-already-used"),$salias),"",true);
+						FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-alias-already-used"),$salias),"",true);
 						return;
 					}
 						
@@ -1488,7 +1492,7 @@
 						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","login",
 							"addr ='".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'")) {
 							$this->log(1,"Radius DB already exists (".$sdbname."@".$saddr.":".$sport.")");
-							FS::$iMgr->ajaxEcho("err-exist");
+							FS::$iMgr->ajaxEchoError("err-exist");
 							return;
 						}
 					}
@@ -1514,7 +1518,7 @@
 				case 14:
 					if (!FS::$sessMgr->hasRight("mrule_radius_manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
-						FS::$iMgr->ajaxEcho("err-no-right");
+						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}
 
@@ -1537,7 +1541,7 @@
 							return;
 						}
 					}
-					FS::$iMgr->ajaxEcho("err-bad-data");
+					FS::$iMgr->ajaxEchoError("err-bad-data");
 					return;
 				// Ping radius db
 				case 15:
