@@ -127,7 +127,7 @@
 					if ($edit) {
 						if (!$exist) {
 							$this->log(1,"Community '".$name."' not exists");
-							FS::$iMgr->ajaxEcho("err-not-exist");
+							FS::$iMgr->ajaxEchoError("err-not-exist");
 							return;
 						}
 					}
@@ -185,24 +185,30 @@
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
 					if (!$name) {
 						$this->log(2,"Invalid Deleting data");
-						FS::$iMgr->ajaxEcho("err-invalid-data");
+						FS::$iMgr->ajaxEchoError("err-invalid-data");
 						return;
 					}
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						$this->log(2,"Community '".$name."' not in DB");
-						FS::$iMgr->ajaxEcho("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-not-exist");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if (!is_array($netdiscoCfg)) {
 						$this->log(2,"Reading error on netdisco.conf");
-						FS::$iMgr->ajaxEcho("err-read-fail");
+						FS::$iMgr->ajaxEchoError("err-read-fail");
 						return;
 					}
+					
+					FS::$dbMgr->BeginTr();
+					
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
+					
+					FS::$dbMgr->CommitTr();
+					
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
 					
 					$tMgr = new HTMLTableMgr(array(

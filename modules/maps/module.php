@@ -444,20 +444,20 @@
 
 					if (!$name || !$label || !$posx || !FS::$secMgr->isNumeric($posx) || $posx < 0 || !$posy || !FS::$secMgr->isNumeric($posy) || $posy < 0 || 
 						!$size || !FS::$secMgr->isNumeric($size) || $size < 1 || !$color || $edit && $edit != 1) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 
 					$exist = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname = 'mainmap' AND nodename = '".$name."'");
 					if ($edit) {
 						if (!$exist) {
-							FS::$iMgr->ajaxEcho("err-node-not-exists");
+							FS::$iMgr->ajaxEchoError("err-node-not-exists");
 							return;
 						}
 					}
 					else {
 						if ($exist) {
-							FS::$iMgr->ajaxEcho("err-node-exists");
+							FS::$iMgr->ajaxEchoError("err-node-exists");
 							return;
 						}
 					}
@@ -483,47 +483,52 @@
 
 					if (!$name /*|| !$label*/ || !$node1|| !$node2 || !$size || !FS::$secMgr->isNumeric($size) || $size < 1 || !$color  ||
 						$edit && $edit != 1) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 
 					if ($node1 == $node2) {
-						FS::$iMgr->ajaxEcho("err-src-equal-dest");
+						FS::$iMgr->ajaxEchoError("err-src-equal-dest");
 						return;
 					}
 
 					$node1exist = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname = 'mainmap' AND nodename = '".$node1."'");
 					$node2exist = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_nodes","node_label","mapname = 'mainmap' AND nodename = '".$node2."'");
 					if (!$node1exist || !$node2exist) {
-						FS::$iMgr->ajaxEcho("err-node-not-exists");
+						FS::$iMgr->ajaxEchoError("err-node-not-exists");
 						return;
 					}
 
 					$exist = FS::$dbMgr->GetOneData(PgDbConfig::getDbPrefix()."map_edges","node1","mapname = 'mainmap' AND edgename = '".$name."'");
 					if ($edit) {
 						if (!$exist) {
-							FS::$iMgr->ajaxEcho("err-edge-not-exists");
+							FS::$iMgr->ajaxEchoError("err-edge-not-exists");
 							return;
 						}
 					}
 					else {
 						if ($exist) {
-							FS::$iMgr->ajaxEcho("err-edge-exists");
+							FS::$iMgr->ajaxEchoError("err-edge-exists");
 							return;
 						}
 					}
 
 					FS::$dbMgr->BeginTr();
-					if ($edit) FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_edges","mapname = 'mainmap' AND edgename = '".$name."'");
+					if ($edit) {
+						FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_edges","mapname = 'mainmap' AND edgename = '".$name."'");
+					}
 
 					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_edges","mapname,edgename,node1,node2,edge_color,edge_size",
 						"'mainmap','".$name."','".$node1."','".$node2."','".$color."','".$size."'");
 					FS::$dbMgr->CommitTr();
+					
 					FS::$iMgr->ajaxEcho("Done");
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
 				// test
 				case 5:
+					FS::$dbMgr->BeginTr();
+					
 					FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_nodes");
 					FS::$dbMgr->Delete(PgDbConfig::getDbPrefix()."map_edges");
 					$nodelist = array(
@@ -542,11 +547,14 @@
 				"esx2" => array("label" => "esx2", "links" => array("2vm1","2vm2","2vm3","2vm4","2vm5","2vm6","2vm7"), "placed" => false),
 				"test9" => array("label" => "test9", "links" => array(), "placed" => false)
 					);
-					for ($i=1;$i<=13;$i++)
+					for ($i=1;$i<=13;$i++) {
 						$nodelist["vm".$i] = array("label" => "vm".$i, "links" => array(), "placed" => false);
-					for ($i=1;$i<=7;$i++)
+					}
+					for ($i=1;$i<=7;$i++) {
 						$nodelist["2vm".$i] = array("label" => "2vm".$i, "links" => array(), "placed" => false);
+					}
 
+					FS::$dbMgr->CommitTr();
 					$this->ImportNodes($nodelist);
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
