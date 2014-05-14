@@ -293,17 +293,17 @@
 			// @TODO forbid remove when used (service, service_group)
 			$ctgname = FS::$secMgr->checkAndSecuriseGetData("ctg");
 			if(!$ctgname) {
-				FS::$iMgr->ajaxEchoNC("err-bad-data");
+				FS::$iMgr->ajaxEchoErrorNC("err-bad-data");
 				return;
 			}
 
 			if(!FS::$dbMgr->GetOneData($this->sqlTable,"alias","name = '".$ctgname."'")) {
-					FS::$iMgr->ajaxEchoNC("err-bad-data");
+					FS::$iMgr->ajaxEchoErrorNC("err-bad-data");
 				return;
 			}
 
 			if(FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","contactgroup = '".$ctgname."'")) {
-				FS::$iMgr->ajaxEchoNC("err-ctg-used");
+				FS::$iMgr->ajaxEchoErrorNC("err-ctg-used");
 				return;
 			}
 
@@ -533,7 +533,7 @@
 			}
 			else {
 				if(FS::$dbMgr->GetOneData($this->sqlTable,"name","name = '".$name."'")) {
-					FS::$iMgr->ajaxEchoNC("err-data-exist");
+					FS::$iMgr->ajaxEchoErrorNC("err-data-exist");
 					return;
 				}
 			}
@@ -1492,7 +1492,7 @@
 			}
 			else {
 				if($this->exists($name)) {
-					FS::$iMgr->ajaxEchoNC("err-data-exist");
+					FS::$iMgr->ajaxEchoErrorNC("err-data-exist");
 					return;
 				}
 			}
@@ -1576,7 +1576,7 @@
 
 			$icingaAPI = new icingaBroker();
 			if(!$icingaAPI->writeConfiguration()) {
-				FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
+				FS::$iMgr->ajaxEchoErrorNC("err-fail-writecfg");
 				return;
 			}
 			

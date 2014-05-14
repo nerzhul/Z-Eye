@@ -119,7 +119,7 @@
 
 					if (!$name || $ro && $ro != "on" || $rw && $rw != "on" || $edit && $edit != 1) {
 						$this->log(2,"Invalid Adding data");
-						FS::$iMgr->ajaxEchoNC("err-invalid-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-invalid-data");
 						return;
 					}
 
@@ -134,21 +134,21 @@
 					else {
 						if ($exist) {
 							$this->log(1,"Community '".$name."' already in DB");
-							FS::$iMgr->ajaxEchoNC("err-already-exist");
+							FS::$iMgr->ajaxEchoErrorNC("err-already-exist");
 							return;
 						}
 					}
 
 					// User must choose read and/or write
 					if ($ro != "on" && $rw != "on") {
-						FS::$iMgr->ajaxEchoNC("err-readorwrite");
+						FS::$iMgr->ajaxEchoErrorNC("err-readorwrite");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if (!is_array($netdiscoCfg)) {
 						$this->log(2,"Reading error on netdisco.conf");
-						FS::$iMgr->ajaxEchoNC("err-read-netdisco");
+						FS::$iMgr->ajaxEchoErrorNC("err-read-netdisco");
 						return;
 					}
 					

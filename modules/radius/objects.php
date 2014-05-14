@@ -306,7 +306,7 @@
 			}
 			else {
 				$this->log(1,"Try to add user ".$username." but user already exists");
-				FS::$iMgr->ajaxEchoNC("err-exist");
+				FS::$iMgr->ajaxEchoErrorNC("err-exist");
 				return;
 			}
 			$this->radSQLMgr->CommitTr();

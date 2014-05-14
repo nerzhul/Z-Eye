@@ -287,7 +287,7 @@
 			}
 
 			if (!FS::$secMgr->isDNSName($zonename)) {
-				FS::$iMgr->ajaxEchoNC("err-invalid-zonename");
+				FS::$iMgr->ajaxEchoErrorNC("err-invalid-zonename");
 				return;
 			}
 
@@ -300,7 +300,7 @@
 			}
 			else {
 				if ($exists) {
-					FS::$iMgr->ajaxEchoNC($this->errAlreadyExists);
+					FS::$iMgr->ajaxEchoErrorNC($this->errAlreadyExists);
 					return;
 				}
 			}
@@ -321,7 +321,7 @@
 			if ($forwarders) {
 				$fwdarr = FS::$secMgr->getIPList($forwarders);
 				if (!$fwdarr) {
-					FS::$iMgr->ajaxEchoNC("err-some-ip-invalid");
+					FS::$iMgr->ajaxEchoErrorNC("err-some-ip-invalid");
 					return;
 				}
 			}
@@ -329,7 +329,7 @@
 			if ($masters) {
 				$masterarr = FS::$secMgr->getIPList($masters);
 				if (!$masterarr) {
-					FS::$iMgr->ajaxEchoNC("err-some-ip-invalid");
+					FS::$iMgr->ajaxEchoErrorNC("err-some-ip-invalid");
 					return;
 				}
 			}
@@ -746,13 +746,13 @@
 			$dnslistarr = array();
 
 			if (!$aclname || !$description) {
-				FS::$iMgr->ajaxEchoNC("err-bad-datas");
+				FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 				$this->log(2,"Some datas are invalid or wrong for modify dns ACL");
 				return;
 			}
 
 			if ($aclname == "none" || $aclname == "herited" || $aclname == "any") {
-				FS::$iMgr->ajaxEchoNC("err-acl-name-protected");
+				FS::$iMgr->ajaxEchoErrorNC("err-acl-name-protected");
 				$this->log(2,"ACL name '".$aclname."' is protected");
 				return;
 			}
@@ -780,7 +780,7 @@
 					for ($i=0;$i<$count;$i++) {
 						$tsig = new dnsTSIGKey();
 						if (!$tsig->Load($tsiglist[$i])) {
-							FS::$iMgr->ajaxEchoNC("err-tsig-key-not-exists");
+							FS::$iMgr->ajaxEchoErrorNC("err-tsig-key-not-exists");
 							return;
 						}
 						$rulefound = true;
@@ -794,7 +794,7 @@
 					for ($i=0;$i<$count;$i++) {
 						$subnet = new dhcpSubnet();
 						if (!$subnet->Load($subnetlist[$i])) {
-							FS::$iMgr->ajaxEchoNC("err-subnet-not-exists");
+							FS::$iMgr->ajaxEchoErrorNC("err-subnet-not-exists");
 							return;
 						}
 						$rulefound = true;
@@ -808,7 +808,7 @@
 					for ($i=0;$i<$count;$i++) {
 						$acl = new dnsACL();
 						if (!$acl->Load($acllist[$i])) {
-							FS::$iMgr->ajaxEchoNC("err-acl-not-exists");
+							FS::$iMgr->ajaxEchoErrorNC("err-acl-not-exists");
 							return;
 						}
 						$rulefound = true;
@@ -819,7 +819,7 @@
 			if ($iplist) {
 				$iplistarr = FS::$secMgr->getIPList($iplist);
 				if (!$iplistarr) {
-					FS::$iMgr->ajaxEchoNC("err-some-ip-invalid");
+					FS::$iMgr->ajaxEchoErrorNC("err-some-ip-invalid");
 					return;
 				}
 				$rulefound = true;
@@ -827,14 +827,14 @@
 			if ($dnslist) {
 				$dnslistarr = FS::$secMgr->getDNSNameList($dnslist);
 				if (!$dnslistarr) {
-					FS::$iMgr->ajaxEchoNC("err-some-dns-invalid");
+					FS::$iMgr->ajaxEchoErrorNC("err-some-dns-invalid");
 					return;
 				}
 				$rulefound = true;
 			}
 
 			if (!$rulefound) {
-				FS::$iMgr->ajaxEchoNC("err-no-rule-specified");
+				FS::$iMgr->ajaxEchoErrorNC("err-no-rule-specified");
 				return;
 			}
 
@@ -918,7 +918,7 @@
 			}
 
 			if ($aclname == "none" || $aclname == "herited" || $aclname == "any") {
-				FS::$iMgr->ajaxEchoNC("err-acl-name-protected");
+				FS::$iMgr->ajaxEchoErrorNC("err-acl-name-protected");
 				$this->log(2,"ACL name '".$aclname."' is protected");
 				return;
 			}
@@ -1228,13 +1228,13 @@
 					}
 					if ($slaves) {
 						if (in_array($masters[$i],$slaves)) {
-							FS::$iMgr->ajaxEchoNC("err-cluster-member-only-one-category");
+							FS::$iMgr->ajaxEchoErrorNC("err-cluster-member-only-one-category");
 							return;
 						}
 					}
 					if ($caches) {
 						if (in_array($masters[$i],$caches)) {
-							FS::$iMgr->ajaxEchoNC("err-cluster-member-only-one-category");
+							FS::$iMgr->ajaxEchoErrorNC("err-cluster-member-only-one-category");
 							return;
 						}
 					}
@@ -1244,7 +1244,7 @@
 
 			// No master found, stop it.
 			if (!$masterfound) {
-				FS::$iMgr->ajaxEchoNC("err-cluster-need-master");
+				FS::$iMgr->ajaxEchoErrorNC("err-cluster-need-master");
 				return;
 			}
 
@@ -1259,7 +1259,7 @@
 					// Slave - master already checked
 					if ($caches) {
 						if (in_array($slaves[$i],$caches)) {
-							FS::$iMgr->ajaxEchoNC("err-cluster-member-only-one-category");
+							FS::$iMgr->ajaxEchoErrorNC("err-cluster-member-only-one-category");
 							return;
 						}
 					}
@@ -1711,12 +1711,12 @@
 				($mzonepath && (!$zeyenamedpath || !$szonepath || !$machineFQDN)) ||
 				($szonepath && (!$zeyenamedpath || !$mzonepath || !$machineFQDN)) ||
 				($machineFQDN && (!$mzonepath || !$szonepath || !$zeyenamedpath))) {
-				FS::$iMgr->ajaxEchoNC("err-zeyenamedpath-together");
+				FS::$iMgr->ajaxEchoErrorNC("err-zeyenamedpath-together");
 				return;
 			}
 
 			if ($zeyenamedpath == $namedpath) {
-				FS::$iMgr->ajaxEchoNC("err-named-zeyenamed-different");
+				FS::$iMgr->ajaxEchoErrorNC("err-named-zeyenamed-different");
 				return;
 			}
 
@@ -1726,27 +1726,27 @@
 				return;
 			}
 			if (!$ssh->Authenticate($slogin,$spwd)) {
-				FS::$iMgr->ajaxEchoNC("err-bad-login");
+				FS::$iMgr->ajaxEchoErrorNC("err-bad-login");
 				return;
 			}
 			
 			if (!$ssh->isRemoteReadable($namedpath)) {
-				FS::$iMgr->ajaxEchoNC("err-namedconf-not-readable");
+				FS::$iMgr->ajaxEchoErrorNC("err-namedconf-not-readable");
 				return;
 			}
 			
 			if (!$ssh->isRemoteWritable($zeyenamedpath)) {
-				FS::$iMgr->ajaxEchoNC("err-z-eye-not-writable");
+				FS::$iMgr->ajaxEchoErrorNC("err-z-eye-not-writable");
 				return;
 			}
 			
 			if (!$ssh->isDirectory($chrootnamed."/".$mzonepath)) {
-				FS::$iMgr->ajaxEchoNC("err-masterdir-not-readable");
+				FS::$iMgr->ajaxEchoErrorNC("err-masterdir-not-readable");
 				return;
 			}
 			
 			if (!$ssh->isDirectory($chrootnamed."/".$szonepath)) {
-				FS::$iMgr->ajaxEchoNC("err-slavedir-not-readable");
+				FS::$iMgr->ajaxEchoErrorNC("err-slavedir-not-readable");
 				return;
 			}
 		
@@ -1999,7 +1999,7 @@
 			}
 
 			if (!FS::$secMgr->isBase64($keyvalue)) {
-				FS::$iMgr->ajaxEchoNC("err-tsig-not-base64");
+				FS::$iMgr->ajaxEchoErrorNC("err-tsig-not-base64");
 				return;
 			}
 
@@ -2302,7 +2302,7 @@
 				!$recttl || !FS::$secMgr->isNumeric($recttl) ||
 				!$rectype || !$recvalue || !FS::$secMgr->isDNSRecordCoherent($rectype,$recvalue) ||
 				$edit && ($edit != 1 || !$oldvalue)) {
-				FS::$iMgr->ajaxEchoNC("err-bad-datas");
+				FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 				return;
 			}
 			

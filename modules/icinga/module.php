@@ -1031,7 +1031,7 @@
 					}
 					
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-data-not-exist");
+						FS::$iMgr->ajaxEchoErrorNC("err-data-not-exist");
 						return;
 					}
 
@@ -1044,18 +1044,18 @@
 					
 					// Forbid remove if command is used
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","srvcmd = '".$cmdname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-binary-used");
+						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
 					
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","hostcmd = '".$cmdname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-binary-used");
+						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
 					
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
-						FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
+						FS::$iMgr->ajaxEchoErrorNC("err-fail-writecfg");
 						return;
 					}
 					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#cmd_".preg_replace("#[. ]#","-",$cmdname)."');");
@@ -1163,28 +1163,28 @@
 
 					$tpname = FS::$secMgr->checkAndSecuriseGetData("tp");
 					if (!$tpname) {
-						FS::$iMgr->ajaxEchoNC("err-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-bad-data");
 						return;
 					}
 					
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$tpname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-bad-data");
 						return;
 					}
 					
 					// Forbid remove if timeperiod is used
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_notif_strategy","name","period = '".$tpname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-binary-used");
+						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
 					
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","checkperiod = '".$tpname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-binary-used");
+						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
 					
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","checkperiod = '".$tpname."'")) {
-						FS::$iMgr->ajaxEchoNC("err-binary-used");
+						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
 
@@ -1306,7 +1306,7 @@
 					}
 					else {
 						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
-							FS::$iMgr->ajaxEchoNC("err-data-exist");
+							FS::$iMgr->ajaxEchoErrorNC("err-data-exist");
 							return;
 						}
 					}
@@ -1333,7 +1333,7 @@
 						}
 					}
 					else {
-						FS::$iMgr->ajaxEchoNC("err-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-bad-data");
 						return;
 					}
 

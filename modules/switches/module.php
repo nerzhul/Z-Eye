@@ -2115,7 +2115,7 @@
 						}
 						
 						if (!FS::$secMgr->isIP($iplsrc[$i])) {
-							FS::$iMgr->ajaxEchoNC(sprintf($this->loc->s("err-bad-ip"),$iplsrc[$i]),"",true);
+							FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-bad-ip"),$iplsrc[$i]),"",true);
 							return;
 						}
 						

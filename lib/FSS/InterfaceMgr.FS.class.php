@@ -962,10 +962,6 @@
 				$this->js($js);
 			}
 		}
-
-		public function ajaxEchoNC($str,$js="",$raw=false) {
-			$this->ajaxEcho($str,$js,$raw,array("no-close" => true));
-		}
 		
 		public function ajaxEchoError($str,$js="",$raw=false,$options=array()) {
 			$this->ajaxEcho(
@@ -974,6 +970,10 @@
 					$raw ? $str : $this->getLocale($str)),
 				$js, true, $options
 			);
+		}
+		
+		public function ajaxEchoErrorNC($str,$js="",$raw=false,$options=array()) {
+			$this->ajaxEchoError($str,$js,$raw,array("no-close" => true));
 		}
 		
 		public function ajaxEchoOK($str,$js="",$raw=false,$options=array()) {

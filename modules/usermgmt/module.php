@@ -251,7 +251,7 @@
 			// If user already exists
 			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","uid","username = '".$username."'")) {
 				$this->log(2,"User '".$username."' already exists");
-				FS::$iMgr->ajaxEchoNC("err-user-already-exists");
+				FS::$iMgr->ajaxEchoErrorNC("err-user-already-exists");
 				return;
 			}
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr,port,dn,rootdn,dnpwd,ldapuid,filter,ldapmail,ldapname,ldapsurname,ssl");
@@ -267,7 +267,7 @@
 						for ($i=0;$i<$grpcount;$i++) {
 							if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gid = '".$groups[$i]."'")) {
 								$this->log(2,"Group '".$groups[$i]."' doesn't exists");
-								FS::$iMgr->ajaxEchoNC("err-group-not-exists");
+								FS::$iMgr->ajaxEchoErrorNC("err-group-not-exists");
 								return;
 							}
 						}
@@ -336,14 +336,14 @@
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
 					if (!$uid || !FS::$secMgr->isNumeric($uid)) {
 						$this->log(2,"Some fields are missing for user management (user edit)");
-						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-invalid-bad-data");
 						return;
 					}
 
 					$username = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","username","uid = '".$uid."'");
 					if (!$username) {
 						$this->log(2,"User uid '".$uid."' doesn't exists");
-						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-invalid-bad-data");
 						return;
 					}
 					
@@ -354,7 +354,7 @@
 					if ($pwd || $pwd2) {
 						if ($pwd != $pwd2) {
 							$this->log(1,"Try to modify password for user ".$uid." but passwords didn't match");
-							FS::$iMgr->ajaxEchoNC("err-pwd-match");
+							FS::$iMgr->ajaxEchoErrorNC("err-pwd-match");
 							return;
 						}
 						$user = new User();
@@ -362,13 +362,13 @@
 						switch($user->changePassword($pwd)) {
 							case 0: break; // ok
 							case 1: // too short
-								FS::$iMgr->ajaxEchoNC("err-pwd-short");
+								FS::$iMgr->ajaxEchoErrorNC("err-pwd-short");
 								return;
 							case 2: // complexity
-								FS::$iMgr->ajaxEchoNC("err-pwd-complex");
+								FS::$iMgr->ajaxEchoErrorNC("err-pwd-complex");
                                 return;
 							default: // unk
-								FS::$iMgr->ajaxEchoNC("err-pwd-unk");
+								FS::$iMgr->ajaxEchoErrorNC("err-pwd-unk");
                                 return;
 						}
 					}
@@ -376,7 +376,7 @@
 					$mail = FS::$secMgr->checkAndSecurisePostData("mail");
 					if ($mail) {
 						if (!FS::$secMgr->isMail($mail)) {
-							FS::$iMgr->ajaxEchoNC("err-mail");
+							FS::$iMgr->ajaxEchoErrorNC("err-mail");
 							return;
 						}
 						FS::$dbMgr->Update(PGDbConfig::getDbPrefix()."users","mail = '".$mail."'","uid = '".$uid."'");
@@ -392,7 +392,7 @@
 						$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$groups[$i]."'");
 						if (!$exist) {
 							$this->log(1,"Try to add user ".$uid." to inexistant group '".$groups[$i]."'");
-							FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
+							FS::$iMgr->ajaxEchoErrorNC("err-invalid-bad-data");
 							return;
 						}
 					}
@@ -416,13 +416,13 @@
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
 					if (!$uid || !FS::$secMgr->isNumeric($uid)) {
 						$this->log(2,"Some fields are wrong or missing for user management (User delete)");
-						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-invalid-bad-data");
 						return;
 					}
 					$exist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","last_conn","uid = '".$uid."'");
 					if (!$exist) {
 						$this->log(1,"Unable to remove user '".$uid."', doesn't exist");
-						FS::$iMgr->ajaxEchoNC("err-invalid-user");
+						FS::$iMgr->ajaxEchoErrorNC("err-invalid-user");
 						return;
 					}
 					FS::$dbMgr->BeginTr();
@@ -452,7 +452,7 @@
 
 					if (!$addr || !$port || !FS::$secMgr->isNumeric($port) || !$basedn || !$rootdn || !$rootpwd || !$ldapname || !$ldapsurname || !$ldapmail || !$ldapuid || !$ldapfilter) {
 						$this->log(2,"Some fields are missing/wrong for user management (LDAP add)");
-						FS::$iMgr->ajaxEchoNC("err-invalid-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-invalid-bad-data");
 						return;
 					}
 
@@ -467,7 +467,7 @@
 					else {
 						if ($serv) {
 							$this->log(1,"Unable to add LDAP ".$addr.":".$port.", already exists");
-							FS::$iMgr->ajaxEchoNC("err-ldap-exist");
+							FS::$iMgr->ajaxEchoErrorNC("err-ldap-exist");
 							return;
 						}
 					}
@@ -476,7 +476,7 @@
 					$ldapMgr->setServerInfos($addr,$port,$ssl == "on" ? true : false,$basedn,$rootdn,$rootpwd,$ldapuid,$ldapfilter);
 					if (!$ldapMgr->RootConnect()) {
 						$this->log(1,"Unable to add LDAP ".$addr.":".$port.", connection fail");
-						FS::$iMgr->ajaxEchoNC("err-ldap-bad-data");
+						FS::$iMgr->ajaxEchoErrorNC("err-ldap-bad-data");
 						return;
 					}
 

@@ -856,20 +856,20 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 					if ($saddr == NULL || $saddr == "" || !FS::$secMgr->isIP($saddr) || $spath == NULL || $spath == "" || $stype == NULL || ($stype != 1 && $stype != 2 && $stype != 4 && $stype != 5) || ($stype > 1 && ($slogin == NULL || $slogin == "" || $spwd == NULL || $spwd == "" || $spwd2 == NULL || $spwd2 == "" || $spwd != $spwd2)) || ($stype == 1 && ($slogin != "" || $spwd != "" || $spwd2 != ""))) {
 						$this->log(2,"Some fields are missing/wrong for saving switch config");
-						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 						return;
 					}
 					if ($edit) {
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
-							FS::$iMgr->ajaxEchoNC("err-not-found");
+							FS::$iMgr->ajaxEchoErrorNC("err-not-found");
 							return;
 						}
 					}
 					else {
 						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."save_device_servers","addr","addr ='".$saddr."' AND type = '".$stype."'")) {
 							$this->log(1,"Server '".$saddr."' already exists for saving switch config");
-							FS::$iMgr->ajaxEchoNC("err-already-exists");
+							FS::$iMgr->ajaxEchoErrorNC("err-already-exists");
 							return;
 						}
 					}

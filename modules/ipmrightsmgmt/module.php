@@ -745,7 +745,7 @@
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
 
 					if (!$subnet || !FS::$secMgr->isIP($subnet)) {
-						FS::$iMgr->ajaxEchoNC("err-bad-datas");
+						FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 						return;
 					}
 					

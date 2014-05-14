@@ -825,13 +825,13 @@
 					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"id","groupname='".$groupname."'");
 					if ($groupexist && $edit != 1) {
 						$this->log(1,"Trying to add existing group '".$groupname."'");
-						FS::$iMgr->ajaxEchoNC("err-exist");
+						FS::$iMgr->ajaxEchoErrorNC("err-exist");
 						return;
 					}
 					$groupexist = $radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"id","groupname='".$groupname."'");
 					if ($groupexist && $edit != 1) {
 						$this->log(1,"Trying to add existing group '".$groupname."'");
-						FS::$iMgr->ajaxEchoNC("err-exist");
+						FS::$iMgr->ajaxEchoErrorNC("err-exist");
 						return;
 					}
 					$attrTab = array();
@@ -1043,7 +1043,7 @@
 						FS::$dbMgr->CommitTr();
 						if ($userfound) {
 							$this->log(2,"Some users are already found for mass import");
-                            FS::$iMgr->ajaxEchoNC("err-exist2");
+                            FS::$iMgr->ajaxEchoErrorNC("err-exist2");
 							return;
 						}
 						$this->log(0,"Mass import done (list:".$userlist." group: ".$group.")");
@@ -1099,7 +1099,7 @@
 						}
 						if ($userfound) {
 							$this->log(1,"Some users already exists for mass import");
-							FS::$iMgr->ajaxEchoNC("err-exist2");
+							FS::$iMgr->ajaxEchoErrorNC("err-exist2");
 							return;
 						}
 						$this->log(0,"Mass import done (group: ".$group.")");
@@ -1183,7 +1183,7 @@
 					$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for radius cleanup table (radius server)");
-						FS::$iMgr->ajaxEchoNC("err-invalid-table");
+						FS::$iMgr->ajaxEchoErrorNC("err-invalid-table");
 						return;
 					}
 
@@ -1504,7 +1504,7 @@
 
 					$conn = $testDBMgr->Connect();
 					if ($conn == NULL) {
-						FS::$iMgr->ajaxEchoNC("err-bad-server");
+						FS::$iMgr->ajaxEchoErrorNC("err-bad-server");
 						return;
 					}
 					FS::$dbMgr->Connect();
