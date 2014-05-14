@@ -124,7 +124,7 @@
 					$inactivityTimer = FS::$secMgr->checkAndSecurisePostData("intim");
 					
 					if (!$lang || !$inactivityTimer || !FS::$secMgr->isNumeric($inactivityTimer)) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
 					
@@ -133,7 +133,7 @@
 					}
 					
 					if ($lang && $lang != "fr" && $lang != "en") {
-						FS::$iMgr->ajaxEcho("err-bad-lang");
+						FS::$iMgr->ajaxEchoError("err-bad-lang");
 						return;
 					}
 					

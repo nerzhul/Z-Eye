@@ -114,7 +114,7 @@
 					if (checkNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) == true) {
 						if (writeNetdiscoConf($suffix,$nodetimeout,$devicetimeout,$pghost,$dbname,$dbuser,$dbpwd,$snmptimeout,$snmptry,$snmpver,$fnode) != 0) {
 							$this->log(2,"Fail to write netdisco configuration");
-							FS::$iMgr->ajaxEcho("err-write-fail");
+							FS::$iMgr->ajaxEchoError("err-write-fail");
 							return;
 						}
 						$this->log(0,"Netdisco configuration changed");
@@ -122,7 +122,7 @@
 						return;
 					}
 					$this->log(2,"Bad netdisco configuration");
-					FS::$iMgr->ajaxEcho("err-bad-datas");
+					FS::$iMgr->ajaxEchoError("err-bad-datas");
 					return;
 				default: break;
 			}

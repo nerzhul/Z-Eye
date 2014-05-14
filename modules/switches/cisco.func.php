@@ -120,7 +120,7 @@
 			if($duplex && FS::$secMgr->isNumeric($duplex)) {
 				if($duplex < 1 || $duplex > 4) {
 					$this->log(2,"Some fields are wrong: duplex (plug edit)");
-					FS::$iMgr->ajaxEcho("Duplex field is wrong (".$duplex.")");
+					FS::$iMgr->ajaxEchoError("Duplex field is wrong (".$duplex.")","",true);
 					return;
 				}
 
@@ -235,7 +235,7 @@
 
 				$logvals["voicevlan"]["src"] = $portvoicevlan;
 				if($this->setSwitchportVoiceVlan($voicevlan) != 0) {
-					FS::$iMgr->ajaxEcho("Fail to set switchport voice vlan");
+					FS::$iMgr->ajaxEchoError("Fail to set switchport voice vlan","",true);
 					return 1;
 				}
 				$logvals["voicevlan"]["dst"] = $voicevlan;
