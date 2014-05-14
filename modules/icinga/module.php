@@ -265,8 +265,9 @@
 					$hostlist[] = $data["hosttype"]."$".$data["host"];
 			}	
 
-			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".$this->getHostOrGroupList("members",true,$hostlist,$name)."</td></tr>";
-			$output .= FS::$iMgr->aeTableSubmit($name == "");
+			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".
+				$this->getHostOrGroupList("members",true,$hostlist,$name)."</td></tr>".
+				FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
 
@@ -343,8 +344,9 @@
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
 			
-			if (FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+			if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 				$output .= FS::$iMgr->opendiv(6,$this->loc->s("new-timeperiod"));
+			}
 
 			/*
 			 * Timeperiod table
@@ -359,10 +361,12 @@
 				}
 				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write"))
+				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 					$output .= FS::$iMgr->opendiv(13,$data["name"],array("lnkadd" => "name=".$data["name"]));
-				else
+				}
+				else {
 					$output .= $data["name"];
+				}
 
 				$output .= "</td><td>".$data["alias"]."</td><td>";
 				if ($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0) {
@@ -436,28 +440,25 @@
 			}
 
 			FS::$iMgr->setJSBuffer(1);
-			$output = FS::$iMgr->cbkForm("4");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
-
-			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
-
-			$output .= FS::$iMgr->idxLine("Alias","alias",array("value" => $alias,"length" => 120, "size" => 30));
-			$output .= "<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms",$mhs,$mms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme",$mhe,$mme)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums",$tuhs,$tums)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume",$tuhe,$tume)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms",$whs,$wms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme",$whe,$wme)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("thhs","thms",$thhs,$thms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme",$thhe,$thme)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("fhs","fms",$fhs,$fms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme",$fhe,$fme)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams",$sahs,$sams)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same",$sahe,$same)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums",$suhs,$sums)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$suhe,$sume)."</td></tr>";
-			$output .= FS::$iMgr->aeTableSubmit($name == "");
-			return $output;
+			return FS::$iMgr->cbkForm("4").
+				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30)).
+				FS::$iMgr->idxLine("Alias","alias",array("value" => $alias,"length" => 120, "size" => 30)).
+				"<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms",$mhs,$mms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme",$mhe,$mme)."</td></tr>".
+				"<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums",$tuhs,$tums)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume",$tuhe,$tume)."</td></tr>".
+				"<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms",$whs,$wms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme",$whe,$wme)."</td></tr>".
+				"<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("thhs","thms",$thhs,$thms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme",$thhe,$thme)."</td></tr>".
+				"<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("fhs","fms",$fhs,$fms)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme",$fhe,$fme)."</td></tr>".
+				"<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams",$sahs,$sams)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same",$sahe,$same)."</td></tr>".
+				"<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums",$suhs,$sums)."<br />".
+				$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$suhe,$sume)."</td></tr>".
+				FS::$iMgr->aeTableSubmit($name == "");
 		}
 
 		private function showContactsTab() {
@@ -668,7 +669,8 @@
 		
 		public function genContactGroupsList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups","name,alias","",array("order" => "name"));
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups",
+				"name,alias","",array("order" => "name"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["alias"].")",$data["name"],$select == $data["name"] ? true : false);
 			}
@@ -678,7 +680,8 @@
 		
 		private function genHostsList($name) {
 			$output = FS::$iMgr->select($name);
-			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'",array("order" => "name"));
+			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts",
+				"name,addr","template = 'f'",array("order" => "name"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= FS::$iMgr->selElmt($data["name"]." (".$data["addr"].")",$data["name"]);
 			}
@@ -689,9 +692,11 @@
 		public function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "",$grouponly = false) {
 			$hostlist = array();
 			if (!$grouponly) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts","name,addr","template = 'f'");
-				while ($data = FS::$dbMgr->Fetch($query))
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts",
+					"name,addr","template = 'f'");
+				while ($data = FS::$dbMgr->Fetch($query)) {
 					$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
+				}
 			}
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name");
