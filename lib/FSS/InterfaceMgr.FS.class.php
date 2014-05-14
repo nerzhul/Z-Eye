@@ -951,41 +951,37 @@
 		}
 
 
-		protected function ajaxEcho($str,$js="",$raw=false) {
+		protected function ajaxEcho($str,$js="",$raw=false,$options=array()) {
 			echo ($raw ? $str : $this->getLocale($str));
 			
+			if (isset($options["no-close"]) &&
+				$options["no-close"] === true) {
+				$js = sprintf("dontClosePopup();%s",$js);
+			}
 			if (strlen($js) > 0) {
 				$this->js($js);
 			}
 		}
 
 		public function ajaxEchoNC($str,$js="",$raw=false) {
-			$js = "";
-			if(strlen($js) > 0) {
-				$js = sprintf("dontClosePopup();%s",$js);
-			}
-			else {
-				$js = "dontClosePopup();";
-			}
-			
-			$this->ajaxEcho($str,$js,$raw);
+			$this->ajaxEcho($str,$js,$raw,array("no-close" => true));
 		}
 		
-		public function ajaxEchoError($str,$js="",$raw=false) {
+		public function ajaxEchoError($str,$js="",$raw=false,$options=array()) {
 			$this->ajaxEcho(
 				sprintf("<span style=\"notifErr\">%s:</span> %s",
 					$this->loc->s("Error"),
 					$raw ? $str : $this->getLocale($str)),
-				$js,$raw
+				$js, true, $options
 			);
 		}
 		
-		public function ajaxEchoOK($str,$js="",$raw=false) {
+		public function ajaxEchoOK($str,$js="",$raw=false,$options=array()) {
 			$this->ajaxEcho(
 				sprintf("<span style=\"notifOK\"></span> %s",
 					$this->loc->s("Error"),
 					$raw ? $str : $this->getLocale($str)),
-				$js,$raw
+				$js, true, $options
 			);
 		}
 
