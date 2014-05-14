@@ -430,7 +430,7 @@
 			FS::$dbMgr->CommitTr();
 
 			$js = $this->tMgr->addLine($zonename,$edit);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		public function Remove() {
@@ -458,7 +458,7 @@
 			$this->log(0,"Removing zone '".$zonename."'");
 
 			$js = $this->tMgr->removeLine($zonename);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 		private $zonename;
 		private $description;
@@ -902,7 +902,7 @@
 			FS::$dbMgr->CommitTr();
 
 			$js = $this->tMgr->addLine($aclname,$edit);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		public function Remove() {
@@ -934,7 +934,7 @@
 			FS::$dbMgr->CommitTr();
 			
 			$js = $this->tMgr->removeLine($aclname);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 			return;
 		}
 
@@ -1454,7 +1454,7 @@
 			FS::$dbMgr->CommitTr();
 
 			$js = $this->tMgr->addLine($clustername,$edit);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		public function Remove() {
@@ -1482,7 +1482,7 @@
 			$this->log(0,"Removing cluster '".$clustername."'");
 
 			$js = $this->tMgr->removeLine($clustername);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		private $clustername;
@@ -1799,7 +1799,7 @@
 			$this->log(0,"Add/Edit server '".$saddr."'");
 
 			$js = $this->tMgr->addLine($saddr,$edit);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		public function Remove() {
@@ -1824,7 +1824,7 @@
 			$this->log(0,"Removing server '".$addr."'");
 
 			$js = $this->tMgr->removeLine($addr);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 		private $addr;
 		private $sshUser;
@@ -2042,7 +2042,7 @@
 			FS::$dbMgr->CommitTr();
 
 			$js = $this->tMgr->addLine($keyalias,$edit);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		public function Remove() {
@@ -2064,7 +2064,7 @@
 			$this->removeFromDB($keyalias);
 
 			$js = $this->tMgr->removeLine($keyalias);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		private $name;
@@ -2355,7 +2355,7 @@
 					shell_exec($cmd);
 				}
 			}
-			FS::$iMgr->ajaxEcho("Done");
+			FS::$iMgr->ajaxEchoOK("Done");
 		}
 		
 		public function Remove() {
@@ -2421,7 +2421,7 @@
 					shell_exec($cmd);
 				}
 			}
-			FS::$iMgr->ajaxEcho("Done");
+			FS::$iMgr->ajaxEchoOK("Done");
 		}
 	};
 ?>

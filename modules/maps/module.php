@@ -468,7 +468,7 @@
 					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."map_nodes","mapname,nodename,node_x,node_y,node_label,node_size,node_color",
 						"'mainmap','".$name."','".$posx."','".$posy."','".$label."','".$size."','".$color."'");
 					FS::$dbMgr->CommitTr();
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
 				// Add/edit edges
@@ -522,7 +522,7 @@
 						"'mainmap','".$name."','".$node1."','".$node2."','".$color."','".$size."'");
 					FS::$dbMgr->CommitTr();
 					
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					FS::$iMgr->redir("mod=".$this->mid."&sh=4",true);
 					return;
 				// test

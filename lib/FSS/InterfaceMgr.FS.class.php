@@ -951,7 +951,7 @@
 		}
 
 
-		public function ajaxEcho($str,$js="",$raw=false) {
+		protected function ajaxEcho($str,$js="",$raw=false) {
 			echo ($raw ? $str : $this->getLocale($str));
 			
 			if (strlen($js) > 0) {

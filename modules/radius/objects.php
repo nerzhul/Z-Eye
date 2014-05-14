@@ -278,7 +278,7 @@
 				}
 				foreach ($attrTab as $attrKey => $attrEntry) {
 					if (!isset($attrEntry["op"])) {
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoOK("err-bad-datas");
 						return;
 					}
 

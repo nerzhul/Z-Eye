@@ -1058,7 +1058,7 @@
 						FS::$iMgr->ajaxEchoNC("err-fail-writecfg");
 						return;
 					}
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#cmd_".preg_replace("#[. ]#","-",$cmdname)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#cmd_".preg_replace("#[. ]#","-",$cmdname)."');");
 					return;
 				// Add/Edit timeperiod
 				case 4:
@@ -1193,7 +1193,7 @@
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#tp_".preg_replace("#[. ]#","-",$tpname)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#tp_".preg_replace("#[. ]#","-",$tpname)."');");
 					return;
 				// Add/Edit contact
 				case 7:
@@ -1229,7 +1229,7 @@
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ct_".preg_replace("#[. ]#","-",$ctname)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#ct_".preg_replace("#[. ]#","-",$ctname)."');");
 					return;
 				// Add/Edit contact group
 				case 10:
@@ -1280,7 +1280,7 @@
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#srv_".preg_replace("#[. ]#","-",$name)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#srv_".preg_replace("#[. ]#","-",$name)."');");
 					return;
 				// Add/Edit hostgroup
 				case 19:
@@ -1387,7 +1387,7 @@
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#hg_".preg_replace("#[. ]#","-",$name)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#hg_".preg_replace("#[. ]#","-",$name)."');");
 					return;
 				// Add/Edit notification strategy
 				case 22:

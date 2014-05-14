@@ -628,7 +628,7 @@
 						}
 					}
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Remove group/user for global/subnet rights
 				case 2:
@@ -708,14 +708,14 @@
 								$gid,$right,
 								$this->jsUserGroupSelect($right,"glbl","gid".$idsfx)
 							);
-							FS::$iMgr->ajaxEcho("Done",$js);
+							FS::$iMgr->ajaxEchoOK("Done",$js);
 						}
 						else if ($subnet) {
 							$js = sprintf("hideAndRemove('#g%s');%s",
 								FS::$iMgr->formatHTMLId($gid.$right.$subnet),
 								$this->jsUserGroupSelect($right,"subnet","gid".$idsfx,$subnet)
 							);
-							FS::$iMgr->ajaxEcho("Done",$js);
+							FS::$iMgr->ajaxEchoOK("Done",$js);
 						}
 					}
 					else if ($uid) {
@@ -724,14 +724,14 @@
 								$uid,$right,
 								$this->jsUserGroupSelect($right,"glbl","uid".$idsfx)
 							);
-							FS::$iMgr->ajaxEcho("Done",$js); 
+							FS::$iMgr->ajaxEchoOK("Done",$js); 
 						}
 						else if ($subnet) {
 							$js = sprintf("hideAndRemove('#u%s');%s",
 								FS::$iMgr->formatHTMLId($uid.$right.$subnet),
 								$this->jsUserGroupSelect($right,"subnet","uid".$idsfx,$subnet)
 							);
-							FS::$iMgr->ajaxEcho("Done",$js); 
+							FS::$iMgr->ajaxEchoOK("Done",$js); 
 						}
 					}
 					return;
@@ -750,7 +750,7 @@
 					}
 					
 					$js = "$('#subnetrights').html('".FS::$secMgr->cleanForJS($this->showSubnetRights($subnet))."');";
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				default: break;
 			}

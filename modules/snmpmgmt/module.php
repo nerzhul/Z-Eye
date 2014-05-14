@@ -179,7 +179,7 @@
 					));
 					$js = $tMgr->addLine($name,$edit);
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				case 2: // Remove SNMP community
 					$name = FS::$secMgr->checkAndSecuriseGetData("snmp");
@@ -220,7 +220,7 @@
 
 					$js = $tMgr->removeLine($name);
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				default: break;
 			}

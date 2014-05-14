@@ -118,7 +118,7 @@
 							return;
 						}
 						$this->log(0,"Netdisco configuration changed");
-						FS::$iMgr->ajaxEcho("Done");
+						FS::$iMgr->ajaxEchoOK("Done");
 						return;
 					}
 					$this->log(2,"Bad netdisco configuration");

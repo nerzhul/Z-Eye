@@ -101,7 +101,7 @@
 			FS::$dbMgr->CommitTr();
 
 			$js = $this->tMgr->addLine($rname,$edit);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 
 		public function Remove() {
@@ -129,7 +129,7 @@
 			$this->log(0,"Removing router '".$rname."'");
 
 			$js = $this->tMgr->removeLine($rname);
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 		}
 		
 		private $routername;

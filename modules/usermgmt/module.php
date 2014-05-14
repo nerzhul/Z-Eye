@@ -290,7 +290,7 @@
 					$jscontent = "";
 					$js = "$('".$jscontent."').addAfter('#userthead');";
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					FS::$iMgr->redir("mod=".$this->mid,true);
 					return;
 				}
@@ -430,7 +430,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_group","uid = '".$uid."'");
 					FS::$dbMgr->CommitTr();
 					$this->log(0,"User '".$uid."' removed");
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#u".$uid."tr');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#u".$uid."tr');");
 					return;
 				case 4: // add ldap
 					if (!FS::$sessMgr->hasRight("mrule_usermgmt_ldapwrite")) {
@@ -509,7 +509,7 @@
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."ldap_auth_servers","addr ='".$addr."'");
 					$this->log(0,"LDAP '".$addr."' removed");
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#d".preg_replace("#[.]#","-",$addr)."tr');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#d".preg_replace("#[.]#","-",$addr)."tr');");
 					return;
 				case 6: // LDAP Import
 					$username = FS::$secMgr->checkAndSecurisePostData("username");

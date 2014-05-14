@@ -194,7 +194,7 @@
 					FS::$dbMgr->CommitTr();
 					
 					$this->log(0,"Group '".$gname."' removed");
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#gr".$gid."tr');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#gr".$gid."tr');");
                     return;
 				case 3:
 					$gid = FS::$secMgr->checkAndSecurisePostData("gid");
@@ -220,7 +220,7 @@
 					FS::$dbMgr->CommitTr();
 					
 					$this->log(0,"Group Id '".$gid."' edited");
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 
 				default: break;
 			}

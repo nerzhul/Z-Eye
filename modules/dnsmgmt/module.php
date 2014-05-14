@@ -457,7 +457,7 @@
 					}
 					else {
 						FS::$iMgr->js("$('#recordlist').html('".FS::$secMgr->cleanForJS($this->showRecords($dnszone))."');");
-						FS::$iMgr->ajaxEcho("Done".FS::$iMgr->jsSortTable("dnsRecords"));
+						FS::$iMgr->ajaxEchoOK("Done".FS::$iMgr->jsSortTable("dnsRecords"));
 					}
 					return;
 				case 2:
@@ -540,7 +540,7 @@
 					$js = "$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');";
 					FS::$iMgr->js($js);
 
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					$this->log(0,"search old records for DNS zones");
 					return;
 				// Add/Edit DNS server

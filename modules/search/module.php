@@ -402,7 +402,7 @@
 					if ($search) {
 						$js = sprintf("var data = \"%s\"; $('#main').html(data);",
 							FS::$secMgr->cleanForJS($this->findRefsAndShow($search)));
-						FS::$iMgr->ajaxEcho("Done",$js);
+						FS::$iMgr->ajaxEchoOK("Done",$js);
 					}
 					return;
 			}

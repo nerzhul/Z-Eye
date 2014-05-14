@@ -387,7 +387,7 @@
 				echo $building;
 			}
 			else {
-				FS::$iMgr->ajaxEcho("Modify");
+				FS::$iMgr->ajaxEchoOK("Modify");
 			}
 			$this->log(0,"Set building for '".$device."' to '".$building."'");
 			return;
@@ -427,7 +427,7 @@
 				echo $room;
 			}
 			else {
-				FS::$iMgr->ajaxEcho("Modify");
+				FS::$iMgr->ajaxEchoOK("Modify");
 			}
 			$this->log(0,"Set room for '".$device."' to '".$room."'");
 			return;
@@ -587,7 +587,7 @@
 				}
 			}
 			FS::$dbMgr->CommitTr();
-			FS::$iMgr->ajaxEcho("Done");
+			FS::$iMgr->ajaxEchoOK("Done");
 		}
 		
 		public function search($search, $autocomplete = false) {

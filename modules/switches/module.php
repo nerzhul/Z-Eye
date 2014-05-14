@@ -1874,7 +1874,7 @@
 					}
 					$this->log(0,"Replace VLAN '".$old."' by '".$new."' on device '".$device."'");
 					$this->devapi->replaceVlan($old,$new);
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					return;
 				/*
 				* Backup startup-config
@@ -2047,7 +2047,7 @@
 					
 					$this->log(0,"Port monitoring for device '".$device."' and port '".$dport."' edited. Enabled: ".($enmon == "on" ? "yes" : "no").
 						" wlimit: ".$wlimit." climit: ".$climit." desc: '".$desc."'");
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					return;
 				case 17: // device cleanup
 					$device = FS::$secMgr->checkAndSecuriseGetData("device");
@@ -2203,7 +2203,7 @@
 					}
 					
 					$this->log(0,"User ".FS::$sessMgr->getUserName()." saved all devices");
-					FS::$iMgr->ajaxEcho("saveorder-terminated");
+					FS::$iMgr->ajaxEchoOK("saveorder-terminated");
 					return;
 				case 21: // Backup all devices
 					if (!FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
@@ -2273,7 +2273,7 @@
 						}
 						else {
 							$this->log(0,"User ".FS::$sessMgr->getUserName()." backup all devices");
-							FS::$iMgr->ajaxEcho("Done");
+							FS::$iMgr->ajaxEchoOK("Done");
 						}
 					}
 					return;
@@ -2322,7 +2322,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_pwd","device = '".$device."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."switch_pwd","device,sshuser,sshpwd,enablepwd","'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".
 						base64_encode($enablepwd)."'");
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					return;
 				// Remove SSH link
 				case 23:
@@ -2386,7 +2386,7 @@
 					$this->devapi->setDHCPSnoopingMatchMAC($matchmac == "on" ? 1 : 2);
 					$this->devapi->setDHCPSnoopingVlans($vlanlist);
 
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					return;
 				// CSV plug and room import
 				case 25:
@@ -2470,7 +2470,7 @@
 					// Save if needed
 					$this->devapi->handleSaveCfg();
 					
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					return;
 				default: break;
 			}

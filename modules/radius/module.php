@@ -920,7 +920,7 @@
 						"radalias = '".$radalias."' AND username ='".$username."'");
 						
 					$this->log(0,"User '".$username."' removed");
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#rdu_".FS::$iMgr->formatHTMLId($username)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#rdu_".FS::$iMgr->formatHTMLId($username)."');");
 					return;
 				case 5: // group removal
 					$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
@@ -947,7 +947,7 @@
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import","groupname = '".$groupname."'");
 
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#rdg_".FS::$iMgr->formatHTMLId($groupname)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#rdg_".FS::$iMgr->formatHTMLId($groupname)."');");
 					$this->log(0,"Group '".$groupname."' removed");
 					return;
 				// Mass import
@@ -1177,7 +1177,7 @@
 
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import","addr = '".$radhost."' AND port = '".$radport."' AND dbname = '".$raddb."' AND dhcpsubnet = '".$subnet."'");
 					$this->log(0,"Remove sync between subnet '".$subnet."' and radius");
-					FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".preg_replace("#[.]#","-",$subnet)."');");
+					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#".preg_replace("#[.]#","-",$subnet)."');");
 					return;
 				case 9: // radius cleanup table
 					$radalias = FS::$secMgr->checkAndSecurisePostData("ra");
@@ -1536,7 +1536,7 @@
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import",
 								"addr = '".$data["addr"]."' AND port = '".$data["port"]."' AND dbname = '".$data["dbname"]."'");
 
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#".
+							FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#".
 								preg_replace("#[.]#","-",$$data["dbname"].$$data["addr"].$data["port"])."');");
 							
 							$this->log(0,"Remove Radius DB ".$salias. "(".$data["dbname"]."@".$data["addr"].":".$data["port"].")");

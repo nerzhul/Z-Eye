@@ -314,7 +314,7 @@
 				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
-			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#ctg_".preg_replace("#[. ]#","-",$ctgname)."');");
+			FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#ctg_".preg_replace("#[. ]#","-",$ctgname)."');");
 		}
 
 		private $name;
@@ -640,7 +640,7 @@
 				FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 				return;
 			}
-			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#h_".preg_replace("#[. ]#","-",$name)."');");
+			FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#h_".preg_replace("#[. ]#","-",$name)."');");
 		}
 
 		private $name;
@@ -1580,7 +1580,7 @@
 				return;
 			}
 			
-			FS::$iMgr->ajaxEcho("Done","hideAndRemove('#notifstr_".preg_replace("#[. ]#","-",$name)."');");
+			FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#notifstr_".preg_replace("#[. ]#","-",$name)."');");
 		}
 		
 		protected function removeFromDB($name) {

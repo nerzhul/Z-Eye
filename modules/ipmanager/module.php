@@ -1337,7 +1337,7 @@
 					if ($view == 3) 
 						$js .= "$('#netHCr').html('');";
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				case 2:
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
@@ -1371,11 +1371,11 @@
 							$output .= $value;
 						}
 						
-						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');");
+						FS::$iMgr->ajaxEchoOK("Done","$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');");
 						$this->log(0,"User find obsolete datas");
 					}
 					else {
-						FS::$iMgr->ajaxEcho("Done","$('#obsres').html('".FS::$secMgr->cleanForJS(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
+						FS::$iMgr->ajaxEchoOK("Done","$('#obsres').html('".FS::$secMgr->cleanForJS(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
 					}
 					
 					return;
@@ -1426,7 +1426,7 @@
 					FS::$dbMgr->CommitTr();
 
 					$this->log(0,"User ".($enmon == "on" ? "enable" : "disable")." monitoring for subnet '".$filtr."'");
-					FS::$iMgr->ajaxEcho("modif-record");
+					FS::$iMgr->ajaxEchoOK("modif-record");
 					return;
 				case 4:
 					$filter = FS::$secMgr->checkAndSecurisePostData("filter");
@@ -1621,7 +1621,7 @@
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$addr."'");
 					FS::$dbMgr->CommitTr();
 
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					$this->log(0,"Delete DHCP server: server '".$addr."' removed");
                                         return;
@@ -1803,7 +1803,7 @@
 						$this->log(0,"Add/Edit subnet: subnet '".$netid."' added");
 					}
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Remove DHCP subnet
 				case 8:
@@ -1835,7 +1835,7 @@
 					$js = $tMgr->removeLine($netid);
 
 					$this->log(0,"Remove subnet: subnet '".$netid."' removed");
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Add/Edit cluster
 				case 9:
@@ -1962,7 +1962,7 @@
 						$this->log(0,"Add/Edit cluster: added cluster '".$cname."'");
 					}
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Remove cluster
 				case 10:
@@ -2000,7 +2000,7 @@
 					$js = $tMgr->removeLine($cname);
 					
 					$this->log(0,"Remove cluster: cluster '".$cname."' removed");
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Add/Edit IP informations
 				case 11:
@@ -2172,7 +2172,7 @@
 
 					$this->log(0,"Edit IP informations: informations edited for IP '".$ip."'");
 					
-					FS::$iMgr->ajaxEcho("Done",(new dhcpIP())->genIPLine($ip,true));
+					FS::$iMgr->ajaxEchoOK("Done",(new dhcpIP())->genIPLine($ip,true));
 					return;
 				// Add/Edit Custom Option
 				case 12:
@@ -2257,7 +2257,7 @@
 					));
 					$js = $tMgr->addLine($optname,$edit);
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Delete Custom Option
 				case 13:
@@ -2314,7 +2314,7 @@
 					));
 					$js = $tMgr->removeLine($optname);
 					
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Add option
 				case 14:
@@ -2442,7 +2442,7 @@
 					));
 					$js = $tMgr->addLine($optname,$edit);
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Remove option
 				case 15:
@@ -2497,7 +2497,7 @@
 					));
 					$js = $tMgr->removeLine($optalias);
 					
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Add/edit option group
 				case 16:
@@ -2570,7 +2570,7 @@
 						"multiid" => true,
 						));
 					$js = $tMgr->addLine($optgroup,$edit);
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Remove option group
 				case 17:
@@ -2617,7 +2617,7 @@
 						"multiid" => true,
 						));
 					$js = $tMgr->removeLine($optgroup);
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Ip range management
 				case 18:
@@ -2697,7 +2697,7 @@
 						"' / endIP: '".$endip."'");
 
 					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$this->showSubnetIPList($subnet)))."');";
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Import fixed adresses
 				case 19:
@@ -2716,7 +2716,7 @@
 						$this->calculateRanges($subnet,$subnetObj);
 						$rstateId = "sb".FS::$iMgr->formatHTMLId($ipObj->getIP())."rsttd";
 						FS::$iMgr->js("$('#".$rstateId."').html('".FS::$secMgr->cleanForJS($this->loc->s("Reserved-by-ipmanager"))."');");
-						FS::$iMgr->ajaxEcho("Done");
+						FS::$iMgr->ajaxEchoOK("Done");
 					}
 					return;
 				// Remove IP informations

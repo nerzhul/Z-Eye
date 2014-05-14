@@ -766,7 +766,7 @@
 						}
 					}
 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				case 2: // Remove group/ from SNMP community
 					$snmp = FS::$secMgr->checkAndSecuriseGetData("snmp");
@@ -823,21 +823,21 @@
 					if ($gid) {
 						if ($snmp) {
 							$js = $this->jsUserGroupSelect($right,"snmp","gid".$idsfx,$snmp);
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."snmp');".$js);
+							FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#"."g".$gid.$right."snmp');".$js);
 						}
 						else if ($ip) {
 							$js = $this->jsUserGroupSelect($right,"ip","gid".$idsfx,$ip);
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."g".$gid.$right."ip');".$js);
+							FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#"."g".$gid.$right."ip');".$js);
 						}
 					}
 					else if ($uid) {
 						if ($snmp) {
 							$js = $this->jsUserGroupSelect($right,"snmp","uid".$idsfx,$snmp);
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."snmp');".$js);
+							FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#"."u".$uid.$right."snmp');".$js);
 						}
 						else if ($ip) {
 							$js = $this->jsUserGroupSelect($right,"ip","uid".$idsfx,$ip);
-							FS::$iMgr->ajaxEcho("Done","hideAndRemove('#"."u".$uid.$right."ip');".$js); 
+							FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#"."u".$uid.$right."ip');".$js); 
 						}
 					}
 					return;
@@ -895,7 +895,7 @@
 					if ($saddr && $stype) {
 						$this->log(0,"Delete server '".$saddr."' for saving switch config");
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."save_device_servers","addr = '".$saddr."' AND type = '".$stype."'");
-						FS::$iMgr->ajaxEcho("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."');");
+						FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#b".preg_replace("#[.]#","-",$saddr).$stype."');");
 					}
 					else {
 						FS::$iMgr->ajaxEchoError("err-bad-datas");

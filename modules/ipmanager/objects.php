@@ -668,7 +668,7 @@
 			// And reload datas from cache
 			$this->LoadFromCache($ip);
 			
-			FS::$iMgr->ajaxEcho("Done", $this->genIPLine($ip));
+			FS::$iMgr->ajaxEchoOK("Done", $this->genIPLine($ip));
 		}
 		
 		protected function removeFromDB($ip) {

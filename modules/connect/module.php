@@ -210,7 +210,7 @@
 			}
 			$this->setLoginResult("result-ok-load",true);
 			$js = "loadWindowHead();loadMainContainer('".$url."');closeLogin();";
-			FS::$iMgr->ajaxEcho("Done",$js);
+			FS::$iMgr->ajaxEchoOK("Done",$js);
 			FS::$iMgr->loadFooterPlugins();
 		}
 
@@ -227,7 +227,7 @@
 					$this->setLoginResult("",true);
 				}
 				$js = "loadWindowHead(); loadMainContainer('');unlockScreen(true); setMaxIdleTimer('-1');";
-				FS::$iMgr->ajaxEcho("Done",$js);
+				FS::$iMgr->ajaxEchoOK("Done",$js);
 			}
 			FS::$iMgr->loadFooterPlugins();
 		}

@@ -116,7 +116,7 @@
 					FS::$dbMgr->Insert(PgDbConfig::getDbPrefix()."user_settings_android","uid,enable_monitor",
 						"'".FS::$sessMgr->getUid()."','".($enmon == "on" ? 't' : 'f')."'");
 					FS::$dbMgr->CommitTr();
-					FS::$iMgr->ajaxEcho("Done");
+					FS::$iMgr->ajaxEchoOK("Done");
 					return;
 				// Set account options
 				case 2:
@@ -151,7 +151,7 @@
 					}
 			
 					$js = "setMaxIdleTimer('".$inactivityTimer."');"; 
-					FS::$iMgr->ajaxEcho("Done",$js);
+					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				default: break;
 			}
