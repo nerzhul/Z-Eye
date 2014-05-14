@@ -771,6 +771,14 @@
 		}
 
 		public function img($path,$sizeX = 0,$sizeY = 0, $id = "",$options = array()) {
+			/*
+			 * If image is not prefixed by a /, force it.
+			 * This doesn't permit external images
+			 */
+			if (!preg_match("#^\/(.*)#",$path)) {
+				$path = sprintf("/%s",$path);
+			}
+
 			return sprintf("<img src=\"%s\" %s%s%s%s style=\"border: none;\"/>",
 				$path,
 				isset($options["tooltip"]) ? $this->tooltip($options["tooltip"]) : "",
