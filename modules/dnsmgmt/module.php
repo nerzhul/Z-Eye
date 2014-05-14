@@ -453,7 +453,7 @@
 
 					if ($dnszone == NULL && $shA == NULL && $shAAAA == NULL && $shNS == NULL && $shCNAME == NULL && $shSRV == NULL && $shPTR == NULL && $shTXT == NULL && $shother == NULL) {
 						$this->log(2,"Getting zone: Some values are wrong");
-						FS::$iMgr->ajaxEcho("err-bad-datas");
+						FS::$iMgr->ajaxEchoError("err-bad-datas");
 					}
 					else {
 						FS::$iMgr->js("$('#recordlist').html('".FS::$secMgr->cleanForJS($this->showRecords($dnszone))."');");
@@ -464,7 +464,7 @@
 					$interval = FS::$secMgr->checkAndSecurisePostData("ival");
 					if (!$interval || !FS::$secMgr->isNumeric($interval) ||
 						$interval < 1) {
-						FS::$iMgr->ajaxEcho("err-invalid-req");
+						FS::$iMgr->ajaxEchoError("err-invalid-req");
 						$this->log(2,"Invalid data when searching obsolete datas");
 						return;
 					}

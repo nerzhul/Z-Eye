@@ -362,17 +362,17 @@
 			$building = FS::$secMgr->checkAndSecurisePostData("building");
 			if (!$device || $building === NULL) {
 				$this->log(2,"Some fields are missing (building fast edit)");
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
 			if (!$this->Load($device)) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-rights");
+				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return;	
 			}
 			
@@ -398,19 +398,21 @@
 			$room = FS::$secMgr->checkAndSecurisePostData("room");
 			if (!$device || $room === NULL) {
 				$this->log(2,"Some fields are missing (room fast edit)");
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
 			if (!$this->Load($device)) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-rights");
+				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return;	
 			}
+			
+			FS::$dbMgr->BeginTr();
 			
 			if (FS::$dbMgr->GetOneData($this->infoTable,"device","device = '".$device."'")) {
 				FS::$dbMgr->Update($this->infoTable,"room = '".$room."'","device = '".$device."'");
@@ -418,6 +420,8 @@
 			else {
 				FS::$dbMgr->Insert($this->infoTable,"device,room","'".$device."','".$room."'");
 			}
+			
+			FS::$dbMgr->CommitTr();
 			
 			if ($room) {
 				echo $room;
@@ -510,14 +514,14 @@
 			$repl = FS::$secMgr->checkAndSecurisePostData("repl");
 			
 			if (!$csv || !$sep || $sep != "," && $sep != ";") {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
 			$csv = preg_replace("#[\r]#","",$csv);
 			$lines = preg_split("#[\n]#",$csv);
 			if (!$lines) {
-				FS::$iMgr->ajaxEcho("err-invalid-csv");
+				FS::$iMgr->ajaxEchoError("err-invalid-csv");
 				return;
 			}
 			
@@ -529,7 +533,7 @@
 				
 				// Entry has 4 fields
 				if (count($entry) != 4) {
-					FS::$iMgr->ajaxEcho(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
+					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
 					return;
 				}
 				
@@ -552,18 +556,18 @@
 			foreach ($plugAndRooms as $device => $ports) {
 				$deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 				if (!$deviceIP) {
-					FS::$iMgr->ajaxEcho($this->loc->s("err-invalid-csv-device").$device,"",true);
+					FS::$iMgr->ajaxEchoError($this->loc->s("err-invalid-csv-device").$device,"",true);
 					return;
 				}
 				foreach($ports as $port => $values) {
 					if (!FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$deviceIP."' AND port = '".$port."'")) {
-						FS::$iMgr->ajaxEcho($this->loc->s("err-invalid-csv-port").$device."/".$port."'","",true);
+						FS::$iMgr->ajaxEchoError($this->loc->s("err-invalid-csv-port").$device."/".$port."'","",true);
 						return;
 					}
 					
 					if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlPlugRoomTable,"ip",
 						"ip = '".$deviceIP."' AND port = '".$port."' AND (prise != '' OR room != '')")) {
-						FS::$iMgr->ajaxEcho($this->loc->s("err-csv-replace-data").$device."/".$port."'","",true);
+						FS::$iMgr->ajaxEchoError($this->loc->s("err-csv-replace-data").$device."/".$port."'","",true);
 						return;
 					}
 					
@@ -1048,7 +1052,7 @@
 			$this->device = FS::$dbMgr->GetOneData("device","name","ip = '".$this->deviceIP."'");
 			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-rights");
+				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return;	
 			}
 

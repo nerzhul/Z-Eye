@@ -86,7 +86,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -106,19 +106,19 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
 			$rname = FS::$secMgr->checkAndSecuriseGetData("rname");
 
 			if (!$zonename) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
 			if (!$this->exists($rname)) {
-				FS::$iMgr->ajaxEcho($this->errNotExists);
+				FS::$iMgr->ajaxEchoError($this->errNotExists);
 				return;
 			}
 

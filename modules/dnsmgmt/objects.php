@@ -251,7 +251,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -282,7 +282,7 @@
 				!$ttlExpire || !FS::$secMgr->isNumeric($ttlExpire) ||
 				!$ttlMinimum || !FS::$secMgr->isNumeric($ttlMinimum) ||
 				$edit && $edit != 1) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
@@ -294,7 +294,7 @@
 			$exists = $this->exists($zonename);
 			if ($edit) {
 				if (!$exists) {
-					FS::$iMgr->ajaxEcho($this->errNotExists);
+					FS::$iMgr->ajaxEchoError($this->errNotExists);
 					return;
 				}
 			}
@@ -306,7 +306,7 @@
 			}
 
 			if ($zonetype < 1 && $zonetype > 3) {
-				FS::$iMgr->ajaxEcho("err-bad-zonetype");
+				FS::$iMgr->ajaxEchoError("err-bad-zonetype");
 				return;
 			}
 
@@ -314,7 +314,7 @@
 			// It's a simple value a this time. Must be multi value for forward & slave only
 			// JS ?
 			if (!$cluster->exists($clusters)) {
-				FS::$iMgr->ajaxEcho($cluster->getErrNotExists());
+				FS::$iMgr->ajaxEchoError($cluster->getErrNotExists());
 				return;
 			}
 
@@ -339,7 +339,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($queryAcls[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -350,7 +350,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($notifyAcls[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -361,7 +361,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($updateAcls[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -372,7 +372,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($transferAcls[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -435,19 +435,19 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
 			$zonename = FS::$secMgr->checkAndSecuriseGetData("zonename");
 
 			if (!$zonename) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
 			if (!$this->exists($zonename)) {
-				FS::$iMgr->ajaxEcho($this->errNotExists);
+				FS::$iMgr->ajaxEchoError($this->errNotExists);
 				return;
 			}
 
@@ -730,7 +730,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -761,14 +761,14 @@
 			if ($edit) {	
 				if (!$exists) {
 					$this->log(1,"Unable to edit acl '".$aclname."': not exists");
-					FS::$iMgr->ajaxEcho($this->errNotExists);
+					FS::$iMgr->ajaxEchoError($this->errNotExists);
 					return;
 				}
 			}
 			else {
 				if ($exists) {
 					$this->log(1,"Unable to add acl '".$aclname ."': already exists");
-					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					FS::$iMgr->ajaxEchoError($this->errAlreadyExists);
 					return;
 				}
 			}
@@ -907,13 +907,13 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
 			$aclname = FS::$secMgr->checkAndSecuriseGetData("aclname");
 			if (!$aclname) {
-				FS::$dbMgr->ajaxEcho("err-bad-datas");
+				FS::$dbMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
@@ -925,7 +925,7 @@
 			$exists = $this->exists($aclname);
 			if (!$exists) {
 				$this->log(1,"Unable to remove acl '".$aclname."': not exists");
-				FS::$iMgr->ajaxEcho($this->errNotExists);
+				FS::$iMgr->ajaxEchoError($this->errNotExists);
 				return;
 			}
 
@@ -1172,7 +1172,7 @@
 		}
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -1195,7 +1195,7 @@
 				$recurse && !is_array($recurse) || $transfer && !is_array($transfer) ||
 				$notify && !is_array($notify) || $update && !is_array($update) ||
 				$query && !is_array($query) || $edit && $edit != 1) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 		
@@ -1204,14 +1204,14 @@
 			if ($edit) {
 				if (!$exists) {
 					$this->log(1,"Unable to edit cluster '".$clustername."': not exists");
-					FS::$iMgr->ajaxEcho($this->errNotExists);
+					FS::$iMgr->ajaxEchoError($this->errNotExists);
 					return;
 				}
 			}
 			else {
 				if ($exists) {
 					$this->log(1,"Unable to add cluster '".$clustername."': already exists");
-					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					FS::$iMgr->ajaxEchoError($this->errAlreadyExists);
 					return;
 				}
 			}
@@ -1223,7 +1223,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$server = new dnsServer();
 					if (!$server->exists($masters[$i])) {
-						FS::$iMgr->ajaxEcho($server->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($server->getErrNotExists());
 						return;
 					}
 					if ($slaves) {
@@ -1253,7 +1253,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$server = new dnsServer();
 					if (!$server->exists($slaves[$i])) {
-						FS::$iMgr->ajaxEcho($server->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($server->getErrNotExists());
 						return;
 					}
 					// Slave - master already checked
@@ -1271,7 +1271,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$server = new dnsServer();
 					if (!$server->exists($caches[$i])) {
-						FS::$iMgr->ajaxEcho($server->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($server->getErrNotExists());
 						return;
 					}
 					// All duplicated have been checked at this time
@@ -1283,7 +1283,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($recurse[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -1294,7 +1294,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($notify[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -1304,7 +1304,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($transfer[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -1314,7 +1314,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($query[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -1324,7 +1324,7 @@
 				for ($i=0;$i<$count;$i++) {
 					$acl = new dnsACL();
 					if (!$acl->exists($update[$i])) {
-						FS::$iMgr->ajaxEcho($acl->getErrNotExists());
+						FS::$iMgr->ajaxEchoError($acl->getErrNotExists());
 						return;
 					}
 				}
@@ -1459,19 +1459,19 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
 			$clustername = FS::$secMgr->checkAndSecuriseGetData("clustername");
 
 			if (!$clustername) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
 			if (!$this->exists($clustername)) {
-				FS::$iMgr->ajaxEcho($this->errNotExists);
+				FS::$iMgr->ajaxEchoError($this->errNotExists);
 				return;
 			}
 
@@ -1676,7 +1676,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -1703,7 +1703,7 @@
 					($machineFQDN && !FS::$secMgr->isDNSName($machineFQDN))
 				) {
 				$this->log(2,"Some datas are invalid or wrong for add server");
-				FS::$iMgr->ajaxEcho("err-miss-bad-fields");
+				FS::$iMgr->ajaxEchoError("err-miss-bad-fields");
 				return;
 			}
 
@@ -1722,7 +1722,7 @@
 
 			$ssh = new SSH($saddr);
 			if (!$ssh->Connect()) {
-				FS::$iMgr->ajaxEcho("err-unable-conn");
+				FS::$iMgr->ajaxEchoError("err-unable-conn");
 				return;
 			}
 			if (!$ssh->Authenticate($slogin,$spwd)) {
@@ -1754,14 +1754,14 @@
 			if ($edit) {	
 				if (!$exists) {
 					$this->log(1,"Unable to edit server '".$saddr."': not exists");
-					FS::$iMgr->ajaxEcho($this->errNotExists);
+					FS::$iMgr->ajaxEchoError($this->errNotExists);
 					return;
 				}
 			}
 			else {
 				if ($exists) {
 					$this->log(1,"Unable to add server '".$saddr."': already exists");
-					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					FS::$iMgr->ajaxEchoError($this->errAlreadyExists);
 					return;
 				}
 			}
@@ -1804,19 +1804,19 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
 			$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 			
 			if (!$addr) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
 			if (!$this->exists($addr)) {
-				FS::$iMgr->ajaxEcho($this->errNotExists);
+				FS::$iMgr->ajaxEchoError($this->errNotExists);
 				return;
 			}
 			
@@ -1982,7 +1982,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 
@@ -1994,7 +1994,7 @@
 
 			if (!$keyalias || !$keyid || !$keyalgo || !FS::$secMgr->isNumeric($keyalgo) || !$keyvalue ||
 				$edit && $edit != 1) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 
@@ -2006,30 +2006,30 @@
 			$exist = $this->exists($keyalias);
 			if ($edit) {
 				if (!$exist) {
-					FS::$iMgr->ajaxEcho($this->errNotExists);
+					FS::$iMgr->ajaxEchoError($this->errNotExists);
 					return;
 				}
 			}
 			else {
 				if ($exist) {
-					FS::$iMgr->ajaxEcho($this->errAlreadyExists);
+					FS::$iMgr->ajaxEchoError($this->errAlreadyExists);
 					return;
 				}
 				$exist = FS::$dbMgr->GetOneEntry($this->sqlTable,"keyalias","keyid = '".$keyid.
 					"' AND keyalgo = '".$keyalgo."' AND keyvalue = '".$keyvalue."'");
 				if ($exist) {
-					FS::$iMgr->ajaxEcho("err-tsig-key-exactly-same");
+					FS::$iMgr->ajaxEchoError("err-tsig-key-exactly-same");
 					return;
 				}
 			}
 			
 			if (!FS::$secMgr->isHostname($keyid)) {
-				FS::$iMgr->ajaxEcho("err-tsig-key-id-invalid");
+				FS::$iMgr->ajaxEchoError("err-tsig-key-id-invalid");
 				return;
 			}
 
 			if ($keyalgo < 1 || $keyalgo > 3) {
-				FS::$iMgr->ajaxecho("err-tsig-key-algo-invalid");
+				FS::$iMgr->ajaxEchoError("err-tsig-key-algo-invalid");
 				return;
 			}
 
@@ -2047,17 +2047,17 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			} 
 			$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
 			if (!$keyalias) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
 			if (!$this->exists($keyalias)) {
-				FS::$iMgr->ajaxEcho($this->errNotExists);
+				FS::$iMgr->ajaxEchoError($this->errNotExists);
 				return;
 			}
 
@@ -2227,7 +2227,7 @@
 		
 		public function showForm($zonename = "") {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			}
 			
@@ -2285,7 +2285,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			}
 			
@@ -2360,7 +2360,7 @@
 		
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEcho("err-no-right");
+				FS::$iMgr->ajaxEchoError("err-no-right");
 				return;
 			}
 			
@@ -2372,7 +2372,7 @@
 			if (!$zonename || !FS::$secMgr->isDNSName($zonename) ||
 				!$record || !FS::$secMgr->isDNSName($record) ||
 				!$rectype || !$recvalue || !FS::$secMgr->isDNSRecordCoherent($rectype,$recvalue)) {
-				FS::$iMgr->ajaxEcho("err-bad-datas");
+				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
 			
