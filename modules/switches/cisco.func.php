@@ -699,7 +699,9 @@
 		}
 
 		public function showSaveCfg() {
-			return FS::$iMgr->idxLine("Save-switch","wr",array("value" => false, "type" => "chk", "tooltip" => "tooltip-saveone"));
+			return FS::$iMgr->idxLine("Save-switch","wr",
+				array("value" => true, "type" => "chk", 
+					"tooltip" => "tooltip-saveone"));
 		}
 
 		public function handleSaveCfg() {

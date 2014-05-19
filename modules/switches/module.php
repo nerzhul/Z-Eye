@@ -1030,24 +1030,25 @@
 							checkCopyState(copyId);
 						});";
 						$js .= "return false;};";
-						$output .= FS::$iMgr->js($js);
+						FS::$iMgr->js($js);
 
-						$output .= FS::$iMgr->h3("title-transfer-conf");
-						$output .= $this->loc->s("Server-type")." ".FS::$iMgr->select("exportm","arangeform();");
-						$output .= FS::$iMgr->selElmt("TFTP",1);
-						$output .= FS::$iMgr->selElmt("FTP",2);
-						$output .= FS::$iMgr->selElmt("SCP",4);
-						$output .= FS::$iMgr->selElmt("SFTP",5);
-						$output .= "</select><br />";
-						$output .= $this->loc->s("transfer-way")." ".FS::$iMgr->select("io");
-						$output .= FS::$iMgr->selElmt($this->loc->s("Export"),1);
-						$output .= FS::$iMgr->selElmt($this->loc->s("Import"),2);
-						$output .= "</select><br />";
-						$output .= $this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />";
-						$output .= $this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />";
-						$output .= "<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser");
-						$output .= " ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>";
-						$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
+						$output .= FS::$iMgr->h3("title-transfer-conf").
+							$this->loc->s("Server-type")." ".
+							FS::$iMgr->select("exportm","arangeform();").
+							FS::$iMgr->selElmt("TFTP",1).
+							FS::$iMgr->selElmt("FTP",2).
+							FS::$iMgr->selElmt("SCP",4).
+							FS::$iMgr->selElmt("SFTP",5).
+							"</select><br />".
+							$this->loc->s("transfer-way")." ".FS::$iMgr->select("io").
+							FS::$iMgr->selElmt($this->loc->s("Export"),1).
+							FS::$iMgr->selElmt($this->loc->s("Import"),2).
+							"</select><br />".
+							$this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />".
+							$this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />".
+							"<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser").
+							" ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>".
+							FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
 					}
 
 					if (FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_restorestartupcfg") ||
