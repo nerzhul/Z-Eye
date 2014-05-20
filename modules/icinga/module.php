@@ -1311,7 +1311,7 @@
 						}
 					}
 					
-					FS::$iMgr->BeginTr();
+					FS::$dbMgr->BeginTr();
 					if ($members) {
 						$count = count($members);
 						for ($i=0;$i<$count;$i++) {
@@ -1342,7 +1342,7 @@
 					}
 					
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","'".$name."','".$alias."'");
-					FS::$iMgr->CommitTr();
+					FS::$dbMgr->CommitTr();
 					
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
