@@ -33,7 +33,7 @@ import zConfig, ZEyeUtil
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1411"
+	nextDBVersion = "1412"
 	pgsqlCon = None
 	logger = None
 
@@ -445,6 +445,9 @@ class ZEyeDBUpgrade():
 				self.tryDropColumn("z_eye_icinga_contacts","soptf")
 				self.tryDropColumn("z_eye_icinga_contacts","sopts")
 				self.setDBVersion("1411")
+			if self.dbVersion == "1411":
+				self.tryAddColumn("z_eye_dhcp_servers","clusteraddr","inet")
+				self.setDBVersion("1412")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

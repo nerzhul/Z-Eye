@@ -784,9 +784,21 @@
 			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
-			$user = ""; $dhcpdpath = ""; $leasepath = ""; $reservconfpath = ""; $subnetconfpath = ""; $alias = ""; $description = ""; $dhcptype = 0;
+			
+			$user = "";
+			$dhcpdpath = "";
+			$leasepath = "";
+			$reservconfpath = "";
+			$subnetconfpath = "";
+			$alias = "";
+			$description = "";
+			$clusteraddr = "";
+			$dhcptype = 0;
+			
 			if ($addr) {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype","addr = '".$addr."'");
+				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers",
+					"alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype,clusteraddr",
+					"addr = '".$addr."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$alias = $data["alias"];
 					$description = $data["description"];
@@ -795,29 +807,53 @@
 					$leasepath = $data["leasespath"];
 					$reservconfpath = $data["reservconfpath"];
 					$subnetconfpath = $data["subnetconfpath"];
+					$clusteraddr = $data["clusteraddr"];
 					$dhcptype = $data["dhcptype"];
 				}
 			}
+			
+			$selForm = sprintf("%s%s</select>",
+				FS::$iMgr->select("dhcptype"),
+				FS::$iMgr->selElmt("ISC-DHCP",1,$dhcptype == 1)
+			);
+			
 			$output = FS::$iMgr->cbkForm("5").$this->loc->s("note-needed")."<table>".
-				FS::$iMgr->idxLine($this->loc->s("server-addr")." (*)","addr",
-					array("value" => $addr,"type" => "idxedit", "length" => 128, "edit" => $addr != "","rawlabel" => true)).
-				FS::$iMgr->idxLine("server-alias","alias",array("value" => $alias,"length" => 64, "tooltip" => "tooltip-dhcp-alias")).
-				FS::$iMgr->idxLine("server-desc","description",array("value" => $description,"length" => 128, "tooltip" => "tooltip-dhcp-desc")).
-				FS::$iMgr->idxLine($this->loc->s("ssh-user")." (*)","sshuser",
-					array("value" => $user,"length" => 128,"rawlabel" => true)).
-				FS::$iMgr->idxLine($this->loc->s("ssh-pwd")." (*)","sshpwd",array("type" => "pwd","rawlabel" => true)).
-				FS::$iMgr->idxLine($this->loc->s("ssh-pwd-repeat")." (*)","sshpwd2",array("type" => "pwd","rawlabel" => true)).
-				"<tr><td>".$this->loc->s("dhcp-type")." (*)</td><td>".FS::$iMgr->select("dhcptype").
-				FS::$iMgr->selElmt("ISC-DHCP",1,$dhcptype == 1).
-				"</td></tr>".
-				FS::$iMgr->idxLine("dhcpd-path","dhcpdpath",
-					array("value" => $dhcpdpath,"length" => 980, "size" => 30, "tooltip" => "tooltip-dhcpdpath")).
-				FS::$iMgr->idxLine("lease-path","leasepath",
-					array("value" => $leasepath,"length" => 980, "size" => 30, "tooltip" => "tooltip-leasepath")).
-				FS::$iMgr->idxLine("reservconf-path","reservconfpath",
-					array("value" => $reservconfpath,"length" => 980, "size" => 30, "tooltip" => "tooltip-reservconfpath")).
-				FS::$iMgr->idxLine("subnetconf-path","subnetconfpath",
-					array("value" => $subnetconfpath,"length" => 980, "size" => 30, "tooltip" => "tooltip-subnetconfpath")).
+				FS::$iMgr->idxLines(array(
+					array($this->loc->s("server-addr")." (*)","addr",
+						array("value" => $addr,"type" => "idxedit", 
+							"length" => 128, "edit" => $addr != "",
+							"rawlabel" => true, "tooltip" => "tooltip-dhcp-server-ip"
+					)),
+					array("server-alias","alias",array("value" => $alias,
+						"length" => 64, "tooltip" => "tooltip-dhcp-alias")),
+					array("server-desc","description",
+						array("value" => $description, "length" => 128,
+							"tooltip" => "tooltip-dhcp-desc")),
+					array($this->loc->s("ssh-user")." (*)","sshuser",
+						array("value" => $user,"length" => 128,"rawlabel" => true)),
+					array($this->loc->s("ssh-pwd")." (*)","sshpwd",
+						array("type" => "pwd","rawlabel" => true)),
+					array($this->loc->s("ssh-pwd-repeat")." (*)",
+						"sshpwd2", array("type" => "pwd","rawlabel" => true)),
+					array("clustering-ip","dhcpdclusterip", array(
+						"type" => "ip", "value" => $clusteraddr,
+						"tooltip" => "tooltip-clustering-ip")),
+					array($this->loc->s("dhcp-type")." (*)","", array(
+						"type" => "raw", "rawlabel" => true, 
+						"value" => $selForm)),
+					array("dhcpd-path","dhcpdpath",
+						array("value" => $dhcpdpath,"length" => 980,
+							"size" => 30, "tooltip" => "tooltip-dhcpdpath")),
+					array("lease-path","leasepath",
+						array("value" => $leasepath,"length" => 980,
+							"size" => 30, "tooltip" => "tooltip-leasepath")),
+					array("reservconf-path","reservconfpath",
+						array("value" => $reservconfpath,"length" => 980,
+						"size" => 30, "tooltip" => "tooltip-reservconfpath")),
+					array("subnetconf-path","subnetconfpath",
+						array("value" => $subnetconfpath,"length" => 980,
+							"size" => 30, "tooltip" => "tooltip-subnetconfpath"))
+				)).
 				FS::$iMgr->aeTableSubmit($addr == "");
 			return $output;
 		}
@@ -1449,6 +1485,7 @@
 					$slogin = FS::$secMgr->checkAndSecurisePostData("sshuser");
 					$spwd = FS::$secMgr->checkAndSecurisePostData("sshpwd");
 					$spwd2 = FS::$secMgr->checkAndSecurisePostData("sshpwd2");
+					$clusteraddr = FS::$secMgr->checkAndSecurisePostData("dhcpdclusterip");
 					$dhcpdpath = FS::$secMgr->checkAndSecurisePostData("dhcpdpath");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$dhcptype = FS::$secMgr->checkAndSecurisePostData("dhcptype");
@@ -1465,6 +1502,12 @@
 					) {
 						$this->log(2,"Some datas are invalid or wrong for add server");
 						FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
+						return;
+					}
+					
+					if ($clusteraddr && !FS::$secMgr->isIP($clusteraddr)) {
+						FS::$iMgr->ajaxEchoErrorNC("err-dhcpserver-invalid-clusteraddr");
+						$this->log(1,"Add/edit DHCP server: invalid cluster address");
 						return;
 					}
 
@@ -1569,20 +1612,25 @@
 					$osname = preg_replace("#[\n\r]#","",$ssh->execCmd("uname -srm"));
 
 					FS::$dbMgr->BeginTr();
-					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers","addr = '".$saddr."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype,osname",
+					if ($edit) {
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers",
+							"addr = '".$saddr."'");
+					}
+					
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers",
+						"addr,alias,description,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype,osname,clusteraddr",
 						"'".$saddr."','".$alias."','".$desc.
-						"','".$slogin."','".$spwd."','".$dhcpdpath."','".$leasepath."','".$reservconfpath."','".$subnetconfpath."','".$dhcptype."','".$osname."'");
+						"','".$slogin."','".$spwd."','".$dhcpdpath."','".
+						$leasepath."','".$reservconfpath."','".
+						$subnetconfpath."','".$dhcptype."','".
+						$osname."','".$clusteraddr."'");
 					FS::$dbMgr->CommitTr();
 
-					if ($edit) {
-						$this->log(0,"Add/edit DHCP server: Edited DHCP server '".$saddr."' (login: '".$slogin."')");
-					}
-					else {
-						$this->log(0,"Add/edit DHCP server: Added DHCP server '".$saddr."' (login: '".$slogin."')");
-					}
+					$this->log(0,"Add/edit DHCP server: ".
+						($edit ? "Edited" : "Added")." DHCP server '".
+						$saddr."' (login: '".$slogin."')");
 
-					FS::$iMgr->redir("mod=".$this->mid,true);
+					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					return;
 				// Delete DHCP Server
 				case 6:
