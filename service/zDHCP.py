@@ -200,7 +200,13 @@ class DHCPManager(ZEyeUtil.Thread):
 							"""
 							for peer in self.clusterMembers[idx[0]]:
 								if peer != addr:
-									peerAddr = peer
+									if self.clusterMembers[idx[0]][peer]["clusteraddr"] != None:
+										peerAddr = self.clusterMembers[idx[0]][peer]["clusteraddr"]
+							
+							localAddr = addr
+							# If there is a valid clusterAddr, replace localAddr
+							if addr in self.clusterMembers[idx[0]] and self.clusterMembers[idx[0]][addr]["clusteraddr"] != None:
+								localAddr = self.clusterMembers[idx[0]][addr]["clusteraddr"]
 
 							failoverPeerBuf += "failover peer \"cluster-%s\" {" % idx[0].replace(' ','-')
 							failoverPeerName = "cluster-%s" % idx[0].replace(' ','-')
@@ -211,7 +217,7 @@ class DHCPManager(ZEyeUtil.Thread):
 							else:
 								failoverPeerBuf += "\n\tsecondary;"
 
-							failoverPeerBuf += "\n\taddress %s;\n\tport 647;\n\tpeer address %s;\n\tpeer port 647;" % (addr,peerAddr)
+							failoverPeerBuf += "\n\taddress %s;\n\tport 647;\n\tpeer address %s;\n\tpeer port 647;" % (localAddr,peerAddr)
 							failoverPeerBuf += "\n\tmax-response-delay 3;\n\tmax-unacked-updates 2;\n\tload balance max seconds 10;"
 							# This is for cluster master
 							if (self.clusterOptions[idx[0]][0] == 1 or self.clusterOptions[idx[0]][0] == 2) and self.clusterOptions[idx[0]][1] == addr:
@@ -398,7 +404,7 @@ class DHCPManager(ZEyeUtil.Thread):
 			if idx[0] not in self.clusterList:
 				# Init buffers
 				self.clusterList[idx[0]] = []
-				self.clusterMembers[idx[0]] = []
+				self.clusterMembers[idx[0]] = {}
 				self.clusterOptions[idx[0]] = []
 				# Load cluster options when create the cluster buffer
 				pgcursor.execute("SELECT clustermode,master FROM z_eye_dhcp_cluster_options WHERE clustername = '%s'" % idx[0])
@@ -411,7 +417,15 @@ class DHCPManager(ZEyeUtil.Thread):
 				pgcursor.execute("SELECT dhcpaddr FROM z_eye_dhcp_cluster WHERE clustername = '%s'" % idx[0])
 				pgres2 = pgcursor.fetchall()
 				for idx2 in pgres2:
-					self.clusterMembers[idx[0]].append(idx2[0])
+					# Create a dict for each member
+					self.clusterMembers[idx[0]][idx2[0]] = {}
+					
+					# For each member, check if there is a cluster address
+					pgcursor.execute("SELECT clusteraddr FROM z_eye_dhcp_servers WHERE addr = '%s'" % idx2[0])
+					pgres3 = pgcursor.fetchone()
+					
+					# And set it
+					self.clusterMembers[idx[0]][idx2[0]]["clusteraddr"] = pgres3[0]
 
 			if idx[1] not in self.clusterList[idx[0]] and idx[1] in self.subnetList:
 				self.clusterList[idx[0]].append(idx[1])
