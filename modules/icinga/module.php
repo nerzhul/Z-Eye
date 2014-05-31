@@ -16,14 +16,14 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/icingaBroker.api.php");
 	require_once(dirname(__FILE__)."/objects.php");
 
 	if(!class_exists("iIcinga")) {
-		
+
 	final class iIcinga extends FSModule {
 		function __construct() {
 			parent::__construct();
@@ -50,43 +50,43 @@
 				if (FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
 					$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("Hosts"));
 				}
-				
+
 				if (FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 					$panElmts[] = array(3,"mod=".$this->mid,$this->loc->s("Hostgroups"));
 				}
-				
+
 				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 					$panElmts[] = array(4,"mod=".$this->mid,$this->loc->s("Services"));
 				}
-				
+
 				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 					$panElmts[] = array(5,"mod=".$this->mid,$this->loc->s("Timeperiods"));
 				}
-				
+
 				if (FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
 					$panElmts[] = array(9,"mod=".$this->mid,$this->loc->s("Notification-strategies"));
 				}
-				
+
 				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 					$panElmts[] = array(6,"mod=".$this->mid,$this->loc->s("Contacts"));
 				}
-				
+
 				if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
 					$panElmts[] = array(7,"mod=".$this->mid,$this->loc->s("Contactgroups"));
 				}
-				
+
 				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 					$panElmts[] = array(8,"mod=".$this->mid,$this->loc->s("Commands"));
 				}
-				
+
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				return $output;
 			}
-			
+
 			if (!$sh) {
 				$sh = 1;
 			}
-			
+
 			switch($sh) {
 				case 1: $output .= $this->showGeneralTab(); break;
 				case 2: $output .= $this->showHostsTab(); break;
@@ -109,19 +109,19 @@
 
 		private function showHostsTab() {
 			FS::$iMgr->setURL("sh=2");
-			
+
 			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
-			
+
 			$output = "";
-			
+
 			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 			if (!$tpexist) {
 				$output .= FS::$iMgr->opendiv(1,$this->loc->s("new-host"));
 				return $output;
 			}
-			
+
 			$ctexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","name","");
 			if (!$ctexist) {
 				$output .= FS::$iMgr->opendiv(2,$this->loc->s("new-host"));
@@ -152,7 +152,7 @@
 				while ($data2 = FS::$dbMgr->Fetch($query2)) {
 					$parentlist[] = $data2["parent"];
 				}
-				
+
 				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				if (FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
@@ -161,13 +161,13 @@
 				else {
 					$output .= $data["name"];
 				}
-				
+
 				$output .= "</td><td>";
 				if ($data["template"] != "t") {
 					$output .= FS::$iMgr->iconOpendiv("17","monitor",array("lnkadd" => "host=".$data["name"],
 						"iconsize" => 20));
 				}
-				
+
 				$output .= "</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
 				if ($data["template"] == "t") {
 					$output .= $this->loc->s("Yes");
@@ -175,7 +175,7 @@
 				else {
 					$output .= $this->loc->s("No");
 				}
-				
+
 				$output .= "</td><td>";
 				$found2 = false;
 				for ($i=0;$i<count($parentlist);$i++) {
@@ -249,7 +249,7 @@
 			}
 			return $output;
 		}
-		
+
 		private function showHostgroupForm($name = "") {
 			$output = FS::$iMgr->cbkForm("19");
 			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
@@ -264,7 +264,7 @@
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name,host,hosttype","name = '".$name."'");
 				while ($data = FS::$dbMgr->Fetch($query))
 					$hostlist[] = $data["hosttype"]."$".$data["host"];
-			}	
+			}
 
 			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".
 				$this->getHostOrGroupList("members",true,$hostlist,$name)."</td></tr>".
@@ -274,7 +274,7 @@
 
 		private function showServicesTab() {
 			FS::$iMgr->setURL("sh=4");
-			
+
 			if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
@@ -304,14 +304,14 @@
 				}
 
 				$output .= "</td><td>";
-				
+
 				if ($data["template"] != "t") {
 					$output .= FS::$iMgr->iconOpendiv("18","monitor",array("lnkadd" => "srv=".$data["name"],
 						"iconsize" => 20));
 				}
-				
+
 				$output .= "</td><td>".$data["host"]."</td><td>";
-				
+
 				switch($data["hosttype"]) {
 					case 1: $output .= "Simple"; break;
 					case 2: $output .= "Groupe"; break;
@@ -334,17 +334,17 @@
 
 		private function showTimeperiodsTab() {
 			FS::$iMgr->setURL("sh=5");
-			
+
 			if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 			$output = "";
-			
+
 			/*
 			 * Ajax new Timeperiod
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
-			
+
 			if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 				$output .= FS::$iMgr->opendiv(6,$this->loc->s("new-timeperiod"));
 			}
@@ -373,40 +373,40 @@
 
 				$output .= "</td><td>".$data["alias"]."</td><td>";
 				if ($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0) {
-					$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].	
+					$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].
 					" ".$this->loc->s("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
 				}
-				
+
 				if ($data["tuhs"] != 0 || $data["tums"] != 0 || $data["tuhe"] != 0 || $data["tume"] != 0) {
-					$output .= $this->loc->s("Tuesday").	" - ".$this->loc->s("From")." ".($data["tuhs"] < 10 ? "0" : "").$data["tuhs"].	":".($data["tums"] < 10 ? "0" : "").$data["tums"].	
+					$output .= $this->loc->s("Tuesday").	" - ".$this->loc->s("From")." ".($data["tuhs"] < 10 ? "0" : "").$data["tuhs"].	":".($data["tums"] < 10 ? "0" : "").$data["tums"].
 					" ".$this->loc->s("To")." ".($data["tuhe"] < 10 ? "0" : "").$data["tuhe"].":".($data["tume"] < 10 ? "0" : "").$data["tume"]."<br />";
 				}
-				
+
 				if ($data["whs"] != 0 || $data["wms"] != 0 || $data["whe"] != 0 || $data["wme"] != 0) {
-					$output .= $this->loc->s("Wednesday").	" - ".$this->loc->s("From")." ".($data["whs"] < 10 ? "0" : "").	$data["whs"].	":".($data["wms"] < 10 ? "0" : "").	$data["wms"].	
+					$output .= $this->loc->s("Wednesday").	" - ".$this->loc->s("From")." ".($data["whs"] < 10 ? "0" : "").	$data["whs"].	":".($data["wms"] < 10 ? "0" : "").	$data["wms"].
 					" ".$this->loc->s("To")." ".($data["whe"] < 10 ? "0" : "").	$data["whe"].":".($data["wme"] < 10 ? "0" : "").$data["wme"]."<br />";
 				}
-				
+
 				if ($data["thhs"] != 0 || $data["thms"] != 0 || $data["thhe"] != 0 || $data["thme"] != 0) {
 					$output .= $this->loc->s("Thursday").	" - ".$this->loc->s("From")." ".($data["thhs"] < 10 ? "0" : "").$data["thhs"].	":".($data["thms"] < 10 ? "0" : "").$data["thms"].
 					" ".$this->loc->s("To")." ".($data["thhe"] < 10 ? "0" : "").$data["thhe"].":".($data["thme"] < 10 ? "0" : "").$data["thme"]."<br />";
 				}
-				
+
 				if ($data["fhs"] != 0 || $data["fms"] != 0 || $data["fhe"] != 0 || $data["fme"] != 0) {
 					$output .= $this->loc->s("Friday").		" - ".$this->loc->s("From")." ".($data["fhs"] < 10 ? "0" : "").	$data["fhs"].	":".($data["fms"] < 10 ? "0" : "").	$data["fms"].
 					" ".$this->loc->s("To")." ".($data["fhe"] < 10 ? "0" : "").	$data["fhe"].":".($data["fme"] < 10 ? "0" : "").$data["fme"]."<br />";
 				}
-				
+
 				if ($data["sahs"] != 0 || $data["sams"] != 0 || $data["sahe"] != 0 || $data["same"] != 0) {
 					$output .= $this->loc->s("Saturday").	" - ".$this->loc->s("From")." ".($data["sahs"] < 10 ? "0" : "").$data["sahs"].	":".($data["sams"] < 10 ? "0" : "").$data["sams"].
 					" ".$this->loc->s("To")." ".($data["sahe"] < 10 ? "0" : "").$data["sahe"].":".($data["same"] < 10 ? "0" : "").$data["same"]."<br />";
 				}
-				
+
 				if ($data["suhs"] != 0 || $data["sums"] != 0 || $data["suhe"] != 0 || $data["sume"] != 0) {
 					$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
 					" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
 				}
-				
+
 				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"tp=".$data["name"],array("js" => true,
 					"confirmtext" => "confirm-remove-timeperiod",
 					"confirmval" => $data["name"]
@@ -466,11 +466,11 @@
 
 		private function showContactsTab() {
 			FS::$iMgr->setURL("sh=6");
-			
+
 			if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
-			
+
 			$output = "";
 
 			if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
@@ -512,11 +512,11 @@
 
 		private function showContactgroupsTab() {
 			FS::$iMgr->setURL("sh=7");
-			
+
 			if (!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
-			
+
 			$output = "";
 
 			if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
@@ -545,7 +545,7 @@
 					$output .= FS::$iMgr->opendiv(15,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
-					
+
 				$output .= "</td><td>".$data["alias"]."</td><td>";
 
 				$found2 = false;
@@ -565,14 +565,14 @@
 			}
 			return $output;
 		}
-		
+
 		private function showNotificationStrategiesTab() {
 			FS::$iMgr->setURL("sh=9");
-			
+
 			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
-			
+
 			/*
 			 * Ajax new command
 			 */
@@ -610,11 +610,11 @@
 
 		private function showCommandTab() {
 			FS::$iMgr->setURL("sh=8");
-			
+
 			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
-			
+
 			/*
 			 * Ajax new command
 			 */
@@ -669,7 +669,7 @@
 					array("selected" => array($tocheck),"sqlopts" => array("order" => "name"))).
 				"</select>";
 		}
-		
+
 		public function genContactGroupsList($name,$select = "") {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_contactgroups",
@@ -680,7 +680,7 @@
 			$output .= "</select>";
 			return $output;
 		}
-		
+
 		private function genHostsList($name) {
 			$output = FS::$iMgr->select($name);
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts",
@@ -691,7 +691,7 @@
 			$output .= "</select>";
 			return $output;
 		}
-		
+
 		public function getHostOrGroupList($name,$multi,$selected = array(),$ignore = "",$grouponly = false) {
 			$hostlist = array();
 			if (!$grouponly) {
@@ -724,20 +724,20 @@
 		}
 
 		private function isForbidCmd($cmd) {
-			if ($cmd == "rm" || $cmd == "/bin/rm" || $cmd == "ls" || $cmd == "/bin/ls" || $cmd == "cp" || $cmd == "/bin/cp" || $cmd == "mv" || $cmd == "/bin/mv") 
+			if ($cmd == "rm" || $cmd == "/bin/rm" || $cmd == "ls" || $cmd == "/bin/ls" || $cmd == "cp" || $cmd == "/bin/cp" || $cmd == "mv" || $cmd == "/bin/mv")
 				return true;
 
 			return false;
 		}
-				
+
 		public function loadFooterPlugin() {
 			// Only users with icinga read right can use this module
 			if (FS::$sessMgr->hasRight("mrule_icinga_read")) {
 				$pluginTitle = $this->loc->s("Monitor");
 				$pluginContent = "";
-				
+
 				// First we look at sensor problems
-				
+
 				$totalIcingaSensors = 0;
 				$totalIcingaWarns = 0;
 				$totalIcingaCrits = 0;
@@ -762,7 +762,7 @@
 									else if ($svalues["current_state"] == 2) {
 										$totalIcingaCrits++;
 									}
-										
+
 									$totalIcingaHS++;
 								}
 							}
@@ -779,7 +779,7 @@
 						}
 					}
 				}
-				
+
 				// If there are bad sensors
 				if ($totalIcingaHS > 0) {
 					// If there are crits
@@ -819,7 +819,7 @@
 			switch($el) {
 				case 1: return FS::$iMgr->printError("err-no-timeperiod");
 				case 2: return FS::$iMgr->printError("err-no-contactgroups");
-				case 3: 
+				case 3:
 					return (new icingaHost())->showForm();
 				case 4:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
@@ -830,18 +830,18 @@
 					if (!$hostexist) {
 						return FS::$iMgr->printError("err-no-hosts");
 					}
-					
+
 					return $this->showHostgroupForm();
 				case 5:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 						return FS::$iMgr->printError("err-no-rights");
 					}
-						
+
 					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 					if ($tpexist) {
 						return (new icingaService())->showForm();
 					}
-					
+
 					return FS::$iMgr->printError("err-no-timeperiods");
 				case 6:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
@@ -936,18 +936,18 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
 						return $this->loc->s("err-no-rights");
 					}
-					
+
 					return (new icingaNotificationStrategy())->showForm();
 				case 20:
 					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
 						return $this->loc->s("err-no-rights");
 					}
-					
+
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
 						return $this->loc->s("err-bad-datas");
 					}
-					
+
 					return (new icingaNotificationStrategy())->showForm($name);
 				default: return;
 			}
@@ -960,36 +960,39 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 						echo $this->loc->s("err-no-right");
 						return;
-					} 
+					}
 
 					$cmdname = FS::$secMgr->checkAndSecurisePostData("name");
 					$cmd = FS::$secMgr->checkAndSecurisePostData("cmd");
 					$comment = FS::$secMgr->checkAndSecurisePostData("comment");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
-					
+
 					if (!$cmdname || !$cmd || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$cmdname) || $edit && $edit != 1) {
 						echo $this->loc->s("err-bad-data");
 						return;
 					}
 
 					if ($edit) {
-						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
+						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands",
+							"cmd","name = '".$cmdname."'")) {
 							echo $this->loc->s("err-not-found");
 							return;
 						}
 					}
-					else if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
+					else if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands",
+						"cmd","name = '".$cmdname."'")) {
 						echo $this->loc->s("err-data-exist");
 						return;
 					}
-					
-					// Verify if it's a system command and forbid if it's a system command		
-					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","syscmd","name = '".$cmdname."'");
+
+					// Verify if it's a system command and forbid if it's a system command
+					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands",
+						"syscmd","name = '".$cmdname."'");
 					if ($sysCmd == 't') {
 						FS::$iMgr->ajaxEchoError("err-cannot-modify-system-command");
 						return;
 					}
-					
+
 					$tmpcmd = preg_replace("#\\\$USER1\\\$#","/usr/local/libexec/nagios/",$cmd);
 					$tmpcmd = preg_split("#[ ]#",$tmpcmd);
 					$out = "";
@@ -997,19 +1000,21 @@
 					if (!is_array($out) || count($out) != 1 || $out[0] != 0 || $this->isForbidCmd($tmpcmd[0])) {
 						FS::$iMgr->ajaxEchoError("err-binary-not-found");
 						return;
-					} 
+					}
 
 					FS::$dbMgr->BeginTr();
-					
+
 					if ($edit) {
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands",
+							"name = '".$cmdname."'");
 					}
-					
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_commands","name,cmd,cmd_comment",
+
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_commands",
+						"name,cmd,cmd_comment",
 						"'".$cmdname."','".$cmd."','".$comment."'");
-						
+
 					FS::$dbMgr->CommitTr();
-					
+
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
@@ -1021,7 +1026,7 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
-					} 
+					}
 
 					// @TODO forbid remove when use (host + service)
 					$cmdname = FS::$secMgr->checkAndSecuriseGetData("cmd");
@@ -1029,31 +1034,36 @@
 						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
-					
-					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","cmd","name = '".$cmdname."'")) {
+
+					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands",
+						"cmd","name = '".$cmdname."'")) {
 						FS::$iMgr->ajaxEchoErrorNC("err-data-not-exist");
 						return;
 					}
 
-					// Verify if it's a system command and forbid if it's a system command		
-					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands","syscmd","name = '".$cmdname."'");
+					// Verify if it's a system command and forbid if it's a system command
+					$sysCmd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands",
+						"syscmd","name = '".$cmdname."'");
 					if ($sysCmd == 't') {
 						FS::$iMgr->ajaxEchoError("err-cannot-modify-system-command");
 						return;
 					}
-					
+
 					// Forbid remove if command is used
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","srvcmd = '".$cmdname."'")) {
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
+						"name","srvcmd = '".$cmdname."'")) {
 						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
-					
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","name","hostcmd = '".$cmdname."'")) {
+
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
+						"name","hostcmd = '".$cmdname."'")) {
 						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
-					
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands","name = '".$cmdname."'");
+
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_commands",
+						"name = '".$cmdname."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEchoErrorNC("err-fail-writecfg");
 						return;
@@ -1065,8 +1075,8 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 						echo $this->loc->s("err-no-right");
 						return;
-					} 
-			
+					}
+
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
@@ -1091,9 +1101,9 @@
 					$suhs = FS::$secMgr->getPost("suhs","n+=");
 					$sums = FS::$secMgr->getPost("sums","n+=");
 
-					if ($mhs == NULL || $mms == NULL || $tuhs == NULL || $tums == NULL || $whs == NULL || $wms == NULL || 
-						$thhs == NULL || $thms == NULL || $fhs == NULL || $fms == NULL || $sahs == NULL || $sams == NULL || 
-						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 || 
+					if ($mhs == NULL || $mms == NULL || $tuhs == NULL || $tums == NULL || $whs == NULL || $wms == NULL ||
+						$thhs == NULL || $thms == NULL || $fhs == NULL || $fms == NULL || $sahs == NULL || $sams == NULL ||
+						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 ||
 						$whs > 23 || $wms > 59 || $thhs > 23 || $thms > 59 || $fhs > 23 || $fms > 59 || $sahs > 23 || $sams > 59 ||
 						$suhs > 23 || $sums > 59) {
 						echo $this->loc->s("err-bad-data");
@@ -1115,9 +1125,9 @@
 					$suhe = FS::$secMgr->getPost("suhe","n+=");
 					$sume = FS::$secMgr->getPost("sume","n+=");
 
-					if ($mhe == NULL || $mme == NULL || $tuhe == NULL || $tume == NULL || $whe == NULL || $wme == NULL || 
-						$thhe == NULL || $thme == NULL || $fhe == NULL || $fme == NULL || $sahe == NULL || $same == NULL || 
-						$suhe == NULL || $sume == NULL || $mhe > 23 || $mme > 59 || $tuhe > 23 || $tume > 59 || 
+					if ($mhe == NULL || $mme == NULL || $tuhe == NULL || $tume == NULL || $whe == NULL || $wme == NULL ||
+						$thhe == NULL || $thme == NULL || $fhe == NULL || $fme == NULL || $sahe == NULL || $same == NULL ||
+						$suhe == NULL || $sume == NULL || $mhe > 23 || $mme > 59 || $tuhe > 23 || $tume > 59 ||
 						$whe > 23 || $wme > 59 || $thhe > 23 || $thme > 59 || $fhe > 23 || $fme > 59 || $sahe > 23 || $same > 59 ||
 						$suhe > 23 || $sume > 59) {
 						echo $this->loc->s("err-bad-data");
@@ -1129,16 +1139,18 @@
 						echo $this->loc->s("err-bad-data");
 						return;
 					}
-							 
+
 
 					if ($edit) {
-						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$name."'")) {
+						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods",
+							"alias","name = '".$name."'")) {
 							echo $this->loc->s("err-data-not-exist");
 							return;
 						}
 					}
 					else {
-						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$name."'")) {
+						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods",
+							"alias","name = '".$name."'")) {
 							echo $this->loc->s("err-data-exist");
 							return;
 						}
@@ -1159,36 +1171,41 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
-					} 
+					}
 
 					$tpname = FS::$secMgr->checkAndSecuriseGetData("tp");
 					if (!$tpname) {
 						FS::$iMgr->ajaxEchoErrorNC("err-bad-data");
 						return;
 					}
-					
-					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","alias","name = '".$tpname."'")) {
+
+					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods",
+						"alias","name = '".$tpname."'")) {
 						FS::$iMgr->ajaxEchoErrorNC("err-bad-data");
 						return;
 					}
-					
+
 					// Forbid remove if timeperiod is used
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_notif_strategy","name","period = '".$tpname."'")) {
-						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
-						return;
-					}
-					
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","checkperiod = '".$tpname."'")) {
-						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
-						return;
-					}
-					
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","checkperiod = '".$tpname."'")) {
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_notif_strategy",
+						"name","period = '".$tpname."'")) {
 						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
 						return;
 					}
 
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_timeperiods","name = '".$tpname."'");
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts",
+						"name","checkperiod = '".$tpname."'")) {
+						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
+						return;
+					}
+
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services",
+						"name","checkperiod = '".$tpname."'")) {
+						FS::$iMgr->ajaxEchoErrorNC("err-binary-used");
+						return;
+					}
+
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_timeperiods",
+						"name = '".$tpname."'");
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
@@ -1204,27 +1221,27 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
-					} 
+					}
 
 					$ctname = FS::$secMgr->checkAndSecuriseGetData("ct");
 					if (!$ctname) {
 						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
-					
+
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts","mail","name = '".$ctname."'")) {
 						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
-					
+
 					// Forbid remove if in existing contact group
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroup_members","name","member = '".$ctname."'")) {
 						FS::$iMgr->ajaxEchoError("err-contact-used");
 						return;
 					}
-					
+
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_contacts","name = '".$ctname."'");
-					
+
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
@@ -1256,26 +1273,28 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
-					} 
+					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if (!$name) {
 						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
-					
+
 					// Not exists
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","name = '".$name."'")) {
 						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
-					
+
 					// membertype 1 = service, 2 = servicegroup
 					FS::$dbMgr->BeginTr();
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_servicegroups","member = '".$name."' AND membertype = 1");
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_services","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_servicegroups",
+						"member = '".$name."' AND membertype = 1");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_services",
+						"name = '".$name."'");
 					FS::$dbMgr->CommitTr();
-					
+
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
@@ -1287,7 +1306,7 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
-					} 
+					}
 
 					$name = FS::$secMgr->checkAndSecurisePostData("name");
 					$alias = FS::$secMgr->checkAndSecurisePostData("alias");
@@ -1297,26 +1316,30 @@
 						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
-					
+
 					if ($edit) {
-						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
+						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups",
+							"name","name = '".$name."'")) {
 							FS::$iMgr->ajaxEchoError("err-data-not-exist");
 							return;
 						}
 					}
 					else {
-						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
+						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups",
+							"name","name = '".$name."'")) {
 							FS::$iMgr->ajaxEchoErrorNC("err-data-exist");
 							return;
 						}
 					}
-					
+
 					FS::$dbMgr->BeginTr();
 					if ($members) {
 						$count = count($members);
 						for ($i=0;$i<$count;$i++) {
 							$mt = preg_split("#[$]#",$members[$i]);
-							if (count($mt) != 2 && !FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","name = '".$mt[1]."'")) {
+							if (count($mt) != 2 &&
+								!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts",
+									"name","name = '".$mt[1]."'")) {
 								FS::$iMgr->ajaxEchoError("err-bad-data");
 								return;
 							}
@@ -1338,17 +1361,19 @@
 					}
 
 					if ($edit) {
-						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups","name = '".$name."'");
+						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups",
+							"name = '".$name."'");
 					}
-					
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroups","name,alias","'".$name."','".$alias."'");
+
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."icinga_hostgroups",
+						"name,alias","'".$name."','".$alias."'");
 					FS::$dbMgr->CommitTr();
-					
+
 					if (!$this->icingaAPI->writeConfiguration()) {
 						FS::$iMgr->ajaxEchoError("err-fail-writecfg");
 						return;
 					}
-					
+
 					FS::$iMgr->redir("mod=".$this->mid."&sh=3",true);
 					return;
 				// remove hostgroup
@@ -1356,7 +1381,7 @@
 					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
-					} 
+					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("hg");
 					if (!$name) {
@@ -1365,22 +1390,27 @@
 					}
 
 					// Not exists
-					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups","name","name = '".$name."'")) {
+					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hostgroups",
+						"name","name = '".$name."'")) {
 						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
 					// Used
-					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services","name","host = '".$name."' AND hosttype = '2'")) {
+					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services",
+						"name","host = '".$name."' AND hosttype = '2'")) {
 						FS::$iMgr->ajaxEchoError("err-hg-used");
 						return;
 					}
 
 					// Delete hostgroup and members
 					FS::$dbMgr->BeginTr();
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","name = '".$name."'");
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members","host = '".$name."' AND hosttype = '2'");
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups","name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members",
+						"name = '".$name."'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroup_members",
+						"host = '".$name."' AND hosttype = '2'");
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."icinga_hostgroups",
+						"name = '".$name."'");
 					FS::$dbMgr->CommitTr();
 
 					if (!$this->icingaAPI->writeConfiguration()) {
@@ -1402,8 +1432,8 @@
 
 		private $icingaAPI;
 	};
-	
+
 	}
-	
+
 	$module = new iIcinga();
 ?>
