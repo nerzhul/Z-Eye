@@ -70,7 +70,7 @@
 			$this->secMgr->SecuriseString($id);
 			$this->secMgr->SecuriseString($data);
 
-			// Connect is required 
+			// Connect is required
 			$this->connectDBIfNot();
 
 			$this->dbMgr->BeginTr();
@@ -83,7 +83,7 @@
 		public function shdestroy($id) {
 			FS::$secMgr->SecuriseString($id);
 
-			// Connect is required 
+			// Connect is required
 			$this->connectDBIfNot();
 			$this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","id = '".$id."'");
 			return true;
@@ -92,7 +92,7 @@
 		public function shgc($max) {
 			$limit = time() - intval($max);
 
-			// Connect is required 
+			// Connect is required
 			$this->connectDBIfNot();
 			return $this->dbMgr->Delete(PgDbConfig::getDbPrefix()."sessions","timestamp < '".$limit."'");
 		}
@@ -118,7 +118,7 @@
 				$this->dbMgr->Connect();
 			}
 		}
-		
+
 		public function InitSessionIfNot() {
 			if (!isset($_SESSION["uid"])) {
 				$_SESSION["uid"] = 0;
@@ -140,34 +140,34 @@
 				$IP = $_SERVER['REMOTE_ADDR'] ;
 			return $IP;
 		}
-		
+
 		public function getUserAgent() {
 			return $_SERVER['HTTP_USER_AGENT'];
 		}
-		
+
 		public function getURI() {
 			return $_SERVER['REQUEST_URI'];
 		}
-		
+
 		public function getBrowserLang() {
 			$lang = Config::getSysLang();
 			$tmp = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			$lang = strtolower(substr(chop($tmp[0]),0,2));
 			return $lang;
 		}
-		
-		public function getUid() { 
+
+		public function getUid() {
 			if (isset($_SESSION["uid"])) {
 				return $_SESSION["uid"];
 			}
 			return NULL;
 		}
-		
+
 		public function getIdleTimer() {
 			if (isset($_SESSION["idle_timer"])) {
 				return $_SESSION["idle_timer"];
 			}
-			
+
 			return (Config::getSessionExpirationTime() / 60);
 		}
 
@@ -188,8 +188,9 @@
 		}
 
 		public function getGroups() {
-			if (is_array($this->groupBuf) && count($this->groupBuf) > 0)
+			if (is_array($this->groupBuf) && count($this->groupBuf) > 0) {
 				return $this->groupBuf;
+			}
 
 			$this->groupBuf = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$this->getUid()."'");
@@ -212,20 +213,23 @@
 
 		public function isInGroup($gname) {
 			$gid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gid","gname = '".$gname."'");
-			if (in_array($gid,$this->getGroups()))
+			if (in_array($gid,$this->getGroups())) {
 				return true;
+			}
 			return false;
 		}
 
 		public function isInGIDGroup($gid) {
-			if (in_array($gid,$this->getGroups()))
+			if (in_array($gid,$this->getGroups())) {
 				return true;
+			}
 			return false;
 		}
 
 		public function hasRight($rulename) {
-			if ($this->getUid() == 1 || $this->isInGIDGroup(1))
+			if ($this->getUid() == 1 || $this->isInGIDGroup(1)) {
 				return true;
+			}
 
 			$groups = $this->getGroups();
 			$count = count($groups);
