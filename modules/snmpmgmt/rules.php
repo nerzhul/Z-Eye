@@ -31,11 +31,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_snmpmgmt_read")) {
+
+			if (FS::$sessMgr->hasRight("read","snmpmgmt")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

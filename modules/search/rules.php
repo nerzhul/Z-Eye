@@ -31,8 +31,8 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if(FS::$sessMgr->hasRight("mrule_search_read")) {
+
+			if(FS::$sessMgr->hasRight("read","search")) {
 				return true;
 			}
 			return false;

@@ -36,11 +36,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if(FS::$sessMgr->hasRight("mrule_switches_read")) {
+
+			if(FS::$sessMgr->hasRight("read","switchmgmt")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

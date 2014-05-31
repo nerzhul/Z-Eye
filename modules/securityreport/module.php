@@ -19,9 +19,9 @@
 
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
-	
+
 	if(!class_exists("iSecReport")) {
-	
+
 	final class iSecReport extends FSModule {
 		function __construct() {
 			parent::__construct();
@@ -60,29 +60,29 @@
 			$showmodule = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$ech = FS::$secMgr->checkAndSecuriseGetData("ech");
 			if ($ech == NULL) $ech = 7;
-			
+
 			$ec = FS::$secMgr->checkAndSecuriseGetData("ec");
 			if (!FS::$secMgr->isNumeric($ec)) $ec = 365;
 			if ($ec == NULL) $ec = 365;
-			
+
 			$shscan = FS::$secMgr->checkAndSecuriseGetData("sc");
 			if ($shscan == NULL) $shscan = true;
 			else if ($shscan > 0) $shscan = true;
 			else $shscan = false;
-			
+
 			$shtse = FS::$secMgr->checkAndSecuriseGetData("tse");
 			if ($shtse == NULL) $shtse = true;
 			else if ($shtse > 0) $shtse = true;
 			else $shtse = false;
-			
+
 			$shssh = FS::$secMgr->checkAndSecuriseGetData("ssh");
 			if ($shssh == NULL) $shssh = true;
 			else if ($shssh > 0) $shssh = true;
 			else $shssh = false;
-			
+
 			$topmax = FS::$secMgr->checkAndSecuriseGetData("max");
 			if ($topmax == NULL || !FS::$secMgr->isNumeric($topmax) || $topmax < 1) $topmax = 10;
-			
+
 			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->tabPan(array(
 					array(1,"mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
@@ -100,32 +100,32 @@
 					$totaltse = $this->snortDB->Sum(PGDbConfig::getDbPrefix()."collected_ips","tse");
 					$totalssh = $this->snortDB->Sum(PGDbConfig::getDbPrefix()."collected_ips","ssh");
 					$totalatk = $totalscan + $totaltse + $totalssh;
-					
+
 					$output .= $this->loc->s("total-atk").": ".$totalatk."<br />";
 					$output .= $this->loc->s("nb-ip-atk").": ".$totalips."<br />";
 					$output .= $this->loc->s("nb-scan-port").": ".$totalscan."<br />";
 					$output .= $this->loc->s("nb-tse-atk").": ".$totaltse."<br />";
 					$output .= $this->loc->s("nb-ssh-atk").": ".$totalssh."<br /><hr>";
-					
+
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=1");
 					$output .= FS::$iMgr->hidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->numInput("ech",$ech,array("size" => 2, "length" => 2))." jours <br />";
 					$output .= "Echelle: ".FS::$iMgr->numInput("ec",$ec,array("size" => 3, "length" => 3))." jours <br />";
-		
+
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
 					$output .= "<div id=\"atkst\"></div>";
 					$year = date("Y");
 					$month = date("m");
 					$day = date("d");
-		
+
 					$sql_date = $year."-".$month."-".$day." 00:00:00";
 					$fields = "";
-					
+
 					$fields .= ",scans";
 					$fields .= ",tse";
 					$fields .= ",ssh";
-					
+
 					$sqlcalc = "(SELECT '".$sql_date."'::timestamp - '".($ec+15)." day'::interval)";
 					$sql = "select atkdate".$fields." from z_eye_attack_stats where atkdate > ".$sqlcalc." ORDER BY atkdate";
 					$query = $this->snortDB->Select("z_eye_attack_stats","atkdate".$fields,"atkdate > ".$sqlcalc,array("order" => "atkdate"));
@@ -172,14 +172,14 @@
 				else if ($showmodule == 2) {
 					FS::$iMgr->setURL("sh=2");
 					$found = 0;
-					
+
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=2");
 					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
-					
+
 					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." (".$this->loc->s("Scans").")",true)."<table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
-					
+
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,scans","",array("order" => "scans","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
 						if ($found == 0) $found = 1;
@@ -187,7 +187,7 @@
 					}
 					if ($found)
 						$output .= $tmpoutput."</table>";
-						
+
 					$found = 0;
 					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>Date</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,scans","",array("order" => "scans","ordersens" => 1,"limit" => $topmax));
@@ -202,14 +202,14 @@
 				else if ($showmodule == 3) {
 					FS::$iMgr->setURL("sh=3");
 					$found = 0;
-					
+
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=3");
 					$output .= "Maximum: ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
-					
+
 					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." (".$this->loc->s("TSE-atk").")",true)."<table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
-					
+
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,tse","",array("order" => "tse","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
 						if ($found == 0) $found = 1;
@@ -217,7 +217,7 @@
 					}
 					if ($found)
 						$output .= $tmpoutput."</table>";
-						
+
 					$found = 0;
 					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>".$this->loc->s("Date")."<th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,tse","",array("order" => "tse","ordersens" => 1,"limit" => $topmax));
@@ -232,14 +232,14 @@
 				else if ($showmodule == 4) {
 					FS::$iMgr->setURL("sh=4");
 					$found = 0;
-					
+
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=4");
 					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
 					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
 					$output .= "</form>";
-					
+
 					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." (".$this->loc->s("SSH-atk").")",true)."<table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
-					
+
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,ssh","",array("order" => "ssh","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
 						if ($found == 0) $found = 1;
@@ -247,7 +247,7 @@
 					}
 					if ($found)
 						$output .= $tmpoutput."</table>";
-						
+
 					$found = 0;
 					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,ssh","",array("order" => "ssh","ordersens" => 1,"limit" => $topmax));
@@ -282,13 +282,13 @@
 			}
 			return $output;
 		}
-		
+
 		public function loadFooterPlugin() {
 			// Only users with icinga read right can use this module
-			if (FS::$sessMgr->hasRight("mrule_securityreport_read")) {
+			if (FS::$sessMgr->hasRight("read")) {
 				$pluginTitle = $this->loc->s("Security");
 				$pluginContent = "";
-				
+
 				// Load snort keys for db config
 				$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
 				if ($dbname == "") {
@@ -306,21 +306,21 @@
 				if ($dbpwd == "") {
 					$dbpwd = "snort";
 				}
-				
+
 				$snortDB = new AbstractSQLMgr();
 				if ($snortDB->setConfig("pg",$dbname,5432,$dbhost,$dbuser,$dbpwd) == 0) {
 					$snortDB->Connect();
 				}
 				$query = $snortDB->Select("acid_event","sig_name,ip_src,ip_dst","timestamp > (SELECT NOW() - '60 minute'::interval) AND ip_src <> '0'",
 					array("group" => "ip_src,ip_dst,sig_name,timestamp","order" => "timestamp","ordersens" => 1));
-				
+
 				$scannb = 0;
 				$atknb = 0;
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (preg_match("#WEB-ATTACKS#",$data["sig_name"])) {
 						$atknb++;
 					}
-					else if (preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) || 
+					else if (preg_match("#SSH Connection#",$data["sig_name"]) || preg_match("#spp_ssh#",$data["sig_name"]) ||
 						preg_match("#Open Port#",$data["sig_name"]) || preg_match("#MISC MS Terminal server#",$data["sig_name"])) {
 						$atknb++;
 					}
@@ -333,7 +333,7 @@
 				}
 				$securityScore = round((10000-$scannb-2*$atknb)/100);
 				FS::$dbMgr->Connect();
-				
+
 				// If score < 50%: critical
 				if ($securityScore < 50) {
 					$pluginTitle = sprintf("%s: %s%% %s",
@@ -350,7 +350,7 @@
 						FS::$iMgr->img("/styles/images/monitor-warn.png",15,15)
 					);
 				}
-				// 
+				//
 				else {
 					$pluginTitle = sprintf("%s: %s%% %s",
 						$this->loc->s("Security"),
@@ -362,7 +362,7 @@
 				$this->registerFooterPlugin($pluginTitle, $pluginContent);
 			}
 		}
-		
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
@@ -380,8 +380,8 @@
 
 		private $snortDB;
 	};
-	
+
 	}
-	
+
 	$module = new iSecReport();
 ?>

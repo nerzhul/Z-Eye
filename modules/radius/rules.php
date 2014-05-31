@@ -34,11 +34,12 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if(FS::$sessMgr->hasRight("mrule_radius_read") || FS::$sessMgr->hasRight("mrule_radius_deleg")) {
+
+			if(FS::$sessMgr->hasRight("read","radius") ||
+				FS::$sessMgr->hasRight("deleg","radius")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

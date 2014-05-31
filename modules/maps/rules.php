@@ -31,11 +31,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_netspeed_read")) {
+
+			if (FS::$sessMgr->hasRight("read","netspeed")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

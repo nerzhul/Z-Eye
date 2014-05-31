@@ -24,7 +24,7 @@
 	require_once(dirname(__FILE__)."/objects.php");
 
 	if(!class_exists("iRadius")) {
-		
+
 	final class iRadius extends FSModule {
 		function __construct() {
 			parent::__construct();
@@ -42,7 +42,7 @@
 			$output = "";
 
 			if (!FS::isAjaxCall()) {
-				if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
+				if (FS::$sessMgr->hasRight("deleg") && FS::$sessMgr->getUid() != 1) {
 					$output .= FS::$iMgr->h1("title-deleg");
 					FS::$iMgr->setTitle($this->loc->s("title-deleg"));
 				}
@@ -60,11 +60,11 @@
 
 			if (!FS::isAjaxCall()) {
 				$edit = FS::$secMgr->checkAndSecuriseGetData("edit");
-				if ($edit && FS::$sessMgr->hasRight("mrule_radius_manage")) {
+				if ($edit && FS::$sessMgr->hasRight("manage")) {
 					$output .= $this->showCreateOrEditRadiusDB(false);
 				}
 				else {
-					if (FS::$sessMgr->hasRight("mrule_radius_manage")) {
+					if (FS::$sessMgr->hasRight("manage")) {
 						FS::$iMgr->setJSBuffer(1);
 						$output .= FS::$iMgr->opendiv(1,$this->loc->s("Manage-radius-db"));
 					}
@@ -72,7 +72,7 @@
 				}
 			}
 			if ($radalias) {
-				if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
+				if (FS::$sessMgr->hasRight("deleg") && FS::$sessMgr->getUid() != 1) {
 					$output .= $this->showDelegTool($radalias);
 				}
 				else {
@@ -104,7 +104,7 @@
 				if ($found == false) {
 					$found = true;
 				}
-				
+
 				$tmpoutput .= "<tr id=\"".preg_replace("#[.]#","-",$data["dbname"].$data["addr"].$data["port"])."\"><td>".
 					FS::$iMgr->aLink($this->mid."&edit=1&addr=".$data["addr"]."&pr=".$data["port"]."&db=".$data["dbname"], $data["addr"]);
 				$tmpoutput .= "</td><td>".$data["port"]."</td><td>";
@@ -117,10 +117,10 @@
 				$tmpoutput .= "</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>";
 				$tmpoutput .= "<td><div id=\"radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."\">".
 					FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>";
-					
+
 				FS::$iMgr->js("$.post('?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
 					$('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
-				
+
 				$tmpoutput .= "</td><td>".
 					FS::$iMgr->removeIcon(14,"alias=".$data["radalias"],
 						array("js" => true,
@@ -220,7 +220,7 @@
 					case "my": $dbtype = "MySQL"; break;
 					case "pg": $dbtype = "PgSQL"; break;
 				}
-				
+
 				$output .= FS::$iMgr->idxLine("ip-addr-dns","",array("type" => "raw", "value" => $saddr)).
 					FS::$iMgr->idxLine("Port","",array("type" => "raw", "value" => $sport)).
 					FS::$iMgr->idxLine("db-type","",array("type" => "raw", "value" => $dbtype)).
@@ -250,16 +250,16 @@
 		private function showRadiusList($rad) {
 			$output = "";
 			$found = false;
-			if (FS::$sessMgr->hasRight("mrule_radius_deleg") && FS::$sessMgr->getUid() != 1) {
+			if (FS::$sessMgr->hasRight("deleg") && FS::$sessMgr->getUid() != 1) {
 				$tmpoutput = FS::$iMgr->cbkForm("1").
 					FS::$iMgr->select("ra",array("js" => "submit()"));
-				
+
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","radalias");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = true;
 					}
-					
+
 					$tmpoutput .= FS::$iMgr->selElmt($data["radalias"],$data["radalias"],$rad == $data["radalias"]);
 				}
 				if ($found) {
@@ -272,13 +272,13 @@
 			else {
 				$tmpoutput = FS::$iMgr->cbkForm("1").
 					FS::$iMgr->select("ra",array("js" => "submit()"));
-					
+
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list","dbname,addr,port,radalias");
 	            while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = 1;
 					}
-					
+
 					$radpath = $data["dbname"]."@".$data["addr"].":".$data["port"];
 					$tmpoutput .= FS::$iMgr->selElmt($data["radalias"]." (".$radpath.")",
 						$data["radalias"],$rad == $data["radalias"]);
@@ -391,7 +391,7 @@
 						$('#radd').fadeIn();
 						});
 					}");
-					
+
 					$output .= FS::$iMgr->cbkForm("12","Modification",false,array("id" => "radf")).
 						FS::$iMgr->hidden("ra",$radalias).
 						FS::$iMgr->select("uf",array("js" => "filterRadiusDatas()")).
@@ -401,7 +401,7 @@
 						"</select>".
 						FS::$iMgr->select("ug",array("js" => "filterRadiusDatas()")).
 						FS::$iMgr->selElmt("--".$this->loc->s("Group")."--","",true);
-						
+
 					$query = $radSQLMgr->Select($this->raddbinfos["tradusrgrp"],"distinct groupname");
 					while ($data = $radSQLMgr->Fetch($query)) {
 						$output .= FS::$iMgr->selElmt($data["groupname"],$data["groupname"]);
@@ -432,7 +432,7 @@
 						else
 							$groups[$data["groupname"]] += $rcount;
 					}
-					
+
 					if (count($groups) > 0) {
 						$output .= "<table id=\"radgrp\" style=\"width:30%;\"><tr><th>".$this->loc->s("Group")."</th><th style=\"width:30%\">".
 							$this->loc->s("User-nb")."</th><th></th></tr>";
@@ -480,7 +480,7 @@
 							$('#uptype').hide(); $('#csvtooltip').html('');
 						}
 					};");
-					
+
 					$output .= FS::$iMgr->h3("title-mass-import").
 						FS::$iMgr->cbkForm("6").
 						"<ul class=\"ulform\"><li width=\"100%\">".
@@ -641,7 +641,7 @@
 			$uf = FS::$secMgr->checkAndSecurisePostData("uf");
 			$tmpoutput = "";
 			$expirationbuffer = array();
-			
+
 			if ($this->hasExpirationEnabled()) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_user_expiration",
 					"username,expiration_date","radalias = '".$this->raddbinfos["radalias"]."'");
@@ -651,19 +651,19 @@
 					}
 				}
 			}
-			
+
 			$query = $radSQLMgr->Select($this->raddbinfos["tradcheck"],"id,username,value",
 				"attribute IN ('Auth-Type','Cleartext-Password','User-Password','Crypt-Password','MD5-Password','SHA1-Password','CHAP-Password')".
 				($ug ? " AND username IN (SELECT username FROM radusergroup WHERE groupname = '".$ug."')" : ""));
 			while ($data = $radSQLMgr->Fetch($query)) {
-				if (!$found && (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]) 
+				if (!$found && (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"])
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"]))) {
 					$found = true;
 					$tmpoutput .= "<table id=\"raduser\" style=\"width:70%\"><thead><tr><th class=\"headerSortDown\">Id</th><th>".
 						$this->loc->s("User")."</th><th>".
 						$this->loc->s("Password")."</th><th>".$this->loc->s("Groups")."</th><th>".
 						$this->loc->s("Expiration-Date")."</th><th></th></tr></thead>";
-				}	
+				}
 				if (!$uf || $uf != "mac" && $uf != "other" || $uf == "mac" && preg_match('#^([0-9A-F]{12})$#i', $data["username"])
 					|| $uf == "other" && !preg_match('#^([0-9A-Fa-f]{12})$#i', $data["username"])) {
 					$tmpoutput .= "<tr id=\"rdu_".FS::$iMgr->formatHTMLId($data["username"])."\"><td>".$data["id"]."</td><td>".
@@ -724,7 +724,7 @@
 			}
 			return NULL;
 		}
-		
+
 		private function connectToRaddb($radhost,$radport,$raddb) {
 			// Load some other useful datas from DB
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."radius_db_list",
@@ -761,7 +761,7 @@
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
 				case 1: return $this->showRadiusServerMgmt();
-				case 2: 
+				case 2:
 					$ruObj = new radiusUser();
 					return $ruObj->showForm();
 				case 3:
@@ -815,7 +815,7 @@
 					}
 
 					// For Edition Only, don't delete acct/user-group links
-					
+
 					$radSQLMgr->BeginTr();
 					if ($edit == 1) {
 						$radSQLMgr->Delete($this->raddbinfos["tradgrpchk"],"groupname = '".$groupname."'");
@@ -865,10 +865,10 @@
 							$attrTab[$key]["target"] = $value;
 						}
 					}
-					
+
 					$idxRep = $radSQLMgr->GetMax($this->raddbinfos["tradgrprep"],"id");
 					$idxChk = $radSQLMgr->GetMax($this->raddbinfos["tradgrpchk"],"id");
-					
+
 					foreach ($attrTab as $attrKey => $attrValue) {
 						if (!isset($attrValue["op"])) {
 							FS::$iMgr->ajaxEchoError("err-bad-datas");
@@ -915,10 +915,10 @@
 					$radSQLMgr->Delete("radpostauth","username = '".$username."'");
 					$radSQLMgr->Delete($this->raddbinfos["tradacct"],"username = '".$username."'");
 					$radSQLMgr->CommitTr();
-					
+
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_user_expiration",
 						"radalias = '".$radalias."' AND username ='".$username."'");
-						
+
 					$this->log(0,"User '".$username."' removed");
 					FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#rdu_".FS::$iMgr->formatHTMLId($username)."');");
 					return;
@@ -984,7 +984,7 @@
 							$groupfound = $radSQLMgr->GetOneData($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$group."'");
 						}
 					}
-					
+
 					FS::$dbMgr->BeginTr();
 					if ($utype == 1) {
 						$userlist = str_replace('\r','\n',$userlist);
@@ -1003,13 +1003,13 @@
 							}
 							$fmtuserlist[$tmp[0]] = $tmp[1];
 						}
-						
+
 						// For pgsql compat
 						$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
 						$maxIdChk++;
-				
+
 						FS::$dbMgr->BeginTr();
-						
+
 						$userfound = 0;
 						foreach ($fmtuserlist as $user => $upwd) {
 							switch($pwdtype) {
@@ -1029,7 +1029,7 @@
 								$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
 									"'".$maxIdChk."','".$user."','".$attr."',':=','".$value."'");
 							}
-							
+
 							if ($groupfound) {
 								$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["tradusrgrp"],"groupname",
 									"username = '".$user."' AND groupname = '".$group."'");
@@ -1039,7 +1039,7 @@
 								}
 							}
 						}
-						
+
 						FS::$dbMgr->CommitTr();
 						if ($userfound) {
 							$this->log(2,"Some users are already found for mass import");
@@ -1071,11 +1071,11 @@
 							$userlist[$i] = preg_replace("#[:-]#","",$userlist[$i]);
 							$userlist[$i] = strtolower($userlist[$i]);
 						}
-						
+
 						// For pgsql compat
 						$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
 						$maxIdChk++;
-						
+
 						// Delete duplicate entries
 						$userlist = array_unique($userlist);
 						$userfound = 0;
@@ -1089,7 +1089,7 @@
 							else {
 								$userfound = 1;
 							}
-							
+
 							if ($groupfound) {
 								$usergroup = $radSQLMgr->GetOneData($this->raddbinfos["tradusrgrp"],"groupname","username = '".$userlist[$i]."' AND groupname = '".$group."'");
 								if (!$usergroup) {
@@ -1195,7 +1195,7 @@
 					}
 
 					$cleanradenable = FS::$secMgr->checkAndSecurisePostData("cleanradsqlenable");
-					
+
 					$radhost = $this->raddbinfos["addr"];
 					$radport = $this->raddbinfos["port"];
 					$raddb = $this->raddbinfos["dbname"];
@@ -1226,28 +1226,28 @@
 						echo FS::$iMgr->printError("err-invalid-auth-server");
 						return;
 					}
-					if (!$name || !$surname || !$username || !$valid || !$profil || 
+					if (!$name || !$surname || !$username || !$valid || !$profil ||
 						($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0 ||
-						!FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate) 
+						!FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate)
 					))) {
 						$this->log(2,"Some fields are missing for radius deleg (datas)");
 						echo FS::$iMgr->printError("err-field-missing");
 						return;
 					}
-					
+
 					// Add initial zeros
 					if ($limms < 10) {
 						$limms = "0".$limms;
 					}
-					
+
 					if ($limhs < 10) {
 						$limhs = "0".$limhs;
 					}
-					
+
 					if ($limme < 10) {
 						$limme = "0".$limme;
 					}
-					
+
 					if ($limhe < 10) {
 						$limhe = "0".$limhe;
 					}
@@ -1270,19 +1270,19 @@
 					if (!$exist) {
 						$exist = $radSQLMgr->GetOneData($this->raddbinfos["tradreply"],"id","username = '".$username."'");
 					}
-					
+
 					if ($exist) {
 						$this->log(1,"User '".$username."' already exists (Deleg)");
 						echo FS::$iMgr->printError("err-no-user");
 						return;
 					}
-					
+
 					// For pgsql compat
 					$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
 					$maxIdChk++;
 
 					$password = FS::$secMgr->genRandStr(8);
-					
+
 					$radSQLMgr->BeginTr();
 					$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
 						"'".$maxIdChk."','".$username."','Cleartext-Password',':=','".$password."'");
@@ -1313,44 +1313,44 @@
 					$limms = FS::$secMgr->checkAndSecurisePostData("limmins2");
 					$limhe = FS::$secMgr->checkAndSecurisePostData("limhoure2");
                     $limme = FS::$secMgr->checkAndSecurisePostData("limmine2");
-                    
+
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for massive creation (Deleg) (radius server)");
 						echo FS::$iMgr->printError("err-invalid-auth-server");
 						return;
-					}					
+					}
 
 					if (!$typegen || $typegen == 2 && !$prefix || !$nbacct || !$valid || !$profil
-						|| ($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0 
+						|| ($valid == 2 && (!$sdate || !$edate || $limhs < 0 || $limms < 0 || $limhe < 0 || $limme < 0
 						|| !FS::$secMgr->isNumeric($nbacct) || $nbacct <= 0 || !FS::$secMgr->isNumeric($limhs)
-						|| !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) 
+						|| !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe)
 						|| !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate)
 					))) {
 						$this->log(2,"Some fields are missing or invalid for massive creation (Deleg) (datas)");
 						echo FS::$iMgr->printError("err-field-missing");
 							return;
 					}
-					
+
 					// Add initial zeros
 					if ($limms < 10) {
 						$limms = "0".$limms;
 					}
-					
+
 					if ($limhs < 10) {
 						$limhs = "0".$limhs;
 					}
-					
+
 					if ($limme < 10) {
 						$limme = "0".$limme;
 					}
-					
+
 					if ($limhe < 10) {
 						$limhe = "0".$limhe;
 					}
-					
+
 					$sdate = ($valid == 2 ? date("y-m-d",strtotime($sdate))." ".$limhs.":".$limms.":00" : "");
 			        $edate = ($valid == 2 ? date("y-m-d",strtotime($edate))." ".$limhe.":".$limme.":00" : "");
-			        
+
 					if (strtotime($sdate) > strtotime($edate)) {
 						echo FS::$iMgr->printError("err-end-before-start");
 						return;
@@ -1365,12 +1365,12 @@
 
 					// For pgsql compat
 					$maxIdChk = $radSQLMgr->GetMax($this->raddbinfos["tradcheck"],"id");
-					
+
 					$pdf = new PDFgen();
 					$pdf->SetTitle($this->loc->s("Account").": ".($valid == 1 ? $this->loc->s("Permanent") : $this->loc->s("Temporary")));
 					for ($i=0;$i<$nbacct;$i++) {
 						$maxIdChk++;
-						
+
 						$password = FS::$secMgr->genRandStr(8);
 						if ($typegen == 2) {
 							$username = $prefix.($i+1);
@@ -1382,13 +1382,13 @@
 						$radSQLMgr->BeginTr();
 						$radSQLMgr->Insert($this->raddbinfos["tradcheck"],"id,username,attribute,op,value",
 							"'".$maxIdChk."','".$username."','Cleartext-Password',':=','".$password."'");
-							
+
 						if ($this->hasExpirationEnabled()) {
 							FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_user_expiration",
 								"radalias,username,expiration_date,name,surname,start_date,creator,creation_date",
 								"'".$radalias."','".$username."','".$edate."','".$name."','".$surname."','".$sdate."','".FS::$sessMgr->getUid()."',NOW()");
 						}
-						
+
 						$radSQLMgr->Insert($this->raddbinfos["tradusrgrp"],"username,groupname,priority","'".$username."','".$profil."',0");
 						$radSQLMgr->CommitTr();
 
@@ -1420,7 +1420,7 @@
 					return;
 				// Add/Edit radius db
 				case 13:
-					if (!FS::$sessMgr->hasRight("mrule_radius_manage")) {
+					if (!FS::$sessMgr->hasRight("manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
@@ -1447,7 +1447,7 @@
 						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
-					
+
 					$sdbtype = "";
 					if ($edit) {
 						// Check if DB exists
@@ -1457,7 +1457,7 @@
 							FS::$iMgr->ajaxEchoError("err-not-exist");
 							return;
 						}
-						
+
 						$sdbtype = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list",
 							"dbtype","radalias ='".$salias."'");
 					}
@@ -1471,14 +1471,14 @@
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradcheck) ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradacct) ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradreply) ||
-						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) || 
+						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrpchk) ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradgrprep) ||
 						!preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$tradusrgrp)) {
 						$this->log(2,"Some fields are missing or wrong for radius db adding");
 						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
-	
+
 					// @TODO: test table exist on db
 
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."radius_db_list","radalias",
@@ -1486,7 +1486,7 @@
 						FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-alias-already-used"),$salias),"",true);
 						return;
 					}
-						
+
 					if ($edit) {
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list","addr = '".$saddr."' AND port = '".$sport."' AND dbname = '".$sdbname."'");
 					}
@@ -1498,7 +1498,7 @@
 							return;
 						}
 					}
-					
+
 					$testDBMgr = new AbstractSQLMgr();
 					$testDBMgr->setConfig($sdbtype,$sdbname,$sport,$saddr,$slogin,$spwd);
 
@@ -1508,7 +1508,7 @@
 						return;
 					}
 					FS::$dbMgr->Connect();
-					
+
 					$this->log(0,"Added radius DB ".$sdbname."@".$saddr.":".$sport);
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."radius_db_list",
 						"addr,port,dbname,dbtype,login,pwd,radalias,tradcheck,tradreply,tradgrpchk,tradgrprep,tradusrgrp,tradacct",
@@ -1518,7 +1518,7 @@
 					break;
 				// Remove radius db
 				case 14:
-					if (!FS::$sessMgr->hasRight("mrule_radius_manage")) {
+					if (!FS::$sessMgr->hasRight("manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
@@ -1530,7 +1530,7 @@
 							$saddr = $data["addr"];
 							$sport = $data["port"];
 							$sdbname = $data["dbname"];
-							
+
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_db_list",
 								"radalias = '".$salias."'");
 							FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."radius_dhcp_import",
@@ -1538,7 +1538,7 @@
 
 							FS::$iMgr->ajaxEchoOK("Done","hideAndRemove('#".
 								preg_replace("#[.]#","-",$$data["dbname"].$$data["addr"].$data["port"])."');");
-							
+
 							$this->log(0,"Remove Radius DB ".$salias. "(".$data["dbname"]."@".$data["addr"].":".$data["port"].")");
 							return;
 						}
@@ -1554,21 +1554,21 @@
 						echo "<span style=\"color:red;\">".$this->loc->s("Error")."#1</span>";
 						return;
 					}
-					
+
 					if ($radSQLMgr = $this->connectToRaddb($saddr,$sport,$sdbname)) {
 						echo "<span style=\"color:green;\">".$this->loc->s("OK")."</span>";
 					}
-					else {	
+					else {
 						echo "<span style=\"color:red;\">".$this->loc->s("Error")."</span>";
 					}
 			}
 
 		}
-	
+
 		private $raddbinfos;
 	};
-	
+
 	}
-	
+
 	$module = new iRadius();
 ?>

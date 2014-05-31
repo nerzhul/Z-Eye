@@ -29,8 +29,8 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_read")) {
+
+			if (FS::$sessMgr->hasRight("read","dnsmgmt")) {
 				return true;
 			}
 			return false;

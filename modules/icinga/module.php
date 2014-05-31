@@ -47,35 +47,35 @@
 				$output .= FS::$iMgr->h1("title-icinga");
 				$panElmts = array();
 				$panElmts[] = array(1,"mod=".$this->mid,$this->loc->s("General"));
-				if (FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
+				if (FS::$sessMgr->hasRight("host_write")) {
 					$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("Hosts"));
 				}
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+				if (FS::$sessMgr->hasRight("hg_write")) {
 					$panElmts[] = array(3,"mod=".$this->mid,$this->loc->s("Hostgroups"));
 				}
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+				if (FS::$sessMgr->hasRight("srv_write")) {
 					$panElmts[] = array(4,"mod=".$this->mid,$this->loc->s("Services"));
 				}
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+				if (FS::$sessMgr->hasRight("tp_write")) {
 					$panElmts[] = array(5,"mod=".$this->mid,$this->loc->s("Timeperiods"));
 				}
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
+				if (FS::$sessMgr->hasRight("notif_write")) {
 					$panElmts[] = array(9,"mod=".$this->mid,$this->loc->s("Notification-strategies"));
 				}
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+				if (FS::$sessMgr->hasRight("ct_write")) {
 					$panElmts[] = array(6,"mod=".$this->mid,$this->loc->s("Contacts"));
 				}
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
+				if (FS::$sessMgr->hasRight("ctg_write")) {
 					$panElmts[] = array(7,"mod=".$this->mid,$this->loc->s("Contactgroups"));
 				}
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+				if (FS::$sessMgr->hasRight("cmd_write")) {
 					$panElmts[] = array(8,"mod=".$this->mid,$this->loc->s("Commands"));
 				}
 
@@ -110,7 +110,7 @@
 		private function showHostsTab() {
 			FS::$iMgr->setURL("sh=2");
 
-			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+			if (!FS::$sessMgr->hasRight("cmd_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 
@@ -155,7 +155,7 @@
 
 				$output .= "<tr id=\"h_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_host_write")) {
+				if (FS::$sessMgr->hasRight("host_write")) {
 					$output .= FS::$iMgr->opendiv(10,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				}
 				else {
@@ -200,12 +200,12 @@
 
 		private function showHostgroupsTab() {
 			FS::$iMgr->setURL("sh=3");
-			if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+			if (!FS::$sessMgr->hasRight("hg_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 			$output = "";
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+			if (FS::$sessMgr->hasRight("hg_write")) {
 				$output .= FS::$iMgr->opendiv(4,$this->loc->s("new-hostgroup"));
 			}
 
@@ -219,7 +219,7 @@
 				}
 				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_hg_write"))
+				if (FS::$sessMgr->hasRight("hg_write"))
 					$output .= FS::$iMgr->opendiv(11,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
@@ -275,13 +275,13 @@
 		private function showServicesTab() {
 			FS::$iMgr->setURL("sh=4");
 
-			if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+			if (!FS::$sessMgr->hasRight("srv_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 
 			$output = "";
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+			if (FS::$sessMgr->hasRight("srv_write")) {
 				$output .= FS::$iMgr->opendiv(5,$this->loc->s("new-service"));
 			}
 
@@ -296,7 +296,7 @@
 				}
 				$output .= "<tr id=\"srv_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+				if (FS::$sessMgr->hasRight("srv_write")) {
 					$output .= FS::$iMgr->opendiv(12,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				}
 				else {
@@ -335,7 +335,7 @@
 		private function showTimeperiodsTab() {
 			FS::$iMgr->setURL("sh=5");
 
-			if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+			if (!FS::$sessMgr->hasRight("tp_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 			$output = "";
@@ -345,7 +345,7 @@
 			 * @TODO: support for multiple times in one day, and calendar days
 			 */
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+			if (FS::$sessMgr->hasRight("tp_write")) {
 				$output .= FS::$iMgr->opendiv(6,$this->loc->s("new-timeperiod"));
 			}
 
@@ -364,7 +364,7 @@
 				}
 				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+				if (FS::$sessMgr->hasRight("tp_write")) {
 					$output .= FS::$iMgr->opendiv(13,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				}
 				else {
@@ -467,13 +467,13 @@
 		private function showContactsTab() {
 			FS::$iMgr->setURL("sh=6");
 
-			if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+			if (!FS::$sessMgr->hasRight("ct_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 
 			$output = "";
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+			if (FS::$sessMgr->hasRight("ct_write")) {
 				$output .= FS::$iMgr->opendiv(7,$this->loc->s("new-contact"));
 			}
 
@@ -489,7 +489,7 @@
 				}
 				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+				if (FS::$sessMgr->hasRight("ct_write")) {
 					$output .= FS::$iMgr->opendiv(14,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				}
 				else {
@@ -513,13 +513,13 @@
 		private function showContactgroupsTab() {
 			FS::$iMgr->setURL("sh=7");
 
-			if (!FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
+			if (!FS::$sessMgr->hasRight("ctg_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 
 			$output = "";
 
-			if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write")) {
+			if (FS::$sessMgr->hasRight("ctg_write")) {
 				$output .= FS::$iMgr->opendiv(8,$this->loc->s("new-contactgroup"));
 			}
 
@@ -541,7 +541,7 @@
 				}
 
 				$output .= "<tr id=\"ctg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
-				if (FS::$sessMgr->hasRight("mrule_icinga_ctg_write"))
+				if (FS::$sessMgr->hasRight("ctg_write"))
 					$output .= FS::$iMgr->opendiv(15,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				else
 					$output .= $data["name"];
@@ -569,7 +569,7 @@
 		private function showNotificationStrategiesTab() {
 			FS::$iMgr->setURL("sh=9");
 
-			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+			if (!FS::$sessMgr->hasRight("cmd_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 
@@ -611,7 +611,7 @@
 		private function showCommandTab() {
 			FS::$iMgr->setURL("sh=8");
 
-			if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+			if (!FS::$sessMgr->hasRight("cmd_write")) {
 				return FS::$iMgr->printError("err-no-right");
 			}
 
@@ -633,7 +633,7 @@
 				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
 				// If we can write and it's not a system command
-				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write") && $data["syscmd"] != 't') {
+				if (FS::$sessMgr->hasRight("cmd_write") && $data["syscmd"] != 't') {
 					$output .= FS::$iMgr->opendiv(16,$data["name"],array("lnkadd" => "name=".$data["name"]));
 				}
 				else {
@@ -642,7 +642,7 @@
 
 				$output .= "</td><td>".substr($data["cmd"],0,100).(strlen($data["cmd"]) > 100 ? "..." : "")."</td>";
 
-				if (FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+				if (FS::$sessMgr->hasRight("cmd_write")) {
 					$output .= "<td>";
 					// If it's not a system command, then we can remove it
 					if ($data["syscmd"] != 't') {
@@ -732,7 +732,7 @@
 
 		public function loadFooterPlugin() {
 			// Only users with icinga read right can use this module
-			if (FS::$sessMgr->hasRight("mrule_icinga_read")) {
+			if (FS::$sessMgr->hasRight("read")) {
 				$pluginTitle = $this->loc->s("Monitor");
 				$pluginContent = "";
 
@@ -822,7 +822,7 @@
 				case 3:
 					return (new icingaHost())->showForm();
 				case 4:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+					if (!FS::$sessMgr->hasRight("hg_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
@@ -833,7 +833,7 @@
 
 					return $this->showHostgroupForm();
 				case 5:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+					if (!FS::$sessMgr->hasRight("srv_write")) {
 						return FS::$iMgr->printError("err-no-rights");
 					}
 
@@ -844,13 +844,13 @@
 
 					return FS::$iMgr->printError("err-no-timeperiods");
 				case 6:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+					if (!FS::$sessMgr->hasRight("tp_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
 					return $this->showTimeperiodForm();
 				case 7:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+					if (!FS::$sessMgr->hasRight("ct_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
@@ -866,7 +866,7 @@
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					return (new icingaHost())->showForm($name);
 				case 11:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+					if (!FS::$sessMgr->hasRight("hg_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
@@ -884,7 +884,7 @@
 
 					return (new icingaService())->showForm($name);
 				case 13:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+					if (!FS::$sessMgr->hasRight("srv_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
@@ -895,7 +895,7 @@
 
 					return $this->showTimeperiodForm($name);
 				case 14:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+					if (!FS::$sessMgr->hasRight("ct_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
@@ -933,13 +933,13 @@
 					}
 					return (new icingaService())->showSensors($name);
 				case 19:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
+					if (!FS::$sessMgr->hasRight("notif_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
 					return (new icingaNotificationStrategy())->showForm();
 				case 20:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_notif_write")) {
+					if (!FS::$sessMgr->hasRight("notif_write")) {
 						return $this->loc->s("err-no-rights");
 					}
 
@@ -957,7 +957,7 @@
 			switch($act) {
 				// Add/Edit command
 				case 1:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+					if (!FS::$sessMgr->hasRight("cmd_write")) {
 						echo $this->loc->s("err-no-right");
 						return;
 					}
@@ -1023,7 +1023,7 @@
 					return;
 				// Remove command
 				case 2:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_cmd_write")) {
+					if (!FS::$sessMgr->hasRight("cmd_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}
@@ -1072,7 +1072,7 @@
 					return;
 				// Add/Edit timeperiod
 				case 4:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+					if (!FS::$sessMgr->hasRight("tp_write")) {
 						echo $this->loc->s("err-no-right");
 						return;
 					}
@@ -1168,7 +1168,7 @@
 					return;
 				// Delete timeperiod
 				case 6:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_tp_write")) {
+					if (!FS::$sessMgr->hasRight("tp_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}
@@ -1218,7 +1218,7 @@
 					return;
 				// Delete contact
 				case 9:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_ct_write")) {
+					if (!FS::$sessMgr->hasRight("ct_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}
@@ -1270,7 +1270,7 @@
 					return;
 				// remove service
 				case 18:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_srv_write")) {
+					if (!FS::$sessMgr->hasRight("srv_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}
@@ -1303,7 +1303,7 @@
 					return;
 				// Add/Edit hostgroup
 				case 19:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+					if (!FS::$sessMgr->hasRight("hg_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}
@@ -1378,7 +1378,7 @@
 					return;
 				// remove hostgroup
 				case 21:
-					if (!FS::$sessMgr->hasRight("mrule_icinga_hg_write")) {
+					if (!FS::$sessMgr->hasRight("hg_write")) {
 						FS::$iMgr->ajaxEchoError("err-no-right");
 						return;
 					}

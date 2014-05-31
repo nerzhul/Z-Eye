@@ -18,7 +18,7 @@
 	*/
 
 	require_once(dirname(__FILE__)."/device.api.php");
-	
+
 	class CiscoAPI extends DeviceAPI {
 		function CiscoAPI() { $this->vendor = "cisco"; }
 
@@ -138,8 +138,8 @@
 
 		public function showPortSecurityOpts() {
 			$output = "";
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_portsec") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_portsec")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_portsec") ||
+				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_portsec")) {
 				$portsecen = $this->getPortSecEnable();
 				if($portsecen != -1) {
 					$output .= "<tr><td colspan=\"2\">".$this->loc->s("portsecurity")."</td></tr>";
@@ -171,8 +171,8 @@
 		}
 
 		public function handlePortSecurity($logvals) {
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_portsec") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_portsec")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_portsec") ||
+				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_portsec")) {
 
 				$portsecen = $this->getPortSecEnable();
 
@@ -212,8 +212,8 @@
 
 		public function showVoiceVlanOpts($voicevlanoutput) {
 			$output = "";
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_voicevlan") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_voicevlan")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_voicevlan") ||
+				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_voicevlan")) {
 				$output .= "<tr><td>".$this->loc->s("voice-vlan")."</td><td>";
 				$output .= FS::$iMgr->select("voicevlan",array("tooltip" => "tooltip-voicevlan"));
 				$output .= $voicevlanoutput;
@@ -223,8 +223,8 @@
 		}
 
 		public function handleVoiceVlan($logvals) {
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_voicevlan") ||
-                        	FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_voicevlan")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_voicevlan") ||
+                        	FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_voicevlan")) {
 				$voicevlan = FS::$secMgr->checkAndSecurisePostData("voicevlan");
 
 				$portvoicevlan = $this->getSwitchportVoiceVlan();
@@ -361,7 +361,7 @@
 			$output .= $this->showVoiceVlanOpts($voicevlanoutput);
 			return $output;
 		}
-		
+
 		public function handleVlan($logvals) {
 			$trunk = FS::$secMgr->checkAndSecurisePostData("trmode");
 			$nvlan = FS::$secMgr->checkAndSecurisePostData("nvlan");
@@ -625,8 +625,8 @@
 
 		public function showDHCPSnoopingOpts() {
 			$output = "";
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_dhcpsnooping")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
+				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_dhcpsnooping")) {
 				// DHCP snooping options
 				$dhcpsntrust = $this->getPortDHCPSnoopingTrust();
 				if($dhcpsntrust != NULL) {
@@ -638,7 +638,7 @@
 				$dhcpsnrate = $this->getPortDHCPSnoopingRate();
 				if($dhcpsntrust != NULL) {
 					$output .= FS::$iMgr->idxLine("dhcp-snooping-rate","dhcpsnrate",
-						array("type" => "num", "value" => $dhcpsnrate, "size" => 4, "length" => 4, 
+						array("type" => "num", "value" => $dhcpsnrate, "size" => 4, "length" => 4,
 							"tooltip" => "dhcp-snooping-rate-tooltip"));
 				}
 			}
@@ -646,8 +646,8 @@
 		}
 
 		public function handleDHCPSnooping($logvals) {
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_dhcpsnooping")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_dhcpsnooping") ||
+				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_dhcpsnooping")) {
 				$dhcpsntrusten = FS::$secMgr->checkAndSecurisePostData("dhcpsntrusten");
         	                $dhcpsnrate = FS::$secMgr->checkAndSecurisePostData("dhcpsnrate");
 
@@ -673,8 +673,8 @@
 
 		public function showCDPOpts() {
 			$output = "";
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_cdp") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_cdp")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_cdp") ||
+				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_cdp")) {
 				$cdp = $this->getPortCDPEnable();
 				if($cdp != NULL) {
 					$output .= FS::$iMgr->idxLine("cdp-enable","cdpen",array("value" => ($cdp == 1),"type" => "chk", "tooltip" => "cdp-tooltip"))."</td></tr>";
@@ -684,8 +684,8 @@
 		}
 
 		public function handleCDP($logvals) {
-			if(FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_portmod_cdp") ||
-				FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->devip."_portmod_cdp")) {
+			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_cdp") ||
+				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_cdp")) {
 				$cdpen = FS::$secMgr->checkAndSecurisePostData("cdpen");
 				$cdpstate = $this->getPortCDPEnable();
 
@@ -700,7 +700,7 @@
 
 		public function showSaveCfg() {
 			return FS::$iMgr->idxLine("Save-switch","wr",
-				array("value" => true, "type" => "chk", 
+				array("value" => true, "type" => "chk",
 					"tooltip" => "tooltip-saveone"));
 		}
 
@@ -730,7 +730,7 @@
 		public function getPortDesc() {
 			return $this->getFieldForPortWithPID("ifAlias");
 		}
-		
+
 		public function setPortState($value) {
 			if($value != 1 && $value != 2) {
 				return NULL;
@@ -767,10 +767,10 @@
 		public function setPortSpeed($value) {
 			if($value < 1)
 				return NULL;
-			
+
 			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
 		}
-		
+
 		public function getPortSpeed() {
 			$idx = $this->getPortIndexes($this->device,$this->portid);
 			if($idx == NULL)
@@ -867,7 +867,7 @@
 					return 1;
 			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
 		}
-				
+
 		public function getSwitchportAuthHostMode() {
 			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.3");
 		}
@@ -878,15 +878,15 @@
 
             		return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
 		}
-		
+
 		public function getSwitchTrunkNativeVlan() {
 			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.5");
 		}
-		
+
 		public function setSwitchTrunkVlan($values) {
 			if(!is_array($values) && !preg_match("#^(([1-9]([0-9]){0,3}),)*([1-9]([0-9]){0,3})$#",$values))
 				return -1;
-			/* 
+			/*
 			* For each VLAN from 1 to 4096, set bit value to 1 if vlan is allowed, else set to 0
 			* Each byte is converted to a hex string, and chained
 			*/
@@ -924,7 +924,7 @@
 					$count = 0;
 				}
 			}
-			
+
 			/*
 			* There is 4 mibs, each contains 1024 vlan id
 			* For now, we don't use vlanid > 1024, only 1-1024
@@ -1084,7 +1084,7 @@
 
 			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.3","i",$value);
 		}
-		
+
 		public function getSwitchTrunkEncap() {
 			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.3");
 		}
@@ -1266,7 +1266,7 @@
 				}
 			}
 		}
-		
+
 		// Saving running-config => startup-config
 		public function writeMemory() {
 			if($this->devip == "" || $this->snmprw == "")
@@ -1305,7 +1305,7 @@
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
 			return $rand;
 		}
-		
+
 		// Restore startup-config to TFTP Server
 		public function importConfigFromTFTP($server,$path) {
 			if($this->devip == "" || $this->snmprw == "")
@@ -1319,7 +1319,7 @@
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
 			return $rand;
 		}
-		
+
 		// Save startup-config to FTP/SCP/SFTP Server
 		public function exportConfigToAuthServer($server,$type,$path,$user,$pwd) {
 			if($this->devip == "" || $this->snmprw == "")
@@ -1335,9 +1335,9 @@
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			return $rand;	
+			return $rand;
 		}
-		
+
 		// Restore startup-config to FTP/SCP/SFTP Server
 		public function importConfigFromAuthServer($server,$type,$path,$user,$pwd) {
 			if($this->devip == "" || $this->snmprw == "")
@@ -1353,9 +1353,9 @@
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.7.".$rand,"s",$user);
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.8.".$rand,"s",$pwd);
 			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			return $rand;	
+			return $rand;
 		}
-		
+
 		// Get Copy state from switch, using previous randomized id
 		public function getCopyState($copyId) {
 			if($this->devip == "" || $this->snmpro == "")
@@ -1367,7 +1367,7 @@
 			else
 				return NULL;
 		}
-		
+
 		public function getCopyError($copyId) {
 			if($this->devip == "" || $this->snmpro == "")
 				return -1;
@@ -1375,7 +1375,7 @@
 			$res = preg_split("# #",$res);
 			return $res[1];
 		}
-		
+
 		/*
 		* Port Security
 		*/
@@ -1534,7 +1534,7 @@
 				return NULL;
 
 			foreach($vlans as $vlan => $value)
-				$this->setDHCPSnoopingOnVlan($vlan,$value);	
+				$this->setDHCPSnoopingOnVlan($vlan,$value);
 
 			return 0;
 		}

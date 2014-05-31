@@ -28,12 +28,12 @@ import zConfig, ZEyeUtil
 * Version nomenclature for DB is:
 * <Z-Eye version><db minor version>
 * Z-Eye version: the current Z-Eye major version except the dot
-* db minor version: a incremental number from 00 to 99 defined by -current modification for next Z-Eye series 
+* db minor version: a incremental number from 00 to 99 defined by -current modification for next Z-Eye series
 """
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1412"
+	nextDBVersion = "1413"
 	pgsqlCon = None
 	logger = None
 
@@ -49,7 +49,7 @@ class ZEyeDBUpgrade():
 
 		# Check some system informations and fix it
 		self.fixDBConsistence()
-		
+
 		if(self.pgsqlCon):
 			self.pgsqlCon.close()
 
@@ -258,7 +258,7 @@ class ZEyeDBUpgrade():
 			self.logger.critical("DBUpgrade: %s" % e)
 			print "PgSQL Error: %s" % e
 			sys.exit(1);
-			
+
 	def do14Upgrade(self):
 		try:
 			if self.dbVersion < "1400":
@@ -288,7 +288,7 @@ class ZEyeDBUpgrade():
 				self.setDBVersion("1406")
 			if self.dbVersion == "1406":
 				pgcursor = self.pgsqlCon.cursor()
-				
+
 				"""
 				Verify if 24x7 timeperiod exists, we need it to migrate our strategies
 				If not exist, create it
@@ -297,56 +297,56 @@ class ZEyeDBUpgrade():
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
 					self.rawRequest("INSERT INTO z_eye_icinga_timeperiods (name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume) VALUES ('24x7','24 Hours A Day, 7 Days A Week','0','0','0','0','0','0','0','0','0','0','0','0','0','0','23','59','23','59','23','59','23','59','23','59','23','59','23','59')")
-					
+
 				# Now create the default strategies
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'All'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
 					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('All','Every time, every notification','0','24x7','t','t','t','t','t','t','t')")
-					
+
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'Nothing'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
 					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('Nothing','No alert','0','24x7','f','f','f','f','f','f','f')")
-				
+
 				# we add the strategy column to hosts
 				self.tryAddColumn("z_eye_icinga_hosts","notif_strategy","varchar(64) NOT NULL DEFAULT ''")
-				
+
 				# Now we apply a patch to use the previous created strategies (BREAKUP some configurations)
 				pgcursor.execute("SELECT name FROM z_eye_icinga_hosts WHERE hostoptd = 't' AND hostoptu = 't' AND hostoptr = 't' AND hostoptf = 't' AND hostopts = 't'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_hosts SET notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_hosts WHERE (hostoptd = 'f' AND hostoptu = 'f' AND hostoptr = 'f' AND hostoptf = 'f' AND hostopts = 'f') OR notifen = 'f'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_hosts SET notif_strategy = 'Nothing' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_hosts WHERE notif_strategy = ''")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_hosts SET notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				# we add the strategy column to services
 				self.tryAddColumn("z_eye_icinga_services","notif_strategy","varchar(64) NOT NULL DEFAULT ''")
-				
+
 				# Now we apply a patch to use the previous created strategies (BREAKUP some configurations)
 				pgcursor.execute("SELECT name FROM z_eye_icinga_services WHERE srvoptc = 't' AND srvoptw = 't' AND srvoptf = 't' AND srvopts = 't' AND srvoptu = 't'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_services SET notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_services WHERE (srvoptc = 'f' AND srvoptw = 'f' AND srvoptf = 'f' AND srvopts = 'f' AND srvoptu = 'f') OR notifen = 'f'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_services SET notif_strategy = 'Nothing' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_services WHERE notif_strategy = ''")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_services SET notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				self.setDBVersion("1407")
 			if self.dbVersion == "1407":
 				self.tryDropColumn("z_eye_icinga_services","notifperiod")
@@ -369,7 +369,7 @@ class ZEyeDBUpgrade():
 				self.setDBVersion("1409")
 			if self.dbVersion == "1409":
 				pgcursor = self.pgsqlCon.cursor()
-				
+
 				"""
 				Verify if 24x7 timeperiod exists, we need it to migrate our strategies
 				If not exist, create it
@@ -379,56 +379,56 @@ class ZEyeDBUpgrade():
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
 					self.rawRequest("INSERT INTO z_eye_icinga_timeperiods (name,alias,mhs,mms,tuhs,tums,whs,wms,thhs,fhs,fms,sahs,sams,suhs,sums,mhe,mme,tuhe,tume,whe,wme,thhe,thme,fhe,fme,sahe,same,suhe,sume) VALUES ('24x7','24 Hours A Day, 7 Days A Week','0','0','0','0','0','0','0','0','0','0','0','0','0','0','23','59','23','59','23','59','23','59','23','59','23','59','23','59')")
-					
+
 				# Now create the default strategies
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'All'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
 					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('All','Every time, every notification','0','24x7','t','t','t','t','t','t','t')")
-					
+
 				pgcursor.execute("SELECT count(*) FROM z_eye_icinga_notif_strategy WHERE name = 'Nothing'")
 				pgres = pgcursor.fetchone()
 				if pgres[0] == 0:
 					self.rawRequest("INSERT INTO z_eye_icinga_notif_strategy (name,alias,interval,period,ev_updown,ev_crit,ev_warn,ev_unavailable,ev_flap,ev_recovery,ev_scheduled) VALUES ('Nothing','No alert','0','24x7','f','f','f','f','f','f','f')")
-				
+
 				# we add the strategy column to contacts
 				self.tryAddColumn("z_eye_icinga_contacts","host_notif_strategy","varchar(64) NOT NULL DEFAULT ''")
 				self.tryAddColumn("z_eye_icinga_contacts","service_notif_strategy","varchar(64) NOT NULL DEFAULT ''")
-				
+
 				# Now we apply a patch to use the previous created strategies (BREAKUP some configurations)
-				
+
 				# First for hosts
 				pgcursor.execute("SELECT name FROM z_eye_icinga_contacts WHERE hoptd = 't' AND hoptu = 't' AND hoptr = 't' AND hoptf = 't' AND hopts = 't'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_contacts SET host_notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_contacts WHERE hoptd = 'f' AND hoptu = 'f' AND hoptr = 'f' AND hoptf = 'f' AND hopts = 'f'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_contacts SET host_notif_strategy = 'Nothing' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_contacts WHERE host_notif_strategy = ''")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_contacts SET host_notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-					
+
 				# Second for services
 				pgcursor.execute("SELECT name FROM z_eye_icinga_contacts WHERE soptc = 't' AND soptw = 't' AND soptu = 't' AND soptr = 't' AND soptf = 't' AND sopts = 't'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_contacts SET service_notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_contacts WHERE soptc = 'f' AND soptw = 'f' AND soptu = 'f' AND soptr = 'f' AND soptf = 'f' AND sopts = 'f'")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_contacts SET service_notif_strategy = 'Nothing' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-				
+
 				pgcursor.execute("SELECT name FROM z_eye_icinga_contacts WHERE service_notif_strategy = ''")
 				pgres = pgcursor.fetchall()
 				for idx in pgres:
 					self.rawRequest("UPDATE z_eye_icinga_contacts SET service_notif_strategy = 'All' WHERE name = '%s'" % ZEyeUtil.addPgSlashes(idx[0]))
-					
+
 				self.setDBVersion("1410")
 			if self.dbVersion == "1410":
 				self.tryDropColumn("z_eye_icinga_contacts","hostperiod")
@@ -448,6 +448,25 @@ class ZEyeDBUpgrade():
 			if self.dbVersion == "1411":
 				self.tryAddColumn("z_eye_dhcp_servers","clusteraddr","inet")
 				self.setDBVersion("1412")
+			if self.dbVersion == "1412":
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchmgmt_discover' WHERE rulename = 'mrule_switches_discover'")
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchmgmt_rmswitch' WHERE rulename = 'mrule_switches_rmswitch'")
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchmgmt_write' WHERE rulename = 'mrule_switches_write'")
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchmgmt_globalsave' WHERE rulename = 'mrule_switches_globalsave'")
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchmgmt_globalbackup' WHERE rulename = 'mrule_switches_globalbackup'")
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchmgmt_import_plugs' WHERE rulename = 'mrule_switches_import_plugs'")
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchmgmt_read' WHERE rulename = 'mrule_switches_read'")
+				self.rawRequest("UPDATE z_eye_group_rules SET rulename = 'mrule_switchrightsmgmt_backup' WHERE rulename = 'mrule_switchmgmt_backup'")
+
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_discover' WHERE rulename = 'mrule_switches_discover'")
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_rmswitch' WHERE rulename = 'mrule_switches_rmswitch'")
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_write' WHERE rulename = 'mrule_switches_write'")
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_globalsave' WHERE rulename = 'mrule_switches_globalsave'")
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_globalbackup' WHERE rulename = 'mrule_switches_globalbackup'")
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_import_plugs' WHERE rulename = 'mrule_switches_import_plugs'")
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_read' WHERE rulename = 'mrule_switches_read'")
+				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchrightsmgmt_backup' WHERE rulename = 'mrule_switchmgmt_backup'")
+				self.setDBVersion("1413")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()
@@ -463,14 +482,14 @@ class ZEyeDBUpgrade():
 		if self.dbVersion == "0":
 			self.initDBVersionTable()
 
-		# Upgrades for Z-Eye 1.2 series 
+		# Upgrades for Z-Eye 1.2 series
 		if self.dbVersion <= "1299":
 			self.do12Upgrade()
 
 		# Upgrades for Z-Eye 1.3 series
 		if self.dbVersion <= "1399":
 			self.do13Upgrade()
-			
+
 		# Upgrades for Z-Eye 1.4 series
 		if self.dbVersion <= "1499":
 			self.do14Upgrade()
@@ -480,7 +499,7 @@ class ZEyeDBUpgrade():
 
 	def fixDBConsistence(self):
 		consistenceError = False
-		
+
 		pgcursor = self.pgsqlCon.cursor()
 		pgcursor.execute("SELECT count(*) FROM z_eye_icinga_commands WHERE name IN ('notify-host-by-email','notify-service-by-email','process-host-perfdata','process-service-perfdata')")
 		pgres = pgcursor.fetchone()
@@ -491,14 +510,14 @@ class ZEyeDBUpgrade():
 			self.rawRequest("INSERT INTO z_eye_icinga_commands VALUES ('notify-host-by-email','/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$','','t')")
 			self.rawRequest("INSERT INTO z_eye_icinga_commands VALUES ('notify-service-by-email','/usr/bin/printf \"%b\" \"***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $ HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$','','t')")
 			# @TODO: add missing sensors
-		
+
 		if consistenceError == True:
 			print "Some system DB entries have been fixed"
 			self.logger.warn("Some system DB entries have been fixed")
 		else:
 			print "System DB entries are OK"
 			self.logger.info("System DB entries are OK")
-			
+
 
 	def rawRequest(self,request):
 		try:
@@ -519,7 +538,7 @@ class ZEyeDBUpgrade():
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
 			# If column exists, maybe the database is already up-to-date
-			if re.search("column \"%s\" of relation \"%s\" does not exists" % (columnname,tablename),"%s" % e):	
+			if re.search("column \"%s\" of relation \"%s\" does not exists" % (columnname,tablename),"%s" % e):
 				return
 
 			if self.pgsqlCon:
@@ -535,7 +554,7 @@ class ZEyeDBUpgrade():
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
 			# If column exists, maybe the database is already up-to-date
-			if re.search("column \"%s\" of relation \"%s\" does not exists" % (columnname,tablename),"%s" % e):	
+			if re.search("column \"%s\" of relation \"%s\" does not exists" % (columnname,tablename),"%s" % e):
 				return
 
 			if self.pgsqlCon:
@@ -543,7 +562,7 @@ class ZEyeDBUpgrade():
 			self.logger.critical("DBUpgrade: %s" % e)
 			print "PgSQL Error: %s" % e
 			sys.exit(1);
-                        
+
 	def tryAddColumn(self,tablename,columnname,attributes):
 		try:
 			pgcursor = self.pgsqlCon.cursor()
@@ -551,7 +570,7 @@ class ZEyeDBUpgrade():
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
 			# If column exists, maybe the database is already up-to-date
-			if re.search("column \"%s\" of relation \"%s\" already exists" % (columnname,tablename),"%s" % e):	
+			if re.search("column \"%s\" of relation \"%s\" already exists" % (columnname,tablename),"%s" % e):
 				return
 
 			if self.pgsqlCon:
@@ -567,7 +586,7 @@ class ZEyeDBUpgrade():
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
 			# If table does not exist, maybe the database is up-to-date
-			if re.search("relation \"%s\" does not exist" % tablename,"%s" % e):	
+			if re.search("relation \"%s\" does not exist" % tablename,"%s" % e):
 				return
 
 			if self.pgsqlCon:
@@ -584,7 +603,7 @@ class ZEyeDBUpgrade():
 			self.pgsqlCon.commit()
 		except PgSQL.Error, e:
 			# If table exists, maybe the database is up-to-date
-			if re.search("relation \"%s\" already exists" % tablename,"%s" % e):	
+			if re.search("relation \"%s\" already exists" % tablename,"%s" % e):
 				return
 
 			if self.pgsqlCon:

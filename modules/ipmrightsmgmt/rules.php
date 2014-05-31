@@ -31,11 +31,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_ipmrightsmgmt_read")) {
+
+			if (FS::$sessMgr->hasRight("read","ipmrightsmgmt")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

@@ -54,7 +54,7 @@
 			$netarray = array();
 			$output = "";
 			$found = false;
-			
+
 			if (!$onlyelements) {
 				$output .= FS::$iMgr->select($options["name"],array("multi" => $multi));
 			}
@@ -74,7 +74,7 @@
 						$data["netid"],$data["netmask"],$this->loc->s("in-cache"));
 				}
 			}
-			
+
 			// Then bufferize with declared datas and override cached datas
 			$query = FS::$dbMgr->Select($this->sqlTable,$this->sqlAttrId.",netmask,vlanid,subnet_short_name",$sqlcond,
 				array("order" => $this->sqlAttrId));
@@ -82,7 +82,7 @@
 				if (!$found) {
 					$found = true;
 				}
-				
+
 				if ($data["vlanid"] != 0) {
 					$netarray[$data[$this->sqlAttrId]] = sprintf("%s/%s (VLAN %s - %s)",
 						$data[$this->sqlAttrId],$data["netmask"],
@@ -94,13 +94,13 @@
 						$data["subnet_short_name"]);
 				}
 			}
-			
+
 			ksort($netarray);
 			foreach ($netarray as $netid => $value) {
 				$selectEl = (is_array($selected) ? in_array($netid,$selected) : $netid == $selected);
 				$output .= FS::$iMgr->selElmt($value,$netid,$selectEl);
 			}
-			
+
 			// If no elements found & no empty element
 			if (!$found && !$none) {
 				return NULL;
@@ -141,11 +141,11 @@
 					$this->domainname = $data["domainname"];
 					$this->maxleasetime = $data["mleasetime"];
 					$this->defaultleasetime = $data["dleasetime"];
-					
+
 					$this->netCalc = new FSNetwork();
 					$this->netCalc->setNetAddr($this->netid);
 					$this->netCalc->setNetMask($this->netmask);
-					
+
 					$query2 = FS::$dbMgr->Select($this->sqlTablev6,"netid,prefixlen","netidv4 = '".$this->netid."'");
 					if ($data2 = FS::$dbMgr->Fetch($query2)) {
 						$this->netidv6 = $data2["netid"];
@@ -157,12 +157,12 @@
 			}
 			return true;
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return "";
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,
 						"vlanid","CAST(vlanid as TEXT) ILIKE '".$search."%'",
@@ -171,7 +171,7 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("vlan",$data["vlanid"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select(PgDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","subnet_short_name",
 					"subnet_short_name ILIKE '".$search."%'",
 					array("order" => "subnet_short_name","limit" => "10","group" => "subnet_short_name"));
@@ -188,7 +188,7 @@
 			else {
 				$output = "";
 				$found = false;
-				
+
 				// by VLAN ID
 				if (FS::$secMgr->isNumeric($search)) {
 					$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,subnet_short_name","vlanid = '".$search."'");
@@ -201,10 +201,10 @@
 						$this->storeSearchResult($output,"title-vlan-ipmanager");
 					}
 				}
-				
+
 				// by shortname
 				$output = "";
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,vlanid","subnet_short_name = '".$search."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
@@ -220,11 +220,11 @@
 				if ($found) {
 					$this->storeSearchResult($output,"title-vlan-ipmanager");
 				}
-				
+
 				// by netid
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,vlanid,subnet_short_name","netid = '".$search."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
@@ -243,31 +243,31 @@
 				}
 			}
 		}
-		
+
 		public function isIPIn($ip) {
 			return $this->netCalc->isUsableIP($ip);
 		}
-		
+
 		public function getNetCalc() {
 			return $this->netCalc;
 		}
-		
+
 		public function getNetId() {
 			return $this->netid;
 		}
-		
+
 		public function getNetmask() {
 			return $this->netmask;
 		}
-		
+
 		public function getVLANId() {
 			return $this->vlanid;
 		}
-		
+
 		public function getShortName() {
 			return $this->shortname;
 		}
-		
+
 		private $netid;
 		private $netmask;
 		private $netidv6;
@@ -283,7 +283,7 @@
 		private $defaultleasetime;
 		private $netCalc;
 	};
-	
+
 	final class dhcpServer extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -291,12 +291,12 @@
 			$this->readRight = "mrule_ipmanager_servermgmt";
 			$this->writeRight = "mrule_ipmanager_servermgmt";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"description","description ILIKE '%".$search."%'",array("order" => "description","limit" => "10",
 					"group" => "description"));
@@ -309,7 +309,7 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dhcpserver",$data["alias"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"addr","addr ILIKE '%".$search."%'",array("order" => "addr","limit" => "10",
 					"group" => "addr"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -346,7 +346,7 @@
 			}
 		}
 	};
-	
+
 	final class dhcpCluster extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -354,12 +354,12 @@
 			$this->readRight = "mrule_ipmanager_servermgmt";
 			$this->writeRight = "mrule_ipmanager_servermgmt";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"clustername","clustername ILIKE '%".$search."%'",array("order" => "clustername","limit" => "10",
 					"group" => "clustername"));
@@ -404,7 +404,7 @@
 			}
 		}
 	};
-		
+
 	final class dhcpIP extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -413,7 +413,7 @@
 			$this->sqlAttrId = "ip";
 			$this->readRight = "mrule_ipmanager_read";
 			$this->writeRight = "mrule_ipmmgmt_ipmgmt";
-			
+
 			$this->ip = "";
 			$this->mac = "";
 			$this->hostname = "";
@@ -423,19 +423,19 @@
 			$this->distribState = 0;
 			$this->serverList = array();
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"hostname", "hostname ILIKE '%".$search."%'",
 					array("order" => "hostname","limit" => "10","group" => "hostname"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("dhcphostname",$data["hostname"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"ip","ip ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -447,7 +447,7 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr","macaddr ILIKE '".$search."%'",
 					array("order" => "macaddr","limit" => "10","group" => "macaddr"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -463,7 +463,7 @@
 			else {
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,macaddr,hostname,comment,reserv",
 					"ip = '".$search."' OR CAST(macaddr AS varchar) ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -478,7 +478,7 @@
 						$output .= $this->loc->s("link-ip").": ".FS::$iMgr->aLink($this->mid.
 							"&s=".$data["ip"], $data["ip"])."<br />";
 					}
-							
+
 					if (strlen($data["hostname"]) > 0) {
 						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".
 						$data["hostname"]."<br />";
@@ -500,7 +500,7 @@
 					else {
 						$output .= $this->loc->s("inactive-reserv")."<br />";
 					}
-					
+
 					$this->ip = $data["ip"];
 					$subnet = $this->getSubnet();
 					if ($subnet != NULL) {
@@ -510,7 +510,7 @@
 							$subnet->getNetmask(),
 							$subnet->getShortName()
 						);
-						
+
 						if ($subnet->getVLANId() != 0) {
 							$output .= sprintf("<b>%s</b>: %s<br />",
 								$this->loc->s("vlanid"),
@@ -518,8 +518,8 @@
 							);
 						}
 					}
-					
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+
+					if (!FS::$sessMgr->hasRight("ipmgmt")) {
 						$output .= sprintf("<br />%s<br />",
 							FS::$iMgr->opendiv(7,
 								$this->loc->s("Modify-IPM-Infos"),
@@ -531,14 +531,14 @@
 
 					FS::$searchMgr->incResultCount();
 				}
-		
+
 				if ($found) {
 					$this->storeSearchResult($output,"title-dhcp-distrib-z-eye");
 				}
-				
+
 				$found = false;
 				$output = "";
-				
+
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"hostname,macaddr,ip,leasetime,distributed,server","hostname ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
@@ -550,7 +550,7 @@
 							FS::$iMgr->aLink($this->mid.
 								"&s=".$data["ip"], $data["ip"])."<br />";
 					}
-					
+
 					if (strlen($data["macaddr"]) > 0) {
 						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".
 							FS::$iMgr->aLink($this->mid."&s=".$data["macaddr"], $data["macaddr"])."<br />";
@@ -563,14 +563,14 @@
 					$output .= FS::$iMgr->hr();
 					FS::$searchMgr->incResultCount();
 				}
-				
+
 				if ($found) {
 					$this->storeSearchResult($output,"title-dhcp-hostname");
 				}
-				
+
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,"macaddr,hostname,leasetime,distributed,server",
 					"ip = '".$search."' OR CAST(macaddr as varchar) = '".$search."'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -580,7 +580,7 @@
 					else {
 						$output .= FS::$iMgr->hr();
 					}
-					
+
 					if (strlen($data["hostname"]) > 0) {
 						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
 					}
@@ -592,27 +592,27 @@
 
 					$output .= "<b>".$this->loc->s("attribution-type")."</b>: ".
 						($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
-						
+
 					if ($data["distributed"] != 3 && $data["distributed"] != 4) {
 						$output .= $this->loc->s("Validity")." : ".$data["leasetime"]."<br />";
 					}
-					
+
 					FS::$searchMgr->incResultCount();
 				}
-		
+
 				if ($found) {
 					$this->storeSearchResult($output,"title-dhcp-distrib");
 				}
 			}
 		}
-		
+
 		protected function Load($ip = "") {
 			$this->ip = $ip;
 			$this->mac = "";
 			$this->hostname = "";
 			$this->reserv = false;
 			$this->comment = "";
-			
+
 			if ($this->ip) {
 				$query = FS::$dbMgr->Select($this->sqlTable,
 					"macaddr,hostname,reserv,comment",
@@ -622,7 +622,7 @@
 					$this->hostname = $data["hostname"];
 					$this->reserv = ($data["reserv"] == "t");
 					$this->comment = $data["comment"];
-					
+
 					if ($this->reserv == true) {
 						$this->distribState = 5;
 					}
@@ -632,9 +632,9 @@
 			}
 			return true;
 		}
-		
+
 		public function Remove() {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+			if (!FS::$sessMgr->hasRight("ipmgmt")) {
 				$this->log(2,"Edit IP informations: no rights");
 				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return;
@@ -647,15 +647,15 @@
 					$this->loc->s("err-bad-ip-addr"),$ip),"",true);
 				return;
 			}
-			
+
 			if (!$this->LoadFromCache($ip) && !$this->Load($ip)) {
 				FS::$iMgr->ajaxEchoError(sprintf(
 					$this->loc->s("err-no-info-for-ip-addr"),$ip),"",true);
 				return;
 			}
-			
+
 			$this->removeFromDB($ip);
-			
+
 			// We cleanup the object datas
 			$this->mac = "";
 			$this->hostname = "";
@@ -664,27 +664,27 @@
 			$this->leasetime = "";
 			$this->distribState = 0;
 			$this->serverList = array();
-			
+
 			// And reload datas from cache
 			$this->LoadFromCache($ip);
-			
+
 			FS::$iMgr->ajaxEchoOK("Done", $this->genIPLine($ip));
 		}
-		
+
 		protected function removeFromDB($ip) {
 			FS::$dbMgr->BeginTr();
 			FS::$dbMgr->Delete($this->sqlTable,$this->sqlAttrId." = '".$ip."'");
 			FS::$dbMgr->Delete($this->sqlCacheTable,$this->sqlAttrId." = '".$ip."'");
 			FS::$dbMgr->CommitTr();
 		}
-		
+
 		public function LoadFromCache($ip = "") {
 			$this->ip = $ip;
 			$this->mac = "";
 			$this->hostname = "";
 			$this->reserv = false;
 			$this->comment = "";
-			
+
 			if ($this->ip) {
 				$query = FS::$dbMgr->Select($this->sqlCacheTable,
 					"macaddr,hostname,leasetime,distributed,server",
@@ -702,7 +702,7 @@
 			}
 			return true;
 		}
-			
+
 		public function importIPFromCache() {
 			$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
 			$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
@@ -712,116 +712,116 @@
 				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return false;
 			}
-			
+
 			$subnetObj = new dhcpSubnet();
 			if (!$subnetObj->Load($subnet)) {
 				$this->log(2,"Import IP from cache: invalid subnet");
 				FS::$iMgr->ajaxEchoError("err-subnet-not-exists");
 				return false;
 			}
-			
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+
+			if (!FS::$sessMgr->hasRight("ipmgmt")) {
 				$this->log(2,"Import IP from cache: no rights");
 				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return false;
 			}
-			
+
 			if (!FS::$secMgr->isIP($ip)) {
 				$this->log(2,"Import IP from cache: bad IP");
 				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-ip"),
 					$ip),"",true);
 				return false;
 			}
-			
+
 			// @TODO
 			if (!$this->LoadFromCache($ip)) {
 				$this->log(2,"Import IP from cache: IP not in cache");
 				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-not-in-cache"),
 					$ip),"",true);
 				return false;
-				
+
 			}
-			
+
 			FS::$dbMgr->BeginTr();
 			FS::$dbMgr->Delete($this->sqlTable,
 				$this->sqlAttrId." = '".$this->ip."'");
 			FS::$dbMgr->Insert($this->sqlTable,"ip,macaddr,hostname,reserv,comment",
 				"'".$this->ip."','".$this->mac."','".$this->hostname."','t',''");
 			FS::$dbMgr->CommitTr();
-			
+
 			return $subnetObj->getNetCalc();
 		}
-		
+
 		public function injectIPCSV() {
 			$csv = FS::$secMgr->checkAndSecurisePostData("csv");
 			$sep = FS::$secMgr->checkAndSecurisePostData("sep");
 			$repl = FS::$secMgr->checkAndSecurisePostData("repl");
 			$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
-			
+
 			if (!$subnet || !$csv || !$sep || $sep != "," && $sep != ";") {
 				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return false;
 			}
-			
+
 			$subnetObj = new dhcpSubnet();
 			if (!$subnetObj->Load($subnet)) {
 				FS::$iMgr->ajaxEchoError("err-subnet-not-exists");
 				return false;
 			}
-			
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+
+			if (!FS::$sessMgr->hasRight("ipmgmt")) {
 				$this->log(2,"Import IP via CSV: no rights");
 				FS::$iMgr->ajaxEchoError("err-no-rights");
 				return false;
 			}
-			
+
 			$csv = preg_replace("#[\r]#","",$csv);
 			$lines = preg_split("#[\n]#",$csv);
 			if (!$lines) {
 				FS::$iMgr->ajaxEchoError("err-invalid-csv");
 				return false;
 			}
-			
+
 			$hostList = array();
 			$tmpIPList = array();
 			$tmpMACList = array();
-			
+
 			// @TODO multiple MAC errors
 			$count = count($lines);
 			for ($i=0;$i<$count;$i++) {
 				$entry = preg_split("#[".$sep."]#",$lines[$i]);
-				
+
 				// Entry has 3 fields
 				if (count($entry) != 3) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
 					return false;
 				}
-				
+
 				if (!FS::$secMgr->isHostname($entry[0])) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-hostname"),
 						$entry[0]),"",true);
 					return false;
 				}
-				
+
 				if (!FS::$secMgr->isIP($entry[2])) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-ip"),
 						$entry[2]),"",true);
 					return false;
 				}
-				
+
 				if (!FS::$secMgr->isMacAddr($entry[1])) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-mac"),
 						$entry[1]),"",true);
 					return false;
 				}
-				
+
 				// Hostname must be unique in this import
 				if (isset($hostList[$entry[0]])) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-hostname"),
 						$entry[0]),"",true);
 					return false;
 				}
-				
+
 				// Hostname mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"hostname",
 					"hostname = '".$entry[0]."' AND reserv = 't'")) {
@@ -829,21 +829,21 @@
 						$entry[0]),"",true);
 					return false;
 				}
-				
+
 				// IP must be in selected subnet
 				if (!$subnetObj->isIPIn($entry[2])) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-not-in-subnet"),
 						$entry[2],$subnet),"",true);
 					return false;
 				}
-				
+
 				// IP must be unique in this import
 				if (in_array($entry[2],$tmpIPList)) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-ip"),
 						$entry[2]),"",true);
 					return false;
 				}
-				
+
 				// IP mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"ip",
 					"ip = '".$entry[2]."' AND reserv = 't'")) {
@@ -851,10 +851,10 @@
 						$entry[2]),"",true);
 					return false;
 				}
-				
+
 				// cleanup MAC Address
 				$entry[1] = strtolower(preg_replace("#[-]#",":",$entry[1]));
-				
+
 				// MAC mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"macaddr",
 					"macaddr = '".$entry[1]."' AND reserv = 't'")) {
@@ -862,23 +862,23 @@
 						$entry[1]),"",true);
 					return false;
 				}
-				
+
 				// MAC must be unique in this import
 				if (in_array($entry[1],$tmpMACList)) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-mac"),
 						$entry[1]),"",true);
 					return false;
 				}
-				
+
 				// Create array dimension by hostname
 				$hostList[$entry[0]] = array();
-				
+
 				// Create array dimension by IP
 				$hostList[$entry[0]][$entry[2]] = $entry[1];
 				$tmpIPList[] = $entry[2];
 				$tmpMACList[] = $entry[1];
 			}
-			
+
 			FS::$dbMgr->BeginTr();
 			foreach ($hostList as $hostname => $values) {
 				foreach($values as $IP => $mac) {
@@ -893,14 +893,14 @@
 			FS::$dbMgr->CommitTr();
 			return $subnetObj->getNetCalc();
 		}
-		
+
 		public function genIPLine($ip,$loadDatas = false) {
 			$subnetLinkedToCluster = false;
-			
+
 			if ($loadDatas == true) {
 				$this->LoadFromCache($ip);
 				$this->Load($ip);
-				
+
 				/*
 				 * We verify if subnet is linked to cluster
 				 * This permit to import reservation from cache
@@ -910,7 +910,7 @@
 				$subnetLinkedToCluster = (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix().
 					"dhcp_subnet_cluster","subnet","subnet = '".$this->subnetId."'") != NULL);
 			}
-			
+
 			/*
 			 * Because we have loaded cache and informations before,
 			 * we can use the loaded datas
@@ -918,20 +918,20 @@
 			 */
 			$output = $this->genIPLineFull($ip,$this->mac,
 				$this->hostname,$this->comment,"",$this->leasetime,
-				$this->serverList, $this->distribState, $subnetLinkedToCluster);			
+				$this->serverList, $this->distribState, $subnetLinkedToCluster);
 			return sprintf("$('#sb%str').html('%s');",
 				FS::$iMgr->formatHTMLId($ip),
 				addslashes($output));
 		}
-		
+
 		public function genIPLineFull($ip,$mac,$hostname,$comment,
-			$subnet, $leasetime="", $servers=array(), 
+			$subnet, $leasetime="", $servers=array(),
 			$distrib = 0, $clusterLink=false) {
-				
+
 			$switch = "";
 			$port = "";
 			$rstate = "";
-			
+
 			// This JS must be output before the table
 			FS::$iMgr->setJSBuffer(1);
 			switch($distrib) {
@@ -975,7 +975,7 @@
 					break;
 			}
 			FS::$iMgr->setJSBuffer(0);
-			
+
 			$rstateId = "sb".FS::$iMgr->formatHTMLId($ip)."rsttd";
 			$output = sprintf("<td>%s</td><td>%s</td><td id=\"%s\">%s",
 				FS::$iMgr->opendiv(7,$ip,array("lnkadd" => "ip=".$ip)),
@@ -983,7 +983,7 @@
 				$rstateId,
 				$rstate
 			);
-			
+
 			// Import option when subnet is distributed on a cluster and IP is only in the cache, not IPM
 			if ($distrib == 3 && $clusterLink) {
 				$output .= FS::$iMgr->linkIcon("mod=".$this->mid."&act=20&ip=".$ip."&subnet=".$this->subnetId,"upload",
@@ -992,16 +992,16 @@
 							$this->loc->s("confirm-import-reserv"),$ip),
 							"Import","Cancel")
 					)
-				);	
+				);
 			}
 			$output .= "</td><td>";
 			if (strlen($mac) > 0) {
 				$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$mac, $mac);
 			}
-			
+
 			$output .= "</td><td>".
 				$hostname."</td><td>".$comment."</td><td>";
-			
+
 			// If we have a MAC address, then show the switch
 			if (strlen($mac) > 0) {
 				$switch = FS::$dbMgr->GetOneData("node","switch","mac = '".$mac."' AND active = 't'",
@@ -1017,35 +1017,35 @@
 				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 					"&d=".$switch, $switch) : "");
 			}
-					
+
 			$output .= "</td><td>";
-			
+
 			if ($switch) {
 				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 					"&d=".$switch."&p=".$port, $port) : "");
 			}
-			
+
 			$output .= "</td><td>".$leasetime."</td><td>";
 			$count = count($servers);
 			for ($i=0;$i<$count;$i++) {
 				if ($i > 0) $output .= "<br />";
 				$output .= $servers[$i];
 			}
-			
+
 			$output .= "</td><td>".
 				FS::$iMgr->removeIcon(21,"ip=".$ip,array("js" => true,
 					"confirmtext" => "confirm-remove-reservation",
 					"confirmval" => $ip
 				)).
 				"</td>";
-			
+
 			return $output;
 		}
-		
+
 		public function getIP() {
 			return $this->ip;
 		}
-		
+
 		private function getSubnet() {
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix().
 				"dhcp_subnet_v4_declared",
@@ -1058,25 +1058,25 @@
 					return $subnetObj;
 				}
 			}
-			
+
 			return NULL;
 		}
-		
+
 		private $sqlCacheTable;
-		
+
 		private $ip;
 		private $mac;
 		private $hostname;
 		private $reserv;
 		private $comment;
-		
+
 		private $leasetime;
 		private $distribState;
 		private $serverList;
-		
+
 		private $subnetId;
 	};
-	
+
 	final class dhcpCustomOption extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -1084,12 +1084,12 @@
 			$this->readRight = "mrule_ipmanager_optionsmgmt";
 			$this->writeRight = "mrule_ipmanager_optionsmgmt";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optname","optname ILIKE '%".$search."%'",array("order" => "optname","limit" => "10",
 					"group" => "optname"));
@@ -1101,7 +1101,7 @@
 				// Custom DHCP options
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"optcode,opttype,optname",
 					"optname ILIKE '%".$search."%' AND protectrm = 'f'",array("order" => "optname", "group" => "optname"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -1122,7 +1122,7 @@
 			}
 		}
 	};
-	
+
 	final class dhcpOption extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -1130,12 +1130,12 @@
 			$this->readRight = "mrule_ipmanager_optionsmgmt";
 			$this->writeRight = "mrule_ipmanager_optionsmgmt";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optalias","optalias ILIKE '%".$search."%'",array("order" => "optalias","limit" => "10",
 					"group" => "optalias"));
@@ -1146,7 +1146,7 @@
 			else {
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"optalias,optname,optval",
 					"optalias ILIKE '%".$search."%'",array("order" => "optalias", "group" => "optalias"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -1167,7 +1167,7 @@
 			}
 		}
 	};
-	
+
 	final class dhcpOptionGroup extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -1175,12 +1175,12 @@
 			$this->readRight = "mrule_ipmanager_optionsmgmt";
 			$this->writeRight = "mrule_ipmanager_optionsmgmt";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"optgroup","optgroup ILIKE '%".$search."%'",array("order" => "optgroup","limit" => "10",
 					"group" => "optgroup"));
@@ -1199,7 +1199,7 @@
 					if (!$found) {
 						$found = true;
 					}
-					
+
 					if (!isset($optgroups[$data["optgroup"]])) {
 						$optgroups[$data["optgroup"]] = array();
 					}
@@ -1215,7 +1215,7 @@
 						for ($i=0;$i<$count;$i++) {
 							$output .= "<li>".$members[$i]."</li>";
 						}
-							
+
 						$output .= "</ul>".FS::$iMgr->hr();
 						FS::$searchMgr->incResultCount();
 					}

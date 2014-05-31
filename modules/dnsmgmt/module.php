@@ -23,7 +23,7 @@
 	require_once(dirname(__FILE__)."/objects.php");
 
 	if(!class_exists("iDNSManager")) {
-		
+
 	final class iDNSManager extends FSModule {
 		function __construct() {
 			parent::__construct();
@@ -85,7 +85,7 @@
 			FS::$iMgr->setURL("sh=1");
 			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("DNS-zones"));
 			$output = "";
-			if (FS::$sessMgr->hasRight("mrule_dnsmgmt_write")) {
+			if (FS::$sessMgr->hasRight("write")) {
 				$found = false;
 			}
 
@@ -105,10 +105,10 @@
 
 			$shSRV = FS::$secMgr->checkAndSecuriseGetData("ssrv");
 			if ($shSRV == NULL) $shSRV = 1;
-			
+
 			$shPTR = FS::$secMgr->checkAndSecuriseGetData("sptr");
 			if ($shPTR == NULL) $shPTR = 1;
-			
+
 			$shTXT = FS::$secMgr->checkAndSecuriseGetData("stxt");
 			if ($shTXT == NULL) $shTXT = 1;
 
@@ -157,40 +157,40 @@
 			$shA = FS::$secMgr->checkAndSecurisePostData("sa");
 			if ($shA == "on") $shA = true;
 			else $shA = false;
-			
+
 			$shAAAA = FS::$secMgr->checkAndSecurisePostData("saaaa");
 			if ($shAAAA == "on") $shAAAA = true;
 			else $shAAAA = false;
-			
+
 			$shNS = FS::$secMgr->checkAndSecurisePostData("sns");
 			if ($shNS == "on") $shNS = true;
 			else $shNS = false;
-			
+
 			$shCNAME = FS::$secMgr->checkAndSecurisePostData("scname");
 			if ($shCNAME == "on") $shCNAME = true;
 			else $shCNAME = false;
-			
+
 			$shSRV = FS::$secMgr->checkAndSecurisePostData("ssrv");
 			if ($shSRV == "on") $shSRV = true;
 			else if ($shSRV > 0) $shSRV = true;
 			else $shSRV = false;
-			
+
 			$shPTR = FS::$secMgr->checkAndSecurisePostData("sptr");
 			if ($shPTR == "on") $shPTR = true;
 			else $shPTR = false;
-			
+
 			$shTXT = FS::$secMgr->checkAndSecurisePostData("stxt");
 			if ($shTXT == "on") $shTXT = true;
 			else $shTXT = false;
-			
+
 			$shother = FS::$secMgr->checkAndSecurisePostData("sother");
 			if ($shother == "on") $shother = true;
 			else $shother = false;
-			
+
 			if (!$dnszone) {
 				return $output;
 			}
-			
+
 			$rectypef = "";
 			if (!$shA || !$shAAAA || !$shNS || !$shCNAME || !$shPTR || !$shSRV || !$shTXT || !$shother) {
 				$rectypef .= " AND rectype IN (";
@@ -229,25 +229,25 @@
 					else $found = true;
 					$rectypef .= "'TXT'";
 				}
-				
+
 				$rectypef .= ")";
 				if ($shother) $rectypef .= " OR rectype NOT IN ('A','AAAA','CNAME','NS','PTR','SRV','TXT')";
 			}
-			
+
 			$first = true;
 			$administrable = false;
 			$dnszone2 = $dnszone;
 			$dnsrecords = array();
-			
+
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dns_zone_record_cache","zonename,record,rectype,recval,server","zonename = '".$dnszone."'".$rectypef,
 				array("order" => "zonename,record","ordersens" => 2));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($first) {
 					$first = false;
 					$output .= FS::$iMgr->h3("Zone: ".$dnszone,true);
-					
+
 					// We must use DNS zone without the ending dot
-					
+
 					if (preg_match("#(.*)\.$#",$dnszone)) {
 						$dnszone2 = substr($dnszone,0,strlen($dnszone)-1);
 					}
@@ -263,7 +263,7 @@
 					}
 					$output .= "</tr></thead>";
 				}
-				if (!isset($dnsrecords[$data["record"]])) 
+				if (!isset($dnsrecords[$data["record"]]))
 					$dnsrecords[$data["record"]] = array();
 
 				if (!isset($dnsrecords[$data["record"]][$data["rectype"]]))
@@ -314,7 +314,7 @@
 						}
 						if ($administrable) {
 							$output .= sprintf("<td>%s</td>",
-								$recordtype != "SOA" ? 
+								$recordtype != "SOA" ?
 									FS::$iMgr->removeIcon(14,"zn=".$dnszone2.
 									"&rc=".$recordname."&rct=".$recordtype."&rcv=".$recordval,
 									array("js" => true,
@@ -340,7 +340,7 @@
 		private function showAdvancedTools() {
 			FS::$iMgr->setURL("sh=3");
 			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("Advanced-tools"));
-			
+
 			$output = FS::$iMgr->h3("title-old-records").
 				FS::$iMgr->cbkForm("2").
 				"Intervalle (jours) ".FS::$iMgr->numInput("ival")."<br />".
@@ -371,7 +371,7 @@
 		public function getIfaceElmt() {
 			$el = FS::$secMgr->checkAndSecuriseGetData("el");
 			switch($el) {
-				case 1: 
+				case 1:
 					$server = new dnsServer();
 					return $server->showForm();
 				case 2:
@@ -382,7 +382,7 @@
 
 					$server = new dnsServer();
 					return $server->showForm($addr);
-				case 3: 
+				case 3:
 					$dnsTSIG = new dnsTSIGKey();
 					return $dnsTSIG->showForm();
 				case 4:
@@ -431,7 +431,7 @@
 					if (!$zonename) {
 						return $this->loc->s("err-bad-datas");
 					}
-					
+
 					$dnsRecord = new dnsRecord();
 					return $dnsRecord->showForm($zonename);
 				default: return;
@@ -549,7 +549,7 @@
 					$server->Modify();
 					return;
 				// Delete DNS server
-				case 4: 
+				case 4:
 					$server = new dnsServer();
 					$server->Remove();
 					return;
@@ -605,8 +605,8 @@
 			}
 		}
 	};
-	
+
 	}
-	
+
 	$module = new iDNSManager();
 ?>

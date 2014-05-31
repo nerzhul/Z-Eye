@@ -226,20 +226,36 @@
 			return false;
 		}
 
-		public function hasRight($rulename) {
+		public function hasRight($rulename,$moduleOverride=NULL) {
 			if ($this->getUid() == 1 || $this->isInGIDGroup(1)) {
 				return true;
+			}
+
+			// If no override, we set the rulename with the modulename
+			if ($moduleOverride === NULL) {
+				$rulename = sprintf("mrule_%s_%s",
+					FS::$iMgr->getCurModule()->getName(),
+					$rulename
+				);
+			}
+			else {
+				$rulename = sprintf("mrule_%s_%s",
+					$moduleOverride,
+					$rulename
+				);
 			}
 
 			$groups = $this->getGroups();
 			$count = count($groups);
 			for ($i=0;$i<$count;$i++) {
-				if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules","ruleval","rulename = '".
+				if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."group_rules",
+					"ruleval","rulename = '".
 					$rulename."' AND gid = '".$groups[$i]."'") == "on") {
 					return true;
 				}
 			}
-			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules","ruleval","rulename = '".
+			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."user_rules",
+				"ruleval","rulename = '".
 				$rulename."' AND uid = '".$this->getUid()."'") == "on") {
 				return true;
 			}

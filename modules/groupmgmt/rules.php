@@ -32,11 +32,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_groumgmt_read")) {
+
+			if (FS::$sessMgr->hasRight("read","groupmgmt")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

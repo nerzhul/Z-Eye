@@ -29,8 +29,8 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_routermgmt_read")) {
+
+			if (FS::$sessMgr->hasRight("read","routermgmt")) {
 				return true;
 			}
 			return false;

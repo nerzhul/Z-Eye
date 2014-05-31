@@ -40,11 +40,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_icinga_read")) {
+
+			if (FS::$sessMgr->hasRight("read","icinga")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

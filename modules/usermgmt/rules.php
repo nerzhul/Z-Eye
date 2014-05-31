@@ -34,11 +34,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if(FS::$sessMgr->hasRight("mrule_usermgmt_read")) {
+
+			if(FS::$sessMgr->hasRight("read","usermgmt")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

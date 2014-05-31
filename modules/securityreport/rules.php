@@ -31,11 +31,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_securityreport_read")) {
+
+			if (FS::$sessMgr->hasRight("read","securityreport")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

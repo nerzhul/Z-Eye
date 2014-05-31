@@ -24,7 +24,7 @@
 			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
 				array($this->loc->s("rule-read-datas"),		"mrule_netdisco_read"),
 				array($this->loc->s("rule-write-datas"),	"mrule_netdisco_write")
-				
+
 			));
 			return $output;
 		}
@@ -33,11 +33,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_netdisco_write")) {
+
+			if (FS::$sessMgr->hasRight("write","netdisco")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

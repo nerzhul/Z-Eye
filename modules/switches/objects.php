@@ -16,7 +16,7 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	final class netDevice extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -25,7 +25,7 @@
 			$this->vlanTable = "device_vlan";
 			$this->readRight = "mrule_switches_read";
 		}
-		
+
 		public function Load($device = "") {
 			$this->device = $device;
 			$this->ip = "";
@@ -38,7 +38,7 @@
 			$this->osVer = "";
 			$this->snmpro = "";
 			$this->snmprw = "";
-			
+
 			if ($this->device != "") {
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,serial,model,os,os_ver,dns,location",
 					"name = '".$device."'");
@@ -50,7 +50,7 @@
 					$this->model = $data["model"];
 					$this->os = $data["os"];
 					$this->osVer = $data["os_ver"];
-					
+
 					$this->snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
 						"snmpro","device = '".$this->device."'");
 					$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
@@ -67,31 +67,31 @@
 			}
 			return true;
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->vlanTable,"vlan","CAST(vlan as TEXT) ILIKE '".$search."%'",
 					array("order" => "vlan","limit" => "10","group" => "vlan"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("vlan",$data["vlan"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"name","name ILIKE '%".$search."%'",
 					array("order" => "name","limit" => "10","group" => "name"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("device",$data["name"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip","host(ip) ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"mac","text(mac) ILIKE '".$search."%'",
 					array("order" => "mac","limit" => "10","group" => "mac"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -108,26 +108,26 @@
 					if ($found == false) {
 						$found = true;
 					}
-					
+
 					$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$data["name"], $data["name"])." (";
-						
+
 					if (strlen($data["mac"]) > 0) {
 						$output .= FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"])." - ";
 					}
-					
+
 					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).")<br />".
 						"<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />".
 						"<b><i>".$this->loc->s("Description").": </i></b>".
 						preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"]).
 						FS::$iMgr->hr();
-						
+
 					FS::$searchMgr->incResultCount();
 				}
-				
+
 				if ($found) {
 					$this->storeSearchResult($output,"Network-device");
 				}
-				
+
 				// VLAN on a device
 				if (FS::$secMgr->isNumeric($search)) {
 					$output = "";
@@ -137,7 +137,7 @@
 						if ($found == false) {
 							$found = true;
 						}
-						
+
 						if ($dname = FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$data["ip"]."'")) {
 							$output .= "<li> ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 								"&d=".$dname."&fltr=".$search, $dname)." (".$data["description"].")<br />";
@@ -150,16 +150,16 @@
 				}
 			}
 		}
-		
+
 		public function showList() {
 			FS::$iMgr->setURL("");
-			
+
 			$output = "";
 			$foundsw = false;
 			$foundwif = false;
 			$showtitle = true;
-			
-			if (FS::$sessMgr->hasRight("mrule_switches_discover")) {
+
+			if (FS::$sessMgr->hasRight("discover")) {
 				$showtitle = false;
 				$output .= FS::$iMgr->h2("title-global-fct").
 					FS::$iMgr->opendiv(1,$this->loc->s("Discover-device"),array("line" => true));
@@ -172,11 +172,11 @@
 				$this->loc->s("Building")."</th><th>".$this->loc->s("Room")."</th><th>".
 				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb").
 				"</th><th>".$this->loc->s("State")."</th>";
-			
-			if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+
+			if (FS::$sessMgr->hasRight("rmswitch")) {
 				$outputswitch .= "<th></th>";
 			}
-			
+
 			$outputswitch .= "</tr></thead>";
 
 			$outputwifi = FS::$iMgr->h2("title-WiFi-AP").
@@ -186,8 +186,8 @@
 				$this->loc->s("OS")."</th><th>".$this->loc->s("Building")."</th><th>".
 				$this->loc->s("Room")."</th><th>".
 				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb")."</th>";
-				
-			if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+
+			if (FS::$sessMgr->hasRight("rmswitch")) {
 				$outputwifi .= "<th></th>";
 			}
 			$outputwifi .= "</tr></thead>";
@@ -199,7 +199,7 @@
 				$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$data["name"]."'");
 				$building = FS::$dbMgr->GetOneData($this->infoTable,"building","device = '".$data["name"]."'");
 				$room = FS::$dbMgr->GetOneData($this->infoTable,"room","device = '".$data["name"]."'");
-				
+
 				if (!$this->canReadOrWriteRight($snmpro,$snmprw,$data["ip"])) {
 					continue;
 				}
@@ -212,8 +212,8 @@
 					$outputwifi .= "<tr><td id=\"draga\" draggable=\"true\">".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
 						"</td><td>".$data["ip"]."</td><td>".
 						$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>";
-					
-					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+
+					if (FS::$sessMgr->hasRight("write")) {
 						$convname = preg_replace("#\/#","-",$data["name"]);
 						$convname = preg_replace("#\.#","-",$convname);
 						$outputwifi .= "<div id=\"devbding_".$convname."\">".
@@ -229,10 +229,10 @@
 					else {
 						$outputwifi .= $building;
 					}
-							
+
 					$outputwifi .= "</td><td>";
-					
-					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+
+					if (FS::$sessMgr->hasRight("write")) {
 						$convname = preg_replace("#\/#","-",$data["name"]);
 						$convname = preg_replace("#\.#","-",$convname);
 						$outputwifi .= "<div id=\"devroom_".$convname."\">".
@@ -248,10 +248,10 @@
 					else {
 						$outputwifi .= $room;
 					}
-					
+
 					$outputwifi .= "</td><td>".$data["location"]."</td><td>".
 						$data["serial"]."</td>";
-					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+					if (FS::$sessMgr->hasRight("rmswitch")) {
 						$outputwifi .= "<td>".FS::$iMgr->removeIcon(17,"device=".$data["name"],array("js" => true,
 							"confirmtext" => "confirm-remove-device",
 							"confirmval" => $data["name"]
@@ -266,8 +266,8 @@
 					$outputswitch .= "<tr><td>".FS::$iMgr->aLink($this->mid."&d=".$data["name"], $data["name"]).
 						"</td><td>".$data["ip"]."</td><td>".$data["mac"]."</td><td>".
 						$data["model"]."</td><td>".$data["os"]." ".$data["os_ver"]."</td><td>";
-					
-					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+
+					if (FS::$sessMgr->hasRight("write")) {
 						$convname = preg_replace("#\/#","-",$data["name"]);
 						$convname = preg_replace("#\.#","-",$convname);
 						$outputswitch .= "<div id=\"devbding_".$convname."\">".
@@ -283,10 +283,10 @@
 					else {
 						$outputswitch .= $building;
 					}
-					
+
 					$outputswitch .= "</td><td>";
-					
-					if (FS::$sessMgr->hasRight("mrule_switches_write")) {
+
+					if (FS::$sessMgr->hasRight("write")) {
 						$convname = preg_replace("#\/#","-",$data["name"]);
 						$convname = preg_replace("#\.#","-",$convname);
 						$outputswitch .= "<div id=\"devroom_".$convname."\">".
@@ -302,13 +302,13 @@
 					else {
 						$outputswitch .= $room;
 					}
-					
+
 					$outputswitch .= "</td><td>".$data["location"]."</td><td>".$data["serial"]."</td><td>
 						<div id=\"st".preg_replace("#[.]#","-",$data["ip"])."\">".FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>".
 						FS::$iMgr->js("$.post('?mod=".$this->mid."&act=19', { dip: '".$data["ip"]."' }, function(data) {
 						$('#st".preg_replace("#[.]#","-",$data["ip"])."').html(data); });")."</td>";
-						
-					if (FS::$sessMgr->hasRight("mrule_switches_rmswitch")) {
+
+					if (FS::$sessMgr->hasRight("rmswitch")) {
 						$outputswitch .= "<td>".FS::$iMgr->removeIcon(17,"device=".$data["name"],array("js" => true,
 							"confirmtext" => "confirm-remove-device",
 							"confirmval" => $data["name"]
@@ -318,13 +318,13 @@
 				}
 			}
 			if ($foundsw || $foundwif) {
-				if (FS::$sessMgr->hasRight("mrule_switches_globalsave") || FS::$sessMgr->hasRight("mrule_switches_globalbackup")) {
+				if (FS::$sessMgr->hasRight("globalsave") || FS::$sessMgr->hasRight("globalbackup")) {
 					if ($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
 					// Openable divs
 					$output .= FS::$iMgr->opendiv(2,$this->loc->s("Advanced-Functions"));
 				}
 				$output .= FS::$iMgr->h2("title-router-switch");
-				
+
 				FS::$iMgr->js("function modifyBuilding(src,sbmit,device_,building_) {
 					if (sbmit == true) {
 					$.post('?at=3&mod=".$this->mid."&act=27', { device: device_, building: document.getElementsByName(building_)[0].value }, function(data) {
@@ -356,7 +356,7 @@
 
 			return $output;
 		}
-		
+
 		public function modifyBuilding() {
 			$device = FS::$secMgr->checkAndSecurisePostData("device");
 			$building = FS::$secMgr->checkAndSecurisePostData("building");
@@ -365,24 +365,24 @@
 				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
-			
+
 			if (!$this->Load($device)) {
 				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
-			
+
 			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEchoError("err-no-rights");
-				return;	
+				return;
 			}
-			
+
 			if (FS::$dbMgr->GetOneData($this->infoTable,"device","device = '".$device."'")) {
 				FS::$dbMgr->Update($this->infoTable,"building = '".$building."'","device = '".$device."'");
 			}
 			else {
 				FS::$dbMgr->Insert($this->infoTable,"device,building","'".$device."','".$building."'");
 			}
-			
+
 			if ($building) {
 				echo $building;
 			}
@@ -392,7 +392,7 @@
 			$this->log(0,"Set building for '".$device."' to '".$building."'");
 			return;
 		}
-		
+
 		public function modifyRoom() {
 			$device = FS::$secMgr->checkAndSecurisePostData("device");
 			$room = FS::$secMgr->checkAndSecurisePostData("room");
@@ -401,28 +401,28 @@
 				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
-			
+
 			if (!$this->Load($device)) {
 				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
-			
+
 			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEchoError("err-no-rights");
-				return;	
+				return;
 			}
-			
+
 			FS::$dbMgr->BeginTr();
-			
+
 			if (FS::$dbMgr->GetOneData($this->infoTable,"device","device = '".$device."'")) {
 				FS::$dbMgr->Update($this->infoTable,"room = '".$room."'","device = '".$device."'");
 			}
 			else {
 				FS::$dbMgr->Insert($this->infoTable,"device,room","'".$device."','".$room."'");
 			}
-			
+
 			FS::$dbMgr->CommitTr();
-			
+
 			if ($room) {
 				echo $room;
 			}
@@ -432,25 +432,25 @@
 			$this->log(0,"Set room for '".$device."' to '".$room."'");
 			return;
 		}
-		
+
 		protected function canWrite() {
-			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_write") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->ip."_write")) {
+			if (!FS::$sessMgr->hasRight("snmp_".$this->snmprw."_write") &&
+				!FS::$sessMgr->hasRight("ip_".$this->ip."_write")) {
 				return false;
 			}
 			return true;
 		}
-		
+
 		private function canReadOrWriteRight($snmpro, $snmprw, $dip) {
-			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmpro."_read") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$snmprw."_write") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_read") && 
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$dip."_write")) {
+			if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_read") &&
+				!FS::$sessMgr->hasRight("snmp_".$snmprw."_write") &&
+				!FS::$sessMgr->hasRight("ip_".$dip."_read") &&
+				!FS::$sessMgr->hasRight("ip_".$dip."_write")) {
 				return false;
 			}
 			return true;
 		}
-		
+
 		private $ip;
 		private $dnsName;
 		private $building;
@@ -461,11 +461,11 @@
 		private $osVer;
 		private $snmpro;
 		private $snmprw;
-		
+
 		private $infoTable;
 		private $vlanTable;
 	};
-	
+
 	final class netDevicePort extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -473,14 +473,14 @@
 			$this->sqlPlugRoomTable = PGDbConfig::getDbPrefix()."switch_port_prises";
 			$this->readRight = "mrule_switches_read";
 		}
-		
+
 		public function Load($device = "", $port = "") {
 			$this->device = $device;
 			$this->port = $port;
 			$this->plug = "";
 			$this->room = "";
 			$this->deviceIP = "";
-			
+
 			if ($this->device != "" && $this->port != "") {
 				$this->deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 
@@ -496,62 +496,62 @@
 			}
 			return true;
 		}
-		
+
 		public function removeDatas() {
 			FS::$dbMgr->Delete($this->sqlPlugRoomTable,"ip = '".$dip."'");
 		}
-		
+
 		public function SaveRoomAndPlug() {
 			FS::$dbMgr->BeginTr();
 			FS::$dbMgr->Delete($this->sqlPlugRoomTable,"ip = '".$this->deviceIP."' AND port = '".$this->port."'");
 			FS::$dbMgr->Insert($this->sqlPlugRoomTable,"ip,port,prise,room","'".$this->deviceIP."','".$this->port."','".$this->plug."','".$this->room."'");
 			FS::$dbMgr->CommitTr();
 		}
-		
+
 		public function injectPlugRoomCSV() {
 			$csv = FS::$secMgr->checkAndSecurisePostData("csv");
 			$sep = FS::$secMgr->checkAndSecurisePostData("sep");
 			$repl = FS::$secMgr->checkAndSecurisePostData("repl");
-			
+
 			if (!$csv || !$sep || $sep != "," && $sep != ";") {
 				FS::$iMgr->ajaxEchoError("err-bad-datas");
 				return;
 			}
-			
+
 			$csv = preg_replace("#[\r]#","",$csv);
 			$lines = preg_split("#[\n]#",$csv);
 			if (!$lines) {
 				FS::$iMgr->ajaxEchoError("err-invalid-csv");
 				return;
 			}
-			
+
 			$plugAndRooms = array();
-			
+
 			$count = count($lines);
 			for ($i=0;$i<$count;$i++) {
 				$entry = preg_split("#[".$sep."]#",$lines[$i]);
-				
+
 				// Entry has 4 fields
 				if (count($entry) != 4) {
 					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
 					return;
 				}
-				
+
 				// Create array dimension by device
 				if (!isset($plugAndRooms[$entry[0]])) {
 					$plugAndRooms[$entry[0]] = array();
 				}
-				
+
 				// Create array dimension by port
 				if (!isset($plugAndRooms[$entry[0]][$entry[1]])) {
 					$plugAndRooms[$entry[0]][$entry[1]] = array();
 				}
-				
+
 				// Store port informations into buffer
 				$plugAndRooms[$entry[0]][$entry[1]][0] = $entry[2];
 				$plugAndRooms[$entry[0]][$entry[1]][1] = $entry[3];
 			}
-			
+
 			// Now we test if devices and ports exists
 			foreach ($plugAndRooms as $device => $ports) {
 				$deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
@@ -564,37 +564,37 @@
 						FS::$iMgr->ajaxEchoError($this->loc->s("err-invalid-csv-port").$device."/".$port."'","",true);
 						return;
 					}
-					
+
 					if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlPlugRoomTable,"ip",
 						"ip = '".$deviceIP."' AND port = '".$port."' AND (prise != '' OR room != '')")) {
 						FS::$iMgr->ajaxEchoError($this->loc->s("err-csv-replace-data").$device."/".$port."'","",true);
 						return;
 					}
-					
+
 					// We add device IP there for improve perfs (not the best location)
 					$plugAndRooms[$device][$port][2] = $deviceIP;
 				}
 			}
-			
+
 			FS::$dbMgr->BeginTr();
 			foreach ($plugAndRooms as $device => $ports) {
 				foreach($ports as $port => $values) {
 					if ($repl == "on") {
 						FS::$dbMgr->Delete($this->sqlPlugRoomTable,"ip = '".$values[2]."' AND port = '".$port."'");
 					}
-					
+
 					FS::$dbMgr->Insert($this->sqlPlugRoomTable,"ip,port,prise,room","'".$values[2]."','".$port."','".$values[0]."','".$values[1]."'");
 				}
 			}
 			FS::$dbMgr->CommitTr();
 			FS::$iMgr->ajaxEchoOK("Done");
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"name","name ILIKE '".$search."%'",
 					array("order" => "name","limit" => "10","group" => "name"));
@@ -605,7 +605,7 @@
 			else {
 				$output = "";
 				$found = false;
-				
+
 				$devportname = array();
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,port,name","name ILIKE '%".$search."%'",array("order" => "ip,port"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -621,12 +621,12 @@
 
 				if ($found) {
 					$output = "";
-					
+
 					foreach ($devportname as $device => $devport) {
 						if ($output != "") {
 							$output .= FS::$iMgr->hr();
 						}
-						
+
 						$output .= $this->loc->s("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 							"&d=".$device, $device)."<ul>";
 						foreach ($devport as $port => $portdata) {
@@ -636,12 +636,12 @@
 								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 								"&d=".$device."&p=".$port, FS::$iMgr->img("styles/images/pencil.gif",12,12))." ".
 								"<br /><b>".$this->loc->s("Description").":</b> ".$portdata[0];
-								
+
 							if ($portdata[1]) {
 								$output .= "<br /><b>".$this->loc->s("Plug").":</b> ".$portdata[1];
 							}
 							$output .= "</li>";
-							
+
 							FS::$searchMgr->incResultCount();
 						}
 						$output .= "</ul>";
@@ -650,32 +650,32 @@
 				}
 			}
 		}
-		
+
 		public function setPlug($plug) {
 			$this->plug = $plug;
 		}
-		
+
 		public function getPlug() {
 			return $this->plug;
 		}
-		
+
 		public function setRoom($room) {
 			$this->room = $room;
 		}
-		
+
 		public function getRoom() {
 			return $this->room;
 		}
-		
+
 		private $device;
 		private $deviceIP;
 		private $port;
 		private $plug;
 		private $room;
-		
+
 		private $sqlPlugRoomTable;
 	};
-	
+
 	final class netNode extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -684,12 +684,12 @@
 			$this->nipTable = "node_ip";
 			$this->readRight = "mrule_switches_read";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->nbtTable,"domain","domain ILIKE '%".$search."%'",
 					array("order" => "domain","limit" => "10","group" => "domain"));
@@ -702,19 +702,19 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("nbname",$data["nbname"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->nipTable,"ip","host(ip) ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->nbtTable,"ip","host(ip) ILIKE '".$search."%'",
 					array("order" => "ip","limit" => "10","group" => "ip"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					FS::$searchMgr->addAR("ip",$data["ip"]);
 				}
-				
+
 				$query = FS::$dbMgr->Select($this->nipTable,"mac","text(mac) ILIKE '".$search."%'",
 					array("order" => "mac","limit" => "10","group" => "mac"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -736,7 +736,7 @@
 			else {
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last,active",
 					"domain ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -754,7 +754,7 @@
 						($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")." @ ".
 						FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).
 						"</td><td>".$fst[0]."</td><td>".$lst[0]."</td><td>";
-					
+
 					$output = sprintf("%s%s</td></tr>",$output,($data["active"] == 't' ? $this->loc->s("Yes") : $this->loc->s("No")));
 					FS::$searchMgr->incResultCount();
 				}
@@ -762,10 +762,10 @@
 				if ($found) {
 					$this->storeSearchResult($output."</table>","title-netbios");
 				}
-				
+
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->nbtTable,"mac,ip,domain,nbname,nbuser,time_first,time_last,active",
 					"host(ip) = '".$search."' OR nbname ILIKE '%".$search."%' OR CAST(mac AS varchar) ILIKE '%".$search."%'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -783,23 +783,23 @@
 						"&s=".$data["domain"], $data["domain"]).
 						"\\".FS::$iMgr->aLink($this->mid."&s=".$data["nbname"], $data["nbname"])."<br />".
 						$this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
-						
+
 					$output = sprintf("%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s %s)",
 						$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
 						$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
 					);
-					
+
 					FS::$searchMgr->incResultCount();
 				}
-				
+
 				if ($found) {
 					$this->storeSearchResult($output,"title-netbios");
 				}
-				
+
 				$output = "";
 				$found = false;
 				$lastmac = "";
-				
+
 				$query = FS::$dbMgr->Select($this->nipTable,"mac,time_first,time_last",
 					"host(ip) = '".$search."' OR CAST(mac AS varchar) ILIKE '%".$search."%'",
 					array("order" => "time_last","ordersens" => 1));
@@ -811,7 +811,7 @@
 					else {
 						$output .= FS::$iMgr->hr();
 					}
-					
+
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"]).
@@ -819,11 +819,11 @@
 						" ".$this->loc->s("and-the")." ".$lst[0].")";
 					FS::$searchMgr->incResultCount();
 				}
-				
+
 				if ($found) {
 					$this->storeSearchResult($output,"title-mac-addr");
 				}
-				
+
 				if ($lastmac) {
 					$output = "";
 					$query = FS::$dbMgr->Select($this->sqlTable,"switch,port,time_first,time_last,active",
@@ -836,30 +836,30 @@
 						$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises","prise",
 							"ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
 						$convport = preg_replace("#\/#","-",$data["port"]);
-						
+
 						$output .= FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch, $switch)." ".
 							"[".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."#".
 							$convport, $data["port"])."] ".
 							FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$switch."&p=".
 							$data["port"], FS::$iMgr->img("styles/images/pencil.gif",10,10));
-							
+
 						if ($piece) {
 							$output .= "/ ".$this->loc->s("Plug")." ".$piece;
 						}
-						
+
 						$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s%s)<br />",
 							$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
 							$data["active"] == 't' ? " <b>".$this->loc->s("Active")."</b>" : ""
 						);
-						
+
 						FS::$searchMgr->incResultCount();
 						$this->storeSearchResult($output,"title-last-device");
 					}
 				}
-			
+
 				$output = "";
 				$found = false;
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"switch,port,time_first,time_last,active",
 					"CAST (mac AS varchar) ILIKE '%".$search."%'",
 					array("order" => "time_last","ordersens" => 2));
@@ -867,7 +867,7 @@
 					if ($found == false) {
 						$found = true;
 					}
-					
+
 					$switch = FS::$dbMgr->GetOneData("device","name","ip = '".$data["switch"]."'");
 					$piece = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_port_prises",
 						"prise","ip = '".$data["switch"]."' AND port = '".$data["port"]."'");
@@ -880,12 +880,12 @@
 						($piece == NULL ? "" : " / Prise ".$piece);
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
-					
+
 					$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s%s)<br />",
 						$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
 						$data["active"] == 't' ? " <b>".$this->loc->s("Active")."</b>" : ""
 					);
-					
+
 					FS::$searchMgr->incResultCount();
 				}
 
@@ -894,11 +894,11 @@
 				}
 			}
 		}
-		
+
 		private $nbtTable;
 		private $nipTable;
 	};
-	
+
 	final class netPlug extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -907,12 +907,12 @@
 			$this->devPortTable = "device_port";
 			$this->readRight = "mrule_switches_read";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"prise","prise ILIKE '".$search."%'",array("order" => "prise","limit" => "10","group" => "prise"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -922,14 +922,14 @@
 			else {
 				$found = false;
 				$output = "";
-				
+
 				$query = FS::$dbMgr->Select($this->sqlTable,"ip,port,prise","prise ILIKE '".$search."%'",array("order" => "port"));
 				$devprise = array();
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
 					}
-					
+
 					$swname = FS::$dbMgr->GetOneData($this->deviceTable,"name","ip = '".$data["ip"]."'");
 					if (!isset($devprise[$swname])) {
 						$devprise[$swname] = array();
@@ -961,11 +961,11 @@
 				}
 			}
 		}
-		
+
 		private $deviceTable;
 		private $devPortTable;
 	};
-	
+
 	final class netRoom extends FSMObj {
 		function __construct() {
 			parent::__construct();
@@ -975,12 +975,12 @@
 			$this->readRight = "mrule_switches_read";
 			$this->writeRight = "mrule_switches_write";
 		}
-		
+
 		public function search($search, $autocomplete = false) {
 			if (!$this->canRead()) {
 				return;
 			}
-			
+
 			if ($autocomplete) {
 				$query = FS::$dbMgr->Select($this->sqlTable,"room","room ILIKE '".$search."%'",
 					array("order" => "room","limit" => "10","group" => "room"));
@@ -998,7 +998,7 @@
 					if ($found == false) {
 						$found = true;
 					}
-					
+
 					$swname = FS::$dbMgr->GetOneData($this->deviceTable,"name","ip = '".$data["ip"]."'");
 					if (!isset($devroom[$swname])) {
 						$devroom[$swname] = array();
@@ -1031,13 +1031,13 @@
 				}
 			}
 		}
-		
+
 		protected function canWrite() {
-			if (!FS::$sessMgr->hasRight("mrule_switchmgmt_snmp_".$this->snmprw."_write") &&
-				!FS::$sessMgr->hasRight("mrule_switchmgmt_ip_".$this->deviceIP."_write")) {
+			if (!FS::$sessMgr->hasRight("snmp_".$this->snmprw."_write") &&
+				!FS::$sessMgr->hasRight("ip_".$this->deviceIP."_write")) {
 				return false;
 			}
-			return true;	
+			return true;
 		}
 		public function FastModify() {
 			$this->devicePort = FS::$secMgr->checkAndSecurisePostData("swport");
@@ -1048,24 +1048,24 @@
 				echo "ERROR";
 				return;
 			}
-			
+
 			$this->device = FS::$dbMgr->GetOneData("device","name","ip = '".$this->deviceIP."'");
 			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if (!$this->canWrite()) {
 				FS::$iMgr->ajaxEchoError("err-no-rights");
-				return;	
+				return;
 			}
 
 			if ($room == NULL) {
 				$room = "";
 			}
-			
+
 			$portObj = new netDevicePort();
 			if (!$portObj->Load($this->device,$this->devicePort)) {
 				echo "ERROR";
 				return;
 			}
-			
+
 			$portObj->setRoom($room);
 			$portObj->SaveRoomAndPlug();
 
@@ -1076,7 +1076,7 @@
 			}
 			echo $room;
 		}
-		
+
 		private $deviceTable;
 		private $devPortTable;
 		private $device;

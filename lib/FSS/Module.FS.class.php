@@ -47,6 +47,7 @@
 		public function getModuleId() { return $this->mid; }
 		public function getMenuTitle() { return $this->loc->s("menu-title"); }
 		public function getLoc() { return $this->loc; }
+		public function getName() { return $this->modulename; }
 
 		public function log($level,$str,$user=NULL) {
 			if ($user === NULL) {
@@ -54,14 +55,14 @@
 			}
 			FS::$log->i($user,$this->modulename,$level,$str);
 		}
-		
+
 		public function getRulesClass() { return $this->rulesclass; }
 		public function getMenu() { return $this->menu; }
 		public function getMenuPriority() { return $this->menupriority; }
-		
+
 		// Footer Plugin
 		public function loadFooterPlugin() {}
-		
+
 		/*
 		 * The title is the label on the footer bar
 		 * Content is a clickable element (NOT IMPLEMENTED)
@@ -76,7 +77,7 @@
 				)
 			);
 		}
-		
+
 		protected function removeFooterPlugin() {
 			FS::$iMgr->js(
 				sprintf("$('#footer_%s').remove();",
@@ -84,7 +85,7 @@
 				)
 			);
 		}
-		
+
 		protected function setFooterPluginTitle($title) {
 			FS::$iMgr->js(
 				sprintf("$('#footer_%s #footerPluginTitle').html('%s');",
@@ -93,7 +94,7 @@
 				)
 			);
 		}
-		
+
 		protected function setFooterPluginContent($content) {
 			FS::$iMgr->js(
 				sprintf("$('#footer_%s #footerPluginContent').html('%s');",
@@ -102,7 +103,7 @@
 				)
 			);
 		}
-		
+
 		private function genFooterPluginName() {
 			return FS::$iMgr->formatHTMLId($this->modulename);
 		}
@@ -110,12 +111,12 @@
 		// Attributes
 		protected $mid;
 		protected $modulename;
-		
+
 		protected $loc;
-		
+
 		protected $rulesclass;
 		protected $scheduleclass;
-		
+
 		protected $menu;
 		protected $menupriority;
 	}

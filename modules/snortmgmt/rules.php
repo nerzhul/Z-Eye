@@ -32,11 +32,11 @@
 			if (!FS::$sessMgr->isConnected()) {
 				return -1;
 			}
-			
-			if(FS::$sessMgr->hasRight("mrule_snortmgmt_read")) {
+
+			if(FS::$sessMgr->hasRight("read","snortmgmt")) {
 				return true;
 			}
-			
+
 			return false;
 		}
 	};

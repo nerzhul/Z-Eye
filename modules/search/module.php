@@ -24,9 +24,9 @@
 	require_once(dirname(__FILE__)."/../switches/objects.php");
 
 	if(!class_exists("iSearch")) {
-		
+
 	final class iSearch extends FSModule {
-		function __construct() { 
+		function __construct() {
 			parent::__construct();
 			$this->modulename = "search";
 			$this->loc = new lSearch();
@@ -44,7 +44,7 @@
 				if (!$search) {
 					$search = FS::$secMgr->checkAndSecuriseGetData("s");
 				}
-				
+
 				if (!$search) {
 					return FS::$iMgr->printError("err-no-search");
 				}
@@ -57,7 +57,7 @@
 			if (!$search) {
 				$search = FS::$secMgr->checkAndSecuriseGetData("s");
 			}
-			
+
 			if (!$search) {
 				return NULL;
 			}
@@ -68,7 +68,7 @@
 		private function findRefsAndShow($search,$autocomp=false) {
 			if (!$autocomp) {
 				FS::$iMgr->setURL("s=".$search);
-				
+
 				$output = FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
 				if (FS::$secMgr->isMacFragment($search)) {
 					$this->showMacAddrResults($search);
@@ -82,9 +82,9 @@
 				else {
 					$this->showNamedInfos($search);
 				}
-				
+
 				$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true);
-				
+
 				if (FS::$searchMgr->getMode() != 1) {
 					if (count(FS::$searchMgr->getResults()) > 0) {
 						foreach (FS::$searchMgr->getResults() as $title => $results) {
@@ -96,7 +96,7 @@
 						return $output.FS::$iMgr->printError("err-no-res");
 					}
 				}
-							
+
 				$this->log(0,"searching '".$search."'");
 			}
 			else {
@@ -112,7 +112,7 @@
 				else {
 					$this->showNamedInfos($search,true);
 				}
-				
+
 				$output = "[";
 				$outresults = array();
 				foreach (FS::$searchMgr->getAutoResults() as $key => $values) {
@@ -133,7 +133,7 @@
 
 		private function showNumericResults($search,$autocomp=false) {
 			$objs = array(new netPlug(), new netRoom(), new netDevice(), new dhcpIP());
-			
+
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
 				$objs[$i]->search($search,$autocomp);
@@ -150,7 +150,7 @@
 				new dhcpSubnet(), new dhcpServer(), new dhcpCluster(), new dhcpIP(), new dhcpCustomOption(), new dhcpOption(),
 				new dhcpOptionGroup(),
 				new netDevice(), new netPlug(), new netRoom(), new netDevicePort() , new netNode());
-				
+
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
 				$objs[$i]->search($search,$autocomp);
@@ -160,7 +160,7 @@
 		private function showIPAddrResults($search,$autocomp=false) {
 			$objs = array(new dnsRecord(), new dhcpIP(), new dhcpServer(), new dhcpSubnet(),
 				new netNode(), new netDevice());
-			
+
 			$count = count($objs);
 			for ($i=0;$i<$count;$i++) {
 				$objs[$i]->search($search,$autocomp);
@@ -205,7 +205,7 @@
 							}
 						}
 					}
-					
+
 					if ($found) {
 						$found = 0;
 						$raddatas = true;
@@ -256,7 +256,7 @@
 								$inputbw = round($data2["input"]/1024,2)."Ko";
 							else
 								$inputbw = $data2["input"]." ".$this->loc->s("Bytes");
-								
+
 							if ($data2["output"] > 1024*1024*1024)
 								$outputbw = round($data2["output"]/1024/1024/1024,2)."Go";
 							else if ($data2["output"] > 1024*1024)
@@ -281,7 +281,7 @@
 								$inputbw = round($totinbw/1024,2)."Ko";
 							else
 								$inputbw = $totinbw." ".$this->loc->s("Bytes");
-								
+
 							if ($totoutbw > 1024*1024*1024)
 								$outputbw = round($totoutbw/1024/1024/1024,2)."Go";
 							else if ($totoutbw > 1024*1024)
@@ -326,7 +326,7 @@
 								$outputbw = round($data2["acctoutputoctets"]/1024,2)." Ko";
 						else
 								$outputbw = $data2["acctoutputoctets"]." ".$this->loc->s("Bytes");
-						
+
 						$macdev = "";
 						if (strlen($data2["calledstationid"]) > 0) {
 							$devportmac = preg_replace("[-]",":",$data2["calledstationid"]);
@@ -350,7 +350,7 @@
 					if ($found) {
 						$output .= "</table>";
 					}
-					if ($raddatas) { 
+					if ($raddatas) {
 						$output = $this->divEncapResults(FS::$iMgr->h3($this->loc->s("Radius-Server")." (".$data["dbname"].
 							"@".$data["addr"].":".$data["port"].")",true).FS::$iMgr->hr().$output,"",true);
 					}
@@ -368,19 +368,19 @@
 				}
 			}
 
-			if (FS::$sessMgr->hasRight("mrule_ipmanager_read")) {
+			if (FS::$sessMgr->hasRight("read","ipmanager")) {
 				(new dhcpIP())->search($search,$autocomp);
 			}
 
-			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
+			if (FS::$sessMgr->hasRight("read","switches")) {
 				(new netNode())->search($search,$autocomp);
 			}
-	
-			if (FS::$sessMgr->hasRight("mrule_radius_read")) {
+
+			if (FS::$sessMgr->hasRight("read","radius")) {
 				$this->showRadiusInfos($search,$autocomp);
 			}
-			
-			if (FS::$sessMgr->hasRight("mrule_switches_read")) {
+
+			if (FS::$sessMgr->hasRight("read","switches")) {
 				(new netDevice())->search($search,$autocomp);
 			}
 		}
@@ -394,7 +394,7 @@
 				return "";
 			}
 		}
-		
+
 		public function handlePostDatas($act) {
 			switch($act) {
 				case 1:
@@ -408,8 +408,8 @@
 			}
 		}
 	};
-	
+
 	}
-	
+
 	$module = new iSearch();
 ?>

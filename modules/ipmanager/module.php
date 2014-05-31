@@ -16,19 +16,19 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/modules/Network.FS.class.php");
 	require_once(dirname(__FILE__)."/objects.php");
 
 	if(!class_exists("iIPManager")) {
-		
+
 	final class iIPManager extends FSModule {
 		function __construct() {
 			parent::__construct();
 			$this->loc = new lIPManager();
-			$this->modulename = "ipmanager";
+			$this->modulename = "ipmmgmt";
 			$this->rulesclass = new rIPManager($this->loc);
 			$this->menu = $this->loc->s("menu-name");
 		}
@@ -46,20 +46,20 @@
 			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-ip-management");
 				$tabs = array();
-				if (FS::$sessMgr->hasRight("mrule_ipmmgmt_read"))
+				if (FS::$sessMgr->hasRight("read"))
 					$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("Consult"));
-				if (FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt"))
+				if (FS::$sessMgr->hasRight("subnetmgmt"))
 					$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("Manage-Subnets"));
-				if (FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt") ||
-					FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt"))
+				if (FS::$sessMgr->hasRight("optionsmgmt") ||
+					FS::$sessMgr->hasRight("optionsgrpmgmt"))
 					$tabs[] = array(5,"mod=".$this->mid,$this->loc->s("Manage-DHCP-Opts"));
-				if (FS::$sessMgr->hasRight("mrule_ipmmgmt_advancedtools"))
+				if (FS::$sessMgr->hasRight("advancedtools"))
 					$tabs[] = array(4,"mod=".$this->mid,$this->loc->s("Advanced-tools"));
-				if (FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt"))
+				if (FS::$sessMgr->hasRight("servermgmt"))
 					$tabs[] = array(3,"mod=".$this->mid,$this->loc->s("Manage-Servers"));
 
 				$output .= FS::$iMgr->tabPan($tabs,$sh);
-			}	
+			}
 			else {
 				switch($sh) {
 					case 1: $output .= $this->showStats(); break;
@@ -74,7 +74,7 @@
 
 		private function showStats() {
 			FS::$iMgr->setURL("sh=1");
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
+			if (!FS::$sessMgr->hasRight("read")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$output = "";
@@ -89,7 +89,7 @@
 			$subnetObj = new dhcpSubnet();
 			$formoutput = $subnetObj->getSelect(array("name" => "f", "selected" => $filter,
 				"withcache" => true));
-			
+
 			$tmpoutput .= $formoutput.
 				FS::$iMgr->select("view").FS::$iMgr->selElmt($this->loc->s("Stats"),1).
 				FS::$iMgr->selElmt($this->loc->s("History"),2).
@@ -102,12 +102,12 @@
 
 			$output .= $tmpoutput.
 				"<div id=\"netHCr\"></div><div id=\"netshowcont\"></div>";
-					
+
 			return $output;
 		}
 
 		private function showSubnetIPList($filter) {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_read")) {
+			if (!FS::$sessMgr->hasRight("read")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$netid = ""; $netmask = "";
@@ -118,10 +118,10 @@
 				$netid = $data["netid"]; $netmask = $data["netmask"];
 				$netdeclared = true;
 			}
-			
+
 			// Check if subnet is distributed to cluster
 			$subnetLinkedToCluster = (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet","subnet = '".$filter."'") != NULL);
-			
+
 			if (!$netid) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cache","netid,netmask","netid = '".$filter."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
@@ -134,8 +134,8 @@
 
 			// range management
 			$subnetu = preg_replace("#[.]#","_",$filter);
-			if ((FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") ||
-				FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) &&
+			if ((FS::$sessMgr->hasRight("rangemgmt") ||
+				FS::$sessMgr->hasRight($subnetu."_rangemgmt")) &&
 				$netdeclared) {
 				$output .= FS::$iMgr->opendiv(14,$this->loc->s("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$netid));
 				$output .= FS::$iMgr->opendiv(15,$this->loc->s("import-dhcp-reserv"),array("line" => true,"lnkadd" => "subnet=".$netid));
@@ -149,7 +149,7 @@
 
 			$this->loadSwitchList();
 
-			// for Z-Eye ipmanager request. Not the better idea, i think 
+			// for Z-Eye ipmanager request. Not the better idea, i think
 			$iplist = "";
 			// Initiate network IPs
 			$lastip = $netobj->getLastUsableIPLong();
@@ -165,7 +165,7 @@
 				$iparray[$i]["distrib"] = 0;
 				$iparray[$i]["servers"] = array();
 				$iparray[$i]["comment"] = "";
-	
+
 				if ($iplist != "") $iplist .= ",";
 				$iplist .= "'".long2ip($i)."'";
 			}
@@ -240,7 +240,7 @@
 						}
 						break;
 				}
-				
+
 				$output .= "<tr id=\"sb".FS::$iMgr->formatHTMLId(long2ip($key))."tr\">".
 					(new dhcpIP())->genIPLineFull(long2ip($key),
 						$value["mac"],$value["host"],$value["comment"],
@@ -265,42 +265,42 @@
 			if ($used > 0) {
 				$js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
 			}
-			
+
 			if ($reserv > 0) {
 				$js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
 			}
-			
+
 			if ($fixedip > 0) {
 				$js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
 			}
-			
+
 			if ($distrib > 0) {
 				$js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
 			}
-			
+
 			$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
 				}]});},300);";
 			FS::$iMgr->js($js);
 
 			return $output;
 		}
-		
+
 		private function showDHCPImportReservForm($subnet) {
 			$subnetu = preg_replace("#[.]#","_",$subnet);
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
-				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) {
+			if (!FS::$sessMgr->hasRight("rangemgmt") &&
+				!FS::$sessMgr->hasRight($subnetu."_rangemgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
-			
+
 			$netmask = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$subnet."'");
 			if (!$netmask) {
 				return FS::$iMgr->printError("err-subnet-not-exists");
 			}
 
-			
+
 			$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt($this->loc->s("comma"),",").
 					FS::$iMgr->selElmt($this->loc->s("semi-colon"),";")."</select>";
-						
+
 			return FS::$iMgr->tip("tip-import-reserv").
 				FS::$iMgr->cbkForm("19")."<table>".
 				FS::$iMgr->hidden("subnet",$subnet).
@@ -314,8 +314,8 @@
 
 		private function showDHCPRangeForm($subnet) {
 			$subnetu = preg_replace("#[.]#","_",$subnet);
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
-				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) {
+			if (!FS::$sessMgr->hasRight("rangemgmt") &&
+				!FS::$sessMgr->hasRight($subnetu."_rangemgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 
@@ -323,7 +323,7 @@
 			if (!$netmask) {
 				return FS::$iMgr->printError("err-subnet-not-exists");
 			}
-			
+
 			$output = FS::$iMgr->tip("tip-range").FS::$iMgr->cbkForm("18")."<table>".
 				FS::$iMgr->idxLine("start-ip","startip",array("type" => "ip", "length" => 16)).
 				FS::$iMgr->idxLine("end-ip","endip",array("type" => "ip", "length" => 16)).
@@ -338,13 +338,13 @@
 
 		private function showSubnetHistory($filter) {
 			$subnetu = preg_replace("#[.]#","_",$filter);
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_history") &&
-				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_history")) {
+			if (!FS::$sessMgr->hasRight("history") &&
+				!FS::$sessMgr->hasRight($subnetu."_history")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 
 			$output = FS::$iMgr->js("function historyDateChange() {
-				hideAndEmpty('#hstcontent'); 
+				hideAndEmpty('#hstcontent');
 				$.post('?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
 					$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
 				}); };");
@@ -366,8 +366,8 @@
 
 		private function showSubnetMonitoring($filter) {
 			$subnetu = preg_replace("#[.]#","_",$filter);
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmon") &&
-				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_subnetmon")) {
+			if (!FS::$sessMgr->hasRight("subnetmon") &&
+				!FS::$sessMgr->hasRight($subnetu."_subnetmon")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 
@@ -400,11 +400,11 @@
 
 		private function showAdvancedTools() {
 			FS::$iMgr->setURL("sh=4");
-			
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_advancedtools")) {
+
+			if (!FS::$sessMgr->hasRight("advancedtools")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
-			
+
 			$output = FS::$iMgr->h4("title-search-old");
 			$output .= FS::$iMgr->cbkForm("2");
 			$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
@@ -415,9 +415,9 @@
 
 		private function showDHCPOptsMgmt() {
 			FS::$iMgr->setURL("sh=5");
-			
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt") &&
-				!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt")) {
+
+			if (!FS::$sessMgr->hasRight("optionsmgmt") &&
+				!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$output = FS::$iMgr->h2("title-dhcp-opts-group").FS::$iMgr->tip("tip-dhcp-opt-group")."<br />".
@@ -518,7 +518,7 @@
 			$output .= "</td></tr>".
 				FS::$iMgr->aeTableSubmit($optgroup == "");
 			return $output;
-		}	
+		}
 
 		private function showDHCPOptsForm($optalias="") {
 			$optname = ""; $optvalue = "";
@@ -526,7 +526,7 @@
 			if (!$customoptexist) {
 				return FS::$iMgr->printError("err-no-dhcp-custom-option");
 			}
-		
+
 			if ($optalias) {
 				if ($data = FS::$dbMgr->GetOneEntry(PGDbConfig::getDbPrefix()."dhcp_option","optname,optval",
 					"optalias = '".$optalias."'")) {
@@ -593,8 +593,8 @@
 
 		private function showSubnetMgmt() {
 			FS::$iMgr->setURL("sh=2");
-			
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
+
+			if (!FS::$sessMgr->hasRight("subnetmgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 	                $output = FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
@@ -642,14 +642,14 @@
 			$net->CalcCIDR();
 			$output = "<tr id=\"ds".FS::$iMgr->formatHTMLId($netid)."tr\"><td>".FS::$iMgr->opendiv(2,$netid,array("lnkadd" => "netid=".$netid)).
 				"/".$netmask." (/".$net->getCIDR().")</td><td>";
-				
+
 			if ($netidv6 != "" && $prefixlenv6 != 0) {
 				$output .= $netidv6."/".$prefixlenv6;
 			}
-				
+
 			$output .= "</td><td>".$vlanid."</td><td>".
 				($net->getMaxHosts()-1)."</td><td>".$shortname."</td><td>".$desc."</td><td>";
-			
+
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","clustername","subnet = '".$netid."'");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -673,7 +673,7 @@
 		}
 
 		private function showDHCPSubnetForm($netid = "") {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
+			if (!FS::$sessMgr->hasRight("subnetmgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$netmask = ""; $vlanid = 0; $shortname = ""; $desc = "";
@@ -694,7 +694,7 @@
 					$domainname = $data["domainname"];
 					$mleasetime = $data["mleasetime"];
 					$dleasetime = $data["dleasetime"];
-					
+
 					$query2 = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared","netid,prefixlen","netidv4 = '".$netid."'");
 					if ($data2 = FS::$dbMgr->Fetch($query2)) {
 						$netidv6 = $data2["netid"];
@@ -781,10 +781,10 @@
 		}
 
 		private function showDHCPSrvForm($addr = "") {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+			if (!FS::$sessMgr->hasRight("servermgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
-			
+
 			$user = "";
 			$dhcpdpath = "";
 			$leasepath = "";
@@ -794,7 +794,7 @@
 			$description = "";
 			$clusteraddr = "";
 			$dhcptype = 0;
-			
+
 			if ($addr) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers",
 					"alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype,clusteraddr",
@@ -811,16 +811,16 @@
 					$dhcptype = $data["dhcptype"];
 				}
 			}
-			
+
 			$selForm = sprintf("%s%s</select>",
 				FS::$iMgr->select("dhcptype"),
 				FS::$iMgr->selElmt("ISC-DHCP",1,$dhcptype == 1)
 			);
-			
+
 			$output = FS::$iMgr->cbkForm("5").$this->loc->s("note-needed")."<table>".
 				FS::$iMgr->idxLines(array(
 					array($this->loc->s("server-addr")." (*)","addr",
-						array("value" => $addr,"type" => "idxedit", 
+						array("value" => $addr,"type" => "idxedit",
 							"length" => 128, "edit" => $addr != "",
 							"rawlabel" => true, "tooltip" => "tooltip-dhcp-server-ip"
 					)),
@@ -839,7 +839,7 @@
 						"type" => "ip", "value" => $clusteraddr,
 						"tooltip" => "tooltip-clustering-ip")),
 					array($this->loc->s("dhcp-type")." (*)","", array(
-						"type" => "raw", "rawlabel" => true, 
+						"type" => "raw", "rawlabel" => true,
 						"value" => $selForm)),
 					array("dhcpd-path","dhcpdpath",
 						array("value" => $dhcpdpath,"length" => 980,
@@ -859,7 +859,7 @@
 		}
 
 		private function showDHCPSrvList() {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+			if (!FS::$sessMgr->hasRight("servermgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("os-name").
@@ -869,7 +869,7 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				$output .= "<tr><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"]))."</td><td>".$data["alias"]."</td><td>".$data["description"]."</td><td>".
 					$data["osname"]."</td><td>";
-	
+
 				switch($data["dhcptype"]) {
 					case 1:	$output .= "ISC-DHCP"; break;
 					default: $output .= $this->loc->s("unknown"); break;
@@ -887,7 +887,7 @@
 				}
 
 				if (!$found) $output .= $this->loc->s("None");
-				
+
 				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"addr=".$data["addr"],array("js" => true,
 					"confirmtext" => "confirm-remove-dhcp",
 					"confirmval" => $data["addr"]
@@ -900,15 +900,15 @@
 
 		private function showDHCPMgmt() {
 			FS::$iMgr->setURL("sh=3");
-			
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+
+			if (!FS::$sessMgr->hasRight("servermgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 
 			$output = FS::$iMgr->h2("title-dhcp-cluster-mgmt");
 
 			$dhcpcount = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."dhcp_servers","addr");
-			
+
 			if ($dhcpcount > 0) {
 				// To add DHCP cluster
 				$output .= FS::$iMgr->opendiv(4,$this->loc->s("add-cluster")).
@@ -938,7 +938,7 @@
 		}
 
 		private function showDHCPClusterForm($name = "") {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+			if (!FS::$sessMgr->hasRight("servermgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$members = array();
@@ -975,7 +975,7 @@
 		}
 
 		private function showDHCPClusterList() {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+			if (!FS::$sessMgr->hasRight("servermgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$output = $this->showTableHeadCluster();
@@ -1024,7 +1024,7 @@
 		}
 
 		private function showIPForm($ip = "") {
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+			if (!FS::$sessMgr->hasRight("ipmgmt")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$mac = "";
@@ -1032,7 +1032,7 @@
 			$comment = "";
 			$reserv = false;
 			$expiration = "";
-			
+
 			if ($ip) {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_ip","macaddr,hostname,comment,reserv,expiration_date","ip = '".$ip."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
@@ -1087,8 +1087,8 @@
 
 		private function showHistory($filter,$interval = 1) {
 			$subnetu = preg_replace("#[.]#","_",$filter);
-			if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_history") &&
-				!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_history")) {
+			if (!FS::$sessMgr->hasRight("history") &&
+				!FS::$sessMgr->hasRight($subnetu."_history")) {
 				return FS::$iMgr->printError("err-no-rights");
 			}
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
@@ -1205,7 +1205,7 @@
 					$ipToDynDistribute[$i] = 1;
 				}
 			}
-			// If Action 2: we clean dynamic IP from ranges 
+			// If Action 2: we clean dynamic IP from ranges
 			else if ($action == 2) {
 				for ($i=ip2long($startip);$i<=ip2long($endip);$i++) {
 					$ipToDynDistribute[$i] = 0;
@@ -1271,7 +1271,7 @@
 
 			FS::$dbMgr->CommitTr();
 		}
-		
+
 		private function loadSwitchList() {
 			// Bufferize switch list
 			$this->switchList = array();
@@ -1293,7 +1293,7 @@
 					}
 
 					return $this->showDHCPSubnetForm($netid);
-				case 3: 
+				case 3:
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if (!$addr) {
 						return $this->loc->s("err-bad-datas");
@@ -1363,14 +1363,14 @@
 						FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 						return;
 					}
-					
+
 					switch($view) {
 						case 1: $subout = $this->showSubnetIPList($filtr); break;
 						case 2: $subout = $this->showSubnetHistory($filtr); break;
 						case 3: $subout = $this->showSubnetMonitoring($filtr); break;
 					}
 					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$subout))."');";
-					if ($view == 3) 
+					if ($view == 3)
 						$js .= "$('#netHCr').html('');";
 
 					FS::$iMgr->ajaxEchoOK("Done",$js);
@@ -1406,18 +1406,18 @@
 							$logbuffer .= $value;
 							$output .= $value;
 						}
-						
+
 						FS::$iMgr->ajaxEchoOK("Done","$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');");
 						$this->log(0,"User find obsolete datas");
 					}
 					else {
 						FS::$iMgr->ajaxEchoOK("Done","$('#obsres').html('".FS::$secMgr->cleanForJS(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
 					}
-					
+
 					return;
 				// Monitor DHCP subnet
 				case 3:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmon")) {
+					if (!FS::$sessMgr->hasRight("subnetmon")) {
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
 					}
@@ -1428,7 +1428,7 @@
 					$contact = FS::$secMgr->checkAndSecurisePostData("contact");
 					$enmon = FS::$secMgr->checkAndSecurisePostData("enmon");
 					$eniphistory = FS::$secMgr->checkAndSecurisePostData("eniphistory");
-					if (!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) || 
+					if (!$filtr || !FS::$secMgr->isIP($filtr) || !$warn || !FS::$secMgr->isNumeric($warn) ||
 						$warn < 0 || $warn > 100|| !$crit || !FS::$secMgr->isNumeric($crit) || $crit < 0 || $crit > 100 ||
 						!FS::$secMgr->isNumeric($maxage) || $maxage < 0 || !$contact || !FS::$secMgr->isMail($contact)) {
 						$this->log(2,"Some datas are missing when try to monitor subnet");
@@ -1438,8 +1438,8 @@
 
 					// Also here because we have subnet
 					$subnetu = preg_replace("#[.]#","_",$filtr);
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmon") && 
-						!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_subnetmon")) {
+					if (!FS::$sessMgr->hasRight("subnetmon") &&
+						!FS::$sessMgr->hasRight($subnetu."_subnetmon")) {
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
 					}
@@ -1475,7 +1475,7 @@
 					return;
 				// Add/Edit DHCP server
 				case 5:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+					if (!FS::$sessMgr->hasRight("servermgmt")) {
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
 					}
@@ -1493,7 +1493,7 @@
 					$leasepath = FS::$secMgr->checkAndSecurisePostData("leasepath");
 					$reservconfpath = FS::$secMgr->checkAndSecurisePostData("reservconfpath");
 					$subnetconfpath = FS::$secMgr->checkAndSecurisePostData("subnetconfpath");
-					
+
 					if (!$saddr || !$slogin || !$spwd || !$spwd2 ||
 						!$dhcpdpath || !$leasepath || !$reservconfpath || !$subnetconfpath ||
 						!$alias || $desc && !FS::$secMgr->isSentence($desc) ||
@@ -1504,7 +1504,7 @@
 						FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 						return;
 					}
-					
+
 					if ($clusteraddr && !FS::$secMgr->isIP($clusteraddr)) {
 						FS::$iMgr->ajaxEchoErrorNC("err-dhcpserver-invalid-clusteraddr");
 						$this->log(1,"Add/edit DHCP server: invalid cluster address");
@@ -1564,13 +1564,13 @@
 
 					}
 					$ssh = new SSH($saddr,22);
-					
+
                     if (!$ssh->Connect()) {
 						$this->log(1,"Add/edit DHCP server: ssh connection failed to '".$saddr."'");
 						FS::$iMgr->ajaxEchoErrorNC("err-ssh-conn-failed");
                         return;
                     }
-                    
+
 					if (!$ssh->Authenticate($slogin,$spwd)) {
 						$this->log(1,"Add/edit DHCP server: ssh connection failed for '".$slogin."'@'".$saddr."'");
 						FS::$iMgr->ajaxEchoErrorNC("err-ssh-auth-failed");
@@ -1616,7 +1616,7 @@
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_servers",
 							"addr = '".$saddr."'");
 					}
-					
+
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_servers",
 						"addr,alias,description,sshuser,sshpwd,dhcpdpath,leasespath,reservconfpath,subnetconfpath,dhcptype,osname,clusteraddr",
 						"'".$saddr."','".$alias."','".$desc.
@@ -1634,7 +1634,7 @@
 					return;
 				// Delete DHCP Server
 				case 6:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+					if (!FS::$sessMgr->hasRight("servermgmt")) {
 						$this->log(2,"Delete DHCP server: User don't have rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -1675,7 +1675,7 @@
                                         return;
 				// Add DHCP subnet
 				case 7:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
+					if (!FS::$sessMgr->hasRight("subnetmgmt")) {
 						$this->log(2,"Add/Edit subnet: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -1702,24 +1702,24 @@
 						$vlanid < 0 || $vlanid > 4096 || !$desc || !$shortname || preg_match("# #",$shortname) || $subnetclusters && !is_array($subnetclusters) ||
 						$router && !FS::$secMgr->isIP($router) || $dns1 && !FS::$secMgr->isIP($dns1) || $dns2 && (!$dns1 || !FS::$secMgr->isIP($dns2)) ||
 						$domainname && !FS::$secMgr->isDNSName($domainname) || $mleasetime && (!FS::$secMgr->isNumeric($mleasetime) || $mleasetime < 60) ||
-						$dleasetime && (!FS::$secMgr->isNumeric($dleasetime) || $dleasetime < 30) || 
+						$dleasetime && (!FS::$secMgr->isNumeric($dleasetime) || $dleasetime < 30) ||
 						$edit && $edit != 1) {
 						$this->log(2,"Add/Edit subnet: Bad datas");
 						FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 						return;
 					}
-					
+
 					if (!$dleasetime) {
 						$dleasetime = 0;
 					}
-					
+
 					if (!$mleasetime) {
 						$mleasetime = 0;
 					}
-					
+
 					// @TODO check if IPv6 network is used elsewhere
 					if ($prefixlen && (!$netidv6 ||	!FS::$secMgr->isNumeric($prefixlen)) ||
-						$netidv6 && 
+						$netidv6 &&
 							(!$prefixlen || !FS::$secMgr->isIPv6NetworkAddr($netidv6) ||
 							$prefixlen < 1 || $prefixlen > 126)) {
 							$this->log(2,"Add/Edit subnet: subnet '".$netid."': invalid IPv6 infos");
@@ -1748,7 +1748,7 @@
 						FS::$iMgr->ajaxEchoErrorNC("err-dlease-sup-mlease");
 						return;
 					}
-					
+
 					if ($router) {
 						$netobj = new FSNetwork();
 						$netobj->setNetAddr($netid);
@@ -1781,7 +1781,7 @@
 							return;
 						}
 					}
-					
+
 					if ($dhcpopts) {
 						$count = count($dhcpopts);
 						for ($i=0;$i<$count;$i++) {
@@ -1808,7 +1808,7 @@
 						FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared","netid,prefixlen,netidv4",
 						"'".$netidv6."','".$prefixlen."','".$netid."'");
 					}
-					
+
 					if ($subnetclusters) {
 						$count = count($subnetclusters);
 						for ($i=0;$i<$count;$i++) {
@@ -1855,7 +1855,7 @@
 					return;
 				// Remove DHCP subnet
 				case 8:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_subnetmgmt")) {
+					if (!FS::$sessMgr->hasRight("subnetmgmt")) {
 						$this->log(2,"Remove subnet: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -1867,7 +1867,7 @@
 						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
 					}
-					
+
 					FS::$dbMgr->BeginTr();
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid = '".$netid."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_cluster","subnet = '".$netid."'");
@@ -1887,7 +1887,7 @@
 					return;
 				// Add/Edit cluster
 				case 9:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+					if (!FS::$sessMgr->hasRight("servermgmt")) {
 						$this->log(2,"Add/Edit cluster: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -1935,7 +1935,7 @@
 					if (($cmode == 1 || $cmode == 2) && $count != 2) {
 						$this->log(1,"Add/Edit cluster: selected mode require two members");
 						FS::$iMgr->ajaxEchoErrorNC("err-clustermode-require-two");
-						return;	
+						return;
 					}
 
 					for ($i=0;$i<$count;$i++) {
@@ -2014,7 +2014,7 @@
 					return;
 				// Remove cluster
 				case 10:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_servermgmt")) {
+					if (!FS::$sessMgr->hasRight("servermgmt")) {
 						$this->log(2,"Remove cluster: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2046,13 +2046,13 @@
 						"trpfx" => "cl"
 					));
 					$js = $tMgr->removeLine($cname);
-					
+
 					$this->log(0,"Remove cluster: cluster '".$cname."' removed");
 					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Add/Edit IP informations
 				case 11:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt")) {
+					if (!FS::$sessMgr->hasRight("ipmgmt")) {
 						$this->log(2,"Edit IP informations: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2073,19 +2073,19 @@
 						FS::$iMgr->ajaxEchoErrorNC("err-bad-datas");
 						return;
 					}
-					
+
 					if ($mac && !FS::$secMgr->isMacAddr($mac)) {
 						$this->log(2,sprintf("Edit IP informations: bad mac '%s' given",$mac));
 						FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-bad-mac-addr"),$mac),"",true);
 						return;
 					}
-					
+
 					if ($hostname && !FS::$secMgr->isHostname($hostname)) {
 						$this->log(2,sprintf("Edit IP informations: bad hostname '%s' given",$hostname));
 						FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-bad-hostname"),$hostname),"",true);
 						return;
 					}
-					
+
 					if ($comment && strlen($comment) > 500) {
 						$this->log(2,sprintf("Edit IP informations: comment length too long",$comment));
 						FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-comment-too-long"),$comment),"",true);
@@ -2115,7 +2115,7 @@
 							$netinfos = array($data["netid"],$data["netmask"]);
 						}
 					}
-					
+
 					if (!$found) {
 						$this->log(2,"Edit IP informations: IP isn't in a declared subnet");
 						FS::$iMgr->ajaxEchoError("err-ip-not-in-declared-subnets");
@@ -2124,8 +2124,8 @@
 
 					$subnetu = preg_replace("#[.]#","_",$netinfos[0]);
 					// Another test here because we have subnet
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_ipmgmt") &&
-						!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_ipmgmt")) {
+					if (!FS::$sessMgr->hasRight("ipmgmt") &&
+						!FS::$sessMgr->hasRight($subnetu."_ipmgmt")) {
 						$this->log(2,"Edit IP informations: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2163,7 +2163,7 @@
 					if ($comment) {
 						$comment = preg_replace("#[\n\r]+#","\r",$comment);
 					}
-						
+
 					if ($ipopts) {
 						$count = count($ipopts);
 						for ($i=0;$i<$count;$i++) {
@@ -2174,22 +2174,22 @@
 							}
 						}
 					}
-					
+
 					if ($expiration) {
 						if (!preg_match("#^[0-9]{2}-[0-9]{2}-[0-9]{4}$#",$expiration)) {
 							FS::$iMgr->ajaxEchoErrorNC("err-expiration-date-invalid");
 							return;
 						}
-						
+
 						$expirationtmp = preg_split("#[-]#",$expiration);
-						
+
 						$expirationtime = strtotime(sprintf("%s-%s-%s",$expirationtmp[0],$expirationtmp[1],$expirationtmp[2]));
 						$nowtime = strtotime(sprintf("%s-%s-%s",date("d"),date("m"),date("Y")));
 						if ($expirationtime < $nowtime) {
 							FS::$iMgr->ajaxEchoErrorNC("err-expiration-date-must-be-today-or-more");
 							return;
 						}
-						
+
 						$expiration = sprintf("%s/%s/%s",$expirationtmp[1],$expirationtmp[0],$expirationtmp[2]);
 					}
 
@@ -2219,12 +2219,12 @@
 					$this->calculateRanges($netinfos[0],$netobj);
 
 					$this->log(0,"Edit IP informations: informations edited for IP '".$ip."'");
-					
+
 					FS::$iMgr->ajaxEchoOK("Done",(new dhcpIP())->genIPLine($ip,true));
 					return;
 				// Add/Edit Custom Option
 				case 12:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Add/Edit custom option: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2309,7 +2309,7 @@
 					return;
 				// Delete Custom Option
 				case 13:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Delete custom option: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2345,7 +2345,7 @@
 					for ($i=0;$i<$count;$i++)
 						FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_subnet_optgroups","optgroup = '".$toRemove[$i]."'");
 
-					// We need to remove group options linked to option linked to custom option 
+					// We need to remove group options linked to option linked to custom option
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option_group","optalias IN (SELECT optalias FROM ".
 						PGDbConfig::getDbPrefix()."dhcp_option WHERE optname = '".$optname."')");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."dhcp_option","optname = '".$optname."'");
@@ -2361,12 +2361,12 @@
 						"trpfx" => "dco"
 					));
 					$js = $tMgr->removeLine($optname);
-					
+
 					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Add option
 				case 14:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Add/Edit option: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2494,7 +2494,7 @@
 					return;
 				// Remove option
 				case 15:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsmgmt")) {
+					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Remove option: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2544,12 +2544,12 @@
 						"trpfx" => "do"
 					));
 					$js = $tMgr->removeLine($optalias);
-					
+
 					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				// Add/edit option group
 				case 16:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt")) {
+					if (!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
 						$this->log(2,"Add/Edit option group: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2622,7 +2622,7 @@
 					return;
 				// Remove option group
 				case 17:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_optionsgrpmgmt")) {
+					if (!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
 						$this->log(2,"Remove option group: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2669,7 +2669,7 @@
 					return;
 				// Ip range management
 				case 18:
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt")) {
+					if (!FS::$sessMgr->hasRight("rangemgmt")) {
 						$this->log(2,"IP range management: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2680,7 +2680,7 @@
 					$action = FS::$secMgr->checkAndSecurisePostData("rangeact");
 
 					if (!$subnet || !FS::$secMgr->isIP($subnet) ||
-						!$startip || !FS::$secMgr->isIP($startip) || 
+						!$startip || !FS::$secMgr->isIP($startip) ||
 						!$endip || !FS::$secMgr->isIP($endip) ||
 						!$action) {
 						$this->log(2,"IP range management: bad datas given");
@@ -2690,8 +2690,8 @@
 
 					// Another test here because we have subnet
 					$subnetu = preg_replace("#[.]#","_",$subnet);
-					if (!FS::$sessMgr->hasRight("mrule_ipmmgmt_rangemgmt") &&
-						!FS::$sessMgr->hasRight("mrule_ipmmgmt_".$subnetu."_rangemgmt")) {
+					if (!FS::$sessMgr->hasRight("rangemgmt") &&
+						!FS::$sessMgr->hasRight($subnetu."_rangemgmt")) {
 						$this->log(2,"IP range management: no rights");
 						FS::$iMgr->ajaxEchoError("err-no-rights");
 						return;
@@ -2773,11 +2773,11 @@
 					return;
 			}
 		}
-		
+
 		private $switchList;
 	};
-	
+
 	}
-	
+
 	$module = new iIPManager();
 ?>
