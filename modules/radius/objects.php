@@ -26,7 +26,7 @@
 		
 		public function showForm($username = "") {
 			if (!$this->canWrite()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show user form");
 			}
 			
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");
@@ -325,7 +325,7 @@
 		
 		public function showForm($groupname = "") {
 			if (!$this->canWrite()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show group form");
 			}
 			
 			$radalias = FS::$secMgr->checkAndSecuriseGetData("ra");

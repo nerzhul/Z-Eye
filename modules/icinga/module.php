@@ -111,7 +111,7 @@
 			FS::$iMgr->setURL("sh=2");
 
 			if (!FS::$sessMgr->hasRight("cmd_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show hosts informations");
 			}
 
 			$output = "";
@@ -201,7 +201,7 @@
 		private function showHostgroupsTab() {
 			FS::$iMgr->setURL("sh=3");
 			if (!FS::$sessMgr->hasRight("hg_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show hostgroups informations");
 			}
 			$output = "";
 
@@ -276,7 +276,7 @@
 			FS::$iMgr->setURL("sh=4");
 
 			if (!FS::$sessMgr->hasRight("srv_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show services informations");
 			}
 
 			$output = "";
@@ -336,7 +336,7 @@
 			FS::$iMgr->setURL("sh=5");
 
 			if (!FS::$sessMgr->hasRight("tp_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show timeperiods informations");
 			}
 			$output = "";
 
@@ -468,7 +468,7 @@
 			FS::$iMgr->setURL("sh=6");
 
 			if (!FS::$sessMgr->hasRight("ct_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show contacts informations");
 			}
 
 			$output = "";
@@ -514,7 +514,7 @@
 			FS::$iMgr->setURL("sh=7");
 
 			if (!FS::$sessMgr->hasRight("ctg_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show contactgroups informations");
 			}
 
 			$output = "";
@@ -570,7 +570,7 @@
 			FS::$iMgr->setURL("sh=9");
 
 			if (!FS::$sessMgr->hasRight("cmd_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show notification strategy informations");
 			}
 
 			/*
@@ -612,7 +612,7 @@
 			FS::$iMgr->setURL("sh=8");
 
 			if (!FS::$sessMgr->hasRight("cmd_write")) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show command informations");
 			}
 
 			/*
@@ -823,7 +823,7 @@
 					return (new icingaHost())->showForm();
 				case 4:
 					if (!FS::$sessMgr->hasRight("hg_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show hosts informations");
 					}
 
 					$hostexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts","name","");
@@ -834,7 +834,7 @@
 					return $this->showHostgroupForm();
 				case 5:
 					if (!FS::$sessMgr->hasRight("srv_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show services informations");
 					}
 
 					$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
@@ -845,13 +845,13 @@
 					return FS::$iMgr->printError("err-no-timeperiods");
 				case 6:
 					if (!FS::$sessMgr->hasRight("tp_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show timeperiod informations");
 					}
 
 					return $this->showTimeperiodForm();
 				case 7:
 					if (!FS::$sessMgr->hasRight("ct_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show contact informations");
 					}
 
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","","alias")) {
@@ -867,7 +867,7 @@
 					return (new icingaHost())->showForm($name);
 				case 11:
 					if (!FS::$sessMgr->hasRight("hg_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show hostgroup informations");
 					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
@@ -885,7 +885,7 @@
 					return (new icingaService())->showForm($name);
 				case 13:
 					if (!FS::$sessMgr->hasRight("srv_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show service informations");
 					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
@@ -896,7 +896,7 @@
 					return $this->showTimeperiodForm($name);
 				case 14:
 					if (!FS::$sessMgr->hasRight("ct_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show contact informations");
 					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
@@ -934,13 +934,13 @@
 					return (new icingaService())->showSensors($name);
 				case 19:
 					if (!FS::$sessMgr->hasRight("notif_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show notif informations");
 					}
 
 					return (new icingaNotificationStrategy())->showForm();
 				case 20:
 					if (!FS::$sessMgr->hasRight("notif_write")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show notification strategy informations");
 					}
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");

@@ -52,7 +52,7 @@
 
 		public function showForm($rname = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show router form");
 			}
 
 			if (!$this->Load($rname)) {

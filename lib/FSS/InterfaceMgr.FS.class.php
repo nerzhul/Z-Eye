@@ -198,7 +198,7 @@
 					return "";
 				}
 				else {
-					return $this->printError("err-no-rights");
+					return $this->printNoRight("access to module");
 				}
 			}
 			return $this->printError("err-unk-module");
@@ -910,8 +910,7 @@
 			$this->cur_module->log(2,
 				sprintf("User doesn't have rights to %s",$rightStr)
 			);
-			$this->printError("err-no-rights");
-			
+			return $this->printError("err-no-rights");
 		}
 
 		public function printDebug($msg) {

@@ -215,7 +215,7 @@
 				else if ($sh == 2) {
 					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_readportstats") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_readportstats")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show port stats");
 					}
 					$file = file(dirname(__FILE__)."/../../datas/rrd/".$dip."_".$portid.".html");
 					if ($file) {
@@ -244,7 +244,7 @@
 					if (!$this->hasDeviceWriteRight($snmprw,$dip) &&
 						!FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show monitoring form");
 					}
 					$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","climit","device = '".$device."' AND port = '".$port."'");
 					$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
@@ -265,7 +265,7 @@
 				else if ($sh == 4) {
 					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_sshportinfos") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_sshportinfos")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show SSH form");
 					}
 
 					$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
@@ -359,21 +359,28 @@
 						!FS::$sessMgr->hasRight("ip_".$dip."_readswmodules") &&
 						!FS::$sessMgr->hasRight("snmp_".$snmpro."_readswdetails") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_readswdetails")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show device details");
 					}
 
 					if (FS::$sessMgr->hasRight("snmp_".$snmpro."_readswdetails") ||
 						FS::$sessMgr->hasRight("ip_".$dip."_readswdetails")) {
 						$query = FS::$dbMgr->Select("device","*","name ='".$device."'");
 						if ($data = FS::$dbMgr->Fetch($query)) {
-							$output .= FS::$iMgr->h3("Device-detail");
-							$output .= "<table>";
-							$output .= "<tr><td>".$this->loc->s("Name")."</td><td>".$data["name"]."</td></tr>";
-							$output .= "<tr><td>".$this->loc->s("Place")." / ".$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>";
-							$output .= "<tr><td>".$this->loc->s("Model")." / ".$this->loc->s("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>";
-							$output .= "<tr><td>".$this->loc->s("OS")." / ".$this->loc->s("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>";
-							$output .= "<tr><td>".$this->loc->s("Description")."</td><td>".$data["description"]."</td></tr>";
-							$output .= "<tr><td>".$this->loc->s("Uptime")."</td><td>".$data["uptime"]."</td></tr>";
+							$output .= FS::$iMgr->h3("Device-detail").
+								"<table>".
+								"<tr><td>".$this->loc->s("Name")."</td><td>".
+								$data["name"]."</td></tr>".
+								"<tr><td>".$this->loc->s("Place")." / ".
+								$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>".
+								"<tr><td>".$this->loc->s("Model")." / ".
+								$this->loc->s("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>".
+								"<tr><td>".$this->loc->s("OS")." / ".
+								$this->loc->s("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>".
+								"<tr><td>".$this->loc->s("Description").
+								"</td><td>".$data["description"]."</td></tr>".
+								"<tr><td>".$this->loc->s("Uptime").
+								"</td><td>".$data["uptime"]."</td></tr>";
+								
 							$found = 0;
 							$tmpoutput = "<tr><td>".$this->loc->s("Energy")."</td><td>";
 
@@ -1072,7 +1079,7 @@
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_readswvlans") &&
                                         	!FS::$sessMgr->hasRight("ip_".$dip."_readswvlans")) {
-						return FS::$iMgr->printError("err-no-rights");
+						return FS::$iMgr->printNoRight("show device VLANs");
 					}
 					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
 					$tmpoutput = "<table id=\"tvlanList\"><thead><tr><th class=\"headerSortDown\">ID</th><th>".$this->loc->s("Description").
@@ -1332,7 +1339,7 @@
 					else if ($showmodule == 7) {
 						if (!FS::$sessMgr->hasRight("snmp_".$snmprw."_sshpwd") &&
 							!FS::$sessMgr->hasRight("ip_".$dip."_sshpwd")) {
-							return FS::$iMgr->printError("err-no-rights");
+							return FS::$iMgr->printNoRight("show SSH informations");
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						$output .= $this->loc->s("ssh-link-state").": ";
@@ -1340,21 +1347,23 @@
 							$output .= "<span style=\"color: green;\">".$this->loc->s("Enabled")."</span> ";
 							$output .= FS::$iMgr->removeIcon(23,"d=".$device);
 						}
-						else
+						else {
 							$output .= "<span style=\"color: red;\">".$this->loc->s("Disabled")."</span>";
-						$output .= FS::$iMgr->cbkForm("22&d=".$device);
-						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
-						$output .= FS::$iMgr->idxLine("User","sshuser",array("value" => $sshuser));
-						$output .= FS::$iMgr->idxLine("SSH-pwd","sshpwd",array("type" => "pwd"));
-						$output .= FS::$iMgr->idxLine("SSH-pwd-repeat","sshpwd2",array("type" => "pwd"));
-						$output .= FS::$iMgr->idxLine("enable-pwd","enablepwd",array("type" => "pwd"));
-						$output .= FS::$iMgr->idxLine("enable-pwd-repeat","enablepwd2",array("type" => "pwd"));
-						$output .= FS::$iMgr->tableSubmit("Save");
+						}
+						
+						$output .= FS::$iMgr->cbkForm("22&d=".$device).
+							"<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>".
+							FS::$iMgr->idxLine("User","sshuser",array("value" => $sshuser)).
+							FS::$iMgr->idxLine("SSH-pwd","sshpwd",array("type" => "pwd")).
+							FS::$iMgr->idxLine("SSH-pwd-repeat","sshpwd2",array("type" => "pwd")).
+							FS::$iMgr->idxLine("enable-pwd","enablepwd",array("type" => "pwd")).
+							FS::$iMgr->idxLine("enable-pwd-repeat","enablepwd2",array("type" => "pwd")).
+							FS::$iMgr->tableSubmit("Save");
 					}
 					else if ($showmodule == 8) {
 						if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_sshshowstart") &&
 							!FS::$sessMgr->hasRight("ip_".$dip."_sshshowstart")) {
-							return FS::$iMgr->printError("err-no-rights");
+							return FS::$iMgr->printNoRight("show SSH startup-config");
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {
@@ -1381,7 +1390,7 @@
 					else if ($showmodule == 9) {
 						if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_sshshowrun") &&
 							!FS::$sessMgr->hasRight("ip_".$dip."_sshshowrun")) {
-							return FS::$iMgr->printError("err-no-rights");
+							return FS::$iMgr->printNoRight("show SSH running-config");
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {

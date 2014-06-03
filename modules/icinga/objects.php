@@ -51,7 +51,7 @@
 		
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show contact informations");
 			}
 			
 			$this->Load($name);
@@ -200,7 +200,7 @@
 
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show contact informations");
 			}
 			$this->Load($name);
 
@@ -387,7 +387,7 @@
 
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show host informations");
 			}
 
 			$this->Load($name);
@@ -722,7 +722,7 @@
 		
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show service form");
 			}
 			
 			$this->Load($name);
@@ -1387,7 +1387,7 @@
 		
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show command form");
 			}
 			
 			$this->Load($name);
@@ -1591,7 +1591,7 @@
 		
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show notification strategy form");
 			}
 			
 			$this->Load($name);

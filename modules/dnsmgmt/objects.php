@@ -54,7 +54,7 @@
 
 		public function showForm($aclname = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show zone form");
 			}
 
 			if (!$this->Load($aclname)) {
@@ -514,7 +514,7 @@
 
 		public function showForm($aclname = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show ACL form");
 			}
 
 			if (!$this->Load($aclname)) {
@@ -980,7 +980,7 @@
 
 		public function showForm($clustername = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show cluster form");
 			}
 			
 			if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_servers","addr")) {
@@ -1533,7 +1533,7 @@
 
 		public function showForm($addr = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show server form");
 			}
 
 			if (!$this->Load($addr)) {
@@ -1958,7 +1958,7 @@
 
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show TSIG key form");
 			}
 
 			if (!$this->Load($name)) {
@@ -2227,7 +2227,7 @@
 		
 		public function showForm($zonename = "") {
 			if (!$this->canWrite()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printNoRight("show DNS record form");
 			}
 			
 			$recname = FS::$secMgr->checkAndSecuriseGetData("recname");

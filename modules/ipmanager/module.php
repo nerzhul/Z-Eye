@@ -75,7 +75,7 @@
 		private function showStats() {
 			FS::$iMgr->setURL("sh=1");
 			if (!FS::$sessMgr->hasRight("read")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show IP stats");
 			}
 			$output = "";
 			$formoutput = "";
@@ -108,7 +108,7 @@
 
 		private function showSubnetIPList($filter) {
 			if (!FS::$sessMgr->hasRight("read")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show IP list");
 			}
 			$netid = ""; $netmask = "";
 			$netdeclared = false;
@@ -289,7 +289,7 @@
 			$subnetu = preg_replace("#[.]#","_",$subnet);
 			if (!FS::$sessMgr->hasRight("rangemgmt") &&
 				!FS::$sessMgr->hasRight($subnetu."_rangemgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show reserv importation form");
 			}
 
 			$netmask = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$subnet."'");
@@ -316,7 +316,7 @@
 			$subnetu = preg_replace("#[.]#","_",$subnet);
 			if (!FS::$sessMgr->hasRight("rangemgmt") &&
 				!FS::$sessMgr->hasRight($subnetu."_rangemgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show range form");
 			}
 
 			$netmask = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netmask","netid = '".$subnet."'");
@@ -340,7 +340,7 @@
 			$subnetu = preg_replace("#[.]#","_",$filter);
 			if (!FS::$sessMgr->hasRight("history") &&
 				!FS::$sessMgr->hasRight($subnetu."_history")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show subnet history");
 			}
 
 			$output = FS::$iMgr->js("function historyDateChange() {
@@ -368,7 +368,7 @@
 			$subnetu = preg_replace("#[.]#","_",$filter);
 			if (!FS::$sessMgr->hasRight("subnetmon") &&
 				!FS::$sessMgr->hasRight($subnetu."_subnetmon")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show subnet monitoring");
 			}
 
 			$wlimit = 0; $climit = 0;
@@ -402,15 +402,15 @@
 			FS::$iMgr->setURL("sh=4");
 
 			if (!FS::$sessMgr->hasRight("advancedtools")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show advanced tools");
 			}
 
-			$output = FS::$iMgr->h4("title-search-old");
-			$output .= FS::$iMgr->cbkForm("2");
-			$output .= $this->loc->s("intval-days")." ".FS::$iMgr->numInput("ival")."<br />";
-			$output .= FS::$iMgr->submit("",$this->loc->s("Search"));
-			$output .= "</form><div id=\"obsres\"></div>";
-			return $output;
+			return FS::$iMgr->h4("title-search-old").
+				FS::$iMgr->cbkForm("2").
+				$this->loc->s("intval-days")." ".
+				FS::$iMgr->numInput("ival")."<br />".
+				FS::$iMgr->submit("",$this->loc->s("Search")).
+				"</form><div id=\"obsres\"></div>";
 		}
 
 		private function showDHCPOptsMgmt() {
@@ -418,7 +418,7 @@
 
 			if (!FS::$sessMgr->hasRight("optionsmgmt") &&
 				!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show DHCP options management tab");
 			}
 			$output = FS::$iMgr->h2("title-dhcp-opts-group").FS::$iMgr->tip("tip-dhcp-opt-group")."<br />".
 				FS::$iMgr->opendiv(12,$this->loc->s("create-option-group"),array("line" => true));
@@ -595,7 +595,7 @@
 			FS::$iMgr->setURL("sh=2");
 
 			if (!FS::$sessMgr->hasRight("subnetmgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show subnet management");
 			}
 	                $output = FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
 
@@ -674,7 +674,7 @@
 
 		private function showDHCPSubnetForm($netid = "") {
 			if (!FS::$sessMgr->hasRight("subnetmgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show subnet form");
 			}
 			$netmask = ""; $vlanid = 0; $shortname = ""; $desc = "";
 			$router = ""; $domainname = ""; $dns1 = ""; $dns2 = "";
@@ -782,7 +782,7 @@
 
 		private function showDHCPSrvForm($addr = "") {
 			if (!FS::$sessMgr->hasRight("servermgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show server form");
 			}
 
 			$user = "";
@@ -860,7 +860,7 @@
 
 		private function showDHCPSrvList() {
 			if (!FS::$sessMgr->hasRight("servermgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show server list");
 			}
 			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("os-name").
 				"</th><th>".$this->loc->s("dhcp-type")."</th><th>".$this->loc->s("ssh-user")."</th><th>".$this->loc->s("member-of")."<th></th></tr>";
@@ -902,7 +902,7 @@
 			FS::$iMgr->setURL("sh=3");
 
 			if (!FS::$sessMgr->hasRight("servermgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show DHCP management");
 			}
 
 			$output = FS::$iMgr->h2("title-dhcp-cluster-mgmt");
@@ -939,7 +939,7 @@
 
 		private function showDHCPClusterForm($name = "") {
 			if (!FS::$sessMgr->hasRight("servermgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show cluster form");
 			}
 			$members = array();
 			$clustermode = 0;
@@ -976,7 +976,7 @@
 
 		private function showDHCPClusterList() {
 			if (!FS::$sessMgr->hasRight("servermgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show cluster list");
 			}
 			$output = $this->showTableHeadCluster();
 			$clusters = array();
@@ -1025,7 +1025,7 @@
 
 		private function showIPForm($ip = "") {
 			if (!FS::$sessMgr->hasRight("ipmgmt")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show IP form");
 			}
 			$mac = "";
 			$hostname = "";
@@ -1089,7 +1089,7 @@
 			$subnetu = preg_replace("#[.]#","_",$filter);
 			if (!FS::$sessMgr->hasRight("history") &&
 				!FS::$sessMgr->hasRight($subnetu."_history")) {
-				return FS::$iMgr->printError("err-no-rights");
+				return FS::$iMgr->printNoRight("show IP history");
 			}
 			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
 			$results = array();
