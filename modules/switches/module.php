@@ -130,17 +130,28 @@
 				default: break;
 			}
 			if (!FS::isAjaxCall()) {
-				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".FS::$iMgr->aLink($this->mid."&d=".$device, $device),true);
+				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".
+					FS::$iMgr->aLink($this->mid."&d=".$device, $device),true);
 				$panElmts = array();
 				$panElmts[] = array(1,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"));
 				if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
-					(FS::$sessMgr->hasRight("snmp_".$snmpro."_sshportinfos") || FS::$sessMgr->hasRight("ip_".$dip."_sshportinfos")))
+					(FS::$sessMgr->hasRight("snmp_".$snmpro."_sshportinfos") ||
+					FS::$sessMgr->hasRight("ip_".$dip."_sshportinfos"))) {
 					$panElmts[] = array(4,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view"));
-				if (FS::$sessMgr->hasRight("snmp_".$snmpro."_readportstats") || FS::$sessMgr->hasRight("ip_".$dip."_readportstats"))
+				}
+				
+				if (FS::$sessMgr->hasRight("snmp_".$snmpro."_readportstats") ||
+					FS::$sessMgr->hasRight("ip_".$dip."_readportstats")) {
 					$panElmts[] = array(2,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"));
-				if (FS::$sessMgr->hasRight("snmp_".$snmprw."_write") || FS::$sessMgr->hasRight("ip_".$dip."_write") ||
-					FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") || FS::$sessMgr->hasRight("ip_".$dip."_writeportmon"))
+				}
+				
+				if (FS::$sessMgr->hasRight("snmp_".$snmprw."_write") ||
+					FS::$sessMgr->hasRight("ip_".$dip."_write") || 
+					FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") ||
+					FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
 					$panElmts[] = array(3,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring"));
+				}
+				
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			} else {
 				$this->devapi->setDevice($device);

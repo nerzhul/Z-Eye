@@ -33,6 +33,7 @@ from SNMPCommunityCacher import ZEyeSNMPCommCacher
 from zNetdisco import NetdiscoDataRefresher
 from zDNS import DNSManager, RecordCollector
 from zMRTG import MRTGDiscoverer, MRTGDataRefresher
+from DeviceCollector import ZEyeSwitchesConfigCollector
 import zConfig
 
 class ZEyeDaemon(Daemon.Daemon):
@@ -66,6 +67,8 @@ class ZEyeDaemon(Daemon.Daemon):
 			
 		DNSManager().start()
 		RecordCollector().start()
+		
+		ZEyeSwitchesConfigCollector().start()
 
 		while True:
 			time.sleep(1)

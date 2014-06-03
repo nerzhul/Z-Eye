@@ -33,7 +33,7 @@ import zConfig, ZEyeUtil
 
 class ZEyeDBUpgrade():
 	dbVersion = "0"
-	nextDBVersion = "1413"
+	nextDBVersion = "1414"
 	pgsqlCon = None
 	logger = None
 
@@ -467,6 +467,9 @@ class ZEyeDBUpgrade():
 				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchmgmt_read' WHERE rulename = 'mrule_switches_read'")
 				self.rawRequest("UPDATE z_eye_user_rules SET rulename = 'mrule_switchrightsmgmt_backup' WHERE rulename = 'mrule_switchmgmt_backup'")
 				self.setDBVersion("1413")
+			if self.dbVersion == "1413":
+				self.tryCreateTable("z_eye_switch_configs","device varchar(128) NOT NULL, cfgtype int NOT NULL, cfgoutput TEXT, PRIMARY KEY(device,cfgtype)")
+				self.setDBVersion("1414")
 		except PgSQL.Error, e:
 			if self.pgsqlCon:
 				self.pgsqlCon.close()

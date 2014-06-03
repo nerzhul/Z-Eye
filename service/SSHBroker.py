@@ -26,12 +26,16 @@ class ZEyeSSHBroker():
 	sshUser = ""
 	sshPwd = ""
 	sshHost = ""
+	sshPrivTerm = None
+	sshPrivSession = None
 	logger = None
 
 	def __init__(self,host,user,pwd):
 		self.sshHost = host
 		self.sshUser = user
 		self.sshPwd = pwd
+		sshPrivTerm = None
+		sshPrivSession = None
 		self.logger = logging.getLogger("Z-Eye")
 
 	def connect(self):
@@ -60,7 +64,37 @@ class ZEyeSSHBroker():
 		else:
 			self.logger.critical("SSH Fatal error, ssh connection not opened !")
 			return None
+	
+	def setupPrivileges(self,privilegedPwd,privilegedCmd = "su -"):
+		if self.sshConn != None:
+			self.sshPrivTerm = self.sshConn.get_transport()
+			self.sshPrivSession = self.sshPrivTerm.open_session()
+			self.sshPrivSession.exec_command("%s" % privilegedCmd)
+			self.sshPrivSession.send("%s\n" % privilegedPwd)
+			return True
+		else:
+			self.logger.critical("SSH Fatal error, ssh connection not opened !")
+			return False
 
+	def disablePrivileges(self):
+		if self.sshConn != None and self.sshPrivSession != None:
+			self.sshPrivTerm.close()
+			self.sshPrivSession = None
+	
+	def sendPrivilegedCmd(self,cmd):
+		if self.sshConn != None and self.sshPrivSession != None:
+			if self.sshPrivSession.send("%s\n" % cmd) == 0:
+				self.logger.critical("SSH Fatal error, privileged session not active, receiving 0 when sending command !")
+				return None
+			
+			# We use a 10K buffer it's sufficient
+			recvDatas = "%s" % self.sshPrivSession.recv(10240)
+			self.logger.critical(recvDatas)
+			return recvDatas
+		else:
+			self.logger.critical("SSH Fatal error, ssh connection not opened or privileged session not active !")
+			return None
+		
 	def getRemoteOS(self):
 		if self.sshConn == None:
 			return None
