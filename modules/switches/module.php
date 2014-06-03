@@ -1867,7 +1867,7 @@
 					$dip = $this->devip->getDeviceIP();
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("replace a VLAN");
 						return;
 					}
 					$this->log(0,"Replace VLAN '".$old."' by '".$new."' on device '".$device."'");
@@ -2011,7 +2011,7 @@
 					if (!$this->hasDeviceWriteRight($snmprw,$dip) &&
 						!FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("monitor a device");
 						return;
 					}
 
@@ -2059,7 +2059,7 @@
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove a device");
 						return;
 					}
 
@@ -2093,7 +2093,7 @@
 				case 18: // Device discovery
 					if (!FS::$sessMgr->hasRight("discover")) {
 						$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("discover a device");
 						return;
 					}
 					$iplist = FS::$secMgr->checkAndSecurisePostData("iplist");
@@ -2201,7 +2201,7 @@
 				case 20: // Save all devices
 					if (!FS::$sessMgr->hasRight("globalsave")) {
 						$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to save all devices !");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("launch a global save");
 						return;
 					}
 					$query = FS::$dbMgr->Select("device","name,vendor");
@@ -2222,7 +2222,7 @@
 				case 21: // Backup all devices
 					if (!FS::$sessMgr->hasRight("globalbackup")) {
 						$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to backup all devices !");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("launch a global backup");
 						return;
 					}
 
@@ -2303,7 +2303,7 @@
 
 					if (!FS::$sessMgr->hasRight("snmp_".$snmprw."_sshpwd") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_sshpwd")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify SSH informations");
 						return;
 					}
 
@@ -2377,7 +2377,7 @@
 
 					if (!FS::$sessMgr->hasRight("ip_".$dip."_dhcpsnmgmt") &&
 						!FS::$sessMgr->hasRight("snmp_".$snmprw."_dhcpsnmgmt")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify DHCP snooping");
 						return;
 					}
 

@@ -958,7 +958,7 @@
 				// Add/Edit command
 				case 1:
 					if (!FS::$sessMgr->hasRight("cmd_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify an Icinga command");
 						return;
 					}
 
@@ -1024,7 +1024,7 @@
 				// Remove command
 				case 2:
 					if (!FS::$sessMgr->hasRight("cmd_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove an Icinga command");
 						return;
 					}
 
@@ -1073,7 +1073,7 @@
 				// Add/Edit timeperiod
 				case 4:
 					if (!FS::$sessMgr->hasRight("tp_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify a timeperiod");
 						return;
 					}
 
@@ -1169,7 +1169,7 @@
 				// Delete timeperiod
 				case 6:
 					if (!FS::$sessMgr->hasRight("tp_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("delete a timeperiod");
 						return;
 					}
 
@@ -1219,7 +1219,7 @@
 				// Delete contact
 				case 9:
 					if (!FS::$sessMgr->hasRight("ct_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("delete a contact");
 						return;
 					}
 
@@ -1271,7 +1271,7 @@
 				// remove service
 				case 18:
 					if (!FS::$sessMgr->hasRight("srv_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("delete a service");
 						return;
 					}
 
@@ -1304,7 +1304,7 @@
 				// Add/Edit hostgroup
 				case 19:
 					if (!FS::$sessMgr->hasRight("hg_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify an hostgroup");
 						return;
 					}
 
@@ -1379,7 +1379,7 @@
 				// remove hostgroup
 				case 21:
 					if (!FS::$sessMgr->hasRight("hg_write")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("delete an hostgroup");
 						return;
 					}
 

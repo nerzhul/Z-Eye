@@ -635,8 +635,7 @@
 
 		public function Remove() {
 			if (!FS::$sessMgr->hasRight("ipmgmt")) {
-				$this->log(2,"Edit IP informations: no rights");
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove IP informations");
 				return;
 			}
 
@@ -721,8 +720,7 @@
 			}
 
 			if (!FS::$sessMgr->hasRight("ipmgmt")) {
-				$this->log(2,"Import IP from cache: no rights");
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("import IP from cache");
 				return false;
 			}
 
@@ -770,8 +768,7 @@
 			}
 
 			if (!FS::$sessMgr->hasRight("ipmgmt")) {
-				$this->log(2,"Import IP via CSV: no rights");
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("import IP via a CSV");
 				return false;
 			}
 

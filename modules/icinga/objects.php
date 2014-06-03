@@ -81,7 +81,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a contact");
 				return;
 			} 
 
@@ -227,7 +227,7 @@
 
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a contactgroup");
 				return;
 			}
 
@@ -286,7 +286,7 @@
 
 		public function Remove() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a contactgroup");
 				return;
 			} 
 
@@ -480,7 +480,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify an host");
 				return;
 			} 
 
@@ -617,7 +617,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove an host");
 				return;
 			} 
 
@@ -859,7 +859,7 @@
 		
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a service");
 				return;
 			}
 
@@ -1460,7 +1460,7 @@
 		
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a command");
 				return;
 			}
 			
@@ -1533,7 +1533,7 @@
 		
 		public function Remove() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a command");
 				return;
 			}
 			

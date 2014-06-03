@@ -372,7 +372,7 @@
 			}
 
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a switch building");
 				return;
 			}
 
@@ -408,7 +408,7 @@
 			}
 
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a switch room");
 				return;
 			}
 
@@ -1049,10 +1049,12 @@
 				return;
 			}
 
-			$this->device = FS::$dbMgr->GetOneData("device","name","ip = '".$this->deviceIP."'");
-			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
+			$this->device = FS::$dbMgr->GetOneData("device","name",
+				"ip = '".$this->deviceIP."'");
+			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
+				"snmprw","device = '".$device."'");
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a room");
 				return;
 			}
 
@@ -1062,7 +1064,7 @@
 
 			$portObj = new netDevicePort();
 			if (!$portObj->Load($this->device,$this->devicePort)) {
-				echo "ERROR";
+				FS::$iMgr->ajaxEcho("ERROR","",true);
 				return;
 			}
 
@@ -1074,7 +1076,7 @@
 			if ($room == "") {
 				$room = $this->loc->s("Modify");
 			}
-			echo $room;
+			FS::$iMgr->ajaxEcho($room,"",true);
 		}
 
 		private $deviceTable;

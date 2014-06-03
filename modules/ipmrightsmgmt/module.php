@@ -497,7 +497,7 @@
 				// Add/Edit global user/group right
 				case 1:
 					if (!FS::$sessMgr->hasRight("read")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify global rights");
 						return;
 					}
 
@@ -633,7 +633,7 @@
 				// Remove group/user for global/subnet rights
 				case 2:
 					if (!FS::$sessMgr->hasRight("read")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove global rights");
 						return;
 					}
 
@@ -738,7 +738,7 @@
 				// Filtering
 				case 3:
 					if (!FS::$sessMgr->hasRight("read")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("filter rights");
 						return;
 					}
 

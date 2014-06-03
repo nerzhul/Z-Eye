@@ -1370,9 +1370,10 @@
 						case 3: $subout = $this->showSubnetMonitoring($filtr); break;
 					}
 					$js = "$('#netshowcont').html('".FS::$secMgr->cleanForJS(preg_replace("[\n]","",$subout))."');";
-					if ($view == 3)
+					if ($view == 3) {
 						$js .= "$('#netHCr').html('');";
-
+					}
+					
 					FS::$iMgr->ajaxEchoOK("Done",$js);
 					return;
 				case 2:
@@ -1418,7 +1419,7 @@
 				// Monitor DHCP subnet
 				case 3:
 					if (!FS::$sessMgr->hasRight("subnetmon")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("monitor a subnet");
 						return;
 					}
 					$filtr = FS::$secMgr->checkAndSecuriseGetData("f");
@@ -1438,9 +1439,8 @@
 
 					// Also here because we have subnet
 					$subnetu = preg_replace("#[.]#","_",$filtr);
-					if (!FS::$sessMgr->hasRight("subnetmon") &&
-						!FS::$sessMgr->hasRight($subnetu."_subnetmon")) {
-						FS::$iMgr->echoNoRights();
+					if (!FS::$sessMgr->hasRight($subnetu."_subnetmon")) {
+						FS::$iMgr->echoNoRights("monitor a subnet");
 						return;
 					}
 
@@ -1476,7 +1476,7 @@
 				// Add/Edit DHCP server
 				case 5:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify server");
 						return;
 					}
 
@@ -1635,8 +1635,7 @@
 				// Delete DHCP Server
 				case 6:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
-						$this->log(2,"Delete DHCP server: User don't have rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove DHCP server");
 						return;
 					}
 
@@ -1676,8 +1675,7 @@
 				// Add DHCP subnet
 				case 7:
 					if (!FS::$sessMgr->hasRight("subnetmgmt")) {
-						$this->log(2,"Add/Edit subnet: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify subnet");
 						return;
 					}
 
@@ -1856,8 +1854,7 @@
 				// Remove DHCP subnet
 				case 8:
 					if (!FS::$sessMgr->hasRight("subnetmgmt")) {
-						$this->log(2,"Remove subnet: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove a DHCP subnet");
 						return;
 					}
 
@@ -1888,8 +1885,7 @@
 				// Add/Edit cluster
 				case 9:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
-						$this->log(2,"Add/Edit cluster: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify a DHCP cluster");
 						return;
 					}
 
@@ -2015,8 +2011,7 @@
 				// Remove cluster
 				case 10:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
-						$this->log(2,"Remove cluster: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove a DHCP cluster");
 						return;
 					}
 
@@ -2053,8 +2048,7 @@
 				// Add/Edit IP informations
 				case 11:
 					if (!FS::$sessMgr->hasRight("ipmgmt")) {
-						$this->log(2,"Edit IP informations: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify IP informations");
 						return;
 					}
 
@@ -2126,8 +2120,7 @@
 					// Another test here because we have subnet
 					if (!FS::$sessMgr->hasRight("ipmgmt") &&
 						!FS::$sessMgr->hasRight($subnetu."_ipmgmt")) {
-						$this->log(2,"Edit IP informations: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify IP informations);
 						return;
 					}
 
@@ -2225,8 +2218,7 @@
 				// Add/Edit Custom Option
 				case 12:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
-						$this->log(2,"Add/Edit custom option: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify custom option");
 						return;
 					}
 					$optname = FS::$secMgr->checkAndSecurisePostData("optname");
@@ -2310,8 +2302,7 @@
 				// Delete Custom Option
 				case 13:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
-						$this->log(2,"Delete custom option: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove custom option");
 						return;
 					}
 					$optname = FS::$secMgr->checkAndSecuriseGetData("optname");
@@ -2367,8 +2358,7 @@
 				// Add option
 				case 14:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
-						$this->log(2,"Add/Edit option: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify DHCP option");
 						return;
 					}
 					$optalias = FS::$secMgr->checkAndSecurisePostData("optalias");
@@ -2495,8 +2485,7 @@
 				// Remove option
 				case 15:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
-						$this->log(2,"Remove option: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove DHCP option");
 						return;
 					}
 					$optalias = FS::$secMgr->checkAndSecuriseGetData("optalias");
@@ -2550,8 +2539,7 @@
 				// Add/edit option group
 				case 16:
 					if (!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
-						$this->log(2,"Add/Edit option group: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify DHCP option group");
 						return;
 					}
 					$optgroup = FS::$secMgr->checkAndSecurisePostData("optgroup");
@@ -2623,8 +2611,7 @@
 				// Remove option group
 				case 17:
 					if (!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
-						$this->log(2,"Remove option group: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove DHCP option group");
 						return;
 					}
 					$optgroup = FS::$secMgr->checkAndSecuriseGetData("optgroup");
@@ -2670,8 +2657,7 @@
 				// Ip range management
 				case 18:
 					if (!FS::$sessMgr->hasRight("rangemgmt")) {
-						$this->log(2,"IP range management: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify IP range");
 						return;
 					}
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
@@ -2692,8 +2678,7 @@
 					$subnetu = preg_replace("#[.]#","_",$subnet);
 					if (!FS::$sessMgr->hasRight("rangemgmt") &&
 						!FS::$sessMgr->hasRight($subnetu."_rangemgmt")) {
-						$this->log(2,"IP range management: no rights");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("modify IP range");
 						return;
 					}
 

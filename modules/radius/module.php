@@ -1421,8 +1421,7 @@
 				// Add/Edit radius db
 				case 13:
 					if (!FS::$sessMgr->hasRight("manage")) {
-						$this->log(2,"This user don't have rights to manage radius !");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("manage Radius databases");
 						return;
 					}
 
@@ -1520,7 +1519,7 @@
 				case 14:
 					if (!FS::$sessMgr->hasRight("manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
-						FS::$iMgr->echoNoRights();
+						FS::$iMgr->echoNoRights("remove Radius databases");
 						return;
 					}
 

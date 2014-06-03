@@ -86,7 +86,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a router");
 				return;
 			} 
 
@@ -106,7 +106,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a router");
 				return;
 			} 
 

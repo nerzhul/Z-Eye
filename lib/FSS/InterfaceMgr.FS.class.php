@@ -971,7 +971,7 @@
 			}
 		}
 
-		public function ajaxEchoError($str,$js="",$raw=false,$options=array()) {
+		public function ajaxEchoError($str, $js = "", $raw = false, $options = array()) {
 			$js = sprintf("%s%s", $js,
 				"setNotifIconToErr();"
 			);
@@ -983,15 +983,18 @@
 			);
 		}
 
-		public function ajaxEchoErrorNC($str,$js="",$raw=false,$options=array()) {
+		public function ajaxEchoErrorNC($str, $js = "", $raw = false, $options = array()) {
 			$this->ajaxEchoError($str,$js,$raw,array("no-close" => true));
 		}
 		
-		public function echoNoRights($js = "", $options = array()) {
+		public function echoNoRights($rightStr, $js = "", $options = array()) {
+			$this->cur_module->log(2,
+				sprintf("User doesn't have rights to %s",$rightStr)
+			);
 			$this->ajaxEcho($this->getLocale("err-no-rights"),$js,false,$options);
 		}
 
-		public function ajaxEchoOK($str,$js="",$raw=false,$options=array()) {
+		public function ajaxEchoOK($str, $js = "", $raw = false, $options = array()) {
 			$js = sprintf("%s%s", $js,
 				"setNotifIconToOK();"
 			);

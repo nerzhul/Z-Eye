@@ -251,7 +251,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a zone");
 				return;
 			} 
 
@@ -435,7 +435,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a zone");
 				return;
 			} 
 
@@ -730,7 +730,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify an ACL");
 				return;
 			} 
 
@@ -907,7 +907,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove an ACL");
 				return;
 			} 
 
@@ -1172,7 +1172,7 @@
 		}
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a cluster");
 				return;
 			} 
 
@@ -1459,7 +1459,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a cluster");
 				return;
 			} 
 
@@ -1676,7 +1676,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a server");
 				return;
 			} 
 
@@ -1804,7 +1804,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a server");
 				return;
 			} 
 
@@ -1982,7 +1982,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a TSIG key");
 				return;
 			} 
 
@@ -2047,7 +2047,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a TSIG key");
 				return;
 			} 
 			$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
@@ -2284,7 +2284,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("modify a record");
 				return;
 			}
 			
@@ -2359,7 +2359,7 @@
 		
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->echoNoRights();
+				FS::$iMgr->echoNoRights("remove a record");
 				return;
 			}
 			
