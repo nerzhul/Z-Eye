@@ -2320,16 +2320,23 @@
 							FS::$iMgr->ajaxEchoError("err-enable-auth-fail");
 							return;
 					}
-					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_pwd","device = '".$device."'");
-					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."switch_pwd","device,sshuser,sshpwd,enablepwd","'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".
+					
+					FS::$dbMgr->BeginTr();
+					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."switch_pwd",
+						"device = '".$device."'");
+					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."switch_pwd",
+						"device,sshuser,sshpwd,enablepwd",
+						"'".$device."','".$sshuser."','".base64_encode($sshpwd)."','".
 						base64_encode($enablepwd)."'");
+					FS::$dbMgr->CommitTr();
 					FS::$iMgr->ajaxEchoOK("Done");
 					return;
 				// Remove SSH link
 				case 23:
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					$dip = "";
-					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
+					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
+						"snmprw","device = '".$device."'");
 					if (!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
 						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
@@ -2422,7 +2429,8 @@
 					$this->devapi->setDevice($sw);
 					$dip = $this->devapi->getDeviceIP();
 
-					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$sw."'");
+					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
+						"snmprw","device = '".$sw."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 						FS::$iMgr->ajaxEchoError("err-no-credentials");
 						return;
