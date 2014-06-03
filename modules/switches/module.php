@@ -2176,14 +2176,29 @@
 					}
 					$out = "";
 					exec("ping -W 100 -c 1 ".$dip." | grep ttl | wc -l|awk '{print $1}'",$out);
-					if (!is_array($out) || count($out) > 1)
-						echo "<span style=\"color:red;\">".$this->loc->s("err-output")." ".var_dump($out)."</span>";
-					else if ($out[0] > 1)
-						echo "<span style=\"color:red;\">".$this->loc->s("err-output-value")." ".$out."</span>";
-					else if ($out[0] == 0)
-						echo "<span style=\"color:red;\">".$this->loc->s("Offline")."</span>";
-					else if ($out[0] == 1)
-						echo "<span style=\"color:green;\">".$this->loc->s("Online")."</span>";
+					
+					$spColor = "";
+					$spText = "";
+					
+					if (!is_array($out) || count($out) > 1) {
+						$spColor = "red";
+						$spText = $this->loc->s("err-output")." ".var_dump($out);
+					}
+					else if ($out[0] > 1) {
+						$spColor = "red";
+						$spText = $this->loc->s("err-output-value")." ".$out;
+					}
+					else if ($out[0] == 0) {
+						$spColor = "red";
+						$spText = $this->loc->s("Offline");
+					}
+					else if ($out[0] == 1) {
+						$spColor = "green";
+						$spText = $this->loc->s("Online");
+					}
+					
+					echo sprintf("<span style=\"color:%s;\">%s</span>",
+						$spColor, $spText);
 					return;
 				case 20: // Save all devices
 					if (!FS::$sessMgr->hasRight("globalsave")) {
@@ -2281,7 +2296,8 @@
 				case 22: // SSH pwd set
 					$device = FS::$secMgr->checkAndSecuriseGetData("d");
 					$dip = "";
-					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
+					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache",
+						"snmprw","device = '".$device."'");
 					if (!$device || !($dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'"))) {
 						FS::$iMgr->ajaxEchoError("err-bad-datas");
 						return;
