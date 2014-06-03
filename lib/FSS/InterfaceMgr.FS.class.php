@@ -905,6 +905,14 @@
 				return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$this->getLocale($msg));
 			}
 		}
+		
+		public function printNoRight($rightStr) {
+			$this->cur_module->log(2,
+				sprintf("User doesn't have rights to %s",$rightStr)
+			);
+			$this->printError("err-no-rights");
+			
+		}
 
 		public function printDebug($msg) {
 			return sprintf("<div id=\"debugContent\">%s: %s</div>",$this->getLocale("Notification"),$msg);
@@ -991,7 +999,7 @@
 			$this->cur_module->log(2,
 				sprintf("User doesn't have rights to %s",$rightStr)
 			);
-			$this->ajaxEcho($this->getLocale("err-no-rights"),$js,false,$options);
+			$this->ajaxEchoError("err-no-rights",$js,false,$options);
 		}
 
 		public function ajaxEchoOK($str, $js = "", $raw = false, $options = array()) {
