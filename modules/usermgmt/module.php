@@ -330,7 +330,7 @@
 				case 2: // edit user
 					if (!FS::$sessMgr->hasRight("write")) {
 						$this->log(2,"User tries to edit user but don't have rights !");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$uid = FS::$secMgr->checkAndSecurisePostData("uid");
@@ -410,7 +410,7 @@
 				case 3: // del user
 					if (!FS::$sessMgr->hasRight("write")) {
                         $this->log(2,"User tries to delete user but don't have rights");
-						FS::$iMgr->ajaxEchoError("err-no-right");
+						FS::$iMgr->echoNoRights();
                         return;
                     }
 					$uid = FS::$secMgr->checkAndSecuriseGetData("uid");
@@ -488,8 +488,8 @@
 					return;
 				case 5: // LDAP remove
 					if (!FS::$sessMgr->hasRight("ldapwrite")) {
-                                                $this->log(2,"User tries to remove ldap but don't have rights");
-						FS::$iMgr->ajaxEchoError("err-no-right");
+						$this->log(2,"User tries to remove ldap but don't have rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 

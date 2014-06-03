@@ -52,7 +52,7 @@
 
 		public function showForm($rname = "") { 
 			if (!$this->canRead()) {
-				return FS::$iMgr->printError("err-no-right");
+				return FS::$iMgr->printError("err-no-rights");
 			}
 
 			if (!$this->Load($rname)) {
@@ -86,7 +86,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -106,7 +106,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 

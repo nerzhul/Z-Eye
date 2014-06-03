@@ -58,7 +58,7 @@
 					$ruleAccess = $module->getRulesClass()->canAccessToModule();
 					if($ruleAccess === false) {
 						if(FS::isAjaxCall()) {
-							FS::$iMgr->ajaxEchoError("err-no-rights");
+							FS::$iMgr->echoNoRights();
 						}
 						else {
 							header("Location: /");

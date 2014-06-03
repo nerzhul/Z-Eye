@@ -986,6 +986,10 @@
 		public function ajaxEchoErrorNC($str,$js="",$raw=false,$options=array()) {
 			$this->ajaxEchoError($str,$js,$raw,array("no-close" => true));
 		}
+		
+		public function echoNoRights($js = "", $options = array()) {
+			$this->ajaxEcho($this->getLocale("err-no-rights"),$js,false,$options);
+		}
 
 		public function ajaxEchoOK($str,$js="",$raw=false,$options=array()) {
 			$js = sprintf("%s%s", $js,

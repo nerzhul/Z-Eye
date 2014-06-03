@@ -844,7 +844,7 @@
 				case 3: // add or edit backup server
 					if (!FS::$sessMgr->hasRight("backup")) {
 						$this->log(2,"User don't have rights to add/edit server '".$saddr."' from switches backup");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$saddr = FS::$secMgr->checkAndSecurisePostData("saddr");
@@ -887,7 +887,7 @@
 				case 4: // remove backup server
 					if (!FS::$sessMgr->hasRight("backup")) {
 						$this->log("User don't have rights to remove server '".$saddr."' from switches backup");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$saddr = FS::$secMgr->checkAndSecuriseGetData("addr");

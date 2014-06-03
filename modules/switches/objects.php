@@ -372,7 +372,7 @@
 			}
 
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-rights");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 
@@ -408,7 +408,7 @@
 			}
 
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-rights");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 
@@ -1052,7 +1052,7 @@
 			$this->device = FS::$dbMgr->GetOneData("device","name","ip = '".$this->deviceIP."'");
 			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-rights");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 

@@ -81,7 +81,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -227,7 +227,7 @@
 
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 
@@ -286,7 +286,7 @@
 
 		public function Remove() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -387,7 +387,7 @@
 
 		public function showForm($name = "") {
 			if (!$this->canRead()) {
-				return $this->loc->s("err-no-right");
+				return FS::$iMgr->printError("err-no-right");
 			}
 
 			$this->Load($name);
@@ -480,7 +480,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -617,7 +617,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -859,7 +859,7 @@
 		
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 
@@ -1460,7 +1460,7 @@
 		
 		public function Modify() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 			
@@ -1533,7 +1533,7 @@
 		
 		public function Remove() {
 			if(!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 			

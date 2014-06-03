@@ -251,7 +251,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -435,7 +435,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -730,7 +730,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -907,7 +907,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -1172,7 +1172,7 @@
 		}
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -1459,7 +1459,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -1676,7 +1676,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -1804,7 +1804,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -1982,7 +1982,7 @@
 
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 
@@ -2047,7 +2047,7 @@
 
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			} 
 			$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
@@ -2227,8 +2227,7 @@
 		
 		public function showForm($zonename = "") {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
-				return;
+				return FS::$iMgr->printError("err-no-right");
 			}
 			
 			$recname = FS::$secMgr->checkAndSecuriseGetData("recname");
@@ -2285,7 +2284,7 @@
 		
 		public function Modify() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 			
@@ -2360,7 +2359,7 @@
 		
 		public function Remove() {
 			if (!$this->canWrite()) {
-				FS::$iMgr->ajaxEchoError("err-no-right");
+				FS::$iMgr->echoNoRights();
 				return;
 			}
 			

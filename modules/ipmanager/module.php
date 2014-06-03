@@ -1418,7 +1418,7 @@
 				// Monitor DHCP subnet
 				case 3:
 					if (!FS::$sessMgr->hasRight("subnetmon")) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$filtr = FS::$secMgr->checkAndSecuriseGetData("f");
@@ -1440,7 +1440,7 @@
 					$subnetu = preg_replace("#[.]#","_",$filtr);
 					if (!FS::$sessMgr->hasRight("subnetmon") &&
 						!FS::$sessMgr->hasRight($subnetu."_subnetmon")) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -1476,7 +1476,7 @@
 				// Add/Edit DHCP server
 				case 5:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -1636,7 +1636,7 @@
 				case 6:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
 						$this->log(2,"Delete DHCP server: User don't have rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -1677,7 +1677,7 @@
 				case 7:
 					if (!FS::$sessMgr->hasRight("subnetmgmt")) {
 						$this->log(2,"Add/Edit subnet: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -1857,7 +1857,7 @@
 				case 8:
 					if (!FS::$sessMgr->hasRight("subnetmgmt")) {
 						$this->log(2,"Remove subnet: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -1889,7 +1889,7 @@
 				case 9:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
 						$this->log(2,"Add/Edit cluster: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2016,7 +2016,7 @@
 				case 10:
 					if (!FS::$sessMgr->hasRight("servermgmt")) {
 						$this->log(2,"Remove cluster: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2054,7 +2054,7 @@
 				case 11:
 					if (!FS::$sessMgr->hasRight("ipmgmt")) {
 						$this->log(2,"Edit IP informations: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2127,7 +2127,7 @@
 					if (!FS::$sessMgr->hasRight("ipmgmt") &&
 						!FS::$sessMgr->hasRight($subnetu."_ipmgmt")) {
 						$this->log(2,"Edit IP informations: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2226,7 +2226,7 @@
 				case 12:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Add/Edit custom option: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$optname = FS::$secMgr->checkAndSecurisePostData("optname");
@@ -2311,7 +2311,7 @@
 				case 13:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Delete custom option: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$optname = FS::$secMgr->checkAndSecuriseGetData("optname");
@@ -2368,7 +2368,7 @@
 				case 14:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Add/Edit option: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$optalias = FS::$secMgr->checkAndSecurisePostData("optalias");
@@ -2496,7 +2496,7 @@
 				case 15:
 					if (!FS::$sessMgr->hasRight("optionsmgmt")) {
 						$this->log(2,"Remove option: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$optalias = FS::$secMgr->checkAndSecuriseGetData("optalias");
@@ -2551,7 +2551,7 @@
 				case 16:
 					if (!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
 						$this->log(2,"Add/Edit option group: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$optgroup = FS::$secMgr->checkAndSecurisePostData("optgroup");
@@ -2624,7 +2624,7 @@
 				case 17:
 					if (!FS::$sessMgr->hasRight("optionsgrpmgmt")) {
 						$this->log(2,"Remove option group: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$optgroup = FS::$secMgr->checkAndSecuriseGetData("optgroup");
@@ -2671,7 +2671,7 @@
 				case 18:
 					if (!FS::$sessMgr->hasRight("rangemgmt")) {
 						$this->log(2,"IP range management: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$subnet = FS::$secMgr->checkAndSecurisePostData("subnet");
@@ -2693,7 +2693,7 @@
 					if (!FS::$sessMgr->hasRight("rangemgmt") &&
 						!FS::$sessMgr->hasRight($subnetu."_rangemgmt")) {
 						$this->log(2,"IP range management: no rights");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 

@@ -213,9 +213,9 @@
 				}
 				// Port Stats
 				else if ($sh == 2) {
-					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_readportstats") && !FS::$sessMgr->hasRight("ip_".$dip."_readportstats")) {
-						$output .= FS::$iMgr->printError("err-no-rights");
-						return $output;
+					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_readportstats") &&
+						!FS::$sessMgr->hasRight("ip_".$dip."_readportstats")) {
+						return FS::$iMgr->printError("err-no-rights");
 					}
 					$file = file(dirname(__FILE__)."/../../datas/rrd/".$dip."_".$portid.".html");
 					if ($file) {
@@ -242,9 +242,9 @@
 				// Monitoring
 				else if ($sh == 3) {
 					if (!$this->hasDeviceWriteRight($snmprw,$dip) &&
-						!FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
-						$output .= FS::$iMgr->printError("err-no-rights");
-						return $output;
+						!FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") &&
+						!FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
+						return FS::$iMgr->printError("err-no-rights");
 					}
 					$climit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","climit","device = '".$device."' AND port = '".$port."'");
 					$wlimit = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_monitor","wlimit","device = '".$device."' AND port = '".$port."'");
@@ -263,16 +263,15 @@
 						"</ul></form>";
 				}
 				else if ($sh == 4) {
-					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_sshportinfos") && !FS::$sessMgr->hasRight("ip_".$dip."_sshportinfos")) {
-						$output .= FS::$iMgr->printError("err-no-rights");
-						return $output;
+					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_sshportinfos") &&
+						!FS::$sessMgr->hasRight("ip_".$dip."_sshportinfos")) {
+						return FS::$iMgr->printError("err-no-rights");
 					}
 
 					$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 					if (!$sshuser) {
-						$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
+						return FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
 							FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")),true);
-						return $output;
 					}
 
 					$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
@@ -360,8 +359,7 @@
 						!FS::$sessMgr->hasRight("ip_".$dip."_readswmodules") &&
 						!FS::$sessMgr->hasRight("snmp_".$snmpro."_readswdetails") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_readswdetails")) {
-						$output .= FS::$iMgr->printError("err-no-rights");
-						return $output;
+						return FS::$iMgr->printError("err-no-rights");
 					}
 
 					if (FS::$sessMgr->hasRight("snmp_".$snmpro."_readswdetails") ||
@@ -1074,8 +1072,7 @@
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					if (!FS::$sessMgr->hasRight("snmp_".$snmpro."_readswvlans") &&
                                         	!FS::$sessMgr->hasRight("ip_".$dip."_readswvlans")) {
-						$output .= FS::$iMgr->printError("err-no-rights");
-						return $output;
+						return FS::$iMgr->printError("err-no-rights");
 					}
 					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
 					$tmpoutput = "<table id=\"tvlanList\"><thead><tr><th class=\"headerSortDown\">ID</th><th>".$this->loc->s("Description").
@@ -1870,7 +1867,7 @@
 					$dip = $this->devip->getDeviceIP();
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$this->log(0,"Replace VLAN '".$old."' by '".$new."' on device '".$device."'");
@@ -2012,8 +2009,9 @@
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip) &&
-						!FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") && !FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						!FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") &&
+						!FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2061,7 +2059,7 @@
 					$dip = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2095,7 +2093,7 @@
 				case 18: // Device discovery
 					if (!FS::$sessMgr->hasRight("discover")) {
 						$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to discover a device !");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$iplist = FS::$secMgr->checkAndSecurisePostData("iplist");
@@ -2203,7 +2201,7 @@
 				case 20: // Save all devices
 					if (!FS::$sessMgr->hasRight("globalsave")) {
 						$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to save all devices !");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 					$query = FS::$dbMgr->Select("device","name,vendor");
@@ -2224,7 +2222,7 @@
 				case 21: // Backup all devices
 					if (!FS::$sessMgr->hasRight("globalbackup")) {
 						$this->log(2,"User ".FS::$sessMgr->getUserName()." wants to backup all devices !");
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2305,7 +2303,7 @@
 
 					if (!FS::$sessMgr->hasRight("snmp_".$snmprw."_sshpwd") &&
 						!FS::$sessMgr->hasRight("ip_".$dip."_sshpwd")) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -2379,7 +2377,7 @@
 
 					if (!FS::$sessMgr->hasRight("ip_".$dip."_dhcpsnmgmt") &&
 						!FS::$sessMgr->hasRight("snmp_".$snmprw."_dhcpsnmgmt")) {
-						FS::$iMgr->ajaxEchoError("err-no-rights");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 

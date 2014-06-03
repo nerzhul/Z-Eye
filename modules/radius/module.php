@@ -1422,7 +1422,7 @@
 				case 13:
 					if (!FS::$sessMgr->hasRight("manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
-						FS::$iMgr->ajaxEchoError("err-no-right");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
@@ -1520,7 +1520,7 @@
 				case 14:
 					if (!FS::$sessMgr->hasRight("manage")) {
 						$this->log(2,"This user don't have rights to manage radius !");
-						FS::$iMgr->ajaxEchoError("err-no-right");
+						FS::$iMgr->echoNoRights();
 						return;
 					}
 
