@@ -53,7 +53,7 @@
 		}
 
 		private function bottomContainer() {
-			return "<div id=\"footer\"><div id=\"copyright\">by Loïc BLOT, CNRS - Copyright 2010-".date('Y').
+			return "<div id=\"footer\"><div id=\"copyright\">by Loïc BLOT, IOGS - Copyright 2010-".date('Y').
 				"</div><div id=\"content\"></div></div>";
 		}
 
