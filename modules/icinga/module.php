@@ -968,20 +968,20 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if (!$cmdname || !$cmd || !preg_match("#^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$#",$cmdname) || $edit && $edit != 1) {
-						echo $this->loc->s("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
 					if ($edit) {
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands",
 							"cmd","name = '".$cmdname."'")) {
-							echo $this->loc->s("err-not-found");
+							FS::$iMgr->ajaxEchoError("err-not-found");
 							return;
 						}
 					}
 					else if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_commands",
 						"cmd","name = '".$cmdname."'")) {
-						echo $this->loc->s("err-data-exist");
+						FS::$iMgr->ajaxEchoError("err-data-exist");
 						return;
 					}
 
@@ -1082,7 +1082,7 @@
 					$edit = FS::$secMgr->checkAndSecurisePostData("edit");
 
 					if (!$name || !$alias || preg_match("#[ ]#",$name)) {
-						echo $this->loc->s("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
@@ -1106,7 +1106,7 @@
 						$suhs == NULL || $sums == NULL || $mhs > 23 || $mms > 59 || $tuhs > 23 || $tums > 59 ||
 						$whs > 23 || $wms > 59 || $thhs > 23 || $thms > 59 || $fhs > 23 || $fms > 59 || $sahs > 23 || $sams > 59 ||
 						$suhs > 23 || $sums > 59) {
-						echo $this->loc->s("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
@@ -1130,13 +1130,13 @@
 						$suhe == NULL || $sume == NULL || $mhe > 23 || $mme > 59 || $tuhe > 23 || $tume > 59 ||
 						$whe > 23 || $wme > 59 || $thhe > 23 || $thme > 59 || $fhe > 23 || $fme > 59 || $sahe > 23 || $same > 59 ||
 						$suhe > 23 || $sume > 59) {
-						echo $this->loc->s("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
 					if (!$mhs && !$mms && !$tuhs && !$tums && !$whs && !$wms && !$thhs && !$thms && !$fhs && !$fms && !$sahs && !$sams && !$suhs && !$sums &&
 						!$mhe && !$mme && !$tuhe && !$tume && !$whe && !$wme && !$thhe && !$thme && !$fhe && !$fme && !$sahe && !$same && !$suhe && !$sume) {
-						echo $this->loc->s("err-bad-data");
+						FS::$iMgr->ajaxEchoError("err-bad-data");
 						return;
 					}
 
@@ -1144,14 +1144,14 @@
 					if ($edit) {
 						if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods",
 							"alias","name = '".$name."'")) {
-							echo $this->loc->s("err-data-not-exist");
+							FS::$iMgr->ajaxEchoError("err-data-not-exist");
 							return;
 						}
 					}
 					else {
 						if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods",
 							"alias","name = '".$name."'")) {
-							echo $this->loc->s("err-data-exist");
+							FS::$iMgr->ajaxEchoError("err-data-exist");
 							return;
 						}
 					}

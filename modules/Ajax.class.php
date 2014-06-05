@@ -29,7 +29,6 @@
 			switch($type) {
 				// menu
 				case 1: 
-					
 					echo "{\"htmldatas\":  \"".FS::$secMgr->cleanForJS(FS::$iMgr->showWindowHead())."\"}";
 					//echo FS::$iMgr->showWindowHead();
 					break;

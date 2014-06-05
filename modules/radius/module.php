@@ -1223,7 +1223,7 @@
 
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for radius deleg (radius server)");
-						echo FS::$iMgr->printError("err-invalid-auth-server");
+						FS::$iMgr->ajaxEchoError("err-invalid-auth-server");
 						return;
 					}
 					if (!$name || !$surname || !$username || !$valid || !$profil ||
@@ -1231,7 +1231,7 @@
 						!FS::$secMgr->isNumeric($limhs) || !FS::$secMgr->isNumeric($limms) || !FS::$secMgr->isNumeric($limhe) || !FS::$secMgr->isNumeric($limme) || !preg_match("#^\d{2}[-]\d{2}[-]\d{4}$#",$sdate)
 					))) {
 						$this->log(2,"Some fields are missing for radius deleg (datas)");
-						echo FS::$iMgr->printError("err-field-missing");
+						FS::$iMgr->ajaxEchoError("err-field-missing");
 						return;
 					}
 

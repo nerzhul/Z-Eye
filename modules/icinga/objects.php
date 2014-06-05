@@ -909,7 +909,7 @@
 			$maxcheck = FS::$secMgr->getPost("maxcheck","n+");
 
 			if ($checkintval == NULL || $retcheckintval == NULL || $maxcheck == NULL) {
-				echo $this->loc->s("err-bad-data");
+				FS::$iMgr->ajaxEchoError("err-bad-data");
 				return;
 			}
 			
