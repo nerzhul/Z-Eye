@@ -304,7 +304,7 @@
 		* $type2: glbl
 		*/
 		private function showRemoveSpan($type,$type2,$name,$id,$right,$value2) {
-			$confirm = ($type == "g" ? $this->loc->s("confirm-remove-groupright") : $this->loc->s("confirm-remove-userright"));
+			$confirm = ($type == "g" ? "confirm-remove-groupright" : "confirm-remove-userright");
 			if ($type2 == "subnet") {
 				$output = "<span id=\"".FS::$iMgr->formatHTMLId($type.$id.$right.$value2)."\">".$name." ".
 					FS::$iMgr->removeIcon(2,$type."id=".$id."&".$type2."=".$value2."&right=".$right,
