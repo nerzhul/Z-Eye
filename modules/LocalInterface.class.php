@@ -30,13 +30,19 @@
 		public function content() {
 			$installlocked = file_get_contents(dirname(__FILE__)."/../config/LOCK");
 
-			$output = $this->header().$this->popupContainer().$this->loginContainer().
-				"<div id=\"tooltip\"></div><div id=\"main_wrapper\"><div id=\"main\">".$this->showModule()."</div></div>";
+			$output = sprintf("%s<div id=\"app-dyn-container\">%s%s%s</div>%s%s",
+				$this->header(),
+				$this->popupContainer(), $this->notifContainer(),
+				$this->tooltipContainer(), $this->loginContainer(),
+				$this->mainContainer()
+			);
 
 			if($installlocked) {
-				$output .= $this->showWindowHead();
+				$output = sprintf("%s<div id=\"logform\">%s</div>",
+					$output, $this->showWindowHead()
+				);
 			}
-			$output .= $this->notifContainer().$this->bottomContainer();
+			$output .= $this->bottomContainer();
 
 			if ($installlocked) {
 				$this->loadFooterPlugins();
@@ -47,10 +53,21 @@
 		private function popupContainer() {
 			return "<div id=\"lock\"><div id=\"subpop\"></div><div id=\"loaderpop\"></div></div>";
 		}
+		
+		private function tooltipContainer() {
+			return "<div id=\"tooltip\"></div>";
+		}
 
 		private function notifContainer() {
 			return "<div id=\"notification\"><div id=\"subnotification\"><div id=\"notifIcon\"></div><div id=\"notifText\"></div></div></div>";
 		}
+		
+		private function mainContainer() {
+			return sprintf("<div id=\"main_wrapper\"><div id=\"main\">%s</div></div>",
+				$this->showModule()
+			);
+		}
+			
 
 		private function bottomContainer() {
 			return "<div id=\"footer\"><div id=\"copyright\">by Loïc BLOT, IOGS - Copyright 2010-".date('Y').
@@ -58,7 +75,7 @@
 		}
 
 		public function showWindowHead() {
-			$output = "<div id=\"logform\"><div id=\"menupanel\">";
+			$output = "<div id=\"menupanel\">";
 			if($this->showRetMenu) {
 				$output .= "<div id=\"menuStack\"><div id=\"menuTitle\" onclick=\"javascript:history.back()\">Retour</div></div>";
 			}
@@ -79,7 +96,7 @@
 					"</div></div>";
 			}
 
-			$output .= "</div></div>";
+			$output .= "</div>";
 
 			return $output;
 		}
