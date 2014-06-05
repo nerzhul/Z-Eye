@@ -28,9 +28,10 @@
 			$type = FS::$secMgr->checkAndSecuriseGetData("at");
 			switch($type) {
 				// menu
-				case 1: 
-					echo "{\"htmldatas\":  \"".FS::$secMgr->cleanForJS(FS::$iMgr->showWindowHead())."\"}";
-					//echo FS::$iMgr->showWindowHead();
+				case 1:
+					echo json_encode(array(
+						"htmldatas" => FS::$iMgr->showWindowHead()
+					));
 					break;
 				// module
 				case 2: 
