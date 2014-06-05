@@ -273,7 +273,6 @@
 			$jsBuf = "";
 			for ($i=0;$i<2;$i++) {
 				if (strlen($this->js_buffer[$i]) > 0) {
-					//$jsBuf = sprintf("%s<script type=\"text/javascript\">%s</script>",
 					$jsBuf = sprintf("%s%s",
 						$jsBuf,
 						$this->js_buffer[$i]);

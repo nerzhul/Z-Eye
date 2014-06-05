@@ -30,7 +30,8 @@
 				// menu
 				case 1:
 					echo json_encode(array(
-						"htmldatas" => FS::$iMgr->showWindowHead()
+						"htmldatas" => FS::$iMgr->showWindowHead(),
+						"jscode" => ""
 					));
 					break;
 				// module
@@ -52,8 +53,6 @@
 				// module: getIfaceElmt()
 				case 4: 
 					$mod = FS::$secMgr->checkAndSecuriseGetData("mod");
-					//echo FS::$iMgr->loadModule($mod,2);
-					//echo FS::$iMgr->renderJS();
 					echo json_encode(array(
 						"htmldatas" => FS::$iMgr->loadModule($mod,2),
 						"jscode" => FS::$iMgr->renderJS()
@@ -63,7 +62,6 @@
 				case 5:
 					if ($module = FS::$iMgr->getModuleByPath("connect")) {
 						$module->Disconnect(true);
-						//echo FS::$iMgr->renderJS();
 						echo json_encode(array(
 							"htmldatas" => "",
 							"jscode" => FS::$iMgr->renderJS()

@@ -76,7 +76,6 @@
 						$module->handlePostDatas($act);
 					}
 
-					//echo FS::$iMgr->renderJS();
 					echo json_encode(array(
 						"htmldatas" => FS::$iMgr->getAjaxEchoBuffer(),
 						"jscode" => FS::$iMgr->renderJS()

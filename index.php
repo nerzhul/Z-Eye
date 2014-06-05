@@ -64,8 +64,6 @@
 			FS::$iMgr->jsinc("/lib/Sigma/sigma.min.js");
 
 			echo FS::$iMgr->content();
-			echo FS::$iMgr->renderJS();
-			echo FS::$iMgr->footer();
 		}
 		/* For optimize times
 		$end_time = microtime(true);

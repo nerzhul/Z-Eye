@@ -46,7 +46,11 @@
 			if ($installlocked) {
 				$this->loadFooterPlugins();
 			}
-			return $output;
+
+			// Add JS exec here, because we aren't using AJAX
+			return sprintf("%s%s<script type=\"text/javascript\">%s</script>",
+				$output, FS::$iMgr->footer(), FS::$iMgr->renderJS()
+			);
 		}
 		
 		private function mainContainer() {
