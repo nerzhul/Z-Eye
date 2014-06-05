@@ -259,7 +259,7 @@
 					$('#vllabel').html('".$this->loc->s("Vlan")."');
 				} else if(document.getElementsByName('trmode')[0].value == 3) {
 					if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
-					$('#vllabel').html('".$this->loc->s("fail-vlan")."');
+						$('#vllabel').html('".$this->loc->s("fail-vlan")."');
 					if($('#mabtr').is(':hidden')) $('#mabtr').show('slow');
 					if($('#mabdead').is(':hidden')) $('#mabdead').show('slow');
 					if($('#mabnoresp').is(':hidden')) $('#mabnoresp').show('slow');

@@ -346,7 +346,8 @@
 			$output = FS::$iMgr->js("function historyDateChange() {
 				hideAndEmpty('#hstcontent');
 				$.post('?mod=".$this->mid."&act=4',$('#hstfrm').serialize(), function(data) {
-					$('#hstcontent').show(\"fast\",function() { $('#hstcontent').html(data); });
+					$('#hstcontent').show(\"fast\",function() {
+						setJSONContent('#hstcontent',data); });
 				}); };");
 
 			$output .= "<div id=\"hstcontent\">".$this->showHistory($filter)."</div>".

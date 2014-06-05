@@ -537,8 +537,7 @@
 						$output .= FS::$iMgr->printDebug($this->loc->s("no-found-records"));
 					}
 
-					$js = "$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');";
-					FS::$iMgr->js($js);
+					FS::$iMgr->js("$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');";);
 
 					FS::$iMgr->ajaxEchoOK("Done");
 					$this->log(0,"search old records for DNS zones");

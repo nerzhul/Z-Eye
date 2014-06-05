@@ -74,9 +74,8 @@
 					$output .= FS::$iMgr->js("function loadStep1() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
 						$.post('?mod=".$this->mid."&at=2&step=1', function(data) {
-							$('#installer').html(data);
-							});
-						}");
+							setJSONContent('#installer',data);
+						});}");
 					$output .= FS::$iMgr->h2("title-welcome");
 					$output .= $this->loc->s("text-welcome")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Lets-Go"),"loadStep1();")."</center>";
 					break;
@@ -84,7 +83,7 @@
 					FS::$iMgr->js("function loadStep2() {
 						$('#installer').html('<center><img src=\"/styles/images/loader.gif\" /></center>');
 						$.post('?mod=".$this->mid."&at=2&step=2', function(data) {
-							$('#installer').html(data);
+							setJSONContent('#installer',data);
 							});
 						};
 						function sendAdmCfg() {

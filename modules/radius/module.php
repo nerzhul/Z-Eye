@@ -113,13 +113,20 @@
 					case "my": $tmpoutput .= "MySQL"; break;
 					case "pg": $tmpoutput .= "PgSQL"; break;
 				}
+				
+				$radStatusDivID = sprintf("radstatus%s",
+					preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])
+				);
 
-				$tmpoutput .= "</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>";
-				$tmpoutput .= "<td><div id=\"radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."\">".
+				$tmpoutput .= "</td><td>".$data["dbname"]."</td><td>".$data["login"]."</td>".
+					"<td><div id=\"".$radStatusDivID."\">".
 					FS::$iMgr->img("styles/images/loader.gif",24,24)."</div>";
 
-				FS::$iMgr->js("$.post('?mod=".$this->mid."&act=15', { saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, function(data) {
-					$('#radstatus".preg_replace("#[.]#","-",$data["addr"].$data["port"].$data["dbname"])."').html(data); });");
+				FS::$iMgr->js("$.post('?mod=".$this->mid."&act=15', 
+					{ saddr: '".$data["addr"]."', sport: '".$data["port"]."', sdbname: '".$data["dbname"]."' }, 
+					function(data) {
+					setJSONContent('#".$radStatusDivID."',data); 
+				});");
 
 				$tmpoutput .= "</td><td>".
 					FS::$iMgr->removeIcon(14,"alias=".$data["radalias"],
@@ -326,10 +333,11 @@
 
 					FS::$iMgr->js("$('#adduser').submit(function(event) {
 					event.preventDefault();
-					$.post('?mod=".$this->mid."&at=3&ra=".$radalias."&act=10', $('#adduser').serialize(), function(data) {
-						$('#adduserres').html(data);
-					});
-				});");
+					$.post('?mod=".$this->mid."&at=3&ra=".$radalias."&act=10',
+						$('#adduser').serialize(), function(data) {
+							setJSONContent('#adduserres',data);
+						});
+					});");
 			}
 			else if ($sh == 2) {
 				$radSQLMgr = $this->connectToRaddb2($radalias);
@@ -386,9 +394,10 @@
 					// Filtering
 					FS::$iMgr->js("function filterRadiusDatas() {
 						$('#radd').fadeOut();
-						$.post('?mod=".$this->mid."&act=12', $('#radf').serialize(), function(data) {
-						$('#radd').html(data);
-						$('#radd').fadeIn();
+						$.post('?mod=".$this->mid."&act=12',
+							$('#radf').serialize(), function(data) {
+							setJSONContent('#radd',data);
+							$('#radd').fadeIn();
 						});
 					}");
 
@@ -600,7 +609,7 @@
 					FS::$iMgr->js("$('#adduser').submit(function(event) {
 						event.preventDefault();
 						$.post('?mod=".$this->mid."&at=3&ra=".$radalias."&act=10', $('#adduser').serialize(), function(data) {
-							$('#adduserres').html(data);
+							setJSONContent('#adduserres',data);
 						});
 					});");
 				}

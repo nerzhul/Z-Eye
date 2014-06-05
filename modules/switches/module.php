@@ -966,11 +966,14 @@
 					if (FS::$sessMgr->hasRight("ip_".$dip."_retagvlan") ||
 						FS::$sessMgr->hasRight("snmp_".$snmprw."_retagvlan")) {
 						$js = "function searchports() {
-							waitingPopup('".$this->loc->s("search-ports")."...');
-							var ovlid = document.getElementsByName('oldvl')[0].value;
-							$.get('?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid, function(data) {
-							$('#vlplist').html(data); unlockScreen(true); });
-							return false; };
+								waitingPopup('".$this->loc->s("search-ports")."...');
+								var ovlid = document.getElementsByName('oldvl')[0].value;
+								$.get('?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid,
+									function(data) {
+										setJSONContent('#vlplist',data); unlockScreen(true); 
+								});
+								return false;
+							};
 							function checkTagForm() {
 							if ($('#vlplist') == null || $('#vlplist').html().length < 1) {
 								alert('".$this->loc->s("must-verify-ports")." !');
@@ -1004,22 +1007,24 @@
 						$output .= FS::$iMgr->js("function checkCopyState(copyId) {
 							setTimeout(function() {
 								$.post('?at=3&mod=".$this->mid."&act=13&d=".$device."&saveid='+copyId, function(data) {
-									if (data == 2) {
+									var code = JSON.parse(data);
+									
+									if (code['htmldatas'] == 2) {
 										$('#subpop').html('".$this->loc->s("Copy-in-progress")." ...');
 										checkCopyState(copyId);
 									}
-									else if (data == 3) {
+									else if (code['htmldatas'] == 3) {
 										$('#subpop').html('".$this->loc->s("Success")." !');
 										setTimeout(function() { unlockScreen(true); },1000);
 									}
-									else if (data == 4) {
+									else if (code['htmldatas'] == 4) {
 										$.post('?at=3&mod=".$this->mid."&act=14&d=".$device."&saveid='+copyId, function(data) {
-											$('#subpop').html('".$this->loc->s("Fail")." !<br />Cause: '+data);
+											$('#subpop').html('".$this->loc->s("Fail")." !<br />Cause: '+code['htmldatas']);
 										});
 										setTimeout(function() { unlockScreen(true); },5000);
 									}
 									else {
-										$('#subpop').html('".$this->loc->s("unk-answer").": '+data);
+										$('#subpop').html('".$this->loc->s("unk-answer").": '+code['htmldatas']);
 										setTimeout(function() { unlockScreen(true); },5000);
 									}
 								}); }, 1000);
@@ -1042,7 +1047,7 @@
 						io: document.getElementsByName('io')[0].value },
 						function(data) {
 							var copyId = data;
-							$('#subpop').html('".$this->loc->s("Copy-in-progress")."...');
+							setJSONContent('#subpop','".$this->loc->s("Copy-in-progress")."...');
 							checkCopyState(copyId);
 						});";
 						$js .= "return false;};";
@@ -1074,7 +1079,7 @@
 							waitingPopup('".$this->loc->s("req-sent")."...');
 						$.post('?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) {
 							var copyId = data;
-							$('#subpop').html('".$this->loc->s("restore-in-progress")."...');
+							setJSONContent('#subpop','".$this->loc->s("restore-in-progress")."...');
 							checkCopyState(copyId);
 						});
 						return false;
@@ -1144,17 +1149,29 @@
 					if ($iswif == false) {
 						// Script pour modifier le nom de la prise
 						FS::$iMgr->js("function modifyPlug(src,sbmit,sw_,swport_,swpr_) {
-						if (sbmit == true) {
-						$.post('?at=3&mod=".$this->mid."&d=".$device."&act=2', { sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value }, function(data) {
-						$(src+'l').html(data); $(src+' a').toggle();
-						}); }
-						else $(src).toggle(); }
+							if (sbmit == true) {
+								$.post('?at=3&mod=".$this->mid."&d=".$device."&act=2',
+									{ sw: sw_, swport: swport_, swprise: document.getElementsByName(swpr_)[0].value },
+									function(data) {
+										setJSONContent(src+'l',data); $(src+' a').toggle();
+								});
+							}
+							else {
+								$(src).toggle();
+							}
+						}
 						function modifyRoom(src,sbmit,sw_,swport_,swproom_) {
-						if (sbmit == true) {
-						$.post('?at=3&mod=".$this->mid."&d=".$device."&act=26', { sw: sw_, swport: swport_, room: document.getElementsByName(swproom_)[0].value }, function(data) {
-						$(src+'l').html(data); $(src+' a').toggle();
-						}); }
-						else $(src).toggle(); }");
+							if (sbmit == true) {
+								$.post('?at=3&mod=".$this->mid."&d=".$device."&act=26'
+									{ sw: sw_, swport: swport_, room: document.getElementsByName(swproom_)[0].value },
+									function(data) {
+										setJSONContent(src+'l',data); $(src+' a').toggle();
+								});
+							}
+							else {
+								$(src).toggle();
+							}
+						}");
 					}
 
 

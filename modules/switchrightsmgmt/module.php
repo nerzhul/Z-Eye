@@ -218,7 +218,7 @@
 					$output .= FS::$iMgr->js("function filterSw() {
 							$('#swfdiv').fadeOut('slow',function() {
 								$.post('?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
-									$('#swfdiv').html(data);
+									setJSONConten('#swfdiv',data);
 								});
 						});
               	        $('#swfdiv').fadeIn();
@@ -370,28 +370,31 @@
 			}
 			if ($found) {
 				if ($community == "") {
-					$output .= FS::$iMgr->form("?mod=".$this->mid."&sh=1",array("id" => "snmpfform"));
-					$output .= FS::$iMgr->select("snmp",array("js" => "filterSNMP()"));
-					$output .= $formoutput;
-					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSNMP()")."</form>";
-					$output .= FS::$iMgr->js("function filterSNMP() {
-        	                                $('#snmpfdiv').fadeOut('fast',function() {
-	                                       		$.post('?mod=".$this->mid."&at=2&sh=1', $('#snmpfform').serialize(), function(data) {
-                                        	                $('#snmpfdiv').html(data);
-                        	                        });
+					$output .= FS::$iMgr->form("?mod=".$this->mid."&sh=1",array("id" => "snmpfform")).
+						FS::$iMgr->select("snmp",array("js" => "filterSNMP()")).
+						$formoutput.
+						"</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSNMP()")."</form>".
+						"<div id=\"snmpfdiv\">";
+					
+					FS::$iMgr->js("function filterSNMP() {
+						$('#snmpfdiv').fadeOut('fast',function() {
+							$.post('?mod=".$this->mid."&at=2&sh=1',
+								$('#snmpfform').serialize(), function(data) {
+										setJSONContent('#snmpfdiv',data);
+								});
 						});
 						$('#snmpfdiv').fadeIn('fast');
-                	                        }");
-					$output .= "<div id=\"snmpfdiv\">";
+					}");
 				}
-				$output .= FS::$iMgr->h1("group-rights").$grpoutput."</table>";
-				$output .= FS::$iMgr->h1("user-rights").$usroutput."</table>";
-				if ($community == "")
+				$output .= FS::$iMgr->h1("group-rights").$grpoutput."</table>".
+					FS::$iMgr->h1("user-rights").$usroutput."</table>";
+				if ($community == "") {
 					$output .= "</div>";
+				}
 			}
 			else {
 				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-                                        "<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")),true);
+					"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")),true);
 			}
 			return $output;
 		}
