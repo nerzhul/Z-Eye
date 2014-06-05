@@ -83,7 +83,7 @@
 			}
 
 			$output .= "</div>";
-
+			
 			return $output;
 		}
 
@@ -105,7 +105,7 @@
 				"<div class=\"userMenu\">".FS::$sessMgr->getUserRealName().
 				" (".FS::$sessMgr->getUserName().")".
 				"</div><div class=\"userpopup\">".
-				"<div class=\"menuItem\" onclick=\"loadInterface('&mod=".FS::$iMgr->getModuleIdByPath("usersettings")."');\">".
+				"<div class=\"menuItem\" onclick=\"loadInterface('".FS::$iMgr->getModuleIdByPath("usersettings")."');\">".
 				$this->getLocale("Settings")."</div>".
 				"<div class=\"menuItem\" onclick=\"confirmPopup('".FS::$secMgr->cleanForJS($this->getLocale("confirm-disconnect")).
 				"','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',".

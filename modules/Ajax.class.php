@@ -29,8 +29,9 @@
 			switch($type) {
 				// menu
 				case 1: 
-					$mod = FS::$secMgr->checkAndSecuriseGetData("mid");
-					echo FS::$iMgr->showWindowHead();
+					
+					echo "{\"htmldatas\":  \"".FS::$secMgr->cleanForJS(FS::$iMgr->showWindowHead())."\"}";
+					//echo FS::$iMgr->showWindowHead();
 					break;
 				// module
 				case 2: 

@@ -112,7 +112,7 @@
 								}
 								if ($module->getRulesClass()->canAccessToModule() === true) {
 									$menus[$menuname][] =
-										sprintf("<div class=\"menuItem\" onclick=\"loadInterface('&mod=%s');\">%s</div>",
+										sprintf("<div class=\"menuItem\" onclick=\"loadInterface('%s');\">%s</div>",
 										$moduleid,$module->getMenuTitle());
 								}
 							}

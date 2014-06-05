@@ -416,7 +416,7 @@
 		}
 		
 		public function cleanForJS($str) {
-			return addslashes(preg_replace("#[\n\r]#","",$str));
+			return addslashes(preg_replace("#[\n\r\t]#","",$str));
 		}
 
 		public function isStrongPwd($pwd) {
