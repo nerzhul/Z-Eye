@@ -46,12 +46,12 @@
 				FS::$iMgr->setURL("");
 				FS::$iMgr->js("var refreshId = setInterval(function()
 				{
-				$.get('?mod=".$this->mid."&at=2', function(data) {
-							$('#reports').fadeOut(1500,function() {
-								$('#reports').html(data);
-								$('#reports').fadeIn(1500);
+					$.get('?mod=".$this->mid."&at=2', function(data) {
+						$('#reports').fadeOut(1500,function() {
+							setJSONContent('#reports',data);
+							$('#reports').fadeIn(1500);
 					});
-						});
+				});
 				}, 20000);");
 				$output = FS::$iMgr->h1("Speed Reporting",true);
 				$output .= "<div id=\"reports\">";
