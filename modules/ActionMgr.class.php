@@ -49,11 +49,13 @@
 					}
 
 					if($found == false) {
-						header("Location: /");
+						FS::$iMgr->redir("/", true);
 						return;
 					}
 
 					require_once(dirname(__FILE__)."/".$mod_path."/module.php");
+					
+					
 					
 					$ruleAccess = $module->getRulesClass()->canAccessToModule();
 					if($ruleAccess === false) {
@@ -61,7 +63,7 @@
 							FS::$iMgr->echoNoRights("access to module");
 						}
 						else {
-							header("Location: /");
+							FS::$iMgr->redir("/", true);
 						}
 					}
 					else if($ruleAccess === -1) {
@@ -74,7 +76,11 @@
 						$module->handlePostDatas($act);
 					}
 
-					echo FS::$iMgr->renderJS();
+					//echo FS::$iMgr->renderJS();
+					echo json_encode(array(
+						"htmldatas" => FS::$iMgr->getAjaxEchoBuffer(),
+						"jscode" => FS::$iMgr->renderJS()
+					));
 					break;
 			}
 		}

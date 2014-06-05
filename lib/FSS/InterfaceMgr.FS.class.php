@@ -42,6 +42,8 @@
 			$this->arr_css = array();
 			$this->arr_js = array();
 			$this->title = "";
+			
+			$this->echo_buffer = "";
 
 			// Create 2 JS buffers
 			$this->js_buffer = array();
@@ -271,7 +273,8 @@
 			$jsBuf = "";
 			for ($i=0;$i<2;$i++) {
 				if (strlen($this->js_buffer[$i]) > 0) {
-					$jsBuf = sprintf("%s<script type=\"text/javascript\">%s</script>",
+					//$jsBuf = sprintf("%s<script type=\"text/javascript\">%s</script>",
+					$jsBuf = sprintf("%s%s",
 						$jsBuf,
 						$this->js_buffer[$i]);
 				}
@@ -967,7 +970,10 @@
 
 
 		protected function ajaxEcho($str,$js="",$raw=false,$options=array()) {
-			echo ($raw ? $str : $this->getLocale($str));
+			$this->echo_buffer = sprintf("%s%s",
+				$this->echo_buffer,
+				($raw ? $str : $this->getLocale($str))
+			);
 
 			if (isset($options["no-close"]) &&
 				$options["no-close"] === true) {
@@ -1008,6 +1014,10 @@
 
 			$this->ajaxEcho($str, $js, $raw, $options);
 		}
+		
+		public function getAjaxEchoBuffer() {
+			return $this->echo_buffer;
+		}
 
 		public function getLocale($locid) {
 			return $this->getLocales()->s($locid);
@@ -1039,6 +1049,7 @@
 		private $arr_css;
 		private $arr_js;
 		private $title;
+		private $echo_buffer;
 		private $js_buffer;
 		private $js_buffer_idx;
 

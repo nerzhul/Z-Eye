@@ -39,8 +39,10 @@
 					if($mod == 0) {
 						$mod = FS::$iMgr->getModuleIdByPath("default");
 					}
-					echo FS::$iMgr->loadModule($mod);
-					echo FS::$iMgr->renderJS();
+					echo json_encode(array(
+						"htmldatas" => FS::$iMgr->loadModule($mod),
+						"jscode" => FS::$iMgr->renderJS()
+					));
 					break;
 				// Action Handler
 				case 3:
@@ -50,20 +52,32 @@
 				// module: getIfaceElmt()
 				case 4: 
 					$mod = FS::$secMgr->checkAndSecuriseGetData("mod");
-					echo FS::$iMgr->loadModule($mod,2);
-					echo FS::$iMgr->renderJS();
+					//echo FS::$iMgr->loadModule($mod,2);
+					//echo FS::$iMgr->renderJS();
+					echo json_encode(array(
+						"htmldatas" => FS::$iMgr->loadModule($mod,2),
+						"jscode" => FS::$iMgr->renderJS()
+					));
 					break;
 				// special case: disconnect user
 				case 5:
 					if ($module = FS::$iMgr->getModuleByPath("connect")) {
 						$module->Disconnect(true);
-						echo FS::$iMgr->renderJS();
+						//echo FS::$iMgr->renderJS();
+						echo json_encode(array(
+							"htmldatas" => "",
+							"jscode" => FS::$iMgr->renderJS()
+						));
 					}
 					break;
 				// Reload all footer plugins
 				case 6:
 					FS::$iMgr->loadFooterPlugins();
-					echo FS::$iMgr->renderJS();
+					//echo FS::$iMgr->renderJS();
+					echo json_encode(array(
+						"htmldatas" => "",
+						"jscode" => FS::$iMgr->renderJS()
+					));
 					break;
 				default: $this->honeyPot(); break;
 			}
