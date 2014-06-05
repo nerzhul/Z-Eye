@@ -2120,7 +2120,7 @@
 					// Another test here because we have subnet
 					if (!FS::$sessMgr->hasRight("ipmgmt") &&
 						!FS::$sessMgr->hasRight($subnetu."_ipmgmt")) {
-						FS::$iMgr->echoNoRights("modify IP informations);
+						FS::$iMgr->echoNoRights("modify IP informations");
 						return;
 					}
 

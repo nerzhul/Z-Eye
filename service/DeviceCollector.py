@@ -86,9 +86,11 @@ class ZEyeSwitchesConfigCollector(ZEyeUtil.Thread):
 			if ssh.setupPrivileges(privilegedPwdClear) == False:
 				self.decrThreadNb()
 				return
-				
-			startupCfg = ssh.sendPrivilegedCmd("show startup-config")
-			runningCfg = ssh.sendPrivilegedCmd("show running-config")
+			
+			startupCfg = ""
+			runningCfg = ""	
+			#startupCfg = ssh.sendPrivilegedCmd("show startup-config")
+			#runningCfg = ssh.sendPrivilegedCmd("show running-config")
 			
 			pgsqlCon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
 			pgcursor = pgsqlCon.cursor()
