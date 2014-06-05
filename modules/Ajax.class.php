@@ -40,10 +40,18 @@
 					if($mod == 0) {
 						$mod = FS::$iMgr->getModuleIdByPath("default");
 					}
-					echo json_encode(array(
-						"htmldatas" => FS::$iMgr->loadModule($mod),
-						"jscode" => FS::$iMgr->renderJS()
-					));
+					
+					$noJSON = FS::$secMgr->checkAndSecuriseGetData("nojson");
+					if ($noJSON == 1) {
+						echo FS::$iMgr->loadModule($mod);
+						// noJSON is for specific JS modules, then JS mustn't appear here
+					}
+					else {
+						echo json_encode(array(
+							"htmldatas" => FS::$iMgr->loadModule($mod),
+							"jscode" => FS::$iMgr->renderJS()
+						));
+					}
 					break;
 				// Action Handler
 				case 3:

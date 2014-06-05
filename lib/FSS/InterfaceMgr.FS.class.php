@@ -393,7 +393,7 @@
 				(isset($options["length"]) ? $options["length"] : 40), (isset($options["label"]) ? $options["label"] : NULL),
 				(isset($options["tooltip"]) ? $options["tooltip"] : NULL));
 
-			$this->js(sprintf("$('#%s').autocomplete({source: '?mod=%s&at=2',minLength: 3});",
+			$this->js(sprintf("$('#%s').autocomplete({source: '?mod=%s&at=2&nojson=1',minLength: 3});",
 				$name,$this->getModuleIdByPath("search")));
 			return $output;
 		}
