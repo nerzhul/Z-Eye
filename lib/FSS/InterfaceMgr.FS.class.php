@@ -830,10 +830,21 @@
 
 			$output = sprintf("<div id=\"contenttabs\"><ul>%s</ul></div>",$output);
 			FS::$iMgr->js("$('#contenttabs').tabs({cache: false,
-				ajaxOptions: { error: function(xhr,status,index,anchor) {
-					$(anchor.hash).html(\"".$this->getLocale("fail-tab")."\");
-				}},
-				beforeLoad: function(event,ui) { $(ui.panel).html('<span class=\"loader\"></span>');}
+				ajaxOptions: {
+					error: function(xhr,status,index,anchor) {
+						$(anchor.hash).html(\"".$this->getLocale("fail-tab")."\");
+					},
+				},
+				beforeLoad: function(event,ui) {
+					ui.panel.html('<span class=\"loader\"></span>');
+					var url = ui.ajaxSettings.url;
+					$.post(url, function(data) {
+						var cb = JSON.parse(data);
+						ui.panel.html(cb['htmldatas']);
+						eval(cb['jscode']);
+					});
+					return false;
+				}
 			});");
 			return ($count > 0 ? $output : "");
 		}
@@ -893,7 +904,8 @@
 
 		public function redir($link,$js=false) {
 			if ($js && FS::isAjaxCall()) {
-				$this->js("window.location.href=\"?".$link."\";");
+				//$this->js("window.location.href=\"?".$link."\";");
+				$this->js("loadInterface('&".$link."',false);");
 			}
 			else {
 				header("Location: /?".$link);
