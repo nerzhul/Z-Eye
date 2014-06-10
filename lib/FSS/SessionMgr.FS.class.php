@@ -233,10 +233,12 @@
 
 			// If no override, we set the rulename with the modulename
 			if ($moduleOverride === NULL) {
-				$rulename = sprintf("mrule_%s_%s",
-					FS::$iMgr->getCurModule()->getName(),
-					$rulename
-				);
+				if (FS::$iMgr->getCurModule()) {
+					$rulename = sprintf("mrule_%s_%s",
+						FS::$iMgr->getCurModule()->getName(),
+						$rulename
+					);
+				}
 			}
 			else {
 				$rulename = sprintf("mrule_%s_%s",
