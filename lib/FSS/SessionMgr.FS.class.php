@@ -231,8 +231,6 @@
 				return true;
 			}
 
-			FS::$iMgr->ajaxEchoError($rulename,"",true);
-
 			// If no override, we set the rulename with the modulename
 			if ($moduleOverride === NULL) {
 				if (FS::$iMgr->getCurModule()) {
