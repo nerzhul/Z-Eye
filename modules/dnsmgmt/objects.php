@@ -24,8 +24,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_zones";
 			$this->sqlAttrId = "zonename";
-			$this->readRight = "mrule_dnsmgmt_zone_read";
-			$this->writeRight = "mrule_dnsmgmt_zone_write";
+			$this->readRight = "zone_read";
+			$this->writeRight = "zone_write";
 			$this->errNotExists = "err-zone-not-exists";
 			$this->errAlreadyExists = "err-zone-already-exists";
 
@@ -486,8 +486,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_acls";
 			$this->sqlAttrId = "aclname";
-			$this->readRight = "mrule_dnsmgmt_acl_read";
-			$this->writeRight = "mrule_dnsmgmt_acl_write";
+			$this->readRight = "acl_read";
+			$this->writeRight = "acl_write";
 			$this->errNotExists = "err-acl-not-exists";
 			$this->errAlreadyExists = "err-acl-already-exists";
 
@@ -952,8 +952,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_clusters";
 			$this->sqlAttrId = "clustername";
-			$this->readRight = "mrule_dnsmgmt_read";
-			$this->writeRight = "mrule_dnsmgmt_write";
+			$this->readRight = "read";
+			$this->writeRight = "write";
 			$this->errNotExists = "err-cluster-not-exists";
 			$this->errAlreadyExists = "err-cluster-already-exists";
 
@@ -1504,8 +1504,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_servers";
 			$this->sqlAttrId = "addr";
-			$this->readRight = "mrule_dnsmgmt_read";
-			$this->writeRight = "mrule_dnsmgmt_write";
+			$this->readRight = "read";
+			$this->writeRight = "write";
 			$this->errNotExists = "err-server-not-exists";
 			$this->errAlreadyExists = "err-server-already-exists";
 
@@ -1843,8 +1843,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dns_tsig";
 			$this->sqlAttrId = "keyalias";
-			$this->readRight = "mrule_dnsmgmt_read";
-			$this->writeRight = "mrule_dnsmgmt_write";
+			$this->readRight = "read";
+			$this->writeRight = "write";
 			$this->errNotExists = "err-tsig-key-not-exists";
 			$this->errAlreadyExists = "err-tsig-key-already-exists";
 
@@ -2077,8 +2077,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dns_zone_record_cache";
-			$this->readRight = "mrule_dnsmgmt_read";
-			$this->writeRight = "mrule_dnsmgmt_write";
+			$this->readRight = "read";
+			$this->writeRight = "write";
 		}
 		
 		public function search($search, $autocomplete = false) {

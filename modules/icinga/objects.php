@@ -22,8 +22,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_contacts";
 			$this->sqlAttrId = "name";
-			$this->readRight = "mrule_icinga_ct_write";
-			$this->writeRight = "mrule_icinga_ct_write";
+			$this->readRight = "ct_write";
+			$this->writeRight = "ct_write";
 		}
 		
 		protected function Load($name = "") {
@@ -171,8 +171,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_contactgroups";
-			$this->readRight = "mrule_icinga_ctg_write";
-			$this->writeRight = "mrule_icinga_ctg_write";
+			$this->readRight = "ctg_write";
+			$this->writeRight = "ctg_write";
 		}
 
 		protected function Load($name = "") {
@@ -326,8 +326,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_hosts";
-			$this->readRight = "mrule_icinga_host_write";
-			$this->writeRight = "mrule_icinga_host_write";
+			$this->readRight = "host_write";
+			$this->writeRight = "host_write";
 		}
 
 		protected function Load($name = "") {
@@ -672,8 +672,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_services";
-			$this->readRight = "mrule_icinga_srv_write";
-			$this->writeRight = "mrule_icinga_srv_write";
+			$this->readRight = "srv_write";
+			$this->writeRight = "srv_write";
 		}
 		
 		protected function Load($name = "") {
@@ -1338,8 +1338,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_timeperiods";
 			$this->sqlAttrId = "name";
-			$this->readRight = "mrule_icinga_tp_write";
-			$this->writeRight = "mrule_icinga_tp_write";
+			$this->readRight = "tp_write";
+			$this->writeRight = "tp_write";
 		}
 		
 		protected function Load($name = "") {
@@ -1363,8 +1363,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_commands";
 			$this->sqlAttrId = "name";
-			$this->readRight = "mrule_icinga_cmd_write";
-			$this->writeRight = "mrule_icinga_cmd_write";
+			$this->readRight = "cmd_write";
+			$this->writeRight = "cmd_write";
 		}
 		
 		protected function Load($name = "") {
@@ -1422,8 +1422,8 @@
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."icinga_notif_strategy";
 			$this->sqlAttrId = "name";
-			$this->readRight = "mrule_icinga_notif_write";
-			$this->writeRight = "mrule_icinga_notif_write";
+			$this->readRight = "notif_write";
+			$this->writeRight = "notif_write";
 		}
 		
 		protected function Load($name = "") {

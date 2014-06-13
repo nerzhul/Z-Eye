@@ -20,8 +20,8 @@
 	final class radiusUser extends radiusObject {
 		function __construct() {
 			parent::__construct();
-			$this->readRight = "rule-read-datas";
-			$this->writeRight = "rule-write-datas";
+			$this->readRight = "read";
+			$this->writeRight = "write";
 		}
 		
 		public function showForm($username = "") {
@@ -319,8 +319,8 @@
 	final class radiusGroup extends radiusObject {
 		function __construct() {
 			parent::__construct();
-			$this->readRight = "rule-read-datas";
-			$this->writeRight = "rule-write-datas";
+			$this->readRight = "read";
+			$this->writeRight = "write";
 		}
 		
 		public function showForm($groupname = "") {

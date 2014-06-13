@@ -23,7 +23,7 @@
 			$this->sqlTable = "device";
 			$this->infoTable = PGDbConfig::getDbPrefix()."switch_infos";
 			$this->vlanTable = "device_vlan";
-			$this->readRight = "mrule_switches_read";
+			$this->readRight = "read";
 		}
 
 		public function Load($device = "") {
@@ -492,7 +492,7 @@
 			parent::__construct();
 			$this->sqlTable = "device_port";
 			$this->sqlPlugRoomTable = PGDbConfig::getDbPrefix()."switch_port_prises";
-			$this->readRight = "mrule_switches_read";
+			$this->readRight = "read";
 		}
 
 		public function Load($device = "", $port = "") {
@@ -703,7 +703,7 @@
 			$this->sqlTable = "node";
 			$this->nbtTable = "node_nbt";
 			$this->nipTable = "node_ip";
-			$this->readRight = "mrule_switches_read";
+			$this->readRight = "read";
 		}
 
 		public function search($search, $autocomplete = false) {
@@ -926,7 +926,7 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."switch_port_prises";
 			$this->deviceTable = "device";
 			$this->devPortTable = "device_port";
-			$this->readRight = "mrule_switches_read";
+			$this->readRight = "read";
 		}
 
 		public function search($search, $autocomplete = false) {
@@ -993,8 +993,8 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."switch_port_prises";
 			$this->devPortTable = "device_port";
 			$this->deviceTable = "device";
-			$this->readRight = "mrule_switches_read";
-			$this->writeRight = "mrule_switches_write";
+			$this->readRight = "read";
+			$this->writeRight = "write";
 		}
 
 		public function search($search, $autocomplete = false) {

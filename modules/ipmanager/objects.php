@@ -23,8 +23,8 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared";
 			$this->sqlTablev6 = PGDbConfig::getDbPrefix()."dhcp_subnet_v6_declared";
 			$this->sqlAttrId = "netid";
-			$this->readRight = "mrule_ipmgmt_subnetmgmt";
-			$this->writeRight = "mrule_ipmgmt_subnetmgmt";
+			$this->readRight = "subnetmgmt";
+			$this->writeRight = "subnetmgmt";
 			$this->errNotExists = "err-subnet-not-exists";
 			$this->errAlreadyExists = "err-subnet-already-exists";
 
@@ -288,8 +288,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_servers";
-			$this->readRight = "mrule_ipmanager_servermgmt";
-			$this->writeRight = "mrule_ipmanager_servermgmt";
+			$this->readRight = "servermgmt";
+			$this->writeRight = "servermgmt";
 		}
 
 		public function search($search, $autocomplete = false) {
@@ -351,8 +351,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_cluster";
-			$this->readRight = "mrule_ipmanager_servermgmt";
-			$this->writeRight = "mrule_ipmanager_servermgmt";
+			$this->readRight = "servermgmt";
+			$this->writeRight = "servermgmt";
 		}
 
 		public function search($search, $autocomplete = false) {
@@ -411,8 +411,8 @@
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_ip";
 			$this->sqlCacheTable = PGDbConfig::getDbPrefix()."dhcp_ip_cache";
 			$this->sqlAttrId = "ip";
-			$this->readRight = "mrule_ipmanager_read";
-			$this->writeRight = "mrule_ipmmgmt_ipmgmt";
+			$this->readRight = "read";
+			$this->writeRight = "ipmgmt";
 
 			$this->ip = "";
 			$this->mac = "";
@@ -1078,8 +1078,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_custom_option";
-			$this->readRight = "mrule_ipmanager_optionsmgmt";
-			$this->writeRight = "mrule_ipmanager_optionsmgmt";
+			$this->readRight = "optionsmgmt";
+			$this->writeRight = "optionsmgmt";
 		}
 
 		public function search($search, $autocomplete = false) {
@@ -1124,8 +1124,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_option";
-			$this->readRight = "mrule_ipmanager_optionsmgmt";
-			$this->writeRight = "mrule_ipmanager_optionsmgmt";
+			$this->readRight = "optionsmgmt";
+			$this->writeRight = "optionsmgmt";
 		}
 
 		public function search($search, $autocomplete = false) {
@@ -1169,8 +1169,8 @@
 		function __construct() {
 			parent::__construct();
 			$this->sqlTable = PGDbConfig::getDbPrefix()."dhcp_option_group";
-			$this->readRight = "mrule_ipmanager_optionsmgmt";
-			$this->writeRight = "mrule_ipmanager_optionsmgmt";
+			$this->readRight = "optionsmgmt";
+			$this->writeRight = "optionsmgmt";
 		}
 
 		public function search($search, $autocomplete = false) {
