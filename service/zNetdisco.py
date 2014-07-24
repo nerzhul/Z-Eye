@@ -23,8 +23,6 @@ import ZEyeUtil, zConfig
 from DatabaseManager import ZEyeSQLMgr
 
 class NetdiscoDataRefresher(ZEyeUtil.Thread):
-	zeyeDB = None
-	
 	def __init__(self):
 		""" 15 min between two netdisco updates """
 		self.sleepingTimer = 900
@@ -35,52 +33,46 @@ class NetdiscoDataRefresher(ZEyeUtil.Thread):
 		self.launchMsg()
 		while True:
 			self.setRunning(True)
+			
+			starttime = datetime.datetime.now()
+			
 			self.launchRefresh()
+			
+			"""
+			Because netdisco can be slow, modify the sleeping timer to 
+			refresh datas faster
+			"""
+			
+			totaltime = datetime.datetime.now() - starttime
+			"""
+			If runtime exceed 10 mins, sleeping timer is 15 min - totaltime
+			But if there is less than 1 minute interval, let 1 min interval
+			"""
+			
+			if totaltime > 600:
+				self.sleepingTimer = 900 - totaltime
+				if self.sleepingTimer < 60:
+					self.sleepingTimer = 60
+				
 			self.setRunning(False)
 
 	def launchRefresh(self):
-		try:		
-			self.zeyeDB = ZEyeSQLMgr()	
-			self.zeyeDB.initForZEye()
+		try:
+			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R"
+			subprocess.check_output(cmd,shell=True)
 			
-			pgres = self.zeyeDB.Select("device","ip")
-			for idx in pgres:
-				if len(idx[0]) > 0:
-					thread.start_new_thread(self.doRefreshDevice,(idx[0],))
+			self.logInfo("Refresh OK, now nbtwalk")
+			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -w" % device
+			subprocess.check_output(cmd,shell=True)
+			
+			self.logInfo("nbtwalk OK, now macwalk")
+			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -m" % device
+			subprocess.check_output(cmd,shell=True)
+			
+			self.logInfo("macwalk OK, now arpwalk")			
+			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -a" % device
+			subprocess.check_output(cmd,shell=True)
+			
 		except Exception, e:
 			self.logCritical(e)
-			sys.exit(1);	
-		finally:
-			if self.zeyeDB != None:
-				self.zeyeDB.close()
-			# We must wait 1 sec, because fast it's a fast algo and threadCounter hasn't increased. Else function return whereas it runs
-			time.sleep(1)
-			while self.getThreadNb() > 0:
-				self.logDebug("waiting %d threads" % self.getThreadNb())
-				time.sleep(1)
-
-	def doRefreshDevice(self,device):
-		self.incrThreadNb()
-		self.logDebug("refresh device %s" % device)
-		
-		# We refresh all datas
-		try:
-			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -d %s" % device
-			subprocess.check_output(cmd,shell=True)
-			
-			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -W %s" % device
-			subprocess.check_output(cmd,shell=True)
-			
-			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -M %s" % device
-			subprocess.check_output(cmd,shell=True)
-						
-			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -A %s" % device
-			subprocess.check_output(cmd,shell=True)
-			
-		except Exception, e:
-			self.logCritical("%s (device %s)" % (e,device))
-			self.decrThreadNb()
-			return
-		
-		self.logDebug("device %s refreshed" % device)
-		self.decrThreadNb()
+			sys.exit(1);
