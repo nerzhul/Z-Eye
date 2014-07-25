@@ -147,7 +147,7 @@
 					$dir2 = opendir($dirpath);
 					while($elem2 = readdir($dir2)) {
 						if (is_file($dirpath."/".$elem2) && $elem2 == "module.php") {
-							require(dirname(__FILE__)."/../../modules/".$path."/module.php");
+							require(dirname(__FILE__)."/../../modules/".$elem."/module.php");
 							if ($module->getRulesClass()->canAccessToModule() === true) {
 								FS::$iMgr->setCurrentModule($module);
 								$module->loadFooterPlugin();
