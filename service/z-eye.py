@@ -21,22 +21,22 @@
 
 import sys, time, logging
 
-import Daemon
+from Utils.Daemon import zDaemon
 
 from PeriodicCmd import ZEyePeriodicCmd
 from PortIDCacher import ZEyeSwitchesPortIDCacher
 from SwitchesBackup import ZEyeSwitchesBackup
 from zServiceMgr import ServiceMgr
 from DatabaseUpgrader import ZEyeDBUpgrade
-from zDHCP import DHCPManager, DHCPRadiusSyncer, DHCPCleaner
+from DHCP.zDHCP import DHCPManager, DHCPRadiusSyncer, DHCPCleaner
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
-from zNetdisco import NetdiscoDataRefresher, NetdiscoDataCleanup
-from zDNS import DNSManager, RecordCollector
-from zMRTG import MRTGDiscoverer, MRTGDataRefresher
+from Collectors.zNetdisco import NetdiscoDataRefresher, NetdiscoDataCleanup
+from DNS.zDNS import DNSManager, RecordCollector
+from Collectors.zMRTG import MRTGDiscoverer, MRTGDataRefresher
 from DeviceCollector import ZEyeSwitchesConfigCollector
 import zConfig
 
-class ZEyeDaemon(Daemon.Daemon):
+class ZEyeDaemon(zDaemon):
 	def run(self):
 		SNMPcc = ZEyeSNMPCommCacher()
 		SNMPcc.start()
