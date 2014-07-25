@@ -81,8 +81,8 @@ class NetdiscoDataRefresher(ZEyeUtil.Thread):
 
 class NetdiscoDataCleanup(ZEyeUtil.Thread):
 	def __init__(self):
-		""" 1 day between two netdisco updates """
-		self.sleepingTimer = 86400
+		""" 15 mins between two netdisco cleanups """
+		self.sleepingTimer = 900
 		self.myName = "Netdisco Data Cleanup"
 		ZEyeUtil.Thread.__init__(self)
 
