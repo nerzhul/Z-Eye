@@ -1,12 +1,12 @@
-# Z-Eye Fr translation
-# Copyright (C) 2014
-# This file is distributed under the same license as the Z-Ey package.
-# Loic Blot <loic.blot@unix-experience.fr>, 2014
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.4\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-07-25 23:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -16,23 +16,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: Z_Eye/engine/snmpmgmt/Forms/__init__.py:34
 msgid "snmp-community"
-msgstr "Communauté SNMP"
+msgstr "SNMP Community"
 
 #: Z_Eye/engine/snmpmgmt/Forms/__init__.py:35
 msgid "Reading"
-msgstr "Lecture"
+msgstr ""
 
 #: Z_Eye/engine/snmpmgmt/Forms/__init__.py:36
 msgid "Writing"
-msgstr "Ecriture"
+msgstr ""
 
 #: Z_Eye/templates/footer.html:3
 msgid "by"
-msgstr "par"
-
-#~ msgid "Save"
-#~ msgstr "Enregistrer"
+msgstr ""

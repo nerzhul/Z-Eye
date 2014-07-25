@@ -46,6 +46,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 )
 
 ROOT_URLCONF = 'Z_Eye.urls'
@@ -73,6 +74,7 @@ DATABASES = {
 LANGUAGE_CODE = 'en-us'
 
 LOCALE_PATH = (
+	"/usr/local/www/z-eye/service/WebApp/locale/",
 	"/usr/local/www/z-eye/service/WebApp/Z_Eye/locale/"
 )
 
