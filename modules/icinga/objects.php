@@ -1158,10 +1158,10 @@
 			$output = "";
 			$outBuffer = "";
 			
-			$iStates = (new icingaBroker())->readStates(
+			if ($iStates = (new icingaBroker())->readStates(
 				array("plugin_output","current_state","current_attempt",
 				"max_attempts","state_type","last_time_ok",
-				"last_time_up"));
+				"last_time_up"))) {
 
 			// Loop hosts
 			foreach ($iStates as $host => $hostvalues) {
@@ -1258,6 +1258,7 @@
 						}
 					}
 				}
+			}
 			}
 
 			if ($oosSensors > 0) {

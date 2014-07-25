@@ -743,9 +743,9 @@
 				$totalIcingaCrits = 0;
 				$totalIcingaHS = 0;
 
-				$iStates = $this->icingaAPI->readStates(
+				if ($iStates = $this->icingaAPI->readStates(
 					array("plugin_output","current_state","current_attempt",
-						"state_type","last_time_ok","last_time_up"));
+						"state_type","last_time_ok","last_time_up"))) {
 
 				// Loop hosts
 				foreach ($iStates as $host => $hostvalues) {
@@ -778,6 +778,7 @@
 							}
 						}
 					}
+				}
 				}
 
 				// If there are bad sensors

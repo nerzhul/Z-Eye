@@ -72,6 +72,10 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
+LOCALE_PATH = (
+	"/usr/local/www/z-eye/service/WebApp/Z_Eye/locale/"
+)
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
