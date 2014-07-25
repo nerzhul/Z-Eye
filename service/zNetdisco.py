@@ -19,6 +19,8 @@
 
 import sys, re, time, thread, subprocess
 
+from pyPgSQL import PgSQL
+
 import ZEyeUtil, zConfig
 from DatabaseManager import ZEyeSQLMgr
 
@@ -72,6 +74,31 @@ class NetdiscoDataRefresher(ZEyeUtil.Thread):
 			self.logInfo("macwalk OK, now arpwalk")			
 			cmd = "/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -a" % device
 			subprocess.check_output(cmd,shell=True)
+			
+		except Exception, e:
+			self.logCritical(e)
+			sys.exit(1);
+
+class NetdiscoDataCleanup(ZEyeUtil.Thread):
+	def __init__(self):
+		""" 1 day between two netdisco updates """
+		self.sleepingTimer = 86400
+		self.myName = "Netdisco Data Cleanup"
+		ZEyeUtil.Thread.__init__(self)
+
+	def run(self):
+		self.launchMsg()
+		while True:
+			self.setRunning(True)
+			self.launchCleanup()
+			self.setRunning(False)
+
+	def launchCleanup(self):
+		try:
+			self.pgcon = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
+			self.pgcursor = self.pgcon.cursor()
+			self.pgcursor.execute("DELETE FROM z_eye_switch_port_prises WHERE (ip,port) NOT IN (select host(ip),port from device_port)")
+			self.pgcon.commit()
 			
 		except Exception, e:
 			self.logCritical(e)
