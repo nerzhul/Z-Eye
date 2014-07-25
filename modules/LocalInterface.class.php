@@ -60,8 +60,7 @@
 		}
 			
 		private function bottomContainer() {
-			return "<div id=\"footer\"><div id=\"copyright\">by Loïc BLOT, IOGS - Copyright 2010-".date('Y').
-				"</div><div id=\"content\"></div></div>";
+			return file_get_contents("http://localhost:8080/templates/footer");
 		}
 
 		public function showWindowHead() {
