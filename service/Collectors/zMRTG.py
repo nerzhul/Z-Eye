@@ -138,9 +138,9 @@ class MRTGDataRefresher(ZEyeUtil.Thread):
 		try:
 			self.logInfo("MRTG datas refresh started, searching config into dir: %s" % os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/")
 
-			_dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/");
+			_dir = os.listdir(os.path.dirname(os.path.abspath(__file__))+"/../../datas/mrtg-config/");
 			for _file in _dir:
-				filename = os.path.dirname(os.path.abspath(__file__))+"/../datas/mrtg-config/"+_file
+				filename = os.path.dirname(os.path.abspath(__file__))+"/../../datas/mrtg-config/"+_file
 				# Launch only if it's a .cfg, recent MRTG create .ok files
 				if(os.path.isfile(filename) and re.search("cfg$",filename) != None):
 					while self.getThreadNb() >= self.max_threads:

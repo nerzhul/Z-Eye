@@ -33,7 +33,7 @@ import zConfig
 import ZEyeUtil
 from SSHBroker import ZEyeSSHBroker
 
-class DNSManager(ZEyeUtil.Thread):
+class Manager(ZEyeUtil.Thread):
 	serverList = {}
 	clusterList = {}
 	tsigList = {}

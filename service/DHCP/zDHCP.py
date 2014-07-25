@@ -36,7 +36,7 @@ from SSHBroker import ZEyeSSHBroker
 *   OpenBSD: /etc/rc.d/dhcpd restart
 """
 
-class DHCPManager(ZEyeUtil.Thread):
+class Manager(ZEyeUtil.Thread):
 	ipList = {}
 	subnetList = {}
 	rangeList = {}
@@ -445,7 +445,7 @@ class DHCPManager(ZEyeUtil.Thread):
 						ipList.append(ip)
 				self.subnetList[idx[0]] = (idx[1],ipList,idx[2],idx[3],idx[4],idx[5],idx[6],idx[7])
 				
-class DHCPRadiusSyncer(ZEyeUtil.Thread):
+class RadiusSyncer(ZEyeUtil.Thread):
 	zeyeDB = None
 	radiusList = {}
 	subnetList = {}
@@ -595,7 +595,7 @@ class DHCPRadiusSyncer(ZEyeUtil.Thread):
 			else:
 				self.logError("%s is not a valid DB type (%s:%s/%s)" % (idx[0],idx[1],idx[2]))
 
-class DHCPCleaner(ZEyeUtil.Thread):
+class Cleaner(ZEyeUtil.Thread):
 	zeyeDB = None
 	radiusList = {}
 	subnetList = {}

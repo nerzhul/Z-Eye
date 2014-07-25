@@ -27,7 +27,7 @@ import ZEyeUtil
 import zConfig
 from SSHBroker import ZEyeSSHBroker
 
-class ZEyeSwitchesConfigCollector(ZEyeUtil.Thread):
+class ConfigCollector(ZEyeUtil.Thread):
 	def __init__(self):
 		""" 5 minutes between two collects"""
 		self.sleepingTimer = 5*60

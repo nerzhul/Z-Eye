@@ -28,12 +28,12 @@ from PortIDCacher import ZEyeSwitchesPortIDCacher
 from SwitchesBackup import ZEyeSwitchesBackup
 from zServiceMgr import ServiceMgr
 from DatabaseUpgrader import ZEyeDBUpgrade
-from DHCP.zDHCP import DHCPManager, DHCPRadiusSyncer, DHCPCleaner
+from DHCP import zDHCP
 from SNMPCommunityCacher import ZEyeSNMPCommCacher
 from Collectors.zNetdisco import NetdiscoDataRefresher, NetdiscoDataCleanup
-from DNS.zDNS import DNSManager, RecordCollector
+from DNS import zDNS
 from Collectors.zMRTG import MRTGDiscoverer, MRTGDataRefresher
-from DeviceCollector import ZEyeSwitchesConfigCollector
+import Switches.Collector
 import zConfig
 
 class ZEyeDaemon(zDaemon):
@@ -62,14 +62,14 @@ class ZEyeDaemon(zDaemon):
 		NetdiscoDataCleanup().start()
 		NetdiscoDataRefresher().start()
 
-		DHCPCleaner().start()
-		DHCPManager().start()
-		DHCPRadiusSyncer().start()
+		zDHCP.Cleaner().start()
+		zDHCP.Manager().start()
+		zDHCP.RadiusSyncer().start()
 			
-		DNSManager().start()
-		RecordCollector().start()
+		zDNS.Manager().start()
+		zDNS.RecordCollector().start()
 		
-		ZEyeSwitchesConfigCollector().start()
+		Switches.Collector.ConfigCollector().start()
 
 		while True:
 			time.sleep(1)
