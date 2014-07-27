@@ -67,7 +67,12 @@
 		}
 
 		private function showCommunityForm($id = "") {
-			return FS::$iMgr->fileGetContent("http://localhost:8080/snmpmgmt/forms/community?id=".$id);
+			if ($id) {
+				return FS::$iMgr->fileGetContent("http://localhost:8080/snmpmgmt/forms/community?id=".$id);
+			}
+			else {
+				return FS::$iMgr->fileGetContent("http://localhost:8080/snmpmgmt/forms/community");
+			}
 		}
 
 		private function tableCommunityLine($name,$ro,$rw) {

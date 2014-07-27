@@ -19,6 +19,7 @@
 """
 
 from django.forms import ModelForm
+from InterfaceManager.ModelForms import zModelForm
 from django.shortcuts import render
 from django.db import models
 from django.http import HttpResponse
@@ -48,7 +49,7 @@ def showCommunity(request):
 	else:
 		return ""
 
-class CommunityForm(ModelForm):
+class CommunityForm(zModelForm):
 	class Meta:
 		model = engine.snmpmgmt.Models.Community
 		fields = "__all__"
