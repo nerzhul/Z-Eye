@@ -21,16 +21,21 @@
 from django import forms
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
-import django
 
 def community(request):
 	if request.method == "GET":
-		form = CommunityForm()
-		return render(request, "snmpmgmt/community.html", {'form': form})
+		form = CommunityForm(request.GET)
+
+		return render(request, "interface/forms/generic.html", {
+			'form': form,
+			'formaction': '?mod=18&act=1',
+			'modificationlabel': _('Modification'),
+			'submitname' : _('Save')
+		})
 	else:
 		return ""
 
 class CommunityForm(forms.Form):
-	name = forms.CharField(label=django.utils.translation.gettext("snmp-community"),required=True,max_length=64)
-	ro = forms.BooleanField(label=_("Reading"))
-	rw = forms.BooleanField(label=_("Writing"))
+	name = forms.CharField(label=_("snmp-community"),required=True,max_length=64)
+	ro = forms.BooleanField(label=_("Reading"),required=False)
+	rw = forms.BooleanField(label=_("Writing"),required=False)

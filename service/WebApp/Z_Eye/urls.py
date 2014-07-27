@@ -15,5 +15,5 @@ urlpatterns = patterns('',
     #url(r'^admin/', include(admin.site.urls)),
     url(r'^templates/footer', views.Footer.as_view(), name='footer'),
     url(r'^templates/test', views.renderTestForm, name='footer'),
-    url(r'^snmpmgmt/communityform', engine.snmpmgmt.Forms.community, name='footer'),
+    url(r'^snmpmgmt/forms/community', engine.snmpmgmt.Forms.community),
 )

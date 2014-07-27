@@ -16,13 +16,13 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
-	
+
 	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../netdisco/netdiscoCfg.api.php");
-	
+
 	if(!class_exists("iSNMPMgmt")) {
-	
+
 	final class iSNMPMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
@@ -31,7 +31,7 @@
 			$this->menu = $this->loc->s("menu-name");
 			$this->modulename = "snmpmgmt";
 		}
-		
+
 		public function Load() {
 			FS::$iMgr->setURL("");
 			return $this->showMain();
@@ -67,21 +67,23 @@
 		}
 
 		private function showCommunityForm($name = "") {
-			$ro = ""; $rw = "";
-			$output = FS::$iMgr->cbkForm("1")."<table>";
+			/*$ro = ""; $rw = "";
+			$output = FS::$iMgr->cbkForm("1")."<table>";*/
 			if ($name)  {
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","ro,rw","name = '".$name."'");
 				if ($data = FS::$dbMgr->Fetch($query)) {
 					$ro = $data["ro"] == 't';
 					$rw = $data["rw"] == 't';
 				}
-				$output .= "<tr><td>".$this->loc->s("snmp-community")."</td><td>".$name.FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1)."</td></tr>";
+				//$output .= "<tr><td>".$this->loc->s("snmp-community")."</td><td>".$name.FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1)."</td></tr>";
 			}
-			else
+			/*else
 				$output .= FS::$iMgr->idxLine("snmp-community","name",array("value" => $name,"length" => 64, "size" => 20));
 			$output .= FS::$iMgr->idxLine("Read","ro",array("value" => $ro,"type" => "chk", "tooltip" => "tooltip-read"));
 			$output .= FS::$iMgr->idxLine("Write","rw",array("value" => $rw,"type" => "chk", "tooltip" => "tooltip-write"));
-			$output .= FS::$iMgr->tableSubmit("Save");
+			$output .= FS::$iMgr->tableSubmit("Save");*/
+
+			return file_get_contents("http://localhost:8080/snmpmgmt/forms/community?name=".$name."&ro=".$ro."&rw=".$rw);
 			return $output;
 		}
 
@@ -89,7 +91,7 @@
 			FS::$iMgr->setJSBuffer(1);
 			return "<tr id=\"".FS::$iMgr->formatHTMLId($name)."tr\"><td>".FS::$iMgr->opendiv(2,$name,array("lnkadd" => "name=".$name)).
 				"</td><td>".($ro ? "X" : "")."</td><td>".($rw ? "X": "")."</td><td>".
-				FS::$iMgr->removeIcon(2,"snmp=".$name,array("js" => true, 
+				FS::$iMgr->removeIcon(2,"snmp=".$name,array("js" => true,
 					"confirmtext" => "confirm-remove-community",
 					"confirmval" => $name
 				))."</td></tr>";
@@ -151,7 +153,7 @@
 						FS::$iMgr->ajaxEchoErrorNC("err-read-netdisco");
 						return;
 					}
-					
+
 					FS::$dbMgr->BeginTr();
 					if ($edit) FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
 					FS::$dbMgr->Insert(PGDbConfig::getDbPrefix()."snmp_communities","name,ro,rw","'".$name."','".($ro == "on" ? 't' : 'f')."','".
@@ -200,17 +202,17 @@
 						FS::$iMgr->ajaxEchoError("err-read-fail");
 						return;
 					}
-					
+
 					FS::$dbMgr->BeginTr();
-					
+
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."snmp_communities","name = '".$name."'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."user_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
 					FS::$dbMgr->Delete(PGDbConfig::getDbPrefix()."group_rules","rulename ILIKE 'mrule_switchmgmt_snmp_".$name."_%'");
-					
+
 					FS::$dbMgr->CommitTr();
-					
+
 					writeNetdiscoConf($netdiscoCfg["dnssuffix"],$netdiscoCfg["nodetimeout"],$netdiscoCfg["devicetimeout"],$netdiscoCfg["pghost"],$netdiscoCfg["dbname"],$netdiscoCfg["dbuser"],$netdiscoCfg["dbpwd"],$netdiscoCfg["snmptimeout"],$netdiscoCfg["snmptry"],$netdiscoCfg["snmpver"],$netdiscoCfg["firstnode"]);
-					
+
 					$tMgr = new HTMLTableMgr(array(
 						"tabledivid" => "snmptable",
 						"sqltable" => "snmp_communities",
@@ -226,8 +228,8 @@
 			}
 		}
 	};
-	
+
 	}
-	
+
 	$module = new iSNMPmgmt();
 ?>

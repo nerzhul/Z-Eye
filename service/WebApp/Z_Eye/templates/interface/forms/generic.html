@@ -1,0 +1,13 @@
+<form action="{{ formaction }}" method="POST" onsubmit="return callbackForm('{{ formaction }}',this,{'snotif':'{{ modificationlabel }}'});">
+	{% csrf_token %}
+	<table>
+		{% for field in form %}
+		<tr>
+			<td>{{ field.label_tag }} {% if field.field.required %}<span class="special_class">(*)</span>{% endif %}</td>
+			<td>{{ field }}</td>
+		</tr>
+
+		{% endfor %}
+		{% include "interface/buttons/formsubmit.html" %}
+	</table>
+</form>

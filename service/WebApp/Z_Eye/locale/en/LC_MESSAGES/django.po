@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-25 23:09+0200\n"
+"POT-Creation-Date: 2014-07-27 15:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,18 +17,21 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Z_Eye/engine/snmpmgmt/Forms/__init__.py:34
+#: engine/snmpmgmt/Forms/__init__.py:34
 msgid "snmp-community"
 msgstr "SNMP Community"
 
-#: Z_Eye/engine/snmpmgmt/Forms/__init__.py:35
+#: engine/snmpmgmt/Forms/__init__.py:35
 msgid "Reading"
 msgstr ""
 
-#: Z_Eye/engine/snmpmgmt/Forms/__init__.py:36
+#: engine/snmpmgmt/Forms/__init__.py:36
 msgid "Writing"
 msgstr ""
 
-#: Z_Eye/templates/footer.html:3
+#: templates/footer.html:3
 msgid "by"
 msgstr ""
+
+msgid "Save"
+msgstr "Save"

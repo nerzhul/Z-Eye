@@ -1,7 +1,8 @@
 <?php
 	class Config {
 		private static $lang = "FR-fr";
-		private static $websiteName = "Z-Eye 1.4",
+		private static $stylesheet = "fss1.css";
+		private static $websiteName = "Z-Eye 1.4 (-current)";
 		private static $OS = "FreeBSD";
 		/* 0 (no crypt, not recommended
 		1: sha1

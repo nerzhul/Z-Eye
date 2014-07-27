@@ -39,10 +39,10 @@
 			 * It seems is_numeric matches also the point to decimals.
 			 * We don't use it
 			 */
-			
+
 			if(is_numeric($str) === true && !preg_match("#[.]#",$str))
 				return true;
-			
+
 			return false;
 		}
 
@@ -91,33 +91,33 @@
 				$recordtype == "PTR" && $this->isDNSName($recordvalue)) {
 				return true;
 			}
-			
+
 			if ($recordtype == "MX") {
 				$mxval = preg_split(" ",$recordvalue);
 				if (count($mxval) != 2) {
 					return false;
 				}
-				
+
 				if (!$this->isNumeric($maxval[0]) || !$this->isDNSName($maxval[1])) {
 					return false;
 				}
 				return true;
 			}
-			
+
 			if ($recordtype == "SRV") {
 				$srvval = preg_split(" ",$recordvalue);
 				if (count($srvval) != 4) {
 					return false;
 				}
-				
+
 				if (!$this->isNumeric($srvval[0]) || !$this->isNumeric($srvval[1]) ||
 					!$this->isNumeric($srvval[2]) || !$this->isDNSName($srvval[3])) {
 					return false;
 				}
-				
+
 				return true;
 			}
-			
+
 			return false;
 		}
 		public function getDNSNameList($buffer) {
@@ -211,7 +211,7 @@
 
 			return false;
 		}
-		
+
 		public function isIPv6NetworkAddr($str) {
 			if (preg_match("#^([0-9a-f]{1,4}:){1,7}:$#i",$str))
 				return true;
@@ -237,17 +237,17 @@
 		}
 
 		public function isMacAddr($str) {
-			if (preg_match('#^([0-9A-F]{2}:){5}[0-9A-F]{2}$#i', $str) || 
+			if (preg_match('#^([0-9A-F]{2}:){5}[0-9A-F]{2}$#i', $str) ||
 				preg_match('#^([0-9A-F]{2}-){5}[0-9A-F]{2}$#i', $str)) {
 				return true;
 			}
 
 			return false;
 		}
-		
+
 		public function isMacFragment($str) {
 			// Recognize a MAC Addr if where have a minimum of two mac address frags.
-			if (preg_match('#^([0-9A-F]{2}:){1,5}[0-9A-F]{2}$#i', $str) || 
+			if (preg_match('#^([0-9A-F]{2}:){1,5}[0-9A-F]{2}$#i', $str) ||
 				preg_match('#^([0-9A-F]{2}-){1,5}[0-9A-F]{2}$#i', $str)) {
 				return true;
 			}
@@ -261,23 +261,23 @@
 
 			if ($num == 255)
 				return true;
-				
+
 			while($add != 1) {
 				if ($num == $mask)
 					return true;
-					
+
 				$add /= 2;
 				$mask += $add;
 			}
-			
+
 			return false;
 		}
-		
+
 		public function isMaskAddr($str) {
 			$arr = preg_split("#\.#",$str);
 			if (count($arr) != 4)
 				return false;
-				
+
 			if ($arr[0] == 255) {
 				if ($arr[1] == 255) {
 					if ($arr[2] == 255) {
@@ -286,17 +286,17 @@
 					}
 					else if ($arr[3] != 0)
 						return false;
-						
+
 					if (!$this->isMaskElem($arr[2]))
 						return false;
 				}
 				else if ($arr[2] != 0 || $arr[3] != 0)
 					return false;
-					
+
 				if (!$this->isMaskElem($arr[1]))
 					return false;
 			}
-			else if ($arr[1] != 0 || $arr[2] != 0 || $arr[3] != 0) 
+			else if ($arr[1] != 0 || $arr[2] != 0 || $arr[3] != 0)
 				return false;
 
 			if (!$this->isMaskElem($arr[0]))
@@ -352,7 +352,12 @@
 			else
 				$this->SecuriseString($data_new);
 			return $data_new;
+		}
 
+		public function genSecuredPostDatas($postVars = array()) {
+			foreach ($postVars as $varName => &$var) {
+				$var = $this->checkAndSecurisePostData($varName);
+			}
 		}
 
 		public function checkAndSecuriseGetData($data) {
@@ -368,15 +373,15 @@
 			return $data_new;
 
 		}
-		
+
 		// Function to get Post Data + check
 		public function getPost($str,$pattern) {
 			$data = $this->checkAndSecurisePostData($str);
 			// Only numerics
 			if (preg_match("#[n]#",$pattern)) {
 				if (!$this->isNumeric($data))
-					return NULL;	
-				
+					return NULL;
+
 				// Positive
 				if (preg_match("#[+]#",$pattern)) {
 					if ($data < 0 || !preg_match("#[=]#",$pattern) && $data == 0)
@@ -414,7 +419,7 @@
 			if ($this->hasJS($str))
 				$str = "";
 		}
-		
+
 		public function cleanForJS($str) {
 			return addslashes(preg_replace("#[\n\r\t]#","",$str));
 		}
