@@ -18,13 +18,14 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from django.forms import ModelForm
 from InterfaceManager.ModelForms import zModelForm
+
 from django.shortcuts import render
-from django.db import models
 from django.http import HttpResponse
 
 from django.utils.translation import ugettext_lazy as _
+
+from django.core.exceptions import ObjectDoesNotExist
 
 import engine.snmpmgmt.Models
 
@@ -35,6 +36,8 @@ def showCommunity(request):
 				communityObj = engine.snmpmgmt.Models.Community.objects.get(pk=request.GET["id"])
 			except ValueError:
 				return HttpResponse(_('Err-Wrong-Request'))
+			except ObjectDoesNotExist:
+				return HttpResponse(_('Err-Object-Not-Exists'))
 		else:
 			communityObj = None
 

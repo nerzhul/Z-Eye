@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-27 19:13+0200\n"
+"POT-Creation-Date: 2014-07-27 19:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: engine/snmpmgmt/Forms/__init__.py:36
+#: engine/snmpmgmt/Forms/__init__.py:38
 msgid "Err-Wrong-Request"
 msgstr "Bad request"
 
-#: engine/snmpmgmt/Forms/__init__.py:45
+#: engine/snmpmgmt/Forms/__init__.py:40
+msgid "Err-Object-Not-Exists"
+msgstr "The requested object doesn't exists"
+
+#: engine/snmpmgmt/Forms/__init__.py:49
 msgid "Modification"
 msgstr ""
 
-#: engine/snmpmgmt/Forms/__init__.py:46
+#: engine/snmpmgmt/Forms/__init__.py:50
 msgid "Save"
 msgstr "Save"
 
@@ -35,12 +39,12 @@ msgstr "SNMP Community"
 
 #: engine/snmpmgmt/Models/__init__.py:27
 msgid "Reading"
-msgstr ""
+msgstr "Reading"
 
 #: engine/snmpmgmt/Models/__init__.py:28
 msgid "Writing"
-msgstr ""
+msgstr "Writing"
 
 #: templates/footer.html:3
 msgid "by"
-msgstr ""
+msgstr "by"

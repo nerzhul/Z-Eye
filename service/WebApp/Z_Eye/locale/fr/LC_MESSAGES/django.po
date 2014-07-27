@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-27 19:13+0200\n"
+"POT-Creation-Date: 2014-07-27 19:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,15 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: engine/snmpmgmt/Forms/__init__.py:36
+#: engine/snmpmgmt/Forms/__init__.py:38
 msgid "Err-Wrong-Request"
 msgstr "Requete invalide"
 
-#: engine/snmpmgmt/Forms/__init__.py:45
-msgid "Modification"
-msgstr ""
+#: engine/snmpmgmt/Forms/__init__.py:40
+msgid "Err-Object-Not-Exists"
+msgstr "L'objet demandé n'existe pas"
 
-#: engine/snmpmgmt/Forms/__init__.py:46
+#: engine/snmpmgmt/Forms/__init__.py:49
+msgid "Modification"
+msgstr "Modification"
+
+#: engine/snmpmgmt/Forms/__init__.py:50
 msgid "Save"
 msgstr "Enregistrer"
 

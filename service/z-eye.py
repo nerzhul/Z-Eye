@@ -34,6 +34,7 @@ from DNS import zDNS
 from Collectors.zMRTG import MRTGDiscoverer, MRTGDataRefresher
 import Switches.Collector, Switches.Backup
 import zConfig
+from WebApp import zWebApp
 
 class ZEyeDaemon(zDaemon):
 	def run(self):
@@ -47,12 +48,12 @@ class ZEyeDaemon(zDaemon):
 
 		MRTGDiscoveryTask = MRTGDiscoverer(SNMPcc)
 		MRTGDiscoveryTask.start()
-		
+
 		"""
 		We wait 1 second to let MRTG discoverer start and block other SNMP using processes
 		"""
 		time.sleep(1)
-		
+
 		MRTGDataRefresher(MRTGDiscoveryTask).start()
 		ZEyePeriodicCmd(15*60,40,"Netdisco device discovery","/usr/bin/perl /usr/local/bin/netdisco -C /usr/local/etc/netdisco/netdisco.conf -R").start()
 		ZEyeSwitchesPortIDCacher(SNMPcc).start()
@@ -64,11 +65,13 @@ class ZEyeDaemon(zDaemon):
 		zDHCP.Cleaner().start()
 		zDHCP.Manager().start()
 		zDHCP.RadiusSyncer().start()
-			
+
 		zDNS.Manager().start()
 		zDNS.RecordCollector().start()
-		
+
 		Switches.Collector.ConfigCollector().start()
+
+		zWebApp().start()
 
 		while True:
 			time.sleep(1)
@@ -79,22 +82,22 @@ def usage():
 if __name__ == "__main__":
 	# Init daemon
 	daemon = ZEyeDaemon("/var/run/z-eye.pid")
-	
+
 	# Init logger
 	logger = logging.getLogger("Z-Eye")
 	handler = logging.FileHandler("/var/log/z-eye.log")
 	formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s')
 	handler.setFormatter(formatter)
-	logger.addHandler(handler) 
+	logger.addHandler(handler)
 	logger.setLevel(zConfig.logLevel)
-        
+
 	if len(sys.argv) == 2:
 		if 'start' == sys.argv[1]:
 			print "Z-Eye daemon pre-start checks..."
 			ZEyeDBUpgrade().checkAndDoUpgrade()
 			print "Starting Z-Eye daemon"
 			logger.info("Starting Z-Eye daemon")
-			
+
 			if zConfig.daemon == True:
 				daemon.start()
 			else:
@@ -117,5 +120,5 @@ if __name__ == "__main__":
 			sys.exit(1)
 		sys.exit(0)
 	else:
-		usage()	
+		usage()
 		sys.exit(1)
