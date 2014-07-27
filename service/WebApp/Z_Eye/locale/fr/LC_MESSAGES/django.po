@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-27 15:16+0200\n"
+"POT-Creation-Date: 2014-07-27 19:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,21 +18,30 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: engine/snmpmgmt/Forms/__init__.py:34
+#: engine/snmpmgmt/Forms/__init__.py:36
+msgid "Err-Wrong-Request"
+msgstr "Requete invalide"
+
+#: engine/snmpmgmt/Forms/__init__.py:45
+msgid "Modification"
+msgstr ""
+
+#: engine/snmpmgmt/Forms/__init__.py:46
+msgid "Save"
+msgstr "Enregistrer"
+
+#: engine/snmpmgmt/Models/__init__.py:26
 msgid "snmp-community"
 msgstr "Communauté SNMP"
 
-#: engine/snmpmgmt/Forms/__init__.py:35
+#: engine/snmpmgmt/Models/__init__.py:27
 msgid "Reading"
 msgstr "Lecture"
 
-#: engine/snmpmgmt/Forms/__init__.py:36
+#: engine/snmpmgmt/Models/__init__.py:28
 msgid "Writing"
 msgstr "Ecriture"
 
 #: templates/footer.html:3
 msgid "by"
 msgstr "par"
-
-msgid "Save"
-msgstr "Enregistrer"

@@ -1,8 +1,12 @@
 #!/usr/bin/env python
-import os,re
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Z_Eye.settings")
+import os
+import sys
 
-from django.core.management import execute_from_command_line
-args = "manage.py runserver 0.0.0.0:8080"
-execute_from_command_line(re.split(" ",args))
+if __name__ == "__main__":
+	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Z_Eye.settings")
 
+	sys.path.append("%s/%s" % (os.path.dirname(os.path.abspath(__file__)),"Z_Eye"))
+    
+	from django.core.management import execute_from_command_line
+
+	execute_from_command_line(sys.argv)

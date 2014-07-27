@@ -55,7 +55,7 @@
 				"attrlist" => array(array("snmp-community","name",""), array("Read","ro","b"), array("Write","rw","b")),
 				"sorted" => true,
 				"odivnb" => 2,
-				"odivlink" => "name=",
+				"odivlink" => "id=",
 				"rmcol" => true,
 				"rmlink" => "snmp",
 				"rmactid" => 2,
@@ -66,25 +66,8 @@
 			return $output;
 		}
 
-		private function showCommunityForm($name = "") {
-			/*$ro = ""; $rw = "";
-			$output = FS::$iMgr->cbkForm("1")."<table>";*/
-			if ($name)  {
-				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."snmp_communities","ro,rw","name = '".$name."'");
-				if ($data = FS::$dbMgr->Fetch($query)) {
-					$ro = $data["ro"] == 't';
-					$rw = $data["rw"] == 't';
-				}
-				//$output .= "<tr><td>".$this->loc->s("snmp-community")."</td><td>".$name.FS::$iMgr->hidden("name",$name).FS::$iMgr->hidden("edit",1)."</td></tr>";
-			}
-			/*else
-				$output .= FS::$iMgr->idxLine("snmp-community","name",array("value" => $name,"length" => 64, "size" => 20));
-			$output .= FS::$iMgr->idxLine("Read","ro",array("value" => $ro,"type" => "chk", "tooltip" => "tooltip-read"));
-			$output .= FS::$iMgr->idxLine("Write","rw",array("value" => $rw,"type" => "chk", "tooltip" => "tooltip-write"));
-			$output .= FS::$iMgr->tableSubmit("Save");*/
-
-			return file_get_contents("http://localhost:8080/snmpmgmt/forms/community?name=".$name."&ro=".$ro."&rw=".$rw);
-			return $output;
+		private function showCommunityForm($id = "") {
+			return FS::$iMgr->fileGetContent("http://localhost:8080/snmpmgmt/forms/community?id=".$id);
 		}
 
 		private function tableCommunityLine($name,$ro,$rw) {
@@ -102,11 +85,11 @@
 			switch($el) {
 				case 1: return $this->showCommunityForm();
 				case 2:
-					$name = FS::$secMgr->checkAndSecuriseGetData("name");
-					if (!$name)
+					$id = FS::$secMgr->checkAndSecuriseGetData("id");
+					if (!$id)
 						return $this->loc->s("err-bad-datas");
 
-					return $this->showCommunityForm($name);
+					return $this->showCommunityForm($id);
 				default: return;
 			}
 		}

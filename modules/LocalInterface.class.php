@@ -52,15 +52,15 @@
 				$output, FS::$iMgr->footer(), FS::$iMgr->renderJS()
 			);
 		}
-		
+
 		private function mainContainer() {
 			return sprintf("<div id=\"main_wrapper\"><div id=\"main\">%s</div></div>",
 				$this->showModule()
 			);
 		}
-			
+
 		private function bottomContainer() {
-			return file_get_contents("http://localhost:8080/templates/footer");
+			return FS::$iMgr->fileGetContent("http://localhost:8080/templates/footer");
 		}
 
 		public function showWindowHead() {
@@ -86,7 +86,7 @@
 			}
 
 			$output .= "</div>";
-			
+
 			return $output;
 		}
 

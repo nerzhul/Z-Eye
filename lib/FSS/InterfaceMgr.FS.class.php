@@ -42,7 +42,7 @@
 			$this->arr_css = array();
 			$this->arr_js = array();
 			$this->title = "";
-			
+
 			$this->echo_buffer = "";
 
 			// Create 2 JS buffers
@@ -918,7 +918,7 @@
 				return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$this->getLocale($msg));
 			}
 		}
-		
+
 		public function printNoRight($rightStr) {
 			$this->cur_module->log(2,
 				sprintf("User doesn't have rights to %s",$rightStr)
@@ -1009,7 +1009,7 @@
 		public function ajaxEchoErrorNC($str, $js = "", $raw = false, $options = array()) {
 			$this->ajaxEchoError($str,$js,$raw,array("no-close" => true));
 		}
-		
+
 		public function echoNoRights($rightStr, $js = "", $options = array()) {
 			$this->cur_module->log(2,
 				sprintf("User doesn't have rights to %s",$rightStr)
@@ -1024,7 +1024,7 @@
 
 			$this->ajaxEcho($str, $js, $raw, $options);
 		}
-		
+
 		public function getAjaxEchoBuffer() {
 			return $this->echo_buffer;
 		}
@@ -1055,6 +1055,17 @@
 			}
 		}
 
+		public function fileGetContent($path) {
+			$opts = array(
+				'http'=> array(
+					'method'=>"GET",
+					'header'=> sprintf("Accept-language: %s\r\n",
+						FS::$sessMgr->getBrowserLang())
+				)
+			);
+			$context = stream_context_create($opts);
+			return file_get_contents($path, false, $context);
+	}
 		protected $cur_module;
 		private $arr_css;
 		private $arr_js;

@@ -18,38 +18,14 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from django.forms import ModelForm
-from django.shortcuts import render
 from django.db import models
-from django.http import HttpResponse
 
 from django.utils.translation import ugettext_lazy as _
 
-import engine.snmpmgmt.Models
+class Community(models.Model):
+	name = models.CharField(verbose_name=_('snmp-community'),max_length=64)
+	ro = models.BooleanField(verbose_name=_('Reading'))
+	rw = models.BooleanField(verbose_name=_('Writing'))
 
-def showCommunity(request):
-	if request.method == "GET":
-		if "id" in request.GET:
-			try:
-				communityObj = engine.snmpmgmt.Models.Community.objects.get(pk=request.GET["id"])
-			except ValueError:
-				return HttpResponse(_('Err-Wrong-Request'))
-		else:
-			communityObj = None
-
-		form = CommunityForm(instance=communityObj)
-
-		return render(request, "interface/forms/generic.html", {
-			'form': form,
-			'formaction': '?mod=18&act=1',
-			'modificationlabel': _('Modification'),
-			'submitname' : _('Save')
-		})
-	else:
-		return ""
-
-class CommunityForm(ModelForm):
 	class Meta:
-		model = engine.snmpmgmt.Models.Community
-		fields = "__all__"
-
+		app_label = "Z_Eye"
