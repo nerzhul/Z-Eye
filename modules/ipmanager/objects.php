@@ -1005,9 +1005,6 @@
 					array("order" => "time_last","ordersens" => 2));
 				$port = FS::$dbMgr->GetOneData("node","port","mac = '".$mac."' AND active = 't'",
 					array("order" => "time_last","ordersens" => 2));
-				if ($switch) {
-					$switch = $this->switchList[$switch];
-				}
 			}
 			// Show switch column only of a switch is here
 			if ($switch) {

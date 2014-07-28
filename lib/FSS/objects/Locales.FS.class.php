@@ -63,7 +63,6 @@
 					"Loading" => "Loading",
 					"minute" => "minute",
 					"minutes" => "minutes",
-					"Modification" => "Modification",
 					"Modify" => "Modify",
 					"Name" => "Nom",
 					"No" => "No",
@@ -117,7 +116,6 @@
 					"Loading" => "Chargement",
 					"minute" => "minute",
 					"minutes" => "minutes",
-					"Modification" => "Modification",
 					"Modify" => "Modifier",
 					"Name" => "Nom",
 					"No" => "Non",
@@ -156,11 +154,16 @@
 				return "";
 			}
 			
-			if (!$str || $str == "" || !$this->locales ||
-				!isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
-				return "String `".$str."` not found";
+			if (!$str || $str == "") {
+				return "Empty locale string";
 			}
+			
+			if (!$this->locales ||
+				!isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
 				
+				return FS::$iMgr->getDjangoLocale($str,$lang);
+			}
+			
 			return $this->locales[$lang][$str];
 		}
 		

@@ -1055,17 +1055,25 @@
 			}
 		}
 
-		public function fileGetContent($path) {
+		public function fileGetContent($path,$lang="en") {
 			$opts = array(
 				'http'=> array(
 					'method'=>"GET",
 					'header'=> sprintf("Accept-language: %s\r\n",
-						FS::$sessMgr->getBrowserLang())
+						$lang)
 				)
 			);
 			$context = stream_context_create($opts);
 			return file_get_contents($path, false, $context);
-	}
+		}
+
+		public function getDjangoLocale($locale,$lang) {
+			return $this->fileGetContent(
+				sprintf("http://localhost:8080/locale/get?locale=%s", $locale),
+				$lang
+			);
+		}
+		
 		protected $cur_module;
 		private $arr_css;
 		private $arr_js;
