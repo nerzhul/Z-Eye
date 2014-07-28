@@ -30,3 +30,9 @@ def get_locale(request):
 			return HttpResponse(_('Err-Wrong-Request'))
 	else:
 		return HttpResponse(_('Err-Wrong-Request'))
+
+"""
+TEMP CALLs to locales, before their migration to Django App, they need to be
+referenced in a place. It seems here is a good idea
+"""
+_('Yes')
