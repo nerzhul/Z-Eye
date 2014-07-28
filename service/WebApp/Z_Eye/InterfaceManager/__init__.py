@@ -25,7 +25,10 @@ from django.utils.translation import ugettext_lazy as _
 def get_locale(request):
 	if request.method == "GET":
 		if "locale" in request.GET:
-			return _(request.GET["locale"])
+			if len(request.GET["locale"]) > 0:
+				return HttpResponse(_(request.GET["locale"]))
+			else:
+				return HttpResponse(_('Err-Wrong-Request'))
 		else:
 			return HttpResponse(_('Err-Wrong-Request'))
 	else:

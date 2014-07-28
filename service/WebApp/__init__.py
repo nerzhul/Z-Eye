@@ -18,7 +18,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import os, sys, re, subprocess
+import os, sys, re, time, subprocess
 
 sys.path.append("%s/%s" % (os.path.dirname(os.path.abspath(__file__)),"../"))
 
@@ -32,6 +32,7 @@ class zWebApp(ZEyeUtil.Thread):
 		self.logger.info("Web App launched")
 		while True:
 			self.launchWebApp()
+			time.sleep(1)
 
 	def launchWebApp(self):
 		self.logger.info("Web App started")
@@ -40,5 +41,4 @@ class zWebApp(ZEyeUtil.Thread):
 			subprocess.check_output(cmd,shell=True)
 		except Exception, e:
 			self.logger.critical("Web App: %s" % e)
-			sys.exit(1);
 		self.logger.info("Web App ended")
