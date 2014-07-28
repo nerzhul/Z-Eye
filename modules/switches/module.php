@@ -299,9 +299,9 @@
 							return $output;
 						}
 						$output .= FS::$iMgr->h2("iface-dev-cfg").
-							"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd("show running-config interface ".$port))."</pre>";
+							"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->showSSHInterfaceCfg($port))."</pre>";
 						$output .= FS::$iMgr->h2("iface-dev-status").
-							"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->sendSSHCmd("show interface ".$port))."</pre>";
+							"<pre style=\"width: 50%; display:inline-block;\">".preg_replace("#[\n]#","<br />",$this->devapi->showSSHInterfaceStatus($port))."</pre>";
 					}
 
 				}

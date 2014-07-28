@@ -392,9 +392,10 @@
 			return "";
 		}		
 
-		public function showSSHRunCfg() {
-			return "";
-		}
+		public function showSSHRunCfg() { return ""; }
+		public function showSSHStartCfg() { return ""; }
+		public function showSSHInterfaceCfg($iface) { return ""; }
+		public function showSSHInterfaceStatus($iface) { return ""; }
 
 		public function setPortId($pid) {
 			if(FS::$secMgr->isNumeric($pid))

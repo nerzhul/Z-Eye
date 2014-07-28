@@ -1400,30 +1400,30 @@
                 }
 
 		public function setPortSecViolAct($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
-                                return -1;
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
+				return -1;
 
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
-                }
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
+		}
 
 		public function getPortSecMaxMAC() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.3");
-                }
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.3");
+		}
 
 		public function setPortSecMaxMAC($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 6144)
-                                return -1;
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 6144)
+				return -1;
 
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
-                }
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
+		}
 
 		/*
 		* special
 		*/
 
 		public function getPortCDPEnable() {
-                         return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2");
-                }
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2");
+		}
 
 		public function setPortCDPEnable($value) {
                         if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
@@ -1556,6 +1556,14 @@
 
 		public function showSSHStartCfg() {
 			return $this->ssh->sendCmd("show startup-config");
+		}
+		
+		public function showSSHInterfaceCfg($iface) {
+			return $this->ssh->sendCmd("show running-config interface ".$iface);
+		}
+		
+		public function showSSHInterfaceStatus($iface) {
+			return $this->ssh->sendCmd("show interface ".$iface);
 		}
 
 		public function connectToDevice($device,$sshuser,$sshpwd,$enablepwd) {
