@@ -405,7 +405,7 @@
 			}
 
 			if ($building) {
-				echo $building;
+				FS::$iMgr->ajaxEchoOK($building);
 			}
 			else {
 				FS::$iMgr->ajaxEchoOK("Modify");
@@ -445,7 +445,7 @@
 			FS::$dbMgr->CommitTr();
 
 			if ($room) {
-				echo $room;
+				FS::$iMgr->ajaxEchoOK($room);
 			}
 			else {
 				FS::$iMgr->ajaxEchoOK("Modify");
