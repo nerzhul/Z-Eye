@@ -1,6 +1,6 @@
 # Z-Eye Fr translation
 # Copyright (C) 2014
-# This file is distributed under the same license as the Z-Ey package.
+# This file is distributed under the same license as the Z-Eye package.
 # Loic Blot <loic.blot@unix-experience.fr>, 2014
 #
 #, fuzzy
