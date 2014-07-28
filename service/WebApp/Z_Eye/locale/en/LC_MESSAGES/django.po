@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 08:30+0200\n"
+"POT-Creation-Date: 2014-07-28 13:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,223 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: InterfaceManager/__init__.py:30 InterfaceManager/__init__.py:32
-#: engine/snmpmgmt/Forms/__init__.py:38
+#: InterfaceManager/__init__.py:31 InterfaceManager/__init__.py:33
+#: InterfaceManager/__init__.py:35 engine/snmpmgmt/Forms/__init__.py:38
 msgid "Err-Wrong-Request"
 msgstr "Bad request"
 
-#: InterfaceManager/__init__.py:38
-msgid "Yes"
+#: InterfaceManager/__init__.py:42
+msgid "Action"
+msgstr "Action"
+
+#: InterfaceManager/__init__.py:43
+msgid "Add"
+msgstr "Add"
+
+#: InterfaceManager/__init__.py:44
+msgid "Cancel"
+msgstr "Cancel"
+
+#: InterfaceManager/__init__.py:45
+msgid "comma"
+msgstr "comma (,)"
+
+#: InterfaceManager/__init__.py:46
+msgid "Confirm"
+msgstr "Confirm"
+
+#: InterfaceManager/__init__.py:47
+msgid "confirm-disconnect"
+msgstr "Are you sure you want to disconnect ?"
+
+#: InterfaceManager/__init__.py:48
+#, fuzzy
+msgid "Connection"
+msgstr "Connection"
+
+#: InterfaceManager/__init__.py:49
+msgid "Connect-to"
+msgstr "Connect to"
+
+#: InterfaceManager/__init__.py:50
+msgid "CSV-content"
+msgstr "CSV content"
+
+#: InterfaceManager/__init__.py:51
+msgid "day"
+msgstr "day"
+
+#: InterfaceManager/__init__.py:52
+msgid "days"
+msgstr "days"
+
+#: InterfaceManager/__init__.py:53
+msgid "Default"
+msgstr "Default"
+
+#: InterfaceManager/__init__.py:54
+msgid "Description"
+msgstr "Description"
+
+#: InterfaceManager/__init__.py:55
+msgid "Disconnection"
+msgstr "Disconnect"
+
+#: InterfaceManager/__init__.py:56
+msgid "Done"
+msgstr "Done"
+
+#: InterfaceManager/__init__.py:57
+msgid "English"
+msgstr "English"
+
+#: InterfaceManager/__init__.py:58
+msgid "Error"
+msgstr "Error"
+
+#: InterfaceManager/__init__.py:59
+msgid "err-bad-datas"
+msgstr "Invalid datas"
+
+#: InterfaceManager/__init__.py:60
+msgid "err-devel"
+msgstr "Development error !"
+
+#: InterfaceManager/__init__.py:61
+msgid "err-devel-locale"
 msgstr ""
+"Development error ! Please verify the following backtrace. A locale is "
+"miscalled.<br /><br />%s"
+
+#: InterfaceManager/__init__.py:62
+msgid "err-must-be-connected"
+msgstr "You must be logged to access to this functionnality"
+
+#: InterfaceManager/__init__.py:63
+msgid "err-no-rights"
+msgstr "You don't have rights to do that"
+
+#: InterfaceManager/__init__.py:64
+msgid "err-sql-query-failed"
+msgstr "Query failed: '%s'"
+
+#: InterfaceManager/__init__.py:65
+msgid "err-unk-module"
+msgstr "Unknown module !"
+
+#: InterfaceManager/__init__.py:66
+msgid "French"
+msgstr "French"
+
+#: InterfaceManager/__init__.py:67
+msgid "hour"
+msgstr "hour"
+
+#: InterfaceManager/__init__.py:68
+msgid "hours"
+msgstr "hours"
+
+#: InterfaceManager/__init__.py:69
+msgid "Import"
+msgstr "Import"
+
+#: InterfaceManager/__init__.py:70
+#, fuzzy
+msgid "Loading"
+msgstr "Loading"
+
+#: InterfaceManager/__init__.py:71
+msgid "minute"
+msgstr "minute"
+
+#: InterfaceManager/__init__.py:72
+msgid "minutes"
+msgstr "minutes"
+
+#: InterfaceManager/__init__.py:73
+msgid "Modify"
+msgstr "Modify"
+
+#: InterfaceManager/__init__.py:74
+msgid "Name"
+msgstr "Name"
+
+#: InterfaceManager/__init__.py:75
+msgid "No"
+msgstr ""
+
+#: InterfaceManager/__init__.py:76
+msgid "None"
+msgstr "None"
+
+#: InterfaceManager/__init__.py:77
+#, fuzzy
+msgid "Notification"
+msgstr "Notification"
+
+#: InterfaceManager/__init__.py:78
+msgid "OK"
+msgstr "OK"
+
+#: InterfaceManager/__init__.py:79
+msgid "Online"
+msgstr "Online"
+
+#: InterfaceManager/__init__.py:80
+msgid "Remove"
+msgstr "Remove"
+
+#: InterfaceManager/__init__.py:81
+msgid "Replace-?"
+msgstr "Replace ?"
+
+#: InterfaceManager/__init__.py:82
+msgid "rule-read-datas"
+msgstr "Read datas"
+
+#: InterfaceManager/__init__.py:83
+msgid "rule-write-datas"
+msgstr "Write datas"
+
+#: InterfaceManager/__init__.py:84 engine/snmpmgmt/Forms/__init__.py:50
+msgid "Save"
+msgstr "Save"
+
+#: InterfaceManager/__init__.py:85
+msgid "Searching..."
+msgstr "Searching..."
+
+#: InterfaceManager/__init__.py:86
+msgid "second"
+msgstr "second"
+
+#: InterfaceManager/__init__.py:87
+msgid "seconds"
+msgstr "seconds"
+
+#: InterfaceManager/__init__.py:88
+msgid "semi-colon"
+msgstr "Semi-colon (;)"
+
+#: InterfaceManager/__init__.py:89
+msgid "separator"
+msgstr "Separator"
+
+#: InterfaceManager/__init__.py:90
+msgid "Settings"
+msgstr "Settings"
+
+#: InterfaceManager/__init__.py:91
+msgid "Type"
+msgstr "Type"
+
+#: InterfaceManager/__init__.py:92
+msgid "unknown"
+msgstr "unknown"
+
+#: InterfaceManager/__init__.py:93
+msgid "Yes"
+msgstr "Yes"
 
 #: engine/snmpmgmt/Forms/__init__.py:40
 msgid "Err-Object-Not-Exists"
@@ -32,11 +241,7 @@ msgstr "The requested object doesn't exists"
 
 #: engine/snmpmgmt/Forms/__init__.py:49
 msgid "Modification"
-msgstr ""
-
-#: engine/snmpmgmt/Forms/__init__.py:50
-msgid "Save"
-msgstr "Save"
+msgstr "Modification"
 
 #: engine/snmpmgmt/Models/__init__.py:26
 msgid "snmp-community"

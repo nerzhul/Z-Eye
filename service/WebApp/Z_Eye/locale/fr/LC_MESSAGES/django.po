@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 08:30+0200\n"
+"POT-Creation-Date: 2014-07-28 13:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,12 +18,221 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: InterfaceManager/__init__.py:30 InterfaceManager/__init__.py:32
-#: engine/snmpmgmt/Forms/__init__.py:38
+#: InterfaceManager/__init__.py:31 InterfaceManager/__init__.py:33
+#: InterfaceManager/__init__.py:35 engine/snmpmgmt/Forms/__init__.py:38
 msgid "Err-Wrong-Request"
 msgstr "Requete invalide"
 
-#: InterfaceManager/__init__.py:38
+#: InterfaceManager/__init__.py:42
+msgid "Action"
+msgstr "Action"
+
+#: InterfaceManager/__init__.py:43
+msgid "Add"
+msgstr "Ajouter"
+
+#: InterfaceManager/__init__.py:44
+msgid "Cancel"
+msgstr "Annuler"
+
+#: InterfaceManager/__init__.py:45
+msgid "comma"
+msgstr "virgule (,)"
+
+#: InterfaceManager/__init__.py:46
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: InterfaceManager/__init__.py:47
+msgid "confirm-disconnect"
+msgstr "Êtes vous sûr de vouloir vous déconnecter ?"
+
+#: InterfaceManager/__init__.py:48
+#, fuzzy
+msgid "Connection"
+msgstr "Connexion"
+
+#: InterfaceManager/__init__.py:49
+msgid "Connect-to"
+msgstr "Connexion à"
+
+#: InterfaceManager/__init__.py:50
+msgid "CSV-content"
+msgstr "Contenu de l'import (CSV)"
+
+#: InterfaceManager/__init__.py:51
+msgid "day"
+msgstr "jour"
+
+#: InterfaceManager/__init__.py:52
+msgid "days"
+msgstr "jours"
+
+#: InterfaceManager/__init__.py:53
+msgid "Default"
+msgstr "Défaut"
+
+#: InterfaceManager/__init__.py:54
+msgid "Description"
+msgstr "Description"
+
+#: InterfaceManager/__init__.py:55
+msgid "Disconnection"
+msgstr "Déconnexion"
+
+#: InterfaceManager/__init__.py:56
+msgid "Done"
+msgstr "Effectué"
+
+#: InterfaceManager/__init__.py:57
+msgid "English"
+msgstr "Anglais"
+
+#: InterfaceManager/__init__.py:58
+msgid "Error"
+msgstr "Erreur"
+
+#: InterfaceManager/__init__.py:59
+msgid "err-bad-datas"
+msgstr "Données invalides"
+
+#: InterfaceManager/__init__.py:60
+msgid "err-devel"
+msgstr "Erreur de développement !"
+
+#: InterfaceManager/__init__.py:61
+msgid "err-devel-locale"
+msgstr ""
+"Erreur de développement ! Veuillez vérifier la backtrace ci-dessous, une "
+"locale est appelée de manière incorrecte.<br /><br />%s"
+
+#: InterfaceManager/__init__.py:62
+msgid "err-must-be-connected"
+msgstr "Vous devez être connecté pour accéder à cette fonctionnalité"
+
+#: InterfaceManager/__init__.py:63
+msgid "err-no-rights"
+msgstr "Vous n'avez pas le droit de faire cela"
+
+#: InterfaceManager/__init__.py:64
+msgid "err-sql-query-failed"
+msgstr "Echec de la requête: '%s'"
+
+#: InterfaceManager/__init__.py:65
+msgid "err-unk-module"
+msgstr "Module inconnu "
+
+#: InterfaceManager/__init__.py:66
+msgid "French"
+msgstr "Français"
+
+#: InterfaceManager/__init__.py:67
+msgid "hour"
+msgstr "heure"
+
+#: InterfaceManager/__init__.py:68
+msgid "hours"
+msgstr "heures"
+
+#: InterfaceManager/__init__.py:69
+msgid "Import"
+msgstr "Importer"
+
+#: InterfaceManager/__init__.py:70
+#, fuzzy
+msgid "Loading"
+msgstr "Chargement"
+
+#: InterfaceManager/__init__.py:71
+msgid "minute"
+msgstr "minute"
+
+#: InterfaceManager/__init__.py:72
+msgid "minutes"
+msgstr "minutes"
+
+#: InterfaceManager/__init__.py:73
+msgid "Modify"
+msgstr "Modifier"
+
+#: InterfaceManager/__init__.py:74
+msgid "Name"
+msgstr "Nom"
+
+#: InterfaceManager/__init__.py:75
+msgid "No"
+msgstr "Non"
+
+#: InterfaceManager/__init__.py:76
+msgid "None"
+msgstr "Aucun"
+
+#: InterfaceManager/__init__.py:77
+#, fuzzy
+msgid "Notification"
+msgstr "Notification"
+
+#: InterfaceManager/__init__.py:78
+msgid "OK"
+msgstr "OK"
+
+#: InterfaceManager/__init__.py:79
+msgid "Online"
+msgstr "En ligne"
+
+#: InterfaceManager/__init__.py:80
+msgid "Remove"
+msgstr "Supprimer"
+
+#: InterfaceManager/__init__.py:81
+msgid "Replace-?"
+msgstr "Remplacer ?"
+
+#: InterfaceManager/__init__.py:82
+msgid "rule-read-datas"
+msgstr "Lire les données"
+
+#: InterfaceManager/__init__.py:83
+msgid "rule-write-datas"
+msgstr "Ecrire les données"
+
+#: InterfaceManager/__init__.py:84 engine/snmpmgmt/Forms/__init__.py:50
+msgid "Save"
+msgstr "Enregistrer"
+
+#: InterfaceManager/__init__.py:85
+msgid "Searching..."
+msgstr "Recherche..."
+
+#: InterfaceManager/__init__.py:86
+msgid "second"
+msgstr "seconde"
+
+#: InterfaceManager/__init__.py:87
+msgid "seconds"
+msgstr "secondes"
+
+#: InterfaceManager/__init__.py:88
+msgid "semi-colon"
+msgstr "Point-virgule (;)"
+
+#: InterfaceManager/__init__.py:89
+msgid "separator"
+msgstr "Séparateur"
+
+#: InterfaceManager/__init__.py:90
+msgid "Settings"
+msgstr "Paramètres"
+
+#: InterfaceManager/__init__.py:91
+msgid "Type"
+msgstr "Type"
+
+#: InterfaceManager/__init__.py:92
+msgid "unknown"
+msgstr "inconnu"
+
+#: InterfaceManager/__init__.py:93
 msgid "Yes"
 msgstr "Oui"
 
@@ -34,10 +243,6 @@ msgstr "L'objet demandé n'existe pas"
 #: engine/snmpmgmt/Forms/__init__.py:49
 msgid "Modification"
 msgstr "Modification"
-
-#: engine/snmpmgmt/Forms/__init__.py:50
-msgid "Save"
-msgstr "Enregistrer"
 
 #: engine/snmpmgmt/Models/__init__.py:26
 msgid "snmp-community"

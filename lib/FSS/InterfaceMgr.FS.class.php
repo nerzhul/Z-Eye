@@ -979,7 +979,7 @@
 		}
 
 
-		protected function ajaxEcho($str,$js="",$raw=false,$options=array()) {
+		public function ajaxEcho($str,$js="",$raw=false,$options=array()) {
 			$this->echo_buffer = sprintf("%s%s",
 				$this->echo_buffer,
 				($raw ? $str : $this->getLocale($str))

@@ -2206,7 +2206,7 @@
 					$dip = FS::$secMgr->getPost("dip","i4");
 					if (!$dip) {
 						$this->log(2,"Some fields are missing (AJAX device status)");
-						echo "<span style=\"color:red\">IP Error ".$dip."</span>";
+						FS::$iMgr->ajaxEcho("<span style=\"color:red\">IP Error ".$dip."</span>");
 						return;
 					}
 					$out = "";
@@ -2232,8 +2232,8 @@
 						$spText = $this->loc->s("Online");
 					}
 					
-					echo sprintf("<span style=\"color:%s;\">%s</span>",
-						$spColor, $spText);
+					FS::$iMgr->ajaxEcho(sprintf("<span style=\"color:%s;\">%s</span>",
+						$spColor, $spText),"",true);
 					return;
 				case 20: // Save all devices
 					if (!FS::$sessMgr->hasRight("globalsave")) {

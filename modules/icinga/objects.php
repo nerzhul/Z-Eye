@@ -1103,7 +1103,7 @@
 							$totalPbs++;
 						}
 						else {
-							$outstate = $this->loc->s("Up");
+							$outstate = $this->loc->s("Online");
 						}
 						
 						$output .= "<tr style=\"background-color:";
