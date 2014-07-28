@@ -1690,7 +1690,7 @@
 					// Return text for AJAX call
 					$this->log(0,"Set plug for device '".$dip."' to '".$plug."' on port '".$port."'");
 					if ($plug == "") {
-						$plug = "Modifier";
+						$plug = $this->loc->s("Modify");
 					}
 					echo $plug;
 					return;
@@ -1770,7 +1770,7 @@
 					$room = FS::$secMgr->checkAndSecurisePostData("room");
 					if ($port == NULL || $sw == NULL || !$this->devapi->checkFields()) {
 						$this->log(2,"Some fields are missing (plug edit)");
-						echo "Some fields are missing (port, switch, trunk or native vlan)";
+						FS::$iMgr->ajaxEchoError("Some fields are missing (port, switch, trunk or native vlan)","",true);
 						return;
 					}
 
@@ -1779,13 +1779,13 @@
 
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$sw."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-						echo $this->loc->s("err-no-credentials");
+						FS::$iMgr->ajaxEchoError("err-no-credentials");
 						return;
 					}
 					$pid = $this->devapi->getPortId($port);
 					if ($pid == -1) {
 						$this->log(2,"PID is incorrect (plug edit)");
-						echo "PID is incorrect (".$pid.")";
+						FS::$iMgr->ajaxEchoError("PID is incorrect (".$pid.")","",true);
 						return;
 					}
 					$this->devapi->setPortId($pid);
@@ -1803,6 +1803,7 @@
 					$this->devapi->handleState($logvals);
 
 					if ($this->devapi->handleVoiceVlan($logvals) != 0) {
+						FS::$iMgr->ajaxEchoError("There is a problem when handling voice VLAN","",true);
 						return;
 					}
 
@@ -1851,7 +1852,7 @@
 					}
 					$this->log(0,$logoutput);
 					if (FS::isAjaxCall())
-						echo $this->loc->s("done-with-success");
+						FS::$iMgr->ajaxEchoOK("done-with-success");
 					else
 						FS::$iMgr->redir("mod=".$this->mid."&d=".$sw."&p=".$port);
 					return;
@@ -1861,7 +1862,7 @@
 					$vlan = FS::$secMgr->checkAndSecuriseGetData("vlan");
 					if (!$device) {
 						$this->log(2,"Some fields are missing (vlan replacement, portlist)");
-						echo FS::$iMgr->printError("err-no-device");
+						FS::$iMgr->ajaxEchoError("err-no-device");
 						return;
 					}
 
@@ -1869,23 +1870,24 @@
 					$dip = $this->devapi->getDeviceIP();
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
-						echo FS::$iMgr->printError("err-no-credentials");
+						FS::$iMgr->ajaxEchoError("err-no-credentials");
 						return;
 					}
 
 					if (!$vlan || !FS::$secMgr->isNumeric($vlan)) {
 						$this->log(2,"Some fields are missing/wrong (vlan replacement, portlist)");
-						echo FS::$iMgr->printError("err-vlan-fail");
+						FS::$iMgr->ajaxEchoError("err-vlan-fail");
 						return;
 					}
 
 					$plist = $this->devapi->getPortList($vlan);
 					$count = count($plist);
 					if ($count > 0) {
-						echo "<ul>";
+						$buf = "<ul>";
 						for ($i=0;$i<$count;$i++)
-							echo "<li>".$plist[$i]."</li>";
-						echo "</ul>";
+							$buf .= "<li>".$plist[$i]."</li>";
+						$buf .= "</ul>";
+						FS::$iMgr->ajaxEchoOK($buf,"",true);
 					}
 					else
 						FS::$iMgr->printError("err-vlan-not-on-device");
