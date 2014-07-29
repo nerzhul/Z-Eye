@@ -22,44 +22,15 @@
 			parent::__construct();
 			$locales = array(
 				"fr" => array(
-					"Add" => "Ajouter",
-					"confirm-removegrp" => "Êtes vous sûr de vouloir supprimer le groupe '%s' ?",
-					"Delete" => "Supprimer",
-					"err-already-exist" => "Ce groupe existe déjà !",
-					"err-bad-data" => "Données invalides.",
-					"err-not-exist" => "Ce groupe n'existe pas !",
-					"Groupname" => "Nom du groupe",
 					"menu-name" => "Utilisateurs et droits",
 					"menu-title" => "Gestion des groupes Z-Eye",
-					"New-group" => "Nouveau Groupe",
-					"Rule" => "Règle",
-					"Save" => "Enregistrer",
-					"sure-delete" => "Êtes vous sûr de vouloir supprimer le groupe",
-					"title-edit" => "Edition du groupe",
-					"title-mgmt" => "Gestion des groupes",
-					"title-opts" => "Options des modules",
-					"User-nb" => "Nombre d'utilisateurs",
 				),
 				"en" => array(
-					"Add" => "Add",
-					"confirm-removegrp" => "Are you sure to want to remove group '%s' ?",
-					"Delete" => "Remove",
-					"err-already-exist" => "This group already exists !",
-					"err-bad-data" => "Invalid data(s).",
-					"err-not-exist" => "This group doesn't exists !",
-					"Groupname" => "Groupname",
 					"menu-name" => "Users and rights",
 					"menu-title" => "Z-Eye groups management",
-					"New-group" => "New group",
-					"Rule" => "Rule",
-					"Save" => "Save",
-					"sure-delete" => "Are you sure to remove group",
-					"title-edit" => "Group edition",
-					"title-mgmt" => "Groups management",
-					"title-opts" => "Modules' options",
-					"User-nb" => "User number",
 				)
 			);
+			
 			$this->concat($locales);
 		}
 	};

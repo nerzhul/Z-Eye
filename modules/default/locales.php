@@ -17,11 +17,9 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	//final class lDefault extends FSLocales {
-	new lDefault();
-	final class lDefault {
+	final class lDefault extends FSLocales {
 		function __construct() {
-			//parent::__construct();
+			parent::__construct();
 			$locales = array(
 				"fr" => array(
 					"menu-name" => "Supervision",
@@ -32,29 +30,6 @@
 					"menu-title" => "Speed reporting",
 				)
 			);
-			$msgidbuf = array();
-			foreach ($locales["en"] as $locname => $value) {
-				echo sprintf("msgid \"%s\"\nmsgstr \"%s\"\n\n",
-					$locname,
-					$value);
-				if (!in_array($locname,$msgidbuf)) {
-					$msgidbuf[] = $locname;
-				}
-
-			}
-			echo "\n\n==================================\n\n";
-			foreach ($locales["fr"] as $locname => $value) {
-				echo sprintf("msgid \"%s\"\nmsgstr \"%s\"\n\n",
-					$locname,
-					$value);
-				if (!in_array($locname,$msgidbuf)) {
-					$msgidbuf[] = $locname;
-				}
-			}
-			echo "\n\n==================================\n\n";
-			for ($i=0;$i<count($msgidbuf);$i++) {
-				echo sprintf("_('%s')\n",$msgidbuf[$i]);
-			}
 			$this->concat($locales);
 		}
 	};
