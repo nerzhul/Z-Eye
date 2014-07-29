@@ -1017,7 +1017,7 @@
 
 			$output .= "</td><td>".
 				FS::$iMgr->removeIcon(10,"cluster=".$clustername,array("js" => true,
-					"confirmtext" => "confirm-remove-cluster",
+					"confirmtext" => "confirm-remove-dhcp-cluster",
 					"confirmval" => $clustername
 				)).
 				"</td></tr>";

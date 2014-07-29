@@ -104,6 +104,31 @@
 					"Writing" => "Modification",
 				)
 			);
+			/*
+			$msgidbuf = array();
+			foreach ($locales["en"] as $locname => $value) {
+				echo sprintf("msgid \"%s\"\nmsgstr \"%s\"\n\n",
+					$locname,
+					$value);
+				if (!in_array($locname,$msgidbuf)) {
+					$msgidbuf[] = $locname;
+				}
+
+			}
+			echo "\n\n==================================\n\n";
+			foreach ($locales["fr"] as $locname => $value) {
+				echo sprintf("msgid \"%s\"\nmsgstr \"%s\"\n\n",
+					$locname,
+					$value);
+				if (!in_array($locname,$msgidbuf)) {
+					$msgidbuf[] = $locname;
+				}
+			}
+			echo "\n\n==================================\n\n";
+			for ($i=0;$i<count($msgidbuf);$i++) {
+				echo sprintf("_('%s')\n",$msgidbuf[$i]);
+			}
+			*/
 			$this->concat($locales);
 		}
 	};

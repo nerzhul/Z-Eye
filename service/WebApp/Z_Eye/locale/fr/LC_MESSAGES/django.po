@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-29 19:19+0200\n"
+"POT-Creation-Date: 2014-07-29 19:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgid "Action"
 msgstr "Action"
 
 #: InterfaceManager/__init__.py:43 InterfaceManager/__init__.py:289
-#: InterfaceManager/__init__.py:308
+#: InterfaceManager/__init__.py:308 InterfaceManager/__init__.py:488
 msgid "Add"
 msgstr "Ajouter"
 
@@ -65,7 +65,7 @@ msgstr "Contenu de l'import (CSV)"
 msgid "day"
 msgstr "jour"
 
-#: InterfaceManager/__init__.py:52
+#: InterfaceManager/__init__.py:52 InterfaceManager/__init__.py:517
 msgid "days"
 msgstr "jours"
 
@@ -93,7 +93,7 @@ msgstr "Anglais"
 msgid "Error"
 msgstr "Erreur"
 
-#: InterfaceManager/__init__.py:59
+#: InterfaceManager/__init__.py:59 InterfaceManager/__init__.py:531
 msgid "err-bad-datas"
 msgstr "Données invalides"
 
@@ -165,6 +165,7 @@ msgid "No"
 msgstr "Non"
 
 #: InterfaceManager/__init__.py:76 InterfaceManager/__init__.py:396
+#: InterfaceManager/__init__.py:638
 msgid "None"
 msgstr "Aucun"
 
@@ -181,7 +182,7 @@ msgstr "OK"
 msgid "Online"
 msgstr "En ligne"
 
-#: InterfaceManager/__init__.py:80
+#: InterfaceManager/__init__.py:80 InterfaceManager/__init__.py:654
 msgid "Remove"
 msgstr "Supprimer"
 
@@ -199,7 +200,7 @@ msgstr "Ecrire les données"
 
 #: InterfaceManager/__init__.py:84 InterfaceManager/__init__.py:241
 #: InterfaceManager/__init__.py:300 InterfaceManager/__init__.py:424
-#: engine/snmpmgmt/Forms/__init__.py:50
+#: InterfaceManager/__init__.py:665 engine/snmpmgmt/Forms/__init__.py:50
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -265,11 +266,13 @@ msgstr "Utilisateur"
 
 #: InterfaceManager/__init__.py:100 InterfaceManager/__init__.py:123
 #: InterfaceManager/__init__.py:227 InterfaceManager/__init__.py:297
-#: InterfaceManager/__init__.py:383
+#: InterfaceManager/__init__.py:383 InterfaceManager/__init__.py:472
+#: InterfaceManager/__init__.py:631
 msgid "menu-title"
 msgstr "Gestion DNS"
 
 #: InterfaceManager/__init__.py:101 InterfaceManager/__init__.py:235
+#: InterfaceManager/__init__.py:474
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -354,6 +357,7 @@ msgstr "Lien"
 
 #: InterfaceManager/__init__.py:122 InterfaceManager/__init__.py:226
 #: InterfaceManager/__init__.py:296 InterfaceManager/__init__.py:382
+#: InterfaceManager/__init__.py:630
 msgid "menu-name"
 msgstr "Hypervision"
 
@@ -425,7 +429,7 @@ msgstr "Adresse"
 msgid "add-acl"
 msgstr "Ajouter une ACL"
 
-#: InterfaceManager/__init__.py:142
+#: InterfaceManager/__init__.py:142 InterfaceManager/__init__.py:489
 msgid "add-cluster"
 msgstr "Créer un cluster"
 
@@ -441,7 +445,7 @@ msgstr "Ajouter un serveur"
 msgid "add-zone"
 msgstr "Ajouter une zone DNS"
 
-#: InterfaceManager/__init__.py:146
+#: InterfaceManager/__init__.py:146 InterfaceManager/__init__.py:491
 msgid "Advanced-tools"
 msgstr "Outils avancés"
 
@@ -573,7 +577,7 @@ msgstr "Echec de l'identification sur le serveur"
 msgid "err-bad-zonetype"
 msgstr "Type de zone invalide"
 
-#: InterfaceManager/__init__.py:179
+#: InterfaceManager/__init__.py:179 InterfaceManager/__init__.py:540
 msgid "err-cluster-already-exists"
 msgstr "Un cluster portant ce nom existe déjà"
 
@@ -586,7 +590,7 @@ msgstr ""
 msgid "err-cluster-need-master"
 msgstr "Un cluster a besoin de serveurs maîtres"
 
-#: InterfaceManager/__init__.py:182
+#: InterfaceManager/__init__.py:182 InterfaceManager/__init__.py:542
 msgid "err-cluster-not-exists"
 msgstr "Ce cluster n'existe pas"
 
@@ -594,7 +598,7 @@ msgstr "Ce cluster n'existe pas"
 msgid "err-invalid-db"
 msgstr "Aucune base de données avec ces informations en base"
 
-#: InterfaceManager/__init__.py:184
+#: InterfaceManager/__init__.py:184 InterfaceManager/__init__.py:571
 #, fuzzy
 msgid "err-invalid-req"
 msgstr "Aucune base de données avec ces informations en base"
@@ -715,6 +719,7 @@ msgid "expert-tools"
 msgstr "Outils avancés"
 
 #: InterfaceManager/__init__.py:211 InterfaceManager/__init__.py:361
+#: InterfaceManager/__init__.py:605
 msgid "fail-tab"
 msgstr "Unable to load tab, link may be wrong or page unavailable"
 
@@ -799,7 +804,7 @@ msgstr "Aucun enregistrement obsolète trouvé"
 msgid "Others"
 msgstr "Autres"
 
-#: InterfaceManager/__init__.py:236
+#: InterfaceManager/__init__.py:236 InterfaceManager/__init__.py:475
 msgid "Password-repeat"
 msgstr "Mot de passe (répétition)"
 
@@ -819,11 +824,11 @@ msgstr "Type d'enregistrement"
 msgid "Return"
 msgstr "Retour"
 
-#: InterfaceManager/__init__.py:242
+#: InterfaceManager/__init__.py:242 InterfaceManager/__init__.py:666
 msgid "Search"
 msgstr "Rechercher"
 
-#: InterfaceManager/__init__.py:243
+#: InterfaceManager/__init__.py:243 InterfaceManager/__init__.py:667
 msgid "Server"
 msgstr "Serveur"
 
@@ -835,7 +840,7 @@ msgstr "Gestion des serveurs"
 msgid "serverlist"
 msgstr "Liste des serveurs"
 
-#: InterfaceManager/__init__.py:246
+#: InterfaceManager/__init__.py:246 InterfaceManager/__init__.py:668
 msgid "Servers"
 msgstr "Serveur(s)"
 
@@ -867,11 +872,11 @@ msgstr "Intervalle de rafraîchissement (secondes)"
 msgid "soa-ttl-retry"
 msgstr "Intervalles entre deux essais (secondes)"
 
-#: InterfaceManager/__init__.py:254
+#: InterfaceManager/__init__.py:254 InterfaceManager/__init__.py:673
 msgid "ssh-user"
 msgstr "Utilisateur SSH"
 
-#: InterfaceManager/__init__.py:255
+#: InterfaceManager/__init__.py:255 InterfaceManager/__init__.py:677
 msgid "Stats"
 msgstr "Statistiques"
 
@@ -1006,6 +1011,7 @@ msgid "tsig-update"
 msgstr "Clef TSIG de mise à jour"
 
 #: InterfaceManager/__init__.py:279 InterfaceManager/__init__.py:452
+#: InterfaceManager/__init__.py:482
 msgid "Value"
 msgstr "Valeur"
 
@@ -1064,7 +1070,7 @@ msgstr "Données invalides."
 msgid "err-not-exist"
 msgstr "Ce groupe n'existe pas !"
 
-#: InterfaceManager/__init__.py:295
+#: InterfaceManager/__init__.py:295 InterfaceManager/__init__.py:608
 msgid "Groupname"
 msgstr "Nom du groupe"
 
@@ -1132,7 +1138,7 @@ msgstr "Période de vérification"
 msgid "Commands"
 msgstr "Commandes"
 
-#: InterfaceManager/__init__.py:318
+#: InterfaceManager/__init__.py:318 InterfaceManager/__init__.py:505
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -1461,7 +1467,7 @@ msgstr "Stratégies de notification"
 msgid "obs-over-srv"
 msgstr "Service nécessaire"
 
-#: InterfaceManager/__init__.py:406
+#: InterfaceManager/__init__.py:406 InterfaceManager/__init__.py:473
 msgid "Option"
 msgstr "Option"
 
@@ -1656,6 +1662,1177 @@ msgstr "Commande"
 #: InterfaceManager/__init__.py:457
 msgid "retainnonstatus"
 msgstr "Garder les infos hors status (reboot Z-Eye)"
+
+#: InterfaceManager/__init__.py:459
+msgid "err-fields-missing"
+msgstr "Certains champs sont manquants"
+
+#: InterfaceManager/__init__.py:460
+msgid "err-mail-invalid"
+msgstr "Adresse mail invalide"
+
+#: InterfaceManager/__init__.py:461
+msgid "err-mail-match"
+msgstr "Les adresses mails ne correspondent pas"
+
+#: InterfaceManager/__init__.py:462
+msgid "err-name-invalid"
+msgstr "Le nom spécifié est invalide (lettres uniquement)"
+
+#: InterfaceManager/__init__.py:463
+msgid "err-pwd-match"
+msgstr "Les mots de passe ne correspondent pas"
+
+#: InterfaceManager/__init__.py:464
+msgid "err-pwd-too-weak"
+msgstr "Le mot de passe n'est pas assez complexe"
+
+#: InterfaceManager/__init__.py:465
+msgid "err-step-invalid"
+msgstr "étape demandée invalide !"
+
+#: InterfaceManager/__init__.py:466
+msgid "err-surname-invalid"
+msgstr "Le prénom spécifié est invalide (lettres uniquement)"
+
+#: InterfaceManager/__init__.py:467
+msgid "err-username-invalid"
+msgstr "Nom d'utilisateur invalide"
+
+#: InterfaceManager/__init__.py:468
+msgid "Finish"
+msgstr "Terminer"
+
+#: InterfaceManager/__init__.py:469
+msgid "Lets-Go"
+msgstr "C'est parti !"
+
+#: InterfaceManager/__init__.py:470
+msgid "Mail"
+msgstr "Adresse mail"
+
+#: InterfaceManager/__init__.py:471
+msgid "Mail-repeat"
+msgstr "Répétez l'adresse mail"
+
+#: InterfaceManager/__init__.py:476
+msgid "Send"
+msgstr "Envoyer"
+
+#: InterfaceManager/__init__.py:477
+msgid "Surname"
+msgstr "Prénom"
+
+#: InterfaceManager/__init__.py:478
+msgid "title-admin-set"
+msgstr "Configuration de l'administrateur"
+
+#: InterfaceManager/__init__.py:479
+msgid "title-master-install"
+msgstr "Installation de Z-Eye"
+
+#: InterfaceManager/__init__.py:480
+msgid "title-welcome"
+msgstr "Bienvenue !"
+
+#: InterfaceManager/__init__.py:481
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: InterfaceManager/__init__.py:483
+msgid "text-admin-set"
+msgstr ""
+"L'administrateur a tous les droits sur Z-Eye, il est impossible de lui "
+"restreindre l'accès à un module, quand bien même on lui aurait retiré les "
+"droits. Il possède également un accès privilégié à quelques fonctions de "
+"développement comme la réorganisation des menus.<br > Vous pourrez spécifier "
+"ici un mot de passe et une adresse mail afin que vos utilisateurs puissent "
+"vous contacter en cas de problème"
+
+#: InterfaceManager/__init__.py:484
+msgid "text-finish"
+msgstr ""
+"Félicitations ! L'installation est désormais terminée. L'application est "
+"désormais pleinement utilisable avec les identifiants fournis. Appuyez sur "
+"le bouton Terminer pour commenter à utiliser Z-Eye !"
+
+#: InterfaceManager/__init__.py:485
+msgid "text-welcome"
+msgstr ""
+"Bienvenue dans l'installeur de Z-Eye.<br /><br />Merci d'avoir choisi cette "
+"solution pour vos besoins en terme de gestion réseau et monitoring. Cette "
+"solution propose un ensemble de services optionnels. Il n'est pas nécessaire "
+"d'utiliser tous les systèmes embarqués, néanmoins, dans un souci de "
+"visibilité, il est conseillé d'utiliser les modules réseau ensemble<br /"
+"><br />Cet installeur va vous permettre de configurer les premiers "
+"paramètres de Z-Eye"
+
+#: InterfaceManager/__init__.py:486
+msgid "title-install-finished"
+msgstr "Installation terminée"
+
+#: InterfaceManager/__init__.py:490
+msgid "add-to-dynamic-distrib"
+msgstr "Ajouter au pool de distribution dynamique"
+
+#: InterfaceManager/__init__.py:492
+msgid "Available-s"
+msgstr "Distribuables"
+
+#: InterfaceManager/__init__.py:493
+msgid "bad-filter"
+msgstr "Filtre invalide !"
+
+#: InterfaceManager/__init__.py:494
+msgid "Baux"
+msgstr "Baux"
+
+#: InterfaceManager/__init__.py:495
+msgid "boolean"
+msgstr "Booléen"
+
+#: InterfaceManager/__init__.py:496
+msgid "change-interval"
+msgstr "Changer l'intervalle"
+
+#: InterfaceManager/__init__.py:497
+msgid "choose-net"
+msgstr "Veuillez choisir le réseau IP à monitorer"
+
+#: InterfaceManager/__init__.py:498
+msgid "Cluster-master"
+msgstr "Noeud maître du cluster"
+
+#: InterfaceManager/__init__.py:499
+msgid "Cluster-members"
+msgstr "Membres du cluster"
+
+#: InterfaceManager/__init__.py:500
+msgid "Cluster-mode"
+msgstr "Mode de cluster"
+
+#: InterfaceManager/__init__.py:501
+msgid "Cluster-name"
+msgstr "Nom du cluster"
+
+#: InterfaceManager/__init__.py:502
+msgid "clustering-ip"
+msgstr "Adresse IP source du cluster"
+
+#: InterfaceManager/__init__.py:503
+msgid "create-option"
+msgstr "Définir une option"
+
+#: InterfaceManager/__init__.py:504
+msgid "create-option-group"
+msgstr "Créer un groupe d'options"
+
+#: InterfaceManager/__init__.py:506
+msgid "configure-ip-range"
+msgstr "Configurer les intervales de distribution dynamique"
+
+#: InterfaceManager/__init__.py:507
+msgid "confirm-import-reserv"
+msgstr ""
+"Êtes vous sûr de vouloir importer la réservation pour l'adresse IP '%s' ?"
+
+#: InterfaceManager/__init__.py:508
+msgid "confirm-remove-dhcp-cluster"
+msgstr ""
+"Êtes vous sûr de vouloir supprimer le cluster '%s' ?<br />Cela aura pour "
+"effet de retirer tous les liens reliant ce cluster des subnets."
+
+#: InterfaceManager/__init__.py:509
+msgid "confirm-remove-custom-option"
+msgstr "Êtes vous sûr de vouloir supprimer l'option DHCP customisée '%s' ?"
+
+#: InterfaceManager/__init__.py:510
+msgid "confirm-remove-declared-subnet"
+msgstr "Êtes vous sûr de vouloir supprimer le subnet IP '%s' ?"
+
+#: InterfaceManager/__init__.py:511
+msgid "confirm-remove-dhcp"
+msgstr ""
+"Êtes vous sûr de vouloir supprimer le serveur sources de données '%s' ?"
+
+#: InterfaceManager/__init__.py:512
+msgid "confirm-remove-option"
+msgstr "Êtes vous sûr de vouloir supprimer l'option '%s' ?"
+
+#: InterfaceManager/__init__.py:513
+msgid "Consult"
+msgstr "Consulter"
+
+#: InterfaceManager/__init__.py:514
+msgid "Contact"
+msgstr "Contact"
+
+#: InterfaceManager/__init__.py:515
+msgid "create-custom-option"
+msgstr "Créer une option personnalisée"
+
+#: InterfaceManager/__init__.py:516
+msgid "crit-line"
+msgstr "Seuil critique"
+
+#: InterfaceManager/__init__.py:518
+msgid "declare-subnet"
+msgstr "Déclarer un réseau IP"
+
+#: InterfaceManager/__init__.py:519
+msgid "default-lease-time"
+msgstr "Durée par défaut des baux DHCP"
+
+#: InterfaceManager/__init__.py:520
+msgid "dhcp-cluster"
+msgstr "Cluster DHCP"
+
+#: InterfaceManager/__init__.py:521
+msgid "dhcp-clusters"
+msgstr "Clusters DHCP"
+
+#: InterfaceManager/__init__.py:522
+msgid "dhcp-type"
+msgstr "Type de DHCP"
+
+#: InterfaceManager/__init__.py:523
+msgid "dhcpd-path"
+msgstr "Chemin vers le fichier dhcpd.conf"
+
+#: InterfaceManager/__init__.py:524
+msgid "Distributed"
+msgstr "Disponible"
+
+#: InterfaceManager/__init__.py:525
+msgid "Distributed-by-ipmanager"
+msgstr "Disponibles (Z-Eye)"
+
+#: InterfaceManager/__init__.py:526
+msgid "DNS"
+msgstr "Serveur de noms"
+
+#: InterfaceManager/__init__.py:527
+msgid "domain-name"
+msgstr "Suffixe DNS"
+
+#: InterfaceManager/__init__.py:528
+msgid "end-ip"
+msgstr "Adresse IP de fin"
+
+#: InterfaceManager/__init__.py:529
+msgid "En-IP-history"
+msgstr "Activer l'historique IP"
+
+#: InterfaceManager/__init__.py:530
+msgid "En-monitor"
+msgstr "Activer le monitoring de capacité"
+
+#: InterfaceManager/__init__.py:532
+msgid "err-bad-hostname"
+msgstr "Le nom d'hôte '%s' est invalide"
+
+#: InterfaceManager/__init__.py:533
+msgid "err-bad-ip-addr"
+msgstr "L'adresse IP '%s' est invalide"
+
+#: InterfaceManager/__init__.py:534
+msgid "err-bad-mac-addr"
+msgstr "L'adresse MAC '%s' est invalide"
+
+#: InterfaceManager/__init__.py:535
+msgid "err-bad-range-action"
+msgstr "Action non supportée"
+
+#: InterfaceManager/__init__.py:536
+msgid "err-bad-subnet"
+msgstr "Le subnet entré est invalide !"
+
+#: InterfaceManager/__init__.py:537
+msgid "err-clustermaster-iscdhcp"
+msgstr "Ce type de cluster nécessite un maître"
+
+#: InterfaceManager/__init__.py:538
+msgid "err-clustermaster-not-in-members"
+msgstr "Le maître choisi ne fait pas partie du cluster"
+
+#: InterfaceManager/__init__.py:539
+msgid "err-clustermode-require-two"
+msgstr "Ce mode de cluster requiert exactement 2 serveurs DHCP"
+
+#: InterfaceManager/__init__.py:541
+msgid "err-cluster-need-members"
+msgstr "Un cluster doit avoir un membre ou plus"
+
+#: InterfaceManager/__init__.py:543
+msgid "err-comment-too-long"
+msgstr "Le commentaire dépasse la taille autorisée"
+
+#: InterfaceManager/__init__.py:544
+msgid "err-custom-option-already-exists"
+msgstr "Cette option personnalisée existe déjà"
+
+#: InterfaceManager/__init__.py:545
+msgid "err-custom-option-not-exists"
+msgstr "Cette option personnalisée n'existe pas"
+
+#: InterfaceManager/__init__.py:546
+msgid "err-dlease-sup-mlease"
+msgstr "La durée par défaut est supérieure à la durée maximale !"
+
+#: InterfaceManager/__init__.py:547
+msgid "err-dhcpserver-invalid-alias"
+msgstr "Alias du serveur DHCP invalide"
+
+#: InterfaceManager/__init__.py:548
+msgid "err-dhcpserver-invalid-clusteraddr"
+msgstr "L'adresse IP source du cluster est invalide"
+
+#: InterfaceManager/__init__.py:549
+msgid "err-dhcpserver-dhcpdpath"
+msgstr "Le chemin du fichier dhcpd.conf n'est pas sous une forme acceptable"
+
+#: InterfaceManager/__init__.py:550
+msgid "err-dhcpserver-leasepath"
+msgstr "Le chemin du fichier dhcpd.leases n'est pas sous une forme acceptable"
+
+#: InterfaceManager/__init__.py:551
+msgid "err-dhcpserver-not-exists"
+msgstr "Ce serveur DHCP n'existe pas !"
+
+#: InterfaceManager/__init__.py:552
+msgid "err-dhcpserver-reservconf"
+msgstr ""
+"Le chemin du fichier de réservations n'est pas sous une forme acceptable"
+
+#: InterfaceManager/__init__.py:553
+msgid "err-dhcpserver-subnetconf"
+msgstr "Le chemin du fichier de réseaux n'est pas sous une forme acceptable"
+
+#: InterfaceManager/__init__.py:554
+msgid "err-dhcp-option-not-exists"
+msgstr "Cette option DHCP n'existe pas"
+
+#: InterfaceManager/__init__.py:555
+msgid "err-dhcp-opts-group-already-exists"
+msgstr "Un groupe d'options DHCP avec ce nom existe déjà"
+
+#: InterfaceManager/__init__.py:556
+msgid "err-dhcp-opts-group-not-exists"
+msgstr "Ce groupe d'options DHCP n'existe pas"
+
+#: InterfaceManager/__init__.py:557
+msgid "err-distrib-subnet-need-infos"
+msgstr ""
+"La distribution d'un réseau nécessite les informations suivantes: Routeur, "
+"DNS1, Suffixe DNS"
+
+#: InterfaceManager/__init__.py:558
+msgid "err-endip-not-in-range"
+msgstr "L'IP de fin n'est pas incluse dans le réseau"
+
+#: InterfaceManager/__init__.py:559
+msgid "err-expiration-date-invalid"
+msgstr "La date d'expiration est invalide"
+
+#: InterfaceManager/__init__.py:560
+msgid "err-expiration-date-must-be-today-or-more"
+msgstr "La date d'expiration doit être fixée au minimum à aujourd'hui"
+
+#: InterfaceManager/__init__.py:561
+msgid "err-hostname-already-defined"
+msgstr "Ce nom d'hôte est déjà utilisé par une autre IP"
+
+#: InterfaceManager/__init__.py:562
+msgid "err-hostname-already-used"
+msgstr "Le nom d'hôte '%s' est déjà utilisé"
+
+#: InterfaceManager/__init__.py:563
+msgid "err-invalid-csv"
+msgstr "Fichier CSV invalide"
+
+#: InterfaceManager/__init__.py:564
+msgid "err-invalid-csv-entry"
+msgstr "Entrée du fichier CSV invalide: '%s'"
+
+#: InterfaceManager/__init__.py:565
+msgid "err-invalid-csv-entry-multiple-hostname"
+msgstr "Le nom d'hôte '%s' est référencé plusieurs fois"
+
+#: InterfaceManager/__init__.py:566
+msgid "err-invalid-csv-entry-multiple-ip"
+msgstr "L'adresse IP '%s' est référencée plusieurs fois"
+
+#: InterfaceManager/__init__.py:567
+msgid "err-invalid-csv-entry-multiple-mac"
+msgstr "L'adresse MAC '%s' est référencée plusieurs fois"
+
+#: InterfaceManager/__init__.py:568
+msgid "err-invalid-hostname"
+msgstr "Le nom d'hôte '%s' est invalide"
+
+#: InterfaceManager/__init__.py:569
+msgid "err-invalid-ip"
+msgstr "L'adresse IP '%s' est invalide"
+
+#: InterfaceManager/__init__.py:570
+msgid "err-invalid-mac"
+msgstr "L'adresse MAC '%s' est invalide"
+
+#: InterfaceManager/__init__.py:572
+msgid "err-ip-not-in-cache"
+msgstr "L'adresse IP '%s' n'est pas dans le cache"
+
+#: InterfaceManager/__init__.py:573
+msgid "err-ip-already-used"
+msgstr "L'adresse IP '%s' est déjà utilisée"
+
+#: InterfaceManager/__init__.py:574
+msgid "err-ip-not-in-subnet"
+msgstr "L'adresse IP '%s' n'est pas dans le réseau '%s'"
+
+#: InterfaceManager/__init__.py:575
+msgid "err-ip-not-in-declared-subnets"
+msgstr ""
+"Cette IP n'est pas dans un réseau déclaré ! Veuillez déclarer un réseau afin "
+"de pouvoir l'éditer"
+
+#: InterfaceManager/__init__.py:576
+msgid "err-mac-already-used"
+msgstr "L'adresse MAC '%s' est déjà utilisée"
+
+#: InterfaceManager/__init__.py:577
+msgid "err-mac-already-used-in-subnet"
+msgstr ""
+"Cette adresse MAC est déjà utilisée dans le réseau, choisissez en une autre."
+
+#: InterfaceManager/__init__.py:578
+msgid "err-miss-data"
+msgstr "Certaines données sont manquantes ou invalides !"
+
+#: InterfaceManager/__init__.py:579
+msgid "err-need-dhcp-server"
+msgstr "Au moins un serveur DHCP doit être déclaré pour utiliser les clusters"
+
+#: InterfaceManager/__init__.py:580
+msgid "err-no-dhcp-custom-option"
+msgstr ""
+"Aucune option DHCP personnalisée définie. Cet élément nécessite une option "
+"DHCP personnalisée"
+
+#: InterfaceManager/__init__.py:581
+msgid "err-no-dhcp-option"
+msgstr "Aucune option DHCP configurée"
+
+#: InterfaceManager/__init__.py:582
+msgid "err-no-info-for-ip-addr"
+msgstr "Aucune information trouvée pour l'adresse IP '%s'"
+
+#: InterfaceManager/__init__.py:583
+msgid "err-option-already-exists"
+msgstr "Une option DHCP avec ce nom existe déjà"
+
+#: InterfaceManager/__init__.py:584
+msgid "err-option-code-lower-255"
+msgstr "Le code d'option DHCP est un nombre non signé entre 0 et 255"
+
+#: InterfaceManager/__init__.py:585
+msgid "err-option-code-protected"
+msgstr ""
+"Ce code d'option est protégé. Vous devez choisir un code supérieur à 126"
+
+#: InterfaceManager/__init__.py:586
+msgid "err-option-not-exists"
+msgstr "Cette option DHCP n'existe pas !"
+
+#: InterfaceManager/__init__.py:587
+msgid "err-option-value-invalid"
+msgstr "La valeur associée à cette option est invalide"
+
+#: InterfaceManager/__init__.py:588
+msgid "err-pwd-not-match"
+msgstr "Les mots de passe ne correspondent pas"
+
+#: InterfaceManager/__init__.py:589
+msgid "err-remove-dhcpserver-master"
+msgstr "Impossible de supprimer ce serveur DHCP, il est maître du cluster '"
+
+#: InterfaceManager/__init__.py:590
+msgid "err-remove-dhcpserver-master2"
+msgstr ""
+"'. Vous devez d'abord intervenir afin d'élire un autre maître ou supprimer "
+"le cluster DHCP"
+
+#: InterfaceManager/__init__.py:591
+msgid "err-reserv-need-fields"
+msgstr "Les réservations nécessitent une adresse MAC et un nom d'hôte"
+
+#: InterfaceManager/__init__.py:592
+msgid "err-router-not-in-subnet"
+msgstr "La passerelle par défaut spécifiée n'est pas dans le réseau"
+
+#: InterfaceManager/__init__.py:593
+msgid "err-subnet-already-exists"
+msgstr "Ce réseau est déjà déclaré"
+
+#: InterfaceManager/__init__.py:594
+msgid "err-subnet-bad-ipv6-infos"
+msgstr "Les informations de réseau IPv6 sont incomplètes ou incorrectes"
+
+#: InterfaceManager/__init__.py:595
+msgid "err-subnet-not-exists"
+msgstr "Ce réseau n'existe pas"
+
+#: InterfaceManager/__init__.py:596
+msgid "err-ssh-conn-failed"
+msgstr ""
+"Connexion au serveur SSH impossible, vérifiez qu'il est possible de joindre "
+"le serveur SSH distant"
+
+#: InterfaceManager/__init__.py:597
+msgid "err-ssh-auth-failed"
+msgstr "Authentification échouée au serveur SSH"
+
+#: InterfaceManager/__init__.py:598
+msgid "err-startip-lower-endip"
+msgstr "L'adresse IP de départ est supériere à l'adresse IP de fin"
+
+#: InterfaceManager/__init__.py:599
+msgid "err-startip-not-in-range"
+msgstr "L'adresse IP de départ n'est pas dans le réseau"
+
+#: InterfaceManager/__init__.py:600
+msgid "err-unable-read"
+msgstr ""
+"Impossible de lire le fichier (il n'existe pas ou les droits sont incorrects)"
+
+#: InterfaceManager/__init__.py:601
+msgid "err-vlan-already-used"
+msgstr "Ce VLAN est déjà affecté à un autre réseau IP"
+
+#: InterfaceManager/__init__.py:602
+msgid "Expert-tools"
+msgstr "Outils avancés"
+
+#: InterfaceManager/__init__.py:603
+msgid "Expiration"
+msgstr "Date d'expiration"
+
+#: InterfaceManager/__init__.py:604
+msgid "Failover"
+msgstr "Maître/esclave"
+
+#: InterfaceManager/__init__.py:606
+msgid "Free"
+msgstr "Libre"
+
+#: InterfaceManager/__init__.py:607
+msgid "Free-s"
+msgstr "Libres"
+
+#: InterfaceManager/__init__.py:609
+msgid "Group-DHCP-opts"
+msgstr "Options DHCP associées au groupe"
+
+#: InterfaceManager/__init__.py:610
+msgid "History"
+msgstr "Historique"
+
+#: InterfaceManager/__init__.py:611
+msgid "Hostname"
+msgstr "Nom d'hôte"
+
+#: InterfaceManager/__init__.py:612
+msgid "import-dhcp-reserv"
+msgstr "Importer des réservations DHCP"
+
+#: InterfaceManager/__init__.py:613
+msgid "integer-8"
+msgstr "Entier signé 8 bits"
+
+#: InterfaceManager/__init__.py:614
+msgid "integer-16"
+msgstr "Entier signé 16 bits"
+
+#: InterfaceManager/__init__.py:615
+msgid "integer-32"
+msgstr "Entier signé 32 bits"
+
+#: InterfaceManager/__init__.py:616
+msgid "intval-days"
+msgstr "Intervalle (jours)"
+
+#: InterfaceManager/__init__.py:617
+msgid "in-cache"
+msgstr "En cache"
+
+#: InterfaceManager/__init__.py:618
+msgid "IP-Addr"
+msgstr "Adresse IP"
+
+#: InterfaceManager/__init__.py:619
+msgid "last-view"
+msgstr "Dernière vue"
+
+#: InterfaceManager/__init__.py:620
+msgid "Lease-end"
+msgstr "Fin du bail"
+
+#: InterfaceManager/__init__.py:621
+msgid "lease-path"
+msgstr "Chemin vers le fichier dhcpd.leases"
+
+#: InterfaceManager/__init__.py:622
+msgid "Loadbalancing"
+msgstr "Répartition de charge"
+
+#: InterfaceManager/__init__.py:623
+msgid "MAC-Addr"
+msgstr "Adresse MAC"
+
+#: InterfaceManager/__init__.py:624
+msgid "Manage-DHCP-Opts"
+msgstr "Gestion des options DHCP"
+
+#: InterfaceManager/__init__.py:625
+msgid "Manage-Servers"
+msgstr "Gestion des serveurs"
+
+#: InterfaceManager/__init__.py:626
+msgid "Manage-Subnets"
+msgstr "Gestion des réseaux IP"
+
+#: InterfaceManager/__init__.py:627
+msgid "max-age"
+msgstr "Age maximum"
+
+#: InterfaceManager/__init__.py:628
+msgid "max-lease-time"
+msgstr "Durée maximale des baux DHCP"
+
+#: InterfaceManager/__init__.py:629
+msgid "member-of"
+msgstr "Membre de"
+
+#: InterfaceManager/__init__.py:632
+msgid "modif-record"
+msgstr "Modifications enregistrées"
+
+#: InterfaceManager/__init__.py:633
+msgid "Monitoring"
+msgstr "Monitoring"
+
+#: InterfaceManager/__init__.py:634
+msgid "netid"
+msgstr "Adresse de réseau (IPv4)"
+
+#: InterfaceManager/__init__.py:635
+msgid "netidv6"
+msgstr "Adresse de réseau (IPv6)"
+
+#: InterfaceManager/__init__.py:636
+msgid "netmask"
+msgstr "Masque réseau"
+
+#: InterfaceManager/__init__.py:637
+msgid "Network"
+msgstr "Réseau"
+
+#: InterfaceManager/__init__.py:639
+msgid "note-needed"
+msgstr "Requis (*)"
+
+#: InterfaceManager/__init__.py:640
+msgid "no-net-found"
+msgstr "Aucun réseau distribué par DHCP découvert"
+
+#: InterfaceManager/__init__.py:641
+msgid "no-old-record"
+msgstr "Aucune réservation obsolète trouvée"
+
+#: InterfaceManager/__init__.py:642
+msgid "no-tab"
+msgstr "Cet onglet n'existe pas"
+
+#: InterfaceManager/__init__.py:643
+msgid "not-usable"
+msgstr "Non utilisables"
+
+#: InterfaceManager/__init__.py:644
+msgid "options"
+msgstr "Options"
+
+#: InterfaceManager/__init__.py:645
+msgid "option-alias"
+msgstr "Alias de l'option"
+
+#: InterfaceManager/__init__.py:646
+msgid "option-code"
+msgstr "Code"
+
+#: InterfaceManager/__init__.py:647
+msgid "option-group"
+msgstr "Groupe(s) d'options DHCP"
+
+#: InterfaceManager/__init__.py:648
+msgid "option-name"
+msgstr "Nom"
+
+#: InterfaceManager/__init__.py:649
+msgid "option-type"
+msgstr "Type"
+
+#: InterfaceManager/__init__.py:650
+msgid "option-value"
+msgstr "Valeur de l'option"
+
+#: InterfaceManager/__init__.py:651
+msgid "os-name"
+msgstr "OS"
+
+#: InterfaceManager/__init__.py:652
+msgid "Port"
+msgstr "Port"
+
+#: InterfaceManager/__init__.py:653
+msgid "prefixlen"
+msgstr "Longueur du préfixe IPv6"
+
+#: InterfaceManager/__init__.py:655
+msgid "remove-from-dynamic-distrib"
+msgstr "Supprimer du pool d'adresses dynamiques"
+
+#: InterfaceManager/__init__.py:656
+msgid "remove-history"
+msgstr "Supprimer l'historique DHCP ?"
+
+#: InterfaceManager/__init__.py:657
+msgid "required-if-cluster"
+msgstr "Requis si un cluster est sélectionné"
+
+#: InterfaceManager/__init__.py:658
+msgid "reservconf-path"
+msgstr "Fichier de réservations"
+
+#: InterfaceManager/__init__.py:659
+msgid "Reserv"
+msgstr "Réserver"
+
+#: InterfaceManager/__init__.py:660
+msgid "Reserved"
+msgstr "Réservée"
+
+#: InterfaceManager/__init__.py:661
+msgid "Reserved-by-ipmanager"
+msgstr "Réservée via Z-Eye"
+
+#: InterfaceManager/__init__.py:662
+msgid "Reservations"
+msgstr "Reservations"
+
+#: InterfaceManager/__init__.py:663
+msgid "router"
+msgstr "Passerelle par défaut"
+
+#: InterfaceManager/__init__.py:664
+#, fuzzy
+msgid "rule-manage-server"
+msgstr "Gestion des serveurs DHCP"
+
+#: InterfaceManager/__init__.py:669
+msgid "server-addr"
+msgstr "Adresse du serveur (IP/DNS)"
+
+#: InterfaceManager/__init__.py:670
+msgid "server-alias"
+msgstr "Alias"
+
+#: InterfaceManager/__init__.py:671
+msgid "server-desc"
+msgstr "Description"
+
+#: InterfaceManager/__init__.py:672
+msgid "Server-mgmt"
+msgstr "Gestion des serveurs"
+
+#: InterfaceManager/__init__.py:674
+msgid "ssh-pwd"
+msgstr "Mot de passe SSH"
+
+#: InterfaceManager/__init__.py:675
+msgid "ssh-pwd-repeat"
+msgstr "Répétez le mot de passe"
+
+#: InterfaceManager/__init__.py:676
+msgid "start-ip"
+msgstr "Adresse IP de début"
+
+#: InterfaceManager/__init__.py:678
+msgid "Status"
+msgstr "Statut"
+
+#: InterfaceManager/__init__.py:679
+msgid "Stuck-IP"
+msgstr "IP fixe"
+
+#: InterfaceManager/__init__.py:680
+msgid "subnetconf-path"
+msgstr "Fichier de subnets"
+
+#: InterfaceManager/__init__.py:681
+msgid "subnet-desc"
+msgstr "Description du réseau"
+
+#: InterfaceManager/__init__.py:682
+msgid "subnet-shortname"
+msgstr "Nom court (alias)"
+
+#: InterfaceManager/__init__.py:683
+msgid "Switch"
+msgstr "Equipement"
+
+#: InterfaceManager/__init__.py:684
+msgid "text"
+msgstr "Texte"
+
+#: InterfaceManager/__init__.py:685
+msgid "tip-custom-dhcp-opts"
+msgstr ""
+"Les options DHCP personnalisées permettent de créer des options non normées "
+"et utilisées par certains systèmes (TOIP notamment)"
+
+#: InterfaceManager/__init__.py:686
+msgid "tip-dhcp-opts"
+msgstr ""
+"Les options DHCP sont associées à des couples nom/valeur afin de définir "
+"ensuite des ensembles à associer à des subnets DHCP"
+
+#: InterfaceManager/__init__.py:687
+msgid "tip-dhcp-opt-group"
+msgstr ""
+"Les groupes d'options définissent des ensembles d'options configurées.<br /"
+">Ces groupes d'options peuvent ensuite être rattachés à des subnets afin de "
+"configurer des clients"
+
+#: InterfaceManager/__init__.py:688
+msgid "tip-import-reserv"
+msgstr ""
+"Permet d'importer des réservations dans le subnet sélectionné.<br />Il faut "
+"impérativement 3 champs:<ul><li>Nom d'hôte</li><li>Adresse MAC</"
+"li><li>Adresse IP</li></ul><br /><b>Attention !</b> Si le remplacement est "
+"sélectionné et que l'adresse IP, l'adresse MAC ou le nom d'hôte sont déjà "
+"utilisés autre part, cela remplacera l'entrée en conflit"
+
+#: InterfaceManager/__init__.py:689
+msgid "tip-inherit-if-null"
+msgstr "Laisser vide ou nul hérite les paramètres"
+
+#: InterfaceManager/__init__.py:690
+msgid "tip-range"
+msgstr ""
+"Configure un pool d'adresses dynamiques distribuées par le DHCP. Vous n'avez "
+"pas besoin d'exclure les réservations des pools d'adresses.<br />Les ranges "
+"qui se chevauchent sont automatiquement fusionnés."
+
+#: InterfaceManager/__init__.py:691
+msgid "tip-reserv"
+msgstr ""
+"L'adresse MAC 00:00:00:00:00:00 peut être utilisée pour bloquer des IP dans "
+"le DHCP"
+
+#: InterfaceManager/__init__.py:692
+msgid "title-add-server"
+msgstr "Ajouter un serveur DHCP"
+
+#: InterfaceManager/__init__.py:693
+msgid "title-custom-dhcp-opts"
+msgstr "Options DHCP personnalisées"
+
+#: InterfaceManager/__init__.py:694
+msgid "title-declared-subnets"
+msgstr "Réseaux déclarés"
+
+#: InterfaceManager/__init__.py:695
+msgid "title-dhcp-cluster-mgmt"
+msgstr "Gestion des clusters DHCP"
+
+#: InterfaceManager/__init__.py:696
+msgid "title-dhcp-opts"
+msgstr "Options DHCP"
+
+#: InterfaceManager/__init__.py:697
+msgid "title-dhcp-opts-group"
+msgstr "Groupe d'options DHCP"
+
+#: InterfaceManager/__init__.py:698
+msgid "title-dhcp-server-mgmt"
+msgstr "Gestion des serveurs DHCP"
+
+#: InterfaceManager/__init__.py:699
+msgid "title-history-1d"
+msgstr "Historique depuis 24 heures"
+
+#: InterfaceManager/__init__.py:700
+msgid "title-history-1w"
+msgstr "Historique depuis 1 semaine"
+
+#: InterfaceManager/__init__.py:701
+msgid "title-history-1m"
+msgstr "Historique depuis 1 mois"
+
+#: InterfaceManager/__init__.py:702
+msgid "title-history-1y"
+msgstr "Historique depuis 1 an"
+
+#: InterfaceManager/__init__.py:703
+msgid "title-history-since"
+msgstr "Historique depuis"
+
+#: InterfaceManager/__init__.py:704
+msgid "title-ip-management"
+msgstr "Gestion IP"
+
+#: InterfaceManager/__init__.py:705
+msgid "title-old-record"
+msgstr "Réservations obsolètes trouvées !"
+
+#: InterfaceManager/__init__.py:706
+#, fuzzy
+msgid "title-remove-dhcp"
+msgstr "Supprimer un serveur DHCP"
+
+#: InterfaceManager/__init__.py:707
+msgid "title-search-old"
+msgstr "Recherche de réservations obsolètes"
+
+#: InterfaceManager/__init__.py:708
+msgid "title-subnet-management"
+msgstr "Gestion de sous-réseau"
+
+#: InterfaceManager/__init__.py:709
+msgid "tooltip-clustermaster"
+msgstr ""
+"Définit le noeud maître du cluster.<br />Cette variable n'est utile que dans "
+"le cas d'un cluster en répartition de charge ou maître esclave. Si le mode "
+"<b>Répartition de charge</b> est utilisé, le noeud maître est le serveur "
+"décidant de la répartition de charge"
+
+#: InterfaceManager/__init__.py:710
+msgid "tooltip-clustermode"
+msgstr ""
+"Définit le mode de fonctionnement du cluster.<br /><b>Aucun</b>: ne "
+"configure pas le mode du cluster<br /><b>Maître/esclave</b>: définit un "
+"serveur maître et un serveur esclave qui ne répondra pas aux requêtes. "
+"Lorsque le maître est injoignable, l'esclave répond aux requêtes à sa place "
+"jusqu'à son retour. Cette configuration est idéale dans un fonctionnement "
+"avec des relais DHCP (ip helper).<br /><b>Répartition de charge</b>: les "
+"serveurs sélectionnés sont configurés en répartition de charge. Chaque "
+"serveur répond pour un pool d'adresses définit automatiquement. Si l'un des "
+"serveurs tombe l'autre prend le relai pour l'ensemble des requêtes. Cette "
+"configuration est idéale pour un DHCP directement connecté aux réseaux "
+"clients.<br /><b>Attention</b>: Les clusters Maître/eslave et Répartition de "
+"charge ne sont disponibles que pour des DHCP ISC"
+
+#: InterfaceManager/__init__.py:711
+msgid "tooltip-clustering-ip"
+msgstr ""
+"Adresse IP source du cluster DHCP. Celle-ci doit exister sur le serveur. Si "
+"celle-ci n'est pas précisée, l'adresse IP principale sera utilisée. <br /"
+">Utilisé uniquement dans un cluster ISC-DHCP."
+
+#: InterfaceManager/__init__.py:712
+#, fuzzy
+msgid "tooltip-comment"
+msgstr "Un commentaire arbitraire afin de décrire l'adresse ou l'hôte concerné"
+
+#: InterfaceManager/__init__.py:713
+msgid "tooltip-contact"
+msgstr "@ mail recevant les alertes d'obsolescence"
+
+#: InterfaceManager/__init__.py:714
+msgid "tooltip-default-lease-time"
+msgstr "Durée par défaut (en secondes) des baux DHCP (30 secondes minimum)"
+
+#: InterfaceManager/__init__.py:715
+msgid "tooltip-desc"
+msgstr "Description courte du réseau (128 caractères)"
+
+#: InterfaceManager/__init__.py:716
+msgid "tooltip-dhcpdpath"
+msgstr ""
+"Chemin vers le fichier de configuration principal du dhcpd, généralement /"
+"etc/dhcpd.conf"
+
+#: InterfaceManager/__init__.py:717
+msgid "tooltip-dhcp-alias"
+msgstr ""
+"Un nom permettant d'identifier rapidement le serveur. Ce nom ne peut "
+"contenir que des chiffres et des lettres et est unique."
+
+#: InterfaceManager/__init__.py:718
+msgid "tooltip-dhcp-cluster-distrib"
+msgstr "Un ou plusieurs clusters DHCP qui distribueront le subnet"
+
+#: InterfaceManager/__init__.py:719
+msgid "tooltip-dhcp-desc"
+msgstr "Une description courte (128 caractères) du serveur"
+
+#: InterfaceManager/__init__.py:720
+msgid "tooltip-dhcp-option-code"
+msgstr ""
+"Spécifie un code unique d'option DHCP. Doit être strictement supérieur à 125"
+
+#: InterfaceManager/__init__.py:721
+msgid "tooltip-dhcp-option-group"
+msgstr ""
+"Spécifie les groupes d'options DHCP (facultatifs) à utiliser pour ce subnet "
+"lors de la distribution d'adresses via DHCP"
+
+#: InterfaceManager/__init__.py:722
+msgid "tooltip-dhcp-option-value"
+msgstr ""
+"boolean: true/false<br />integer: entier<br />ip: une adresse IPv4<br /"
+">text: ce que vous souhaitez"
+
+#: InterfaceManager/__init__.py:723
+msgid "tooltip-dhcp-server-ip"
+msgstr ""
+"Nom ou adresse IP du serveur. Celle-ci est utilisée pour se connecter en SSH "
+"afin de configurer le DHCP."
+
+#: InterfaceManager/__init__.py:724
+msgid "tooltip-domainname"
+msgstr ""
+"Il s'agit du nom de domaine apposé en tant que suffixe au nom d'hôte de la "
+"machine"
+
+#: InterfaceManager/__init__.py:725
+msgid "tooltip-import-reserv"
+msgstr "Importe la réservation IP depuis le cache de Z-Eye"
+
+#: InterfaceManager/__init__.py:726
+msgid "tooltip-ipv6"
+msgstr "Adresse réseau IPv6 (utilisée par le gestionnaire DNS)"
+
+#: InterfaceManager/__init__.py:727
+msgid "tooltip-ip-expiration"
+msgstr ""
+"Spécifie une date d'expiration après laquelle la réservation sera supprimée. "
+"Laisser le champ vide définit que la réservation n'expire jamais."
+
+#: InterfaceManager/__init__.py:728
+msgid "tooltip-ip-hostname"
+msgstr ""
+"Nom d'hôte de la machine. Ce n'est pas forcément le nom d'hôte de la "
+"machine, cependant certains systèmes choisissent le nom d'hôte provenant du "
+"DHCP. Ce champ ne peut contenir que des lettres, tirets '-' et chiffres. Il "
+"ne doit pas commencer par un chiffre ni par un tiret et ne doit pas se "
+"terminer par un tiret"
+
+#: InterfaceManager/__init__.py:729
+msgid "tooltip-ip-reserv"
+msgstr ""
+"Réserve cette IP dans les clusters DHCP concernés (si le subnet est lié à un "
+"cluster, autrement n'a aucun effet)"
+
+#: InterfaceManager/__init__.py:730
+msgid "tooltip-leasepath"
+msgstr ""
+"Chemin vers le fichier de référence des baux, généralement /var/db/dhcpd."
+"leases"
+
+#: InterfaceManager/__init__.py:731
+msgid "tooltip-max-age"
+msgstr ""
+"Délai maximum (en jours) avant d'avertir de l'obsolescence d'une réservation."
+"<br />0 = pas de vérification"
+
+#: InterfaceManager/__init__.py:732
+msgid "tooltip-max-lease-time"
+msgstr "Durée maximale (en secondes) des baux DHCP (60 secondes minimum)"
+
+#: InterfaceManager/__init__.py:733
+msgid "tooltip-prefixlen"
+msgstr "Longueur du préfixe IPv6 (1-126)"
+
+#: InterfaceManager/__init__.py:734
+msgid "tooltip-reservconfpath"
+msgstr ""
+"Pour un usage futur, chemin vers un fichier accessible en écriture afin de "
+"réserver des hôtes. Non obligatoire"
+
+#: InterfaceManager/__init__.py:735
+msgid "tooltip-router"
+msgstr ""
+"La passerelle par défaut définit le routeur utilisé par les clients pour "
+"sortir du réseau"
+
+#: InterfaceManager/__init__.py:736
+msgid "tooltip-shortname"
+msgstr "Alias utilisé pour identifier le réseau"
+
+#: InterfaceManager/__init__.py:737
+msgid "tooltip-subnetconfpath"
+msgstr ""
+"Pour un usage futur, chemin vers un fichier accessible en écriture afin de "
+"créer des subnets. Non obligatoire"
+
+#: InterfaceManager/__init__.py:738
+msgid "tooltip-vlanid"
+msgstr "ID numérique du VLAN associé à ce réseau. (0 pour ne pas en associer)"
+
+#: InterfaceManager/__init__.py:739
+#, python-format
+msgid "tooltip-%use"
+msgstr "% d'utilisation"
+
+#: InterfaceManager/__init__.py:740
+msgid "uinteger-8"
+msgstr "Entier non signé 8 bits"
+
+#: InterfaceManager/__init__.py:741
+msgid "uinteger-16"
+msgstr "Entier non signé 16 bits"
+
+#: InterfaceManager/__init__.py:742
+msgid "uinteger-32"
+msgstr "Entier non signé 32 bits"
+
+#: InterfaceManager/__init__.py:743
+msgid "Usable"
+msgstr "Utilisables"
+
+#: InterfaceManager/__init__.py:744
+msgid "Used"
+msgstr "Utilisée"
+
+#: InterfaceManager/__init__.py:745
+msgid "vlanid"
+msgstr "ID de vlan"
+
+#: InterfaceManager/__init__.py:746
+msgid "warn-line"
+msgstr "Seuil d'avertissement"
+
+#: InterfaceManager/__init__.py:747
+msgid "confirm-remove-reservation"
+msgstr ""
+"Êtes vous sûr de vouloir supprimer les données pour l'adresse IP '%s' ?"
+
+#: InterfaceManager/__init__.py:748
+msgid "err-already-exists"
+msgstr "Le serveur SSH mentionné existe déjà"
+
+#: InterfaceManager/__init__.py:749
+msgid "rule-manage-servers"
+msgstr "Gestion des serveurs DHCP"
+
+#: InterfaceManager/__init__.py:750
+msgid "title-remove-server"
+msgstr "Supprimer un serveur DHCP"
+
+#: InterfaceManager/__init__.py:751
+msgid "tooltip-ip-comment"
+msgstr "Un commentaire arbitraire afin de décrire l'adresse ou l'hôte concerné"
 
 #: engine/snmpmgmt/Forms/__init__.py:40
 msgid "Err-Object-Not-Exists"
