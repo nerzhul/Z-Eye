@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 13:48+0200\n"
+"POT-Creation-Date: 2014-07-29 18:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -236,6 +236,153 @@ msgstr "inconnu"
 msgid "Yes"
 msgstr "Oui"
 
+#: InterfaceManager/__init__.py:95
+#, fuzzy
+msgid "Connect"
+msgstr "Connexion"
+
+#: InterfaceManager/__init__.py:96
+#, fuzzy
+msgid "err-bad-user"
+msgstr "Données invalides"
+
+#: InterfaceManager/__init__.py:97
+#, fuzzy
+msgid "err-unk"
+msgstr "Module inconnu "
+
+#: InterfaceManager/__init__.py:98
+#, fuzzy
+msgid "inactivity-disconnect"
+msgstr "Êtes vous sûr de vouloir vous déconnecter ?"
+
+#: InterfaceManager/__init__.py:99
+msgid "Login"
+msgstr "Utilisateur"
+
+#: InterfaceManager/__init__.py:101
+msgid "Password"
+msgstr "Mot de passe"
+
+#: InterfaceManager/__init__.py:103
+msgid "title-conn"
+msgstr "Connexion à l'espace d'administration"
+
+#: InterfaceManager/__init__.py:105
+msgid "alert-on"
+msgstr "alerte(s) sur"
+
+#: InterfaceManager/__init__.py:106
+msgid "alert-s"
+msgstr "alerte(s)"
+
+#: InterfaceManager/__init__.py:107
+msgid "Attack"
+msgstr "Attaques"
+
+#: InterfaceManager/__init__.py:108
+msgid "Availability"
+msgstr "Disponibilité"
+
+#: InterfaceManager/__init__.py:109
+msgid "CRITICAL"
+msgstr "CRITIQUE"
+
+#: InterfaceManager/__init__.py:110
+msgid "critical-s"
+msgstr "critique(s)"
+
+#: InterfaceManager/__init__.py:111
+msgid "DOWN"
+msgstr "INJOIGNABLE"
+
+#: InterfaceManager/__init__.py:112
+#, fuzzy
+msgid "Duration"
+msgstr "Durée"
+
+#: InterfaceManager/__init__.py:113
+#, fuzzy
+msgid "err-detect-atk"
+msgstr "Menace détectée !"
+
+#: InterfaceManager/__init__.py:114
+msgid "err-icinga"
+msgstr "Erreur de services rapportées par Icinga"
+
+#: InterfaceManager/__init__.py:115
+msgid "err-icinga-off"
+msgstr "Service de monitoring OFFLINE"
+
+#: InterfaceManager/__init__.py:116
+#, fuzzy
+msgid "err-net"
+msgstr "Problème(s) de bande passante"
+
+#: InterfaceManager/__init__.py:117
+msgid "err-security"
+msgstr "Attaques des 60 dernières minutes"
+
+#: InterfaceManager/__init__.py:118
+msgid "Host"
+msgstr "Hôte"
+
+#: InterfaceManager/__init__.py:119
+msgid "inc-bw"
+msgstr "Débit Entrant"
+
+#: InterfaceManager/__init__.py:120
+msgid "ipaddr"
+msgstr "Adresse IP"
+
+#: InterfaceManager/__init__.py:121
+msgid "Link"
+msgstr "Lien"
+
+#: InterfaceManager/__init__.py:124
+msgid "out-bw"
+msgstr "Débit Sortant"
+
+#: InterfaceManager/__init__.py:125
+msgid "sensors"
+msgstr "sondes"
+
+#: InterfaceManager/__init__.py:126
+msgid "Service"
+msgstr "Service"
+
+#: InterfaceManager/__init__.py:127
+msgid "Since-icinga-start"
+msgstr "Depuis le démarrage du processus Icinga"
+
+#: InterfaceManager/__init__.py:128
+msgid "State"
+msgstr "Statut"
+
+#: InterfaceManager/__init__.py:129
+msgid "state-net"
+msgstr "Etat du réseau"
+
+#: InterfaceManager/__init__.py:130
+msgid "state-security"
+msgstr "Etat de la sécurité"
+
+#: InterfaceManager/__init__.py:131
+msgid "state-srv"
+msgstr "Etat des services"
+
+#: InterfaceManager/__init__.py:132
+msgid "Status-information"
+msgstr "Informations de statut"
+
+#: InterfaceManager/__init__.py:133
+msgid "WARN"
+msgstr "ATTENTION"
+
+#: InterfaceManager/__init__.py:134
+msgid "warning-s"
+msgstr "avertissement(s)"
+
 #: engine/snmpmgmt/Forms/__init__.py:40
 msgid "Err-Object-Not-Exists"
 msgstr "L'objet demandé n'existe pas"
@@ -259,3 +406,6 @@ msgstr "Ecriture"
 #: templates/footer.html:3
 msgid "by"
 msgstr "par"
+
+#~ msgid "connok-then-load"
+#~ msgstr "Connexion réussie. Chargement de l'interface."

@@ -17,75 +17,44 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	final class lDefault extends FSLocales {
+	//final class lDefault extends FSLocales {
+	new lDefault();
+	final class lDefault {
 		function __construct() {
-			parent::__construct();
+			//parent::__construct();
 			$locales = array(
 				"fr" => array(
-					"alert-on" => "alerte(s) sur",
-					"alert-s" => "alerte(s)",
-					"Attack" => "Attaques",
-					"Availability" => "Disponibilité",
-					"CRITICAL" => "CRITIQUE",
-					"critical-s" => "critique(s)",
-					"DOWN" => "INJOIGNABLE",
-					"Duration" => "Durée",
-					"err-detect-atk" => "Menace détectée !",
-					"err-icinga" => "Erreur de services rapportées par Icinga",
-					"err-icinga-off" => "Service de monitoring OFFLINE",
-					"err-net" => "Problème(s) de bande passante",
-					"err-security" => "Attaques des 60 dernières minutes",
-					"Host" => "Hôte",
-					"inc-bw" => "Débit Entrant",
-					"ipaddr" => "Adresse IP",
-					"Link" => "Lien",
 					"menu-name" => "Supervision",
 					"menu-title" => "Speed reporting",
-					"out-bw" => "Débit Sortant",
-					"sensors" => "sondes",
-					"Service" => "Service",
-					"Since-icinga-start" => "Depuis le démarrage du processus Icinga",
-					"State" => "Statut",
-					"state-net" => "Etat du réseau",
-					"state-security" => "Etat de la sécurité",
-					"state-srv" => "Etat des services",
-					"Status-information" => "Informations de statut",
-					"WARN" => "ATTENTION",
-					"warning-s" => "avertissement(s)",
 				),
 				"en" => array(
-					"alert-on" => "alert(s) on",
-					"alert-s" => "alert(s)",
-					"Attack" => "Attacks",
-					"Availability" => "Availability",
-					"CRITICAL" => "CRITICAL",
-					"critical-s" => "critical(s)",
-					"DOWN" => "DOWN",
-					"Duration" => "Duration",
-					"err-detect-atk" => "Threat detected !",
-					"err-icinga" => "Icinga services report",
-					"err-icinga-off" => "Service Monitor OFFLINE",
-					"err-net" => "Bandwidth problems",
-					"err-security" => "Last 60 minutes' attacks",
-					"Host" => "Host",
-					"inc-bw" => "Input Bandwidth",
-					"ipaddr" => "IP Address",
-					"Link" => "Link",
 					"menu-name" => "Supervision",
 					"menu-title" => "Speed reporting",
-					"out-bw" => "Output bandwidth",
-					"sensors" => "sensors",
-					"Service" => "Service",
-					"Since-icinga-start" => "Since icinga start",
-					"State" => "State",
-					"state-net" => "Network state",
-					"state-security" => "Security state",
-					"state-srv" => "Services state",
-					"Status-information" => "Status information",
-					"WARN" => "WARNING",
-					"warning-s" => "warning(s)",
 				)
 			);
+			$msgidbuf = array();
+			foreach ($locales["en"] as $locname => $value) {
+				echo sprintf("msgid \"%s\"\nmsgstr \"%s\"\n\n",
+					$locname,
+					$value);
+				if (!in_array($locname,$msgidbuf)) {
+					$msgidbuf[] = $locname;
+				}
+
+			}
+			echo "\n\n==================================\n\n";
+			foreach ($locales["fr"] as $locname => $value) {
+				echo sprintf("msgid \"%s\"\nmsgstr \"%s\"\n\n",
+					$locname,
+					$value);
+				if (!in_array($locname,$msgidbuf)) {
+					$msgidbuf[] = $locname;
+				}
+			}
+			echo "\n\n==================================\n\n";
+			for ($i=0;$i<count($msgidbuf);$i++) {
+				echo sprintf("_('%s')\n",$msgidbuf[$i]);
+			}
 			$this->concat($locales);
 		}
 	};

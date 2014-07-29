@@ -208,7 +208,7 @@
 			if ($url) {
 				$url = "&".$url;
 			}
-			$this->setLoginResult("result-ok-load",true);
+			$this->setLoginResult("connok-then-load",true);
 			$js = "loadWindowHead();loadMainContainer('".$url."');closeLogin();";
 			FS::$iMgr->ajaxEchoOK("Done",$js);
 			FS::$iMgr->loadFooterPlugins();

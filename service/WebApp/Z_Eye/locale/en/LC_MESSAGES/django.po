@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 13:48+0200\n"
+"POT-Creation-Date: 2014-07-29 18:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -160,7 +160,7 @@ msgstr "Name"
 
 #: InterfaceManager/__init__.py:75
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: InterfaceManager/__init__.py:76
 msgid "None"
@@ -235,6 +235,153 @@ msgstr "unknown"
 msgid "Yes"
 msgstr "Yes"
 
+#: InterfaceManager/__init__.py:95
+#, fuzzy
+msgid "Connect"
+msgstr "Connection"
+
+#: InterfaceManager/__init__.py:96
+#, fuzzy
+msgid "err-bad-user"
+msgstr "Invalid datas"
+
+#: InterfaceManager/__init__.py:97
+#, fuzzy
+msgid "err-unk"
+msgstr "Unknown module !"
+
+#: InterfaceManager/__init__.py:98
+#, fuzzy
+msgid "inactivity-disconnect"
+msgstr "Are you sure you want to disconnect ?"
+
+#: InterfaceManager/__init__.py:99
+msgid "Login"
+msgstr "Login"
+
+#: InterfaceManager/__init__.py:101
+msgid "Password"
+msgstr "Password"
+
+#: InterfaceManager/__init__.py:103
+msgid "title-conn"
+msgstr "Connect to the admin panel"
+
+#: InterfaceManager/__init__.py:105
+msgid "alert-on"
+msgstr "alert(s) on"
+
+#: InterfaceManager/__init__.py:106
+msgid "alert-s"
+msgstr "alert(s)"
+
+#: InterfaceManager/__init__.py:107
+msgid "Attack"
+msgstr "Attacks"
+
+#: InterfaceManager/__init__.py:108
+msgid "Availability"
+msgstr "Availability"
+
+#: InterfaceManager/__init__.py:109
+msgid "CRITICAL"
+msgstr "CRITICAL"
+
+#: InterfaceManager/__init__.py:110
+msgid "critical-s"
+msgstr "critical(s)"
+
+#: InterfaceManager/__init__.py:111
+msgid "DOWN"
+msgstr "DOWN"
+
+#: InterfaceManager/__init__.py:112
+#, fuzzy
+msgid "Duration"
+msgstr "Duration"
+
+#: InterfaceManager/__init__.py:113
+#, fuzzy
+msgid "err-detect-atk"
+msgstr "Threat detected !"
+
+#: InterfaceManager/__init__.py:114
+msgid "err-icinga"
+msgstr "Icinga services report"
+
+#: InterfaceManager/__init__.py:115
+msgid "err-icinga-off"
+msgstr "Service Monitor OFFLINE"
+
+#: InterfaceManager/__init__.py:116
+#, fuzzy
+msgid "err-net"
+msgstr "Bandwidth problems"
+
+#: InterfaceManager/__init__.py:117
+msgid "err-security"
+msgstr "Last 60 minutes' attacks"
+
+#: InterfaceManager/__init__.py:118
+msgid "Host"
+msgstr "Host"
+
+#: InterfaceManager/__init__.py:119
+msgid "inc-bw"
+msgstr "Input Bandwidth"
+
+#: InterfaceManager/__init__.py:120
+msgid "ipaddr"
+msgstr "IP Address"
+
+#: InterfaceManager/__init__.py:121
+msgid "Link"
+msgstr "Link"
+
+#: InterfaceManager/__init__.py:124
+msgid "out-bw"
+msgstr "Output bandwidth"
+
+#: InterfaceManager/__init__.py:125
+msgid "sensors"
+msgstr "sensors"
+
+#: InterfaceManager/__init__.py:126
+msgid "Service"
+msgstr "Service"
+
+#: InterfaceManager/__init__.py:127
+msgid "Since-icinga-start"
+msgstr "Since icinga start"
+
+#: InterfaceManager/__init__.py:128
+msgid "State"
+msgstr "State"
+
+#: InterfaceManager/__init__.py:129
+msgid "state-net"
+msgstr "Network state"
+
+#: InterfaceManager/__init__.py:130
+msgid "state-security"
+msgstr "Security state"
+
+#: InterfaceManager/__init__.py:131
+msgid "state-srv"
+msgstr "Services state"
+
+#: InterfaceManager/__init__.py:132
+msgid "Status-information"
+msgstr "Status information"
+
+#: InterfaceManager/__init__.py:133
+msgid "WARN"
+msgstr "WARNING"
+
+#: InterfaceManager/__init__.py:134
+msgid "warning-s"
+msgstr "warning(s)"
+
 #: engine/snmpmgmt/Forms/__init__.py:40
 msgid "Err-Object-Not-Exists"
 msgstr "The requested object doesn't exists"
@@ -258,3 +405,6 @@ msgstr "Writing"
 #: templates/footer.html:3
 msgid "by"
 msgstr "by"
+
+#~ msgid "connok-then-load"
+#~ msgstr "Connection success. Loading interface."
