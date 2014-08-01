@@ -216,6 +216,7 @@
 				$this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>".
 				$this->loc->s("Lease-end")."</th><th>".$this->loc->s("Servers")."</th><th></th></tr></thead>";
 
+			// @TODO: cache this HTML output with Z-Eye service
 			foreach ($iparray as $key => $value) {
 				$style = "";
 				switch($value["distrib"]) {
