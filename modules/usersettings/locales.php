@@ -22,28 +22,13 @@
 			parent::__construct();
 			$locales = array(
 				"fr" => array(
-					"Account-parameters" => "Paramètres du compte",
-					"Android-options" => "Options Android",
-					"API-Key" => "Clef d'API",
-					"App-Lang" => "Langage de l'interface",
-					"Disconnect-after" => "Déconnexion après",
-					"Enable-Monitoring" => "Activer l'onglet monitoring",
-					"err-bad-lang" => "Langue non supportée",
 					"menu-name" => "",
-					"tooltip-disconnect-after" => "Cette valeur spécifie une durée maximale d'inactivité avant que Z-Eye ne déconnecte votre compte",
 				),
 				"en" => array(
-					"Account-parameters" => "Account parameters",
-					"Android-options" => "Android options",
-					"API-Key" => "API key",
-					"App-Lang" => "Interface language",
-					"Disconnect-after" => "Disconnect after",
-					"Enable-Monitoring" => "Enable monitoring tab",
-					"err-bad-lang" => "Unsupported language",
 					"menu-name" => "",
-					"tooltip-disconnect-after" => "This value set a maximum inactivity time before Z-Eye disconnect your account",
 				)
 			);
+			
 			$this->concat($locales);
 		}
 	};

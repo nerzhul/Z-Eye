@@ -361,7 +361,10 @@
 						switch($user->changePassword($pwd)) {
 							case 0: break; // ok
 							case 1: // too short
-								FS::$iMgr->ajaxEchoErrorNC("err-pwd-short");
+								FS::$iMgr->ajaxEchoErrorNC(
+									sprintf($this->loc->s("err-pwd-short"),Config::getPasswordMinLength()),
+									"", true
+								);
 								return;
 							case 2: // complexity
 								FS::$iMgr->ajaxEchoErrorNC("err-pwd-complex");

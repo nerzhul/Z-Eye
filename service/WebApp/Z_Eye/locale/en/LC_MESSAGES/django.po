@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-04 16:08+0200\n"
+"POT-Creation-Date: 2014-08-04 16:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,6 +29,7 @@ msgstr "Action"
 #: InterfaceManager/__init__.py:43 InterfaceManager/__init__.py:289
 #: InterfaceManager/__init__.py:308 InterfaceManager/__init__.py:488
 #: InterfaceManager/__init__.py:753 InterfaceManager/__init__.py:874
+#: InterfaceManager/__init__.py:1454
 msgid "Add"
 msgstr "Add"
 
@@ -96,6 +97,7 @@ msgstr "Error"
 
 #: InterfaceManager/__init__.py:59 InterfaceManager/__init__.py:531
 #: InterfaceManager/__init__.py:758 InterfaceManager/__init__.py:1272
+#: InterfaceManager/__init__.py:1462
 msgid "err-bad-datas"
 msgstr "Invalid datas"
 
@@ -138,6 +140,7 @@ msgid "hours"
 msgstr "hours"
 
 #: InterfaceManager/__init__.py:69 InterfaceManager/__init__.py:816
+#: InterfaceManager/__init__.py:1545
 msgid "Import"
 msgstr "Import"
 
@@ -154,7 +157,7 @@ msgstr "minute"
 msgid "minutes"
 msgstr "minutes"
 
-#: InterfaceManager/__init__.py:73
+#: InterfaceManager/__init__.py:73 InterfaceManager/__init__.py:1557
 msgid "Modify"
 msgstr "Modify"
 
@@ -169,6 +172,7 @@ msgstr "No"
 #: InterfaceManager/__init__.py:76 InterfaceManager/__init__.py:396
 #: InterfaceManager/__init__.py:638 InterfaceManager/__init__.py:768
 #: InterfaceManager/__init__.py:943 InterfaceManager/__init__.py:1352
+#: InterfaceManager/__init__.py:1478 InterfaceManager/__init__.py:1559
 msgid "None"
 msgstr "None"
 
@@ -187,7 +191,7 @@ msgid "Online"
 msgstr "Online"
 
 #: InterfaceManager/__init__.py:80 InterfaceManager/__init__.py:654
-#: InterfaceManager/__init__.py:1371
+#: InterfaceManager/__init__.py:1371 InterfaceManager/__init__.py:1563
 msgid "Remove"
 msgstr "Remove"
 
@@ -207,6 +211,7 @@ msgstr "Write datas"
 #: InterfaceManager/__init__.py:300 InterfaceManager/__init__.py:424
 #: InterfaceManager/__init__.py:665 InterfaceManager/__init__.py:780
 #: InterfaceManager/__init__.py:962 InterfaceManager/__init__.py:1382
+#: InterfaceManager/__init__.py:1499 InterfaceManager/__init__.py:1566
 #: engine/snmpmgmt/Forms/__init__.py:50
 msgid "Save"
 msgstr "Save"
@@ -237,6 +242,7 @@ msgstr "Settings"
 
 #: InterfaceManager/__init__.py:91 InterfaceManager/__init__.py:785
 #: InterfaceManager/__init__.py:1004 InterfaceManager/__init__.py:1432
+#: InterfaceManager/__init__.py:1510
 msgid "Type"
 msgstr "Type"
 
@@ -270,6 +276,7 @@ msgstr "Are you sure you want to disconnect ?"
 
 #: InterfaceManager/__init__.py:99 InterfaceManager/__init__.py:221
 #: InterfaceManager/__init__.py:766 InterfaceManager/__init__.py:929
+#: InterfaceManager/__init__.py:1473
 msgid "Login"
 msgstr "Login"
 
@@ -278,13 +285,15 @@ msgstr "Login"
 #: InterfaceManager/__init__.py:383 InterfaceManager/__init__.py:472
 #: InterfaceManager/__init__.py:631 InterfaceManager/__init__.py:937
 #: InterfaceManager/__init__.py:1053 InterfaceManager/__init__.py:1188
-#: InterfaceManager/__init__.py:1339
+#: InterfaceManager/__init__.py:1339 InterfaceManager/__init__.py:1475
+#: InterfaceManager/__init__.py:1555
 msgid "menu-title"
 msgstr ""
 
 #: InterfaceManager/__init__.py:101 InterfaceManager/__init__.py:235
 #: InterfaceManager/__init__.py:474 InterfaceManager/__init__.py:947
 #: InterfaceManager/__init__.py:1192 InterfaceManager/__init__.py:1358
+#: InterfaceManager/__init__.py:1479 InterfaceManager/__init__.py:1560
 msgid "Password"
 msgstr "Password"
 
@@ -372,6 +381,7 @@ msgstr "Link"
 #: InterfaceManager/__init__.py:296 InterfaceManager/__init__.py:382
 #: InterfaceManager/__init__.py:630 InterfaceManager/__init__.py:936
 #: InterfaceManager/__init__.py:1187 InterfaceManager/__init__.py:1338
+#: InterfaceManager/__init__.py:1474 InterfaceManager/__init__.py:1554
 msgid "menu-name"
 msgstr ""
 
@@ -733,6 +743,7 @@ msgstr "Unable to load tab, link may be wrong or page unavailable"
 
 #: InterfaceManager/__init__.py:212 InterfaceManager/__init__.py:761
 #: InterfaceManager/__init__.py:795 InterfaceManager/__init__.py:920
+#: InterfaceManager/__init__.py:1468
 msgid "Filter"
 msgstr "Filter"
 
@@ -753,6 +764,7 @@ msgid "Herited"
 msgstr "Inherited"
 
 #: InterfaceManager/__init__.py:217 InterfaceManager/__init__.py:765
+#: InterfaceManager/__init__.py:1472
 msgid "ip-addr"
 msgstr "IP address"
 
@@ -785,7 +797,8 @@ msgid "masterzone-path"
 msgstr "Master zone's file path"
 
 #: InterfaceManager/__init__.py:228 InterfaceManager/__init__.py:384
-#: InterfaceManager/__init__.py:767 engine/snmpmgmt/Forms/__init__.py:49
+#: InterfaceManager/__init__.py:767 InterfaceManager/__init__.py:1476
+#: engine/snmpmgmt/Forms/__init__.py:49
 msgid "Modification"
 msgstr "Modifying"
 
@@ -814,7 +827,8 @@ msgid "Others"
 msgstr "Others"
 
 #: InterfaceManager/__init__.py:236 InterfaceManager/__init__.py:475
-#: InterfaceManager/__init__.py:948
+#: InterfaceManager/__init__.py:948 InterfaceManager/__init__.py:1480
+#: InterfaceManager/__init__.py:1561
 msgid "Password-repeat"
 msgstr "Password (repeat)"
 
@@ -831,7 +845,7 @@ msgid "Record-Type"
 msgstr "Record Type"
 
 #: InterfaceManager/__init__.py:240 InterfaceManager/__init__.py:769
-#: InterfaceManager/__init__.py:959
+#: InterfaceManager/__init__.py:959 InterfaceManager/__init__.py:1496
 msgid "Return"
 msgstr "Return"
 
@@ -842,6 +856,7 @@ msgstr "Search"
 
 #: InterfaceManager/__init__.py:243 InterfaceManager/__init__.py:667
 #: InterfaceManager/__init__.py:781 InterfaceManager/__init__.py:963
+#: InterfaceManager/__init__.py:1500 InterfaceManager/__init__.py:1567
 msgid "Server"
 msgstr "Server"
 
@@ -1069,7 +1084,7 @@ msgid "Delete"
 msgstr "Remove"
 
 #: InterfaceManager/__init__.py:292 InterfaceManager/__init__.py:757
-#: InterfaceManager/__init__.py:831 InterfaceManager/__init__.py:1154
+#: InterfaceManager/__init__.py:1154 InterfaceManager/__init__.py:1461
 msgid "err-already-exist"
 msgstr "This group already exists !"
 
@@ -1077,8 +1092,7 @@ msgstr "This group already exists !"
 msgid "err-bad-data"
 msgstr "Invalid data(s)."
 
-#: InterfaceManager/__init__.py:294 InterfaceManager/__init__.py:835
-#: InterfaceManager/__init__.py:1158
+#: InterfaceManager/__init__.py:294 InterfaceManager/__init__.py:1158
 msgid "err-not-exist"
 msgstr "This group doesn't exists !"
 
@@ -1246,6 +1260,7 @@ msgid "err-hg-used"
 msgstr "Hostgroup in use. Please remove links with this hostgroup."
 
 #: InterfaceManager/__init__.py:344 InterfaceManager/__init__.py:760
+#: InterfaceManager/__init__.py:1465
 msgid "err-not-found"
 msgstr "Not found"
 
@@ -1581,6 +1596,7 @@ msgid "Sunday"
 msgstr "Sunday"
 
 #: InterfaceManager/__init__.py:436 InterfaceManager/__init__.py:975
+#: InterfaceManager/__init__.py:1573
 msgid "Template"
 msgstr "Template"
 
@@ -1681,7 +1697,7 @@ msgstr "Mail addresses don't match"
 msgid "err-name-invalid"
 msgstr "Name is invalid (letters only)"
 
-#: InterfaceManager/__init__.py:463
+#: InterfaceManager/__init__.py:463 InterfaceManager/__init__.py:1537
 msgid "err-pwd-match"
 msgstr "Passwords don't match"
 
@@ -1709,7 +1725,7 @@ msgstr "Finish"
 msgid "Lets-Go"
 msgstr "Let's go !"
 
-#: InterfaceManager/__init__.py:470
+#: InterfaceManager/__init__.py:470 InterfaceManager/__init__.py:1556
 msgid "Mail"
 msgstr "Mail address"
 
@@ -2628,7 +2644,7 @@ msgstr "mail address which receive alerts"
 msgid "tooltip-default-lease-time"
 msgstr "Default duration (in seconds) for DHCP leases (minimum: 30secs)"
 
-#: InterfaceManager/__init__.py:715 InterfaceManager/__init__.py:1420
+#: InterfaceManager/__init__.py:715
 msgid "tooltip-desc"
 msgstr "Subnet description (max: 128 chars)"
 
@@ -2802,15 +2818,16 @@ msgid "tooltip-ip-comment"
 msgstr "A comment to describe the address or the host"
 
 #: InterfaceManager/__init__.py:754 InterfaceManager/__init__.py:1233
+#: InterfaceManager/__init__.py:1455
 msgid "All"
 msgstr "All"
 
-#: InterfaceManager/__init__.py:755
+#: InterfaceManager/__init__.py:755 InterfaceManager/__init__.py:1457
 #, fuzzy
 msgid "confirm-remove-groupright"
 msgstr "Are you sure you want to remove right for group '%s' ?"
 
-#: InterfaceManager/__init__.py:756
+#: InterfaceManager/__init__.py:756 InterfaceManager/__init__.py:1458
 #, fuzzy
 msgid "confirm-remove-userright"
 msgstr "Are you sure you want to remove right for user '%s' ?"
@@ -2821,22 +2838,23 @@ msgid "err-no-subnet"
 msgstr "This subnet is invalid !"
 
 #: InterfaceManager/__init__.py:762 InterfaceManager/__init__.py:840
-#: InterfaceManager/__init__.py:1321
+#: InterfaceManager/__init__.py:1321 InterfaceManager/__init__.py:1469
 msgid "Go"
 msgstr "Go"
 
-#: InterfaceManager/__init__.py:763
+#: InterfaceManager/__init__.py:763 InterfaceManager/__init__.py:1470
 #, fuzzy
 msgid "group-rights"
 msgstr "Group rights"
 
 #: InterfaceManager/__init__.py:764 InterfaceManager/__init__.py:924
-#: InterfaceManager/__init__.py:1043
+#: InterfaceManager/__init__.py:1043 InterfaceManager/__init__.py:1471
+#: InterfaceManager/__init__.py:1544
 #, fuzzy
 msgid "Groups"
 msgstr "Groups"
 
-#: InterfaceManager/__init__.py:770
+#: InterfaceManager/__init__.py:770 InterfaceManager/__init__.py:1497
 msgid "Right"
 msgstr "Right"
 
@@ -2901,21 +2919,24 @@ msgstr "IP manager rights management"
 #: InterfaceManager/__init__.py:786 InterfaceManager/__init__.py:800
 #: InterfaceManager/__init__.py:1005 InterfaceManager/__init__.py:1113
 #: InterfaceManager/__init__.py:1226 InterfaceManager/__init__.py:1436
+#: InterfaceManager/__init__.py:1511 InterfaceManager/__init__.py:1587
 #, fuzzy
 msgid "User"
 msgstr "User"
 
-#: InterfaceManager/__init__.py:787
+#: InterfaceManager/__init__.py:787 InterfaceManager/__init__.py:1512
 #, fuzzy
 msgid "user-rights"
 msgstr "User rights"
 
 #: InterfaceManager/__init__.py:788 InterfaceManager/__init__.py:1010
+#: InterfaceManager/__init__.py:1513
 #, fuzzy
 msgid "Users"
 msgstr "Users"
 
-#: InterfaceManager/__init__.py:789 engine/snmpmgmt/Models/__init__.py:28
+#: InterfaceManager/__init__.py:789 InterfaceManager/__init__.py:1514
+#: engine/snmpmgmt/Models/__init__.py:28
 msgid "Writing"
 msgstr "Writing"
 
@@ -3043,8 +3064,12 @@ msgstr "Device expiration"
 msgid "dns-suffix"
 msgstr "DNS suffix"
 
-#: InterfaceManager/__init__.py:832 InterfaceManager/__init__.py:1155
-msgid "err-read-fail"
+#: InterfaceManager/__init__.py:831
+msgid "err-community-already-exist"
+msgstr "This SNMP community already exists"
+
+#: InterfaceManager/__init__.py:832
+msgid "err-read-netdisco"
 msgstr "Unable to read /usr/local/etc/netdisco/netdisco.conf"
 
 #: InterfaceManager/__init__.py:833 InterfaceManager/__init__.py:1156
@@ -3055,13 +3080,17 @@ msgstr "You must choose read and/or write"
 msgid "err-invalid-data"
 msgstr "Some sent datas are wrong !"
 
+#: InterfaceManager/__init__.py:835
+msgid "err-community-not-exist"
+msgstr "This SNMP community doesn't exist"
+
 #: InterfaceManager/__init__.py:836 InterfaceManager/__init__.py:1159
-#: InterfaceManager/__init__.py:1295
+#: InterfaceManager/__init__.py:1295 InterfaceManager/__init__.py:1464
 msgid "err-no-snmp-community"
 msgstr "No SNMP community found. Please configure them before use"
 
-#: InterfaceManager/__init__.py:838 InterfaceManager/__init__.py:1161
-msgid "err-write-fail"
+#: InterfaceManager/__init__.py:838
+msgid "err-netdisco-write-fail"
 msgstr "Unable to write netdisco configuration"
 
 #: InterfaceManager/__init__.py:841
@@ -3102,7 +3131,7 @@ msgid "Read"
 msgstr "Reading"
 
 #: InterfaceManager/__init__.py:850 InterfaceManager/__init__.py:1164
-#: engine/snmpmgmt/Models/__init__.py:26
+#: InterfaceManager/__init__.py:1503 engine/snmpmgmt/Models/__init__.py:26
 msgid "snmp-community"
 msgstr "SNMP Community"
 
@@ -3158,8 +3187,8 @@ msgstr "First node. Reference for discovering all devices"
 msgid "tooltip-nodetimeout"
 msgstr "Expiration time for nodes (IP/MAC addresses, Netdisco), in days"
 
-#: InterfaceManager/__init__.py:864 InterfaceManager/__init__.py:1172
-msgid "tooltip-read"
+#: InterfaceManager/__init__.py:864
+msgid "tooltip-community-read"
 msgstr "Specify is community allow reading"
 
 #: InterfaceManager/__init__.py:865
@@ -3170,8 +3199,8 @@ msgstr "Expiration time for SNMP requests (in seconds)"
 msgid "tooltip-snmptry"
 msgstr "Try number for contacting device"
 
-#: InterfaceManager/__init__.py:867 InterfaceManager/__init__.py:1173
-msgid "tooltip-write"
+#: InterfaceManager/__init__.py:867
+msgid "tooltip-community-write"
 msgstr "Specify is community allow writing"
 
 #: InterfaceManager/__init__.py:868
@@ -3310,7 +3339,7 @@ msgstr "Some users are not added because already existing !"
 msgid "err-field-missing"
 msgstr "Some fields are missing or invalid !"
 
-#: InterfaceManager/__init__.py:907
+#: InterfaceManager/__init__.py:907 InterfaceManager/__init__.py:1529
 msgid "err-group-not-exists"
 msgstr "Profile '%s' doesn't exists"
 
@@ -3358,7 +3387,7 @@ msgstr "Expiration date"
 msgid "Generation-type"
 msgstr "Generation type"
 
-#: InterfaceManager/__init__.py:923
+#: InterfaceManager/__init__.py:923 InterfaceManager/__init__.py:1543
 msgid "Group"
 msgstr "Group"
 
@@ -3477,7 +3506,7 @@ msgstr "User management (deleg)"
 msgid "SQL-table"
 msgstr "SQL table"
 
-#: InterfaceManager/__init__.py:965
+#: InterfaceManager/__init__.py:965 InterfaceManager/__init__.py:1569
 msgid "Subname"
 msgstr "Subname"
 
@@ -3569,7 +3598,7 @@ msgstr "User list"
 msgid "title-usermod"
 msgstr "User edition"
 
-#: InterfaceManager/__init__.py:989
+#: InterfaceManager/__init__.py:989 InterfaceManager/__init__.py:1578
 msgid "title-usermgmt"
 msgstr "Radius user/group edition"
 
@@ -3641,7 +3670,7 @@ msgstr "User field"
 msgid "Userlist-CSV"
 msgstr "User list (CSV format)"
 
-#: InterfaceManager/__init__.py:1009
+#: InterfaceManager/__init__.py:1009 InterfaceManager/__init__.py:1588
 msgid "User-type"
 msgstr "User type"
 
@@ -4080,9 +4109,25 @@ msgstr " most violent days"
 msgid "confirm-remove-community"
 msgstr "Are you sure you want to remove community '%s' ?"
 
+#: InterfaceManager/__init__.py:1155
+msgid "err-read-fail"
+msgstr "Unable to read /usr/local/etc/netdisco/netdisco.conf"
+
+#: InterfaceManager/__init__.py:1161
+msgid "err-write-fail"
+msgstr "Unable to write netdisco configuration"
+
 #: InterfaceManager/__init__.py:1165
 msgid "snmp-communities"
 msgstr "SNMP communities"
+
+#: InterfaceManager/__init__.py:1172
+msgid "tooltip-read"
+msgstr "Specify is community allow reading"
+
+#: InterfaceManager/__init__.py:1173
+msgid "tooltip-write"
+msgstr "Specify is community allow writing"
 
 #: InterfaceManager/__init__.py:1175
 msgid "Activate"
@@ -4940,6 +4985,10 @@ msgstr ""
 "Launch immediately an export order for each startup configuration to "
 "registered backup server specified into Z-Eye data sources servers"
 
+#: InterfaceManager/__init__.py:1420
+msgid "tooltip-port-desc"
+msgstr "Describe the port. Doesn't affect the operation"
+
 #: InterfaceManager/__init__.py:1421
 msgid "tooltip-dhcpsnoopingen"
 msgstr "Enable DHCP Snooping function"
@@ -5066,35 +5115,385 @@ msgstr "Repeat password"
 msgid "tooltip-voicevlan"
 msgstr "VLAN number (802.1Q tag)"
 
+#: InterfaceManager/__init__.py:1456
+msgid "confirm-remove-backupsrv"
+msgstr "Are you sure you want to remove backup server "
+
+#: InterfaceManager/__init__.py:1459
+msgid "device"
+msgstr "Device"
+
+#: InterfaceManager/__init__.py:1460
+msgid "DHCP-Snooping-mgmt"
+msgstr "DHCP Snooping Mgmt (device)"
+
+#: InterfaceManager/__init__.py:1463
+msgid "err-no-backup-found"
+msgstr "No backup server found"
+
+#: InterfaceManager/__init__.py:1466
+msgid "err-snmpgid-not-found"
+msgstr "This community/group doesn't exist (anymore)"
+
+#: InterfaceManager/__init__.py:1467
+msgid "Export-cfg"
+msgstr "Configuration export"
+
+#: InterfaceManager/__init__.py:1477
+msgid "New-Server"
+msgstr "New Server"
+
+#: InterfaceManager/__init__.py:1481
+msgid "Portmod-cdp"
+msgstr "Modify CDP (port)"
+
+#: InterfaceManager/__init__.py:1482
+msgid "Portmod-dhcpsnooping"
+msgstr "Modify DHCP snooping (port)"
+
+#: InterfaceManager/__init__.py:1483
+msgid "Portmod-portsec"
+msgstr "Modify port security (port)"
+
+#: InterfaceManager/__init__.py:1484
+msgid "Portmod-voicevlan"
+msgstr "Modify voice VLAN (port)"
+
+#: InterfaceManager/__init__.py:1485 engine/snmpmgmt/Models/__init__.py:27
+msgid "Reading"
+msgstr "Reading"
+
+#: InterfaceManager/__init__.py:1486
+msgid "Read-port-stats"
+msgstr "Reading<br />(port stats)"
+
+#: InterfaceManager/__init__.py:1487
+msgid "Read-ssh-portinfos"
+msgstr "Reading port informations (via SSH)"
+
+#: InterfaceManager/__init__.py:1488
+msgid "Read-ssh-showstart"
+msgstr "Reading startup configuration (via SSH)"
+
+#: InterfaceManager/__init__.py:1489
+msgid "Read-ssh-showrun"
+msgstr "Reading running configuration (via SSH)"
+
+#: InterfaceManager/__init__.py:1490
+msgid "Read-switch-details"
+msgstr "Reading<br />(device features)"
+
+#: InterfaceManager/__init__.py:1491
+msgid "Read-switch-modules"
+msgstr "Reading<br />(device modules list)"
+
+#: InterfaceManager/__init__.py:1492
+msgid "Read-switch-vlan"
+msgstr "Reading<br />(device vlan list)"
+
+#: InterfaceManager/__init__.py:1493
+msgid "Remove-Switch"
+msgstr "Remove a device"
+
+#: InterfaceManager/__init__.py:1494
+msgid "Restore-startup-cfg"
+msgstr "Restore startup config"
+
+#: InterfaceManager/__init__.py:1495
+msgid "Retag-vlan"
+msgstr "Replace VLAN tag"
+
+#: InterfaceManager/__init__.py:1498
+msgid "rule-manage-serverbackup"
+msgstr "Backup server management"
+
+#: InterfaceManager/__init__.py:1501
+msgid "server-path"
+msgstr "Server path"
+
+#: InterfaceManager/__init__.py:1502
+msgid "Set-switch-sshpwd"
+msgstr "Modify ssh logins for connecting to devices"
+
+#: InterfaceManager/__init__.py:1504
+msgid "srv-type"
+msgstr "Server type"
+
+#: InterfaceManager/__init__.py:1505
+msgid "title-device-backup"
+msgstr "Backup servers"
+
+#: InterfaceManager/__init__.py:1506
+msgid "title-edit-backup-switch-server"
+msgstr "Edit backup server"
+
+#: InterfaceManager/__init__.py:1507
+msgid "title-rightsbysnmp"
+msgstr "By SNMP community"
+
+#: InterfaceManager/__init__.py:1508
+msgid "title-rightsbyswitch"
+msgstr "By device"
+
+#: InterfaceManager/__init__.py:1509
+msgid "title-switchrightsmgmt"
+msgstr "Network devices rights management"
+
+#: InterfaceManager/__init__.py:1515
+msgid "Write-port-mon"
+msgstr "Modification (port monitoring)"
+
+#: InterfaceManager/__init__.py:1516
+#, fuzzy
+msgid "rule-manage-backupservers"
+msgstr "DHCP Server management"
+
+#: InterfaceManager/__init__.py:1518
+msgid "Adding"
+msgstr "Adding..."
+
+#: InterfaceManager/__init__.py:1519
+msgid "Add-to-new-group"
+msgstr "Add new group"
+
+#: InterfaceManager/__init__.py:1520
+msgid "attr-mail"
+msgstr "Mail attribute"
+
+#: InterfaceManager/__init__.py:1521
+msgid "attr-name"
+msgstr "Name Attribute"
+
+#: InterfaceManager/__init__.py:1522
+msgid "attr-subname"
+msgstr "Subname Attribute"
+
+#: InterfaceManager/__init__.py:1523
+msgid "attr-uid"
+msgstr "UID Attribut"
+
+#: InterfaceManager/__init__.py:1524
+msgid "base-dn"
+msgstr "Base DN"
+
+#: InterfaceManager/__init__.py:1525
+msgid "confirm-removedirectory"
+msgstr "Are you sure to want to remove directory '%s' ?"
+
+#: InterfaceManager/__init__.py:1526
+msgid "confirm-removeuser"
+msgstr "Are you sure to want to remove user '%s' ?"
+
+#: InterfaceManager/__init__.py:1527
+msgid "Directory"
+msgstr "Directory"
+
+#: InterfaceManager/__init__.py:1528
+msgid "Editing"
+msgstr "Editing..."
+
+#: InterfaceManager/__init__.py:1530
+msgid "err-invalid-bad-data"
+msgstr "Some informations are missing or invalid"
+
+#: InterfaceManager/__init__.py:1531
+msgid "err-invalid-user"
+msgstr "Invalid user"
+
+#: InterfaceManager/__init__.py:1532
+msgid "err-ldap-bad-data"
+msgstr "Invalid LDAP datas, unable to connect to server"
+
+#: InterfaceManager/__init__.py:1533
+msgid "err-ldap-exist"
+msgstr "Server already exists"
+
+#: InterfaceManager/__init__.py:1534
+msgid "err-ldap-not-exist"
+msgstr "This LDAP server doesn't exist"
+
+#: InterfaceManager/__init__.py:1535
+msgid "err-mail"
+msgstr "Malformed mail address"
+
+#: InterfaceManager/__init__.py:1536
+msgid "err-pwd-complex"
+msgstr "Password isn't complex (major, minor chars and numerics, minimal)"
+
+#: InterfaceManager/__init__.py:1538
+msgid "err-pwd-short"
+msgstr "Password is too short (%s minimum)"
+
+#: InterfaceManager/__init__.py:1539
+msgid "err-pwd-unk"
+msgstr "Unknown password error"
+
+#: InterfaceManager/__init__.py:1540
+msgid "err-user-already-exists"
+msgstr "User already exists"
+
+#: InterfaceManager/__init__.py:1541
+msgid "err-user-not-found"
+msgstr "User not found"
+
+#: InterfaceManager/__init__.py:1542
+msgid "Extern"
+msgstr "External"
+
+#: InterfaceManager/__init__.py:1546
+msgid "import-user"
+msgstr "Import user from directory"
+
+#: InterfaceManager/__init__.py:1547
+msgid "inscription"
+msgstr "Inscription"
+
+#: InterfaceManager/__init__.py:1548
+msgid "Intern"
+msgstr "Internal"
+
+#: InterfaceManager/__init__.py:1549
+msgid "last-conn"
+msgstr "Last connection"
+
+#: InterfaceManager/__init__.py:1550
+msgid "last-ip"
+msgstr "Last IP"
+
+#: InterfaceManager/__init__.py:1551
+msgid "ldap-addr"
+msgstr "LDAP IP address"
+
+#: InterfaceManager/__init__.py:1552
+msgid "ldap-filter"
+msgstr "LDAP filter"
+
+#: InterfaceManager/__init__.py:1553
+msgid "ldap-port"
+msgstr "LDAP port"
+
+#: InterfaceManager/__init__.py:1558
+msgid "new-directory"
+msgstr "New directory"
+
+#: InterfaceManager/__init__.py:1562
+msgid "port"
+msgstr "Port"
+
+#: InterfaceManager/__init__.py:1564
+msgid "root-dn"
+msgstr "Root DN"
+
+#: InterfaceManager/__init__.py:1565
+msgid "root-pwd"
+msgstr "Root Pwd"
+
+#: InterfaceManager/__init__.py:1568
+msgid "SSL"
+msgstr "SSL"
+
+#: InterfaceManager/__init__.py:1570
+msgid "rule-import-user"
+msgstr "Import LDAP users"
+
+#: InterfaceManager/__init__.py:1571
+msgid "rule-modify-directory"
+msgstr "Modify directories"
+
+#: InterfaceManager/__init__.py:1572
+msgid "rule-modify-user"
+msgstr "Modify users"
+
+#: InterfaceManager/__init__.py:1574
+msgid "tip-password"
+msgstr "You can let the password fields empty to not change the password"
+
+#: InterfaceManager/__init__.py:1575
+msgid "title-directory"
+msgstr "Directory edition"
+
+#: InterfaceManager/__init__.py:1576
+msgid "title-directorymgmt"
+msgstr "Directory management"
+
+#: InterfaceManager/__init__.py:1577
+msgid "title-user-dont-exist"
+msgstr "This user doesn't exist !"
+
+#: InterfaceManager/__init__.py:1579
+msgid "title-user-mod"
+msgstr "User edition"
+
+#: InterfaceManager/__init__.py:1580
+msgid "tooltip-attr-mail"
+msgstr "LDAP attribute for mail"
+
+#: InterfaceManager/__init__.py:1581
+msgid "tooltip-attr-name"
+msgstr "LDAP attribute for name"
+
+#: InterfaceManager/__init__.py:1582
+msgid "tooltip-attr-subname"
+msgstr "LDAP attribute for subname"
+
+#: InterfaceManager/__init__.py:1583
+msgid "tooltip-attr-uid"
+msgstr "LDAP attribute for subname"
+
+#: InterfaceManager/__init__.py:1584
+msgid "tooltip-base-dn"
+msgstr "LDAP search path"
+
+#: InterfaceManager/__init__.py:1585
+msgid "tooltip-ldap-filter"
+msgstr "LDAP filter.<br /><i>(objectclass=*)</i> means no filter"
+
+#: InterfaceManager/__init__.py:1586
+msgid "tooltip-root-dn"
+msgstr ""
+"LDAP users who can read ldap users and their attributes in base DN branch"
+
+#: InterfaceManager/__init__.py:1589
+msgid "filter-ldap"
+msgstr ""
+
+#: InterfaceManager/__init__.py:1591
+msgid "Account-parameters"
+msgstr "Account parameters"
+
+#: InterfaceManager/__init__.py:1592
+msgid "Android-options"
+msgstr "Android options"
+
+#: InterfaceManager/__init__.py:1593
+msgid "API-Key"
+msgstr "API key"
+
+#: InterfaceManager/__init__.py:1594
+msgid "App-Lang"
+msgstr "Interface language"
+
+#: InterfaceManager/__init__.py:1595
+msgid "Disconnect-after"
+msgstr "Disconnect after"
+
+#: InterfaceManager/__init__.py:1596
+msgid "Enable-Monitoring"
+msgstr "Enable monitoring tab"
+
+#: InterfaceManager/__init__.py:1597
+msgid "err-bad-lang"
+msgstr "Unsupported language"
+
+#: InterfaceManager/__init__.py:1598
+msgid "tooltip-disconnect-after"
+msgstr ""
+"This value set a maximum inactivity time before Z-Eye disconnect your account"
+
 #: engine/snmpmgmt/Forms/__init__.py:40
 msgid "Err-Object-Not-Exists"
 msgstr "The requested object doesn't exists"
 
-#: engine/snmpmgmt/Models/__init__.py:27
-msgid "Reading"
-msgstr "Reading"
-
 #: templates/footer.html:3
 msgid "by"
 msgstr "by"
-
-#~ msgid "err-community-already-exist"
-#~ msgstr "This SNMP community already exists"
-
-#~ msgid "err-community-not-exist"
-#~ msgstr "This SNMP community doesn't exist"
-
-#~ msgid "err-read-netdisco"
-#~ msgstr "Unable to read /usr/local/etc/netdisco/netdisco.conf"
-
-#~ msgid "err-netdisco-write-fail"
-#~ msgstr "Unable to write netdisco configuration"
-
-#~ msgid "tooltip-community-read"
-#~ msgstr "Specify is community allow reading"
-
-#~ msgid "tooltip-community-write"
-#~ msgstr "Specify is community allow writing"
-
-#~ msgid "tooltip-port-desc"
-#~ msgstr "Describe the port. Doesn't affect the operation"
