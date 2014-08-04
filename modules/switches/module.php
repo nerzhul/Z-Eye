@@ -169,7 +169,7 @@
 							$output .= FS::$iMgr->hidden("port",$port);
 						}
 						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
-						$output .= FS::$iMgr->idxLine("Description","desc",array("value" => $data["name"],"tooltip" => "tooltip-desc"));
+						$output .= FS::$iMgr->idxLine("Description","desc",array("value" => $data["name"],"tooltip" => "tooltip-port-desc"));
 
 						$portObj = new netDevicePort();
 						$portObj->Load($device,$port);

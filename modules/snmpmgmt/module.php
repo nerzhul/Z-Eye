@@ -44,7 +44,6 @@
 
 			$output .= FS::$iMgr->opendiv(1,$this->loc->s("Add-community"));
 
-
 			// Div for Ajax modifications
 			$tMgr = new HTMLTableMgr(array(
 				"tabledivid" => "snmptable",
@@ -117,14 +116,14 @@
 					if ($edit) {
 						if (!$exist) {
 							$this->log(1,"Community '".$name."' not exists");
-							FS::$iMgr->ajaxEchoError("err-not-exist");
+							FS::$iMgr->ajaxEchoError("err-community-not-exist");
 							return;
 						}
 					}
 					else {
 						if ($exist) {
 							$this->log(1,"Community '".$name."' already in DB");
-							FS::$iMgr->ajaxEchoErrorNC("err-already-exist");
+							FS::$iMgr->ajaxEchoErrorNC("err-community-already-exist");
 							return;
 						}
 					}
@@ -180,14 +179,14 @@
 					}
 					if (!FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_communities","name","name = '".$name."'")) {
 						$this->log(2,"Community '".$name."' not in DB");
-						FS::$iMgr->ajaxEchoError("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-community-not-exist");
 						return;
 					}
 
 					$netdiscoCfg = readNetdiscoConf();
 					if (!is_array($netdiscoCfg)) {
 						$this->log(2,"Reading error on netdisco.conf");
-						FS::$iMgr->ajaxEchoError("err-read-fail");
+						FS::$iMgr->ajaxEchoError("err-netdisco-read-fail");
 						return;
 					}
 
