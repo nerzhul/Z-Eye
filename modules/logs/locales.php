@@ -52,6 +52,7 @@
 					"webapp" => "Web application",
 				)
 			);
+			
 			$this->concat($locales);
 		}
 	};

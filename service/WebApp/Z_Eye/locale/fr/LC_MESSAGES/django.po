@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-29 19:37+0200\n"
+"POT-Creation-Date: 2014-08-04 15:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,6 +29,7 @@ msgstr "Action"
 
 #: InterfaceManager/__init__.py:43 InterfaceManager/__init__.py:289
 #: InterfaceManager/__init__.py:308 InterfaceManager/__init__.py:488
+#: InterfaceManager/__init__.py:753 InterfaceManager/__init__.py:874
 msgid "Add"
 msgstr "Ajouter"
 
@@ -89,11 +90,12 @@ msgstr "Effectué"
 msgid "English"
 msgstr "Anglais"
 
-#: InterfaceManager/__init__.py:58
+#: InterfaceManager/__init__.py:58 InterfaceManager/__init__.py:897
 msgid "Error"
 msgstr "Erreur"
 
 #: InterfaceManager/__init__.py:59 InterfaceManager/__init__.py:531
+#: InterfaceManager/__init__.py:758
 msgid "err-bad-datas"
 msgstr "Données invalides"
 
@@ -135,7 +137,7 @@ msgstr "heure"
 msgid "hours"
 msgstr "heures"
 
-#: InterfaceManager/__init__.py:69
+#: InterfaceManager/__init__.py:69 InterfaceManager/__init__.py:816
 msgid "Import"
 msgstr "Importer"
 
@@ -165,7 +167,8 @@ msgid "No"
 msgstr "Non"
 
 #: InterfaceManager/__init__.py:76 InterfaceManager/__init__.py:396
-#: InterfaceManager/__init__.py:638
+#: InterfaceManager/__init__.py:638 InterfaceManager/__init__.py:768
+#: InterfaceManager/__init__.py:943
 msgid "None"
 msgstr "Aucun"
 
@@ -174,7 +177,7 @@ msgstr "Aucun"
 msgid "Notification"
 msgstr "Notification"
 
-#: InterfaceManager/__init__.py:78
+#: InterfaceManager/__init__.py:78 InterfaceManager/__init__.py:944
 msgid "OK"
 msgstr "OK"
 
@@ -200,7 +203,8 @@ msgstr "Ecrire les données"
 
 #: InterfaceManager/__init__.py:84 InterfaceManager/__init__.py:241
 #: InterfaceManager/__init__.py:300 InterfaceManager/__init__.py:424
-#: InterfaceManager/__init__.py:665 engine/snmpmgmt/Forms/__init__.py:50
+#: InterfaceManager/__init__.py:665 InterfaceManager/__init__.py:780
+#: InterfaceManager/__init__.py:962 engine/snmpmgmt/Forms/__init__.py:50
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -228,7 +232,8 @@ msgstr "Séparateur"
 msgid "Settings"
 msgstr "Paramètres"
 
-#: InterfaceManager/__init__.py:91
+#: InterfaceManager/__init__.py:91 InterfaceManager/__init__.py:785
+#: InterfaceManager/__init__.py:1004
 msgid "Type"
 msgstr "Type"
 
@@ -261,18 +266,19 @@ msgid "inactivity-disconnect"
 msgstr "Êtes vous sûr de vouloir vous déconnecter ?"
 
 #: InterfaceManager/__init__.py:99 InterfaceManager/__init__.py:221
+#: InterfaceManager/__init__.py:766 InterfaceManager/__init__.py:929
 msgid "Login"
 msgstr "Utilisateur"
 
 #: InterfaceManager/__init__.py:100 InterfaceManager/__init__.py:123
 #: InterfaceManager/__init__.py:227 InterfaceManager/__init__.py:297
 #: InterfaceManager/__init__.py:383 InterfaceManager/__init__.py:472
-#: InterfaceManager/__init__.py:631
+#: InterfaceManager/__init__.py:631 InterfaceManager/__init__.py:937
 msgid "menu-title"
 msgstr "Gestion DNS"
 
 #: InterfaceManager/__init__.py:101 InterfaceManager/__init__.py:235
-#: InterfaceManager/__init__.py:474
+#: InterfaceManager/__init__.py:474 InterfaceManager/__init__.py:947
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -340,6 +346,7 @@ msgid "err-security"
 msgstr "Attaques des 60 dernières minutes"
 
 #: InterfaceManager/__init__.py:118 InterfaceManager/__init__.py:373
+#: InterfaceManager/__init__.py:925
 msgid "Host"
 msgstr "Hôte"
 
@@ -357,7 +364,7 @@ msgstr "Lien"
 
 #: InterfaceManager/__init__.py:122 InterfaceManager/__init__.py:226
 #: InterfaceManager/__init__.py:296 InterfaceManager/__init__.py:382
-#: InterfaceManager/__init__.py:630
+#: InterfaceManager/__init__.py:630 InterfaceManager/__init__.py:936
 msgid "menu-name"
 msgstr "Hypervision"
 
@@ -369,7 +376,7 @@ msgstr "Débit Sortant"
 msgid "sensors"
 msgstr "sondes"
 
-#: InterfaceManager/__init__.py:126
+#: InterfaceManager/__init__.py:126 InterfaceManager/__init__.py:798
 msgid "Service"
 msgstr "Service"
 
@@ -719,11 +726,13 @@ msgid "expert-tools"
 msgstr "Outils avancés"
 
 #: InterfaceManager/__init__.py:211 InterfaceManager/__init__.py:361
-#: InterfaceManager/__init__.py:605
+#: InterfaceManager/__init__.py:605 InterfaceManager/__init__.py:794
+#: InterfaceManager/__init__.py:814 InterfaceManager/__init__.py:919
 msgid "fail-tab"
 msgstr "Unable to load tab, link may be wrong or page unavailable"
 
-#: InterfaceManager/__init__.py:212
+#: InterfaceManager/__init__.py:212 InterfaceManager/__init__.py:761
+#: InterfaceManager/__init__.py:795 InterfaceManager/__init__.py:920
 msgid "Filter"
 msgstr "Filtrer"
 
@@ -743,7 +752,7 @@ msgstr "Enregistrements obsolètes trouvés !"
 msgid "Herited"
 msgstr "Hérité"
 
-#: InterfaceManager/__init__.py:217
+#: InterfaceManager/__init__.py:217 InterfaceManager/__init__.py:765
 msgid "ip-addr"
 msgstr "Adresse IP"
 
@@ -776,7 +785,7 @@ msgid "masterzone-path"
 msgstr "Chemin des fichiers de zone maître"
 
 #: InterfaceManager/__init__.py:228 InterfaceManager/__init__.py:384
-#: engine/snmpmgmt/Forms/__init__.py:49
+#: InterfaceManager/__init__.py:767 engine/snmpmgmt/Forms/__init__.py:49
 msgid "Modification"
 msgstr "Modification"
 
@@ -805,6 +814,7 @@ msgid "Others"
 msgstr "Autres"
 
 #: InterfaceManager/__init__.py:236 InterfaceManager/__init__.py:475
+#: InterfaceManager/__init__.py:948
 msgid "Password-repeat"
 msgstr "Mot de passe (répétition)"
 
@@ -820,7 +830,8 @@ msgstr "TTL de l'enregistrement"
 msgid "Record-Type"
 msgstr "Type d'enregistrement"
 
-#: InterfaceManager/__init__.py:240
+#: InterfaceManager/__init__.py:240 InterfaceManager/__init__.py:769
+#: InterfaceManager/__init__.py:959
 msgid "Return"
 msgstr "Retour"
 
@@ -829,6 +840,7 @@ msgid "Search"
 msgstr "Rechercher"
 
 #: InterfaceManager/__init__.py:243 InterfaceManager/__init__.py:667
+#: InterfaceManager/__init__.py:781 InterfaceManager/__init__.py:963
 msgid "Server"
 msgstr "Serveur"
 
@@ -877,6 +889,7 @@ msgid "ssh-user"
 msgstr "Utilisateur SSH"
 
 #: InterfaceManager/__init__.py:255 InterfaceManager/__init__.py:677
+#: InterfaceManager/__init__.py:799
 msgid "Stats"
 msgstr "Statistiques"
 
@@ -1011,7 +1024,7 @@ msgid "tsig-update"
 msgstr "Clef TSIG de mise à jour"
 
 #: InterfaceManager/__init__.py:279 InterfaceManager/__init__.py:452
-#: InterfaceManager/__init__.py:482
+#: InterfaceManager/__init__.py:482 InterfaceManager/__init__.py:1011
 msgid "Value"
 msgstr "Valeur"
 
@@ -1054,11 +1067,12 @@ msgstr "Une liste d'adresses IP seules (une par ligne)"
 msgid "confirm-removegrp"
 msgstr "Êtes vous sûr de vouloir supprimer le groupe '%s' ?"
 
-#: InterfaceManager/__init__.py:291
+#: InterfaceManager/__init__.py:291 InterfaceManager/__init__.py:889
 msgid "Delete"
 msgstr "Supprimer"
 
-#: InterfaceManager/__init__.py:292
+#: InterfaceManager/__init__.py:292 InterfaceManager/__init__.py:757
+#: InterfaceManager/__init__.py:831
 msgid "err-already-exist"
 msgstr "Ce groupe existe déjà !"
 
@@ -1066,7 +1080,7 @@ msgstr "Ce groupe existe déjà !"
 msgid "err-bad-data"
 msgstr "Données invalides."
 
-#: InterfaceManager/__init__.py:294
+#: InterfaceManager/__init__.py:294 InterfaceManager/__init__.py:835
 msgid "err-not-exist"
 msgstr "Ce groupe n'existe pas !"
 
@@ -1098,7 +1112,7 @@ msgstr "Gestion des groupes"
 msgid "title-opts"
 msgstr "Options des modules"
 
-#: InterfaceManager/__init__.py:305
+#: InterfaceManager/__init__.py:305 InterfaceManager/__init__.py:1007
 msgid "User-nb"
 msgstr "Nombre d'utilisateurs"
 
@@ -1110,7 +1124,7 @@ msgstr "Vérifications actives"
 msgid "Address"
 msgstr "Adresse"
 
-#: InterfaceManager/__init__.py:310
+#: InterfaceManager/__init__.py:310 InterfaceManager/__init__.py:877
 msgid "Alias"
 msgstr "Alias"
 
@@ -1237,7 +1251,7 @@ msgstr ""
 "Le groupe d'hôtes est utilisé autre part. Retirez les liens avant de le "
 "supprimer."
 
-#: InterfaceManager/__init__.py:344
+#: InterfaceManager/__init__.py:344 InterfaceManager/__init__.py:760
 msgid "err-not-found"
 msgstr "Non trouvé"
 
@@ -1323,11 +1337,11 @@ msgstr "Détection d'instabilité"
 msgid "Friday"
 msgstr "Vendredi"
 
-#: InterfaceManager/__init__.py:364
+#: InterfaceManager/__init__.py:364 InterfaceManager/__init__.py:921
 msgid "From"
 msgstr "De"
 
-#: InterfaceManager/__init__.py:365
+#: InterfaceManager/__init__.py:365 InterfaceManager/__init__.py:839
 msgid "General"
 msgstr "Général"
 
@@ -1580,7 +1594,7 @@ msgstr "Notification sur évènement (Status alerte, services uniquement)"
 msgid "Sunday"
 msgstr "Dimanche"
 
-#: InterfaceManager/__init__.py:436
+#: InterfaceManager/__init__.py:436 InterfaceManager/__init__.py:975
 msgid "Template"
 msgstr "Modèle"
 
@@ -1620,7 +1634,7 @@ msgstr "Edition d'un groupe d'hôtes"
 msgid "title-icinga"
 msgstr "Gestion du moniteur de services Icinga"
 
-#: InterfaceManager/__init__.py:446
+#: InterfaceManager/__init__.py:446 InterfaceManager/__init__.py:990
 msgid "To"
 msgstr "à"
 
@@ -2105,7 +2119,7 @@ msgid "err-mac-already-used-in-subnet"
 msgstr ""
 "Cette adresse MAC est déjà utilisée dans le réseau, choisissez en une autre."
 
-#: InterfaceManager/__init__.py:578
+#: InterfaceManager/__init__.py:578 InterfaceManager/__init__.py:912
 msgid "err-miss-data"
 msgstr "Certaines données sont manquantes ou invalides !"
 
@@ -2200,7 +2214,7 @@ msgstr "L'adresse IP de départ est supériere à l'adresse IP de fin"
 msgid "err-startip-not-in-range"
 msgstr "L'adresse IP de départ n'est pas dans le réseau"
 
-#: InterfaceManager/__init__.py:600
+#: InterfaceManager/__init__.py:600 InterfaceManager/__init__.py:837
 msgid "err-unable-read"
 msgstr ""
 "Impossible de lire le fichier (il n'existe pas ou les droits sont incorrects)"
@@ -2389,7 +2403,7 @@ msgstr "Valeur de l'option"
 msgid "os-name"
 msgstr "OS"
 
-#: InterfaceManager/__init__.py:652
+#: InterfaceManager/__init__.py:652 InterfaceManager/__init__.py:951
 msgid "Port"
 msgstr "Port"
 
@@ -2834,22 +2848,894 @@ msgstr "Supprimer un serveur DHCP"
 msgid "tooltip-ip-comment"
 msgstr "Un commentaire arbitraire afin de décrire l'adresse ou l'hôte concerné"
 
+#: InterfaceManager/__init__.py:754
+msgid "All"
+msgstr "Tous"
+
+#: InterfaceManager/__init__.py:755
+#, fuzzy
+msgid "confirm-remove-groupright"
+msgstr "Êtes vous sûr de vouloir supprimer ce droit pour le groupe '%s' ?"
+
+#: InterfaceManager/__init__.py:756
+#, fuzzy
+msgid "confirm-remove-userright"
+msgstr "Êtes vous sûr de vouloir supprimer ce droit pour l'utilisateur '%s' ?"
+
+#: InterfaceManager/__init__.py:759
+#, fuzzy
+msgid "err-no-subnet"
+msgstr "Aucun réseau référencé"
+
+#: InterfaceManager/__init__.py:762 InterfaceManager/__init__.py:840
+msgid "Go"
+msgstr "Aller"
+
+#: InterfaceManager/__init__.py:763
+#, fuzzy
+msgid "group-rights"
+msgstr "Droits des groupes"
+
+#: InterfaceManager/__init__.py:764 InterfaceManager/__init__.py:924
+#, fuzzy
+msgid "Groups"
+msgstr "Groupes"
+
+#: InterfaceManager/__init__.py:770
+msgid "Right"
+msgstr "Droit"
+
+#: InterfaceManager/__init__.py:771
+#, fuzzy
+msgid "right-advancedtools"
+msgstr "Outils avancés"
+
+#: InterfaceManager/__init__.py:772
+#, fuzzy
+msgid "right-history"
+msgstr "Historique IP"
+
+#: InterfaceManager/__init__.py:773
+#, fuzzy
+msgid "right-ipmgmt"
+msgstr "Gestion des adresses IP"
+
+#: InterfaceManager/__init__.py:774
+#, fuzzy
+msgid "right-optionsgrpmgmt"
+msgstr "Gestion des groupes d'options DHCP"
+
+#: InterfaceManager/__init__.py:775
+#, fuzzy
+msgid "right-optionsmgmt"
+msgstr "Gestion des options DHCP"
+
+#: InterfaceManager/__init__.py:776
+msgid "right-rangemgmt"
+msgstr "Gestion des ranges IP"
+
+#: InterfaceManager/__init__.py:777
+msgid "right-read"
+msgstr "Lecture (global)"
+
+#: InterfaceManager/__init__.py:778
+#, fuzzy
+msgid "right-servermgmt"
+msgstr "Gestion des serveurs DHCP"
+
+#: InterfaceManager/__init__.py:779
+#, fuzzy
+msgid "right-subnetmgmt"
+msgstr "Gestion des réseaux DHCP"
+
+#: InterfaceManager/__init__.py:782
+#, fuzzy
+msgid "title-bysubnet"
+msgstr "Par réseau"
+
+#: InterfaceManager/__init__.py:783
+#, fuzzy
+msgid "title-globalrights"
+msgstr "Droits globaux"
+
+#: InterfaceManager/__init__.py:784
+#, fuzzy
+msgid "title-ipmrightsmgmt"
+msgstr "Gestion des droits sur le gestionnaire IP"
+
+#: InterfaceManager/__init__.py:786 InterfaceManager/__init__.py:800
+#: InterfaceManager/__init__.py:1005
+#, fuzzy
+msgid "User"
+msgstr "Utilisateur"
+
+#: InterfaceManager/__init__.py:787
+#, fuzzy
+msgid "user-rights"
+msgstr "Droits des utilisateurs"
+
+#: InterfaceManager/__init__.py:788 InterfaceManager/__init__.py:1010
+#, fuzzy
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: InterfaceManager/__init__.py:789 engine/snmpmgmt/Models/__init__.py:28
+msgid "Writing"
+msgstr "Modification (global)"
+
+#: InterfaceManager/__init__.py:791
+msgid "Date"
+msgstr "Date"
+
+#: InterfaceManager/__init__.py:792
+msgid "Entry"
+msgstr "Entrée"
+
+#: InterfaceManager/__init__.py:793
+msgid "err-no-logs"
+msgstr "Aucun log collecté"
+
+#: InterfaceManager/__init__.py:796
+msgid "Level"
+msgstr "Niveau"
+
+#: InterfaceManager/__init__.py:797
+msgid "Module"
+msgstr "Module"
+
+#: InterfaceManager/__init__.py:801
+msgid "webapp"
+msgstr "Application Web"
+
+#: InterfaceManager/__init__.py:803
+msgid "Add-Edge"
+msgstr "Ajouter un lien"
+
+#: InterfaceManager/__init__.py:804
+msgid "Add-Node"
+msgstr "Ajouter un noeud"
+
+#: InterfaceManager/__init__.py:805
+msgid "Color"
+msgstr "Couleur"
+
+#: InterfaceManager/__init__.py:806
+msgid "Dest-node"
+msgstr "Noeud de destination"
+
+#: InterfaceManager/__init__.py:807
+msgid "err-edge-exists"
+msgstr "Ce lien existe déjà"
+
+#: InterfaceManager/__init__.py:808
+msgid "err-edge-not-exists"
+msgstr "Ce lien n'existe pas"
+
+#: InterfaceManager/__init__.py:809
+msgid "err-no-node-found"
+msgstr "Aucun noeud trouvé"
+
+#: InterfaceManager/__init__.py:810
+msgid "err-no-tab"
+msgstr "Onglet invalide"
+
+#: InterfaceManager/__init__.py:811
+msgid "err-node-exists"
+msgstr "Ce noeud existe déjà"
+
+#: InterfaceManager/__init__.py:812
+msgid "err-node-not-exists"
+msgstr "Ce noeud n'existe pas"
+
+#: InterfaceManager/__init__.py:813
+msgid "err-src-equal-dest"
+msgstr "La source et la destination sont identiques"
+
+#: InterfaceManager/__init__.py:815
+msgid "icinga-map"
+msgstr "Etat des systèmes"
+
+#: InterfaceManager/__init__.py:817
+msgid "Import-Nodes"
+msgstr "Importer les noeuds (Réseau & Icinga)"
+
+#: InterfaceManager/__init__.py:818
+msgid "link-state"
+msgstr "Etat des liens de"
+
+#: InterfaceManager/__init__.py:819
+msgid "net-map"
+msgstr "Réseau"
+
+#: InterfaceManager/__init__.py:820
+msgid "net-map-full"
+msgstr "Réseau (complet)"
+
+#: InterfaceManager/__init__.py:821
+msgid "PositionX"
+msgstr "Position X"
+
+#: InterfaceManager/__init__.py:822
+msgid "PositionY"
+msgstr "Position Y"
+
+#: InterfaceManager/__init__.py:823
+msgid "Size"
+msgstr "Taille"
+
+#: InterfaceManager/__init__.py:824
+msgid "Source-node"
+msgstr "Noeud source"
+
+#: InterfaceManager/__init__.py:825
+msgid "title-maps"
+msgstr "Cartes"
+
+#: InterfaceManager/__init__.py:827
+msgid "Add-community"
+msgstr "Ajouter une communauté SNMP"
+
+#: InterfaceManager/__init__.py:828
+msgid "database"
+msgstr "Base de données"
+
+#: InterfaceManager/__init__.py:829
+msgid "device-expiration"
+msgstr "Expiration des périphériques"
+
+#: InterfaceManager/__init__.py:830
+msgid "dns-suffix"
+msgstr "Suffixe DNS"
+
+#: InterfaceManager/__init__.py:832
+msgid "err-read-fail"
+msgstr "Impossible de lire le fichier /usr/local/etc/netdisco/netdisco.conf"
+
+#: InterfaceManager/__init__.py:833
+msgid "err-readorwrite"
+msgstr "Il faut choisir lecture et/ou écriture"
+
+#: InterfaceManager/__init__.py:834
+msgid "err-invalid-data"
+msgstr "Les données que vous avez entré ne sont pas valides !"
+
+#: InterfaceManager/__init__.py:836
+msgid "err-no-snmp-community"
+msgstr "Aucune communauté SNMP renseignée. Veuillez les configurer"
+
+#: InterfaceManager/__init__.py:838
+msgid "err-write-fail"
+msgstr "Impossible d'écrire la configuration de netdisco"
+
+#: InterfaceManager/__init__.py:841
+msgid "global-conf"
+msgstr "Configuration globale"
+
+#: InterfaceManager/__init__.py:842
+msgid "main-node"
+msgstr "Noeud principal"
+
+#: InterfaceManager/__init__.py:843
+msgid "mod-ok"
+msgstr "Modification prise en compte"
+
+#: InterfaceManager/__init__.py:844
+msgid "node-expiration"
+msgstr "Expiration des noeuds"
+
+#: InterfaceManager/__init__.py:845
+msgid "pg-db"
+msgstr "Nom de la base de données"
+
+#: InterfaceManager/__init__.py:846
+msgid "pg-host"
+msgstr "Hôte PostGreSQL"
+
+#: InterfaceManager/__init__.py:847
+msgid "pg-pwd"
+msgstr "Mot de passe"
+
+#: InterfaceManager/__init__.py:848
+msgid "pg-user"
+msgstr "Utilisateur PostGreSQL"
+
+#: InterfaceManager/__init__.py:849
+#, fuzzy
+msgid "Read"
+msgstr "Lecture"
+
+#: InterfaceManager/__init__.py:850 engine/snmpmgmt/Models/__init__.py:26
+msgid "snmp-community"
+msgstr "Communauté SNMP"
+
+#: InterfaceManager/__init__.py:851
+msgid "SNMP-communities"
+msgstr "Communautés SNMP"
+
+#: InterfaceManager/__init__.py:852
+msgid "snmp-conf"
+msgstr "Configuration SNMP"
+
+#: InterfaceManager/__init__.py:853
+msgid "snmp-read"
+msgstr "Communautés en lecture"
+
+#: InterfaceManager/__init__.py:854
+msgid "snmp-timeout"
+msgstr "Timeout des requêtes"
+
+#: InterfaceManager/__init__.py:855
+msgid "snmp-try"
+msgstr "Tentatives maximales"
+
+#: InterfaceManager/__init__.py:856
+msgid "snmp-version"
+msgstr "Version SNMP"
+
+#: InterfaceManager/__init__.py:857
+msgid "snmp-write"
+msgstr "Communautés en écriture"
+
+#: InterfaceManager/__init__.py:858
+msgid "timer-conf"
+msgstr "Configuration des timers"
+
+#: InterfaceManager/__init__.py:859
+msgid "title-netdisco"
+msgstr "Management du service de découverte Netdisco"
+
+#: InterfaceManager/__init__.py:860
+msgid "tooltip-devicetimeout"
+msgstr "Durée en jours après laquelle expirent les équipements"
+
+#: InterfaceManager/__init__.py:861
+msgid "tooltip-dnssuffix"
+msgstr ""
+"Suffixe DNS de recherche lorsqu'un nom court DNS est découvert sur un "
+"équipement"
+
+#: InterfaceManager/__init__.py:862
+msgid "tooltip-firstnode"
+msgstr ""
+"Premier noeud. Sert de référence à netdisco pour découvrir l'ensemble des "
+"équipements"
+
+#: InterfaceManager/__init__.py:863
+msgid "tooltip-nodetimeout"
+msgstr ""
+"Durée en jour après laquelle expirent les noeuds (adresses IP, MAC, Netbios) "
+"découvertes"
+
+#: InterfaceManager/__init__.py:864
+msgid "tooltip-read"
+msgstr "Spécifie si la communauté permet la lecture"
+
+#: InterfaceManager/__init__.py:865
+msgid "tooltip-snmptimeout"
+msgstr "Durée d'expiration des requêtes SNMP (en secondes)"
+
+#: InterfaceManager/__init__.py:866
+msgid "tooltip-snmptry"
+msgstr "Nombre de tentatives pour contacter un équipement"
+
+#: InterfaceManager/__init__.py:867
+msgid "tooltip-write"
+msgstr "Spécifie si la communauté permet l'écriture"
+
+#: InterfaceManager/__init__.py:868
+msgid "Write"
+msgstr "Ecriture"
+
+#: InterfaceManager/__init__.py:870
+msgid "Account"
+msgstr "Compte"
+
+#: InterfaceManager/__init__.py:871
+msgid "Account-nb"
+msgstr "Nombre de comptes"
+
+#: InterfaceManager/__init__.py:872
+msgid "Acct-expiration-date"
+msgstr "Date d'expiration du compte"
+
+#: InterfaceManager/__init__.py:873
+msgid "Acct-start-date"
+msgstr "Date de début du compte"
+
+#: InterfaceManager/__init__.py:875
+msgid "Administrate"
+msgstr "Administrer"
+
+#: InterfaceManager/__init__.py:876
+msgid "advanced-tools"
+msgstr "Options avancées"
+
+#: InterfaceManager/__init__.py:878
+msgid "Already-valid"
+msgstr "Toujours valide"
+
+#: InterfaceManager/__init__.py:879
+msgid "Auth-Type"
+msgstr "Type d'authentification"
+
+#: InterfaceManager/__init__.py:880
+msgid "Attributes"
+msgstr "Attributs"
+
+#: InterfaceManager/__init__.py:881
+msgid "auto-import-dhcp"
+msgstr "Import Auto DHCP"
+
+#: InterfaceManager/__init__.py:882
+msgid "confirm-remove-datasrc"
+msgstr "Êtes vous sûr de vouloir supprimer la source de données '%s' ?"
+
+#: InterfaceManager/__init__.py:883
+msgid "confirm-remove-group"
+msgstr "Êtes vous sûr de vouloir supprimer le groupe '%s' ?"
+
+#: InterfaceManager/__init__.py:884
+msgid "confirm-remove-subnetlink"
+msgstr ""
+"Êtes vous sûr de vouloir supprimer le lien entre ces deux éléments '%s' ?"
+
+#: InterfaceManager/__init__.py:885
+msgid "confirm-remove-user"
+msgstr "Êtes vous sûr de vouloir supprimer l'utilisateur '%s' ?"
+
+#: InterfaceManager/__init__.py:886
+msgid "Creation-date"
+msgstr "Date de création du compte"
+
+#: InterfaceManager/__init__.py:887
+msgid "db-name"
+msgstr "Nom de la base de données"
+
+#: InterfaceManager/__init__.py:888
+msgid "db-type"
+msgstr "Type de base de données"
+
+#: InterfaceManager/__init__.py:890
+msgid "Delete-accounting"
+msgstr "Supprimer l'accounting"
+
+#: InterfaceManager/__init__.py:891
+msgid "Delete-logs"
+msgstr "Supprimer les logs"
+
+#: InterfaceManager/__init__.py:892
+msgid "Delete-profil"
+msgstr "Êtes vous sûr de vouloir supprimer le profil"
+
+#: InterfaceManager/__init__.py:893
+msgid "Delete-subnet-import"
+msgstr "Êtes vous sûr de vouloir supprimer l'importation du subnet"
+
+#: InterfaceManager/__init__.py:894
+msgid "DHCP-zone"
+msgstr "Zone DHCP"
+
+#: InterfaceManager/__init__.py:895
+msgid "enable-autoclean"
+msgstr "Activer le nettoyage automatique"
+
+#: InterfaceManager/__init__.py:896
+msgid "entitlement"
+msgstr "Intitulé"
+
+#: InterfaceManager/__init__.py:898
+msgid "err-alias-already-used"
+msgstr "L'alias '%s' est déjà utilisé"
+
+#: InterfaceManager/__init__.py:899
+msgid "err-bad-server"
+msgstr "Base de données radius invalide"
+
+#: InterfaceManager/__init__.py:900
+msgid "err-bad-tab"
+msgstr "Onglet invalide !"
+
+#: InterfaceManager/__init__.py:901
+msgid "err-db-conn-fail"
+msgstr "Impossible de se connecter à la base de données Radius"
+
+#: InterfaceManager/__init__.py:902
+msgid "err-delete"
+msgstr "Echec de la suppression, données invalides !"
+
+#: InterfaceManager/__init__.py:903
+msgid "err-end-before-start"
+msgstr "La date de fin est située avant la date d'activation du compte !"
+
+#: InterfaceManager/__init__.py:904
+msgid "err-exist"
+msgstr "Le groupe/utilisateur inscrit est déjà référencé !"
+
+#: InterfaceManager/__init__.py:905
+msgid "err-exist2"
+msgstr "Certains utilisateurs n'ont pas été ajoutés car déjà existants !"
+
+#: InterfaceManager/__init__.py:906
+msgid "err-field-missing"
+msgstr "Certains champs sont manquants ou invalides !"
+
+#: InterfaceManager/__init__.py:907
+msgid "err-group-not-exists"
+msgstr "Le profil '%s' n'existe pas"
+
+#: InterfaceManager/__init__.py:908
+msgid "err-invalid-auth-server"
+msgstr "Serveur d'authentification invalide !"
+
+#: InterfaceManager/__init__.py:909
+msgid "err-invalid-entry"
+msgstr "Type d'entrée invalide"
+
+#: InterfaceManager/__init__.py:910
+msgid "err-invalid-tab"
+msgstr "Onglet invalide !"
+
+#: InterfaceManager/__init__.py:911
+msgid "err-invalid-table"
+msgstr "La table référencée n'est pas valide !"
+
+#: InterfaceManager/__init__.py:913
+msgid "err-no-server"
+msgstr "Aucun serveur radius référencé"
+
+#: InterfaceManager/__init__.py:914
+msgid "err-no-subnet-for-import"
+msgstr "Aucun subnet DHCP ou Profil Radius disponible pour la synchronisation"
+
+#: InterfaceManager/__init__.py:915
+msgid "err-no-user"
+msgstr "Utilisateur inexistant !"
+
+#: InterfaceManager/__init__.py:916
+msgid "err-radius-not-exist"
+msgstr "Serveur radius non référencé !"
+
+#: InterfaceManager/__init__.py:917
+msgid "expiration-field"
+msgstr "Champ expiration"
+
+#: InterfaceManager/__init__.py:918
+msgid "Expiration-Date"
+msgstr "Date d'expiration"
+
+#: InterfaceManager/__init__.py:922
+msgid "Generation-type"
+msgstr "Type de génération"
+
+#: InterfaceManager/__init__.py:923
+msgid "Group"
+msgstr "Groupe"
+
+#: InterfaceManager/__init__.py:926
+msgid "Identifier"
+msgstr "Identifiant de connexion"
+
+#: InterfaceManager/__init__.py:927
+msgid "Infinite"
+msgstr "Infinie"
+
+#: InterfaceManager/__init__.py:928
+msgid "ip-addr-dns"
+msgstr "Adresse IP/DNS"
+
+#: InterfaceManager/__init__.py:930
+msgid "Mac-addr"
+msgstr "Adresse MAC"
+
+#: InterfaceManager/__init__.py:931
+msgid "Manage"
+msgstr "Gérer"
+
+#: InterfaceManager/__init__.py:932
+msgid "Manage-radius-db"
+msgstr "Gérer la liste des bases de données Radius"
+
+#: InterfaceManager/__init__.py:933
+msgid "mass-account-deleg"
+msgstr "Comptes en masse (Deleg)"
+
+#: InterfaceManager/__init__.py:934
+msgid "mass-import"
+msgstr "Import de masse"
+
+#: InterfaceManager/__init__.py:935
+msgid "mass-import-restriction"
+msgstr ""
+"<b>Note: </b>Les noms d'utilisateurs ne peuvent pas contenir d'espace.<br /"
+">Les mots de passe doivent être en clair.<br />Caractère de formatage: <b>,</"
+"b>"
+
+#: InterfaceManager/__init__.py:938
+msgid "mono-account-deleg"
+msgstr "Compte individuel (Deleg)"
+
+#: InterfaceManager/__init__.py:939
+msgid "New-Attribute"
+msgstr "Nouvel attribut"
+
+#: InterfaceManager/__init__.py:940
+msgid "New-Group"
+msgstr "Nouveau Groupe"
+
+#: InterfaceManager/__init__.py:941
+msgid "New-Profil"
+msgstr "Nouveau profil"
+
+#: InterfaceManager/__init__.py:942
+msgid "New-User"
+msgstr "Nouvel Utilisateur"
+
+#: InterfaceManager/__init__.py:945
+msgid "ok-user"
+msgstr "Utilisateur créé avec succès !"
+
+#: InterfaceManager/__init__.py:946
+msgid "Other"
+msgstr "Autre"
+
+#: InterfaceManager/__init__.py:949
+msgid "Permanent"
+msgstr "Permanent"
+
+#: InterfaceManager/__init__.py:950
+msgid "Period"
+msgstr "Période"
+
+#: InterfaceManager/__init__.py:952
+msgid "Prefix"
+msgstr "Préfixe"
+
+#: InterfaceManager/__init__.py:953
+msgid "Profil"
+msgstr "Profil"
+
+#: InterfaceManager/__init__.py:954
+msgid "Profilname"
+msgstr "Nom du profil"
+
+#: InterfaceManager/__init__.py:955
+msgid "Profils"
+msgstr "Profils"
+
+#: InterfaceManager/__init__.py:956
+msgid "Pwd-Type"
+msgstr "Type de mot de passe"
+
+#: InterfaceManager/__init__.py:957
+msgid "Radius-profile"
+msgstr "Profil Radius"
+
+#: InterfaceManager/__init__.py:958
+msgid "random-name"
+msgstr "Nom aléatoire"
+
+#: InterfaceManager/__init__.py:960
+msgid "rule-db-mgmt"
+msgstr "Gestion des bases de données"
+
+#: InterfaceManager/__init__.py:961
+msgid "rule-user-mgmt-deleg"
+msgstr "Gestion des utilisateurs (Deleg)"
+
+#: InterfaceManager/__init__.py:964
+msgid "SQL-table"
+msgstr "Table SQL"
+
+#: InterfaceManager/__init__.py:965
+msgid "Subname"
+msgstr "Prénom"
+
+#: InterfaceManager/__init__.py:966
+msgid "sure-delete-user"
+msgstr "Êtes vous sûr de vouloir supprimer l'utilisateur"
+
+#: InterfaceManager/__init__.py:967
+msgid "Tables"
+msgstr "Tables SQL"
+
+#: InterfaceManager/__init__.py:968
+msgid "table-radacct"
+msgstr "Table d'accounting"
+
+#: InterfaceManager/__init__.py:969
+msgid "table-radcheck"
+msgstr "Attributs check (utilisateur)"
+
+#: InterfaceManager/__init__.py:970
+msgid "table-radgrpchk"
+msgstr "Attributs check (groupes)"
+
+#: InterfaceManager/__init__.py:971
+msgid "table-radgrprep"
+msgstr "Attributs reply (groupes)"
+
+#: InterfaceManager/__init__.py:972
+msgid "table-radreply"
+msgstr "Attributs reply (utilisateur)"
+
+#: InterfaceManager/__init__.py:973
+msgid "table-radusrgrp"
+msgstr "Appartenance à des groupes"
+
+#: InterfaceManager/__init__.py:974
+msgid "Target"
+msgstr "Cible"
+
+#: InterfaceManager/__init__.py:976
+msgid "Temporary"
+msgstr "Temporaire"
+
+#: InterfaceManager/__init__.py:977
+msgid "title-add-radius"
+msgstr "Ajouter une base de données Radius"
+
+#: InterfaceManager/__init__.py:978
+msgid "title-auto-import"
+msgstr "Nouvel Import Automatique"
+
+#: InterfaceManager/__init__.py:979
+msgid "title-auto-import2"
+msgstr "Imports automatiques existants"
+
+#: InterfaceManager/__init__.py:980
+msgid "title-cleanusers"
+msgstr "Nettoyage des utilisateurs"
+
+#: InterfaceManager/__init__.py:981
+msgid "title-deleg"
+msgstr "Outil de délégation de l'authentification"
+
+#: InterfaceManager/__init__.py:982
+msgid "title-edit-radius"
+msgstr "Edition des informations de la base de données Radius"
+
+#: InterfaceManager/__init__.py:983
+msgid "title-groupmod"
+msgstr "Modification du groupe"
+
+#: InterfaceManager/__init__.py:984
+msgid "title-mass-import"
+msgstr "Import d'utilisateurs en masse"
+
+#: InterfaceManager/__init__.py:985
+msgid "title-profillist"
+msgstr "Liste des profils"
+
+#: InterfaceManager/__init__.py:986
+msgid "title-radius-db"
+msgstr "Liste des bases Radius"
+
+#: InterfaceManager/__init__.py:987
+msgid "title-userlist"
+msgstr "Liste des Utilisateurs"
+
+#: InterfaceManager/__init__.py:988
+msgid "title-usermod"
+msgstr "Modification de l'utilisateur"
+
+#: InterfaceManager/__init__.py:989
+msgid "title-usermgmt"
+msgstr "Gestion des utilisateurs/Groupes Radius"
+
+#: InterfaceManager/__init__.py:991
+#, fuzzy
+msgid "tooltip-ac-expirationfield"
+msgstr "Champ contenant la date d'expiration"
+
+#: InterfaceManager/__init__.py:992
+msgid "tooltip-ac-sqltable"
+msgstr "Table SQL dans laquelle recherche l'expiration"
+
+#: InterfaceManager/__init__.py:993
+msgid "tooltip-ac-sqluserfield"
+msgstr "Champ contenant le nom d'utilisateur"
+
+#: InterfaceManager/__init__.py:994
+msgid "tooltip-alias"
+msgstr "Un alias qui servira pour la délégation (unique)"
+
+#: InterfaceManager/__init__.py:995
+msgid "tooltip-dbname"
+msgstr "Nom de la base de données SQL distante"
+
+#: InterfaceManager/__init__.py:996
+msgid "tooltip-port"
+msgstr ""
+"Port de la base de données<br /><b>MySQL</b>: 3306<br /><b>PgSQL</b>: 5432"
+
+#: InterfaceManager/__init__.py:997
+msgid "tooltip-radacct"
+msgstr ""
+"Cette table contient les données d'accounting de votre serveur Radius "
+"(utilisées pour des statistiques et de la recherche sur Z-Eye)"
+
+#: InterfaceManager/__init__.py:998
+msgid "tooltip-radcheck"
+msgstr ""
+"Cette table contient les attributs associés à un utilisateur lors d'une "
+"requête Radius.<br />Elle sert de support à la création d'utilisateurs "
+"Radius (et mot de passe associé)"
+
+#: InterfaceManager/__init__.py:999
+msgid "tooltip-radgrpchk"
+msgstr ""
+"Cette table contient les attributs associés à un groupe lors d'une requête "
+"Radius.<br />Elle sert de support à la création de groupes Radius"
+
+#: InterfaceManager/__init__.py:1000
+msgid "tooltip-radgrprep"
+msgstr ""
+"Cette table contient les attributs associés à un groupe lors d'une réponse "
+"Radius.<br />Ils sont renvoyés à l'émetteur/équipement"
+
+#: InterfaceManager/__init__.py:1001
+msgid "tooltip-radreply"
+msgstr ""
+"Cette table contient les attributs associés à un utilisateur lors d'une "
+"réponse Radius.<br />Ils sont renvoyés à l'émetteur/équipement"
+
+#: InterfaceManager/__init__.py:1002
+msgid "tooltip-radusrgrp"
+msgstr ""
+"Cette table fait la correspondance entre un utilisateur et un groupe Radius"
+
+#: InterfaceManager/__init__.py:1003
+msgid "tooltip-user"
+msgstr ""
+"Nom d'utilisateur de la base de données. Il doit avoir les droits de lecture "
+"et d'écriture."
+
+#: InterfaceManager/__init__.py:1006
+msgid "user-field"
+msgstr "Champ utilisateur"
+
+#: InterfaceManager/__init__.py:1008
+msgid "Userlist-CSV"
+msgstr "Liste des utilisateurs (format CSV)"
+
+#: InterfaceManager/__init__.py:1009
+msgid "User-type"
+msgstr "Type d'utilisateur"
+
+#: InterfaceManager/__init__.py:1012
+msgid "Validity"
+msgstr "Validité"
+
+#: InterfaceManager/__init__.py:1013
+msgid "Attribut"
+msgstr "Attribut"
+
+#: InterfaceManager/__init__.py:1014
+msgid "mass-account"
+msgstr "Comptes en masse"
+
+#: InterfaceManager/__init__.py:1015
+msgid "mono-account"
+msgstr "Compte individuel"
+
+#: InterfaceManager/__init__.py:1016
+msgid "tooltip-ac-sqlexpirationfield"
+msgstr "Champ contenant la date d'expiration"
+
 #: engine/snmpmgmt/Forms/__init__.py:40
 msgid "Err-Object-Not-Exists"
 msgstr "L'objet demandé n'existe pas"
-
-#: engine/snmpmgmt/Models/__init__.py:26
-msgid "snmp-community"
-msgstr "Communauté SNMP"
 
 #: engine/snmpmgmt/Models/__init__.py:27
 msgid "Reading"
 msgstr "Lecture"
 
-#: engine/snmpmgmt/Models/__init__.py:28
-msgid "Writing"
-msgstr "Ecriture"
-
 #: templates/footer.html:3
 msgid "by"
 msgstr "par"
+
+#~ msgid "err-community-already-exist"
+#~ msgstr "Cette communauté SNMP existe déjà"
+
+#~ msgid "err-community-not-exist"
+#~ msgstr "Cette communauté SNMP n'existe pas"

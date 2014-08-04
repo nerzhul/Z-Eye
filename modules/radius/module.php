@@ -969,7 +969,7 @@
 
 					if (!$radalias) {
 						$this->log(2,"Some datas are missing for mass import");
-						FS::$iMgr->ajaxEchoError("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-radius-not-exist");
 						return;
 					}
 
@@ -1123,7 +1123,7 @@
 
 					if (!$radalias) {
 						$this->log(2,"Some fields are missing for DHCP sync");
-						FS::$iMgr->ajaxEchoError("err-not-exist");
+						FS::$iMgr->ajaxEchoError("err-radius-not-exist");
 						return;
 					}
 
