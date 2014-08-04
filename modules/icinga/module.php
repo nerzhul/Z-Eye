@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/icingaBroker.api.php");
 	require_once(dirname(__FILE__)."/objects.php");
@@ -28,9 +27,12 @@
 		function __construct() {
 			parent::__construct();
 			$this->modulename = "icinga";
-			$this->loc = new lIcinga();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rIcinga($this->loc);
-			$this->menu = $this->loc->s("menu-name");
+			
+			$this->menu = $this->loc->s("Supervision");
+			$this->menutitle = $this->loc->s("Icinga sensors");
+			
 			$this->icingaAPI = new icingaBroker();
 		}
 

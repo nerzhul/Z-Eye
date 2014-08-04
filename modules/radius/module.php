@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/PDFgen.FS.class.php");
@@ -28,9 +27,12 @@
 	final class iRadius extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new lRadius();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rRadius($this->loc);
-			$this->menu = $this->loc->s("menu-name");
+			
+			$this->menu = $this->loc->s("Hypervision");
+			$this->menutitle = $this->loc->s("RADIUS servers");
+			
 			$this->modulename = "radius";
 
 			$raddbinfos = array();

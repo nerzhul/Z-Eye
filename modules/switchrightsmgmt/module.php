@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("iSwitchRightsMgmt")) {
@@ -25,9 +24,11 @@
 	final class iSwitchRightsMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new lSwitchRightsMgmt();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rSwitchRightsMgmt($this->loc);
-			$this->menu = $this->loc->s("menu-name");
+			
+			$this->menu = $this->loc->s("Users and rights");
+			$this->menutitle = $this->loc->s("Network devices (rights & backup)");
 
 			$this->modulename = "switchrightsmgmt";
 		}

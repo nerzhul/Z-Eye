@@ -32,6 +32,7 @@
 		function __construct() {
 			$this->loc = "";
 			$this->modulename = "";
+			$this->menutitle = "";
 			$this->menu = "";
 			$this->menupriority = 0;
 			$this->scheduleclass = NULL;
@@ -45,7 +46,7 @@
 
 		public function setModuleId($id) { $this->mid = $id; }
 		public function getModuleId() { return $this->mid; }
-		public function getMenuTitle() { return $this->loc->s("menu-title"); }
+		public function getMenuTitle() { return $this->menutitle; }
 		public function getLoc() { return $this->loc; }
 		public function getName() { return $this->modulename; }
 
@@ -118,6 +119,7 @@
 		protected $scheduleclass;
 
 		protected $menu;
+		protected $menutitle;
 		protected $menupriority;
 	}
 ?>

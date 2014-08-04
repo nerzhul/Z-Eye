@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	
 	if(!class_exists("iSnortMgmt")) {
@@ -25,9 +24,12 @@
 	final class iSnortMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new lSnort();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rSnortMgmt($this->loc);
-			$this->menu = $this->loc->s("menu-name");
+			
+			$this->menu = $this->loc->s("Z-Eye Engine");
+			$this->menutitle = $this->loc->s("SNORT IDS engine");
+			
 			$this->modulename = "snortmgmt";
 		}
 

@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../../lib/FSS/LDAP.FS.class.php");
 
@@ -26,10 +25,12 @@
 	final class iGroupMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new lGroupMgmt();
+			$this->loc = new FSLocales();
 			$this->modulename = "groupmgmt";
 			$this->rulesclass = new rGroupMgmt($this->loc);
-			$this->menu = $this->loc->s("menu-name");
+			
+			$this->menu = $this->loc->s("Users and rights");
+			$this->menutitle = $this->loc->s("Z-Eye groups management");
 		}
 
 		public function Load() {

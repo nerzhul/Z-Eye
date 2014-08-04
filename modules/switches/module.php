@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/snmpdiscovery.api.php");
 
@@ -36,9 +35,12 @@
 	final class iSwitchMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new lSwitchMgmt();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rSwitchMgmt($this->loc);
-			$this->menu = $this->loc->s("menu-name");
+			
+			$this->menu = $this->loc->s("Hypervision");
+			$this->menutitle = $this->loc->s("Network devices management");
+			
 			$this->modulename = "switchmgmt";
 
 			$device = FS::$secMgr->checkAndSecuriseGetData("d");

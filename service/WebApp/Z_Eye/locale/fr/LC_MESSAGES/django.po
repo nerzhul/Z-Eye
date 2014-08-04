@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-04 16:24+0200\n"
+"POT-Creation-Date: 2014-08-04 17:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,7 +50,7 @@ msgstr "Confirmer"
 msgid "confirm-disconnect"
 msgstr "Êtes vous sûr de vouloir vous déconnecter ?"
 
-#: InterfaceManager/__init__.py:48
+#: InterfaceManager/__init__.py:48 InterfaceManager/__init__.py:1600
 #, fuzzy
 msgid "Connection"
 msgstr "Connexion"
@@ -860,7 +860,7 @@ msgid "Return"
 msgstr "Retour"
 
 #: InterfaceManager/__init__.py:242 InterfaceManager/__init__.py:666
-#: InterfaceManager/__init__.py:1078
+#: InterfaceManager/__init__.py:1078 InterfaceManager/__init__.py:1616
 msgid "Search"
 msgstr "Rechercher"
 
@@ -5580,6 +5580,101 @@ msgstr ""
 "Cette valeur spécifie une durée maximale d'inactivité avant que Z-Eye ne "
 "déconnecte votre compte"
 
+#: InterfaceManager/__init__.py:1601
+#, fuzzy
+msgid "Supervision"
+msgstr "Supervision"
+
+#: InterfaceManager/__init__.py:1602
+msgid "Speed reporting"
+msgstr "Tableau de bord"
+
+#: InterfaceManager/__init__.py:1603
+#, fuzzy
+msgid "DNS management"
+msgstr "Gestion DNS"
+
+#: InterfaceManager/__init__.py:1604
+#, fuzzy
+msgid "Hypervision"
+msgstr "Hypervision"
+
+#: InterfaceManager/__init__.py:1605
+#, fuzzy
+msgid "Users and rights"
+msgstr "Utilisateurs et droits"
+
+#: InterfaceManager/__init__.py:1606
+msgid "Z-Eye groups management"
+msgstr "Gestion des groupes Z-Eye"
+
+#: InterfaceManager/__init__.py:1607
+#, fuzzy
+msgid "Icinga sensors"
+msgstr "Sondes Icinga"
+
+#: InterfaceManager/__init__.py:1608
+msgid "Install"
+msgstr "Installeur"
+
+#: InterfaceManager/__init__.py:1609
+msgid "DHCP/IP management"
+msgstr "Gestionnaire DHCP/IP"
+
+#: InterfaceManager/__init__.py:1610
+#, fuzzy
+msgid "IP manager"
+msgstr "Gestionnaire IP"
+
+#: InterfaceManager/__init__.py:1611
+msgid "Z-Eye Engine"
+msgstr "Moteur Z-Eye"
+
+#: InterfaceManager/__init__.py:1612
+msgid "Z-Eye logs"
+msgstr "Journaux Z-Eye"
+
+#: InterfaceManager/__init__.py:1613
+msgid "Maps"
+msgstr "Cartes"
+
+#: InterfaceManager/__init__.py:1614
+msgid "Netdisco collect engine"
+msgstr "Moteur de collecte Netdisco"
+
+#: InterfaceManager/__init__.py:1615
+#, fuzzy
+msgid "RADIUS servers"
+msgstr "Serveurs RADIUS"
+
+#: InterfaceManager/__init__.py:1617
+#, fuzzy
+msgid "Security reports"
+msgstr "Rapports de sécurité"
+
+#: InterfaceManager/__init__.py:1618
+#, fuzzy
+msgid "SNMP communities"
+msgstr "Communautés SNMP"
+
+#: InterfaceManager/__init__.py:1619
+msgid "SNORT IDS engine"
+msgstr "Moteur IDS SNORT"
+
+#: InterfaceManager/__init__.py:1620
+#, fuzzy
+msgid "Network devices management"
+msgstr "Gestion des équipements réseau"
+
+#: InterfaceManager/__init__.py:1621
+msgid "Network devices (rights & backup)"
+msgstr "Equipements réseau (droits & sauvegarde)"
+
+#: InterfaceManager/__init__.py:1622
+#, fuzzy
+msgid "User management"
+msgstr "Gestion des utilisateurs"
+
 #: engine/snmpmgmt/Forms/__init__.py:40
 msgid "Err-Object-Not-Exists"
 msgstr "L'objet demandé n'existe pas"
@@ -5587,3 +5682,4 @@ msgstr "L'objet demandé n'existe pas"
 #: templates/footer.html:3
 msgid "by"
 msgstr "par"
+

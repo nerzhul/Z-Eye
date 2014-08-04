@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 	
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	
 	if(!class_exists("iUserSettings")) {
@@ -25,9 +24,11 @@
 	final class iUserSettings extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new lUserSettings();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rUserSettings($this->loc);
-			$this->menu = $this->loc->s("menu-name");
+			
+			$this->menu = "";
+			$this->menutitle = $this->loc->s("Settings");
 		}
 		
 		public function Load() {

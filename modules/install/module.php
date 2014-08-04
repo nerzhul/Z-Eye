@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
         
-    require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 
 	if(!class_exists("iInstall")) {
@@ -25,8 +24,9 @@
 	final class iInstall extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new lInstall();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rInstall($this->loc);
+			$this->menutitle = $this->loc->s("Install");
 		}
 
 		public function Load() {

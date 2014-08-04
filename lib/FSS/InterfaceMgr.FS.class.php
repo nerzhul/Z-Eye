@@ -1069,7 +1069,7 @@
 
 		public function getDjangoLocale($locale,$lang) {
 			return $this->fileGetContent(
-				sprintf("http://localhost:8080/locale/get?locale=%s", $locale),
+				sprintf("http://localhost:8080/locale/get?locale=%s", preg_replace("#[ ]#","%20",$locale)),
 				$lang
 			);
 		}

@@ -17,7 +17,6 @@
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
 
-	require_once(dirname(__FILE__)."/locales.php");
 	require_once(dirname(__FILE__)."/rules.php");
 	require_once(dirname(__FILE__)."/../dnsmgmt/objects.php");
 	require_once(dirname(__FILE__)."/../ipmanager/objects.php");
@@ -29,7 +28,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->modulename = "search";
-			$this->loc = new lSearch();
+			$this->loc = new FSLocales();
 			$this->rulesclass = new rSearch($this->loc);
 		}
 
