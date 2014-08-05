@@ -25,8 +25,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->modulename = "securityreport";
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rSecurityReport($this->loc);
+			$this->rulesclass = new rSecurityReport();
 			
 			$this->menu = _("Supervision");
 			$this->menutitle = _("Security reports");

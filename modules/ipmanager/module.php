@@ -26,9 +26,8 @@
 	final class iIPManager extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
 			$this->modulename = "ipmmgmt";
-			$this->rulesclass = new rIPManager($this->loc);
+			$this->rulesclass = new rIPManager();
 			
 			$this->menu = _("Hypervision");
 			$this->menutitle = _("DHCP/IP management");

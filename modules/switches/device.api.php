@@ -25,7 +25,6 @@
 			$this->devip = "";
 			$this->snmpro = "";
 			$this->snmprw = "";
-			$this->loc = NULL;
 		}
 
 		/*
@@ -416,11 +415,9 @@
 		public function unsetPortId() { $this->portid = -1; }
 		public function unsetDevice() { $this->device = ""; $this->devip = ""; $this->snmpro = ""; $this->snmprw = ""; }
 
-		public function setLocales($locales) { $this->loc = $locales; }
 		public $vendor;
 		protected $portid;
 		protected $device, $devip;
 		protected $snmpro, $snmprw;
-		protected $loc;
 	}
 ?>

@@ -33,7 +33,7 @@
 			$netdiscoCfg["snmptry"] = 3;
 
 			if(!$file) {
-				return FS::$iMgr->printError(FS::$iMgr->getLocale("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf", true);
+				return FS::$iMgr->printError(_("err-unable-read")." /usr/local/etc/netdisco/netdisco.conf", true);
 			}
 
 			foreach ($file as $lineNumber => $buf) {

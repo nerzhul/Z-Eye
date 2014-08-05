@@ -18,7 +18,7 @@
 	*/
 
 	final class rSwitchRightsMgmt extends FSRules {
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct() { parent::__construct(); }
 
 		public function showMgmtInterface($activerules = array()) {
 			$output = FS::$iMgr->ruleLines(_("menu-title"),$activerules,array(

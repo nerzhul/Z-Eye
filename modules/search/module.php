@@ -28,8 +28,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->modulename = "search";
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rSearch($this->loc);
+			$this->rulesclass = new rSearch();
 		}
 
 		public function Load() {

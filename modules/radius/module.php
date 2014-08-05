@@ -27,8 +27,7 @@
 	final class iRadius extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rRadius($this->loc);
+			$this->rulesclass = new rRadius();
 			
 			$this->menu = _("Hypervision");
 			$this->menutitle = _("RADIUS servers");

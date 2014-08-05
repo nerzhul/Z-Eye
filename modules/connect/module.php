@@ -25,8 +25,7 @@
 	final class iConnect extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rConnect($this->loc);
+			$this->rulesclass = new rConnect();
 			
 			$this->modulename = "connect";
 			

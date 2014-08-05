@@ -26,8 +26,7 @@
 	final class iDefault extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rDefault($this->loc);
+			$this->rulesclass = new rDefault();
 			
 			$this->menu = _("Supervision");
 			$this->menutitle = _("Speed reporting");

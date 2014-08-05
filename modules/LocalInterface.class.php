@@ -94,12 +94,12 @@
 			return "<div id=\"login\" style=\"display:none;\"><div id=\"loginF\"><header>".
 				FS::$iMgr->img("styles/images/LogoHD.png",446,214).
 				"</header><div id=\"loginCbk\"></div><div id=\"loginMsg\">".
-				$this->getLocale("Connect-to")." ".Config::getWebsiteName()."</div><div>".
+				_("Connect-to")." ".Config::getWebsiteName()."</div><div>".
 				FS::$iMgr->cbkForm("?mod=".$this->getModuleIdByPath("connect")."&act=1","Connection",true).
 				$this->input("loginuname","").
 				$this->password("loginupwd","").
 				$this->hidden("redir",$_SERVER["REQUEST_URI"]).
-				$this->submit("conn",$this->getLocale("Connection")).
+				$this->submit("conn",_("Connection")).
 				"</form></div></div></div>";
 		}
 
@@ -109,11 +109,11 @@
 				" (".FS::$sessMgr->getUserName().")".
 				"</div><div class=\"userpopup\">".
 				"<div class=\"menuItem\" onclick=\"loadInterface('".FS::$iMgr->getModuleIdByPath("usersettings")."');\">".
-				$this->getLocale("Settings")."</div>".
-				"<div class=\"menuItem\" onclick=\"confirmPopup('".FS::$secMgr->cleanForJS($this->getLocale("confirm-disconnect")).
-				"','".$this->getLocale("Confirm")."','".$this->getLocale("Cancel")."',".
+				_("Settings")."</div>".
+				"<div class=\"menuItem\" onclick=\"confirmPopup('".FS::$secMgr->cleanForJS(_("confirm-disconnect")).
+				"','"._("Confirm")."','"._("Cancel")."',".
 				"'?mod=".$this->getModuleIdByPath("connect")."&act=2',{});\">".
-				$this->getLocale("Disconnection").
+				_("Disconnection").
 				"</div></div></div>";
 		}
 
@@ -165,8 +165,8 @@
 					$jsarr .= ($jsarr != "{" ? "," : "")."'lock': true";
 					$output .= sprintf("onclick=\"confirmPopup('%s','%s','%s','?%s'",
 						FS::$secMgr->cleanForJS($options["confirm"][0]),
-						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][1])),
-						FS::$secMgr->cleanForJS($this->cur_module->getLoc()->s($options["confirm"][2])),
+						FS::$secMgr->cleanForJS(_($options["confirm"][1])),
+						FS::$secMgr->cleanForJS(_($options["confirm"][2])),
 						FS::$secMgr->cleanForJS($link)
 					);
 				}
@@ -196,7 +196,7 @@
 			 */
 			if (isset($options["confirmtext"]) && isset($options["confirmval"])) {
 				$options["confirm"] = array(
-					sprintf(FS::$iMgr->getLocale($options["confirmtext"]),
+					sprintf(_($options["confirmtext"]),
 						$options["confirmval"]),
 					"Confirm",
 					"Cancel"

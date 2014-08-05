@@ -24,8 +24,7 @@
 	final class iUserSettings extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rUserSettings($this->loc);
+			$this->rulesclass = new rUserSettings();
 			
 			$this->menu = "";
 			$this->menutitle = _("Settings");

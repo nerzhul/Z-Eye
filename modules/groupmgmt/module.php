@@ -25,9 +25,8 @@
 	final class iGroupMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
 			$this->modulename = "groupmgmt";
-			$this->rulesclass = new rGroupMgmt($this->loc);
+			$this->rulesclass = new rGroupMgmt();
 			
 			$this->menu = _("Users and rights");
 			$this->menutitle = _("Z-Eye groups management");

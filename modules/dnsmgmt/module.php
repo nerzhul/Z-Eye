@@ -26,8 +26,7 @@
 	final class iDNSManager extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rDNSMgmt($this->loc);
+			$this->rulesclass = new rDNSMgmt();
 			
 			$this->menu = _("Hypervision");
 			$this->menutitle = _("DNS management");

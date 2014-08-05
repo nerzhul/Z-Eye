@@ -68,7 +68,7 @@
 					}
 					else if($ruleAccess === -1) {
 						FS::$iMgr->js(sprintf("setLoginCbkMsg('<span style=\"color: red;\">%s</span>');openLogin();",
-							FS::$iMgr->getLocale("err-must-be-connected")));
+							_("err-must-be-connected")));
 					}
 					else {
 						FS::$iMgr->setCurrentModule($module);

@@ -25,8 +25,7 @@
 	final class iNetdisco extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rNetdisco($this->loc);
+			$this->rulesclass = new rNetdisco();
 			
 			$this->menu = _("Z-Eye Engine");
 			$this->menutitle = _("Netdisco collect engine");

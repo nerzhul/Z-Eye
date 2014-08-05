@@ -35,8 +35,7 @@
 	final class iSwitchMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rSwitchMgmt($this->loc);
+			$this->rulesclass = new rSwitchMgmt();
 			
 			$this->menu = _("Hypervision");
 			$this->menutitle = _("Network devices management");
@@ -55,7 +54,6 @@
 					case "dell": $this->devapi = new DellAPI(); break;
 					default: $this->devapi = new DeviceAPI(); break;
 				}
-				$this->devapi->setLocales($this->loc);
 			}
 			else
 				$this->vendor = "";

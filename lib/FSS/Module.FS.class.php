@@ -30,7 +30,6 @@
 
 	abstract class FSModule {
 		function __construct() {
-			$this->loc = "";
 			$this->modulename = "";
 			$this->menutitle = "";
 			$this->menu = "";
@@ -47,7 +46,6 @@
 		public function setModuleId($id) { $this->mid = $id; }
 		public function getModuleId() { return $this->mid; }
 		public function getMenuTitle() { return $this->menutitle; }
-		public function getLoc() { return $this->loc; }
 		public function getName() { return $this->modulename; }
 
 		public function log($level,$str,$user=NULL) {
@@ -112,9 +110,6 @@
 		// Attributes
 		protected $mid;
 		protected $modulename;
-
-		protected $loc;
-
 		protected $rulesclass;
 		protected $scheduleclass;
 

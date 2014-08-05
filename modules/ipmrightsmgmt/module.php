@@ -24,9 +24,8 @@
 	final class iIPMRightsMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
 			$this->modulename = "ipmrightsmgmt";
-			$this->rulesclass = new rIPMRightsMgmt($this->loc);
+			$this->rulesclass = new rIPMRightsMgmt();
 			
 			$this->menu = _("Users and rights");
 			$this->menuname = _("IP manager");

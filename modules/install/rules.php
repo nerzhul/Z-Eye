@@ -18,7 +18,7 @@
 	*/
 
 	final class rInstall extends FSRules {
-		function __construct($locales) { parent::__construct($locales); }
+		function __construct() { parent::__construct(); }
 
 		public function showMgmtInterface($activerules = array()) {
 			return "";

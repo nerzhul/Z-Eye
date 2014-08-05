@@ -25,8 +25,7 @@
 	final class iSNMPMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rSNMPmgmt($this->loc);
+			$this->rulesclass = new rSNMPmgmt();
 			
 			$this->menu = _("Z-Eye Engine");
 			$this->menutitle = _("SNMP communities");

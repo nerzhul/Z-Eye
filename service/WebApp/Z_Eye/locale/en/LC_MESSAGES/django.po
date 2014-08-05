@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-04 17:33+0200\n"
+"POT-Creation-Date: 2014-08-05 10:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Action"
 #: InterfaceManager/__init__.py:43 InterfaceManager/__init__.py:289
 #: InterfaceManager/__init__.py:308 InterfaceManager/__init__.py:488
 #: InterfaceManager/__init__.py:753 InterfaceManager/__init__.py:874
-#: InterfaceManager/__init__.py:1454
+#: InterfaceManager/__init__.py:1454 InterfaceManager/__init__.py:1624
 msgid "Add"
 msgstr "Add"
 
@@ -97,7 +97,7 @@ msgstr "Error"
 
 #: InterfaceManager/__init__.py:59 InterfaceManager/__init__.py:531
 #: InterfaceManager/__init__.py:758 InterfaceManager/__init__.py:1272
-#: InterfaceManager/__init__.py:1462
+#: InterfaceManager/__init__.py:1462 InterfaceManager/__init__.py:1629
 msgid "err-bad-datas"
 msgstr "Invalid datas"
 
@@ -173,6 +173,7 @@ msgstr "No"
 #: InterfaceManager/__init__.py:638 InterfaceManager/__init__.py:768
 #: InterfaceManager/__init__.py:943 InterfaceManager/__init__.py:1352
 #: InterfaceManager/__init__.py:1478 InterfaceManager/__init__.py:1559
+#: InterfaceManager/__init__.py:1641
 msgid "None"
 msgstr "None"
 
@@ -212,7 +213,7 @@ msgstr "Write datas"
 #: InterfaceManager/__init__.py:665 InterfaceManager/__init__.py:780
 #: InterfaceManager/__init__.py:962 InterfaceManager/__init__.py:1382
 #: InterfaceManager/__init__.py:1499 InterfaceManager/__init__.py:1566
-#: engine/snmpmgmt/Forms/__init__.py:50
+#: InterfaceManager/__init__.py:1653 engine/snmpmgmt/Forms/__init__.py:50
 msgid "Save"
 msgstr "Save"
 
@@ -242,7 +243,7 @@ msgstr "Settings"
 
 #: InterfaceManager/__init__.py:91 InterfaceManager/__init__.py:785
 #: InterfaceManager/__init__.py:1004 InterfaceManager/__init__.py:1432
-#: InterfaceManager/__init__.py:1510
+#: InterfaceManager/__init__.py:1510 InterfaceManager/__init__.py:1658
 msgid "Type"
 msgstr "Type"
 
@@ -276,7 +277,7 @@ msgstr "Are you sure you want to disconnect ?"
 
 #: InterfaceManager/__init__.py:99 InterfaceManager/__init__.py:221
 #: InterfaceManager/__init__.py:766 InterfaceManager/__init__.py:929
-#: InterfaceManager/__init__.py:1473
+#: InterfaceManager/__init__.py:1473 InterfaceManager/__init__.py:1637
 msgid "Login"
 msgstr "Login"
 
@@ -286,7 +287,7 @@ msgstr "Login"
 #: InterfaceManager/__init__.py:631 InterfaceManager/__init__.py:937
 #: InterfaceManager/__init__.py:1053 InterfaceManager/__init__.py:1188
 #: InterfaceManager/__init__.py:1339 InterfaceManager/__init__.py:1475
-#: InterfaceManager/__init__.py:1555
+#: InterfaceManager/__init__.py:1555 InterfaceManager/__init__.py:1639
 msgid "menu-title"
 msgstr ""
 
@@ -382,6 +383,7 @@ msgstr "Link"
 #: InterfaceManager/__init__.py:630 InterfaceManager/__init__.py:936
 #: InterfaceManager/__init__.py:1187 InterfaceManager/__init__.py:1338
 #: InterfaceManager/__init__.py:1474 InterfaceManager/__init__.py:1554
+#: InterfaceManager/__init__.py:1638
 msgid "menu-name"
 msgstr ""
 
@@ -743,7 +745,7 @@ msgstr "Unable to load tab, link may be wrong or page unavailable"
 
 #: InterfaceManager/__init__.py:212 InterfaceManager/__init__.py:761
 #: InterfaceManager/__init__.py:795 InterfaceManager/__init__.py:920
-#: InterfaceManager/__init__.py:1468
+#: InterfaceManager/__init__.py:1468 InterfaceManager/__init__.py:1632
 msgid "Filter"
 msgstr "Filter"
 
@@ -764,7 +766,7 @@ msgid "Herited"
 msgstr "Inherited"
 
 #: InterfaceManager/__init__.py:217 InterfaceManager/__init__.py:765
-#: InterfaceManager/__init__.py:1472
+#: InterfaceManager/__init__.py:1472 InterfaceManager/__init__.py:1636
 msgid "ip-addr"
 msgstr "IP address"
 
@@ -798,7 +800,7 @@ msgstr "Master zone's file path"
 
 #: InterfaceManager/__init__.py:228 InterfaceManager/__init__.py:384
 #: InterfaceManager/__init__.py:767 InterfaceManager/__init__.py:1476
-#: engine/snmpmgmt/Forms/__init__.py:49
+#: InterfaceManager/__init__.py:1640 engine/snmpmgmt/Forms/__init__.py:49
 msgid "Modification"
 msgstr "Modifying"
 
@@ -846,6 +848,7 @@ msgstr "Record Type"
 
 #: InterfaceManager/__init__.py:240 InterfaceManager/__init__.py:769
 #: InterfaceManager/__init__.py:959 InterfaceManager/__init__.py:1496
+#: InterfaceManager/__init__.py:1642
 msgid "Return"
 msgstr "Return"
 
@@ -857,6 +860,7 @@ msgstr "Search"
 #: InterfaceManager/__init__.py:243 InterfaceManager/__init__.py:667
 #: InterfaceManager/__init__.py:781 InterfaceManager/__init__.py:963
 #: InterfaceManager/__init__.py:1500 InterfaceManager/__init__.py:1567
+#: InterfaceManager/__init__.py:1654
 msgid "Server"
 msgstr "Server"
 
@@ -1085,6 +1089,7 @@ msgstr "Remove"
 
 #: InterfaceManager/__init__.py:292 InterfaceManager/__init__.py:757
 #: InterfaceManager/__init__.py:1154 InterfaceManager/__init__.py:1461
+#: InterfaceManager/__init__.py:1628
 msgid "err-already-exist"
 msgstr "This group already exists !"
 
@@ -1260,7 +1265,7 @@ msgid "err-hg-used"
 msgstr "Hostgroup in use. Please remove links with this hostgroup."
 
 #: InterfaceManager/__init__.py:344 InterfaceManager/__init__.py:760
-#: InterfaceManager/__init__.py:1465
+#: InterfaceManager/__init__.py:1465 InterfaceManager/__init__.py:1631
 msgid "err-not-found"
 msgstr "Not found"
 
@@ -2818,100 +2823,105 @@ msgid "tooltip-ip-comment"
 msgstr "A comment to describe the address or the host"
 
 #: InterfaceManager/__init__.py:754 InterfaceManager/__init__.py:1233
-#: InterfaceManager/__init__.py:1455
+#: InterfaceManager/__init__.py:1455 InterfaceManager/__init__.py:1625
 msgid "All"
 msgstr "All"
 
 #: InterfaceManager/__init__.py:755 InterfaceManager/__init__.py:1457
+#: InterfaceManager/__init__.py:1626
 #, fuzzy
 msgid "confirm-remove-groupright"
 msgstr "Are you sure you want to remove right for group '%s' ?"
 
 #: InterfaceManager/__init__.py:756 InterfaceManager/__init__.py:1458
+#: InterfaceManager/__init__.py:1627
 #, fuzzy
 msgid "confirm-remove-userright"
 msgstr "Are you sure you want to remove right for user '%s' ?"
 
-#: InterfaceManager/__init__.py:759
+#: InterfaceManager/__init__.py:759 InterfaceManager/__init__.py:1630
 #, fuzzy
 msgid "err-no-subnet"
 msgstr "This subnet is invalid !"
 
 #: InterfaceManager/__init__.py:762 InterfaceManager/__init__.py:840
 #: InterfaceManager/__init__.py:1321 InterfaceManager/__init__.py:1469
+#: InterfaceManager/__init__.py:1633
 msgid "Go"
 msgstr "Go"
 
 #: InterfaceManager/__init__.py:763 InterfaceManager/__init__.py:1470
+#: InterfaceManager/__init__.py:1634
 #, fuzzy
 msgid "group-rights"
 msgstr "Group rights"
 
 #: InterfaceManager/__init__.py:764 InterfaceManager/__init__.py:924
 #: InterfaceManager/__init__.py:1043 InterfaceManager/__init__.py:1471
-#: InterfaceManager/__init__.py:1544
+#: InterfaceManager/__init__.py:1544 InterfaceManager/__init__.py:1635
 #, fuzzy
 msgid "Groups"
 msgstr "Groups"
 
 #: InterfaceManager/__init__.py:770 InterfaceManager/__init__.py:1497
+#: InterfaceManager/__init__.py:1643
 msgid "Right"
 msgstr "Right"
 
-#: InterfaceManager/__init__.py:771
+#: InterfaceManager/__init__.py:771 InterfaceManager/__init__.py:1644
 #, fuzzy
 msgid "right-advancedtools"
 msgstr "Advanced tools"
 
-#: InterfaceManager/__init__.py:772
+#: InterfaceManager/__init__.py:772 InterfaceManager/__init__.py:1645
 #, fuzzy
 msgid "right-history"
 msgstr "IP history"
 
-#: InterfaceManager/__init__.py:773
+#: InterfaceManager/__init__.py:773 InterfaceManager/__init__.py:1646
 #, fuzzy
 msgid "right-ipmgmt"
 msgstr "IP address management"
 
-#: InterfaceManager/__init__.py:774
+#: InterfaceManager/__init__.py:774 InterfaceManager/__init__.py:1647
 #, fuzzy
 msgid "right-optionsgrpmgmt"
 msgstr "DHCP option group management"
 
-#: InterfaceManager/__init__.py:775
+#: InterfaceManager/__init__.py:775 InterfaceManager/__init__.py:1648
 #, fuzzy
 msgid "right-optionsmgmt"
 msgstr "DHCP options management"
 
-#: InterfaceManager/__init__.py:776
+#: InterfaceManager/__init__.py:776 InterfaceManager/__init__.py:1649
 msgid "right-rangemgmt"
 msgstr "IP range management"
 
-#: InterfaceManager/__init__.py:777
+#: InterfaceManager/__init__.py:777 InterfaceManager/__init__.py:1650
 msgid "right-read"
 msgstr "Reading (global)"
 
-#: InterfaceManager/__init__.py:778
+#: InterfaceManager/__init__.py:778 InterfaceManager/__init__.py:1651
 #, fuzzy
 msgid "right-servermgmt"
 msgstr "DHCP server management"
 
-#: InterfaceManager/__init__.py:779
+#: InterfaceManager/__init__.py:779 InterfaceManager/__init__.py:1652
 #, fuzzy
 msgid "right-subnetmgmt"
 msgstr "Subnet management"
 
-#: InterfaceManager/__init__.py:782
+#: InterfaceManager/__init__.py:782 InterfaceManager/__init__.py:1655
 #, fuzzy
 msgid "title-bysubnet"
 msgstr "title-bysubnet"
 
-#: InterfaceManager/__init__.py:783
+#: InterfaceManager/__init__.py:783 InterfaceManager/__init__.py:1656
 #, fuzzy
 msgid "title-globalrights"
 msgstr "Global rights"
 
-#: InterfaceManager/__init__.py:784
+#: InterfaceManager/__init__.py:784 InterfaceManager/__init__.py:1657
 #, fuzzy
 msgid "title-ipmrightsmgmt"
 msgstr "IP manager rights management"
@@ -2920,23 +2930,25 @@ msgstr "IP manager rights management"
 #: InterfaceManager/__init__.py:1005 InterfaceManager/__init__.py:1113
 #: InterfaceManager/__init__.py:1226 InterfaceManager/__init__.py:1436
 #: InterfaceManager/__init__.py:1511 InterfaceManager/__init__.py:1587
+#: InterfaceManager/__init__.py:1659
 #, fuzzy
 msgid "User"
 msgstr "User"
 
 #: InterfaceManager/__init__.py:787 InterfaceManager/__init__.py:1512
+#: InterfaceManager/__init__.py:1660
 #, fuzzy
 msgid "user-rights"
 msgstr "User rights"
 
 #: InterfaceManager/__init__.py:788 InterfaceManager/__init__.py:1010
-#: InterfaceManager/__init__.py:1513
+#: InterfaceManager/__init__.py:1513 InterfaceManager/__init__.py:1661
 #, fuzzy
 msgid "Users"
 msgstr "Users"
 
 #: InterfaceManager/__init__.py:789 InterfaceManager/__init__.py:1514
-#: engine/snmpmgmt/Models/__init__.py:28
+#: InterfaceManager/__init__.py:1662 engine/snmpmgmt/Models/__init__.py:28
 msgid "Writing"
 msgstr "Writing"
 

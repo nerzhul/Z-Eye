@@ -30,7 +30,6 @@
 
 	abstract class FSMObj {
 		function __construct() {
-			$this->loc = FS::$iMgr->getLocales();
 			$this->mod = FS::$iMgr->getCurModule();
 			$this->mid = $this->mod->getModuleId();
 			$this->readRight = "";
@@ -89,7 +88,7 @@
 		
 		public function storeSearchResult($output,$title,$minwidth = false) {
 			if (FS::$searchMgr->getMode() == 1) {
-				FS::$searchMgr->addResult(array($this->loc->s($title),$output));
+				FS::$searchMgr->addResult(array(_($title),$output));
 				return "";
 			}
 			else {

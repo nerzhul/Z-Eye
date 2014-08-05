@@ -24,8 +24,7 @@
 	final class iInstall extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rInstall($this->loc);
+			$this->rulesclass = new rInstall();
 			$this->menutitle = _("Install");
 		}
 

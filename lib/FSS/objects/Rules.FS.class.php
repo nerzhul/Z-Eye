@@ -29,12 +29,10 @@
         */
 
 	abstract class FSRules {
-		function __construct($locales) { $this->loc = $locales; }
+		function __construct() {}
 
 		public function showMgmtInterface() { return ""; }
 
 		public function canAccessToModule() { return false; }
-
-		protected $loc;
 	};
 ?>

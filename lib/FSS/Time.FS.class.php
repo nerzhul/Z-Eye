@@ -59,40 +59,40 @@
 			$dayStr = "";
 			if ($days > 0) {
 				if ($days == 1) {
-					$dayStr = sprintf("%s %s", $days, FS::$iMgr->getLocale("day"));
+					$dayStr = sprintf("%s %s", $days, _("day"));
 				}
 				else {
-					$dayStr = sprintf("%s %s", $days, FS::$iMgr->getLocale("days"));
+					$dayStr = sprintf("%s %s", $days, _("days"));
 				}
 			}
 			
 			$hourStr = "";
 			if ($hours > 0) {
 				if ($hours == 1) {
-					$hourStr = sprintf("%s %s", $hours, FS::$iMgr->getLocale("hour"));
+					$hourStr = sprintf("%s %s", $hours, _("hour"));
 				}
 				else {
-					$hourStr = sprintf("%s %s", $hours, FS::$iMgr->getLocale("hours"));
+					$hourStr = sprintf("%s %s", $hours, _("hours"));
 				}
 			}
 			
 			$minStr = "";
 			if ($minutes > 0) {
 				if ($minutes == 1) {
-					$minStr = sprintf("%s %s", $minutes, FS::$iMgr->getLocale("minute"));
+					$minStr = sprintf("%s %s", $minutes, _("minute"));
 				}
 				else {
-					$minStr = sprintf("%s %s", $minutes, FS::$iMgr->getLocale("minutes"));
+					$minStr = sprintf("%s %s", $minutes, _("minutes"));
 				}
 			}
 			
 			$secStr = "";
 			if ($seconds > 0) {
 				if ($seconds == 1) {
-					$secStr = sprintf("%s %s", $seconds, FS::$iMgr->getLocale("second"));
+					$secStr = sprintf("%s %s", $seconds, _("second"));
 				}
 				else {
-					$secStr = sprintf("%s %s", $seconds, FS::$iMgr->getLocale("seconds"));
+					$secStr = sprintf("%s %s", $seconds, _("seconds"));
 				}
 			}
 			

@@ -30,7 +30,6 @@
 
 	require_once(dirname(__FILE__)."/FS.main.php");
 	require_once(dirname(__FILE__)."/HTMLTableMgr".CLASS_EXT);
-	require_once(dirname(__FILE__)."/objects/Locales".CLASS_EXT);
 	require_once(dirname(__FILE__)."/objects/Rules".CLASS_EXT);
 
 	abstract class FSInterfaceMgr {
@@ -195,7 +194,7 @@
 				}
 				else if($ruleAccess === -1) {
 					$this->js(sprintf("setLoginCbkMsg('<span style=\"color: red;\">%s</span>');openLogin();",
-						$this->getLocale("err-must-be-connected")));
+						_("err-must-be-connected")));
 					return "";
 				}
 				else {
@@ -233,22 +232,22 @@
 
 		public function h1($str,$raw=false,$id="") {
 			return sprintf("<h1%s>%s</h1>",
-				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : _($str)));
 		}
 
 		public function h2($str,$raw=false,$id="") {
 			return sprintf("<h2%s>%s</h2>",
-				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : _($str)));
 		}
 
 		public function h3($str,$raw=false,$id="") {
 			return sprintf("<h3%s>%s</h3>",
-				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : _($str)));
 		}
 
 		public function h4($str,$raw=false,$id="") {
 			return sprintf("<h4%s>%s</h4>",
-				($id ? " id=\"".$id."\"" : ""),($raw ? $str : $this->getLocale($str)));
+				($id ? " id=\"".$id."\"" : ""),($raw ? $str : _($str)));
 		}
 
 		public function hr() { return "<div id=\"hr\"></div>"; }
@@ -282,17 +281,17 @@
 
 		public function label($for,$value,$class = "") {
 			return sprintf("<label class=\"%s\" for=\"%s\">%s</label>",
-				$class,$for,$this->getLocale($value));
+				$class,$for,_($value));
 		}
 
 		public function tooltip($text) {
 			return sprintf(" onmouseover=\"showTooltip('%s');\" onmouseout=\"hideTooltip();\" ",
-				FS::$secMgr->cleanForJS($this->getLocale($text)));
+				FS::$secMgr->cleanForJS(_($text)));
 		}
 
 		public function tip($text,$raw=false) {
 			return sprintf("<div id=\"tip\">%s</div>",
-				($raw ? $text : $this->getLocale($text)));
+				($raw ? $text : _($text)));
 		}
 
 		public function textarea($name, $def_value = "", $options=array()) {
@@ -554,12 +553,12 @@
 				$options["method"] = "POST";
 			}
 			return sprintf("<form action=\"%s\" method=\"%s\" onsubmit=\"return callbackForm('%s',this,{'snotif':'%s'});\" >",
-				$link,$options["method"],$link,FS::$secMgr->cleanForJS($this->getLocale($textid)));
+				$link,$options["method"],$link,FS::$secMgr->cleanForJS(_($textid)));
 		}
 
 		public function idxLine($text,$name,$options = array()) {
 			$value = (isset($options["value"]) ? $options["value"] : "");
-			$label = ((isset($options["rawlabel"]) && $options["rawlabel"] == true) ? $text : $this->getLocale($text));
+			$label = ((isset($options["rawlabel"]) && $options["rawlabel"] == true) ? $text : _($text));
 			$star = (isset($options["star"]) ? $options["star"] : 0);
 
 			$output = "<tr ";
@@ -630,7 +629,7 @@
 		public function idxIdLine($label,$name,$value = "",$options = array()) {
 			if ($value) {
 				return sprintf("<tr><td>%s</td><td>%s%s%s</td></tr>",
-					$this->getLocale($label), $value,
+					_($label), $value,
 					FS::$iMgr->hidden($name,$value), FS::$iMgr->hidden("edit",1)
 				);
 			}
@@ -660,8 +659,8 @@
 			return sprintf("<tr><th colspan=\"%d\" class=\"ctrel\">%s</th></tr></table></form>",
 				isset($options["size"]) ? $options["size"] : 2,
 				isset($options["js"]) ?
-					$this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label),$options["js"]) :
-					$this->submit((isset($options["name"]) ? $options["name"] : ""),$this->getLocale($label))
+					$this->JSSubmit((isset($options["name"]) ? $options["name"] : ""),_($label),$options["js"]) :
+					$this->submit((isset($options["name"]) ? $options["name"] : ""),_($label))
 			);
 		}
 
@@ -830,7 +829,7 @@
 			FS::$iMgr->js("$('#contenttabs').tabs({cache: false,
 				ajaxOptions: {
 					error: function(xhr,status,index,anchor) {
-						$(anchor.hash).html(\"".$this->getLocale("fail-tab")."\");
+						$(anchor.hash).html(\""._("fail-tab")."\");
 					},
 				},
 				beforeLoad: function(event,ui) {
@@ -912,10 +911,10 @@
 
 		public function printError($msg,$raw=false) {
 			if ($raw) {
-				return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$msg);
+				return sprintf("<div id=\"errorContent\">%s: %s</div>",_("Error"),$msg);
 			}
 			else {
-				return sprintf("<div id=\"errorContent\">%s: %s</div>",$this->getLocale("Error"),$this->getLocale($msg));
+				return sprintf("<div id=\"errorContent\">%s: %s</div>",_("Error"),_($msg));
 			}
 		}
 
@@ -927,7 +926,7 @@
 		}
 
 		public function printDebug($msg) {
-			return sprintf("<div id=\"debugContent\">%s: %s</div>",$this->getLocale("Notification"),$msg);
+			return sprintf("<div id=\"debugContent\">%s: %s</div>",_("Notification"),$msg);
 		}
 
 		public function printDebugBacktrace() {
@@ -982,7 +981,7 @@
 		public function ajaxEcho($str,$js="",$raw=false,$options=array()) {
 			$this->echo_buffer = sprintf("%s%s",
 				$this->echo_buffer,
-				($raw ? $str : $this->getLocale($str))
+				($raw ? $str : _($str))
 			);
 
 			if (isset($options["no-close"]) &&
@@ -1000,8 +999,8 @@
 			);
 			$this->ajaxEcho(
 				sprintf("<span class=\"notifErrSpan\">%s:</span> %s",
-					$this->getLocale("Error"),
-					$raw ? $str : $this->getLocale($str)),
+					_("Error"),
+					$raw ? $str : _($str)),
 				$js, true, $options
 			);
 		}
@@ -1027,19 +1026,6 @@
 
 		public function getAjaxEchoBuffer() {
 			return $this->echo_buffer;
-		}
-
-		public function getLocale($locid) {
-			return $this->getLocales()->s($locid);
-		}
-
-		public function getLocales() {
-			if ($this->cur_module) {
-				return $this->cur_module->getLoc();
-			}
-			else {
-				return new FSLocales();
-			}
 		}
 
 		public function getCurModule() { return $this->cur_module; }

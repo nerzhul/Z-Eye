@@ -24,8 +24,7 @@
 	final class iSwitchRightsMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rSwitchRightsMgmt($this->loc);
+			$this->rulesclass = new rSwitchRightsMgmt();
 			
 			$this->menu = _("Users and rights");
 			$this->menutitle = _("Network devices (rights & backup)");

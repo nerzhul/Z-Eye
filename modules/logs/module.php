@@ -25,8 +25,7 @@
 	final class iLogs extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rLogs($this->loc);
+			$this->rulesclass = new rLogs();
 			
 			$this->menu = _("Z-Eye Engine");
 			$this->menutitle = _("Z-Eye logs");

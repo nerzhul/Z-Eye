@@ -25,8 +25,7 @@
 	final class iUserMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rUserMgmt($this->loc);
+			$this->rulesclass = new rUserMgmt();
 			
 			$this->menu = _("Users and rights");
 			$this->menutitle = _("User management");

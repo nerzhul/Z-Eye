@@ -27,8 +27,7 @@
 		function __construct() {
 			parent::__construct();
 			$this->modulename = "icinga";
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rIcinga($this->loc);
+			$this->rulesclass = new rIcinga();
 			
 			$this->menu = _("Supervision");
 			$this->menutitle = _("Icinga sensors");

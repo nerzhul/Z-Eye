@@ -196,7 +196,7 @@
 						}
 						// Select values
 						else if ($this->attrList[$i][2] == "s") {
-							$locoutput = FS::$iMgr->getLocale($this->attrList[$i][3][$values[$j][$i]]);
+							$locoutput = _($this->attrList[$i][3][$values[$j][$i]]);
 						}
 						// Select values (raw mode)
 						else if ($this->attrList[$i][2] == "sr") {
@@ -240,7 +240,7 @@
 				}
 				// Select values
 				else if ($this->attrList[$i][2] == "s") {
-					$locoutput = FS::$iMgr->getLocale($this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]]);
+					$locoutput = _($this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]]);
 				}
 				else if ($this->attrList[$i][2] == "sr") {
 					$locoutput = $this->attrList[$i][3][$sqlDatas[$this->attrList[$i][1]]];
@@ -256,7 +256,7 @@
 			if ($this->removeColumn) {
 				$output = sprintf("%s<td>%s</td>",$output,FS::$iMgr->removeIcon($this->removeLink."=".$sqlDatas[$this->sqlAttrId],
 					array("js" => true, "confirm" =>
-					FS::$iMgr->getLocale($this->removeConfirm)."'".$sqlDatas[$this->sqlAttrId]."' ?")));
+					_($this->removeConfirm)."'".$sqlDatas[$this->sqlAttrId]."' ?")));
 			}
 
 			return sprintf("<tr id=\"%s%s%s\"><td>%s</td>%s</tr>",$this->trPrefix,FS::$iMgr->formatHTMLId($sqlDatas[$this->sqlAttrId]),
@@ -337,7 +337,7 @@
 				$this->tableId,$this->firstLineId);
 			
 			for ($i=0;$i<$attrCount;$i++) {
-				$output = sprintf("%s%s</th>",$output,FS::$iMgr->getLocale($this->attrList[$i][0]));
+				$output = sprintf("%s%s</th>",$output,_($this->attrList[$i][0]));
 				
 				if ($i < $attrCount-1) {
 					$output = sprintf("%s<th>",$output);

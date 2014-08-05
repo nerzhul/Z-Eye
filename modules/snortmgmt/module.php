@@ -24,8 +24,7 @@
 	final class iSnortMgmt extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
-			$this->rulesclass = new rSnortMgmt($this->loc);
+			$this->rulesclass = new rSnortMgmt();
 			
 			$this->menu = _("Z-Eye Engine");
 			$this->menutitle = _("SNORT IDS engine");

@@ -25,9 +25,8 @@
 	final class iMaps extends FSModule {
 		function __construct() {
 			parent::__construct();
-			$this->loc = new FSLocales();
 			$this->icingaAPI = new icingaBroker();
-			$this->rulesclass = new rMaps($this->loc);
+			$this->rulesclass = new rMaps();
 			
 			$this->menu = _("Supervision");
 			$this->menutitle = _("Maps");
