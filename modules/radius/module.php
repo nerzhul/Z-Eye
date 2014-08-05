@@ -1560,15 +1560,15 @@
 					$sport = FS::$secMgr->checkAndSecurisePostData("sport");
 					$sdbname = FS::$secMgr->checkAndSecurisePostData("sdbname");
 					if (!$saddr || !$sport || !$sdbname) {
-						echo "<span style=\"color:red;\">"._("Error")."#1</span>";
+						FS::$iMgr->ajaxEcho("<span style=\"color:red;\">"._("Error")."#1</span>","",true);
 						return;
 					}
 
 					if ($radSQLMgr = $this->connectToRaddb($saddr,$sport,$sdbname)) {
-						echo "<span style=\"color:green;\">"._("OK")."</span>";
+						FS::$iMgr->ajaxEcho("<span style=\"color:green;\">"._("OK")."</span>","",true);
 					}
 					else {
-						echo "<span style=\"color:red;\">"._("Error")."</span>";
+						FS::$iMgr->ajaxEcho("<span style=\"color:red;\">"._("Error")."</span>","",true);
 					}
 			}
 
