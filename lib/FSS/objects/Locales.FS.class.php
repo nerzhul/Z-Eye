@@ -54,7 +54,7 @@
 			if (!$this->locales ||
 				!isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
 				
-				return FS::$iMgr->getDjangoLocale($str,$lang);
+				return _($str);
 			}
 			
 			return $this->locales[$lang][$str];

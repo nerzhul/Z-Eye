@@ -99,6 +99,7 @@
 
 		public function Start() {
 			session_start();
+			$this->initLang();
 		}
 
 		public function Close() {
@@ -154,6 +155,23 @@
 			$tmp = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			$lang = strtolower(substr(chop($tmp[0]),0,2));
 			return $lang;
+		}
+		
+		public function initLang() {
+			if (isset($_SESSION["lang"])) {
+				setlocale(LC_ALL,$_SESSION["lang"]);
+				putenv("LANG=".$_SESSION["lang"]);
+				bindtextdomain("django", dirname(__FILE__)."/../../service/WebApp/Z_Eye/locale");
+				textdomain("django");
+				bind_textdomain_codeset("django", 'UTF-8');
+			}
+			else {
+				setlocale(LC_ALL,"fr");
+				putenv("LANG=fr");
+				bindtextdomain("django", dirname(__FILE__)."/../../service/WebApp/Z_Eye/locale");
+				textdomain("django");
+				bind_textdomain_codeset("django", 'UTF-8');
+			}
 		}
 
 		public function getUid() {
