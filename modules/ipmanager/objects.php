@@ -60,7 +60,7 @@
 			}
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",in_array("none",$selected));
+				$output .= FS::$iMgr->selElmt(_("None"),"none",in_array("none",$selected));
 			}
 
 			// bufferize with cache first because cache has less datas
@@ -71,7 +71,7 @@
 						$found = true;
 					}
 					$netarray[$data["netid"]] = sprintf("%s/%s (%s)",
-						$data["netid"],$data["netmask"],$this->loc->s("in-cache"));
+						$data["netid"],$data["netmask"],_("in-cache"));
 				}
 			}
 
@@ -193,10 +193,10 @@
 				if (FS::$secMgr->isNumeric($search)) {
 					$query = FS::$dbMgr->Select($this->sqlTable,"netid,netmask,subnet_short_name","vlanid = '".$search."'");
 					if ($data = FS::$dbMgr->Fetch($query)) {
-						$output .= $this->loc->s("subnet-shortname").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager").
+						$output .= _("subnet-shortname").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager").
 							"&sh=2", $data["subnet_short_name"])."<br />".
-							$this->loc->s("netid").": ".$data["netid"]."<br />".
-							$this->loc->s("netmask").": ".$data["netmask"]."<br />";
+							_("netid").": ".$data["netid"]."<br />".
+							_("netmask").": ".$data["netmask"]."<br />";
 						FS::$searchMgr->incResultCount();
 						$this->storeSearchResult($output,"title-vlan-ipmanager");
 					}
@@ -210,10 +210,10 @@
 					if ($found == false) {
 						$found = true;
 					}
-					$output .= $this->loc->s("vlanid").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager").
+					$output .= _("vlanid").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager").
 						"&sh=2>", $data["vlanid"])."<br />".
-						$this->loc->s("netid").": ".$data["netid"]."<br />".
-						$this->loc->s("netmask").": ".$data["netmask"]."<br />";
+						_("netid").": ".$data["netid"]."<br />".
+						_("netmask").": ".$data["netmask"]."<br />";
 					FS::$searchMgr->incResultCount();
 				}
 
@@ -230,11 +230,11 @@
 					if ($found == false) {
 						$found = true;
 					}
-					$output .= "<b>".$this->loc->s("subnet-shortname")."</b>: ".
+					$output .= "<b>"._("subnet-shortname")."</b>: ".
 						FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("ipmanager")."&sh=2", $data["subnet_short_name"])."<br />".
-						"<b>".$this->loc->s("netid")."</b>: ".$data["netid"]."<br />".
-						"<b>".$this->loc->s("netmask")."</b>: ".$data["netmask"]."<br />".
-						"<b>".$this->loc->s("vlanid")."</b>: ".$data["vlanid"]."<br />";
+						"<b>"._("netid")."</b>: ".$data["netid"]."<br />".
+						"<b>"._("netmask")."</b>: ".$data["netmask"]."<br />".
+						"<b>"._("vlanid")."</b>: ".$data["vlanid"]."<br />";
 					FS::$iMgr->incResultCount();
 				}
 
@@ -327,13 +327,13 @@
 						$found = true;
 					}
 
-					$output .= "<b>".$this->loc->s("DHCP-name")."</b>: ".$data["alias"]."<br />".
-						"<b>".$this->loc->s("Address")."</b>: ".$data["addr"]."<br />".
-						"<b>".$this->loc->s("Description")."</b>: ".$data["description"]."<br />".
-						"<b>".$this->loc->s("os")."</b>: ".$data["osname"]."<br />";
+					$output .= "<b>"._("DHCP-name")."</b>: ".$data["alias"]."<br />".
+						"<b>"._("Address")."</b>: ".$data["addr"]."<br />".
+						"<b>"._("Description")."</b>: ".$data["description"]."<br />".
+						"<b>"._("os")."</b>: ".$data["osname"]."<br />";
 					switch($data["dhcptype"]) {
 						case 1:
-							$output .= "<b>".$this->loc->s("DHCP-type")."</b>: ISC-DHCPD<br />";
+							$output .= "<b>"._("DHCP-type")."</b>: ISC-DHCPD<br />";
 							break;
 					}
 					$output .= FS::$iMgr->hr();
@@ -388,8 +388,8 @@
 
 				if ($found) {
 					foreach ($clusters as $cname => $members) {
-						$output .= "<b>".$this->loc->s("DHCP-cluster")."</b>: ".$cname."<br /><b>".
-							$this->loc->s("Members").":</b><ul>";
+						$output .= "<b>"._("DHCP-cluster")."</b>: ".$cname."<br /><b>".
+							_("Members").":</b><ul>";
 
 						$count = count($members);
 						for ($i=0;$i<$count;$i++) {
@@ -475,37 +475,37 @@
 					}
 
 					if (strlen($data["ip"]) > 0) {
-						$output .= $this->loc->s("link-ip").": ".FS::$iMgr->aLink($this->mid.
+						$output .= _("link-ip").": ".FS::$iMgr->aLink($this->mid.
 							"&s=".$data["ip"], $data["ip"])."<br />";
 					}
 
 					if (strlen($data["hostname"]) > 0) {
-						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".
+						$output .= "<b>"._("dhcp-hostname")."</b>: ".
 						$data["hostname"]."<br />";
 					}
 
 					if (strlen($data["macaddr"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".
+						$output .= "<b>"._("link-mac-addr")."</b>: ".
 							FS::$iMgr->aLink($this->mid.
 							"&s=".$data["macaddr"], $data["macaddr"])."<br />";
 					}
 
 					if (strlen($data["comment"]) > 0) {
-						$output .= "<b>".$this->loc->s("comment")."</b>: ".$data["comment"]."<br />";
+						$output .= "<b>"._("comment")."</b>: ".$data["comment"]."<br />";
 					}
 
 					if ($data["reserv"] == 't') {
-						$output .= "<b>".$this->loc->s("active-reserv")."</b><br />";
+						$output .= "<b>"._("active-reserv")."</b><br />";
 					}
 					else {
-						$output .= $this->loc->s("inactive-reserv")."<br />";
+						$output .= _("inactive-reserv")."<br />";
 					}
 
 					$this->ip = $data["ip"];
 					$subnet = $this->getSubnet();
 					if ($subnet != NULL) {
 						$output .= sprintf("<b>%s</b>: %s/%s (%s)<br />",
-							$this->loc->s("Network"),
+							_("Network"),
 							$subnet->getNetId(),
 							$subnet->getNetmask(),
 							$subnet->getShortName()
@@ -513,7 +513,7 @@
 
 						if ($subnet->getVLANId() != 0) {
 							$output .= sprintf("<b>%s</b>: %s<br />",
-								$this->loc->s("vlanid"),
+								_("vlanid"),
 								$subnet->getVLANId()
 							);
 						}
@@ -522,7 +522,7 @@
 					if (!FS::$sessMgr->hasRight("ipmgmt")) {
 						$output .= sprintf("<br />%s<br />",
 							FS::$iMgr->opendiv(7,
-								$this->loc->s("Modify-IPM-Infos"),
+								_("Modify-IPM-Infos"),
 								array("lnkadd" => "ip=".$this->ip,
 									"moduleid" => FS::$iMgr->getModuleIdByPath("ipmanager")
 								))
@@ -544,21 +544,21 @@
 					if ($found == false) {
 						$found = true;
 					}
-					$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+					$output .= "<b>"._("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
 					if (strlen($data["ip"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-ip")."</b>: ".
+						$output .= "<b>"._("link-ip")."</b>: ".
 							FS::$iMgr->aLink($this->mid.
 								"&s=".$data["ip"], $data["ip"])."<br />";
 					}
 
 					if (strlen($data["macaddr"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".
+						$output .= "<b>"._("link-mac-addr")."</b>: ".
 							FS::$iMgr->aLink($this->mid."&s=".$data["macaddr"], $data["macaddr"])."<br />";
 					}
-					$output .= "<b>".$this->loc->s("attribution-type")."</b>: ".
-						($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
+					$output .= "<b>"._("attribution-type")."</b>: ".
+						($data["distributed"] != 3 ? _("dynamic") : _("Static"))." (".$data["server"].")<br />";
 					if ($data["distributed"] != 3 && $data["distributed"] != 4) {
-						$output .= "<b>".$this->loc->s("Validity")."</b>: ".$data["leasetime"]."<br />";
+						$output .= "<b>"._("Validity")."</b>: ".$data["leasetime"]."<br />";
 					}
 					$output .= FS::$iMgr->hr();
 					FS::$searchMgr->incResultCount();
@@ -582,19 +582,19 @@
 					}
 
 					if (strlen($data["hostname"]) > 0) {
-						$output .= "<b>".$this->loc->s("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
+						$output .= "<b>"._("dhcp-hostname")."</b>: ".$data["hostname"]."<br />";
 					}
 
 					if (strlen($data["macaddr"]) > 0) {
-						$output .= "<b>".$this->loc->s("link-mac-addr")."</b>: ".
+						$output .= "<b>"._("link-mac-addr")."</b>: ".
 							FS::$iMgr->aLink($this->mid."&s=".$data["macaddr"], $data["macaddr"])."<br />";
 					}
 
-					$output .= "<b>".$this->loc->s("attribution-type")."</b>: ".
-						($data["distributed"] != 3 ? $this->loc->s("dynamic") : $this->loc->s("Static"))." (".$data["server"].")<br />";
+					$output .= "<b>"._("attribution-type")."</b>: ".
+						($data["distributed"] != 3 ? _("dynamic") : _("Static"))." (".$data["server"].")<br />";
 
 					if ($data["distributed"] != 3 && $data["distributed"] != 4) {
-						$output .= $this->loc->s("Validity")." : ".$data["leasetime"]."<br />";
+						$output .= _("Validity")." : ".$data["leasetime"]."<br />";
 					}
 
 					FS::$searchMgr->incResultCount();
@@ -643,13 +643,13 @@
 
 			if (!$ip || !FS::$secMgr->isIP($ip)) {
 				FS::$iMgr->ajaxEchoError(sprintf(
-					$this->loc->s("err-bad-ip-addr"),$ip),"",true);
+					_("err-bad-ip-addr"),$ip),"",true);
 				return;
 			}
 
 			if (!$this->LoadFromCache($ip) && !$this->Load($ip)) {
 				FS::$iMgr->ajaxEchoError(sprintf(
-					$this->loc->s("err-no-info-for-ip-addr"),$ip),"",true);
+					_("err-no-info-for-ip-addr"),$ip),"",true);
 				return;
 			}
 
@@ -726,7 +726,7 @@
 
 			if (!FS::$secMgr->isIP($ip)) {
 				$this->log(2,"Import IP from cache: bad IP");
-				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-ip"),
+				FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-ip"),
 					$ip),"",true);
 				return false;
 			}
@@ -734,7 +734,7 @@
 			// @TODO
 			if (!$this->LoadFromCache($ip)) {
 				$this->log(2,"Import IP from cache: IP not in cache");
-				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-not-in-cache"),
+				FS::$iMgr->ajaxEchoError(sprintf(_("err-ip-not-in-cache"),
 					$ip),"",true);
 				return false;
 
@@ -790,31 +790,31 @@
 
 				// Entry has 3 fields
 				if (count($entry) != 3) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-csv-entry"),$entry),"",true);
 					return false;
 				}
 
 				if (!FS::$secMgr->isHostname($entry[0])) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-hostname"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-hostname"),
 						$entry[0]),"",true);
 					return false;
 				}
 
 				if (!FS::$secMgr->isIP($entry[2])) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-ip"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-ip"),
 						$entry[2]),"",true);
 					return false;
 				}
 
 				if (!FS::$secMgr->isMacAddr($entry[1])) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-mac"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-mac"),
 						$entry[1]),"",true);
 					return false;
 				}
 
 				// Hostname must be unique in this import
 				if (isset($hostList[$entry[0]])) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-hostname"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-csv-entry-multiple-hostname"),
 						$entry[0]),"",true);
 					return false;
 				}
@@ -822,21 +822,21 @@
 				// Hostname mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"hostname",
 					"hostname = '".$entry[0]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-hostname-already-used"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-hostname-already-used"),
 						$entry[0]),"",true);
 					return false;
 				}
 
 				// IP must be in selected subnet
 				if (!$subnetObj->isIPIn($entry[2])) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-not-in-subnet"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-ip-not-in-subnet"),
 						$entry[2],$subnet),"",true);
 					return false;
 				}
 
 				// IP must be unique in this import
 				if (in_array($entry[2],$tmpIPList)) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-ip"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-csv-entry-multiple-ip"),
 						$entry[2]),"",true);
 					return false;
 				}
@@ -844,7 +844,7 @@
 				// IP mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"ip",
 					"ip = '".$entry[2]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-ip-already-used"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-ip-already-used"),
 						$entry[2]),"",true);
 					return false;
 				}
@@ -855,14 +855,14 @@
 				// MAC mustn't be used if replace is not selected
 				if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlTable,"macaddr",
 					"macaddr = '".$entry[1]."' AND reserv = 't'")) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-mac-already-used"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-mac-already-used"),
 						$entry[1]),"",true);
 					return false;
 				}
 
 				// MAC must be unique in this import
 				if (in_array($entry[1],$tmpMACList)) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry-multiple-mac"),
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-csv-entry-multiple-mac"),
 						$entry[1]),"",true);
 					return false;
 				}
@@ -934,38 +934,38 @@
 			switch($distrib) {
 				case 1:
 					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFFBF');");
-					$rstate = $this->loc->s("Free");
+					$rstate = _("Free");
 					break;
 				case 2:
 					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#FF6A6A');");
-					$rstate = $this->loc->s("Used");
+					$rstate = _("Used");
 					break;
 				case 3:
 					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#FFFF80');");
-					$rstate = $this->loc->s("Reserved");
+					$rstate = _("Reserved");
 					break;
 				case 4:
 					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFBFF');");
-					$rstate = $this->loc->s("Distributed");
+					$rstate = _("Distributed");
 					break;
 				case 5:
 					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#FFFF80');");
-					$rstate = $this->loc->s("Reserved-by-ipmanager");
+					$rstate = _("Reserved-by-ipmanager");
 					break;
 				case 6:
 					FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFBFF');");
-					$rstate = $this->loc->s("Distributed-by-ipmanager");
+					$rstate = _("Distributed-by-ipmanager");
 					break;
 				default: {
 						FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('background-color','#BFFFBF');");
-						$rstate = $this->loc->s("Free");
+						$rstate = _("Free");
 						$mac = FS::$dbMgr->GetOneData("node_ip","mac",
 							"ip = '".$ip."' AND time_last > (current_timestamp - interval '1 hour') AND active = 't'");
 						if ($mac) {
 							$query3 = FS::$dbMgr->Select("node","switch,port,time_last","mac = '".$mac."' AND active = 't'");
 							if ($data3 = FS::$dbMgr->Fetch($query3)) {
 								FS::$iMgr->js("$('#sb".FS::$iMgr->formatHTMLId($ip)."tr').css('backgorund-color','orange');");
-								$rstate = $this->loc->s("Stuck-IP");
+								$rstate = _("Stuck-IP");
 							}
 						}
 					}
@@ -986,7 +986,7 @@
 				$output .= FS::$iMgr->linkIcon("mod=".$this->mid."&act=20&ip=".$ip."&subnet=".$this->subnetId,"upload",
 					array("tooltip" => "tooltip-import-reserv", "js" => true,
 						"confirm" => array(sprintf(
-							$this->loc->s("confirm-import-reserv"),$ip),
+							_("confirm-import-reserv"),$ip),
 							"Import","Cancel")
 					)
 				);
@@ -1103,9 +1103,9 @@
 						$found = true;
 					}
 
-					$output .= "<b>".$this->loc->s("option-name")."</b>: ".$data["optname"]."<br />".
-						"<b>".$this->loc->s("option-code")."</b>: ".$data["optcode"]."<br />".
-						"<b>".$this->loc->s("option-type")."</b>: ".$data["opttype"]."<br />".
+					$output .= "<b>"._("option-name")."</b>: ".$data["optname"]."<br />".
+						"<b>"._("option-code")."</b>: ".$data["optcode"]."<br />".
+						"<b>"._("option-type")."</b>: ".$data["opttype"]."<br />".
 						FS::$iMgr->hr();
 					FS::$searchMgr->incResultCount();
 				}
@@ -1148,9 +1148,9 @@
 						$found = true;
 					}
 
-					$output .= "<b>".$this->loc->s("option-alias")."</b>: ".$data["optalias"]."<br />".
-						"<b>".$this->loc->s("option-name")."</b>: ".$data["optname"]."<br />".
-						"<b>".$this->loc->s("option-value")."</b>: ".$data["optval"]."<br />".
+					$output .= "<b>"._("option-alias")."</b>: ".$data["optalias"]."<br />".
+						"<b>"._("option-name")."</b>: ".$data["optname"]."<br />".
+						"<b>"._("option-value")."</b>: ".$data["optval"]."<br />".
 						FS::$iMgr->hr();
 					FS::$searchMgr->incResultCount();
 				}
@@ -1202,8 +1202,8 @@
 
 				if ($found) {
 					foreach ($optgroups as $gname => $members) {
-						$output .= "<b>".$this->loc->s("option-group")."</b>: ".$gname."<br />".
-							"<b>".$this->loc->s("Members")."</b>: <ul>";
+						$output .= "<b>"._("option-group")."</b>: ".$gname."<br />".
+							"<b>"._("Members")."</b>: <ul>";
 
 						$count = count($members);
 						for ($i=0;$i<$count;$i++) {

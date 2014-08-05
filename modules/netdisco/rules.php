@@ -21,9 +21,9 @@
 		function __construct($locales) { parent::__construct($locales); }
 
 		public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
-				array($this->loc->s("rule-read-datas"),		"mrule_netdisco_read"),
-				array($this->loc->s("rule-write-datas"),	"mrule_netdisco_write")
+			$output = FS::$iMgr->ruleLines(_("menu-title"),$activerules,array(
+				array(_("rule-read-datas"),		"mrule_netdisco_read"),
+				array(_("rule-write-datas"),	"mrule_netdisco_write")
 
 			));
 			return $output;

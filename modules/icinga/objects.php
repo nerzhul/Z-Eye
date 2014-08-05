@@ -57,7 +57,7 @@
 			$this->Load($name);
 			
 			return FS::$iMgr->cbkForm("7").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				"<table><tr><th>"._("Option")."</th><th>"._("Value")."</th></tr>".
 				FS::$iMgr->idxLines(array(
 					array("Name","name",array("type" => "idxedit", "value" => $this->name, "edit" => $this->name != "")),
 					array("Email","mail",array("value" => $this->mail)),
@@ -205,7 +205,7 @@
 			$this->Load($name);
 
 			$output = FS::$iMgr->cbkForm("10").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				"<table><tr><th>"._("Option")."</th><th>"._("Value")."</th></tr>".
 				FS::$iMgr->idxIdLine("Name","name",$this->name,array("length" => 60, "size" => 30)).
 				FS::$iMgr->idxLine("Alias","alias",array("value" => $this->alias,"length" => 60, "size" => 30));
 
@@ -218,7 +218,7 @@
 			}
 			if($countElmt/4 < 4) $countElmt = 16;
 
-			$output .= "<tr><td>".$this->loc->s("Contacts")."</td><td>".
+			$output .= "<tr><td>"._("Contacts")."</td><td>".
 				FS::$iMgr->select("cts",array("multi" => true, "size" => round($countElmt/4))).
 				$output2."</select></td></tr>".
 				FS::$iMgr->aeTableSubmit($this->name == "");
@@ -394,7 +394,7 @@
 
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("13").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				"<table><tr><th>"._("Option")."</th><th>"._("Value")."</th></tr>".
 				FS::$iMgr->idxIdLine("Name","name",$this->name).
 				FS::$iMgr->idxLines(array(
 					array("is-template","istemplate",array("value" => false,"type" => "chk")),
@@ -406,9 +406,9 @@
 						FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."icinga_icons","id",
 						array("labelfield" => "name","selected" => array($this->icon)))."</select>"))
 				)).
-				"<tr><td>".$this->loc->s("Parent")."</td><td>";
+				"<tr><td>"._("Parent")."</td><td>";
 
-			$output2 = FS::$iMgr->selElmt($this->loc->s("None"),"none",(count($this->parentlist) == 0));
+			$output2 = FS::$iMgr->selElmt(_("None"),"none",(count($this->parentlist) == 0));
 			$countElmt = 0;
 
 			$query = FS::$dbMgr->Select($this->sqlTable,"name,addr","template = 'f'",array("order" => "name"));
@@ -472,7 +472,7 @@
 
 		public function showSensors($name) {
 			if (!$this->Load($name)) {
-				return $this->loc->s("err-bad-datas");
+				return _("err-bad-datas");
 			}
 			
 			return (new icingaSensor())->showReport($name);
@@ -570,7 +570,7 @@
 			
 			if(!(new icingaTimePeriod())->exists($checkperiod)) {
 				FS::$iMgr->ajaxEchoError(sprintf(
-					$this->loc->s("err-timeperiod-not-exists"), $checkperiod),
+					_("err-timeperiod-not-exists"), $checkperiod),
 					"",false);
 				return;
 			}
@@ -729,7 +729,7 @@
 
 			FS::$iMgr->setJSBuffer(1);
 			$output = FS::$iMgr->cbkForm("16").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				"<table><tr><th>"._("Option")."</th><th>"._("Value")."</th></tr>".
 				FS::$iMgr->idxLines(array(
 				array("is-template","istemplate",array("value" => false,"type" => "chk")),
 				array("Description","desc",array("type" => "idxedit",
@@ -776,7 +776,7 @@
 		
 		public function showSensors($sname) {
 			if (!$this->Load($sname)) {
-				return $this->loc->s("err-bad-datas");
+				return _("err-bad-datas");
 			}
 			
 			$states = (new icingaBroker())->readStates();
@@ -802,10 +802,10 @@
 							
 							$outstate = "";
 							$stylestate = "";
-							$timedown = $this->loc->s("Since-icinga-start");
+							$timedown = _("Since-icinga-start");
 
 							if ($svalues["current_state"] == 1) {
-								$outstate = $this->loc->s("Warn");
+								$outstate = _("Warn");
 								if ($svalues["last_time_ok"]) {
 									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
 								}
@@ -813,7 +813,7 @@
 								$totalPbs++;
 							}
 							else if ($svalues["current_state"] == 2) {
-								$outstate = $this->loc->s("Critical");
+								$outstate = _("Critical");
 								if ($svalues["last_time_ok"]) {
 									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
 								}
@@ -822,7 +822,7 @@
 								$totalPbs++;
 							}
 							else {
-								$outstate = $this->loc->s("OK");
+								$outstate = _("OK");
 							}
 							
 							$output .= "<tr style=\"background-color:";
@@ -850,10 +850,10 @@
 			}
 			
 			return sprintf("<table><b>%s</b>%s<br /><b>%s</b>%s (<b>%s</b>: %s / <b>%s</b>: %s)%s</table>",
-				$this->loc->s("total-sensors"), $totalSensors,
-				$this->loc->s("total-problems"), $totalPbs,
-				$this->loc->s("Critical"), $totalCrits,
-				$this->loc->s("Warn"), $totalWarns,
+				_("total-sensors"), $totalSensors,
+				_("total-problems"), $totalPbs,
+				_("Critical"), $totalCrits,
+				_("Warn"), $totalWarns,
 				$output);
 		}
 		
@@ -1032,10 +1032,10 @@
 							
 							$outstate = "";
 							$stylestate = "";
-							$timedown = $this->loc->s("Since-icinga-start");
+							$timedown = _("Since-icinga-start");
 
 							if ($svalues["current_state"] == 1) {
-								$outstate = $this->loc->s("Warn");
+								$outstate = _("Warn");
 								if ($svalues["last_time_ok"]) {
 									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
 								}
@@ -1043,7 +1043,7 @@
 								$totalPbs++;
 							}
 							else if ($svalues["current_state"] == 2) {
-								$outstate = $this->loc->s("Critical");
+								$outstate = _("Critical");
 								if ($svalues["last_time_ok"]) {
 									$timedown = FSTimeMgr::timeSince($svalues["last_time_ok"]);
 								}
@@ -1052,7 +1052,7 @@
 								$totalPbs++;
 							}
 							else {
-								$outstate = $this->loc->s("OK");
+								$outstate = _("OK");
 							}
 							
 							$output .= "<tr style=\"background-color:";
@@ -1092,10 +1092,10 @@
 							
 						$outstate = "";
 						$stylestate = "";
-						$timedown = $this->loc->s("Since-icinga-start");
+						$timedown = _("Since-icinga-start");
 
 						if ($hosvalues["current_state"] == 1) {
-							$outstate = $this->loc->s("Down");
+							$outstate = _("Down");
 							if ($hosvalues["last_time_up"])
 								$timedown = FSTimeMgr::timeSince($hosvalues["last_time_up"]);
 
@@ -1103,7 +1103,7 @@
 							$totalPbs++;
 						}
 						else {
-							$outstate = $this->loc->s("Online");
+							$outstate = _("Online");
 						}
 						
 						$output .= "<tr style=\"background-color:";
@@ -1130,17 +1130,17 @@
 							$output .= ($showHostname ? $host : "")."</td><td>";
 						}
 						
-						$output .= $this->loc->s("Availability")."</td><td>".$outstate.
+						$output .= _("Availability")."</td><td>".$outstate.
 							"</td><td>".$timedown."</td><td>".$plugOut."</td></tr>"; 
 					}
 					$showHostname = false;
 				}
 			}
 			
-			$output = "<b>".$this->loc->s("total-sensors")."</b>".$totalSensors."<br />".
-				"<b>".$this->loc->s("total-problems")."</b>".$totalPbs.
-				" ("."<b>".$this->loc->s("Critical")."</b>: ".$totalCrits." / <b>".
-				$this->loc->s("Warn")."</b>: ".$totalWarns.")".$output;
+			$output = "<b>"._("total-sensors")."</b>".$totalSensors."<br />".
+				"<b>"._("total-problems")."</b>".$totalPbs.
+				" ("."<b>"._("Critical")."</b>: ".$totalCrits." / <b>".
+				_("Warn")."</b>: ".$totalWarns.")".$output;
 				
 			$output .= "</table>";
 			return $output;
@@ -1172,7 +1172,7 @@
 						foreach ($hosvalues as $sensor => $svalues) {
 							$totalSensors++;
 							if ($svalues["current_state"] > 0) {
-								$timedown = $this->loc->s("Since-icinga-start");
+								$timedown = _("Since-icinga-start");
 								$bgcolor = "orange";
 
 								// Initialize host error array
@@ -1224,7 +1224,7 @@
 						if ($hosvalues["current_state"] > 0) {
 							$oosSensors++;
 							$bgcolor = "orange";
-							$timedown = $this->loc->s("Since-icinga-start");
+							$timedown = _("Since-icinga-start");
 
 							// Initialize host error array
 							if (!isset($problems[$host])) {
@@ -1251,7 +1251,7 @@
 							$problems[$host][1] .= sprintf(
 								"<tr style=\"background-color:%s;\"><td>%s</td>
 								<td>%s</td><td>%s</td></tr>",
-	                            $bgcolor, $this->loc->s("Availability"),
+	                            $bgcolor, _("Availability"),
 	                            $timedown,
 	                            $hosvalues["plugin_output"]
 							);
@@ -1267,19 +1267,19 @@
 					// Create the host Label
 					$label = $problems[$key][0].": ".
 						($problems[$key][2]+$problems[$key][3])." ".
-						$this->loc->s("alert-s")." (";
+						_("alert-s")." (";
 
 					$bgcolor = "orange";
 					
 					if ($problems[$key][2] > 0) {
-						$label .= $problems[$key][2]." ".$this->loc->s("warning-s");
+						$label .= $problems[$key][2]." "._("warning-s");
 					}
 
 					if ($problems[$key][3] > 0) {
 						if ($problems[$key][2] > 0) {
 							$label .= " / ";
 						}
-						$label .= $problems[$key][3]." ".$this->loc->s("critical-s");
+						$label .= $problems[$key][3]." "._("critical-s");
 						$bgcolor = "red";
 					}
 					$label .= ")";
@@ -1313,15 +1313,15 @@
 			
 			FS::$iMgr->js($js);
 			
-			$alerts["icinga"] = array("<b>".$this->loc->s("state-srv")."</b> ".
+			$alerts["icinga"] = array("<b>"._("state-srv")."</b> ".
 				FS::$iMgr->progress("shealth",
 					$totalSensors-$oosSensors,$totalSensors),
 					$outBuffer);
 
 			if ($oosSensors > 0) {
 				$alerts["icinga"][0] .= "<br />".($oosSensors)." ".
-					$this->loc->s("alert-on")." ".$totalSensors." ".
-						$this->loc->s("sensors");
+					_("alert-on")." ".$totalSensors." ".
+						_("sensors");
 			}
 			
 			$output .= "<div id=\"speedreport\">".
@@ -1394,8 +1394,8 @@
 			$this->Load($name);
 			
 			return FS::$iMgr->cbkForm("1").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".
-				$this->loc->s("Value")."</th></tr>".
+				"<table><tr><th>"._("Option")."</th><th>".
+				_("Value")."</th></tr>".
 				FS::$iMgr->idxLines(array(
 					array("Name","name",array("type" => "idxedit",
 						"value" => $name,
@@ -1501,7 +1501,7 @@
 			// Check if TP exists
 			if(!(new icingaTimePeriod())->exists($period)) {
 				FS::$iMgr->ajaxEchoError(sprintf(
-					$this->loc->s("err-timeperiod-not-exists"), $period),
+					_("err-timeperiod-not-exists"), $period),
 					"",false);
 				return;
 			}
@@ -1547,28 +1547,28 @@
 			
 			if ($hostUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_hosts",
 				"name","notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-host"),
+				FS::$iMgr->ajaxEchoError(sprintf(_("err-notification-strategy-used-host"),
 					$name,$hostUsed),"",true);
 				return;
 			}
 			
 			if ($srvUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_services",
 				"name","notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-service"),
+				FS::$iMgr->ajaxEchoError(sprintf(_("err-notification-strategy-used-service"),
 					$name,$srvUsed),"",true);
 				return;
 			}
 			
 			if ($ctUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
 				"name","host_notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-contact"),
+				FS::$iMgr->ajaxEchoError(sprintf(_("err-notification-strategy-used-contact"),
 					$name,$ctUsed),"",true);
 				return;
 			}
 			
 			if ($ctUsed = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contacts",
 				"name","service_notif_strategy = '".$name."'")) {
-				FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-notification-strategy-used-contact"),
+				FS::$iMgr->ajaxEchoError(sprintf(_("err-notification-strategy-used-contact"),
 					$name,$ctUsed),"",true);
 				return;
 			}

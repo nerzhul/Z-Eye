@@ -30,14 +30,14 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rIcinga($this->loc);
 			
-			$this->menu = $this->loc->s("Supervision");
-			$this->menutitle = $this->loc->s("Icinga sensors");
+			$this->menu = _("Supervision");
+			$this->menutitle = _("Icinga sensors");
 			
 			$this->icingaAPI = new icingaBroker();
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-icinga"));
+			FS::$iMgr->setTitle(_("title-icinga"));
 			return $this->showTabPanel();
 		}
 
@@ -48,37 +48,37 @@
 			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-icinga");
 				$panElmts = array();
-				$panElmts[] = array(1,"mod=".$this->mid,$this->loc->s("General"));
+				$panElmts[] = array(1,"mod=".$this->mid,_("General"));
 				if (FS::$sessMgr->hasRight("host_write")) {
-					$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("Hosts"));
+					$panElmts[] = array(2,"mod=".$this->mid,_("Hosts"));
 				}
 
 				if (FS::$sessMgr->hasRight("hg_write")) {
-					$panElmts[] = array(3,"mod=".$this->mid,$this->loc->s("Hostgroups"));
+					$panElmts[] = array(3,"mod=".$this->mid,_("Hostgroups"));
 				}
 
 				if (FS::$sessMgr->hasRight("srv_write")) {
-					$panElmts[] = array(4,"mod=".$this->mid,$this->loc->s("Services"));
+					$panElmts[] = array(4,"mod=".$this->mid,_("Services"));
 				}
 
 				if (FS::$sessMgr->hasRight("tp_write")) {
-					$panElmts[] = array(5,"mod=".$this->mid,$this->loc->s("Timeperiods"));
+					$panElmts[] = array(5,"mod=".$this->mid,_("Timeperiods"));
 				}
 
 				if (FS::$sessMgr->hasRight("notif_write")) {
-					$panElmts[] = array(9,"mod=".$this->mid,$this->loc->s("Notification-strategies"));
+					$panElmts[] = array(9,"mod=".$this->mid,_("Notification-strategies"));
 				}
 
 				if (FS::$sessMgr->hasRight("ct_write")) {
-					$panElmts[] = array(6,"mod=".$this->mid,$this->loc->s("Contacts"));
+					$panElmts[] = array(6,"mod=".$this->mid,_("Contacts"));
 				}
 
 				if (FS::$sessMgr->hasRight("ctg_write")) {
-					$panElmts[] = array(7,"mod=".$this->mid,$this->loc->s("Contactgroups"));
+					$panElmts[] = array(7,"mod=".$this->mid,_("Contactgroups"));
 				}
 
 				if (FS::$sessMgr->hasRight("cmd_write")) {
-					$panElmts[] = array(8,"mod=".$this->mid,$this->loc->s("Commands"));
+					$panElmts[] = array(8,"mod=".$this->mid,_("Commands"));
 				}
 
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
@@ -120,20 +120,20 @@
 
 			$tpexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_timeperiods","name","");
 			if (!$tpexist) {
-				$output .= FS::$iMgr->opendiv(1,$this->loc->s("new-host"));
+				$output .= FS::$iMgr->opendiv(1,_("new-host"));
 				return $output;
 			}
 
 			$ctexist = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."icinga_contactgroups","name","");
 			if (!$ctexist) {
-				$output .= FS::$iMgr->opendiv(2,$this->loc->s("new-host"));
+				$output .= FS::$iMgr->opendiv(2,_("new-host"));
 				return $output;
 			}
 
 			/*
 			 * Ajax new host
 			 */
-			$output .= FS::$iMgr->opendiv(3,$this->loc->s("new-host"));
+			$output .= FS::$iMgr->opendiv(3,_("new-host"));
 
 			/*
 			 * Host table
@@ -144,9 +144,9 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"thostList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"20%\">".$this->loc->s("Name")."</th><th></th><th width=\"20%\">".
-						$this->loc->s("Alias")."</th><th width=\"20%\">".$this->loc->s("Address")."</th><th width=\"15%\">".$this->loc->s("Template").
-						"</th><th width=\"20%\">".$this->loc->s("Parent")."</th><th></th></tr></thead>";
+					$output .= "<table id=\"thostList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"20%\">"._("Name")."</th><th></th><th width=\"20%\">".
+						_("Alias")."</th><th width=\"20%\">"._("Address")."</th><th width=\"15%\">"._("Template").
+						"</th><th width=\"20%\">"._("Parent")."</th><th></th></tr></thead>";
 				}
 
 				$parentlist = array();
@@ -172,10 +172,10 @@
 
 				$output .= "</td><td>".$data["alias"]."</td><td>".$data["addr"]."</td><td>";
 				if ($data["template"] == "t") {
-					$output .= $this->loc->s("Yes");
+					$output .= _("Yes");
 				}
 				else {
-					$output .= $this->loc->s("No");
+					$output .= _("No");
 				}
 
 				$output .= "</td><td>";
@@ -208,7 +208,7 @@
 			$output = "";
 
 			if (FS::$sessMgr->hasRight("hg_write")) {
-				$output .= FS::$iMgr->opendiv(4,$this->loc->s("new-hostgroup"));
+				$output .= FS::$iMgr->opendiv(4,_("new-hostgroup"));
 			}
 
 			$found = false;
@@ -216,8 +216,8 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"thgList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"10%\">".$this->loc->s("Name").
-						"</th><th width=\"10%\">".$this->loc->s("Alias")."</th><th width=\"80%\">".$this->loc->s("Members")."</th><th></th></tr></thead>";
+					$output .= "<table id=\"thgList\" width=\"80%\"><thead><tr><th class=\"headerSortDown\" width=\"10%\">"._("Name").
+						"</th><th width=\"10%\">"._("Alias")."</th><th width=\"80%\">"._("Members")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"hg_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -234,8 +234,8 @@
 					else $found2 = true;
 					$output .= $data2["host"]." (";
 					switch($data2["hosttype"]) {
-						case 1: $output .= $this->loc->s("Host"); break;
-						case 2: $output .= $this->loc->s("Hostgroup"); break;
+						case 1: $output .= _("Host"); break;
+						case 2: $output .= _("Hostgroup"); break;
 						default: $output .= "unk"; break;
 					}
 					$output .= ")";
@@ -254,7 +254,7 @@
 
 		private function showHostgroupForm($name = "") {
 			$output = FS::$iMgr->cbkForm("19");
-			$output .= "<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+			$output .= "<table><tr><th>"._("Option")."</th><th>"._("Value")."</th></tr>";
 			// Global
 			$output .= FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30));
 
@@ -268,7 +268,7 @@
 					$hostlist[] = $data["hosttype"]."$".$data["host"];
 			}
 
-			$output .= "<tr><td>".$this->loc->s("Members")."</td><td>".
+			$output .= "<tr><td>"._("Members")."</td><td>".
 				$this->getHostOrGroupList("members",true,$hostlist,$name)."</td></tr>".
 				FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
@@ -284,7 +284,7 @@
 			$output = "";
 
 			if (FS::$sessMgr->hasRight("srv_write")) {
-				$output .= FS::$iMgr->opendiv(5,$this->loc->s("new-service"));
+				$output .= FS::$iMgr->opendiv(5,_("new-service"));
 			}
 
 			$found = false;
@@ -292,9 +292,9 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"tsrvList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name").
-						"</th><th></th><th>".$this->loc->s("Host").
-						"</th><th>".$this->loc->s("Hosttype")."</th><th>".$this->loc->s("Template")."</th><th></th></tr></thead>";
+					$output .= "<table id=\"tsrvList\"><thead><tr><th class=\"headerSortDown\">"._("Name").
+						"</th><th></th><th>"._("Host").
+						"</th><th>"._("Hosttype")."</th><th>"._("Template")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"srv_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -320,8 +320,8 @@
 					default: $output .= "unk"; break;
 				}
 				$output .= "</td><td>";
-				if ($data["template"] == "t") $output .= $this->loc->s("Yes");
-				else $output .= $this->loc->s("No");
+				if ($data["template"] == "t") $output .= _("Yes");
+				else $output .= _("No");
 				$output .= "</td><td>".FS::$iMgr->removeIcon(18,"srv=".$data["name"],array("js" => true,
 					"confirmtext" => "confirm-remove-service",
 					"confirmval" => $data["name"]
@@ -348,7 +348,7 @@
 			 */
 
 			if (FS::$sessMgr->hasRight("tp_write")) {
-				$output .= FS::$iMgr->opendiv(6,$this->loc->s("new-timeperiod"));
+				$output .= FS::$iMgr->opendiv(6,_("new-timeperiod"));
 			}
 
 			/*
@@ -361,8 +361,8 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"ttpList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias").
-						"</th><th>".$this->loc->s("Periods")."</th><th></th></tr></thead>";
+					$output .= "<table id=\"ttpList\"><thead><tr><th class=\"headerSortDown\">"._("Name")."</th><th>"._("Alias").
+						"</th><th>"._("Periods")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"tp_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -375,38 +375,38 @@
 
 				$output .= "</td><td>".$data["alias"]."</td><td>";
 				if ($data["mhs"] != 0 || $data["mms"] != 0 || $data["mhe"] != 0 || $data["mme"] != 0) {
-					$output .= $this->loc->s("Monday").		" - ".$this->loc->s("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].
-					" ".$this->loc->s("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
+					$output .= _("Monday").		" - "._("From")." ".($data["mhs"] < 10 ? "0" : "").	$data["mhs"].	":".($data["mms"] < 10 ? "0" : "").	$data["mms"].
+					" "._("To")." ".($data["mhe"] < 10 ? "0" : "").	$data["mhe"].":".($data["mme"] < 10 ? "0" : "").$data["mme"]."<br />";
 				}
 
 				if ($data["tuhs"] != 0 || $data["tums"] != 0 || $data["tuhe"] != 0 || $data["tume"] != 0) {
-					$output .= $this->loc->s("Tuesday").	" - ".$this->loc->s("From")." ".($data["tuhs"] < 10 ? "0" : "").$data["tuhs"].	":".($data["tums"] < 10 ? "0" : "").$data["tums"].
-					" ".$this->loc->s("To")." ".($data["tuhe"] < 10 ? "0" : "").$data["tuhe"].":".($data["tume"] < 10 ? "0" : "").$data["tume"]."<br />";
+					$output .= _("Tuesday").	" - "._("From")." ".($data["tuhs"] < 10 ? "0" : "").$data["tuhs"].	":".($data["tums"] < 10 ? "0" : "").$data["tums"].
+					" "._("To")." ".($data["tuhe"] < 10 ? "0" : "").$data["tuhe"].":".($data["tume"] < 10 ? "0" : "").$data["tume"]."<br />";
 				}
 
 				if ($data["whs"] != 0 || $data["wms"] != 0 || $data["whe"] != 0 || $data["wme"] != 0) {
-					$output .= $this->loc->s("Wednesday").	" - ".$this->loc->s("From")." ".($data["whs"] < 10 ? "0" : "").	$data["whs"].	":".($data["wms"] < 10 ? "0" : "").	$data["wms"].
-					" ".$this->loc->s("To")." ".($data["whe"] < 10 ? "0" : "").	$data["whe"].":".($data["wme"] < 10 ? "0" : "").$data["wme"]."<br />";
+					$output .= _("Wednesday").	" - "._("From")." ".($data["whs"] < 10 ? "0" : "").	$data["whs"].	":".($data["wms"] < 10 ? "0" : "").	$data["wms"].
+					" "._("To")." ".($data["whe"] < 10 ? "0" : "").	$data["whe"].":".($data["wme"] < 10 ? "0" : "").$data["wme"]."<br />";
 				}
 
 				if ($data["thhs"] != 0 || $data["thms"] != 0 || $data["thhe"] != 0 || $data["thme"] != 0) {
-					$output .= $this->loc->s("Thursday").	" - ".$this->loc->s("From")." ".($data["thhs"] < 10 ? "0" : "").$data["thhs"].	":".($data["thms"] < 10 ? "0" : "").$data["thms"].
-					" ".$this->loc->s("To")." ".($data["thhe"] < 10 ? "0" : "").$data["thhe"].":".($data["thme"] < 10 ? "0" : "").$data["thme"]."<br />";
+					$output .= _("Thursday").	" - "._("From")." ".($data["thhs"] < 10 ? "0" : "").$data["thhs"].	":".($data["thms"] < 10 ? "0" : "").$data["thms"].
+					" "._("To")." ".($data["thhe"] < 10 ? "0" : "").$data["thhe"].":".($data["thme"] < 10 ? "0" : "").$data["thme"]."<br />";
 				}
 
 				if ($data["fhs"] != 0 || $data["fms"] != 0 || $data["fhe"] != 0 || $data["fme"] != 0) {
-					$output .= $this->loc->s("Friday").		" - ".$this->loc->s("From")." ".($data["fhs"] < 10 ? "0" : "").	$data["fhs"].	":".($data["fms"] < 10 ? "0" : "").	$data["fms"].
-					" ".$this->loc->s("To")." ".($data["fhe"] < 10 ? "0" : "").	$data["fhe"].":".($data["fme"] < 10 ? "0" : "").$data["fme"]."<br />";
+					$output .= _("Friday").		" - "._("From")." ".($data["fhs"] < 10 ? "0" : "").	$data["fhs"].	":".($data["fms"] < 10 ? "0" : "").	$data["fms"].
+					" "._("To")." ".($data["fhe"] < 10 ? "0" : "").	$data["fhe"].":".($data["fme"] < 10 ? "0" : "").$data["fme"]."<br />";
 				}
 
 				if ($data["sahs"] != 0 || $data["sams"] != 0 || $data["sahe"] != 0 || $data["same"] != 0) {
-					$output .= $this->loc->s("Saturday").	" - ".$this->loc->s("From")." ".($data["sahs"] < 10 ? "0" : "").$data["sahs"].	":".($data["sams"] < 10 ? "0" : "").$data["sams"].
-					" ".$this->loc->s("To")." ".($data["sahe"] < 10 ? "0" : "").$data["sahe"].":".($data["same"] < 10 ? "0" : "").$data["same"]."<br />";
+					$output .= _("Saturday").	" - "._("From")." ".($data["sahs"] < 10 ? "0" : "").$data["sahs"].	":".($data["sams"] < 10 ? "0" : "").$data["sams"].
+					" "._("To")." ".($data["sahe"] < 10 ? "0" : "").$data["sahe"].":".($data["same"] < 10 ? "0" : "").$data["same"]."<br />";
 				}
 
 				if ($data["suhs"] != 0 || $data["sums"] != 0 || $data["suhe"] != 0 || $data["sume"] != 0) {
-					$output .= $this->loc->s("Sunday").		" - ".$this->loc->s("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
-					" ".$this->loc->s("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
+					$output .= _("Sunday").		" - "._("From")." ".($data["suhs"] < 10 ? "0" : "").$data["suhs"].	":".($data["sums"] < 10 ? "0" : "").$data["sums"].
+					" "._("To")." ".($data["suhe"] < 10 ? "0" : "").$data["suhe"].":".($data["sume"] < 10 ? "0" : "").$data["sume"];
 				}
 
 				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"tp=".$data["name"],array("js" => true,
@@ -446,23 +446,23 @@
 
 			FS::$iMgr->setJSBuffer(1);
 			return FS::$iMgr->cbkForm("4").
-				"<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>".
+				"<table><tr><th>"._("Option")."</th><th>"._("Value")."</th></tr>".
 				FS::$iMgr->idxIdLine("Name","name",$name,array("length" => 60, "size" => 30)).
 				FS::$iMgr->idxLine("Alias","alias",array("value" => $alias,"length" => 120, "size" => 30)).
-				"<tr><td>".$this->loc->s("Monday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("mhs","mms",$mhs,$mms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("mhe","mme",$mhe,$mme)."</td></tr>".
-				"<tr><td>".$this->loc->s("Tuesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("tuhs","tums",$tuhs,$tums)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("tuhe","tume",$tuhe,$tume)."</td></tr>".
-				"<tr><td>".$this->loc->s("Wednesday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("whs","wms",$whs,$wms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("whe","wme",$whe,$wme)."</td></tr>".
-				"<tr><td>".$this->loc->s("Thursday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("thhs","thms",$thhs,$thms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("thhe","thme",$thhe,$thme)."</td></tr>".
-				"<tr><td>".$this->loc->s("Friday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("fhs","fms",$fhs,$fms)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("fhe","fme",$fhe,$fme)."</td></tr>".
-				"<tr><td>".$this->loc->s("Saturday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("sahs","sams",$sahs,$sams)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("sahe","same",$sahe,$same)."</td></tr>".
-				"<tr><td>".$this->loc->s("Sunday")."</td><td>".$this->loc->s("From")." ".FS::$iMgr->hourlist("suhs","sums",$suhs,$sums)."<br />".
-				$this->loc->s("To")." ".FS::$iMgr->hourlist("suhe","sume",$suhe,$sume)."</td></tr>".
+				"<tr><td>"._("Monday")."</td><td>"._("From")." ".FS::$iMgr->hourlist("mhs","mms",$mhs,$mms)."<br />".
+				_("To")." ".FS::$iMgr->hourlist("mhe","mme",$mhe,$mme)."</td></tr>".
+				"<tr><td>"._("Tuesday")."</td><td>"._("From")." ".FS::$iMgr->hourlist("tuhs","tums",$tuhs,$tums)."<br />".
+				_("To")." ".FS::$iMgr->hourlist("tuhe","tume",$tuhe,$tume)."</td></tr>".
+				"<tr><td>"._("Wednesday")."</td><td>"._("From")." ".FS::$iMgr->hourlist("whs","wms",$whs,$wms)."<br />".
+				_("To")." ".FS::$iMgr->hourlist("whe","wme",$whe,$wme)."</td></tr>".
+				"<tr><td>"._("Thursday")."</td><td>"._("From")." ".FS::$iMgr->hourlist("thhs","thms",$thhs,$thms)."<br />".
+				_("To")." ".FS::$iMgr->hourlist("thhe","thme",$thhe,$thme)."</td></tr>".
+				"<tr><td>"._("Friday")."</td><td>"._("From")." ".FS::$iMgr->hourlist("fhs","fms",$fhs,$fms)."<br />".
+				_("To")." ".FS::$iMgr->hourlist("fhe","fme",$fhe,$fme)."</td></tr>".
+				"<tr><td>"._("Saturday")."</td><td>"._("From")." ".FS::$iMgr->hourlist("sahs","sams",$sahs,$sams)."<br />".
+				_("To")." ".FS::$iMgr->hourlist("sahe","same",$sahe,$same)."</td></tr>".
+				"<tr><td>"._("Sunday")."</td><td>"._("From")." ".FS::$iMgr->hourlist("suhs","sums",$suhs,$sums)."<br />".
+				_("To")." ".FS::$iMgr->hourlist("suhe","sume",$suhe,$sume)."</td></tr>".
 				FS::$iMgr->aeTableSubmit($name == "");
 		}
 
@@ -476,7 +476,7 @@
 			$output = "";
 
 			if (FS::$sessMgr->hasRight("ct_write")) {
-				$output .= FS::$iMgr->opendiv(7,$this->loc->s("new-contact"));
+				$output .= FS::$iMgr->opendiv(7,_("new-contact"));
 			}
 
 			/*
@@ -487,7 +487,7 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"tctList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Email")."</th><th>Template ?</th><th></th></tr></thead>";
+					$output .= "<table id=\"tctList\"><thead><tr><th class=\"headerSortDown\">"._("Name")."</th><th>"._("Email")."</th><th>Template ?</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"ct_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -499,7 +499,7 @@
 				}
 
 				$output .= "</td><td>".$data["mail"]."</td>
-					<td>".($data["template"] == "t" ? $this->loc->s("Yes") : $this->loc->s("No"))."</td><td>".
+					<td>".($data["template"] == "t" ? _("Yes") : _("No"))."</td><td>".
 					FS::$iMgr->removeIcon(9,"ct=".$data["name"],array("js" => true,
 						"confirmtext" => "confirm-remove-contact",
 						"confirmval" => $data["name"]
@@ -522,7 +522,7 @@
 			$output = "";
 
 			if (FS::$sessMgr->hasRight("ctg_write")) {
-				$output .= FS::$iMgr->opendiv(8,$this->loc->s("new-contactgroup"));
+				$output .= FS::$iMgr->opendiv(8,_("new-contactgroup"));
 			}
 
 			/*
@@ -533,7 +533,7 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"tctgList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Alias")."</th><th>".$this->loc->s("Members")."</th><th></th></tr></thead>";
+					$output .= "<table id=\"tctgList\"><thead><tr><th class=\"headerSortDown\">"._("Name")."</th><th>"._("Alias")."</th><th>"._("Members")."</th><th></th></tr></thead>";
 				}
 
 				$contacts = array();
@@ -578,7 +578,7 @@
 			/*
 			 * Ajax new command
 			 */
-			$output = FS::$iMgr->opendiv(19,$this->loc->s("new-strategy"));
+			$output = FS::$iMgr->opendiv(19,_("new-strategy"));
 
 			/*
 			 * Command table
@@ -589,8 +589,8 @@
 				if (!$found) {
 					$found = true;
 					$output .= "<table id=\"tcmdList\"><thead><tr><th class=\"headerSortDown\">".
-						$this->loc->s("Name")."</th><th>".
-						$this->loc->s("Alias")."</th><th></th></tr></thead>";
+						_("Name")."</th><th>".
+						_("Alias")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"notifstr_".preg_replace("#[. ]#","-",$data["name"])."\"><td>".
 					FS::$iMgr->opendiv(20,$data["name"],array("lnkadd" => "name=".$data["name"])).
@@ -620,7 +620,7 @@
 			/*
 			 * Ajax new command
 			 */
-			$output = FS::$iMgr->opendiv(9,$this->loc->s("new-cmd"));
+			$output = FS::$iMgr->opendiv(9,_("new-cmd"));
 
 			/*
 			 * Command table
@@ -630,7 +630,7 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"tcmdList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Name")."</th><th>".$this->loc->s("Command")."</th><th></th></tr></thead>";
+					$output .= "<table id=\"tcmdList\"><thead><tr><th class=\"headerSortDown\">"._("Name")."</th><th>"._("Command")."</th><th></th></tr></thead>";
 				}
 				$output .= "<tr id=\"cmd_".preg_replace("#[. ]#","-",$data["name"])."\"><td>";
 
@@ -700,14 +700,14 @@
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hosts",
 					"name,addr","template = 'f'");
 				while ($data = FS::$dbMgr->Fetch($query)) {
-					$hostlist[$this->loc->s("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
+					$hostlist[_("Host").": ".$data["name"]." (".$data["addr"].")"] = array(1,$data["name"]);
 				}
 			}
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."icinga_hostgroups","name");
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if ($data["name"] != $ignore)
-					$hostlist[($grouponly ? "" : $this->loc->s("Hostgroup").": ").$data["name"]] = array(2,$data["name"]);
+					$hostlist[($grouponly ? "" : _("Hostgroup").": ").$data["name"]] = array(2,$data["name"]);
 			}
 
 			ksort($hostlist);
@@ -735,7 +735,7 @@
 		public function loadFooterPlugin() {
 			// Only users with icinga read right can use this module
 			if (FS::$sessMgr->hasRight("read")) {
-				$pluginTitle = $this->loc->s("Monitor");
+				$pluginTitle = _("Monitor");
 				$pluginContent = "";
 
 				// First we look at sensor problems
@@ -788,7 +788,7 @@
 					// If there are crits
 					if ($totalIcingaCrits > 0) {
 						$pluginTitle = sprintf("%s: %s/%s %s",
-							$this->loc->s("Services"),
+							_("Services"),
 							$totalIcingaSensors - $totalIcingaHS,
 							$totalIcingaSensors,
 							FS::$iMgr->img("/styles/images/monitor-crit.png",15,15)
@@ -797,7 +797,7 @@
 					// If we have only warns
 					else {
 						$pluginTitle = sprintf("%s: %s/%s %s",
-							$this->loc->s("Services"),
+							_("Services"),
 							$totalIcingaSensors - $totalIcingaHS,
 							$totalIcingaSensors,
 							FS::$iMgr->img("/styles/images/monitor-warn.png",15,15)
@@ -807,7 +807,7 @@
 				// No icinga error
 				else {
 					$pluginTitle = sprintf("%s: %s/%s %s",
-							$this->loc->s("Services"),
+							_("Services"),
 							$totalIcingaSensors - $totalIcingaHS,
 							$totalIcingaSensors,
 							FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
@@ -875,14 +875,14 @@
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return $this->showHostgroupForm($name);
 				case 12:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return (new icingaService())->showForm($name);
@@ -893,7 +893,7 @@
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return $this->showTimeperiodForm($name);
@@ -904,35 +904,35 @@
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return (new icingaContact)->showForm($name);
 				case 15:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return (new icingaCtg())->showForm($name);
 				case 16:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return (new icingaCommand())->showForm($name);
 				case 17:
 					$name = FS::$secMgr->checkAndSecuriseGetData("host");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return (new icingaHost())->showSensors($name);
 				case 18:
 					$name = FS::$secMgr->checkAndSecuriseGetData("srv");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return (new icingaService())->showSensors($name);
 				case 19:
@@ -948,7 +948,7 @@
 
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return (new icingaNotificationStrategy())->showForm($name);

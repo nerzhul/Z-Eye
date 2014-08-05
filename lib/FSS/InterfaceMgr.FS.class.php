@@ -1066,13 +1066,6 @@
 			$context = stream_context_create($opts);
 			return file_get_contents($path, false, $context);
 		}
-
-		public function getDjangoLocale($locale,$lang) {
-			return $this->fileGetContent(
-				sprintf("http://localhost:8080/locale/get?locale=%s", preg_replace("#[ ]#","%20",$locale)),
-				$lang
-			);
-		}
 		
 		protected $cur_module;
 		private $arr_css;

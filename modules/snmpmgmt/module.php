@@ -28,8 +28,8 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rSNMPmgmt($this->loc);
 			
-			$this->menu = $this->loc->s("Z-Eye Engine");
-			$this->menutitle = $this->loc->s("SNMP communities");
+			$this->menu = _("Z-Eye Engine");
+			$this->menutitle = _("SNMP communities");
 			
 			$this->modulename = "snmpmgmt";
 		}
@@ -44,7 +44,7 @@
 			FS::$iMgr->setTitle("snmp-communities");
 			$found = false;
 
-			$output .= FS::$iMgr->opendiv(1,$this->loc->s("Add-community"));
+			$output .= FS::$iMgr->opendiv(1,_("Add-community"));
 
 			// Div for Ajax modifications
 			$tMgr = new HTMLTableMgr(array(
@@ -93,7 +93,7 @@
 				case 2:
 					$id = FS::$secMgr->checkAndSecuriseGetData("id");
 					if (!$id)
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 
 					return $this->showCommunityForm($id);
 				default: return;

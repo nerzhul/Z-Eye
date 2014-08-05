@@ -29,13 +29,13 @@
 			$this->modulename = "groupmgmt";
 			$this->rulesclass = new rGroupMgmt($this->loc);
 			
-			$this->menu = $this->loc->s("Users and rights");
-			$this->menutitle = $this->loc->s("Z-Eye groups management");
+			$this->menu = _("Users and rights");
+			$this->menutitle = _("Z-Eye groups management");
 		}
 
 		public function Load() {
 			FS::$iMgr->setURL("");
-			FS::$iMgr->setTitle($this->loc->s("title-mgmt"));
+			FS::$iMgr->setTitle(_("title-mgmt"));
 			return FS::$iMgr->h1("title-mgmt").$this->showMain();
 		}
 
@@ -45,7 +45,7 @@
 				return FS::$iMgr->printError("err-not-exist");
 			}
 
-			$output = "<b>".$this->loc->s("title-edit")." '".$gname."'</b>".
+			$output = "<b>"._("title-edit")." '".$gname."'</b>".
 				FS::$iMgr->cbkForm("3");
 			$rules = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."group_rules","rulename","gid = '".$gid."' AND ruleval = 'on'");
@@ -54,11 +54,11 @@
 			}
 			return $output.$this->loadModuleRuleSets($rules).
 				FS::$iMgr->hidden("gid",$gid).
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";
+				FS::$iMgr->submit("",_("Save"))."</form>";
 		}
 
 		private function showMain() {
-			$output = FS::$iMgr->opendiv(1,$this->loc->s("New-group"));
+			$output = FS::$iMgr->opendiv(1,_("New-group"));
 			$tmpoutput = "";
 			$found = 0;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."groups","gid,gname,description");
@@ -66,7 +66,7 @@
 				if (!$found) {
 					$found = 1;
 					$tmpoutput .= "<table id=\"groupList\"><thead><tr><th class=\"headerSortDown\">GID</th><th>".
-						$this->loc->s("Groupname")."</th><th>".$this->loc->s("User-nb")."</th><th></th></tr></thead>";
+						_("Groupname")."</th><th>"._("User-nb")."</th><th></th></tr></thead>";
 				}
 				$tmpoutput .= "<tr id=\"gr".$data["gid"]."tr\"><td>".$data["gid"]."</td><td>".
 					FS::$iMgr->opendiv(2,$data["gname"],array("lnkadd" => "g=".$data["gname"]))."</td><td>".
@@ -100,7 +100,7 @@
 							if (strlen($tmpoutput) > 0) {
 								if ($found == 0) {
 									$found = 1;
-									$output .= "<table id=\"ruleList\"><thead><tr><th>Module</th><th>".$this->loc->s("Rule")."</th></tr></thead>";
+									$output .= "<table id=\"ruleList\"><thead><tr><th>Module</th><th>"._("Rule")."</th></tr></thead>";
 								}
 								$output .= $tmpoutput;
 							}
@@ -119,7 +119,7 @@
 				"<ul class=\"ulform\"><li>".FS::$iMgr->input("gname","",20,40,"Groupname").
 				FS::$iMgr->h2("title-opts").
 				$this->loadModuleRuleSets().
-				"</li><li>".FS::$iMgr->submit("reggrp",$this->loc->s("Add"))."</li>".
+				"</li><li>".FS::$iMgr->submit("reggrp",_("Add"))."</li>".
 				"</ul></form>";
 			return $output;
 		}
@@ -131,7 +131,7 @@
 				case 2:
 					$gname = FS::$secMgr->checkAndSecuriseGetData("g");
 					if (!$gname) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->editGroup($gname);
 				default: return;

@@ -29,14 +29,14 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rDNSMgmt($this->loc);
 			
-			$this->menu = $this->loc->s("Hypervision");
-			$this->menutitle = $this->loc->s("DNS management");
+			$this->menu = _("Hypervision");
+			$this->menutitle = _("DNS management");
 			
 			$this->modulename = "dnsmgmt";
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-dns"));
+			FS::$iMgr->setTitle(_("title-dns"));
 			return $this->showMain();
 		}
 
@@ -47,12 +47,12 @@
 			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->h1("title-dns");
 
-				$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("DNS-zones"));
-				$tabs[] = array(6,"mod=".$this->mid,$this->loc->s("Zone-Mgmt"));
-				$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("DNSSec-Mgmt"));
-				$tabs[] = array(5,"mod=".$this->mid,$this->loc->s("ACL-Mgmt"));
-				$tabs[] = array(4,"mod=".$this->mid,$this->loc->s("Server-Mgmt"));
-				$tabs[] = array(3,"mod=".$this->mid,$this->loc->s("Advanced-tools"));
+				$tabs[] = array(1,"mod=".$this->mid,_("DNS-zones"));
+				$tabs[] = array(6,"mod=".$this->mid,_("Zone-Mgmt"));
+				$tabs[] = array(2,"mod=".$this->mid,_("DNSSec-Mgmt"));
+				$tabs[] = array(5,"mod=".$this->mid,_("ACL-Mgmt"));
+				$tabs[] = array(4,"mod=".$this->mid,_("Server-Mgmt"));
+				$tabs[] = array(3,"mod=".$this->mid,_("Advanced-tools"));
 				$output .= FS::$iMgr->tabPan($tabs,$sh);
 			}
 			else {
@@ -70,14 +70,14 @@
 
 		private function showZoneMgmt() {
 			FS::$iMgr->setURL("sh=6");
-			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("Zone-Mgmt"));
+			FS::$iMgr->setTitle(_("title-dns")." > "._("Zone-Mgmt"));
 			$dnsZone = new dnsZone();
 			return $dnsZone->renderAll();
 		}
 
 		private function showDNSSecMgmt() {
 			FS::$iMgr->setURL("sh=2");
-			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("DNSSec-Mgmt"));
+			FS::$iMgr->setTitle(_("title-dns")." > "._("DNSSec-Mgmt"));
 			$dnsTSIG = new dnsTSIGKey();
 			$output = $dnsTSIG->renderAll();
 			return $output;
@@ -85,7 +85,7 @@
 
 		private function showRecordMgmt() {
 			FS::$iMgr->setURL("sh=1");
-			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("DNS-zones"));
+			FS::$iMgr->setTitle(_("title-dns")." > "._("DNS-zones"));
 			$output = "";
 			if (FS::$sessMgr->hasRight("write")) {
 				$found = false;
@@ -141,9 +141,9 @@
 					FS::$iMgr->check("ssrv",array("check" => $shSRV))."SRV ".
 					FS::$iMgr->check("stxt",array("check" => $shTXT))."TXT ".
 					FS::$iMgr->check("sptr",array("check" => $shPTR))."PTR ".
-					FS::$iMgr->check("sother",array("check" => $shother)).$this->loc->s("Others").
+					FS::$iMgr->check("sother",array("check" => $shother))._("Others").
 					"<br />".
-					FS::$iMgr->submit("",$this->loc->s("Filter")).
+					FS::$iMgr->submit("",_("Filter")).
 					"</form><div id=\"recordlist\"></div>";
 			}
 			else {
@@ -255,11 +255,11 @@
 					}
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dns_zones",
 						"zonename","zonename = '".$dnszone2."'")) {
-						$output .= FS::$iMgr->opendiv(11,$this->loc->s("Add-Record"),array("lnkadd" => "zn=".$dnszone2));
+						$output .= FS::$iMgr->opendiv(11,_("Add-Record"),array("lnkadd" => "zn=".$dnszone2));
 						$administrable = true;
 					}
 					$output .= "<table id=\"dnsRecords\"><thead><th id=\"headerSortDown\">".
-						$this->loc->s("Record")."</th><th>Type</th><th>".$this->loc->s("Value")."</th><th>".$this->loc->s("Servers")."</th>";
+						_("Record")."</th><th>Type</th><th>"._("Value")."</th><th>"._("Servers")."</th>";
 					if ($administrable) {
 						$output .= "<th></th>";
 					}
@@ -341,26 +341,26 @@
 
 		private function showAdvancedTools() {
 			FS::$iMgr->setURL("sh=3");
-			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("Advanced-tools"));
+			FS::$iMgr->setTitle(_("title-dns")." > "._("Advanced-tools"));
 
 			$output = FS::$iMgr->h3("title-old-records").
 				FS::$iMgr->cbkForm("2").
 				"Intervalle (jours) ".FS::$iMgr->numInput("ival")."<br />".
-				FS::$iMgr->submit("search",$this->loc->s("Search")).
+				FS::$iMgr->submit("search",_("Search")).
 				"</form><div id=\"obsres\"></div>";
 			return $output;
 		}
 
 		private function showACLList() {
 			FS::$iMgr->setURL("sh=5");
-			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("ACL-Mgmt"));
+			FS::$iMgr->setTitle(_("title-dns")." > "._("ACL-Mgmt"));
 			$acl = new dnsACL();
 			return $acl->renderAll();
 		}
 
 		private function showServerMgmt() {
 			FS::$iMgr->setURL("sh=4");
-			FS::$iMgr->setTitle($this->loc->s("title-dns")." > ".$this->loc->s("Server-Mgmt"));
+			FS::$iMgr->setTitle(_("title-dns")." > "._("Server-Mgmt"));
 			$cluster = new dnsCluster();
 			$output = $cluster->renderAll();
 
@@ -379,7 +379,7 @@
 				case 2:
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if (!$addr) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					$server = new dnsServer();
@@ -390,7 +390,7 @@
 				case 4:
 					$keyalias = FS::$secMgr->checkAndSecuriseGetData("keyalias");
 					if (!$keyalias) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					$dnsTSIG = new dnsTSIGKey();
@@ -401,7 +401,7 @@
 				case 6:
 					$aclname = FS::$secMgr->checkAndSecuriseGetData("aclname");
 					if (!$aclname) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					$dnsACL = new dnsACL();
@@ -412,7 +412,7 @@
 				case 8:
 					$clustername = FS::$secMgr->checkAndSecuriseGetData("clustername");
 					if (!$clustername) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					$dnsCluster = new dnsCluster();
@@ -423,7 +423,7 @@
 				case 10:
 					$zonename = FS::$secMgr->checkAndSecuriseGetData("zonename");
 					if (!$zonename) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					$dnsZone = new dnsZone();
@@ -431,7 +431,7 @@
 				case 11:
 					$zonename = FS::$secMgr->checkAndSecuriseGetData("zn");
 					if (!$zonename) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					$dnsRecord = new dnsRecord();
@@ -508,7 +508,7 @@
 						exec("/usr/bin/dig +short -t A ".$toquery." | grep -ve \"^;\" | grep -ve \"^$\" | grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$'",$out);
 						if (count($out) == 0 || $out == "") {
 							$obsoletes[$data["record"]] = FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data["record"].
-								".".$data["zonename"], $data["record"].".".$data["zonename"])." / ".$this->loc->s("Alone")."<br />";
+								".".$data["zonename"], $data["record"].".".$data["zonename"])." / "._("Alone")."<br />";
 						}
 						else {
 							$count = count($out);
@@ -536,7 +536,7 @@
 							$output .= $value;
 					}
 					else {
-						$output .= FS::$iMgr->printDebug($this->loc->s("no-found-records"));
+						$output .= FS::$iMgr->printDebug(_("no-found-records"));
 					}
 
 					FS::$iMgr->js("$('#obsres').html('".FS::$secMgr->cleanForJS($output)."');");

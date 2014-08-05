@@ -117,16 +117,16 @@
 
 			if ($username) {
 				if ($utype == 1) {
-					$tempSelect = $this->loc->s("User").FS::$iMgr->hidden("utype",$utype);
+					$tempSelect = _("User").FS::$iMgr->hidden("utype",$utype);
 				}
 				else if ($utype == 2) {
-					$tempSelect = $this->loc->s("Mac-addr").FS::$iMgr->hidden("utype",$utype);
+					$tempSelect = _("Mac-addr").FS::$iMgr->hidden("utype",$utype);
 				}
 			}
 			else {
 				$tempSelect = FS::$iMgr->select("utype",array("js" => "changeUForm()",)).
-					FS::$iMgr->selElmt($this->loc->s("User"),1,$utype == 1).
-					FS::$iMgr->selElmt($this->loc->s("Mac-addr"),2,$utype == 2).
+					FS::$iMgr->selElmt(_("User"),1,$utype == 1).
+					FS::$iMgr->selElmt(_("Mac-addr"),2,$utype == 2).
 					"</select>";
 			}
 				
@@ -162,9 +162,9 @@
 			)).
 				"<tr><td colspan=\"2\">".
 				FS::$iMgr->hidden("ra",$radalias).
-				FS::$iMgr->button("newgrp",$this->loc->s("New-Group"),"addGrpForm()").
-				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','');").
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</td></tr></table></form>";
+				FS::$iMgr->button("newgrp",_("New-Group"),"addGrpForm()").
+				FS::$iMgr->button("newattr",_("New-Attribute"),"addAttrElmt('','','','');").
+				FS::$iMgr->submit("",_("Save"))."</td></tr></table></form>";
 			
 			return $output;
 		}
@@ -342,7 +342,7 @@
 					$groupexist = $this->radSQLMgr->GetOneData($this->raddbinfos["tradgrprep"],"groupname","groupname = '".$groupname."'");
 				}
 				if (!$groupexist) {
-					return FS::$iMgr->printError(sprintf($this->loc->s("err-group-not-exists"),$groupname),true);
+					return FS::$iMgr->printError(sprintf(_("err-group-not-exists"),$groupname),true);
 				}
 				
 				$attrcount = $this->radSQLMgr->Count($this->raddbinfos["tradgrpchk"],"groupname","groupname = '".$groupname."'");
@@ -352,7 +352,7 @@
 			FS::$iMgr->js("var attridx = 0; function addAttrElmt(attrkey,attrval,attrop,attrtarget) { $('<span class=\"attrli'+attridx+'\">".
 				FS::$iMgr->input("attrkey'+attridx+'","'+attrkey+'",20,40,"Name")." Op ".FS::$iMgr->select("attrop'+attridx+'").
 				FS::$iMgr->raddbCondSelectElmts().
-				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." ".$this->loc->s("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
+				"</select> Valeur".FS::$iMgr->input("attrval'+attridx+'","'+attrval+'",10,40)." "._("Target")." ".FS::$iMgr->select("attrtarget'+attridx+'").
 				FS::$iMgr->selElmt("check",1).
 				FS::$iMgr->selElmt("reply",2)."</select> <a onclick=\"javascript:delAttrElmt('+attridx+');\">".
 				FS::$iMgr->img("styles/images/cross.png",15,15)."</a></span><br />').insertBefore('#attrgrpn');
@@ -385,7 +385,7 @@
 			}
 			
 			$tempSelect = FS::$iMgr->select("radgrptpl",array("js" => "addTemplAttributes()")).
-				FS::$iMgr->selElmt($this->loc->s("None"),0).
+				FS::$iMgr->selElmt(_("None"),0).
 				FS::$iMgr->selElmt("VLAN",1)."</select>";
 				
 			return FS::$iMgr->cbkForm("3")."<table>".
@@ -397,8 +397,8 @@
 				)).
 				"<tr><td colspan=\"2\">".
 				FS::$iMgr->hidden("ra",$radalias).
-				FS::$iMgr->button("newattr",$this->loc->s("New-Attribute"),"addAttrElmt('','','','')").
-				FS::$iMgr->submit("",$this->loc->s("Save")).
+				FS::$iMgr->button("newattr",_("New-Attribute"),"addAttrElmt('','','','')").
+				FS::$iMgr->submit("",_("Save")).
 				"</td></tr></table></form>";
 		}
 	};

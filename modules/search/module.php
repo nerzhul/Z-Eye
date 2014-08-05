@@ -38,7 +38,7 @@
 				return $this->findRefsAndShow($autosearch,true);
 			}
 			else {
-				FS::$iMgr->setTitle($this->loc->s("Search"));
+				FS::$iMgr->setTitle(_("Search"));
 				$search = FS::$secMgr->checkAndSecurisePostData("s");
 				if (!$search) {
 					$search = FS::$secMgr->checkAndSecuriseGetData("s");
@@ -68,7 +68,7 @@
 			if (!$autocomp) {
 				FS::$iMgr->setURL("s=".$search);
 
-				$output = FS::$iMgr->h1($this->loc->s("Search").": ".$search,true);
+				$output = FS::$iMgr->h1(_("Search").": ".$search,true);
 				if (FS::$secMgr->isMacFragment($search)) {
 					$this->showMacAddrResults($search);
 				}
@@ -82,7 +82,7 @@
 					$this->showNamedInfos($search);
 				}
 
-				$output .= FS::$iMgr->h2($this->loc->s("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true);
+				$output .= FS::$iMgr->h2(_("title-res-nb").": ".FS::$searchMgr->getResultsCount(),true);
 
 				if (FS::$searchMgr->getMode() != 1) {
 					if (count(FS::$searchMgr->getResults()) > 0) {
@@ -187,7 +187,7 @@
 					while ($data2 = $radSQLMgr->Fetch($query2)) {
 						if (!$found) {
 							$found = 1;
-							$output .= $this->loc->s("Username").": ".
+							$output .= _("Username").": ".
 								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".$data["port"].
 									"&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"],$data2["username"]);
 						}
@@ -197,7 +197,7 @@
 						while ($data2 = $radSQLMgr->Fetch($query2)) {
 							if (!$found) {
 								$found = 1;
-								$output .= $this->loc->s("Username").": ".
+								$output .= _("Username").": ".
 									FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("radius")."&h=".$data["addr"]."&p=".
 										$data["port"]."&r=".$data["dbname"]."&radentrytype=1&radentry=".$data2["username"],
 										$data2["username"]);
@@ -231,9 +231,9 @@
 							}
 							$fst = preg_split("#\.#",$data2["acctstarttime"]);
 							$lst = preg_split("#\.#",$data2["acctstoptime"]);
-							$locoutput = $this->loc->s("User").": ".$data2["username"]." / ".$this->loc->s("Device").": ".
+							$locoutput = _("User").": ".$data2["username"]." / "._("Device").": ".
 								FS::$iMgr->aLink($this->mid."&s=".$data2["calledstationid"],$data2["calledstationid"]);
-							$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0]." ".$this->loc->s("and-the")." ".$lst[0].")<br />";
+							$output .= "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("._("Between")." ".$fst[0]." "._("and-the")." ".$lst[0].")<br />";
 						}
 
 						if ($found) $output = FS::$iMgr->h3("title-8021x-users").$output;
@@ -254,7 +254,7 @@
 							else if ($data2["input"] > 1024)
 								$inputbw = round($data2["input"]/1024,2)."Ko";
 							else
-								$inputbw = $data2["input"]." ".$this->loc->s("Bytes");
+								$inputbw = $data2["input"]." "._("Bytes");
 
 							if ($data2["output"] > 1024*1024*1024)
 								$outputbw = round($data2["output"]/1024/1024/1024,2)."Go";
@@ -263,11 +263,11 @@
 							else if ($data2["output"] > 1024)
 								$outputbw = round($data2["output"]/1024,2)."Ko";
 							else
-								$outputbw = $data2["output"]." ".$this->loc->s("Bytes");
+								$outputbw = $data2["output"]." "._("Bytes");
 							$fst = preg_split("#\.#",$data2["fst"]);
 							$lst = preg_split("#\.#",$data2["lst"]);
-							$locoutput .= $this->loc->s("Device").": ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".
-							(strlen($lst[0]) > 0 ? $this->loc->s("Between") : $this->loc->s("Since"))." ".$fst[0].(strlen($lst[0]) > 0 ? " ".$this->loc->s("and-the")." ".$lst[0] : "").")<br />".FS::$iMgr->hr();
+							$locoutput .= _("Device").": ".$data2["calledstationid"]." Download: ".$inputbw." / Upload: ".$outputbw. "<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".
+							(strlen($lst[0]) > 0 ? _("Between") : _("Since"))." ".$fst[0].(strlen($lst[0]) > 0 ? " "._("and-the")." ".$lst[0] : "").")<br />".FS::$iMgr->hr();
 							$totinbw += $data2["input"];
 							$totoutbw += $data2["output"];
 						}
@@ -279,7 +279,7 @@
 							else if (totinbw > 1024)
 								$inputbw = round($totinbw/1024,2)."Ko";
 							else
-								$inputbw = $totinbw." ".$this->loc->s("Bytes");
+								$inputbw = $totinbw." "._("Bytes");
 
 							if ($totoutbw > 1024*1024*1024)
 								$outputbw = round($totoutbw/1024/1024/1024,2)."Go";
@@ -288,8 +288,8 @@
 							else if ($totoutbw > 1024)
 								$outputbw = round($totoutbw/1024,2)."Ko";
 							else
-								$outputbw = $totoutbw." ".$this->loc->s("Bytes");
-							$tmpoutput = "<b>".$this->loc->s("Total")."</b> Download: ".$inputbw." / Upload: ".$outputbw."</div>";
+								$outputbw = $totoutbw." "._("Bytes");
+							$tmpoutput = "<b>"._("Total")."</b> Download: ".$inputbw." / Upload: ".$outputbw."</div>";
 							$output .= FS::$iMgr->h3("title-8021x-bw").$locoutput;
 						}
 					}
@@ -305,8 +305,8 @@
 						if ($found == 0) {
 							$found = 1;
 							$raddatas = true;
-							$output .= "<table><tr><th>".$this->loc->s("Device")."</th><th>".$this->loc->s("start-session")."</th><th>".$this->loc->s("end-session")."</th><th>".$this->loc->s("Upload")."</th>
-							<th>".$this->loc->s("Download")."</th><th>".$this->loc->s("end-session-cause")."</th></tr>";
+							$output .= "<table><tr><th>"._("Device")."</th><th>"._("start-session")."</th><th>"._("end-session")."</th><th>"._("Upload")."</th>
+							<th>"._("Download")."</th><th>"._("end-session-cause")."</th></tr>";
 						}
 						if ($data2["acctinputoctets"] > 1024*1024*1024)
 								$inputbw = round($data2["acctinputoctets"]/1024/1024/1024,2)." Go";
@@ -315,7 +315,7 @@
 						else if ($data2["acctinputoctets"] > 1024)
 								$inputbw = round($data2["acctinputoctets"]/1024,2)." Ko";
 						else
-								$inputbw = $data2["acctinputoctets"]." ".$this->loc->s("Bytes");
+								$inputbw = $data2["acctinputoctets"]." "._("Bytes");
 
 						if ($data2["acctoutputoctets"] > 1024*1024*1024)
 								$outputbw = round($data2["acctoutputoctets"]/1024/1024/1024,2)." Go";
@@ -324,7 +324,7 @@
 						else if ($data2["acctoutputoctets"] > 1024)
 								$outputbw = round($data2["acctoutputoctets"]/1024,2)." Ko";
 						else
-								$outputbw = $data2["acctoutputoctets"]." ".$this->loc->s("Bytes");
+								$outputbw = $data2["acctoutputoctets"]." "._("Bytes");
 
 						$macdev = "";
 						if (strlen($data2["calledstationid"]) > 0) {
@@ -340,7 +340,7 @@
 							}
 						}
 						$output .= "<tr><td>".
-							(strlen($macdev) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev, $macdev) : $this->loc->s("Unknown"))."</td>
+							(strlen($macdev) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches")."&d=".$macdev, $macdev) : _("Unknown"))."</td>
 							<td>".date("d-m-y H:i:s",strtotime($data2["acctstarttime"]))."</td><td>".
 							($data2["acctstoptime"] != NULL ? date("d-m-y H:i:s",strtotime($data2["acctstoptime"])) : "").
 						"</td><td>".$inputbw."</td><td>".$outputbw."</td>
@@ -350,7 +350,7 @@
 						$output .= "</table>";
 					}
 					if ($raddatas) {
-						$output = $this->divEncapResults(FS::$iMgr->h3($this->loc->s("Radius-Server")." (".$data["dbname"].
+						$output = $this->divEncapResults(FS::$iMgr->h3(_("Radius-Server")." (".$data["dbname"].
 							"@".$data["addr"].":".$data["port"].")",true).FS::$iMgr->hr().$output,"",true);
 					}
 				}

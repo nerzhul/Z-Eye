@@ -30,11 +30,11 @@
 			
 			$this->modulename = "connect";
 			
-			$this->menutitle = $this->loc->s("Connection");
+			$this->menutitle = _("Connection");
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-conn"));
+			FS::$iMgr->setTitle(_("title-conn"));
 			return "";
 		}
 
@@ -136,7 +136,7 @@
 			if ($text) {
 				FS::$iMgr->js(sprintf("setLoginCbkMsg('<span style=\"color: %s;\">%s</span>');",
 					$good ? "green" : "red",
-					addslashes($this->loc->s($text))));
+					addslashes(_($text))));
 			}
 			else {
 				FS::$iMgr->js("setLoginCbkMsg('');");

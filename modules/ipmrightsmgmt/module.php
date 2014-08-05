@@ -28,12 +28,12 @@
 			$this->modulename = "ipmrightsmgmt";
 			$this->rulesclass = new rIPMRightsMgmt($this->loc);
 			
-			$this->menu = $this->loc->s("Users and rights");
-			$this->menuname = $this->loc->s("IP manager");
+			$this->menu = _("Users and rights");
+			$this->menuname = _("IP manager");
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-ipmrightsmgmt"));
+			FS::$iMgr->setTitle(_("title-ipmrightsmgmt"));
 
 			$output = $this->showMain();
 			return $output;
@@ -73,10 +73,10 @@
 			$output = "";
 			$found = false;
 
-			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Groups")."</th></tr>";
-			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Users")."</th></tr>";
+			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>"._("Right")."</th><th>".
+				_("Groups")."</th></tr>";
+			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>"._("Right")."</th><th>".
+				_("Users")."</th></tr>";
 
 			$grprules = $this->initSubnetRules();
 			$usrrules = $this->initSubnetRules();
@@ -112,10 +112,10 @@
 			$output = "";
 			$found = false;
 
-			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Groups")."</th></tr>";
-			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Users")."</th></tr>";
+			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>"._("Right")."</th><th>".
+				_("Groups")."</th></tr>";
+			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>"._("Right")."</th><th>".
+				_("Users")."</th></tr>";
 
 			$grprules = $this->initRules();
 			$usrrules = $this->initRules();
@@ -336,7 +336,7 @@
 					$output .= FS::$iMgr->selElmt($username,$uid);
 				}
 			}
-			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
+			$output .= "</select>".FS::$iMgr->submit("",_("Add"));
 			if (!$found) return "";
 			else return $output;
 		}
@@ -351,7 +351,7 @@
 					$output .= FS::$iMgr->selElmt($gname,$gid);
 				}
 			}
-			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
+			$output .= "</select>".FS::$iMgr->submit("",_("Add"));
 			if (!$found) return "";
 			else return $output;
 		}
@@ -386,10 +386,10 @@
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 					$output = FS::$iMgr->h1("title-ipmrightsmgmt");
 					$panElmts = array(
-						array(1,"mod=".$this->mid,$this->loc->s("title-globalrights"))
+						array(1,"mod=".$this->mid,_("title-globalrights"))
 					);
 					if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_subnet_v4_declared","netid")) {
-						$panElmts[] = array(2,"mod=".$this->mid,$this->loc->s("title-bysubnet"));
+						$panElmts[] = array(2,"mod=".$this->mid,_("title-bysubnet"));
 					}
 					// Show only if there is devices
 					$output .= FS::$iMgr->tabPan($panElmts,$sh);
@@ -407,15 +407,15 @@
 
 		private function getRightForKey($key) {
 			switch($key) {
-				case "read": return $this->loc->s("right-read");
-				case "servermgmt": return $this->loc->s("right-servermgmt");
-				case "advancedtools": return $this->loc->s("right-advancedtools");
-				case "optionsmgmt": return $this->loc->s("right-optionsmgmt");
-				case "optionsgrpmgmt": return $this->loc->s("right-optionsgrpmgmt");
-				case "subnetmgmt": return $this->loc->s("right-subnetmgmt");
-				case "rangemgmt": return $this->loc->s("right-rangemgmt");
-				case "ipmgmt": return $this->loc->s("right-ipmgmt");
-				case "history": return $this->loc->s("right-history");
+				case "read": return _("right-read");
+				case "servermgmt": return _("right-servermgmt");
+				case "advancedtools": return _("right-advancedtools");
+				case "optionsmgmt": return _("right-optionsmgmt");
+				case "optionsgrpmgmt": return _("right-optionsgrpmgmt");
+				case "subnetmgmt": return _("right-subnetmgmt");
+				case "rangemgmt": return _("right-rangemgmt");
+				case "ipmgmt": return _("right-ipmgmt");
+				case "history": return _("right-history");
 				default: return FS::$iMgr->printError("err-not-found");
 			}
 		}

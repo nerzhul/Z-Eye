@@ -29,12 +29,12 @@
 			$this->icingaAPI = new icingaBroker();
 			$this->rulesclass = new rMaps($this->loc);
 			
-			$this->menu = $this->loc->s("Supervision");
-			$this->menutitle = $this->loc->s("Maps");
+			$this->menu = _("Supervision");
+			$this->menutitle = _("Maps");
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-maps"));
+			FS::$iMgr->setTitle(_("title-maps"));
 
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
@@ -42,8 +42,8 @@
 			if (!FS::isAJAXCall()) {
 				$output .= FS::$iMgr->h1("title-maps");
 				$output .= FS::$iMgr->tabPan(array(
-					array(3,"mod=".$this->mid,$this->loc->s("icinga-map")),
-					array(1,"mod=".$this->mid,$this->loc->s("net-map-full")),
+					array(3,"mod=".$this->mid,_("icinga-map")),
+					array(1,"mod=".$this->mid,_("net-map-full")),
 			//		array(4,"mod=".$this->mid,"Sigma"),
 			//		array(5,"mod=".$this->mid,"Springy")
 					),$sh);
@@ -86,9 +86,9 @@
 		private function showSigmaMap() {
 			FS::$iMgr->setURL("sh=4");
 			
-			$output	= FS::$iMgr->opendiv(1,$this->loc->s("Add-Node"),array("line" => true));
-			$output	.= FS::$iMgr->opendiv(2,$this->loc->s("Add-Edge"),array("line" => true));
-			$output	.= FS::$iMgr->opendiv(3,$this->loc->s("Import"));
+			$output	= FS::$iMgr->opendiv(1,_("Add-Node"),array("line" => true));
+			$output	.= FS::$iMgr->opendiv(2,_("Add-Edge"),array("line" => true));
+			$output	.= FS::$iMgr->opendiv(3,_("Import"));
 			$output .= "<div id=\"sigmap\" style=\"display:inline-block;text-align:left; width:100%; height:800px;\"></div>";
 			
 			$js = "var sigInst = sigma.init(document.getElementById('sigmap')).drawingProperties({
@@ -159,8 +159,8 @@
 			$output = FS::$iMgr->cbkForm("3");
 			$output .= "<table>";
 			$output .= FS::$iMgr->idxIdLine("Name","ename",$name,array("length" => 60));
-			$output .= "<tr><td>".$this->loc->s("Source-node")."</td><td>".$this->showNodeList("node1",NULL)."</td></tr>";
-			$output .= "<tr><td>".$this->loc->s("Dest-node")."</td><td>".$this->showNodeList("node2",NULL)."</td></tr>";
+			$output .= "<tr><td>"._("Source-node")."</td><td>".$this->showNodeList("node1",NULL)."</td></tr>";
+			$output .= "<tr><td>"._("Dest-node")."</td><td>".$this->showNodeList("node2",NULL)."</td></tr>";
 			//$output .= FS::$iMgr->idxLine("Label","elabel",array("length" => 60,"rawlabel" => true));
 			$output .= FS::$iMgr->idxLine("Size","esize",array("type" => "num", "length" => 2, "size" => 2));
 			$output .= FS::$iMgr->idxLine("Color","ecolor",array("value" => "000000","type" => "color", "length" => 6, "size" => 6));

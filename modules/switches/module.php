@@ -38,8 +38,8 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rSwitchMgmt($this->loc);
 			
-			$this->menu = $this->loc->s("Hypervision");
-			$this->menutitle = $this->loc->s("Network devices management");
+			$this->menu = _("Hypervision");
+			$this->menutitle = _("Network devices management");
 			
 			$this->modulename = "switchmgmt";
 
@@ -62,7 +62,7 @@
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-network-device-mgmt"));
+			FS::$iMgr->setTitle(_("title-network-device-mgmt"));
 			return $this->showMain();
 		}
 
@@ -74,8 +74,8 @@
 
 			$count = FS::$dbMgr->Count(PGDbConfig::getDbPrefix()."snmp_communities","name");
 			if ($count < 1) {
-					$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-							"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")),true);
+					$output .= FS::$iMgr->printError(_("err-no-snmp-community").
+							"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", _("Go")),true);
 					return $output;
 			}
 
@@ -132,26 +132,26 @@
 				default: break;
 			}
 			if (!FS::isAjaxCall()) {
-				$output .= FS::$iMgr->h2($port." ".$this->loc->s("on")." ".
+				$output .= FS::$iMgr->h2($port." "._("on")." ".
 					FS::$iMgr->aLink($this->mid."&d=".$device, $device),true);
 				$panElmts = array();
-				$panElmts[] = array(1,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Configuration"));
+				$panElmts[] = array(1,"mod=".$this->mid."&d=".$device."&p=".$port,_("Configuration"));
 				if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'") &&
 					(FS::$sessMgr->hasRight("snmp_".$snmpro."_sshportinfos") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_sshportinfos"))) {
-					$panElmts[] = array(4,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("switch-view"));
+					$panElmts[] = array(4,"mod=".$this->mid."&d=".$device."&p=".$port,_("switch-view"));
 				}
 				
 				if (FS::$sessMgr->hasRight("snmp_".$snmpro."_readportstats") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_readportstats")) {
-					$panElmts[] = array(2,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("bw-stats"));
+					$panElmts[] = array(2,"mod=".$this->mid."&d=".$device."&p=".$port,_("bw-stats"));
 				}
 				
 				if (FS::$sessMgr->hasRight("snmp_".$snmprw."_write") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_write") || 
 					FS::$sessMgr->hasRight("snmp_".$snmprw."_writeportmon") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_writeportmon")) {
-					$panElmts[] = array(3,"mod=".$this->mid."&d=".$device."&p=".$port,$this->loc->s("Monitoring"));
+					$panElmts[] = array(3,"mod=".$this->mid."&d=".$device."&p=".$port,_("Monitoring"));
 				}
 				
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
@@ -170,7 +170,7 @@
 							$output .= FS::$iMgr->hidden("sw",$device);
 							$output .= FS::$iMgr->hidden("port",$port);
 						}
-						$output .= "<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>";
+						$output .= "<table><tr><th>"._("Field")."</th><th>"._("Value")."</th></tr>";
 						$output .= FS::$iMgr->idxLine("Description","desc",array("value" => $data["name"],"tooltip" => "tooltip-port-desc"));
 
 						$portObj = new netDevicePort();
@@ -178,16 +178,16 @@
 
 						$output .= FS::$iMgr->idxLine("Room","room",array("value" => $portObj->getRoom(),"tooltip" => "tooltip-room"));
 						$output .= FS::$iMgr->idxLine("Plug","prise",array("value" => $portObj->getPlug(),"tooltip" => "tooltip-plug"));
-						$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
+						$output .= "<tr><td>"._("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
 						$mtu = $this->devapi->getPortMtu();
-						$output .= "<tr><td>".$this->loc->s("State")." / ".$this->loc->s("Speed")." / ".$this->loc->s("Duplex").
-							($mtu != -1 ? " / ".$this->loc->s("MTU") : "")."</td><td>";
+						$output .= "<tr><td>"._("State")." / "._("Speed")." / "._("Duplex").
+							($mtu != -1 ? " / "._("MTU") : "")."</td><td>";
 						if ($data["up_admin"] == "down")
-								$output .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
+								$output .= "<span style=\"color: red;\">"._("Shut")."</span>";
 						else if ($data["up_admin"] == "up" && $data["up"] == "down")
-							$output .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
+							$output .= "<span style=\"color: orange;\">"._("Inactive")."</span>";
 						else if ($data["up"] == "up")
-							$output .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
+							$output .= "<span style=\"color: black;\">"._("Active")."</span>";
 						else
 							$output .= "unk";
 						$output .= " / ".$data["speed"]." / ".($data["duplex"] == "" ? "[NA]" : $data["duplex"]).
@@ -202,7 +202,7 @@
 
 						$output .= $this->devapi->showPortSecurityOpts();
 
-						$output .= "<tr><td colspan=\"2\">".$this->loc->s("Others")."</td></tr>";
+						$output .= "<tr><td colspan=\"2\">"._("Others")."</td></tr>";
 
 						$output .= $this->devapi->showCDPOpts();
 
@@ -213,7 +213,7 @@
 						$output .= "</table>";
 						if ($portid != -1) {
 							if ($this->hasDeviceWriteRight($snmprw,$dip)) {
-								$output .= "<center><br />".FS::$iMgr->submit("",$this->loc->s("Save"))."</center>";
+								$output .= "<center><br />".FS::$iMgr->submit("",_("Save"))."</center>";
 								$output .= "</form>";
 							}
 							$this->devapi->unsetPortId();
@@ -247,7 +247,7 @@
 								!preg_match("#<html#",$file[$i]) && !preg_match("#<!--#",$file[$i]))
 								$filebuffer .= $file[$i];
 						}
-						$output .= "<br />".$filebuffer."<br /><center><span style=\"font-size: 9px;\">".$this->loc->s("generated-mrtg")."</span></center>";
+						$output .= "<br />".$filebuffer."<br /><center><span style=\"font-size: 9px;\">"._("generated-mrtg")."</span></center>";
 					}
 					else
 						$output .= FS::$iMgr->printError("err-no-port-bw");
@@ -266,12 +266,12 @@
 					$output .= FS::$iMgr->cbkForm("16").
 						FS::$iMgr->hidden("device",$device).FS::$iMgr->hidden("port",$port).
 						"<ul class=\"ulform\"><li>".FS::$iMgr->check("enmon",array("check" => (($climit > 0 || $wlimit) > 0 ? true : false),
-							"label" => $this->loc->s("enable-monitor")))."</li><li>".
-						FS::$iMgr->input("desc",$desc,20,200,$this->loc->s("Label"))."</li><li>".
+							"label" => _("enable-monitor")))."</li><li>".
+						FS::$iMgr->input("desc",$desc,20,200,_("Label"))."</li><li>".
 						FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),
-							array("size" => 10, "length" => 10, "label" => $this->loc->s("warn-step")))."</li><li>".
+							array("size" => 10, "length" => 10, "label" => _("warn-step")))."</li><li>".
 						FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),
-							array("size" => 10, "length" => 10, "label" => $this->loc->s("crit-step")))."</li><li>".
+							array("size" => 10, "length" => 10, "label" => _("crit-step")))."</li><li>".
 						FS::$iMgr->submit("","Enregister")."</li>".
 						"</ul></form>";
 				}
@@ -283,8 +283,8 @@
 
 					$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 					if (!$sshuser) {
-						return FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
-							FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")),true);
+						return FS::$iMgr->printError(_("err-no-sshlink-configured")."<br /><br />".
+							FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", _("Go")),true);
 					}
 
 					$sshpwd = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshpwd","device = '".$device."'");
@@ -332,34 +332,34 @@
 			if (!FS::isAjaxCall()) {
 				FS::$iMgr->showReturnMenu(true);
 				$dloc = FS::$dbMgr->GetOneData("device","location","name = '".$device."'");
-				$output = FS::$iMgr->h2($this->loc->s("Device")." ".$device." (".$dip.($dloc != NULL ? " - ".$dloc : "").")",true);
+				$output = FS::$iMgr->h2(_("Device")." ".$device." (".$dip.($dloc != NULL ? " - ".$dloc : "").")",true);
 
 				$panElmts = array();
-				$panElmts[] = array(6,"mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),$this->loc->s("Portlist"));
+				$panElmts[] = array(6,"mod=".$this->mid."&d=".$device.($od ? "&od=".$od : "").($filter ? "&fltr=".$filter : ""),_("Portlist"));
 				if (FS::$sessMgr->hasRight("snmp_".$snmpro."_readswvlans") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_readswvlans"))
-					$panElmts[] = array(5,"mod=".$this->mid."&d=".$device,$this->loc->s("VLANlist"));
+					$panElmts[] = array(5,"mod=".$this->mid."&d=".$device,_("VLANlist"));
 
-				$panElmts[] = array(3,"mod=".$this->mid."&d=".$device,$this->loc->s("frontview"));
+				$panElmts[] = array(3,"mod=".$this->mid."&d=".$device,_("frontview"));
 
 				if (FS::$sessMgr->hasRight("snmp_".$snmpro."_readswmodules") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_readswmodules") ||
 					FS::$sessMgr->hasRight("snmp_".$snmpro."_readswdetails") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_readswdetails"))
-					$panElmts[] = array(1,"mod=".$this->mid."&d=".$device,$this->loc->s("Internal-mod"));
+					$panElmts[] = array(1,"mod=".$this->mid."&d=".$device,_("Internal-mod"));
 
 				if (FS::$sessMgr->hasRight("snmp_".$snmpro."_sshshowstart") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_sshshowstart"))
-					$panElmts[] = array(8,"mod=".$this->mid."&d=".$device,$this->loc->s("Startup-Cfg"));
+					$panElmts[] = array(8,"mod=".$this->mid."&d=".$device,_("Startup-Cfg"));
 				if (FS::$sessMgr->hasRight("snmp_".$snmpro."_sshshowrun") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_sshshowrun"))
-					$panElmts[] = array(9,"mod=".$this->mid."&d=".$device,$this->loc->s("Running-Cfg"));
+					$panElmts[] = array(9,"mod=".$this->mid."&d=".$device,_("Running-Cfg"));
 
-				$panElmts[] = array(4,"mod=".$this->mid."&d=".$device,$this->loc->s("Advanced-tools"));
+				$panElmts[] = array(4,"mod=".$this->mid."&d=".$device,_("Advanced-tools"));
 
 				if (FS::$sessMgr->hasRight("snmp_".$snmprw."_sshpwd") ||
 					FS::$sessMgr->hasRight("ip_".$dip."_sshpwd"))
-					$panElmts[] = array(7,"mod=".$this->mid."&d=".$device,$this->loc->s("SSH"));
+					$panElmts[] = array(7,"mod=".$this->mid."&d=".$device,_("SSH"));
 				$output .= FS::$iMgr->tabPan($panElmts,$showmodule);
 			} else {
 				if ($dip == NULL) {
@@ -381,21 +381,21 @@
 						if ($data = FS::$dbMgr->Fetch($query)) {
 							$output .= FS::$iMgr->h3("Device-detail").
 								"<table>".
-								"<tr><td>".$this->loc->s("Name")."</td><td>".
+								"<tr><td>"._("Name")."</td><td>".
 								$data["name"]."</td></tr>".
-								"<tr><td>".$this->loc->s("Place")." / ".
-								$this->loc->s("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>".
-								"<tr><td>".$this->loc->s("Model")." / ".
-								$this->loc->s("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>".
-								"<tr><td>".$this->loc->s("OS")." / ".
-								$this->loc->s("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>".
-								"<tr><td>".$this->loc->s("Description").
+								"<tr><td>"._("Place")." / ".
+								_("Contact")."</td><td>".$data["location"]." / ".$data["contact"]."</td></tr>".
+								"<tr><td>"._("Model")." / ".
+								_("Serialnb")."</td><td>".$data["model"]." / ".$data["serial"]."</td></tr>".
+								"<tr><td>"._("OS")." / ".
+								_("Version")."</td><td>".$data["os"]." / ".$data["os_ver"]."</td></tr>".
+								"<tr><td>"._("Description").
 								"</td><td>".$data["description"]."</td></tr>".
-								"<tr><td>".$this->loc->s("Uptime").
+								"<tr><td>"._("Uptime").
 								"</td><td>".$data["uptime"]."</td></tr>";
 								
 							$found = 0;
-							$tmpoutput = "<tr><td>".$this->loc->s("Energy")."</td><td>";
+							$tmpoutput = "<tr><td>"._("Energy")."</td><td>";
 
 							$query2 = FS::$dbMgr->Select("device_power","module,power,status","ip = '".$dip."'");
 							while ($data2 = FS::$dbMgr->Fetch($query2)) {
@@ -413,11 +413,11 @@
 
 							$tmpoutput .= "</td></tr>";
 							if ($found == 1) $output .= $tmpoutput;
-							$output .= "<tr><td>".$this->loc->s("IP-addr")."</td><td>".$data["ip"]."</td></tr>";
+							$output .= "<tr><td>"._("IP-addr")."</td><td>".$data["ip"]."</td></tr>";
 							$iswif = (preg_match("#AIR#",$data["model"]) ? true : false);
 							if ($iswif == false) {
-								$output .= "<tr><td>".$this->loc->s("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
-								$output .= "<tr><td>".$this->loc->s("VTP-domain")."</td><td>".$data["vtp_domain"]."</td></tr>";
+								$output .= "<tr><td>"._("MAC-addr")."</td><td>".$data["mac"]."</td></tr>";
+								$output .= "<tr><td>"._("VTP-domain")."</td><td>".$data["vtp_domain"]."</td></tr>";
 							}
 							$output .= "</table>";
 						}
@@ -445,8 +445,8 @@
 						}
 						if ($found == 1) {
 							$output .= FS::$iMgr->h3("Internal-mod");
-							$output .= "<table><tr><th>".$this->loc->s("Description")."</th><th>".$this->loc->s("Name")."</th>
-								<th>".$this->loc->s("Type")."</th><th></th><th></th><th></th><th></th><th>".$this->loc->s("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
+							$output .= "<table><tr><th>"._("Description")."</th><th>"._("Name")."</th>
+								<th>"._("Type")."</th><th></th><th></th><th></th><th></th><th>"._("Model")."</th></tr>".$this->showDeviceModules($devmod,1)."</table>";
 						}
 					}
 					return $output;
@@ -926,7 +926,7 @@
 									$pbuf, $pbuf2, $poebuf, $slot, $switchType));
 								break;
 							default:
-								$output .= FS::$iMgr->printError(sprintf($this->loc->s("err-unhandled-port-number"),$portNb, $slot), true);
+								$output .= FS::$iMgr->printError(sprintf(_("err-unhandled-port-number"),$portNb, $slot), true);
 								break;
 						}
 					}
@@ -943,9 +943,9 @@
 						$opt82 = $this->devapi->getDHCPSnoopingOpt82();
 						$match = $this->devapi->getDHCPSnoopingMatchMAC();
 
-						$output .= $this->loc->s("Enable")." ".FS::$iMgr->check("enable",array("tooltip" => "tooltip-dhcpsnoopingen", "check" => $enable == 1))."<br />".
-							$this->loc->s("Use-DHCP-opt-82")." ".FS::$iMgr->check("opt82",array("tooltip" => "tooltip-dhcpsnoopingopt", "check" => $opt82 == 1))."<br />".
-							$this->loc->s("Match-MAC-addr")." ".FS::$iMgr->check("matchmac",array("tooltip" => "tooltip-dhcpsnoopingmatch", "check" => $match == 1))."<br />";
+						$output .= _("Enable")." ".FS::$iMgr->check("enable",array("tooltip" => "tooltip-dhcpsnoopingen", "check" => $enable == 1))."<br />".
+							_("Use-DHCP-opt-82")." ".FS::$iMgr->check("opt82",array("tooltip" => "tooltip-dhcpsnoopingopt", "check" => $opt82 == 1))."<br />".
+							_("Match-MAC-addr")." ".FS::$iMgr->check("matchmac",array("tooltip" => "tooltip-dhcpsnoopingmatch", "check" => $match == 1))."<br />";
 
 						$vlanlist = array();
 						$query = FS::$dbMgr->Select("device_vlan","vlan,description","ip = '".$dip."'");
@@ -954,7 +954,7 @@
 
 						$dhcpsnvlanlist = $this->devapi->getDHCPSnoopingVlans();
 						if ($dhcpsnvlanlist && is_array($dhcpsnvlanlist)) {
-							$output .= $this->loc->s("Apply-VLAN").": <br />";
+							$output .= _("Apply-VLAN").": <br />";
 							$output .= FS::$iMgr->select("vlansnooping","",NULL,true,array("tooltip" => "tooltip-dhcpsnoopingvlan", "size" => count($dhcpsnvlanlist)/4));
 
 							foreach ($dhcpsnvlanlist as $vlan => $value)
@@ -962,13 +962,13 @@
 
 							$output .= "</select><br />";
 						}
-						$output .= FS::$iMgr->submit("",$this->loc->s("Save"))."</form>";
+						$output .= FS::$iMgr->submit("",_("Save"))."</form>";
 					}
 
 					if (FS::$sessMgr->hasRight("ip_".$dip."_retagvlan") ||
 						FS::$sessMgr->hasRight("snmp_".$snmprw."_retagvlan")) {
 						$js = "function searchports() {
-								waitingPopup('".$this->loc->s("search-ports")."...');
+								waitingPopup('"._("search-ports")."...');
 								var ovlid = document.getElementsByName('oldvl')[0].value;
 								$.get('?mod=".$this->mid."&at=3&act=10&d=".$device."&vlan='+ovlid,
 									function(data) {
@@ -978,11 +978,11 @@
 							};
 							function checkTagForm() {
 							if ($('#vlplist') == null || $('#vlplist').html().length < 1) {
-								alert('".$this->loc->s("must-verify-ports")." !');
+								alert('"._("must-verify-ports")." !');
 								return false;
 							}
 							if (document.getElementsByName('accept')[0].checked == false) {
-								alert('".$this->loc->s("must-confirm")." !');
+								alert('"._("must-confirm")." !');
 								return false;
 							}
 							return true;
@@ -994,11 +994,11 @@
 							$output .= FS::$iMgr->printError("err-one-bad-value");
 						}
 						$output .= FS::$iMgr->cbkForm("11&d=".$device).
-							$this->loc->s("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />".
-							$this->loc->s("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />".
-							FS::$iMgr->JSSubmit("searchvlan",$this->loc->s("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>".
-							$this->loc->s("Confirm")." ".FS::$iMgr->check("accept").
-							FS::$iMgr->JSSubmit("modify",$this->loc->s("Apply"),"return checkTagForm();")."</form><br />";
+							_("old-vlanid")." ".FS::$iMgr->numInput("oldvl")."<br />".
+							_("new-vlanid")." ".FS::$iMgr->numInput("newvl")."<br />".
+							FS::$iMgr->JSSubmit("searchvlan",_("Verify-ports"),"return searchports();")."<div id=\"vlplist\"></div>".
+							_("Confirm")." ".FS::$iMgr->check("accept").
+							FS::$iMgr->JSSubmit("modify",_("Apply"),"return checkTagForm();")."</form><br />";
 					}
 
 					if (FS::$sessMgr->hasRight("ip_".$dip."_exportcfg") ||
@@ -1012,21 +1012,21 @@
 									var code = JSON.parse(data);
 									
 									if (code['htmldatas'] == 2) {
-										$('#subpop').html('".$this->loc->s("Copy-in-progress")." ...');
+										$('#subpop').html('"._("Copy-in-progress")." ...');
 										checkCopyState(copyId);
 									}
 									else if (code['htmldatas'] == 3) {
-										$('#subpop').html('".$this->loc->s("Success")." !');
+										$('#subpop').html('"._("Success")." !');
 										setTimeout(function() { unlockScreen(true); },1000);
 									}
 									else if (code['htmldatas'] == 4) {
 										$.post('?at=3&mod=".$this->mid."&act=14&d=".$device."&saveid='+copyId, function(data) {
-											$('#subpop').html('".$this->loc->s("Fail")." !<br />Cause: '+code['htmldatas']);
+											$('#subpop').html('"._("Fail")." !<br />Cause: '+code['htmldatas']);
 										});
 										setTimeout(function() { unlockScreen(true); },5000);
 									}
 									else {
-										$('#subpop').html('".$this->loc->s("unk-answer").": '+code['htmldatas']);
+										$('#subpop').html('"._("unk-answer").": '+code['htmldatas']);
 										setTimeout(function() { unlockScreen(true); },5000);
 									}
 								}); }, 1000);
@@ -1043,51 +1043,51 @@
 						$js .= "} else if (document.getElementsByName('exportm')[0].value == 1) {";
 						$js .= "$('#slogin').hide(); }};";
 						$js .= "function sendbackupreq() {";
-						$js .= "waitingPopup('".$this->loc->s("req-sent")."...');";
+						$js .= "waitingPopup('"._("req-sent")."...');";
 						$js .= "$.post('?at=3&mod=".$this->mid."&act=12&d=".$device."', { exportm: document.getElementsByName('exportm')[0].value, srvip: document.getElementsByName('srvip')[0].value,
 						srvfilename: document.getElementsByName('srvfilename')[0].value, srvuser: document.getElementsByName('srvuser')[0].value, srvpwd: document.getElementsByName('srvpwd')[0].value,
 						io: document.getElementsByName('io')[0].value },
 						function(data) {
 							var copyId = data;
-							setJSONContent('#subpop','".$this->loc->s("Copy-in-progress")."...');
+							setJSONContent('#subpop','"._("Copy-in-progress")."...');
 							checkCopyState(copyId);
 						});";
 						$js .= "return false;};";
 						FS::$iMgr->js($js);
 
 						$output .= FS::$iMgr->h3("title-transfer-conf").
-							$this->loc->s("Server-type")." ".
+							_("Server-type")." ".
 							FS::$iMgr->select("exportm","arangeform();").
 							FS::$iMgr->selElmt("TFTP",1).
 							FS::$iMgr->selElmt("FTP",2).
 							FS::$iMgr->selElmt("SCP",4).
 							FS::$iMgr->selElmt("SFTP",5).
 							"</select><br />".
-							$this->loc->s("transfer-way")." ".FS::$iMgr->select("io").
-							FS::$iMgr->selElmt($this->loc->s("Export"),1).
-							FS::$iMgr->selElmt($this->loc->s("Import"),2).
+							_("transfer-way")." ".FS::$iMgr->select("io").
+							FS::$iMgr->selElmt(_("Export"),1).
+							FS::$iMgr->selElmt(_("Import"),2).
 							"</select><br />".
-							$this->loc->s("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />".
-							$this->loc->s("Filename")." ".FS::$iMgr->input("srvfilename")."<br />".
-							"<div id=\"slogin\" style=\"display:none;\">".$this->loc->s("User")." ".FS::$iMgr->input("srvuser").
-							" ".$this->loc->s("Password")." ".FS::$iMgr->password("srvpwd")."</div>".
-							FS::$iMgr->JSSubmit("",$this->loc->s("Send"),"return sendbackupreq();");
+							_("Server-addr")." ".FS::$iMgr->IPInput("srvip")."<br />".
+							_("Filename")." ".FS::$iMgr->input("srvfilename")."<br />".
+							"<div id=\"slogin\" style=\"display:none;\">"._("User")." ".FS::$iMgr->input("srvuser").
+							" "._("Password")." ".FS::$iMgr->password("srvpwd")."</div>".
+							FS::$iMgr->JSSubmit("",_("Send"),"return sendbackupreq();");
 					}
 
 					if (FS::$sessMgr->hasRight("ip_".$dip."_restorestartupcfg") ||
 						FS::$sessMgr->hasRight("snmp_".$snmprw."_restorestartupcfg")) {
 						// Copy startup-config -> running-config
 						$output .= FS::$iMgr->js("function restorestartupconfig() {
-							waitingPopup('".$this->loc->s("req-sent")."...');
+							waitingPopup('"._("req-sent")."...');
 						$.post('?at=3&mod=".$this->mid."&act=15&d=".$device."', function(data) {
 							var copyId = data;
-							setJSONContent('#subpop','".$this->loc->s("restore-in-progress")."...');
+							setJSONContent('#subpop','"._("restore-in-progress")."...');
 							checkCopyState(copyId);
 						});
 						return false;
 						};");
 						$output .= FS::$iMgr->h3("title-restore-startup");
-						$output .= FS::$iMgr->JSSubmit("",$this->loc->s("Restore"),"return restorestartupconfig();");
+						$output .= FS::$iMgr->JSSubmit("",_("Restore"),"return restorestartupconfig();");
 					}
 					return $output;
 				}
@@ -1100,8 +1100,8 @@
 						return FS::$iMgr->printNoRight("show device VLANs");
 					}
 					$query = FS::$dbMgr->Select("device_vlan","vlan,description,creation","ip = '".$dip."'",array("order" => "vlan"));
-					$tmpoutput = "<table id=\"tvlanList\"><thead><tr><th class=\"headerSortDown\">ID</th><th>".$this->loc->s("Description").
-						"</th><th>".$this->loc->s("ip-network")."</th><th>".$this->loc->s("creation-date")."</th></tr></thead>";
+					$tmpoutput = "<table id=\"tvlanList\"><thead><tr><th class=\"headerSortDown\">ID</th><th>"._("Description").
+						"</th><th>"._("ip-network")."</th><th>"._("creation-date")."</th></tr></thead>";
 					while ($data = FS::$dbMgr->Fetch($query)) {
 						if (!$found) $found = 1;
 						$netid = "";
@@ -1187,22 +1187,22 @@
 
 					$tmpoutput .= "<th class=\"headerSortDown\">".
 						FS::$iMgr->aLink($this->mid."&d=".$device."&od=port", "Port")."</th><th>".
-						$this->loc->s("Description")."</th>
-						<th>".$this->loc->s("Plug")."</th><th>".$this->loc->s("Room")."</th><th>Up (Link/Admin)</th>";
+						_("Description")."</th>
+						<th>"._("Plug")."</th><th>"._("Room")."</th><th>Up (Link/Admin)</th>";
 
 					if ($iswif == false) {
-						$tmpoutput .= "<th>".$this->loc->s("Duplex")." (Link/Admin)</th>";
+						$tmpoutput .= "<th>"._("Duplex")." (Link/Admin)</th>";
 					}
-					$tmpoutput .= "<th>".$this->loc->s("Speed")."</th>";
+					$tmpoutput .= "<th>"._("Speed")."</th>";
 					if ($iswif == false) {
 						$tmpoutput .= "<th>POE</th>";
 					}
 					$tmpoutput .= "<th>";
 					if ($iswif == true) {
-						$tmpoutput .= $this->loc->s("Channel")."</th><th>".$this->loc->s("Power")."</th><th>SSID";
+						$tmpoutput .= _("Channel")."</th><th>"._("Power")."</th><th>SSID";
 					}
 					else {
-						$tmpoutput .= "Vlans</th><th>".$this->loc->s("Connected-devices")."</th></tr></thead>";
+						$tmpoutput .= "Vlans</th><th>"._("Connected-devices")."</th></tr></thead>";
 					}
 
 					$query = FS::$dbMgr->Select("device_port","port,name,mac,up,up_admin,duplex,duplex_admin,speed,vlan","ip ='".$dip."'",array("order" => $od));
@@ -1233,7 +1233,7 @@
 						// Editable plug
 						$tmpoutput2 .= "<td><div id=\"swpr_".$convport."\">".
 							"<a onclick=\"javascript:modifyPlug('#swpr_".$convport." a',false);\"><div id=\"swpr_".$convport."l\" class=\"modport\">".
-							($plug == "" ? $this->loc->s("Modify") : $plug).
+							($plug == "" ? _("Modify") : $plug).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("swprise-".$convport,$plug,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyPlug('#swpr_".$convport.
@@ -1242,7 +1242,7 @@
 						// Editable room
 						$tmpoutput2 .= "<td><div id=\"swproom_".$convport."\">".
 							"<a onclick=\"javascript:modifyRoom('#swproom_".$convport." a',false);\"><div id=\"swproom_".$convport."l\" class=\"modport\">".
-							($room == "" ? $this->loc->s("Modify") : $room).
+							($room == "" ? _("Modify") : $room).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("swroom-".$convport,$room,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#swproom_".$convport.
@@ -1251,13 +1251,13 @@
 						// Editable state
 						$tmpoutput2 .= "<td><div id=\"swst_".$convport."\">";
 						if ($data["up_admin"] == "down") {
-							$tmpoutput2 .= "<span style=\"color: red;\">".$this->loc->s("Shut")."</span>";
+							$tmpoutput2 .= "<span style=\"color: red;\">"._("Shut")."</span>";
 						}
 						else if ($data["up_admin"] == "up" && $data["up"] == "down") {
-							$tmpoutput2 .= "<span style=\"color: orange;\">".$this->loc->s("Inactive")."</span>";
+							$tmpoutput2 .= "<span style=\"color: orange;\">"._("Inactive")."</span>";
 						}
 						else if ($data["up"] == "up") {
-							$tmpoutput2 .= "<span style=\"color: black;\">".$this->loc->s("Active")."</span>";
+							$tmpoutput2 .= "<span style=\"color: black;\">"._("Active")."</span>";
 						}
 						else {
 							$tmpoutput2 .= "unk";
@@ -1354,11 +1354,11 @@
 						if (FS::$sessMgr->hasRight("snmp_".$snmprw."_write") &&
 							FS::$sessMgr->hasRight("ip_".$dip."_write")) {
 							$output .= FS::$iMgr->select("swact").
-								FS::$iMgr->selElmt($this->loc->s("Shutdown-ports"),1).
-								FS::$iMgr->selElmt($this->loc->s("Switchon-ports"),2).
+								FS::$iMgr->selElmt(_("Shutdown-ports"),1).
+								FS::$iMgr->selElmt(_("Switchon-ports"),2).
 								"</select><br />".
-								FS::$iMgr->check("wr").$this->loc->s("Save-switch")."<br />".
-								FS::$iMgr->submit("",$this->loc->s("Send"))."</form>";
+								FS::$iMgr->check("wr")._("Save-switch")."<br />".
+								FS::$iMgr->submit("",_("Send"))."</form>";
 						}
 
 						FS::$iMgr->jsSortTable("tportList");
@@ -1372,17 +1372,17 @@
 							return FS::$iMgr->printNoRight("show SSH informations");
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
-						$output .= $this->loc->s("ssh-link-state").": ";
+						$output .= _("ssh-link-state").": ";
 						if ($sshuser) {
-							$output .= "<span style=\"color: green;\">".$this->loc->s("Enabled")."</span> ";
+							$output .= "<span style=\"color: green;\">"._("Enabled")."</span> ";
 							$output .= FS::$iMgr->removeIcon(23,"d=".$device);
 						}
 						else {
-							$output .= "<span style=\"color: red;\">".$this->loc->s("Disabled")."</span>";
+							$output .= "<span style=\"color: red;\">"._("Disabled")."</span>";
 						}
 						
 						$output .= FS::$iMgr->cbkForm("22&d=".$device).
-							"<table><tr><th>".$this->loc->s("Field")."</th><th>".$this->loc->s("Value")."</th></tr>".
+							"<table><tr><th>"._("Field")."</th><th>"._("Value")."</th></tr>".
 							FS::$iMgr->idxLine("User","sshuser",array("value" => $sshuser)).
 							FS::$iMgr->idxLine("SSH-pwd","sshpwd",array("type" => "pwd")).
 							FS::$iMgr->idxLine("SSH-pwd-repeat","sshpwd2",array("type" => "pwd")).
@@ -1397,8 +1397,8 @@
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {
-							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
-								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7",$this->loc->s("Go")),true);
+							$output .= FS::$iMgr->printError(_("err-no-sshlink-configured")."<br /><br />".
+								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7",_("Go")),true);
 							return $output;
 						}
 
@@ -1424,8 +1424,8 @@
 						}
 						$sshuser = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."switch_pwd","sshuser","device = '".$device."'");
 						if (!$sshuser) {
-							$output .= FS::$iMgr->printError($this->loc->s("err-no-sshlink-configured")."<br /><br />".
-								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", $this->loc->s("Go")),true);
+							$output .= FS::$iMgr->printError(_("err-no-sshlink-configured")."<br /><br />".
+								FS::$iMgr->aLink($this->mid."&d=".$device."&sh=7", _("Go")),true);
 							return $output;
 						}
 
@@ -1520,18 +1520,18 @@
 			if (FS::$sessMgr->hasRight("globalsave")) {
 				// Write all devices button
 				$output .= FS::$iMgr->cbkForm("20").
-					FS::$iMgr->submit("sallsw",$this->loc->s("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
+					FS::$iMgr->submit("sallsw",_("save-all-switches"),array("tooltip" => "tooltip-save"))."</form>";
 			}
 			if (FS::$sessMgr->hasRight("globalbackup")) {
 				$rightsok = true;
 				// Backup all devices button
 				$output .= FS::$iMgr->cbkForm("21").
-					FS::$iMgr->submit("bkallsw",$this->loc->s("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
+					FS::$iMgr->submit("bkallsw",_("backup-all-switches"),array("tooltip" => "tooltip-backup"))."</form>";
 			}
 
 			if (FS::$sessMgr->hasRight("import_plugs")) {
-				$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt($this->loc->s("comma"),",").
-					FS::$iMgr->selElmt($this->loc->s("semi-colon"),";")."</select>";
+				$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt(_("comma"),",").
+					FS::$iMgr->selElmt(_("semi-colon"),";")."</select>";
 
 				$output .= FS::$iMgr->h3("title-import-plug-room").
 					FS::$iMgr->tip("tip-import-plug-room").
@@ -1548,7 +1548,7 @@
 
 		public function loadFooterPlugin() {
 			if (FS::$sessMgr->hasRight("read")) {
-				$pluginTitle = $this->loc->s("Network");
+				$pluginTitle = _("Network");
 				$pluginContent = "";
 
 				$BWscore = 0;
@@ -1614,7 +1614,7 @@
 				if ($deviceCount == 0) {
 					// Then 100% OK
 					$pluginTitle = sprintf("%s: %s%% %s",
-						$this->loc->s("Network"),
+						_("Network"),
 						100,
 						FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
 					);
@@ -1624,21 +1624,21 @@
 
 					if ($finalScore < 60) {
 						$pluginTitle = sprintf("%s: %s%% %s",
-							$this->loc->s("Network"),
+							_("Network"),
 							$finalScore,
 							FS::$iMgr->img("/styles/images/monitor-crit.png",15,15)
 						);
 					}
 					else if ($finalScore < 100) {
 						$pluginTitle = sprintf("%s: %s%% %s",
-							$this->loc->s("Network"),
+							_("Network"),
 							$finalScore,
 							FS::$iMgr->img("/styles/images/monitor-warn.png",15,15)
 						);
 					}
 					else {
 						$pluginTitle = sprintf("%s: %s%% %s",
-							$this->loc->s("Network"),
+							_("Network"),
 							$finalScore,
 							FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
 						);
@@ -1692,7 +1692,7 @@
 					// Return text for AJAX call
 					$this->log(0,"Set plug for device '".$dip."' to '".$plug."' on port '".$port."'");
 					if ($plug == "") {
-						$plug = $this->loc->s("Modify");
+						$plug = _("Modify");
 					}
 					echo $plug;
 					return;
@@ -2002,15 +2002,15 @@
 					}
 					$err = $this->devapi->getCopyError($saveid);
 					switch($err) {
-						case 2: echo $this->loc->s("err-transfer-right"); break;
-						case 3: echo $this->loc->s("err-transfer-timeout"); break;
-						case 4: echo $this->loc->s("err-transfer-no-mem"); break;
-						case 5: echo $this->loc->s("err-transfer-src"); break;
-						case 6: echo $this->loc->s("err-transfer-protocol"); break;
-						case 7: echo $this->loc->s("err-transfer-apply"); break;
-						case 8: echo $this->loc->s("err-transfer-not-ready"); break;
-						case 9: echo $this->loc->s("err-transfer-abandonned"); break;
-						default: echo $this->loc->s("err-transfer-unk"); break;
+						case 2: echo _("err-transfer-right"); break;
+						case 3: echo _("err-transfer-timeout"); break;
+						case 4: echo _("err-transfer-no-mem"); break;
+						case 5: echo _("err-transfer-src"); break;
+						case 6: echo _("err-transfer-protocol"); break;
+						case 7: echo _("err-transfer-apply"); break;
+						case 8: echo _("err-transfer-not-ready"); break;
+						case 9: echo _("err-transfer-abandonned"); break;
+						default: echo _("err-transfer-unk"); break;
 					}
 					return;
 				/*
@@ -2155,7 +2155,7 @@
 						}
 
 						if (!FS::$secMgr->isIP($iplsrc[$i])) {
-							FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-bad-ip"),$iplsrc[$i]),"",true);
+							FS::$iMgr->ajaxEchoErrorNC(sprintf(_("err-bad-ip"),$iplsrc[$i]),"",true);
 							return;
 						}
 
@@ -2221,19 +2221,19 @@
 					
 					if (!is_array($out) || count($out) > 1) {
 						$spColor = "red";
-						$spText = $this->loc->s("err-output")." ".var_dump($out);
+						$spText = _("err-output")." ".var_dump($out);
 					}
 					else if ($out[0] > 1) {
 						$spColor = "red";
-						$spText = $this->loc->s("err-output-value")." ".$out;
+						$spText = _("err-output-value")." ".$out;
 					}
 					else if ($out[0] == 0) {
 						$spColor = "red";
-						$spText = $this->loc->s("Offline");
+						$spText = _("Offline");
 					}
 					else if ($out[0] == 1) {
 						$spColor = "green";
-						$spText = $this->loc->s("Online");
+						$spText = _("Online");
 					}
 					
 					FS::$iMgr->ajaxEcho(sprintf("<span style=\"color:%s;\">%s</span>",
@@ -2314,11 +2314,11 @@
 					if (FS::isAjaxCall()) {
 						if (strlen($output) > 0) {
 							$this->log(1,"Some devices cannot be backup: ".$output);
-							echo $this->loc->s("err-thereis-errors")."<br />".$output;
+							echo _("err-thereis-errors")."<br />".$output;
 						}
 						else {
 							$this->log(0,"User ".FS::$sessMgr->getUserName()." backup all devices");
-							echo $this->loc->s("backuporder-terminated");
+							echo _("backuporder-terminated");
 						}
 					}
 					else {

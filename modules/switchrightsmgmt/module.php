@@ -27,14 +27,14 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rSwitchRightsMgmt($this->loc);
 			
-			$this->menu = $this->loc->s("Users and rights");
-			$this->menutitle = $this->loc->s("Network devices (rights & backup)");
+			$this->menu = _("Users and rights");
+			$this->menutitle = _("Network devices (rights & backup)");
 
 			$this->modulename = "switchrightsmgmt";
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-switchrightsmgmt"));
+			FS::$iMgr->setTitle(_("title-switchrightsmgmt"));
 
 			return $this->showMain();;
 		}
@@ -67,7 +67,7 @@
 					$output .= FS::$iMgr->printError("err-bad-server");
 					return $output;
 				}
-				$output .= FS::$iMgr->aLink($this->mid, $this->loc->s("Return"))."<br />";
+				$output .= FS::$iMgr->aLink($this->mid, _("Return"))."<br />";
 			}
 
 			$err = FS::$secMgr->checkAndSecuriseGetData("err");
@@ -90,7 +90,7 @@
 			$output .= "<table>";
 			if ($create) {
 				$output .= FS::$iMgr->idxLine("ip-addr","saddr",array("value" => $saddr, "type" => "ip"));
-				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
+				$output .= "<tr><td>"._("srv-type")."</td><td>";
 				$output .= FS::$iMgr->select("stype",array("js" => "arangeform();"));
 				$output .= FS::$iMgr->selElmt("TFTP",1);
 				$output .= FS::$iMgr->selElmt("FTP",2);
@@ -104,8 +104,8 @@
 				$output .= FS::$iMgr->hidden("stype",$stype);
 				$output .= FS::$iMgr->hidden("edit",1);
 
-				$output .= "<tr><th>".$this->loc->s("ip-addr")."</th><th>".$saddr."</th></tr>";
-				$output .= "<tr><td>".$this->loc->s("srv-type")."</td><td>";
+				$output .= "<tr><th>"._("ip-addr")."</th><th>".$saddr."</th></tr>";
+				$output .= "<tr><td>"._("srv-type")."</td><td>";
 				switch($stype) {
 					case 1: $output .= "TFTP"; break;
 					case 2: $output .= "FTP"; break;
@@ -113,9 +113,9 @@
 					case 5: $output .= "SFTP"; break;
 				}
 			}
-			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("User")."</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
-			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
-			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
+			$output .= "<tr id=\"tohide1\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>"._("User")."</td><td>".FS::$iMgr->input("slogin",$slogin)."</td></tr>";
+			$output .= "<tr id=\"tohide2\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>"._("Password")."</td><td>".FS::$iMgr->password("spwd","")."</td></tr>";
+			$output .= "<tr id=\"tohide3\" ".($stype == 1 ? "style=\"display:none;\"" : "")."><td>"._("Password-repeat")."</td><td>".FS::$iMgr->password("spwd2","")."</td></tr>";
 			$output .= FS::$iMgr->idxLine("server-path","spath",array("value" => $spath));
 			$output .= FS::$iMgr->tableSubmit("Save");
 			return $output;
@@ -124,10 +124,10 @@
 		private function showBackupTab() {
 			FS::$iMgr->setURL("sh=3");
 
-			$output = FS::$iMgr->opendiv(1,$this->loc->s("New-Server"));
+			$output = FS::$iMgr->opendiv(1,_("New-Server"));
 
-			$tmpoutput = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("Type")."</th><th>".
-				$this->loc->s("server-path")."</th><th>".$this->loc->s("Login")."</th><th></th></tr>";
+			$tmpoutput = "<table><tr><th>"._("Server")."</th><th>"._("Type")."</th><th>".
+				_("server-path")."</th><th>"._("Login")."</th><th></th></tr>";
 			$found = false;
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."save_device_servers","addr,type,path,login");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -164,11 +164,11 @@
 			$output = "";
 			$found = false;
 
-			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Groups")."</th></tr>";
-			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>".$this->loc->s("device")."</th><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Users")."</th></tr>";
-			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
+			$grpoutput = FS::$iMgr->h1("group-rights")."<table><tr><th>"._("device")."</th><th>"._("Right")."</th><th>".
+				_("Groups")."</th></tr>";
+			$usroutput = FS::$iMgr->h1("user-rights")."<table><tr><th>"._("device")."</th><th>"._("Right")."</th><th>".
+				_("Users")."</th></tr>";
+			$formoutput = FS::$iMgr->selElmt(_("All"),"NULL0");
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 			if ($ip && $ip != "NULL0")
@@ -215,7 +215,7 @@
 					$output .= FS::$iMgr->cbkForm("?mod=".$this->mid."&sh=2",array("id" => "swfform"));
 					$output .= FS::$iMgr->select("ip",array("js" => "filterSw()"));
 					$output .= $formoutput;
-					$output .= "</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSw()")."</form>";
+					$output .= "</select> ".FS::$iMgr->button("",_("Filter"),"filterSw()")."</form>";
 					$output .= FS::$iMgr->js("function filterSw() {
 							$('#swfdiv').fadeOut('slow',function() {
 								$.post('?mod=".$this->mid."&at=2&sh=2', $('#swfform').serialize(), function(data) {
@@ -321,14 +321,14 @@
 
 			$community = (FS::isAjaxCall() ? FS::$secMgr->checkAndSecurisePostData("snmp") : "");
 
-			$formoutput = FS::$iMgr->selElmt($this->loc->s("All"),"NULL0");
+			$formoutput = FS::$iMgr->selElmt(_("All"),"NULL0");
 			$output = "";
 
 			$found = false;
-			$grpoutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Groups")."</th></tr>";
-			$usroutput = "<table><tr><th>".$this->loc->s("snmp-community")."</th><th>".$this->loc->s("Right")."</th><th>".
-				$this->loc->s("Users")."</th></tr>";
+			$grpoutput = "<table><tr><th>"._("snmp-community")."</th><th>"._("Right")."</th><th>".
+				_("Groups")."</th></tr>";
+			$usroutput = "<table><tr><th>"._("snmp-community")."</th><th>"._("Right")."</th><th>".
+				_("Users")."</th></tr>";
 
 			$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 			if ($community && $community != "NULL0")
@@ -374,7 +374,7 @@
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&sh=1",array("id" => "snmpfform")).
 						FS::$iMgr->select("snmp",array("js" => "filterSNMP()")).
 						$formoutput.
-						"</select> ".FS::$iMgr->button("",$this->loc->s("Filter"),"filterSNMP()")."</form>".
+						"</select> ".FS::$iMgr->button("",_("Filter"),"filterSNMP()")."</form>".
 						"<div id=\"snmpfdiv\">";
 					
 					FS::$iMgr->js("function filterSNMP() {
@@ -394,8 +394,8 @@
 				}
 			}
 			else {
-				$output .= FS::$iMgr->printError($this->loc->s("err-no-snmp-community").
-					"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", $this->loc->s("Go")),true);
+				$output .= FS::$iMgr->printError(_("err-no-snmp-community").
+					"<br /><br />".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("snmpmgmt")."&sh=2", _("Go")),true);
 			}
 			return $output;
 		}
@@ -462,7 +462,7 @@
 		* $type2: snmp/ip
 		*/
 		private function showRemoveSpan($type,$type2,$name,$id,$right,$snmpip) {
-			$confirm = ($type == "g" ? $this->loc->s("confirm-remove-groupright") : $this->loc->s("confirm-remove-userright"));
+			$confirm = ($type == "g" ? _("confirm-remove-groupright") : _("confirm-remove-userright"));
 			$output = "<span id=\"".$type.$id.$right.$type2."\">".$name." ".
 				FS::$iMgr->removeIcon(2,$type."id=".$id."&".$type2."=".$snmpip."&right=".$right,
 					array("js" => true,
@@ -525,7 +525,7 @@
 					$output .= FS::$iMgr->selElmt($username,$uid);
 				}
 			}
-			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
+			$output .= "</select>".FS::$iMgr->submit("",_("Add"));
 			if (!$found) return "";
 			else return $output;
 		}
@@ -540,7 +540,7 @@
 					$output .= FS::$iMgr->selElmt($gname,$gid);
 				}
 			}
-			$output .= "</select>".FS::$iMgr->submit("",$this->loc->s("Add"));
+			$output .= "</select>".FS::$iMgr->submit("",_("Add"));
 			if (!$found) return "";
 			else return $output;
 		}
@@ -574,11 +574,11 @@
 				else {
 					$filter = FS::$secMgr->checkAndSecuriseGetData("filter");
 					$output = FS::$iMgr->h1("title-switchrightsmgmt");
-					$panElmts = array(array(1,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbysnmp")));
+					$panElmts = array(array(1,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),_("title-rightsbysnmp")));
 					// Show only if there is devices
 					if (FS::$dbMgr->Count("device","ip") > 0)
-						$panElmts[] = array(2,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-rightsbyswitch"));
-					$panElmts[] = array(3,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),$this->loc->s("title-device-backup"));
+						$panElmts[] = array(2,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),_("title-rightsbyswitch"));
+					$panElmts[] = array(3,"mod=".$this->mid.($filter ? "&filter=".$filter : ""),_("title-device-backup"));
 					$output .= FS::$iMgr->tabPan($panElmts,$sh);
 				}
 			}
@@ -593,26 +593,26 @@
 
 		private function getRightForKey($key) {
 			switch($key) {
-				case "read": return $this->loc->s("Reading");
-				case "readportstats": return $this->loc->s("Read-port-stats");
-				case "readswdetails": return $this->loc->s("Read-switch-details");
-				case "readswmodules": return $this->loc->s("Read-switch-modules");
-				case "readswvlans": return $this->loc->s("Read-switch-vlan");
-				case "sshportinfos": return $this->loc->s("Read-ssh-portinfos");
-				case "sshshowstart": return $this->loc->s("Read-ssh-showstart");
-				case "sshshowrun": return $this->loc->s("Read-ssh-showrun");
-				case "write": return $this->loc->s("Writing");
-				case "writeportmon": return $this->loc->s("Write-port-mon");
-				case "restorestartupcfg": return $this->loc->s("Restore-startup-cfg");
-				case "exportcfg": return $this->loc->s("Export-cfg");
-				case "retagvlan": return $this->loc->s("Retag-vlan");
-				case "sshpwd": return $this->loc->s("Set-switch-sshpwd");
-				case "portmod_portsec": return $this->loc->s("Portmod-portsec");
-				case "portmod_cdp": return $this->loc->s("Portmod-cdp");
-				case "portmod_voicevlan": return $this->loc->s("Portmod-voicevlan");
-				case "portmod_dhcpsnooping": return $this->loc->s("Portmod-dhcpsnooping");
-				case "dhcpsnmgmt": return $this->loc->s("DHCP-Snooping-mgmt");
-				case "rmswitch": return $this->loc->s("Remove-Switch");
+				case "read": return _("Reading");
+				case "readportstats": return _("Read-port-stats");
+				case "readswdetails": return _("Read-switch-details");
+				case "readswmodules": return _("Read-switch-modules");
+				case "readswvlans": return _("Read-switch-vlan");
+				case "sshportinfos": return _("Read-ssh-portinfos");
+				case "sshshowstart": return _("Read-ssh-showstart");
+				case "sshshowrun": return _("Read-ssh-showrun");
+				case "write": return _("Writing");
+				case "writeportmon": return _("Write-port-mon");
+				case "restorestartupcfg": return _("Restore-startup-cfg");
+				case "exportcfg": return _("Export-cfg");
+				case "retagvlan": return _("Retag-vlan");
+				case "sshpwd": return _("Set-switch-sshpwd");
+				case "portmod_portsec": return _("Portmod-portsec");
+				case "portmod_cdp": return _("Portmod-cdp");
+				case "portmod_voicevlan": return _("Portmod-voicevlan");
+				case "portmod_dhcpsnooping": return _("Portmod-dhcpsnooping");
+				case "dhcpsnmgmt": return _("DHCP-Snooping-mgmt");
+				case "rmswitch": return _("Remove-Switch");
 				default: return FS::$iMgr->printError("err-not-found");
 			}
 		}

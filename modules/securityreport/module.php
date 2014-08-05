@@ -28,12 +28,12 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rSecurityReport($this->loc);
 			
-			$this->menu = $this->loc->s("Supervision");
-			$this->menutitle = $this->loc->s("Security reports");
+			$this->menu = _("Supervision");
+			$this->menutitle = _("Security reports");
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-attack-report"));
+			FS::$iMgr->setTitle(_("title-attack-report"));
 
 			// Load snort keys for db config
 			$dbname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snortmgmt_keys","val","mkey = 'dbname'");
@@ -86,11 +86,11 @@
 
 			if (!FS::isAjaxCall()) {
 				$output .= FS::$iMgr->tabPan(array(
-					array(1,"mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),$this->loc->s("General")),
-					array(5,"mod=".$this->mid."&max=".$topmax,$this->loc->s("Last-logs")),
-					array(2,"mod=".$this->mid."&max=".$topmax,$this->loc->s("Scans")),
-					array(3,"mod=".$this->mid."&max=".$topmax,$this->loc->s("TSE")),
-					array(4,"mod=".$this->mid."&max=".$topmax,$this->loc->s("SSH"))),$showmodule);
+					array(1,"mod=".$this->mid."&max=".$topmax."&ec=".$ec."&ech=".$ech."&ssh=".($shssh ? 1 : 0)."&tse=".($shtse ? 1 : 0)."&scan=".($shscan ? 1 : 0),_("General")),
+					array(5,"mod=".$this->mid."&max=".$topmax,_("Last-logs")),
+					array(2,"mod=".$this->mid."&max=".$topmax,_("Scans")),
+					array(3,"mod=".$this->mid."&max=".$topmax,_("TSE")),
+					array(4,"mod=".$this->mid."&max=".$topmax,_("SSH"))),$showmodule);
 			}
 			else {
 				if (!$showmodule || $showmodule == 1) {
@@ -102,18 +102,18 @@
 					$totalssh = $this->snortDB->Sum(PGDbConfig::getDbPrefix()."collected_ips","ssh");
 					$totalatk = $totalscan + $totaltse + $totalssh;
 
-					$output .= $this->loc->s("total-atk").": ".$totalatk."<br />";
-					$output .= $this->loc->s("nb-ip-atk").": ".$totalips."<br />";
-					$output .= $this->loc->s("nb-scan-port").": ".$totalscan."<br />";
-					$output .= $this->loc->s("nb-tse-atk").": ".$totaltse."<br />";
-					$output .= $this->loc->s("nb-ssh-atk").": ".$totalssh."<br /><hr>";
+					$output .= _("total-atk").": ".$totalatk."<br />";
+					$output .= _("nb-ip-atk").": ".$totalips."<br />";
+					$output .= _("nb-scan-port").": ".$totalscan."<br />";
+					$output .= _("nb-tse-atk").": ".$totaltse."<br />";
+					$output .= _("nb-ssh-atk").": ".$totalssh."<br /><hr>";
 
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=1");
 					$output .= FS::$iMgr->hidden("mod",$this->mid);
 					$output .= "Pas: ".FS::$iMgr->numInput("ech",$ech,array("size" => 2, "length" => 2))." jours <br />";
 					$output .= "Echelle: ".FS::$iMgr->numInput("ec",$ec,array("size" => 3, "length" => 3))." jours <br />";
 
-					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
+					$output .= FS::$iMgr->submit("",_("Update"))."<br />";
 					$output .= "</form>";
 					$output .= "<div id=\"atkst\"></div>";
 					$year = date("Y");
@@ -165,8 +165,8 @@
 							legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
 									x: -10, y: 100 },
 							series: [ { name: 'Scans', data: ".$scans." },
-									{ name: '".$this->loc->s("TSE-atk")."', data: ".$tse." },
-									{ name: '".$this->loc->s("SSH-atk")."', data: ".$ssh." }]
+									{ name: '"._("TSE-atk")."', data: ".$tse." },
+									{ name: '"._("SSH-atk")."', data: ".$ssh." }]
 							});
 						})(jQuery);");
 				}
@@ -175,11 +175,11 @@
 					$found = 0;
 
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=2");
-					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
-					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
+					$output .= _("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
+					$output .= FS::$iMgr->submit("",_("Update"))."<br />";
 					$output .= "</form>";
 
-					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." (".$this->loc->s("Scans").")",true)."<table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." ("._("Scans").")",true)."<table><tr><th>"._("IP-addr")."</th><th>"._("Last-visit")."</th><th>"._("Action-nb")."</th></tr>";
 
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,scans","",array("order" => "scans","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
@@ -190,7 +190,7 @@
 						$output .= $tmpoutput."</table>";
 
 					$found = 0;
-					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>Date</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = FS::$iMgr->h3(_("The")." ".$topmax." "._("violent-days"),true)."<table><tr><th>Date</th><th>"._("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,scans","",array("order" => "scans","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
 						if ($found == 0) $found = 1;
@@ -206,10 +206,10 @@
 
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=3");
 					$output .= "Maximum: ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
-					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
+					$output .= FS::$iMgr->submit("",_("Update"))."<br />";
 					$output .= "</form>";
 
-					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." (".$this->loc->s("TSE-atk").")",true)."<table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." ("._("TSE-atk").")",true)."<table><tr><th>"._("IP-addr")."</th><th>"._("Last-visit")."</th><th>"._("Action-nb")."</th></tr>";
 
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,tse","",array("order" => "tse","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
@@ -220,7 +220,7 @@
 						$output .= $tmpoutput."</table>";
 
 					$found = 0;
-					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>".$this->loc->s("Date")."<th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = FS::$iMgr->h3(_("The")." ".$topmax." "._("violent-days"),true)."<table><tr><th>"._("Date")."<th>"._("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,tse","",array("order" => "tse","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
 						if ($found == 0) $found = 1;
@@ -235,11 +235,11 @@
 					$found = 0;
 
 					$output .= FS::$iMgr->form("?mod=".$this->mid."&act=4");
-					$output .= $this->loc->s("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
-					$output .= FS::$iMgr->submit("",$this->loc->s("Update"))."<br />";
+					$output .= _("Maximum").": ".FS::$iMgr->numInput("max",$topmax,array("size" => 3, "length" => 3))." <br />";
+					$output .= FS::$iMgr->submit("",_("Update"))."<br />";
 					$output .= "</form>";
 
-					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." (".$this->loc->s("SSH-atk").")",true)."<table><tr><th>".$this->loc->s("IP-addr")."</th><th>".$this->loc->s("Last-visit")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = FS::$iMgr->h3("Top ".$topmax." ("._("SSH-atk").")",true)."<table><tr><th>"._("IP-addr")."</th><th>"._("Last-visit")."</th><th>"._("Action-nb")."</th></tr>";
 
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."collected_ips","ip,last_date,ssh","",array("order" => "ssh","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
@@ -250,7 +250,7 @@
 						$output .= $tmpoutput."</table>";
 
 					$found = 0;
-					$tmpoutput = FS::$iMgr->h3($this->loc->s("The")." ".$topmax." ".$this->loc->s("violent-days"),true)."<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Action-nb")."</th></tr>";
+					$tmpoutput = FS::$iMgr->h3(_("The")." ".$topmax." "._("violent-days"),true)."<table><tr><th>"._("Date")."</th><th>"._("Action-nb")."</th></tr>";
 					$query = $this->snortDB->Select(PGDbConfig::getDbPrefix()."attack_stats","atkdate,ssh","",array("order" => "ssh","ordersens" => 1,"limit" => $topmax));
 					while ($data = $this->snortDB->Fetch($query)) {
 						if ($found == 0) $found = 1;
@@ -268,7 +268,7 @@
 					while ($data = $this->snortDB->Fetch($query)) {
 						if (!$found) {
 							$found = true;
-							$output .= "<table><tr><th>".$this->loc->s("Date")."</th><th>".$this->loc->s("Source")."</th><th>".$this->loc->s("Destination")."</th><th>".$this->loc->s("Alert")."</th></tr>";
+							$output .= "<table><tr><th>"._("Date")."</th><th>"._("Source")."</th><th>"._("Destination")."</th><th>"._("Alert")."</th></tr>";
 						}
 						$output .= "<tr><td>".$data["timestamp"]."</td><td>".long2ip($data["ip_src"]).":".$data["layer4_sport"]."</td><td>".long2ip($data["ip_dst"]).":".$data["layer4_dport"].
 							"</td><td>".$data["sig_name"]."</td></tr>";
@@ -287,7 +287,7 @@
 		public function loadFooterPlugin() {
 			// Only users with icinga read right can use this module
 			if (FS::$sessMgr->hasRight("read")) {
-				$pluginTitle = $this->loc->s("Security");
+				$pluginTitle = _("Security");
 				$pluginContent = "";
 
 				// Load snort keys for db config
@@ -338,7 +338,7 @@
 				// If score < 50%: critical
 				if ($securityScore < 50) {
 					$pluginTitle = sprintf("%s: %s%% %s",
-						$this->loc->s("Security"),
+						_("Security"),
 						$securityScore,
 						FS::$iMgr->img("/styles/images/monitor-crit.png",15,15)
 					);
@@ -346,7 +346,7 @@
 				// If score < 93%: warn
 				else if ($securityScore < 93) {
 					$pluginTitle = sprintf("%s: %s%% %s",
-						$this->loc->s("Security"),
+						_("Security"),
 						$securityScore,
 						FS::$iMgr->img("/styles/images/monitor-warn.png",15,15)
 					);
@@ -354,7 +354,7 @@
 				//
 				else {
 					$pluginTitle = sprintf("%s: %s%% %s",
-						$this->loc->s("Security"),
+						_("Security"),
 						$securityScore,
 						FS::$iMgr->img("/styles/images/monitor-ok.png",15,15)
 					);

@@ -28,8 +28,8 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rUserMgmt($this->loc);
 			
-			$this->menu = $this->loc->s("Users and rights");
-			$this->menutitle = $this->loc->s("User management");
+			$this->menu = _("Users and rights");
+			$this->menutitle = _("User management");
 			
 			$this->modulename = "usermgmt";
 		}
@@ -47,13 +47,13 @@
 				return $output;
 			}
 			$output = FS::$iMgr->cbkForm("2").FS::$iMgr->tip("tip-password").
-                "<table><tr><td>".$this->loc->s("User")."</td><td>".$user.FS::$iMgr->hidden("uid",$uid)."</td></tr>";
+                "<table><tr><td>"._("User")."</td><td>".$user.FS::$iMgr->hidden("uid",$uid)."</td></tr>";
 
 			if (FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","sha_pwd","username = '".$user."'")) {
 				$mail = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."users","mail","username = '".$user."'");
-				$output .= "<tr><td>".$this->loc->s("Password")."</td><td>".FS::$iMgr->password("pwd","")."</td></tr>".
-					"<tr><td>".$this->loc->s("Password-repeat")."</td><td>".FS::$iMgr->password("pwd2","")."</td></tr>".
-					"<tr><td>".$this->loc->s("Mail")."</td><td>".FS::$iMgr->input("mail",$mail,24,64)."</td></tr>";
+				$output .= "<tr><td>"._("Password")."</td><td>".FS::$iMgr->password("pwd","")."</td></tr>".
+					"<tr><td>"._("Password-repeat")."</td><td>".FS::$iMgr->password("pwd2","")."</td></tr>".
+					"<tr><td>"._("Mail")."</td><td>".FS::$iMgr->input("mail",$mail,24,64)."</td></tr>";
 			}
 
 			$gids = array();
@@ -61,7 +61,7 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				$gids[] = $data["gid"];
 			}
-			$output .= "<tr><td>".$this->loc->s("Group")."</td><td>".
+			$output .= "<tr><td>"._("Group")."</td><td>".
 				FS::$iMgr->select("ugroup",array("multi" => true)).
 				FS::$iMgr->selElmtFromDB(PGDbConfig::getDbPrefix()."groups","gid",
 					array("labelfield" => "gname", "selected" => $gids,"sqlopts" => array("order" => "gname"))).
@@ -77,7 +77,7 @@
 			$output = FS::$iMgr->h1("title-usermgmt");
 
 			if (FS::$sessMgr->hasRight("ldapuserimport")) {
-				$output .= FS::$iMgr->opendiv(1,$this->loc->s("import-user"));
+				$output .= FS::$iMgr->opendiv(1,_("import-user"));
 			}
 			$tmpoutput = "";
 			$found = 0;
@@ -85,9 +85,9 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = 1;
-					$tmpoutput .= "<table id=\"userList\"><thead id=\"userthead\"><tr><th class=\"headerSortDown\">UID</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("User-type")."</th><th>".
-					$this->loc->s("Groups")."</th><th>".$this->loc->s("Subname")."</th><th>".$this->loc->s("Name")."</th><th>".
-					$this->loc->s("Mail")."</th><th>".$this->loc->s("last-ip")."</th><th>".$this->loc->s("last-conn")."</th><th>".$this->loc->s("inscription")."</th><th></th></tr></thead>";
+					$tmpoutput .= "<table id=\"userList\"><thead id=\"userthead\"><tr><th class=\"headerSortDown\">UID</th><th>"._("User")."</th><th>"._("User-type")."</th><th>".
+					_("Groups")."</th><th>"._("Subname")."</th><th>"._("Name")."</th><th>".
+					_("Mail")."</th><th>"._("last-ip")."</th><th>"._("last-conn")."</th><th>"._("inscription")."</th><th></th></tr></thead>";
 				}
 				$tmpoutput .= $this->showUserTr($data["uid"],$data["username"],$data["sha_pwd"] == "",$data["subname"],$data["name"],$data["mail"],$data["last_ip"],$data["last_conn"],$data["join_date"]);
 			}
@@ -101,7 +101,7 @@
 
 				FS::$iMgr->setJSBuffer(1);
 
-				$output .= FS::$iMgr->opendiv(2,$this->loc->s("new-directory"));
+				$output .= FS::$iMgr->opendiv(2,_("new-directory"));
 
 				$found = 0;
 				$tmpoutput = "";
@@ -109,8 +109,8 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if (!$found) {
 						$found = 1;
-						$tmpoutput .= "<table id=\"ldapList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Server")."</th><th>".$this->loc->s("port").
-						"</th><th>".$this->loc->s("base-dn")."</th><th>".$this->loc->s("root-dn")."</th><th>".$this->loc->s("ldap-filter")."</th><th></th></tr></thead>";
+						$tmpoutput .= "<table id=\"ldapList\"><thead><tr><th class=\"headerSortDown\">"._("Server")."</th><th>"._("port").
+						"</th><th>"._("base-dn")."</th><th>"._("root-dn")."</th><th>"._("ldap-filter")."</th><th></th></tr></thead>";
 					}
 					$tmpoutput .= "<tr id=\"d".preg_replace("#[.]#","-",$data["addr"])."tr\"><td>".FS::$iMgr->opendiv(3,$data["addr"],array("lnkadd" => "addr=".$data["addr"])).
 						"</td><td>".$data["port"]."</td><td>".$data["dn"]."</td><td>".$data["rootdn"]."</td><td>".$data["filter"]."</td><td>".
@@ -131,7 +131,7 @@
 		private function showUserTr($uid, $username = "", $localuser = false, $subname = "", $name = "", $mail = "",$last_ip = "",$last_conn = "", $join_date = "") {
 			$output = "<tr id=\"u".$uid."tr\"><td>".$uid.
 				"</td><td>".FS::$iMgr->opendiv(4,$username,array("lnkadd" => "user=".$username))."</td><td>".
-				($localuser ? $this->loc->s("Extern") : $this->loc->s("Intern"))."</td><td>";
+				($localuser ? _("Extern") : _("Intern"))."</td><td>";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."user_group","gid","uid = '".$uid."'");
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				$gname = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."groups","gname","gid = '".$data["gid"]."'");
@@ -174,7 +174,7 @@
 					$size = round($countElmt/4);
 				else
 					$size = $countElmt;
-				$output .= "<tr><td>".$this->loc->s("Groups")."</td><td>".FS::$iMgr->select("groups",array("multi" => true, "size" => $size));
+				$output .= "<tr><td>"._("Groups")."</td><td>".FS::$iMgr->select("groups",array("multi" => true, "size" => $size));
 				$output .= $tmpoutput;
 				$output .= "</select></td></tr>";
 			}
@@ -201,15 +201,15 @@
 				$ssl = ($data["ssl"] == 't');
 			}
 
-			$output .= "<table><tr><td>".$this->loc->s("Template")."</td><td>".FS::$iMgr->select("ldapmodel",array("js" => "autoCompleteLDAP(this);")).
-				FS::$iMgr->selElmt($this->loc->s("None"),0).
+			$output .= "<table><tr><td>"._("Template")."</td><td>".FS::$iMgr->select("ldapmodel",array("js" => "autoCompleteLDAP(this);")).
+				FS::$iMgr->selElmt(_("None"),0).
 				FS::$iMgr->selElmt("Active Directory",1).
 				"</select></td></tr>";
 
 			$output .= FS::$iMgr->idxLines(array(
 				array("ldap-addr",	"addr",	array("value" => $addr, "type" => "idxedit", "length" => 40, "size" => 20, "edit" => $addr != "")),
 				array("ldap-port",	"port",		array("value" => $port, "size" => 5, "length" => 5)),
-				array($this->loc->s("SSL")." ?",	"ssl",		array("value" => $ssl, "type" => "chk", "rawlabel" => true)),
+				array(_("SSL")." ?",	"ssl",		array("value" => $ssl, "type" => "chk", "rawlabel" => true)),
 				array("base-dn",	"dn",		array("value" => $dn, "size" => 20, "length" => 200,"tooltip" => "tooltip-base-dn")),
 				array("root-dn",	"rootdn",	array("value" => $rootdn, "size" => 20, "length" => 200,"tooltip" => "tooltip-root-dn")),
 				array("root-pwd",	"rootpwd",	array("type" => "pwd")),
@@ -308,13 +308,13 @@
 				case 3:
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if (!$addr) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->showDirectoryForm($addr);
 				case 4:
 					$user = FS::$secMgr->checkAndSecuriseGetData("user");
 					if (!$user) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->EditUser($user);
 				default: return;
@@ -364,7 +364,7 @@
 							case 0: break; // ok
 							case 1: // too short
 								FS::$iMgr->ajaxEchoErrorNC(
-									sprintf($this->loc->s("err-pwd-short"),Config::getPasswordMinLength()),
+									sprintf(_("err-pwd-short"),Config::getPasswordMinLength()),
 									"", true
 								);
 								return;

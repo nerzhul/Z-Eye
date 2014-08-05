@@ -28,7 +28,7 @@
 
 		public function showStateOpts() {
 			$state = $this->getPortState();
-			return FS::$iMgr->idxLine($this->loc->s("Shutdown"),"shut",$state == 2 ? true : false, array("type" => "chk", "tooltip" => "tooltip-shut"));
+			return FS::$iMgr->idxLine(_("Shutdown"),"shut",$state == 2 ? true : false, array("type" => "chk", "tooltip" => "tooltip-shut"));
 		}
 
 		public function handleState($logvals, $port = "", $shut = -1) {

@@ -34,30 +34,13 @@
 		}
 
 		public function s($str) {
-			if (!isset($_SESSION["lang"]) || !isset($this->locales[$_SESSION["lang"]])) {
-				$lang = Config::getDefaultLang();
-			}
-			else {
-				$lang = $_SESSION["lang"];
-			}
-			
 			if (is_array($str)) {
 				echo FS::$iMgr->printError(sprintf(FS::$iMgr->getLocale("err-devel-locale"),
 					FS::$iMgr->printDebugBacktrace()),true);
 				return "";
 			}
-			
-			if (!$str || $str == "") {
-				return "Empty locale string";
-			}
-			
-			if (!$this->locales ||
-				!isset($this->locales[$lang]) || !isset($this->locales[$lang][$str])) {
-				
-				return _($str);
-			}
-			
-			return $this->locales[$lang][$str];
+
+			return _($str);
 		}
 		
 		protected function concat($moduleLocales=array()) {

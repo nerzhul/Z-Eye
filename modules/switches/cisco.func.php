@@ -58,7 +58,7 @@
 		public function showSpeedOpts() {
 			$output = "";
 			$sp = $this->getPortSpeed();
-			$output .= "<tr><td>".$this->loc->s("admin-speed")."</td><td>";
+			$output .= "<tr><td>"._("admin-speed")."</td><td>";
 			if($sp > 0) {
 				$output .= FS::$iMgr->select("speed",array("tooltip" => "tooltip-speed"));
 				$output .= FS::$iMgr->selElmt("Auto",1,$sp == 1 ? true : false);
@@ -76,7 +76,7 @@
 				$output .= "</select>";
 			}
 			else
-				$output .= $this->loc->s("Unavailable");
+				$output .= _("Unavailable");
 			$output .= "</td></tr>";
 			return $output;
 		}
@@ -100,7 +100,7 @@
 			$output = "";
 			$dup = $this->getPortDuplex();
 			if($dup != -1) {
-				$output .= "<tr><td>".$this->loc->s("admin-duplex")."</td><td>";
+				$output .= "<tr><td>"._("admin-duplex")."</td><td>";
 				if($dup > 0 && $dup < 5) {
 					$output .= FS::$iMgr->select("duplex");
 					$output .= FS::$iMgr->selElmt("Auto",4,$dup == 1 ? true : false);
@@ -109,7 +109,7 @@
 					$output .= "</select>";
 				}
 				else
-					$output .= $this->loc->s("Unavailable");
+					$output .= _("Unavailable");
 			}
 			$output .= "</td></tr>";
 			return $output;
@@ -142,29 +142,29 @@
 				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_portsec")) {
 				$portsecen = $this->getPortSecEnable();
 				if($portsecen != -1) {
-					$output .= "<tr><td colspan=\"2\">".$this->loc->s("portsecurity")."</td></tr>";
+					$output .= "<tr><td colspan=\"2\">"._("portsecurity")."</td></tr>";
 					// check for enable/disable PortSecurity
-					$output .= "<tr><td>".$this->loc->s("portsec-enable")."</td><td>".FS::$iMgr->check("psen",array("check" => $portsecen == 1 ? true : false))."</td></tr>";
+					$output .= "<tr><td>"._("portsec-enable")."</td><td>".FS::$iMgr->check("psen",array("check" => $portsecen == 1 ? true : false))."</td></tr>";
 					// Active Status for PortSecurity
-					$output .= "<tr><td>".$this->loc->s("portsec-status")."</td><td>";
+					$output .= "<tr><td>"._("portsec-status")."</td><td>";
 					$portsecstatus = $this->getPortSecStatus();
 					switch($portsecstatus) {
-						case 1: $output .= $this->loc->s("Active"); break;
-						case 2: $output .= $this->loc->s("Inactive"); break;
-						case 3: $output .= "<span style=\"color:red;\">".$this->loc->s("Violation")."</span>"; break;
-						default: $output .= $this->loc->s("unk"); break;
+						case 1: $output .= _("Active"); break;
+						case 2: $output .= _("Inactive"); break;
+						case 3: $output .= "<span style=\"color:red;\">"._("Violation")."</span>"; break;
+						default: $output .= _("unk"); break;
 					}
 					$output .= "</td></tr>";
 					// Action when violation is performed
 					$psviolact = $this->getPortSecViolAct();
-					$output .= "<tr><td>".$this->loc->s("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact",array("tooltip" => "portsec-viol-tooltip"));
-					$output .= FS::$iMgr->selElmt($this->loc->s("Shutdown"),1,$psviolact == 1 ? true : false);
-					$output .= FS::$iMgr->selElmt($this->loc->s("Restrict"),2,$psviolact == 2 ? true : false);
-					$output .= FS::$iMgr->selElmt($this->loc->s("Protect"),3,$psviolact == 3 ? true : false);
+					$output .= "<tr><td>"._("portsec-violmode")."</td><td>".FS::$iMgr->select("psviolact",array("tooltip" => "portsec-viol-tooltip"));
+					$output .= FS::$iMgr->selElmt(_("Shutdown"),1,$psviolact == 1 ? true : false);
+					$output .= FS::$iMgr->selElmt(_("Restrict"),2,$psviolact == 2 ? true : false);
+					$output .= FS::$iMgr->selElmt(_("Protect"),3,$psviolact == 3 ? true : false);
 					$output .= "</select>";
 					// Maximum MAC addresses before violation mode
 					$psmaxmac = $this->getPortSecMaxMAC();
-					$output .= "<tr><td>".$this->loc->s("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => "portsec-maxmac-tooltip"))."</td></tr>";
+					$output .= "<tr><td>"._("portsec-maxmac")."</td><td>".FS::$iMgr->numInput("psmaxmac",$psmaxmac,array("size" => 4, "length" => 4, "tooltip" => "portsec-maxmac-tooltip"))."</td></tr>";
 				}
 			}
 			return $output;
@@ -214,7 +214,7 @@
 			$output = "";
 			if(FS::$sessMgr->hasRight("snmp_".$this->snmprw."_portmod_voicevlan") ||
 				FS::$sessMgr->hasRight("ip_".$this->devip."_portmod_voicevlan")) {
-				$output .= "<tr><td>".$this->loc->s("voice-vlan")."</td><td>";
+				$output .= "<tr><td>"._("voice-vlan")."</td><td>";
 				$output .= FS::$iMgr->select("voicevlan",array("tooltip" => "tooltip-voicevlan"));
 				$output .= $voicevlanoutput;
 				$output .= "</select></td></tr>";
@@ -250,21 +250,21 @@
 					if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
 					if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
 					if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
-					$('#vllabel').html('".$this->loc->s("native-vlan")."');
+					$('#vllabel').html('"._("native-vlan")."');
 				} else if(document.getElementsByName('trmode')[0].value == 2) {
 					if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
 					if(!$('#mabtr').is(':hidden')) $('#mabtr').hide('slow');
 					if(!$('#mabdead').is(':hidden')) $('#mabdead').hide('slow');
 					if(!$('#mabnoresp').is(':hidden')) $('#mabnoresp').hide('slow');
-					$('#vllabel').html('".$this->loc->s("Vlan")."');
+					$('#vllabel').html('"._("Vlan")."');
 				} else if(document.getElementsByName('trmode')[0].value == 3) {
 					if(!$('#vltr').is(':hidden')) $('#vltr').hide('slow');
-						$('#vllabel').html('".$this->loc->s("fail-vlan")."');
+						$('#vllabel').html('"._("fail-vlan")."');
 					if($('#mabtr').is(':hidden')) $('#mabtr').show('slow');
 					if($('#mabdead').is(':hidden')) $('#mabdead').show('slow');
 					if($('#mabnoresp').is(':hidden')) $('#mabnoresp').show('slow');
 			}};");
-			$output = "<tr><td>".$this->loc->s("switchport-mode")."</td><td>";
+			$output = "<tr><td>"._("switchport-mode")."</td><td>";
 			$trmode = $this->getSwitchportMode();
 
 			$mabstate = $this->getSwitchportMABState();
@@ -282,18 +282,18 @@
 			$vllist = array();
 			switch($trmode) {
 				case 1:
-					$output .= $this->loc->s("native-vlan");
-					$portoptlabel = $this->loc->s("encap-vlan");
+					$output .= _("native-vlan");
+					$portoptlabel = _("encap-vlan");
 					$nvlan = $this->getSwitchTrunkNativeVlan();
 					$vllist = $this->getSwitchportTrunkVlans();
 					break;
 				case 2:
-					$output .= $this->loc->s("Vlan");
+					$output .= _("Vlan");
 					$nvlan = $this->getSwitchAccessVLAN();
 					break;
 				case 3:
-					$output .= $this->loc->s("fail-vlan");
-					$portoptlabel = $this->loc->s("MAB-opt");
+					$output .= _("fail-vlan");
+					$portoptlabel = _("MAB-opt");
 					$nvlan = $this->getSwitchportAuthFailVLAN();
 					break;
 			}
@@ -301,9 +301,9 @@
 			$output .= FS::$iMgr->select("nvlan");
 			// Added none for VLAN fail
 			if($trmode == 3)
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$nvlan == 0 ? true : false);
+				$output .= FS::$iMgr->selElmt(_("None"),0,$nvlan == 0 ? true : false);
 
-			$voicevlanoutput = FS::$iMgr->selElmt($this->loc->s("None"),4096);
+			$voicevlanoutput = FS::$iMgr->selElmt(_("None"),4096);
 			$voicevlan = $this->getSwitchportVoiceVlan();
 			$deadvlan = $this->getSwitchportAuthDeadVLAN();
 			$deadvlanoutput = "";
@@ -324,9 +324,9 @@
 				$vlannb++;
 			}
 			$output .= "</select></td></tr>";
-			$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("encap-vlan")."</td><td>";
+			$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>"._("encap-vlan")."</td><td>";
 			$output .= FS::$iMgr->select("vllist",array("multi" => true, "size" => round($vlannb/4)));
-			$output .= FS::$iMgr->selElmt($this->loc->s("All"),"all",$trunkall);
+			$output .= FS::$iMgr->selElmt(_("All"),"all",$trunkall);
 			$output .= $trunkvlanoutput;
 			$output .= "</select>";
 			$output .= "</td></tr>";
@@ -335,27 +335,27 @@
 			*/
 
 			// NoResp Vlan
-			$output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-noresp")."</td><td>";
+			$output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-noresp")."</td><td>";
 			$output .= FS::$iMgr->select("norespvlan",array("tooltip" => "MAB-noresp-tooltip"));
-			$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$norespvlan == 0 ? true : false);
+			$output .= FS::$iMgr->selElmt(_("None"),0,$norespvlan == 0 ? true : false);
 			$output .= $norespvlanoutput;
 			$output .= "</select></td></tr>";
 			// Dead Vlan
-			$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-dead")."</td><td>";
+			$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-dead")."</td><td>";
 			$output .= FS::$iMgr->select("deadvlan",array("tooltip" => "MAB-dead-tooltip"));
-			$output .= FS::$iMgr->selElmt($this->loc->s("None"),0,$deadvlan == 0 ? true : false);
+			$output .= FS::$iMgr->selElmt(_("None"),0,$deadvlan == 0 ? true : false);
 			$output .= $deadvlanoutput;
 			$output .= "</select></td></tr>";
 			// Other options
-			$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>".$this->loc->s("MAB-opt")."</td><td>";
+			$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-opt")."</td><td>";
 			$mabeap = $this->getSwitchportMABType();
 			$dot1xhostmode = $this->getSwitchportAuthHostMode();
 			$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
-			$output .= $this->loc->s("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode");
-			$output .= FS::$iMgr->selElmt($this->loc->s("single-host"),1,$dot1xhostmode == 1 ? true : false);
-			$output .= FS::$iMgr->selElmt($this->loc->s("multi-host"),2,$dot1xhostmode == 2 ? true : false);
-			$output .= FS::$iMgr->selElmt($this->loc->s("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
-			$output .= FS::$iMgr->selElmt($this->loc->s("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
+			$output .= _("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode");
+			$output .= FS::$iMgr->selElmt(_("single-host"),1,$dot1xhostmode == 1 ? true : false);
+			$output .= FS::$iMgr->selElmt(_("multi-host"),2,$dot1xhostmode == 2 ? true : false);
+			$output .= FS::$iMgr->selElmt(_("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
+			$output .= FS::$iMgr->selElmt(_("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
 			$output .= "</select></td></tr>";
 
 			$output .= $this->showVoiceVlanOpts($voicevlanoutput);

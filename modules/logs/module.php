@@ -28,12 +28,12 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rLogs($this->loc);
 			
-			$this->menu = $this->loc->s("Z-Eye Engine");
-			$this->menutitle = $this->loc->s("Z-Eye logs");
+			$this->menu = _("Z-Eye Engine");
+			$this->menutitle = _("Z-Eye logs");
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("menu-title"));
+			FS::$iMgr->setTitle(_("menu-title"));
 			$output = $this->showLogs();
 			return $output;
 		}
@@ -61,8 +61,8 @@
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
 					$found = true;
-					$output .= "<table id=\"tlogList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("Date")."</th><th>".$this->loc->s("Module")."</th><th>".$this->loc->s("Level")."</th>
-						<th>".$this->loc->s("User")."</th><th>".$this->loc->s("Entry")."</th></tr></thead>";
+					$output .= "<table id=\"tlogList\"><thead><tr><th class=\"headerSortDown\">"._("Date")."</th><th>"._("Module")."</th><th>"._("Level")."</th>
+						<th>"._("User")."</th><th>"._("Entry")."</th></tr></thead>";
 				}
 				$date = preg_split("#[.]#",$data["date"]);
 				$lineoutput = "<td>".$date[0]."</td><td>".$data["module"]."</td><td>";
@@ -87,8 +87,8 @@
 			$sh = FS::$secMgr->checkAndSecuriseGetData("sh");
 			$output = "";
 			if (!FS::isAjaxCall()) {
-				$panElmts = array(array(1,"mod=".$this->mid,$this->loc->s("webapp")),
-					array(2,"mod=".$this->mid,$this->loc->s("Service")));
+				$panElmts = array(array(1,"mod=".$this->mid,_("webapp")),
+					array(2,"mod=".$this->mid,_("Service")));
 				$output .= FS::$iMgr->tabPan($panElmts,$sh);
 			}
 			else if (!$sh || $sh == 1) {
@@ -104,7 +104,7 @@
 				
 				$output = FS::$iMgr->form("?mod=".$this->mid."&act=1",array("id" => "logf")).
 					FS::$iMgr->select("uf",array("js" => "filterAppLogs()")).
-					FS::$iMgr->selElmt("--".$this->loc->s("User")."--","",true);
+					FS::$iMgr->selElmt("--"._("User")."--","",true);
 					
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs",
 					"_user","",array("order" => "_user","ordersens" => 2,"group" => "_user"));
@@ -113,7 +113,7 @@
 				}
 
 				$output .= "</select>".FS::$iMgr->select("af",array("js" => "filterAppLogs()")).
-					FS::$iMgr->selElmt("--".$this->loc->s("Module")."--","",true);
+					FS::$iMgr->selElmt("--"._("Module")."--","",true);
 				$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."logs",
 					"module","",array("order" => "module","ordersens" => 2,"group" => "module"));
 				while ($data = FS::$dbMgr->Fetch($query)) {
@@ -121,11 +121,11 @@
 				}
 				
 				$output .= "</select>".FS::$iMgr->select("lf",array("js" => "filterAppLogs()")).
-					FS::$iMgr->selElmt("--".$this->loc->s("Level")."--","",true).
+					FS::$iMgr->selElmt("--"._("Level")."--","",true).
 					FS::$iMgr->selElmt("Info",0).
 					FS::$iMgr->selElmt("Warn",1).
 					FS::$iMgr->selElmt("Crit",2).
-					"</select>".FS::$iMgr->button("but",$this->loc->s("Filter"),"filterAppLogs()").
+					"</select>".FS::$iMgr->button("but",_("Filter"),"filterAppLogs()").
 					"</form>".
 					"<div id=\"logd\">".$this->getApplicationLogs()."</div>";
 			}

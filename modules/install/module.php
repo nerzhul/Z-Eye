@@ -26,11 +26,11 @@
 			parent::__construct();
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rInstall($this->loc);
-			$this->menutitle = $this->loc->s("Install");
+			$this->menutitle = _("Install");
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-master-install"));
+			FS::$iMgr->setTitle(_("title-master-install"));
 			$output = "";
 			if (!FS::isAjaxCall())
 				$output .= $this->showMain();
@@ -77,7 +77,7 @@
 							setJSONContent('#installer',data);
 						});}");
 					$output .= FS::$iMgr->h2("title-welcome");
-					$output .= $this->loc->s("text-welcome")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Lets-Go"),"loadStep1();")."</center>";
+					$output .= _("text-welcome")."<br /><br /><center>".FS::$iMgr->button("",_("Lets-Go"),"loadStep1();")."</center>";
 					break;
 				case 1:
 					FS::$iMgr->js("function loadStep2() {
@@ -89,19 +89,19 @@
 						function sendAdmCfg() {
 						$.post('?mod=".$this->mid."&act=1',$('#admcfg').serialize(), function(data) {
 							if (data == 0) loadStep2();
-							else if (data == 1) { ".$this->showNotification($this->loc->s("err-fields-missing"),5000)." } 
-							else if (data == 2) { ".$this->showNotification($this->loc->s("err-username-invalid"),5000)." } 
-							else if (data == 3) { ".$this->showNotification($this->loc->s("err-mail-invalid"),5000)." } 
-							else if (data == 4) { ".$this->showNotification($this->loc->s("err-pwd-match"),5000)." } 
-							else if (data == 5) { ".$this->showNotification($this->loc->s("err-mail-match"),5000)." } 
-							else if (data == 6) { ".$this->showNotification($this->loc->s("err-pwd-too-weak"),5000)." } 
-							else if (data == 7) { ".$this->showNotification($this->loc->s("err-surname-invalid"),5000)." } 
-							else if (data == 8) { ".$this->showNotification($this->loc->s("err-name-invalid"),5000)." } 
-							else { ".$this->showNotification($this->loc->s("err-unhandled-answer"),5000)." }
+							else if (data == 1) { ".$this->showNotification(_("err-fields-missing"),5000)." } 
+							else if (data == 2) { ".$this->showNotification(_("err-username-invalid"),5000)." } 
+							else if (data == 3) { ".$this->showNotification(_("err-mail-invalid"),5000)." } 
+							else if (data == 4) { ".$this->showNotification(_("err-pwd-match"),5000)." } 
+							else if (data == 5) { ".$this->showNotification(_("err-mail-match"),5000)." } 
+							else if (data == 6) { ".$this->showNotification(_("err-pwd-too-weak"),5000)." } 
+							else if (data == 7) { ".$this->showNotification(_("err-surname-invalid"),5000)." } 
+							else if (data == 8) { ".$this->showNotification(_("err-name-invalid"),5000)." } 
+							else { ".$this->showNotification(_("err-unhandled-answer"),5000)." }
 						});
 					return false;}");
 					$output .= FS::$iMgr->h2("title-admin-set");
-					$output .= $this->loc->s("text-admin-set")."<br /><br />".FS::$iMgr->form("",array("id" => "admcfg","js" => "false"))."<table><tr><th>".$this->loc->s("Option")."</th><th>".$this->loc->s("Value")."</th></tr>";
+					$output .= _("text-admin-set")."<br /><br />".FS::$iMgr->form("",array("id" => "admcfg","js" => "false"))."<table><tr><th>"._("Option")."</th><th>"._("Value")."</th></tr>";
 					$output .= FS::$iMgr->idxLine("Username","username");
 					$output .= FS::$iMgr->idxLine("Name","name");
 					$output .= FS::$iMgr->idxLine("Surname","surname");
@@ -118,7 +118,7 @@
 							window.location = '/'; });
 					}");
 					$output .= FS::$iMgr->h2("title-install-finished");
-					$output .= $this->loc->s("text-finish")."<br /><br /><center>".FS::$iMgr->button("",$this->loc->s("Finish"),"loadStep3();")."</center>";
+					$output .= _("text-finish")."<br /><br /><center>".FS::$iMgr->button("",_("Finish"),"loadStep3();")."</center>";
 					break;	
 				default:
 					return FS::$iMgr->printError("err-step-invalid");

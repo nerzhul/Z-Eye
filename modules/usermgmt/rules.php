@@ -21,11 +21,11 @@
 		function __construct($locales) { parent::__construct($locales); }
 
 		public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
-				array($this->loc->s("rule-read-datas"),			"mrule_usermgmt_read"),
-				array($this->loc->s("rule-modify-user"),		"mrule_usermgmt_write"),
-				array($this->loc->s("rule-modify-directory"),		"mrule_usermgmt_ldapwrite"),
-				array($this->loc->s("rule-import-user"),		"mrule_usermgmt_ldapuserimport")
+			$output = FS::$iMgr->ruleLines(_("menu-title"),$activerules,array(
+				array(_("rule-read-datas"),			"mrule_usermgmt_read"),
+				array(_("rule-modify-user"),		"mrule_usermgmt_write"),
+				array(_("rule-modify-directory"),		"mrule_usermgmt_ldapwrite"),
+				array(_("rule-import-user"),		"mrule_usermgmt_ldapuserimport")
 			));
 			return $output;
 		}

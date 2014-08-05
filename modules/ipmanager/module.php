@@ -30,12 +30,12 @@
 			$this->modulename = "ipmmgmt";
 			$this->rulesclass = new rIPManager($this->loc);
 			
-			$this->menu = $this->loc->s("Hypervision");
-			$this->menutitle = $this->loc->s("DHCP/IP management");
+			$this->menu = _("Hypervision");
+			$this->menutitle = _("DHCP/IP management");
 		}
 
 		public function Load() {
-			FS::$iMgr->setTitle($this->loc->s("title-ip-management"));
+			FS::$iMgr->setTitle(_("title-ip-management"));
 			$output = $this->showMain();
 			return $output;
 		}
@@ -48,16 +48,16 @@
 				$output .= FS::$iMgr->h1("title-ip-management");
 				$tabs = array();
 				if (FS::$sessMgr->hasRight("read"))
-					$tabs[] = array(1,"mod=".$this->mid,$this->loc->s("Consult"));
+					$tabs[] = array(1,"mod=".$this->mid,_("Consult"));
 				if (FS::$sessMgr->hasRight("subnetmgmt"))
-					$tabs[] = array(2,"mod=".$this->mid,$this->loc->s("Manage-Subnets"));
+					$tabs[] = array(2,"mod=".$this->mid,_("Manage-Subnets"));
 				if (FS::$sessMgr->hasRight("optionsmgmt") ||
 					FS::$sessMgr->hasRight("optionsgrpmgmt"))
-					$tabs[] = array(5,"mod=".$this->mid,$this->loc->s("Manage-DHCP-Opts"));
+					$tabs[] = array(5,"mod=".$this->mid,_("Manage-DHCP-Opts"));
 				if (FS::$sessMgr->hasRight("advancedtools"))
-					$tabs[] = array(4,"mod=".$this->mid,$this->loc->s("Advanced-tools"));
+					$tabs[] = array(4,"mod=".$this->mid,_("Advanced-tools"));
 				if (FS::$sessMgr->hasRight("servermgmt"))
-					$tabs[] = array(3,"mod=".$this->mid,$this->loc->s("Manage-Servers"));
+					$tabs[] = array(3,"mod=".$this->mid,_("Manage-Servers"));
 
 				$output .= FS::$iMgr->tabPan($tabs,$sh);
 			}
@@ -92,9 +92,9 @@
 				"withcache" => true));
 
 			$tmpoutput .= $formoutput.
-				FS::$iMgr->select("view").FS::$iMgr->selElmt($this->loc->s("Stats"),1).
-				FS::$iMgr->selElmt($this->loc->s("History"),2).
-				FS::$iMgr->selElmt($this->loc->s("Monitoring"),3)."</select> ".
+				FS::$iMgr->select("view").FS::$iMgr->selElmt(_("Stats"),1).
+				FS::$iMgr->selElmt(_("History"),2).
+				FS::$iMgr->selElmt(_("Monitoring"),3)."</select> ".
 				FS::$iMgr->submit("","Consulter")."</form><br />";
 
 			if ($formoutput == NULL) {
@@ -138,8 +138,8 @@
 			if ((FS::$sessMgr->hasRight("rangemgmt") ||
 				FS::$sessMgr->hasRight($subnetu."_rangemgmt")) &&
 				$netdeclared) {
-				$output .= FS::$iMgr->opendiv(14,$this->loc->s("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$netid));
-				$output .= FS::$iMgr->opendiv(15,$this->loc->s("import-dhcp-reserv"),array("line" => true,"lnkadd" => "subnet=".$netid));
+				$output .= FS::$iMgr->opendiv(14,_("configure-ip-range"),array("line" => true,"lnkadd" => "subnet=".$netid));
+				$output .= FS::$iMgr->opendiv(15,_("import-dhcp-reserv"),array("line" => true,"lnkadd" => "subnet=".$netid));
 			}
 
 			$output .= "<div id=\"".FS::$iMgr->formatHTMLId($netid)."\"></div>";
@@ -212,10 +212,10 @@
 			$distrib = 0;
 			$fixedip = 0;
 
-			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">".$this->loc->s("IP-Addr")."</th><th></th><th>".$this->loc->s("Status")."</th>
-				<th>".$this->loc->s("MAC-Addr")."</th><th>".$this->loc->s("Hostname")."</th><th>".$this->loc->s("Comment")."</th><th>".
-				$this->loc->s("Switch")."</th><th>".$this->loc->s("Port")."</th><th>".
-				$this->loc->s("Lease-end")."</th><th>".$this->loc->s("Servers")."</th><th></th></tr></thead>";
+			$output .= "<table id=\"tipList\"><thead><tr><th class=\"headerSortDown\">"._("IP-Addr")."</th><th></th><th>"._("Status")."</th>
+				<th>"._("MAC-Addr")."</th><th>"._("Hostname")."</th><th>"._("Comment")."</th><th>".
+				_("Switch")."</th><th>"._("Port")."</th><th>".
+				_("Lease-end")."</th><th>"._("Servers")."</th><th></th></tr></thead>";
 
 			// @TODO: cache this HTML output with Z-Eye service
 			foreach ($iparray as $key => $value) {
@@ -265,22 +265,22 @@
 				}}},
 				series: [{ type: 'pie', data: [";
 			if ($used > 0) {
-				$js .= "{ name: '".$this->loc->s("Baux")."', y: ".$used.", color: 'red' },";
+				$js .= "{ name: '"._("Baux")."', y: ".$used.", color: 'red' },";
 			}
 
 			if ($reserv > 0) {
-				$js .= "{ name: '".$this->loc->s("Reservations")."', y: ".$reserv.", color: 'yellow'},";
+				$js .= "{ name: '"._("Reservations")."', y: ".$reserv.", color: 'yellow'},";
 			}
 
 			if ($fixedip > 0) {
-				$js .= "{ name: '".$this->loc->s("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
+				$js .= "{ name: '"._("Stuck-IP")."', y: ".$fixedip.", color: 'orange'},";
 			}
 
 			if ($distrib > 0) {
-				$js .= "{ name: '".$this->loc->s("Available-s")."', y: ".$distrib.", color: 'cyan'},";
+				$js .= "{ name: '"._("Available-s")."', y: ".$distrib.", color: 'cyan'},";
 			}
 
-			$js .= "{ name: '".$this->loc->s("Free-s")."', y:".$free.", color: 'green'}]
+			$js .= "{ name: '"._("Free-s")."', y:".$free.", color: 'green'}]
 				}]});},300);";
 			FS::$iMgr->js($js);
 
@@ -300,8 +300,8 @@
 			}
 
 
-			$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt($this->loc->s("comma"),",").
-					FS::$iMgr->selElmt($this->loc->s("semi-colon"),";")."</select>";
+			$selOutput = FS::$iMgr->select("sep").FS::$iMgr->selElmt(_("comma"),",").
+					FS::$iMgr->selElmt(_("semi-colon"),";")."</select>";
 
 			return FS::$iMgr->tip("tip-import-reserv").
 				FS::$iMgr->cbkForm("19")."<table>".
@@ -329,9 +329,9 @@
 			$output = FS::$iMgr->tip("tip-range").FS::$iMgr->cbkForm("18")."<table>".
 				FS::$iMgr->idxLine("start-ip","startip",array("type" => "ip", "length" => 16)).
 				FS::$iMgr->idxLine("end-ip","endip",array("type" => "ip", "length" => 16)).
-				"<tr><td>".$this->loc->s("Action")."</td><td>".FS::$iMgr->select("rangeact").
-				FS::$iMgr->selElmt($this->loc->s("add-to-dynamic-distrib"),1).
-				FS::$iMgr->selElmt($this->loc->s("remove-from-dynamic-distrib"),2).
+				"<tr><td>"._("Action")."</td><td>".FS::$iMgr->select("rangeact").
+				FS::$iMgr->selElmt(_("add-to-dynamic-distrib"),1).
+				FS::$iMgr->selElmt(_("remove-from-dynamic-distrib"),2).
 				"</select>".FS::$iMgr->hidden("subnet",$subnet)."</td></tr>".
 				FS::$iMgr->aeTableSubmit();
 
@@ -363,7 +363,7 @@
 			$diff = ceil((strtotime("now")-strtotime($date))/(24*60*60));
 
 			$output .= FS::$iMgr->slider("hstslide","daterange",1,$diff,array("hidden" => "jour(s)","width" => "200px","value" => "1")).
-				FS::$iMgr->button("but",$this->loc->s("change-interval"),"historyDateChange()")."</form>";
+				FS::$iMgr->button("but",_("change-interval"),"historyDateChange()")."</form>";
 			return $output;
 		}
 
@@ -391,13 +391,13 @@
 				FS::$iMgr->cbkForm("3&f=".$filter).
 				"<ul class=\"ulform\"><li>".
 				FS::$iMgr->check("eniphistory",array("check" => $eniphistory == 't',
-					"label" => $this->loc->s("En-IP-history"))).
-				"</li><li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => $this->loc->s("En-monitor")))."</li><li>".
-				FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("warn-line"), "tooltip" => "tooltip-%use"))."</li><li>".
-				FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => $this->loc->s("crit-line"), "tooltip" => "tooltip-%use"))."</li><li>".
-				FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => $this->loc->s("max-age"), "tooltip" => "tooltip-max-age"))."</li><li>".
-				FS::$iMgr->input("contact",$contact,20,40,$this->loc->s("Contact"),"tooltip-contact")."</li><li>".
-				FS::$iMgr->submit("",$this->loc->s("Save"))."</li></ul></form>";
+					"label" => _("En-IP-history"))).
+				"</li><li>".FS::$iMgr->check("enmon",array("check" => $enmon == 1,"label" => _("En-monitor")))."</li><li>".
+				FS::$iMgr->numInput("wlimit",($wlimit > 0 ? $wlimit : 0),array("size" => 3, "length" => 3, "label" => _("warn-line"), "tooltip" => "tooltip-%use"))."</li><li>".
+				FS::$iMgr->numInput("climit",($climit > 0 ? $climit : 0),array("size" => 3, "length" => 3, "label" => _("crit-line"), "tooltip" => "tooltip-%use"))."</li><li>".
+				FS::$iMgr->numInput("maxage",($maxage > 0 ? $maxage : 0),array("size" => 7, "length" => 7, "label" => _("max-age"), "tooltip" => "tooltip-max-age"))."</li><li>".
+				FS::$iMgr->input("contact",$contact,20,40,_("Contact"),"tooltip-contact")."</li><li>".
+				FS::$iMgr->submit("",_("Save"))."</li></ul></form>";
 			return $output;
 		}
 
@@ -410,9 +410,9 @@
 
 			return FS::$iMgr->h4("title-search-old").
 				FS::$iMgr->cbkForm("2").
-				$this->loc->s("intval-days")." ".
+				_("intval-days")." ".
 				FS::$iMgr->numInput("ival")."<br />".
-				FS::$iMgr->submit("",$this->loc->s("Search")).
+				FS::$iMgr->submit("",_("Search")).
 				"</form><div id=\"obsres\"></div>";
 		}
 
@@ -424,7 +424,7 @@
 				return FS::$iMgr->printNoRight("show DHCP options management tab");
 			}
 			$output = FS::$iMgr->h2("title-dhcp-opts-group").FS::$iMgr->tip("tip-dhcp-opt-group")."<br />".
-				FS::$iMgr->opendiv(12,$this->loc->s("create-option-group"),array("line" => true));
+				FS::$iMgr->opendiv(12,_("create-option-group"),array("line" => true));
 
 			$tMgr = new HTMLTableMgr(array(
 				"tabledivid" => "dgoptslist",
@@ -446,7 +446,7 @@
 			$output .= $tMgr->render();
 
 			$output .= FS::$iMgr->h2("title-dhcp-opts").FS::$iMgr->tip("tip-dhcp-opts")."<br />".
-				FS::$iMgr->opendiv(10,$this->loc->s("create-option"),array("line" => true));
+				FS::$iMgr->opendiv(10,_("create-option"),array("line" => true));
 
 			$tMgr = new HTMLTableMgr(array(
 				"tabledivid" => "doptslist",
@@ -468,7 +468,7 @@
 			$output .= $tMgr->render();
 
 			$output .= FS::$iMgr->h2("title-custom-dhcp-opts").FS::$iMgr->tip("tip-custom-dhcp-opts")."<br />".
-				FS::$iMgr->opendiv(8,$this->loc->s("create-custom-option"),array("line" => true));
+				FS::$iMgr->opendiv(8,_("create-custom-option"),array("line" => true));
 
 			$tMgr = new HTMLTableMgr(array(
 				"tabledivid" => "customoptslist",
@@ -512,7 +512,7 @@
 			$output = FS::$iMgr->cbkForm("16")."<table>".
 				FS::$iMgr->idxLine("Groupname","optgroup",array("value" => $optgroup,"type" => "idxedit", "length" => 64,
 					"edit" => $optgroup != "")).
-				"<tr><td>".$this->loc->s("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions",array("multi" => true));
+				"<tr><td>"._("Group-DHCP-opts")."</td><td>".FS::$iMgr->select("groupoptions",array("multi" => true));
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option","optalias,optname");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -544,7 +544,7 @@
 			$output = FS::$iMgr->cbkForm("14")."<table>".
 				FS::$iMgr->idxLine("option-alias","optalias",array("value" => $optalias,"type" => "idxedit", "length" => 64,
 					"edit" => $optalias != "")).
-				"<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-value")."><td>".$this->loc->s("option-name")."</td><td>".FS::$iMgr->select("optname");
+				"<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-value")."><td>"._("option-name")."</td><td>".FS::$iMgr->select("optname");
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_custom_option","optcode,optname,opttype");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -578,16 +578,16 @@
 					"edit" => $optname != "")).
 				FS::$iMgr->idxLine("option-code","optcode",array("type" => "num", "length" => 3, "size" => 3,
 					"edit" => $optcode != "", "value" => $optcode, "tooltip" => "tooltip-dhcp-option-code")).
-				"<tr><td>".$this->loc->s("option-type")."</td><td>".FS::$iMgr->select("opttype").
-				FS::$iMgr->selElmt($this->loc->s("boolean"),		"boolean",	$opttype == "boolean").
-				FS::$iMgr->selElmt($this->loc->s("uinteger-8"),		"uint8",	$opttype == "uint8").
-				FS::$iMgr->selElmt($this->loc->s("uinteger-16"),	"uint16",	$opttype == "uint16").
-				FS::$iMgr->selElmt($this->loc->s("uinteger-32"),	"uint32",	$opttype == "uint32").
-				FS::$iMgr->selElmt($this->loc->s("integer-8"),		"int8",		$opttype == "int8").
-				FS::$iMgr->selElmt($this->loc->s("integer-16"),		"int16",	$opttype == "int16").
-				FS::$iMgr->selElmt($this->loc->s("integer-32"),		"int32",	$opttype == "int32").
-				FS::$iMgr->selElmt($this->loc->s("IP-Addr"),		"ip",		$opttype == "ip").
-				FS::$iMgr->selElmt($this->loc->s("text"),		"text",		$opttype == "text").
+				"<tr><td>"._("option-type")."</td><td>".FS::$iMgr->select("opttype").
+				FS::$iMgr->selElmt(_("boolean"),		"boolean",	$opttype == "boolean").
+				FS::$iMgr->selElmt(_("uinteger-8"),		"uint8",	$opttype == "uint8").
+				FS::$iMgr->selElmt(_("uinteger-16"),	"uint16",	$opttype == "uint16").
+				FS::$iMgr->selElmt(_("uinteger-32"),	"uint32",	$opttype == "uint32").
+				FS::$iMgr->selElmt(_("integer-8"),		"int8",		$opttype == "int8").
+				FS::$iMgr->selElmt(_("integer-16"),		"int16",	$opttype == "int16").
+				FS::$iMgr->selElmt(_("integer-32"),		"int32",	$opttype == "int32").
+				FS::$iMgr->selElmt(_("IP-Addr"),		"ip",		$opttype == "ip").
+				FS::$iMgr->selElmt(_("text"),		"text",		$opttype == "text").
 				"</td></tr></select>".
 				FS::$iMgr->aeTableSubmit($optname == "");
 
@@ -600,7 +600,7 @@
 			if (!FS::$sessMgr->hasRight("subnetmgmt")) {
 				return FS::$iMgr->printNoRight("show subnet management");
 			}
-	                $output = FS::$iMgr->opendiv(1,$this->loc->s("declare-subnet"),array("line" => true));
+	                $output = FS::$iMgr->opendiv(1,_("declare-subnet"),array("line" => true));
 
 			$output .= "<div id=\"declsubnets\">";
 
@@ -631,11 +631,11 @@
 
 		private function showDeclaredNetTableHead() {
 			return "<table id=\"declsubnettable\"><thead id=\"declsubnethead\"><tr><th>".
-				$this->loc->s("netid")."/".$this->loc->s("netmask")."</th><th>".
-				$this->loc->s("netidv6")."</th><th>".
-				$this->loc->s("vlanid")."</th><th>".$this->loc->s("Usable")."</th><th>".
-				$this->loc->s("subnet-shortname")."</th><th>".$this->loc->s("subnet-desc")."</th>
-				<th>".$this->loc->s("dhcp-clusters")."</th><th></th></tr></thead>";
+				_("netid")."/"._("netmask")."</th><th>".
+				_("netidv6")."</th><th>".
+				_("vlanid")."</th><th>"._("Usable")."</th><th>".
+				_("subnet-shortname")."</th><th>"._("subnet-desc")."</th>
+				<th>"._("dhcp-clusters")."</th><th></th></tr></thead>";
 		}
 
 		private function tableDeclaredNetEntry($netid,$netmask,$desc,$shortname,$vlanid,$netidv6,$prefixlenv6) {
@@ -664,7 +664,7 @@
 			}
 
 			if (!$found) {
-				$output .= $this->loc->s("None");
+				$output .= _("None");
 			}
 
 			$output .= "</td><td>".FS::$iMgr->removeIcon(8,"netid=".$netid,array("js" => true,
@@ -730,7 +730,7 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_cluster","clustername","",array("order" => "clustername", "group" => "clustername"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
-					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>".$this->loc->s("dhcp-cluster")."</td><td>".
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-cluster-distrib")."><td>"._("dhcp-cluster")."</td><td>".
 						FS::$iMgr->select("subnetclusters",array("multi" => true));
 					$found = true;
 				}
@@ -741,17 +741,17 @@
 			/*
 			* Misc options, related to classic DHCP subnet mgmt
 			*/
-			$output .= FS::$iMgr->idxLine($this->loc->s("router")." (*)","router",
+			$output .= FS::$iMgr->idxLine(_("router")." (*)","router",
 				array("value" => $router,"length" => 16, "type" => "ip", "tooltip" => "tooltip-router", "rawlabel" => true)).
-				FS::$iMgr->idxLine($this->loc->s("domain-name")." (*)","domainname",
+				FS::$iMgr->idxLine(_("domain-name")." (*)","domainname",
 					array("value" => $domainname,"length" => 120, "tooltip" => "tooltip-domainname", "rawlabel" => true)).
-				FS::$iMgr->idxLine($this->loc->s("DNS")." 1 (*)","dns1",
+				FS::$iMgr->idxLine(_("DNS")." 1 (*)","dns1",
 					array("value" => $dns1,"length" => 16, "type" => "ip", "rawlabel" => true)).
-				FS::$iMgr->idxLine($this->loc->s("DNS")." 2 (*)","dns2",
+				FS::$iMgr->idxLine(_("DNS")." 2 (*)","dns2",
 					array("value" => $dns2,"length" => 16, "type" => "ip", "rawlabel" => true)).
-				FS::$iMgr->idxLine($this->loc->s("max-lease-time")." (**)","mleasetime",
+				FS::$iMgr->idxLine(_("max-lease-time")." (**)","mleasetime",
 					array("value" => $mleasetime,"length" => 7, "type" => "num","tooltip" => "tooltip-max-lease-time", "rawlabel" => true)).
-				FS::$iMgr->idxLine($this->loc->s("default-lease-time")." (**)","dleasetime",
+				FS::$iMgr->idxLine(_("default-lease-time")." (**)","dleasetime",
 					array("length" => 7, "type" => "num", "value" => $dleasetime, "rawlabel" => true,
 					"tooltip" => "tooltip-default-lease-time"));
 
@@ -770,15 +770,15 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
-					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".FS::$iMgr->select("dopts",array("multi" => true));
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>"._("option-group")."</td><td>".FS::$iMgr->select("dopts",array("multi" => true));
 					$found = true;
 				}
 				$output .= FS::$iMgr->selElmt($data["optgroup"],$data["optgroup"],in_array($data["optgroup"],$optgroups));
 			}
 			if ($found) $output .= "</select></td></tr>";
 
-			$output .= "<tr><td colspan=\"2\">".FS::$iMgr->tip("(*) ".$this->loc->s("required-if-cluster")."<br />".
-				"(**) ".$this->loc->s("tip-inherit-if-null"),true)."</td></tr>".
+			$output .= "<tr><td colspan=\"2\">".FS::$iMgr->tip("(*) "._("required-if-cluster")."<br />".
+				"(**) "._("tip-inherit-if-null"),true)."</td></tr>".
 				FS::$iMgr->aeTableSubmit($netid == "");
 			return $output;
 		}
@@ -820,9 +820,9 @@
 				FS::$iMgr->selElmt("ISC-DHCP",1,$dhcptype == 1)
 			);
 
-			$output = FS::$iMgr->cbkForm("5").$this->loc->s("note-needed")."<table>".
+			$output = FS::$iMgr->cbkForm("5")._("note-needed")."<table>".
 				FS::$iMgr->idxLines(array(
-					array($this->loc->s("server-addr")." (*)","addr",
+					array(_("server-addr")." (*)","addr",
 						array("value" => $addr,"type" => "idxedit",
 							"length" => 128, "edit" => $addr != "",
 							"rawlabel" => true, "tooltip" => "tooltip-dhcp-server-ip"
@@ -832,16 +832,16 @@
 					array("server-desc","description",
 						array("value" => $description, "length" => 128,
 							"tooltip" => "tooltip-dhcp-desc")),
-					array($this->loc->s("ssh-user")." (*)","sshuser",
+					array(_("ssh-user")." (*)","sshuser",
 						array("value" => $user,"length" => 128,"rawlabel" => true)),
-					array($this->loc->s("ssh-pwd")." (*)","sshpwd",
+					array(_("ssh-pwd")." (*)","sshpwd",
 						array("type" => "pwd","rawlabel" => true)),
-					array($this->loc->s("ssh-pwd-repeat")." (*)",
+					array(_("ssh-pwd-repeat")." (*)",
 						"sshpwd2", array("type" => "pwd","rawlabel" => true)),
 					array("clustering-ip","dhcpdclusterip", array(
 						"type" => "ip", "value" => $clusteraddr,
 						"tooltip" => "tooltip-clustering-ip")),
-					array($this->loc->s("dhcp-type")." (*)","", array(
+					array(_("dhcp-type")." (*)","", array(
 						"type" => "raw", "rawlabel" => true,
 						"value" => $selForm)),
 					array("dhcpd-path","dhcpdpath",
@@ -865,8 +865,8 @@
 			if (!FS::$sessMgr->hasRight("servermgmt")) {
 				return FS::$iMgr->printNoRight("show server list");
 			}
-			$output = "<table><tr><th>".$this->loc->s("Server")."</th><th>".$this->loc->s("server-alias")."</th><th>".$this->loc->s("server-desc")."</th><th>".$this->loc->s("os-name").
-				"</th><th>".$this->loc->s("dhcp-type")."</th><th>".$this->loc->s("ssh-user")."</th><th>".$this->loc->s("member-of")."<th></th></tr>";
+			$output = "<table><tr><th>"._("Server")."</th><th>"._("server-alias")."</th><th>"._("server-desc")."</th><th>"._("os-name").
+				"</th><th>"._("dhcp-type")."</th><th>"._("ssh-user")."</th><th>"._("member-of")."<th></th></tr>";
 
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias,description,sshuser,dhcpdpath,leasespath,reservconfpath,subnetconfpath,osname,dhcptype");
 			while ($data = FS::$dbMgr->Fetch($query)) {
@@ -875,7 +875,7 @@
 
 				switch($data["dhcptype"]) {
 					case 1:	$output .= "ISC-DHCP"; break;
-					default: $output .= $this->loc->s("unknown"); break;
+					default: $output .= _("unknown"); break;
 				}
 				$output .= "</td><td>".$data["sshuser"]."</td><td>";
 
@@ -889,7 +889,7 @@
 					$output .= $data2["clustername"];
 				}
 
-				if (!$found) $output .= $this->loc->s("None");
+				if (!$found) $output .= _("None");
 
 				$output .= "</td><td>".FS::$iMgr->removeIcon(6,"addr=".$data["addr"],array("js" => true,
 					"confirmtext" => "confirm-remove-dhcp",
@@ -914,7 +914,7 @@
 
 			if ($dhcpcount > 0) {
 				// To add DHCP cluster
-				$output .= FS::$iMgr->opendiv(4,$this->loc->s("add-cluster")).
+				$output .= FS::$iMgr->opendiv(4,_("add-cluster")).
 					"<div id=\"clusterdiv\">";
 
 				// To edit/delete clusters
@@ -929,7 +929,7 @@
 
 			$output .= FS::$iMgr->h2("title-dhcp-server-mgmt");
 			// To add servers
-			$output .= FS::$iMgr->opendiv(5,$this->loc->s("title-add-server"));
+			$output .= FS::$iMgr->opendiv(5,_("title-add-server"));
 
 
 			// To edit/delete servers
@@ -957,7 +957,7 @@
 			}
 			$output = FS::$iMgr->cbkForm("9")."<table>".
 				FS::$iMgr->idxLine("Cluster-name","cname",array("value" => $name,"type" => "idxedit", "edit" => $name != "")).
-				"<tr><td>".$this->loc->s("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers",array("multi" => true));
+				"<tr><td>"._("Cluster-members")."</td><td>".FS::$iMgr->select("clustermembers",array("multi" => true));
 
 			$outputlist2 = "";
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_servers","addr,alias","",array("order" => "addr"));
@@ -967,12 +967,12 @@
 			}
 
 			$output .= "</select></td></tr>".
-				"<tr ".FS::$iMgr->tooltip("tooltip-clustermode")."><td>".$this->loc->s("Cluster-mode")."</td><td>".FS::$iMgr->select("clustermode").
-				FS::$iMgr->selElmt($this->loc->s("None"),		0,	$clustermode == "0").
-				FS::$iMgr->selElmt($this->loc->s("Failover"),		1,	$clustermode == "1").
-				FS::$iMgr->selElmt($this->loc->s("Loadbalancing"),	2,	$clustermode == "2")."</select></td></tr>".
-				"<tr ".FS::$iMgr->tooltip("tooltip-clustermaster")."><td>".$this->loc->s("Cluster-master")."</td><td>".FS::$iMgr->select("clustermaster").
-				FS::$iMgr->selElmt($this->loc->s("None"),"none").$outputlist2."</select></td></tr>".
+				"<tr ".FS::$iMgr->tooltip("tooltip-clustermode")."><td>"._("Cluster-mode")."</td><td>".FS::$iMgr->select("clustermode").
+				FS::$iMgr->selElmt(_("None"),		0,	$clustermode == "0").
+				FS::$iMgr->selElmt(_("Failover"),		1,	$clustermode == "1").
+				FS::$iMgr->selElmt(_("Loadbalancing"),	2,	$clustermode == "2")."</select></td></tr>".
+				"<tr ".FS::$iMgr->tooltip("tooltip-clustermaster")."><td>"._("Cluster-master")."</td><td>".FS::$iMgr->select("clustermaster").
+				FS::$iMgr->selElmt(_("None"),"none").$outputlist2."</select></td></tr>".
 				FS::$iMgr->aeTableSubmit($name == "");
 			return $output;
 		}
@@ -1000,7 +1000,7 @@
 		}
 
 		private function showTableHeadCluster() {
-			return "<table id=\"clustertable\"><thead id=\"clusterth\"><tr><th>".$this->loc->s("Cluster-name")."</th><th>".$this->loc->s("Cluster-members")."</th><th></th></tr></thead>";
+			return "<table id=\"clustertable\"><thead id=\"clusterth\"><tr><th>"._("Cluster-name")."</th><th>"._("Cluster-members")."</th><th></th></tr></thead>";
 		}
 
 		private function showDHCPClusterTableEntry($clustername,$members) {
@@ -1074,7 +1074,7 @@
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_option_group","optgroup","",array("order" => "optgroup", "group" => "optgroup"));
 			while ($data = FS::$dbMgr->Fetch($query)) {
 				if (!$found) {
-					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>".$this->loc->s("option-group")."</td><td>".
+					$output .= "<tr ".FS::$iMgr->tooltip("tooltip-dhcp-option-group")."><td>"._("option-group")."</td><td>".
 						FS::$iMgr->select("ipopts",array("multi" => true));
 					$found = true;
 				}
@@ -1094,7 +1094,7 @@
 				!FS::$sessMgr->hasRight($subnetu."_history")) {
 				return FS::$iMgr->printNoRight("show IP history");
 			}
-			$output = FS::$iMgr->h3($this->loc->s("title-history-since")." ".$interval." ".$this->loc->s("days"),true);
+			$output = FS::$iMgr->h3(_("title-history-since")." ".$interval." "._("days"),true);
 			$results = array();
 			$query = FS::$dbMgr->Select(PGDbConfig::getDbPrefix()."dhcp_subnet_history","ipfree,ipactive,ipreserved,ipdistributed,collecteddate",
 				"collecteddate > (NOW()- '".$interval." day'::interval) and subnet = '".$filter."'",
@@ -1175,15 +1175,15 @@
                                        yAxis: { title: { text: 'Nombre d\'adresses' } },
                                        legend: { layout: 'vertical', align: 'right', verticalAlign: 'top',
                                        	x: -10, y: 100 },
-                                       series: [ { name: '".FS::$secMgr->cleanForJS($this->loc->s("Usable"))."',
+                                       series: [ { name: '".FS::$secMgr->cleanForJS(_("Usable"))."',
 					data: [".$total."], color: 'green' },
-					{ name: '".FS::$secMgr->cleanForJS($this->loc->s("not-usable"))."',
+					{ name: '".FS::$secMgr->cleanForJS(_("not-usable"))."',
                                                data: [".$free."], color: 'black' },";
-				if ($bauxshow) $js .= "{ name: '".FS::$secMgr->cleanForJS($this->loc->s("Baux"))."',
+				if ($bauxshow) $js .= "{ name: '".FS::$secMgr->cleanForJS(_("Baux"))."',
 					data: [".$baux."], color: 'red' },";
-				if ($reservshow) $js .= "{ name: '".FS::$secMgr->cleanForJS($this->loc->s("Reservations"))."',
+				if ($reservshow) $js .= "{ name: '".FS::$secMgr->cleanForJS(_("Reservations"))."',
 					data: [".$reserv."], color: 'yellow' },";
-				if ($availshow) $js .= "{ name: '".FS::$secMgr->cleanForJS($this->loc->s("Available-s"))."',
+				if ($availshow) $js .= "{ name: '".FS::$secMgr->cleanForJS(_("Available-s"))."',
 					data: [".$avail."], color: 'cyan' }";
 			$js .= "]});},300);";
 			FS::$iMgr->js($js);
@@ -1292,14 +1292,14 @@
 				case 2:
 					$netid = FS::$secMgr->checkAndSecuriseGetData("netid");
 					if (!$netid) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return $this->showDHCPSubnetForm($netid);
 				case 3:
 					$addr = FS::$secMgr->checkAndSecuriseGetData("addr");
 					if (!$addr) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return $this->showDHCPSrvForm($addr);
@@ -1308,14 +1308,14 @@
 				case 6:
 					$name = FS::$secMgr->checkAndSecuriseGetData("name");
 					if (!$name) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return $this->showDHCPClusterForm($name);
 				case 7:
 					$ip = FS::$secMgr->checkAndSecuriseGetData("ip");
 					if (!$ip || !FS::$secMgr->isIP($ip)) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 
 					return $this->showIPForm($ip);
@@ -1323,33 +1323,33 @@
 				case 9:
 					$optname = FS::$secMgr->checkAndSecuriseGetData("optname");
 					if (!$optname) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->showDHCPCustomOptsForm($optname);
 				case 10: return $this->showDHCPOptsForm();
 				case 11:
 					$optalias = FS::$secMgr->checkAndSecuriseGetData("optalias");
 					if (!$optalias) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->showDHCPOptsForm($optalias);
 				case 12: return $this->showDHCPOptsGroupForm();
 				case 13:
 					$optgroup = FS::$secMgr->checkAndSecuriseGetData("optgroup");
 					if (!$optgroup) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->showDHCPOptsGroupForm($optgroup);
 				case 14:
 					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
 					if (!$subnet) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->showDHCPRangeForm($subnet);
 				case 15:
 					$subnet = FS::$secMgr->checkAndSecuriseGetData("subnet");
 					if (!$subnet) {
-						return $this->loc->s("err-bad-datas");
+						return _("err-bad-datas");
 					}
 					return $this->showDHCPImportReservForm($subnet);
 				default: return;
@@ -1397,7 +1397,7 @@
 						if ($ltime) {
 							if (strtotime($ltime) < strtotime("-".$interval." day",strtotime(date("y-m-d H:i:s")))) {
 								$obsoletes[$data["ip"]] = $data["ip"]." - ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("search")."&s=".$data["macaddr"], $data["macaddr"]);
-								$obsoletes[$data["ip"]] .= " (".$this->loc->s("last-view")." ".date("d/m/y H:i",strtotime($ltime)).")";
+								$obsoletes[$data["ip"]] .= " ("._("last-view")." ".date("d/m/y H:i",strtotime($ltime)).")";
 								$obsoletes[$data["ip"]] .= "<br />";
 								if (!$found) $found = true;
 							}
@@ -1415,7 +1415,7 @@
 						$this->log(0,"User find obsolete datas");
 					}
 					else {
-						FS::$iMgr->ajaxEchoOK("Done","$('#obsres').html('".FS::$secMgr->cleanForJS(FS::$iMgr->printDebug($this->loc->s("no-old-record")))."');");
+						FS::$iMgr->ajaxEchoOK("Done","$('#obsres').html('".FS::$secMgr->cleanForJS(FS::$iMgr->printDebug(_("no-old-record")))."');");
 					}
 
 					return;
@@ -1657,8 +1657,8 @@
 
 					if ($clustername = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."dhcp_cluster_options","clustername","master = '".$addr."'")) {
 						$this->log(1,"Delete DHCP server: DHCP server is master of cluster '".$clustername."', cannot remove it");
-						FS::$iMgr->ajaxEchoError($this->loc->s("err-remove-dhcpserver-master").$clustername.
-							$this->loc->s("err-remove-dhcpserver-master2"),"",true);
+						FS::$iMgr->ajaxEchoError(_("err-remove-dhcpserver-master").$clustername.
+							_("err-remove-dhcpserver-master2"),"",true);
 						return;
 					}
 
@@ -2073,19 +2073,19 @@
 
 					if ($mac && !FS::$secMgr->isMacAddr($mac)) {
 						$this->log(2,sprintf("Edit IP informations: bad mac '%s' given",$mac));
-						FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-bad-mac-addr"),$mac),"",true);
+						FS::$iMgr->ajaxEchoErrorNC(sprintf(_("err-bad-mac-addr"),$mac),"",true);
 						return;
 					}
 
 					if ($hostname && !FS::$secMgr->isHostname($hostname)) {
 						$this->log(2,sprintf("Edit IP informations: bad hostname '%s' given",$hostname));
-						FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-bad-hostname"),$hostname),"",true);
+						FS::$iMgr->ajaxEchoErrorNC(sprintf(_("err-bad-hostname"),$hostname),"",true);
 						return;
 					}
 
 					if ($comment && strlen($comment) > 500) {
 						$this->log(2,sprintf("Edit IP informations: comment length too long",$comment));
-						FS::$iMgr->ajaxEchoErrorNC(sprintf($this->loc->s("err-comment-too-long"),$comment),"",true);
+						FS::$iMgr->ajaxEchoErrorNC(sprintf(_("err-comment-too-long"),$comment),"",true);
 						return;
 					}
 
@@ -2751,7 +2751,7 @@
 					if ($subnetObj = $ipObj->importIPFromCache()) {
 						$this->calculateRanges($subnet,$subnetObj);
 						$rstateId = "sb".FS::$iMgr->formatHTMLId($ipObj->getIP())."rsttd";
-						FS::$iMgr->js("$('#".$rstateId."').html('".FS::$secMgr->cleanForJS($this->loc->s("Reserved-by-ipmanager"))."');");
+						FS::$iMgr->js("$('#".$rstateId."').html('".FS::$secMgr->cleanForJS(_("Reserved-by-ipmanager"))."');");
 						FS::$iMgr->ajaxEchoOK("Done");
 					}
 					return;

@@ -21,13 +21,13 @@
 		function __construct($locales) { parent::__construct($locales); }
 
 		public function showMgmtInterface($activerules = array()) {
-			$output = FS::$iMgr->ruleLines($this->loc->s("menu-title"),$activerules,array(
-				array($this->loc->s("rule-read-datas"),			"mrule_switches_read"),
-				array($this->loc->s("rule-write-datas"),		"mrule_switches_write"),
-				array($this->loc->s("rule-discover-device"),		"mrule_switches_discover"),
-				array($this->loc->s("rule-save-devices"),		"mrule_switches_globalsave"),
-				array($this->loc->s("rule-export-cfg"),			"mrule_switches_globalbackup"),
-				array($this->loc->s("rule-import-plugs"),			"mrule_switches_import_plugs"),
+			$output = FS::$iMgr->ruleLines(_("menu-title"),$activerules,array(
+				array(_("rule-read-datas"),			"mrule_switches_read"),
+				array(_("rule-write-datas"),		"mrule_switches_write"),
+				array(_("rule-discover-device"),		"mrule_switches_discover"),
+				array(_("rule-save-devices"),		"mrule_switches_globalsave"),
+				array(_("rule-export-cfg"),			"mrule_switches_globalbackup"),
+				array(_("rule-import-plugs"),			"mrule_switches_import_plugs"),
 			));
 			return $output;
 		}

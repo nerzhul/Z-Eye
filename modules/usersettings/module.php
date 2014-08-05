@@ -28,7 +28,7 @@
 			$this->rulesclass = new rUserSettings($this->loc);
 			
 			$this->menu = "";
-			$this->menutitle = $this->loc->s("Settings");
+			$this->menutitle = _("Settings");
 		}
 		
 		public function Load() {
@@ -47,14 +47,14 @@
 			
 			$langSelect = sprintf("%s%s%s%s</select>",
 				FS::$iMgr->select("lang"),
-				FS::$iMgr->selElmt($this->loc->s("Default"),"none",($lang != "en" && $lang != "fr")),
-				FS::$iMgr->selElmt($this->loc->s("English"),"en",($lang == "en")),
-				FS::$iMgr->selElmt($this->loc->s("French"),"fr",($lang == "fr"))
+				FS::$iMgr->selElmt(_("Default"),"none",($lang != "en" && $lang != "fr")),
+				FS::$iMgr->selElmt(_("English"),"en",($lang == "en")),
+				FS::$iMgr->selElmt(_("French"),"fr",($lang == "fr"))
 			);
 			
 			$inactSelect = sprintf("%s%s%s%s%s%s%s%s%s</select>",
 				FS::$iMgr->select("intim"),
-				FS::$iMgr->selElmt($this->loc->s("Default"),"0",true),
+				FS::$iMgr->selElmt(_("Default"),"0",true),
 				FS::$iMgr->selElmt(FSTimeMgr::genStr(60),"1",($inactivityTimer == 1)),
 				FS::$iMgr->selElmt(FSTimeMgr::genStr(120),"2",($inactivityTimer == 2)),
 				FS::$iMgr->selElmt(FSTimeMgr::genStr(300),"5",($inactivityTimer == 5)),

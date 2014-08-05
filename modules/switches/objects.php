@@ -116,8 +116,8 @@
 					}
 
 					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).")<br />".
-						"<b><i>".$this->loc->s("Model").":</i></b> ".$data["model"]."<br />".
-						"<b><i>".$this->loc->s("Description").": </i></b>".
+						"<b><i>"._("Model").":</i></b> ".$data["model"]."<br />".
+						"<b><i>"._("Description").": </i></b>".
 						preg_replace("#\\n#","<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$data["description"]).
 						FS::$iMgr->hr();
 
@@ -162,16 +162,16 @@
 			if (FS::$sessMgr->hasRight("discover")) {
 				$showtitle = false;
 				$output .= FS::$iMgr->h2("title-global-fct").
-					FS::$iMgr->opendiv(1,$this->loc->s("Discover-device"),array("line" => true));
+					FS::$iMgr->opendiv(1,_("Discover-device"),array("line" => true));
 			}
 
 			$outputswitch = "<table id=\"dev\"><thead><tr><th class=\"headerSortDown\">".
-				$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
-				"</th><th>".$this->loc->s("MAC-addr")."</th><th>".
-				$this->loc->s("Model")."</th><th>".$this->loc->s("OS")."</th><th>".
-				$this->loc->s("Building")."</th><th>".$this->loc->s("Room")."</th><th>".
-				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb").
-				"</th><th>".$this->loc->s("State")."</th>";
+				_("Name")."</th><th>"._("IP-addr").
+				"</th><th>"._("MAC-addr")."</th><th>".
+				_("Model")."</th><th>"._("OS")."</th><th>".
+				_("Building")."</th><th>"._("Room")."</th><th>".
+				_("Place")." (SNMP)</th><th>"._("Serialnb").
+				"</th><th>"._("State")."</th>";
 
 			if (FS::$sessMgr->hasRight("rmswitch")) {
 				$outputswitch .= "<th></th>";
@@ -181,11 +181,11 @@
 
 			$outputwifi = FS::$iMgr->h2("title-WiFi-AP").
 				"<table id=\"dev2\"><thead><tr><th class=\"headerSortDown\">".
-				$this->loc->s("Name")."</th><th>".$this->loc->s("IP-addr").
-				"</th><th>".$this->loc->s("Model")."</th><th>".
-				$this->loc->s("OS")."</th><th>".$this->loc->s("Building")."</th><th>".
-				$this->loc->s("Room")."</th><th>".
-				$this->loc->s("Place")." (SNMP)</th><th>".$this->loc->s("Serialnb")."</th>";
+				_("Name")."</th><th>"._("IP-addr").
+				"</th><th>"._("Model")."</th><th>".
+				_("OS")."</th><th>"._("Building")."</th><th>".
+				_("Room")."</th><th>".
+				_("Place")." (SNMP)</th><th>"._("Serialnb")."</th>";
 
 			if (FS::$sessMgr->hasRight("rmswitch")) {
 				$outputwifi .= "<th></th>";
@@ -219,7 +219,7 @@
 						$outputwifi .= "<div id=\"devbding_".$convname."\">".
 							"<a onclick=\"javascript:modifyBuilding('#devbding_".$convname." a',false);\">".
 							"<div id=\"devbding_".$convname."l\" class=\"modbuilding\">".
-							($building == "" ? $this->loc->s("Modify") : $building).
+							($building == "" ? _("Modify") : $building).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("devbding-".$convname,$building,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyBuilding('#devbding_".$convname.
@@ -238,7 +238,7 @@
 						$outputwifi .= "<div id=\"devroom_".$convname."\">".
 							"<a onclick=\"javascript:modifyRoom('#devroom_".$convname." a',false);\">".
 							"<div id=\"devroom_".$convname."l\" class=\"modroom\">".
-							($room == "" ? $this->loc->s("Modify") : $room).
+							($room == "" ? _("Modify") : $room).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("devroom-".$convname,$room,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#devroom_".$convname.
@@ -273,7 +273,7 @@
 						$outputswitch .= "<div id=\"devbding_".$convname."\">".
 							"<a onclick=\"javascript:modifyBuilding('#devbding_".$convname." a',false);\">".
 							"<div id=\"devbding_".$convname."l\" class=\"modbuilding\">".
-							($building == "" ? $this->loc->s("Modify") : $building).
+							($building == "" ? _("Modify") : $building).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("devbding-".$convname,$building,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyBuilding('#devbding_".$convname.
@@ -292,7 +292,7 @@
 						$outputswitch .= "<div id=\"devroom_".$convname."\">".
 							"<a onclick=\"javascript:modifyRoom('#devroom_".$convname." a',false);\">".
 							"<div id=\"devroom_".$convname."l\" class=\"modroom\">".
-							($room == "" ? $this->loc->s("Modify") : $room).
+							($room == "" ? _("Modify") : $room).
 							"</div></a><a style=\"display: none;\">".
 							FS::$iMgr->input("devroom-".$convname,$room,10,10).
 							FS::$iMgr->button("Save","OK","javascript:modifyRoom('#devroom_".$convname.
@@ -328,7 +328,7 @@
 				if (FS::$sessMgr->hasRight("globalsave") || FS::$sessMgr->hasRight("globalbackup")) {
 					if ($showtitle) $output .= FS::$iMgr->h2("title-global-fct");
 					// Openable divs
-					$output .= FS::$iMgr->opendiv(2,$this->loc->s("Advanced-Functions"));
+					$output .= FS::$iMgr->opendiv(2,_("Advanced-Functions"));
 				}
 				$output .= FS::$iMgr->h2("title-router-switch");
 
@@ -554,7 +554,7 @@
 
 				// Entry has 4 fields
 				if (count($entry) != 4) {
-					FS::$iMgr->ajaxEchoError(sprintf($this->loc->s("err-invalid-csv-entry"),$entry),"",true);
+					FS::$iMgr->ajaxEchoError(sprintf(_("err-invalid-csv-entry"),$entry),"",true);
 					return;
 				}
 
@@ -577,18 +577,18 @@
 			foreach ($plugAndRooms as $device => $ports) {
 				$deviceIP = FS::$dbMgr->GetOneData("device","ip","name = '".$device."'");
 				if (!$deviceIP) {
-					FS::$iMgr->ajaxEchoError($this->loc->s("err-invalid-csv-device").$device,"",true);
+					FS::$iMgr->ajaxEchoError(_("err-invalid-csv-device").$device,"",true);
 					return;
 				}
 				foreach($ports as $port => $values) {
 					if (!FS::$dbMgr->GetOneData($this->sqlTable,"name","ip = '".$deviceIP."' AND port = '".$port."'")) {
-						FS::$iMgr->ajaxEchoError($this->loc->s("err-invalid-csv-port").$device."/".$port."'","",true);
+						FS::$iMgr->ajaxEchoError(_("err-invalid-csv-port").$device."/".$port."'","",true);
 						return;
 					}
 
 					if ($repl != "on" && FS::$dbMgr->GetOneData($this->sqlPlugRoomTable,"ip",
 						"ip = '".$deviceIP."' AND port = '".$port."' AND (prise != '' OR room != '')")) {
-						FS::$iMgr->ajaxEchoError($this->loc->s("err-csv-replace-data").$device."/".$port."'","",true);
+						FS::$iMgr->ajaxEchoError(_("err-csv-replace-data").$device."/".$port."'","",true);
 						return;
 					}
 
@@ -648,7 +648,7 @@
 							$output .= FS::$iMgr->hr();
 						}
 
-						$output .= $this->loc->s("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+						$output .= _("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 							"&d=".$device, $device)."<ul>";
 						foreach ($devport as $port => $portdata) {
 							$convport = preg_replace("#\/#","-",$port);
@@ -656,10 +656,10 @@
 								"&d=".$device."#".$convport, $port)." ".
 								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 								"&d=".$device."&p=".$port, FS::$iMgr->img("styles/images/pencil.gif",12,12))." ".
-								"<br /><b>".$this->loc->s("Description").":</b> ".$portdata[0];
+								"<br /><b>"._("Description").":</b> ".$portdata[0];
 
 							if ($portdata[1]) {
-								$output .= "<br /><b>".$this->loc->s("Plug").":</b> ".$portdata[1];
+								$output .= "<br /><b>"._("Plug").":</b> ".$portdata[1];
 							}
 							$output .= "</li>";
 
@@ -763,9 +763,9 @@
 				while ($data = FS::$dbMgr->Fetch($query)) {
 					if ($found == false) {
 						$found = true;
-						$output = "<table class=\"standardTable\"><tr><th>".$this->loc->s("Node")."</th><th>".
-							$this->loc->s("Name")."</th><th>".$this->loc->s("User")."</th><th>".$this->loc->s("First-view")."</th><th>".
-							$this->loc->s("Last-view")."</th><th>".$this->loc->s("Active?")."</th></tr>";
+						$output = "<table class=\"standardTable\"><tr><th>"._("Node")."</th><th>".
+							_("Name")."</th><th>"._("User")."</th><th>"._("First-view")."</th><th>".
+							_("Last-view")."</th><th>"._("Active?")."</th></tr>";
 					}
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
@@ -776,7 +776,7 @@
 						FS::$iMgr->aLink($this->mid."&s=".$data["ip"], $data["ip"]).
 						"</td><td>".$fst[0]."</td><td>".$lst[0]."</td><td>";
 
-					$output = sprintf("%s%s</td></tr>",$output,($data["active"] == 't' ? $this->loc->s("Yes") : $this->loc->s("No")));
+					$output = sprintf("%s%s</td></tr>",$output,($data["active"] == 't' ? _("Yes") : _("No")));
 					FS::$searchMgr->incResultCount();
 				}
 
@@ -800,14 +800,14 @@
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 
-					$output .= $this->loc->s("netbios-machine").": \\\\".FS::$iMgr->aLink($this->mid.
+					$output .= _("netbios-machine").": \\\\".FS::$iMgr->aLink($this->mid.
 						"&s=".$data["domain"], $data["domain"]).
 						"\\".FS::$iMgr->aLink($this->mid."&s=".$data["nbname"], $data["nbname"])."<br />".
-						$this->loc->s("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
+						_("netbios-user").": ".($data["nbuser"] != "" ? $data["nbuser"] : "[UNK]")."@".$search."<br />";
 
 					$output = sprintf("%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s %s)",
-						$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
-						$data["active"] == 't' ? "<b>".$this->loc->s("Active")."</b>" : ""
+						$output, _("Between"),$fst[0],_("and-the"),$lst[0],
+						$data["active"] == 't' ? "<b>"._("Active")."</b>" : ""
 					);
 
 					FS::$searchMgr->incResultCount();
@@ -836,8 +836,8 @@
 					$fst = preg_split("#\.#",$data["time_first"]);
 					$lst = preg_split("#\.#",$data["time_last"]);
 					$output .= FS::$iMgr->aLink($this->mid."&s=".$data["mac"], $data["mac"]).
-						"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$this->loc->s("Between")." ".$fst[0].
-						" ".$this->loc->s("and-the")." ".$lst[0].")";
+						"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("._("Between")." ".$fst[0].
+						" "._("and-the")." ".$lst[0].")";
 					FS::$searchMgr->incResultCount();
 				}
 
@@ -865,12 +865,12 @@
 							$data["port"], FS::$iMgr->img("styles/images/pencil.gif",10,10));
 
 						if ($piece) {
-							$output .= "/ ".$this->loc->s("Plug")." ".$piece;
+							$output .= "/ "._("Plug")." ".$piece;
 						}
 
 						$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s%s)<br />",
-							$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
-							$data["active"] == 't' ? " <b>".$this->loc->s("Active")."</b>" : ""
+							$output, _("Between"),$fst[0],_("and-the"),$lst[0],
+							$data["active"] == 't' ? " <b>"._("Active")."</b>" : ""
 						);
 
 						FS::$searchMgr->incResultCount();
@@ -903,8 +903,8 @@
 					$lst = preg_split("#\.#",$data["time_last"]);
 
 					$output = sprintf("%s<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%s %s %s %s%s)<br />",
-						$output, $this->loc->s("Between"),$fst[0],$this->loc->s("and-the"),$lst[0],
-						$data["active"] == 't' ? " <b>".$this->loc->s("Active")."</b>" : ""
+						$output, _("Between"),$fst[0],_("and-the"),$lst[0],
+						$data["active"] == 't' ? " <b>"._("Active")."</b>" : ""
 					);
 
 					FS::$searchMgr->incResultCount();
@@ -962,7 +962,7 @@
 				}
 				if ($found) {
 					foreach ($devprise as $device => $devport) {
-						$output .= $this->loc->s("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+						$output .= _("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 							"&d=".$device, $device)."<ul>";
 						foreach ($devport as $port => $values) {
 							$convport = preg_replace("#\/#","-",$port);
@@ -970,9 +970,9 @@
 								"&d=".$device."#".$convport, $port)." ".
 								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 								"&d=".$device."&p=".$port, FS::$iMgr->img("styles/images/pencil.gif",12,12))." ".
-								"<br /><b>".$this->loc->s("Plug").":</b> ".$values["plug"];
+								"<br /><b>"._("Plug").":</b> ".$values["plug"];
 							if ($values["desc"]) {
-								$output .= "<br /><b>".$this->loc->s("Description").":</b> ".$values["desc"];
+								$output .= "<br /><b>"._("Description").":</b> ".$values["desc"];
 							}
 							$output .= "</li>";
 						}
@@ -1032,7 +1032,7 @@
 				}
 				if ($found) {
 					foreach ($devroom as $device => $devport) {
-						$output .= $this->loc->s("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+						$output .= _("Device").": ".FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 							"&d=".$device, $device)."<ul>";
 						foreach ($devport as $port => $values) {
 							$convport = preg_replace("#\/#","-",$port);
@@ -1040,9 +1040,9 @@
 								"&d=".$device."#".$convport, $port)." ".
 								FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
 								"&d=".$device."&p=".$port, FS::$iMgr->img("styles/images/pencil.gif",12,12))." ".
-								"<br /><b>".$this->loc->s("Room").":</b> ".$values["room"];
+								"<br /><b>"._("Room").":</b> ".$values["room"];
 							if ($values["desc"]) {
-								$output .= "<br /><b>".$this->loc->s("Description").":</b> ".$values["desc"];
+								$output .= "<br /><b>"._("Description").":</b> ".$values["desc"];
 							}
 							$output .= "</li>";
 						}
@@ -1095,7 +1095,7 @@
 			// Return text for AJAX call
 			$this->log(0,"Set room for device '".$this->deviceIP."' to '".$room."' on port '".$this->devicePort."'");
 			if ($room == "") {
-				$room = $this->loc->s("Modify");
+				$room = _("Modify");
 			}
 			FS::$iMgr->ajaxEcho($room,"",true);
 		}

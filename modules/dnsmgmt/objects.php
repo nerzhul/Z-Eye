@@ -47,7 +47,7 @@
 		}
 
 		public function renderAll() {
-			$output = FS::$iMgr->opendiv(9,$this->loc->s("add-zone"),array("line" => true));
+			$output = FS::$iMgr->opendiv(9,_("add-zone"),array("line" => true));
 			$output .= $this->tMgr->render();
 			return $output;
 		}
@@ -62,9 +62,9 @@
 			}
 
 			$ztsel = FS::$iMgr->select("zonetype"/*JS*/).
-				FS::$iMgr->selElmt($this->loc->s("Classic"),"1",$this->zonetype == 1).
-				FS::$iMgr->selElmt($this->loc->s("Slave-only"),"2",$this->zonetype == 2).
-				FS::$iMgr->selElmt($this->loc->s("Forward-only"),"3",$this->zonetype == 3).
+				FS::$iMgr->selElmt(_("Classic"),"1",$this->zonetype == 1).
+				FS::$iMgr->selElmt(_("Slave-only"),"2",$this->zonetype == 2).
+				FS::$iMgr->selElmt(_("Forward-only"),"3",$this->zonetype == 3).
 				"</select>";
 
 			// Generate textarea output for forwarders
@@ -155,17 +155,17 @@
 						$output .= FS::$iMgr->hr();
 					}
 					
-					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"]."<br /><b>".
-						$this->loc->s("Zone-type")."</b>: ";
+					$output .= $data[$this->sqlAttrId]."<br /><b>"._("Description")."</b>: ".$data["description"]."<br /><b>".
+						_("Zone-type")."</b>: ";
 					switch ($data["zonetype"]) {
 						case 1:
-							$output .= $this->loc->s("Classic");
+							$output .= _("Classic");
 							break;
 						case 2:
-							$output .= $this->loc->s("Slave-only");
+							$output .= _("Slave-only");
 							break;
 						case 3:
-							$output .= $this->loc->s("Forward-only");
+							$output .= _("Forward-only");
 							break;
 					}
 					FS::$searchMgr->incResultCount();
@@ -507,7 +507,7 @@
 		}
 
 		public function renderAll() {
-			$output = FS::$iMgr->opendiv(5,$this->loc->s("add-acl"),array("line" => true));
+			$output = FS::$iMgr->opendiv(5,_("add-acl"),array("line" => true));
 			$output .= $this->tMgr->render();
 			return $output;
 		}
@@ -610,15 +610,15 @@
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
+				$output .= FS::$iMgr->selElmt(_("None"),"none",
 					in_array("none",$selected));
 			}
 			if ($herited) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("Herited"),"herited",
+				$output .= FS::$iMgr->selElmt(_("Herited"),"herited",
 					in_array("herited",$selected));
 			}
 			if ($any) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("Any"),"any",
+				$output .= FS::$iMgr->selElmt(_("Any"),"any",
 					in_array("any",$selected));
 			}
 
@@ -658,7 +658,7 @@
 						$output .= FS::$iMgr->hr();
 					}
 					
-					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"];
+					$output .= $data[$this->sqlAttrId]."<br /><b>"._("Description")."</b>: ".$data["description"];
 					FS::$searchMgr->incResultCount();
 				}
 				
@@ -973,7 +973,7 @@
 		}
 
 		public function renderAll() {
-			$output = FS::$iMgr->opendiv(7,$this->loc->s("add-cluster"),array("line" => true));
+			$output = FS::$iMgr->opendiv(7,_("add-cluster"),array("line" => true));
 			$output .= $this->tMgr->render();
 			return $output;
 		}
@@ -1042,7 +1042,7 @@
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
+				$output .= FS::$iMgr->selElmt(_("None"),"none",
 					in_array("none",$selected));
 			}
 
@@ -1082,7 +1082,7 @@
 						$output .= FS::$iMgr->hr();
 					}
 					
-					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("Description")."</b>: ".$data["description"];
+					$output .= $data[$this->sqlAttrId]."<br /><b>"._("Description")."</b>: ".$data["description"];
 					FS::$searchMgr->incResultCount();
 				}
 				
@@ -1526,7 +1526,7 @@
 		}
 
 		public function renderAll() {
-			$output = FS::$iMgr->opendiv(1,$this->loc->s("add-server"),array("line" => true));
+			$output = FS::$iMgr->opendiv(1,_("add-server"),array("line" => true));
 			$output .= $this->tMgr->render();
 			return $output;
 		}
@@ -1591,7 +1591,7 @@
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
+				$output .= FS::$iMgr->selElmt(_("None"),"none",
 					in_array("none",$selected));
 			}
 
@@ -1631,7 +1631,7 @@
 						$output .= FS::$iMgr->hr();
 					}
 					
-					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("machine-FQDN")."</b>: ".$data["nsfqdn"];
+					$output .= $data[$this->sqlAttrId]."<br /><b>"._("machine-FQDN")."</b>: ".$data["nsfqdn"];
 					FS::$searchMgr->incResultCount();
 				}
 				
@@ -1874,7 +1874,7 @@
 			$output = FS::$iMgr->select($options["name"],array("multi" => $multi));
 
 			if ($none) {
-				$output .= FS::$iMgr->selElmt($this->loc->s("None"),"none",
+				$output .= FS::$iMgr->selElmt(_("None"),"none",
 					in_array("none",$selected));
 			}
 
@@ -1915,8 +1915,8 @@
 						$output .= FS::$iMgr->hr();
 					}
 					
-					$output .= $data[$this->sqlAttrId]."<br /><b>".$this->loc->s("key-id")."</b>: ".$data["keyid"].
-						"<br /><b>".$this->loc->s("algorithm")."</b>: ".$data["keyalgo"];
+					$output .= $data[$this->sqlAttrId]."<br /><b>"._("key-id")."</b>: ".$data["keyid"].
+						"<br /><b>"._("algorithm")."</b>: ".$data["keyalgo"];
 					FS::$searchMgr->incResultCount();
 				}
 				
@@ -1951,7 +1951,7 @@
 		}
 
 		public function renderAll() {
-			$output = FS::$iMgr->opendiv(3,$this->loc->s("define-tsig-key"),array("line" => true));
+			$output = FS::$iMgr->opendiv(3,_("define-tsig-key"),array("line" => true));
 			$output .= $this->tMgr->render();
 			return $output;
 		}
@@ -2197,10 +2197,10 @@
 							$output .= FS::$iMgr->h3($data["server"],true);
 						}
 						switch($data["rectype"]) {
-							case "A": $output .= $this->loc->s("ipv4-addr").": "; break;
-							case "AAAA": $output .= $this->loc->s("ipv6-addr").": "; break;
-							case "CNAME": $output .= $this->loc->s("Alias").": "; break;
-							default: $output .= $this->loc->s("Other")." (".$data["rectype"]."): "; break;
+							case "A": $output .= _("ipv4-addr").": "; break;
+							case "AAAA": $output .= _("ipv6-addr").": "; break;
+							case "CNAME": $output .= _("Alias").": "; break;
+							default: $output .= _("Other")." (".$data["rectype"]."): "; break;
 						}
 						if (FS::$secMgr->isIP($data["recval"])) {
 							$output .= FS::$iMgr->aLink($this->mid."&s=".$data["recval"], $data["recval"]);

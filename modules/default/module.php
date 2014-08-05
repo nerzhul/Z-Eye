@@ -29,8 +29,8 @@
 			$this->loc = new FSLocales();
 			$this->rulesclass = new rDefault($this->loc);
 			
-			$this->menu = $this->loc->s("Supervision");
-			$this->menutitle = $this->loc->s("Speed reporting");
+			$this->menu = _("Supervision");
+			$this->menutitle = _("Speed reporting");
 			
 			$this->icingaAPI = new icingaBroker();
 			$this->BWtotalscore = 0;
@@ -70,7 +70,7 @@
 			}
 			
 			$alerts = array();
-			$alerts["net"] = array("<b>".$this->loc->s("state-net")."</b> ".
+			$alerts["net"] = array("<b>"._("state-net")."</b> ".
 				FS::$iMgr->progress("nhealth",
 					$this->BWscore,$this->BWtotalscore),$netbuffer);
 
@@ -80,7 +80,7 @@
 			
 			$alerts = array();
 			$secbuffer = $this->showSecurityReporting();
-			$alerts["sec"] = array("<b>".$this->loc->s("state-security")."</b> ".
+			$alerts["sec"] = array("<b>"._("state-security")."</b> ".
 				FS::$iMgr->progress("sechealth",
 					$this->SECscore,$this->SECtotalscore),$secbuffer);
 
@@ -107,8 +107,8 @@
 				if (!$found) {
 					$found = 1;
 					$tmpoutput = "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".
-						$this->loc->s("err-net")."</h4><table><tr><th>".$this->loc->s("Link")."</th><th>".
-						$this->loc->s("inc-bw")."</th><th>".$this->loc->s("out-bw")."</th></tr>";
+						_("err-net")."</h4><table><tr><th>"._("Link")."</th><th>".
+						_("inc-bw")."</th><th>"._("out-bw")."</th></tr>";
 				}
 				$total++;
 
@@ -372,10 +372,10 @@
 					if ($menace == 0) {
 						$menace = 1;
 						$output .= "<h4 style=\"font-size:16px; text-decoration: blink; color: red\">".
-							$this->loc->s("err-detect-atk")."</h4>";
+							_("err-detect-atk")."</h4>";
 					}
-					$output .= "<span style=\"font-size:15px;\">".$this->loc->s("ipaddr").": ".long2ip($key).
-						" (Scans ".$value["scan"]." ".$this->loc->s("Attack")." ".$value["atk"].")</span><br />";
+					$output .= "<span style=\"font-size:15px;\">"._("ipaddr").": ".long2ip($key).
+						" (Scans ".$value["scan"]." "._("Attack")." ".$value["atk"].")</span><br />";
 				}
 			}
 			ksort($attacklist);
