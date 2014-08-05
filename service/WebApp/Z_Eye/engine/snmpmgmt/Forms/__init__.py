@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-* Copyright (C) 2010-2014 Loïc BLOT, CNRS <http://www.unix-experience.fr/>
+* Copyright (C) 2010-2014 Loïc BLOT <http://www.unix-experience.fr/>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,7 @@ from InterfaceManager.ModelForms import zModelForm
 
 from django.shortcuts import render
 from django.http import HttpResponse
-
 from django.utils.translation import ugettext_lazy as _
-
 from django.core.exceptions import ObjectDoesNotExist
 
 import engine.snmpmgmt.Models

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-05 10:55+0200\n"
+"POT-Creation-Date: 2014-08-05 16:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: InterfaceManager/__init__.py:31 InterfaceManager/__init__.py:33
-#: InterfaceManager/__init__.py:35 engine/snmpmgmt/Forms/__init__.py:38
+#: InterfaceManager/__init__.py:35 engine/logs/Models/serviceLogs.py:68
+#: engine/snmpmgmt/Forms/__init__.py:36
 msgid "Err-Wrong-Request"
 msgstr "Bad request"
 
@@ -213,7 +214,7 @@ msgstr "Write datas"
 #: InterfaceManager/__init__.py:665 InterfaceManager/__init__.py:780
 #: InterfaceManager/__init__.py:962 InterfaceManager/__init__.py:1382
 #: InterfaceManager/__init__.py:1499 InterfaceManager/__init__.py:1566
-#: InterfaceManager/__init__.py:1653 engine/snmpmgmt/Forms/__init__.py:50
+#: InterfaceManager/__init__.py:1653 engine/snmpmgmt/Forms/__init__.py:48
 msgid "Save"
 msgstr "Save"
 
@@ -800,7 +801,7 @@ msgstr "Master zone's file path"
 
 #: InterfaceManager/__init__.py:228 InterfaceManager/__init__.py:384
 #: InterfaceManager/__init__.py:767 InterfaceManager/__init__.py:1476
-#: InterfaceManager/__init__.py:1640 engine/snmpmgmt/Forms/__init__.py:49
+#: InterfaceManager/__init__.py:1640 engine/snmpmgmt/Forms/__init__.py:47
 msgid "Modification"
 msgstr "Modifying"
 
@@ -2953,10 +2954,11 @@ msgid "Writing"
 msgstr "Writing"
 
 #: InterfaceManager/__init__.py:791 InterfaceManager/__init__.py:1125
+#: templates/engine/logs/serviceLogs.html:5
 msgid "Date"
 msgstr "Date"
 
-#: InterfaceManager/__init__.py:792
+#: InterfaceManager/__init__.py:792 templates/engine/logs/serviceLogs.html:7
 msgid "Entry"
 msgstr "Entry"
 
@@ -2964,7 +2966,7 @@ msgstr "Entry"
 msgid "err-no-logs"
 msgstr "No log found"
 
-#: InterfaceManager/__init__.py:796
+#: InterfaceManager/__init__.py:796 templates/engine/logs/serviceLogs.html:6
 msgid "Level"
 msgstr "Level"
 
@@ -5597,7 +5599,7 @@ msgstr "Network devices (rights & backup)"
 msgid "User management"
 msgstr "User management"
 
-#: engine/snmpmgmt/Forms/__init__.py:40
+#: engine/snmpmgmt/Forms/__init__.py:38
 msgid "Err-Object-Not-Exists"
 msgstr "The requested object doesn't exists"
 

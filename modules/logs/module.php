@@ -130,25 +130,7 @@
 			}
 			else if ($sh == 2) {
 				FS::$iMgr->setURL("sh=2");
-				$output = "<pre>";
-				$fp = fopen("/var/log/z-eye.log","r");
-				fseek($fp,-(sizeof('a')), SEEK_END);
-				$linecount = 30;
-				$fileoutput = "";
-				$line = "";
-				while (ftell($fp) > 0 && $linecount > 0) {
-					$chr = fgetc($fp);
-					if ($chr == "\n") {
-						$fileoutput .= $line."<br />";
-						$line = "";
-						$linecount--;
-					}
-					else
-						$line = $chr.$line;
-					fseek($fp, -(sizeof('a') * 2), SEEK_CUR);
-				}
-				fclose($fp);
-				$output .= $fileoutput."</pre>";
+				return file_get_contents("http://localhost:8080/logs/service_logs");
 			}
 			return $output;
 		}

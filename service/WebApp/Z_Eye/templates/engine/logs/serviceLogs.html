@@ -1,0 +1,24 @@
+{% if logs %}
+<table id="tlogList">
+	<thead>
+		<tr>
+			<th class="headerSortDown">{{ _("Date") }}</th>
+			<th>{{ _("Level") }}</th>
+			<th>{{ _("Entry") }}</th>
+		</tr>
+		{% for log in logs %}
+		{% if log.level == "WARN" %}
+		<tr style="background-color: #FFDD00;">
+		{% elif log.level == "ERROR" %}
+		<tr style="background-color: #EE0000;">
+		{% else %}
+		<tr>
+		{% endif %}
+			<td>{{ log.date }}</td>
+			<td>{{ log.level }}</td>
+			<td>{{ log.entry }}</td>
+		</tr>
+		{% endfor %}
+	</thead>
+</table>
+{% endif %}
