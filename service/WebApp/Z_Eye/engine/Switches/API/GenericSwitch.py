@@ -18,7 +18,6 @@
 """
 
 class GenericSwitch:
-	
 	vendor = ""
 	portId = ""
 	device = ""
@@ -33,9 +32,10 @@ class GenericSwitch:
 		self.deviceIP = ""
 		self.snmp_ro = ""
 		self.snmp_rw = ""
-	
-	#Interface & handler functions, herited and modified by each vendor
-	
+
+	#
+	# Interface & handler functions, herited and modified by each vendor
+	#
 
 	def showStateOpts():
 		return ""

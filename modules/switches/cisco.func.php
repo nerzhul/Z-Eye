@@ -297,11 +297,12 @@
 					$nvlan = $this->getSwitchportAuthFailVLAN();
 					break;
 			}
-			$output .= "</td><td id=\"vln\">";
-			$output .= FS::$iMgr->select("nvlan");
+			$output .= "</td><td id=\"vln\">".
+				FS::$iMgr->select("nvlan");
 			// Added none for VLAN fail
-			if($trmode == 3)
-				$output .= FS::$iMgr->selElmt(_("None"),0,$nvlan == 0 ? true : false);
+			if($trmode == 3) {
+				$output .= FS::$iMgr->selElmt(_("None"),0,$nvlan == 0);
+			}
 
 			$voicevlanoutput = FS::$iMgr->selElmt(_("None"),4096);
 			$voicevlan = $this->getSwitchportVoiceVlan();
@@ -323,42 +324,40 @@
 				if($trunkall && in_array($data["vlan"],$vllist)) $trunkall = false;
 				$vlannb++;
 			}
-			$output .= "</select></td></tr>";
-			$output .= "<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>"._("encap-vlan")."</td><td>";
-			$output .= FS::$iMgr->select("vllist",array("multi" => true, "size" => round($vlannb/4)));
-			$output .= FS::$iMgr->selElmt(_("All"),"all",$trunkall);
-			$output .= $trunkvlanoutput;
-			$output .= "</select>";
-			$output .= "</td></tr>";
+			$output .= "</select></td></tr>".
+				"<tr id=\"vltr\" ".($trmode != 1 ? "style=\"display:none;\"" : "")."><td>"._("encap-vlan")."</td><td>".
+				FS::$iMgr->select("vllist",array("multi" => true, "size" => round($vlannb/4))).
+				FS::$iMgr->selElmt(_("All"),"all",$trunkall).
+				$trunkvlanoutput.
+				"</select></td></tr>";
 			/*
 			* MAB tables
 			*/
 
 			// NoResp Vlan
-			$output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-noresp")."</td><td>";
-			$output .= FS::$iMgr->select("norespvlan",array("tooltip" => "MAB-noresp-tooltip"));
-			$output .= FS::$iMgr->selElmt(_("None"),0,$norespvlan == 0 ? true : false);
-			$output .= $norespvlanoutput;
-			$output .= "</select></td></tr>";
+			$output .= "<tr id=\"mabnoresp\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-noresp")."</td><td>".
+				FS::$iMgr->select("norespvlan",array("tooltip" => "MAB-noresp-tooltip")).
+				FS::$iMgr->selElmt(_("None"),0,$norespvlan == 0 ? true : false).
+				$norespvlanoutput.
+				"</select></td></tr>";
 			// Dead Vlan
-			$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-dead")."</td><td>";
-			$output .= FS::$iMgr->select("deadvlan",array("tooltip" => "MAB-dead-tooltip"));
-			$output .= FS::$iMgr->selElmt(_("None"),0,$deadvlan == 0 ? true : false);
-			$output .= $deadvlanoutput;
-			$output .= "</select></td></tr>";
+			$output .= "<tr id=\"mabdead\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-dead")."</td><td>".
+				FS::$iMgr->select("deadvlan",array("tooltip" => "MAB-dead-tooltip")).
+				FS::$iMgr->selElmt(_("None"),0,$deadvlan == 0 ? true : false).
+				$deadvlanoutput.
+				"</select></td></tr>";
 			// Other options
 			$output .= "<tr id=\"mabtr\" ".($trmode != 3 ? "style=\"display:none;\"" : "")."><td>"._("MAB-opt")."</td><td>";
 			$mabeap = $this->getSwitchportMABType();
 			$dot1xhostmode = $this->getSwitchportAuthHostMode();
-			$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />";
-			$output .= _("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode");
-			$output .= FS::$iMgr->selElmt(_("single-host"),1,$dot1xhostmode == 1 ? true : false);
-			$output .= FS::$iMgr->selElmt(_("multi-host"),2,$dot1xhostmode == 2 ? true : false);
-			$output .= FS::$iMgr->selElmt(_("multi-auth"),3,$dot1xhostmode == 3 ? true : false);
-			$output .= FS::$iMgr->selElmt(_("multi-domain"),4,$dot1xhostmode == 4 ? true : false);
-			$output .= "</select></td></tr>";
-
-			$output .= $this->showVoiceVlanOpts($voicevlanoutput);
+			$output .= FS::$iMgr->check("mabeap",array("check" => ($mabeap == 2 ? true : false)))." EAP<br />".
+				_("Dot1x-hostm")." ".FS::$iMgr->select("dot1xhostmode").
+				FS::$iMgr->selElmt(_("single-host"),1,$dot1xhostmode == 1 ? true : false).
+				FS::$iMgr->selElmt(_("multi-host"),2,$dot1xhostmode == 2 ? true : false).
+				FS::$iMgr->selElmt(_("multi-auth"),3,$dot1xhostmode == 3 ? true : false).
+				FS::$iMgr->selElmt(_("multi-domain"),4,$dot1xhostmode == 4 ? true : false).
+				"</select></td></tr>".
+				$this->showVoiceVlanOpts($voicevlanoutput);
 			return $output;
 		}
 
@@ -790,8 +789,8 @@
 		}
 
 		public function getSwitchAccessVLAN() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.2.2.1.2");
-                }
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.2.2.1.2");
+		}
 
 		public function setSwitchportMABEnable($value) {
 			// 1: enable / 2: disable
@@ -807,8 +806,8 @@
 		public function setSwitchMABType($value) {
 			// 1: normal / 2: EAP
 			if($value != 1 && $value != 2)
-                                return 1;
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
+				return 1;
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
 		}
 
 		public function getSwitchportMABType() {
@@ -817,54 +816,54 @@
 
 		public function setSwitchportAuthFailVLAN($value) {
 			// #todo disable feature
-                        if(!FS::$secMgr->isNumeric($value) || $value > 4096)
-                                return 1;
-                        return $this->setFieldForPortWithPID(($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.1.1.2" : "1.3.6.1.4.1.9.9.656.1.3.1.1.3"),"i",($value == 0 ? 1 : $value));
-                }
+			if(!FS::$secMgr->isNumeric($value) || $value > 4096)
+				return 1;
+			return $this->setFieldForPortWithPID(($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.1.1.2" : "1.3.6.1.4.1.9.9.656.1.3.1.1.3"),"i",($value == 0 ? 1 : $value));
+		}
 
-                public function getSwitchportAuthFailVLAN() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.1.1.3");
-                }
+		public function getSwitchportAuthFailVLAN() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.1.1.3");
+		}
 
 		public function setSwitchportAuthNoRespVLAN($value) {
 			// @todo disable feature
-                        if(!FS::$secMgr->isNumeric($value) || $value > 4096)
-                                return 1;
-                        return $this->setFieldForPortWithPID(($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.2.1.1" : "1.3.6.1.4.1.9.9.656.1.3.2.1.2"),"i",($value == 0 ? 1 : $value));
-                }
+			if(!FS::$secMgr->isNumeric($value) || $value > 4096)
+				return 1;
+			return $this->setFieldForPortWithPID(($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.2.1.1" : "1.3.6.1.4.1.9.9.656.1.3.2.1.2"),"i",($value == 0 ? 1 : $value));
+		}
 
-                public function getSwitchportAuthNoRespVLAN() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.2.1.2");
-                }
+		public function getSwitchportAuthNoRespVLAN() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.2.1.2");
+		}
 
 		public function setSwitchportAuthDeadVLAN($value) {
-                        // @todo disable feature
-                        if(!FS::$secMgr->isNumeric($value) || $value > 4096)
-                                return 1;
-                        return $this->setFieldForPortWithPID(($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
-                }
+				// @todo disable feature
+			if(!FS::$secMgr->isNumeric($value) || $value > 4096)
+				return 1;
+			return $this->setFieldForPortWithPID(($value == 0 ? "1.3.6.1.4.1.9.9.656.1.3.3.1.1" : "1.3.6.1.4.1.9.9.656.1.3.3.1.3"),"i",($value == 0 ? 1 : $value));
+		}
 
-                public function getSwitchportAuthDeadVLAN() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.3.1.3");
-                }
+		public function getSwitchportAuthDeadVLAN() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.3.1.3");
+		}
 
 		// authentication port-control 1,2,3
 		public function setSwitchportControlMode($value) {
 			// 1: unauthorized / 2: auto / 3: authorized / 3: disable feature
-                        if($value != 1 && $value != 2 && $value != 3)
-                                return 1;
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
-                }
+			if($value != 1 && $value != 2 && $value != 3)
+				return 1;
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
+		}
 
-                public function getSwitchportControlMode() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.5");
-                }
+		public function getSwitchportControlMode() {
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.5");
+		}
 
 		// authentication host-mode
 		public function setSwitchportAuthHostMode($value) {
 			// 1: single-host (default) / 2: multi-host / 3: multi-auth / 4: multi-domain
 			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4)
-					return 1;
+				return 1;
 			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
 		}
 
@@ -876,7 +875,7 @@
 			if(!FS::$secMgr->isNumeric($value) || $value > 1005)
 				return -1;
 
-            		return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
+            return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
 		}
 
 		public function getSwitchTrunkNativeVlan() {
@@ -1381,23 +1380,23 @@
 		*/
 
 		public function getPortSecStatus() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.2");
-                }
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.2");
+		}
 
 		public function getPortSecEnable() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.1");
-                }
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.1");
+		}
 
 		public function setPortSecEnable($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                                return -1;
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+				return -1;
 
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
-                }
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
+		}
 
 		public function getPortSecViolAct() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.8");
-                }
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.8");
+		}
 
 		public function setPortSecViolAct($value) {
 			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
@@ -1426,71 +1425,71 @@
 		}
 
 		public function setPortCDPEnable($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                        	return -1;
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+				return -1;
 
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
-                }
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
+		}
 
 		/*
 		* DHCP Snooping
 		*/
 
 		public function getPortDHCPSnoopingTrust() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.1.1.1");
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.1.1.1");
 		}
 
 		public function setPortDHCPSnoopingTrust($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                        	return -1;
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+				return -1;
 
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.1.1.1","i",$value);
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.1.1.1","i",$value);
 		}
 
 		public function getPortDHCPSnoopingRate() {
-                        return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.2.1.1");
+			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.2.1.1");
 		}
 
 		public function setPortDHCPSnoopingRate($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 0 || $value > 2048)
-                        	return -1;
+			if(!FS::$secMgr->isNumeric($value) || $value < 0 || $value > 2048)
+				return -1;
 
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.2.1.1","u",$value);
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.2.1.1","u",$value);
 		}
 
 		public function getDHCPSnoopingStatus() {
-                        $state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.1.0");
-                        $state = explode(" ",$state);
-                        if(count($state) != 2)
-                                return NULL;
+			$state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.1.0");
+			$state = explode(" ",$state);
+			if(count($state) != 2)
+				return NULL;
 
-                        $state = $state[1];
-                        return $state;
-                }
+			$state = $state[1];
+			return $state;
+		}
 
-                public function setDHCPSnoopingStatus($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                        	return -1;
+		public function setDHCPSnoopingStatus($value) {
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+				return -1;
 
-                        return $this->setField("1.3.6.1.4.1.9.9.380.1.1.1.0","i",$value);
-                }
+			return $this->setField("1.3.6.1.4.1.9.9.380.1.1.1.0","i",$value);
+		}
 
-                public function getDHCPSnoopingOpt82() {
-                        $state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.4.0");
-                        $state = explode(" ",$state);
-                        if(count($state) != 2)
-                                return NULL;
+		public function getDHCPSnoopingOpt82() {
+			$state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.4.0");
+			$state = explode(" ",$state);
+			if(count($state) != 2)
+				return NULL;
 
-                        $state = $state[1];
-                        return $state;
-                }
+			$state = $state[1];
+			return $state;
+		}
 
-                public function setDHCPSnoopingOpt82($value) {
-                        if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                        	return -1;
-			// TO TEST
-                        return $this->setField("1.3.6.1.4.1.9.9.380.1.1.4.0","i",$value);
-                }
+		public function setDHCPSnoopingOpt82($value) {
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+				return -1;
+		// TO TEST
+			return $this->setField("1.3.6.1.4.1.9.9.380.1.1.4.0","i",$value);
+		}
 
 		public function getDHCPSnoopingMatchMAC() {
 			$state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.6.0");
@@ -1540,10 +1539,10 @@
 		}
 
 		public function setDHCPSnoopingOnVlan($vlan,$value) {
-                        if(!FS::$secMgr->isNumeric($vlan) || $vlan == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
-                        	return -1;
+			if(!FS::$secMgr->isNumeric($vlan) || $vlan == -1 || !FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+				return -1;
 
-                        return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.2.1.1.2.".$vlan,"i",$value);
+			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.2.1.1.2.".$vlan,"i",$value);
 		}
 
 		/*
