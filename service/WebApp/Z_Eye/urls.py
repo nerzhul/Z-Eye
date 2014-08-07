@@ -33,5 +33,6 @@ urlpatterns = patterns('',
     url(r'^templates/footer', views.Footer.as_view(), name='footer'),
     url(r'^logs/service_logs', engine.logs.Models.serviceLogs.show),
     url(r'^snmpmgmt/forms/community', engine.snmpmgmt.Forms.showCommunity),
+    url(r'^switches/api/get_snmp_mib', engine.Switch.API.getSNMPMib),
     url(r'^locale/get', InterfaceManager.get_locale),
 )
