@@ -24,6 +24,7 @@ class GenericSwitch:
 	deviceIP = ""
 	snmp_ro = ""
 	snmp_rw = ""
+	mibs = None
 	
 	def __init__(self):
 		self.vendor = ""
@@ -32,6 +33,7 @@ class GenericSwitch:
 		self.deviceIP = ""
 		self.snmp_ro = ""
 		self.snmp_rw = ""
+		self.mibs = None
 
 	#
 	# Interface & handler functions, herited and modified by each vendor
@@ -364,12 +366,13 @@ class GenericSwitch:
 		return ""
 
 	def setPortId(pid):
-		if FS::secMgr->isNumeric(pid):
-			this->portid = pid
+		# @TODO if FS::secMgr->isNumeric(pid):
+		self.portId = pid
+		
 
 	def setDevice(dev):
 		self.device = dev
-		self.deviceIP = FS::dbMgr->GetOneData("device","ip","name = '".dev."'")
+		# self.deviceIP = FS::dbMgr->GetOneData("device","ip","name = '".dev."'")
 		# @TODO self.snmp_ro = FS::dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".this->device."'")
 		
 		if len(self.snmp_ro) == 0:
