@@ -92,6 +92,9 @@ class CiscoSwitch(GenericSwitch):
 	def getPortSpeed(self):
 		return self.snmpget(self.mibs["speed"])
 	
+	def getPortMtu(self):
+		return self.snmpget(self.mibs["port_mtu"])
+	
 	#
 	# VLAN Management
 	#

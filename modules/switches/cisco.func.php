@@ -775,7 +775,12 @@
 		*/
 
 		public function getPortMtu() {
-			return $this->getFieldForPortWithPID("ifMtu");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=port_mtu",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortDuplex($value) {
@@ -1071,11 +1076,19 @@
 			$vlanlist = array();
 			$trunkNoVlan = true;
 			$vlid = 0;
-			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.4",true);
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			
+			$hstr = file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=trunk_allowed_vlan_1",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
+			
+			$hstr = strtoupper(preg_replace("#0x#","",$hstr));
+			if($hstr != "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF") {
 				$trunkNoVlan = false;
+			}
+			
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
@@ -1090,11 +1103,19 @@
 					$vlid++;
 				}
 			}
-			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.17",true);
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			
+			$hstr = file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=trunk_allowed_vlan_2",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
+			
+			$hstr = strtoupper(preg_replace("#0x#","",$hstr));
+			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF") {
 				$trunkNoVlan = false;
+			}
+			
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
@@ -1109,11 +1130,19 @@
 					$vlid++;
 				}
 			}
-			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.18",true);
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			
+			$hstr = file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=trunk_allowed_vlan_3",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
+			
+			$hstr = strtoupper(preg_replace("#0x#","",$hstr));
+			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF") {
 				$trunkNoVlan = false;
+			}
+			
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
@@ -1128,11 +1157,19 @@
 					$vlid++;
 				}
 			}
-			$hstr = $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.19",true);
-			$hstr = preg_replace("#Hex-STRING\: #","",$hstr);
-			$hstr = preg_replace("#[ \n]#","",$hstr);
-			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE")
+			
+			$hstr = file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=trunk_allowed_vlan_4",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
+			
+			$hstr = strtoupper(preg_replace("#0x#","",$hstr));
+			if($trunkNoVlan && $hstr != "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE") {
 				$trunkNoVlan = false;
+			}
+			
 			$strlen = strlen($hstr);
 			for($i=0;$i<$strlen;$i++) {
 				$vlanbytes = base_convert($hstr[$i],16,2);
@@ -1211,34 +1248,6 @@
 				return -1;
 			snmpset($this->devip,$this->snmprw,$field.".".$this->portid,$vtype,$value);
 			return 0;
-		}
-
-		public function getFieldForPortWithPID($field, $raw = false) {
-			if($this->devip == "" || $this->snmpro == "" || $field == "" || $this->portid == "" || $this->portid < 1)
-				return -1;
-			$out = "";
-			exec("/usr/local/bin/snmpget -v 2c -c ".$this->snmpro." ".$this->devip." ".$field.".".$this->portid,$out);
-			$outoid = "";
-			for($i=0;$i<count($out);$i++) {
-				$outoid .= $out[$i];
-				if($i<count($out)-1) $outoid .= "";
-			}
-			$outoid = preg_split("# = #",$outoid);
-			if(count($outoid) != 2)
-				return -1;
-			$outoid = $outoid[1];
-			if($raw) {
-				return $outoid;
-			}
-
-			// We cut the string type
-			$outoid = explode(" ",$outoid);
-			// There are only two fields
-			if(count($outoid) != 2)
-				return -1;
-
-			$outoid = $outoid[1];
-			return $outoid;
 		}
 
 		public function setField($field, $vtype, $value) {
