@@ -44,9 +44,9 @@ Mibs = {
 	"portsecurity_maximum_macaddr": 	("1.3.6.1.4.1.9.9.315.1.2.1.1.3", "i"),
 	"portsecurity_status": 				("1.3.6.1.4.1.9.9.315.1.2.1.1.2", "i"),
 	"portsecurity_violation_action": 	("1.3.6.1.4.1.9.9.315.1.2.1.1.8", "i"),
-	"port_description": 				("ifAlias", "s"),
-	"port_enable": 						("ifAdminStatus", "i"),
-	"port_mtu": 						("ifMtu", "i"),
+	"port_description": 				("1.3.6.1.2.1.31.1.1.1.18", "s"),
+	"port_enable": 						("1.3.6.1.2.1.2.2.1.7", "i"),
+	"port_mtu": 						("1.3.6.1.2.1.2.2.1.4", "i"),
 	"speed": 							("1.3.6.1.4.1.9.5.1.4.1.1.9", "i"),
 	"switchport_mode": 					("1.3.6.1.4.1.9.9.46.1.6.1.1.13", "i"),
 	"transfer_copy_error": 				("1.3.6.1.4.1.9.9.96.1.1.1.1.13", "i"),
@@ -77,7 +77,13 @@ class CiscoSwitch(GenericSwitch):
 		self.mibs = Mibs
 
 	def getPortDesc(self):
-		return ""
+		return self.snmpget(self.mibs["port_description"])
+		
+	def getPortState(self):
+		return self.snmpget(self.mibs["port_enable"])
+	
+	def getPortCDPEnable(self):
+		return self.snmpget(self.mibs["cdp_enable"])
 	
 	def showCDPOpts(self):
 		return ""

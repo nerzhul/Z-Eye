@@ -17,6 +17,11 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
+from pyPgSQL import PgSQL
+
+from Common import zConfig
+from Common.SNMP.Communicator import SNMPCommunicator
+
 class GenericSwitch:
 	vendor = ""
 	portId = ""
@@ -24,7 +29,12 @@ class GenericSwitch:
 	deviceIP = ""
 	snmp_ro = ""
 	snmp_rw = ""
+	snmpCommunicator = None
 	mibs = None
+	
+	# TEMP: db related
+	dbConn = None
+	cursor = None
 	
 	def __init__(self):
 		self.vendor = ""
@@ -33,7 +43,12 @@ class GenericSwitch:
 		self.deviceIP = ""
 		self.snmp_ro = ""
 		self.snmp_rw = ""
+		self.snmpCommunicator = None
 		self.mibs = None
+		
+		# TEMP: db connection
+		self.dbConn = PgSQL.connect(host=zConfig.pgHost,user=zConfig.pgUser,password=zConfig.pgPwd,database=zConfig.pgDB)
+		self.cursor = self.dbConn.cursor()
 
 	#
 	# Interface & handler functions, herited and modified by each vendor
@@ -295,9 +310,6 @@ class GenericSwitch:
 	#
 	# special
 	#
-
-	def getPortCDPEnable(self):
-		return None
 		
 	def setPortCDPEnable(self, value):
 		return None
@@ -358,26 +370,39 @@ class GenericSwitch:
 		
 	def showSSHInterfaceStatus(self, iface):
 		return ""
-
-	def setPortId(self, pid):
-		# @TODO if FS::secMgr->isNumeric(pid):
-		self.portId = pid
 		
+	def setPortId(self, pid):
+		if pid.isdigit() == False:
+			return False
+			
+		self.portId = pid
+		return True
 
 	def setDevice(self, dev):
+		# We get the device IP
+		self.cursor.execute("SELECT ip FROM device WHERE name = '%s'" % dev)
+		pgres = self.cursor.fetchone()
+		
+		if pgres == None:
+			return False
+			
 		self.device = dev
-		# self.deviceIP = FS::dbMgr->GetOneData("device","ip","name = '".dev."'")
-		# @TODO self.snmp_ro = FS::dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".this->device."'")
+		self.deviceIP = pgres[0]
 		
-		if len(self.snmp_ro) == 0:
+		# And next, the SNMP communities
+		self.cursor.execute("SELECT snmpro, snmprw FROM z_eye_snmp_cache WHERE device = '%s'" % self.device)
+		pgres = self.cursor.fetchone()
+		
+		if pgres != None:
+			self.snmp_ro = pgres[0]
+			self.snmp_rw = pgres[1]
+		else:
 			self.snmp_ro = "public"
-		
-		# @ TODO self.snmp_rw = FS::dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".this->device."'")
-		if len(self.snmp_rw) == 0:
 			self.snmp_rw = "private"
 
-	def getDeviceIP(self):
-		return self.deviceIP
+		self.snmpCommunicator = SNMPCommunicator(self.deviceIP)
+		
+		return True
 
 	def unsetPortId(self):
 		self.portId = -1
@@ -387,3 +412,17 @@ class GenericSwitch:
 		self.deviceIP = ""
 		self.snmp_ro = ""
 		self.snmp_rw = ""
+	
+	def snmpget(self, mib):
+		if self.snmpCommunicator == None:
+			return -1
+		
+		# Mib[0] is the SNMP path
+		return self.snmpCommunicator.snmpget(self.snmp_ro, "%s.%s" % (mib[0], self.portId))
+	
+	def snmpset(self, mib):
+		if self.snmpCommunicator == None:
+			return -1
+		
+		# Mib[0] is the SNMP path
+		return self.snmpCommunicator.snmpget(self.snmp_rw, mib[0], mib[1])

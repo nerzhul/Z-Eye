@@ -25,8 +25,8 @@
 		function getDjangoMib($mib) {
 			$res = json_decode(file_get_contents(sprintf("http://localhost:8080/switches/api/get_snmp_mib?vendor=%s&mib=%s", $this->vendor, $mib)));
 			if (count($res) == 2) {
-				$this->$_djangoMibName = $res[0];
-				$this->$_djangoMibType = $res[1];
+				$this->_djangoMibName = $res[0];
+				$this->_djangoMibType = $res[1];
 				return 0;
 			}
 			return 1;
@@ -737,7 +737,7 @@
 				return 1;
 			}
 			
-			return $this->setFieldForPortWithPID($this->$_djangoMibName,$this->$_djangoMibType,$value);
+			return $this->setFieldForPortWithPID($this->_djangoMibName,$this->_djangoMibType,$value);
 		}
 
 		public function getPortDesc() {
@@ -745,7 +745,12 @@
 				return -1;
 			}
 			
-			return $this->getFieldForPortWithPID($this->$_djangoMibName);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=port_description",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortState($value) {
@@ -757,9 +762,12 @@
 		}
 
 		public function getPortState() {
-			$dup = $this->getFieldForPortWithPID("ifAdminStatus");
-			$dup = preg_replace("#[a-zA-Z()]#","",$dup);
-			return $dup;
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=port_enable",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		/*
@@ -1158,12 +1166,12 @@
 			}
 
 			// We cut the string type
-                        $outoid = explode(" ",$outoid);
+			$outoid = explode(" ",$outoid);
 			// There are only two fields
-                        if(count($outoid) != 2)
-                                return -1;
+			if(count($outoid) != 2)
+				return -1;
 
-                        $outoid = $outoid[1];
+			$outoid = $outoid[1];
 			return $outoid;
 		}
 
@@ -1441,7 +1449,12 @@
 		*/
 
 		public function getPortCDPEnable() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2");
+			return file_get_contents(sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=cisco&device=%s&pid=%s&mib=cdp_enable",
+					$this->device, $this->portid
+				)
+			);
+			//return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2");
 		}
 
 		public function setPortCDPEnable($value) {

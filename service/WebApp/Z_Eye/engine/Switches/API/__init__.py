@@ -30,7 +30,21 @@ def getSNMPMib(request):
 		if request.GET["vendor"] == "cisco" and request.GET["mib"] in Cisco.Mibs:
 			return HttpResponse(json.dumps(Cisco.Mibs[request.GET["mib"]]), content_type="application/json")
 				
-
-		return HttpResponse(_('Err-Wrong-Request'))
-	else:
-		return HttpResponse(_('Err-Wrong-Request'))
+	return HttpResponse(_('Err-Wrong-Request'))
+	
+def getPortMibValue(request):
+	if request.method == "GET" and "vendor" in request.GET and "device" in request.GET and "pid" in request.GET and "mib" in request.GET:
+		if request.GET["vendor"] == "cisco":
+			SwitchObj = Cisco.CiscoSwitch()
+			mib = request.GET["mib"]
+			
+			if SwitchObj.setDevice(request.GET["device"]) and SwitchObj.setPortId(request.GET["pid"]) and mib in Cisco.Mibs:
+				if mib == "cdp_enable":
+					return HttpResponse(SwitchObj.getPortCDPEnable())
+				elif mib == "port_description":
+					return HttpResponse(SwitchObj.getPortDesc())
+				elif mib == "port_enable":
+					return HttpResponse(SwitchObj.getPortState())
+					
+	return HttpResponse(_('Err-Wrong-Request'))
+		

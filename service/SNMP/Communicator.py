@@ -19,7 +19,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-import pysnmp, logging
+import pysnmp, logging, re
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
 
@@ -32,11 +32,22 @@ class SNMPCommunicator():
 		self.logger = logging.getLogger("Z-Eye")
 
 	def snmpget(self,devcom,mib):
+		mibSplit = re.split("\.",mib)
+		
+		try:
+			fmtmib = ()
+			
+			for mibThing in mibSplit:
+				fmtmib += (int(mibThing), )
+		except:
+			self.logger.error("SNMPCommunicator: malformed MIB %s presented to snmpget" % mib)
+			return -1
+		
 		cmdGen = cmdgen.CommandGenerator()
 		errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
 			cmdgen.CommunityData(devcom),
 			cmdgen.UdpTransportTarget((self.ip, 161)),
-			mib
+			fmtmib
 		)
 
 		if errorIndication:

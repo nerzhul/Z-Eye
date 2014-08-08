@@ -405,9 +405,13 @@
 			$this->device = $dev;
 			$this->devip = FS::$dbMgr->GetOneData("device","ip","name = '".$dev."'");
 			$this->snmpro = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".$this->device."'");
-			if(!$this->snmpro) $this->snmpro = SNMPConfig::$SNMPReadCommunity;
+			if(!$this->snmpro) {
+				$this->snmpro = SNMPConfig::$SNMPReadCommunity;
+			}
 			$this->snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$this->device."'");
-			if(!$this->snmprw) $this->snmprw = SNMPConfig::$SNMPWriteCommunity;
+			if(!$this->snmprw) {
+				$this->snmprw = SNMPConfig::$SNMPWriteCommunity;
+			}
 		}
 
 		public function getDeviceIP() { return $this->devip; }
