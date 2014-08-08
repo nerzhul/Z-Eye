@@ -23,7 +23,7 @@ import pysnmp, logging
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
 
-class ZEyeSNMPBroker():
+class SNMPCommunicator():
 	ip = ""
 	logger = None
 
@@ -40,13 +40,13 @@ class ZEyeSNMPBroker():
 		)
 
 		if errorIndication:
-			self.logger.error("SNMPBroker: errorIndication on %s: %s" % (self.ip,errorIndication))
+			self.logger.error("SNMPCommunicator: errorIndication on %s: %s" % (self.ip,errorIndication))
 			return -1
 		elif errorStatus:
 			if errorStatus.prettyPrint() == "'noAccess'":
-				self.logger.error("SNMPBroker: community %s cannot read on %s@%s" % (devcom,mib,self.ip))
+				self.logger.error("SNMPCommunicator: community %s cannot read on %s@%s" % (devcom,mib,self.ip))
 			else:
-				self.logger.error("SNMPBroker: errorStatus on %s: %s at %s" % (self.ip, errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
+				self.logger.error("SNMPCommunicator: errorStatus on %s: %s at %s" % (self.ip, errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
 			return -1
 		else:
 			for name, val in varBinds:
@@ -55,7 +55,7 @@ class ZEyeSNMPBroker():
 
 	def snmpset(self,devcom,mib,value):
 		if self.ip == "":
-			self.logger.error("SNMPBroker: invalid IP '%s'" % (self.ip))
+			self.logger.error("SNMPCommunicator: invalid IP '%s'" % (self.ip))
 			return 0
 
 		cmdGen = cmdgen.CommandGenerator()
@@ -65,12 +65,12 @@ class ZEyeSNMPBroker():
 			(mib, value)
 		)
 		if errorIndication:
-			self.logger.error("SNMPBroker: errorIndication on %s: %s" % (self.ip,errorIndication))
+			self.logger.error("SNMPCommunicator: errorIndication on %s: %s" % (self.ip,errorIndication))
 			return -1
 		elif errorStatus:
 			if errorStatus.prettyPrint() == "'noAccess'":
-				self.logger.error("SNMPBroker: community %s cannot write on %s@%s" % (devcom,mib,self.ip))
+				self.logger.error("SNMPCommunicator: community %s cannot write on %s@%s" % (devcom,mib,self.ip))
 			else:
-				self.logger.error("SNMPBroker: errorStatus on %s: %s at %s" % (self.ip,errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
+				self.logger.error("SNMPCommunicator: errorStatus on %s: %s at %s" % (self.ip,errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex)-1] or '?'))
 			return -1
 		return 0

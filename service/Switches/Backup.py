@@ -27,7 +27,7 @@ from pysnmp.proto import rfc1902
 
 import ZEyeUtil
 import zConfig
-from SNMPBroker import ZEyeSNMPBroker
+from SNMP.Communicator import SNMPCommunicator
 
 class Manager(ZEyeUtil.Thread):
 	SNMPcc = None
@@ -98,7 +98,7 @@ class Manager(ZEyeUtil.Thread):
 		self.incrThreadNb()
 
 		try:
-			SNMPB = ZEyeSNMPBroker(ip)
+			SNMPB = SNMPCommunicator(ip)
 			rand = random.randint(1,100)
 			if SNMPB.snmpset(devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.%d" % rand,rfc1902.Integer(1)) < 0:
 				self.decrThreadNb()
@@ -123,7 +123,7 @@ class Manager(ZEyeUtil.Thread):
 		self.incrThreadNb()
 
 		try:
-			SNMPB = ZEyeSNMPBroker(ip)
+			SNMPB = SNMPCommunicator(ip)
 			rand = random.randint(1,100)
 			if SNMPB.snmpset(devcom,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.%d" % rand,rfc1902.Integer(1)) != 0:
 				self.decrThreadNb()

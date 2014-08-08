@@ -28,6 +28,7 @@ import InterfaceManager
 import engine.snmpmgmt.Forms
 import engine.logs.Models.serviceLogs
 import engine.Switches.API
+import Common.SNMP
 
 urlpatterns = patterns('',
     #url(r'^admin/', include(admin.site.urls)),

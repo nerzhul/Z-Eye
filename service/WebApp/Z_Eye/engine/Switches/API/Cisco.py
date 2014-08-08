@@ -76,3 +76,11 @@ class CiscoSwitch(GenericSwitch):
 		self.vendor = "cisco"
 		self.mibs = Mibs
 
+	def getPortDesc(self):
+		return ""
+	
+	def showCDPOpts(self):
+		return ""
+		
+	def handleCDP(self, logvals):
+		return

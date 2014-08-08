@@ -22,6 +22,16 @@
 	class CiscoAPI extends DeviceAPI {
 		function CiscoAPI() { $this->vendor = "cisco"; }
 
+		function getDjangoMib($mib) {
+			$res = json_decode(file_get_contents(sprintf("http://localhost:8080/switches/api/get_snmp_mib?vendor=%s&mib=%s", $this->vendor, $mib)));
+			if (count($res) == 2) {
+				$this->$_djangoMibName = $res[0];
+				$this->$_djangoMibType = $res[1];
+				return 0;
+			}
+			return 1;
+		}
+		
 		/*
 		* Interface functions
 		*/
@@ -723,11 +733,19 @@
 		*/
 
 		public function setPortDesc($value) {
-			return $this->setFieldForPortWithPID("ifAlias","s",$value);
+			if ($this->getDjangoMib("port_description") != 0) {
+				return 1;
+			}
+			
+			return $this->setFieldForPortWithPID($this->$_djangoMibName,$this->$_djangoMibType,$value);
 		}
 
 		public function getPortDesc() {
-			return $this->getFieldForPortWithPID("ifAlias");
+			if ($this->getDjangoMib("port_description") != 0) {
+				return -1;
+			}
+			
+			return $this->getFieldForPortWithPID($this->$_djangoMibName);
 		}
 
 		public function setPortState($value) {
@@ -1135,7 +1153,9 @@
 			if(count($outoid) != 2)
 				return -1;
 			$outoid = $outoid[1];
-			if($raw) return $outoid;
+			if($raw) {
+				return $outoid;
+			}
 
 			// We cut the string type
                         $outoid = explode(" ",$outoid);
@@ -1579,5 +1599,8 @@
 		}
 
 		private $ssh;
+		
+		private $_djangoMibName;
+		private $_djangoMibType;
 	}
 ?>

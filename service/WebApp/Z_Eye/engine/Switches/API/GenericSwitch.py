@@ -39,338 +39,332 @@ class GenericSwitch:
 	# Interface & handler functions, herited and modified by each vendor
 	#
 
-	def showStateOpts():
+	def showStateOpts(self):
 		return ""
 		
-	def handleState(logvals, port = "", shut = -1):
+	def handleState(self, logvals, port = "", shut = -1):
 		return
 
-	def showSpeedOpts():
+	def showSpeedOpts(self):
 		return ""
 	
-	def handleSpeed(logvals):
+	def handleSpeed(self, logvals):
 		return
 
-	def showDuplexOpts():
+	def showDuplexOpts(self):
 		return ""
 		
-	def handleDuplex(logvals):
+	def handleDuplex(self, logvals):
 		return
 
-	def showVlanOpts():
+	def showVlanOpts(self):
 		return ""
 		
-	def handleVlan(logvals):
+	def handleVlan(self, logvals):
 		return
 
-	def showVoiceVlanOpts(voicevlanoutput):
+	def showVoiceVlanOpts(self, voicevlanoutput):
 		return ""
 		
-	def handleVoiceVlan(logvals):
+	def handleVoiceVlan(self, logvals):
 		return
 
-	def showPortSecurityOpts():
+	def showPortSecurityOpts(self):
 		return ""
 		
-	def handlePortSecurity(logvals):
+	def handlePortSecurity(self, logvals):
 		return
 
-	def showCDPOpts():
+	def showDHCPSnoopingOpts(self):
 		return ""
 		
-	def handleCDP(logvals):
+	def handleDHCPSnooping(self, logvals):
 		return
 
-	def showDHCPSnoopingOpts():
+	def showSaveCfg(self):
 		return ""
 		
-	def handleDHCPSnooping(logvals):
+	def handleSaveCfg(self):
 		return
 
-	def showSaveCfg():
-		return ""
-		
-	def handleSaveCfg():
-		return
-
-	def checkFields():
+	def checkFields(self):
 		return True
 	
 	
 	#Generic port management
 
-	def setPortDesc(value):
+	def setPortDesc(self, value):
 		return None
 
-	def getPortDesc():
+	def getPortDesc(self):
 		return None
 
-	def setPortState(value):
+	def setPortState(self, value):
 		return None
 
-	def getPortState():
+	def getPortState(self):
 		return None
 
 	#
 	# Link Management
 	#
 
-	def getPortMtu():
+	def getPortMtu(self):
 		return None
 
-	def setPortDuplex(value):
+	def setPortDuplex(self, value):
 		return None
 
-	def getPortDuplex():
+	def getPortDuplex(self):
 		return None
 
-	def setPortSpeed(value):
+	def setPortSpeed(self, value):
 		return None
 
-	def getPortSpeed():
+	def getPortSpeed(self):
 		return None
 
 	#
 	# VLAN management
 	#
 
-	def setSwitchAccessVLAN(value):
+	def setSwitchAccessVLAN(self, value):
 		return None
 
-	def getSwitchAccessVLAN():
+	def getSwitchAccessVLAN(self):
 		return None
 		
-	def setSwitchportMABEnable(value):
+	def setSwitchportMABEnable(self, value):
 		return None
 
-	def getSwitchportMABState():
+	def getSwitchportMABState(self):
 		return None
 
-	def setSwitchMABType(value):
+	def setSwitchMABType(self, value):
 		return None
 
-	def getSwitchportMABType():
+	def getSwitchportMABType(self):
 		return None
 
 	def setSwitchportAuthFailVLAN(value):
 		return None
 		
-	def getSwitchportAuthFailVLAN():
+	def getSwitchportAuthFailVLAN(self):
 		return None
 		
-	def setSwitchportAuthNoRespVLAN(value):
+	def setSwitchportAuthNoRespVLAN(self, value):
 		return None
 		
-	def getSwitchportAuthNoRespVLAN():
+	def getSwitchportAuthNoRespVLAN(self):
 		return None
 		
-	def setSwitchportAuthDeadVLAN(value):
+	def setSwitchportAuthDeadVLAN(self, value):
 		return None
 		
-	def getSwitchportAuthDeadVLAN():
+	def getSwitchportAuthDeadVLAN(self):
 		return None
 		
 	# authentication port-control 1,2,3
-	def setSwitchportControlMode(value):
+	def setSwitchportControlMode(self, value):
 		return None
 		
-	def getSwitchportControlMode():
+	def getSwitchportControlMode(self):
 		return None
 		
 	# authentication host-mode
-	def setSwitchportAuthHostMode(value):
+	def setSwitchportAuthHostMode(self, value):
 		return None
 
-	def getSwitchportAuthHostMode():
+	def getSwitchportAuthHostMode(self):
 		return None
 
-	def setSwitchTrunkNativeVlan(value):
+	def setSwitchTrunkNativeVlan(self, value):
 		return None
 
-	def getSwitchTrunkNativeVlan():
+	def getSwitchTrunkNativeVlan(self):
 		return None
 
-	def setSwitchTrunkVlan(values):
+	def setSwitchTrunkVlan(self, values):
 		return None
 
-	def setSwitchNoTrunkVlan():
+	def setSwitchNoTrunkVlan(self):
 		return None
 
-	def getSwitchportTrunkVlans():
+	def getSwitchportTrunkVlans(self):
 		return None
 
-	def setSwitchTrunkEncap(value):
+	def setSwitchTrunkEncap(self, value):
 		return None
 
-	def getSwitchTrunkEncap():
+	def getSwitchTrunkEncap(self):
 		return None
 
-	def setSwitchportMode(value):
+	def setSwitchportMode(self, value):
 		return None
 
-	def getSwitchportMode():
+	def getSwitchportMode(self):
 		return None
 
-	def setSwitchportVoiceVlan(value):
+	def setSwitchportVoiceVlan(self, value):
 		return None
 
-	def getSwitchportVoiceVlan():
+	def getSwitchportVoiceVlan(self):
 		return None
 
 	#
 	# Generic defs
 	#
 
-	def setFieldForPortWithPID(field, vtype, value):
+	def setFieldForPortWithPID(self, field, vtype, value):
 		return None
 
-	def getFieldForPortWithPID(field, raw = False):
+	def getFieldForPortWithPID(self, field, raw = False):
 		return None
 
-	def getPortId(portname):
+	def getPortId(self, portname):
 		return None
 
-	def getPortIndexes():
+	def getPortIndexes(self):
 		return None
 
 	#
 	# get Port list from a device. If there is a filter, only port with specified vlan are returned
 	#
 
-	def getPortList(vlanFltr = None):
+	def getPortList(self, vlanFltr = None):
 		return None
 
-	def replaceVlan(oldvlan, newvlan):
+	def replaceVlan(self, oldvlan, newvlan):
 		return None
 
 	# Saving running-config => startup-config
-	def writeMemory():
+	def writeMemory(self):
 		return None
 
-	def restoreStartupConfig():
+	def restoreStartupConfig(self):
 		return None
 
 	# Save startup-config to TFTP Server
-	def exportConfigToTFTP(server,path):
+	def exportConfigToTFTP(self, server, path):
 		return None
 
 	# Restore startup-config to TFTP Server
-	def importConfigFromTFTP(server,path):
+	def importConfigFromTFTP(self, server, path):
 		return None
 
 	# Save startup-config to FTP/SCP/SFTP Server
-	def exportConfigToAuthServer(server,type,path,user,pwd):
+	def exportConfigToAuthServer(self, server, _type, path, user, pwd):
 		return None
 
 	# Restore startup-config to FTP/SCP/SFTP Server
-	def importConfigFromAuthServer(server,type,path,user,pwd):
+	def importConfigFromAuthServer(self, server, _type, path, user, pwd):
 		return None
 
 	# Get Copy state from switch, using previous randomized id
-	def getCopyState(copyId):
+	def getCopyState(self, copyId):
 		return None
 
-	def getCopyError(copyId):
+	def getCopyError(self, copyId):
 		return None
 
 	#
 	# Port Security
 	#
 
-	def getPortSecStatus():
+	def getPortSecStatus(self):
 		return None
 		
-	def getPortSecEnable():
+	def getPortSecEnable(self):
 		return -1
 		
-	def setPortSecEnable(value):
+	def setPortSecEnable(self, value):
 		return None
 		
-	def getPortSecViolAct():
+	def getPortSecViolAct(self):
 		return None
 		
-	def setPortSecViolAct(value):
+	def setPortSecViolAct(self, value):
 		return None
 		
-	def getPortSecMaxMAC():
+	def getPortSecMaxMAC(self):
 		return None
 		
-	def setPortSecMaxMAC(value):
+	def setPortSecMaxMAC(self, value):
 		return None
 		
 	#
 	# special
 	#
 
-	def getPortCDPEnable():
+	def getPortCDPEnable(self):
 		return None
 		
-	def setPortCDPEnable(value):
+	def setPortCDPEnable(self, value):
 		return None
 		
-	def getPortDHCPSnoopingTrust():
+	def getPortDHCPSnoopingTrust(self):
 		return None
 
-	def setPortDHCPSnoopingTrust(value):
+	def setPortDHCPSnoopingTrust(self, value):
 		return None
 
-	def getPortDHCPSnoopingRate():
+	def getPortDHCPSnoopingRate(self):
 		return None
 
-	def setPortDHCPSnoopingRate(value):
+	def setPortDHCPSnoopingRate(self, value):
 		return None
 
-	def getDHCPSnoopingStatus():
+	def getDHCPSnoopingStatus(self):
 		return None
 
-	def setDHCPSnoopingStatus(value):
+	def setDHCPSnoopingStatus(self, value):
 		return None
 
-	def getDHCPSnoopingOpt82():
+	def getDHCPSnoopingOpt82(self):
 		return None
 
-	def setDHCPSnoopingOpt82(value):
+	def setDHCPSnoopingOpt82(self, value):
 		return None
 
-	def getDHCPSnoopingMatchMAC():
+	def getDHCPSnoopingMatchMAC(self):
 		return None
 
-	def setDHCPSnoopingMatchMAC(value):
+	def setDHCPSnoopingMatchMAC(self, value):
 		return None
 
-	def getDHCPSnoopingVlans():
+	def getDHCPSnoopingVlans(self):
 		return None
 
-	def setDHCPSnoopingVlans(vlans):
+	def setDHCPSnoopingVlans(self, vlans):
 		return None
 
-	def setDHCPSnoopingOnVlan(vlan,value):
+	def setDHCPSnoopingOnVlan(self, vlan,value):
 		return None
 
-	def connectToDevice(server,sshuser,sshpwd,enablepwd):
+	def connectToDevice(self, server,sshuser,sshpwd,enablepwd):
 		return None
 
-	def sendSSHCmd(stdio, cmd):
+	def sendSSHCmd(self, stdio, cmd):
 		return ""
 
-	def showSSHRunCfg():
-		return ""
-		
-	def showSSHStartCfg():
+	def showSSHRunCfg(self):
 		return ""
 		
-	def showSSHInterfaceCfg(iface):
+	def showSSHStartCfg(self):
 		return ""
 		
-	def showSSHInterfaceStatus(iface):
+	def showSSHInterfaceCfg(self, iface):
+		return ""
+		
+	def showSSHInterfaceStatus(self, iface):
 		return ""
 
-	def setPortId(pid):
+	def setPortId(self, pid):
 		# @TODO if FS::secMgr->isNumeric(pid):
 		self.portId = pid
 		
 
-	def setDevice(dev):
+	def setDevice(self, dev):
 		self.device = dev
 		# self.deviceIP = FS::dbMgr->GetOneData("device","ip","name = '".dev."'")
 		# @TODO self.snmp_ro = FS::dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmpro","device = '".this->device."'")
@@ -382,13 +376,13 @@ class GenericSwitch:
 		if len(self.snmp_rw) == 0:
 			self.snmp_rw = "private"
 
-	def getDeviceIP():
+	def getDeviceIP(self):
 		return self.deviceIP
 
-	def unsetPortId():
+	def unsetPortId(self):
 		self.portId = -1
 		
-	def unsetDevice():
+	def unsetDevice(self):
 		self.device = ""
 		self.deviceIP = ""
 		self.snmp_ro = ""

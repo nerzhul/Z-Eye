@@ -24,7 +24,7 @@ from threading import Lock
 
 import ZEyeUtil
 import zConfig
-from SNMPBroker import ZEyeSNMPBroker
+from SNMP.Communicator import SNMPCommunicator
 
 """
 SNMP Community Cacher is important. It make a SNMP community cache for DB
@@ -100,7 +100,7 @@ class ZEyeSNMPCommCacher(ZEyeUtil.Thread):
 		try:
 			foundro = ""
 			foundrw = ""
-			SNMPB = ZEyeSNMPBroker(ip)
+			SNMPB = SNMPCommunicator(ip)
 
 			# First we test the collected communities
 			if name in self.deviceCommunities:
