@@ -18,6 +18,7 @@
 """
 
 from pyPgSQL import PgSQL
+from pysnmp.proto import rfc1902
 
 from Common import zConfig
 from Common.SNMP.Communicator import SNMPCommunicator
@@ -345,13 +346,17 @@ class GenericSwitch:
 		else:
 			return self.snmpCommunicator.snmpget(self.snmp_ro, mib[0])
 	
-	def snmpset(self, mib):
+	def snmpset(self, mib, value):
 		if self.snmpCommunicator == None:
 			return -1
 		
+		# Format value there
+		if mib[1] == "i":
+			value = rfc1902.Integer(value)
+			
 		# Mib[0] is the SNMP path
 		# If there is a port ID, add it to MIB
 		if self.portId != "":
-			return self.snmpCommunicator.snmpget(self.snmp_rw, "%s.%s" % (mib[0], self.portId), mib[1])
+			return self.snmpCommunicator.snmpset(self.snmp_rw, "%s.%s" % (mib[0], self.portId),  value)
 		else:
-			return self.snmpCommunicator.snmpget(self.snmp_rw, mib[0], mib[1])
+			return self.snmpCommunicator.snmpset(self.snmp_rw, mib[0], value)

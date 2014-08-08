@@ -49,3 +49,19 @@ def getPortMibValue(request):
 					
 	return HttpResponse(_('Err-Wrong-Request'))
 		
+def setPortMibValue(request):
+	if request.method == "GET" and "vendor" in request.GET and "device" in request.GET and "mib" in request.GET and "value" in request.GET:
+		if request.GET["vendor"] == "cisco":
+			SwitchObj = Cisco.CiscoSwitch()
+			mib = request.GET["mib"]
+			
+			if SwitchObj.setDevice(request.GET["device"]) and mib in Cisco.Mibs:
+				if "pid" in request.GET and SwitchObj.setPortId(request.GET["pid"]):
+					# We don't call methods here, it's faster to use the dictionnary
+					return HttpResponse(SwitchObj.snmpset(Cisco.Mibs[mib],request.GET["value"]))
+				else:
+					# Invalid the port ID
+					SwitchObj.setPortId("")
+					return HttpResponse(SwitchObj.snmpset(Cisco.Mibs[mib],request.GET["value"]))
+					
+	return HttpResponse(_('Err-Wrong-Request'))

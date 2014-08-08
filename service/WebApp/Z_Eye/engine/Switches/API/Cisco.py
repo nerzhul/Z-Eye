@@ -102,6 +102,9 @@ class CiscoSwitch(GenericSwitch):
 	def getSwitchAccessVLAN(self):
 		return self.snmpget(self.mibs["access_vlan"])
 	
+	def setSwitchAccessVLAN(self, value):
+		return None
+	
 	def getSwitchportMABState(self):
 		return self.snmpget(self.mibs["mab_enable"])
 	
