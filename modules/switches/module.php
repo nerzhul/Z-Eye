@@ -1903,7 +1903,7 @@
 					}
 
 					$this->devapi->setDevice($device);
-					$dip = $this->devip->getDeviceIP();
+					$dip = $this->devapi->getDeviceIP();
 					$snmprw = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."snmp_cache","snmprw","device = '".$device."'");
 					if (!$this->hasDeviceWriteRight($snmprw,$dip)) {
 						FS::$iMgr->echoNoRights("replace a VLAN");

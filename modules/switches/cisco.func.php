@@ -1257,21 +1257,6 @@
 			return 0;
 		}
 
-		public function getField($field) {
-			if($this->devip == "" || $this->snmpro == "" || $field == "")
-				return NULL;
-			$out = "";
-			exec("/usr/local/bin/snmpget -v 2c -c ".$this->snmpro." ".$this->devip." ".$field,$out);
-			$outoid = "";
-			for($i=0;$i<count($out);$i++) {
-				$outoid .= $out[$i];
-				if($i<count($out)-1) $outoid .= "";
-			}
-			$outoid = preg_split("# = #",$outoid);
-			$outoid = $outoid[1];
-			return $outoid;
-		}
-
 		public function getPortId($portname) {
 			$pid = FS::$dbMgr->GetOneData(PGDbConfig::getDbPrefix()."port_id_cache","pid","device = '".$this->device."' AND portname = '".$portname."'");
 			if($pid == NULL) $pid = -1;
@@ -1333,7 +1318,7 @@
 			if($this->devip == "" || $this->snmpro == "")
 				return -1;
 			$out = "";
-			exec("snmpwalk -v 2c -c ".$this->snmpro." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
+			exec("/usr/local/bin/snmpwalk -v 2c -c ".$this->snmpro." ".$this->devip." ifDescr | grep -ve Stack | grep -ve Vlan | grep -ve Null",$out);
 			$count = count($out);
 			for($i=0;$i<$count;$i++) {
 				$pdata = explode(" ",$out[$i]);
@@ -1595,13 +1580,12 @@
 		}
 
 		public function getDHCPSnoopingStatus() {
-			$state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.1.0");
-			$state = explode(" ",$state);
-			if(count($state) != 2)
-				return NULL;
-
-			$state = $state[1];
-			return $state;
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=dhcp_snooping_status",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setDHCPSnoopingStatus($value) {
@@ -1612,13 +1596,12 @@
 		}
 
 		public function getDHCPSnoopingOpt82() {
-			$state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.4.0");
-			$state = explode(" ",$state);
-			if(count($state) != 2)
-				return NULL;
-
-			$state = $state[1];
-			return $state;
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=dhcp_snooping_option_82",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setDHCPSnoopingOpt82($value) {
@@ -1629,14 +1612,12 @@
 		}
 
 		public function getDHCPSnoopingMatchMAC() {
-			$state = $this->getField("1.3.6.1.4.1.9.9.380.1.1.6.0");
-			$state = explode(" ",$state);
-			if(count($state) != 2) {
-				return NULL;
-			}
-
-			$state = $state[1];
-			return $state;
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=dhcp_snooping_match_macaddr",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setDHCPSnoopingMatchMAC($value) {

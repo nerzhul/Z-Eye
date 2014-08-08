@@ -44,9 +44,8 @@ def getPortMibValue(request):
 					return HttpResponse(SwitchObj.snmpget(Cisco.Mibs[mib]))
 				else:
 					# Invalid the port ID
-					SwitchObj.setPortId(-1)
-					# @TODO handle non port ID requests
-					return HttpResponse(_('Err-Wrong-Request'))
+					SwitchObj.setPortId("")
+					return HttpResponse(SwitchObj.snmpget(Cisco.Mibs[mib]))
 					
 	return HttpResponse(_('Err-Wrong-Request'))
 		

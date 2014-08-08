@@ -24,7 +24,7 @@ from Common.SNMP.Communicator import SNMPCommunicator
 
 class GenericSwitch:
 	vendor = ""
-	portId = -1
+	portId = ""
 	device = ""
 	deviceIP = ""
 	snmp_ro = ""
@@ -38,7 +38,7 @@ class GenericSwitch:
 	
 	def __init__(self):
 		self.vendor = ""
-		self.portId = -1
+		self.portId = ""
 		self.device = ""
 		self.deviceIP = ""
 		self.snmp_ro = ""
@@ -340,7 +340,7 @@ class GenericSwitch:
 		
 		# Mib[0] is the SNMP path
 		# If there is a port ID, add it to MIB
-		if self.portId != -1:
+		if self.portId != "":
 			return self.snmpCommunicator.snmpget(self.snmp_ro, "%s.%s" % (mib[0], self.portId))
 		else:
 			return self.snmpCommunicator.snmpget(self.snmp_ro, mib[0])
@@ -351,7 +351,7 @@ class GenericSwitch:
 		
 		# Mib[0] is the SNMP path
 		# If there is a port ID, add it to MIB
-		if self.portId != -1:
+		if self.portId != "":
 			return self.snmpCommunicator.snmpget(self.snmp_rw, "%s.%s" % (mib[0], self.portId), mib[1])
 		else:
 			return self.snmpCommunicator.snmpget(self.snmp_rw, mib[0], mib[1])
