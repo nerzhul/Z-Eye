@@ -786,7 +786,12 @@
 		}
 
 		public function getPortDuplex() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.522.3.15.5");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=duplex_get",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortSpeed($value) {
@@ -797,11 +802,12 @@
 		}
 
 		public function getPortSpeed() {
-			$idx = $this->getPortIndexes($this->device,$this->portid);
-			if($idx == NULL)
-				return -2;
-
-			return $this->getFieldForPortWithPID($idx[0].".".$idx[1],"1.3.6.1.4.1.9.5.1.4.1.1.9");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=speed",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 		/*
 		* VLAN management
@@ -815,7 +821,12 @@
 		}
 
 		public function getSwitchAccessVLAN() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.2.2.1.2");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=access_vlan",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchportMABEnable($value) {
@@ -826,7 +837,12 @@
 		}
 
 		public function getSwitchportMABState() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.1");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=mab_enable",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchMABType($value) {
@@ -837,7 +853,12 @@
 		}
 
 		public function getSwitchportMABType() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.2");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=mab_type",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchportAuthFailVLAN($value) {
@@ -848,7 +869,12 @@
 		}
 
 		public function getSwitchportAuthFailVLAN() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.1.1.3");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=auth_fail_vlan",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchportAuthNoRespVLAN($value) {
@@ -859,7 +885,12 @@
 		}
 
 		public function getSwitchportAuthNoRespVLAN() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.2.1.2");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=auth_noresp_vlan",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchportAuthDeadVLAN($value) {
@@ -870,7 +901,12 @@
 		}
 
 		public function getSwitchportAuthDeadVLAN() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.3.3.1.3");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=auth_dead_vlan",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		// authentication port-control 1,2,3
@@ -882,7 +918,12 @@
 		}
 
 		public function getSwitchportControlMode() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.5");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=control_mode",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		// authentication host-mode
@@ -894,7 +935,12 @@
 		}
 
 		public function getSwitchportAuthHostMode() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.3");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=auth_host_mode",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchTrunkNativeVlan($value) {
@@ -905,7 +951,12 @@
 		}
 
 		public function getSwitchTrunkNativeVlan() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.5");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=trunk_native_vlan",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchTrunkVlan($values) {
@@ -1111,7 +1162,12 @@
 		}
 
 		public function getSwitchTrunkEncap() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.3");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=trunk_encapsulation",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchportMode($value) {
@@ -1122,7 +1178,12 @@
 		}
 
 		public function getSwitchportMode() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.13");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=switchport_mode",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setSwitchportVoiceVlan($value) {
@@ -1133,7 +1194,12 @@
 		}
 
 		public function getSwitchportVoiceVlan() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.5.1.1.1");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=voice_vlan",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		/*
@@ -1408,11 +1474,21 @@
 		*/
 
 		public function getPortSecStatus() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.2");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=portsecurity_status",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function getPortSecEnable() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.1");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=portsecurity_enable",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortSecEnable($value) {
@@ -1423,7 +1499,12 @@
 		}
 
 		public function getPortSecViolAct() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.8");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=portsecurity_violation_action",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortSecViolAct($value) {
@@ -1434,7 +1515,12 @@
 		}
 
 		public function getPortSecMaxMAC() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.3");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=portsecurity_maximum_macaddr",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortSecMaxMAC($value) {
@@ -1454,7 +1540,6 @@
 					$this->device, $this->portid
 				)
 			);
-			//return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2");
 		}
 
 		public function setPortCDPEnable($value) {
@@ -1469,7 +1554,12 @@
 		*/
 
 		public function getPortDHCPSnoopingTrust() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.1.1.1");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=dhcp_snooping_trust",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortDHCPSnoopingTrust($value) {
@@ -1480,7 +1570,12 @@
 		}
 
 		public function getPortDHCPSnoopingRate() {
-			return $this->getFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.2.1.1");
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/get?vendor=%s&device=%s&pid=%s&mib=dhcp_snooping_rate",
+					$this->vendor, $this->device, $this->portid
+				)
+			);
 		}
 
 		public function setPortDHCPSnoopingRate($value) {

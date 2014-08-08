@@ -24,7 +24,7 @@ from Common.SNMP.Communicator import SNMPCommunicator
 
 class GenericSwitch:
 	vendor = ""
-	portId = ""
+	portId = -1
 	device = ""
 	deviceIP = ""
 	snmp_ro = ""
@@ -38,7 +38,7 @@ class GenericSwitch:
 	
 	def __init__(self):
 		self.vendor = ""
-		self.portId = ""
+		self.portId = -1
 		self.device = ""
 		self.deviceIP = ""
 		self.snmp_ro = ""
@@ -114,15 +114,15 @@ class GenericSwitch:
 	def getPortDesc(self):
 		return None
 
+	#
+	# Link Management
+	#
+	
 	def setPortState(self, value):
 		return None
 
 	def getPortState(self):
 		return None
-
-	#
-	# Link Management
-	#
 
 	def getPortMtu(self):
 		return None
@@ -178,21 +178,7 @@ class GenericSwitch:
 		
 	def getSwitchportAuthDeadVLAN(self):
 		return None
-		
-	# authentication port-control 1,2,3
-	def setSwitchportControlMode(self, value):
-		return None
-		
-	def getSwitchportControlMode(self):
-		return None
-		
-	# authentication host-mode
-	def setSwitchportAuthHostMode(self, value):
-		return None
-
-	def getSwitchportAuthHostMode(self):
-		return None
-
+	
 	def setSwitchTrunkNativeVlan(self, value):
 		return None
 
@@ -213,7 +199,7 @@ class GenericSwitch:
 
 	def getSwitchTrunkEncap(self):
 		return None
-
+	
 	def setSwitchportMode(self, value):
 		return None
 
@@ -225,21 +211,23 @@ class GenericSwitch:
 
 	def getSwitchportVoiceVlan(self):
 		return None
-
+	
 	#
-	# Generic defs
+	# Authentication
 	#
-
-	def setFieldForPortWithPID(self, field, vtype, value):
+		
+	# authentication port-control 1,2,3
+	def setSwitchportControlMode(self, value):
+		return None
+		
+	def getSwitchportControlMode(self):
+		return None
+		
+	# authentication host-mode
+	def setSwitchportAuthHostMode(self, value):
 		return None
 
-	def getFieldForPortWithPID(self, field, raw = False):
-		return None
-
-	def getPortId(self, portname):
-		return None
-
-	def getPortIndexes(self):
+	def getSwitchportAuthHostMode(self):
 		return None
 
 	#
@@ -281,78 +269,11 @@ class GenericSwitch:
 
 	def getCopyError(self, copyId):
 		return None
-
-	#
-	# Port Security
-	#
-
-	def getPortSecStatus(self):
-		return None
-		
-	def getPortSecEnable(self):
-		return -1
-		
-	def setPortSecEnable(self, value):
-		return None
-		
-	def getPortSecViolAct(self):
-		return None
-		
-	def setPortSecViolAct(self, value):
-		return None
-		
-	def getPortSecMaxMAC(self):
-		return None
-		
-	def setPortSecMaxMAC(self, value):
-		return None
 		
 	#
-	# special
+	# Others
 	#
 		
-	def setPortCDPEnable(self, value):
-		return None
-		
-	def getPortDHCPSnoopingTrust(self):
-		return None
-
-	def setPortDHCPSnoopingTrust(self, value):
-		return None
-
-	def getPortDHCPSnoopingRate(self):
-		return None
-
-	def setPortDHCPSnoopingRate(self, value):
-		return None
-
-	def getDHCPSnoopingStatus(self):
-		return None
-
-	def setDHCPSnoopingStatus(self, value):
-		return None
-
-	def getDHCPSnoopingOpt82(self):
-		return None
-
-	def setDHCPSnoopingOpt82(self, value):
-		return None
-
-	def getDHCPSnoopingMatchMAC(self):
-		return None
-
-	def setDHCPSnoopingMatchMAC(self, value):
-		return None
-
-	def getDHCPSnoopingVlans(self):
-		return None
-
-	def setDHCPSnoopingVlans(self, vlans):
-		return None
-
-	def setDHCPSnoopingOnVlan(self, vlan,value):
-		return None
-
 	def connectToDevice(self, server,sshuser,sshpwd,enablepwd):
 		return None
 
@@ -418,11 +339,19 @@ class GenericSwitch:
 			return -1
 		
 		# Mib[0] is the SNMP path
-		return self.snmpCommunicator.snmpget(self.snmp_ro, "%s.%s" % (mib[0], self.portId))
+		# If there is a port ID, add it to MIB
+		if self.portId != -1:
+			return self.snmpCommunicator.snmpget(self.snmp_ro, "%s.%s" % (mib[0], self.portId))
+		else:
+			return self.snmpCommunicator.snmpget(self.snmp_ro, mib[0])
 	
 	def snmpset(self, mib):
 		if self.snmpCommunicator == None:
 			return -1
 		
 		# Mib[0] is the SNMP path
-		return self.snmpCommunicator.snmpget(self.snmp_rw, mib[0], mib[1])
+		# If there is a port ID, add it to MIB
+		if self.portId != -1:
+			return self.snmpCommunicator.snmpget(self.snmp_rw, "%s.%s" % (mib[0], self.portId), mib[1])
+		else:
+			return self.snmpCommunicator.snmpget(self.snmp_rw, mib[0], mib[1])

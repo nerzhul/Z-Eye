@@ -78,12 +78,147 @@ class CiscoSwitch(GenericSwitch):
 
 	def getPortDesc(self):
 		return self.snmpget(self.mibs["port_description"])
-		
+	
+	#
+	# Link Management
+	#
+	
 	def getPortState(self):
 		return self.snmpget(self.mibs["port_enable"])
+		
+	def getPortDuplex(self):
+		return self.snmpget(self.mibs["duplex_get"])
+	
+	def getPortSpeed(self):
+		return self.snmpget(self.mibs["speed"])
+	
+	#
+	# VLAN Management
+	#
+	
+	def getSwitchAccessVLAN(self):
+		return self.snmpget(self.mibs["access_vlan"])
+	
+	def getSwitchportMABState(self):
+		return self.snmpget(self.mibs["mab_enable"])
+	
+	def getSwitchportMABType(self):
+		return self.snmpget(self.mibs["mab_type"])
+	
+	def getSwitchportAuthFailVLAN(self):
+		return self.snmpget(self.mibs["auth_fail_vlan"])
+		
+	def getSwitchportAuthNoRespVLAN(self):
+		return self.snmpget(self.mibs["auth_noresp_vlan"])
+
+	def getSwitchportAuthDeadVLAN(self):
+		return self.snmpget(self.mibs["auth_dead_vlan"])
+	
+	def getSwitchTrunkEncap(self):
+		return self.snmpget(self.mibs["trunk_encapsulation"])
+	
+	def getSwitchportMode(self):
+		return self.snmpget(self.mibs["switchport_mode"])
+	
+	def getSwitchportVoiceVlan(self):
+		return self.snmpget(self.mibs["voice_vlan"])
+	
+	#
+	# Authentication
+	#
+	
+	# authentication port-control 1,2,3
+	def getSwitchportControlMode(self):
+		return self.snmpget(self.mibs["control_mode"])
+
+	def getSwitchportAuthHostMode(self):
+		return self.snmpget(self.mibs["auth_host_mode"])
+	
+	def getSwitchTrunkNativeVlan(self):
+		return self.snmpget(self.mibs["trunk_native_vlan"])
+	
+	def getSwitchportTrunkVlans(self):
+		# @TODO
+		return None
+		
+	#
+	# Port Security
+	#
+
+	def getPortSecStatus(self):
+		return self.snmpget(self.mibs["portsecurity_status"])
+		
+	def getPortSecEnable(self):
+		return self.snmpget(self.mibs["portsecurity_enable"])
+		
+	def setPortSecEnable(self, value):
+		return None
+		
+	def getPortSecViolAct(self):
+		return self.snmpget(self.mibs["portsecurity_violation_action"])
+		
+	def setPortSecViolAct(self, value):
+		return None
+		
+	def getPortSecMaxMAC(self):
+		return self.snmpget(self.mibs["portsecurity_maximum_macaddr"])
+		
+	def setPortSecMaxMAC(self, value):
+		return None
+		
+	#
+	# DHCP Snooping
+	#
+	
+	def getPortDHCPSnoopingTrust(self):
+		return self.snmpget(self.mibs["dhcp_snooping_trust"])
+
+	def setPortDHCPSnoopingTrust(self, value):
+		return None
+
+	def getPortDHCPSnoopingRate(self):
+		return self.snmpget(self.mibs["dhcp_snooping_rate"])
+
+	def setPortDHCPSnoopingRate(self, value):
+		return None
+
+	def getDHCPSnoopingStatus(self):
+		return None
+
+	def setDHCPSnoopingStatus(self, value):
+		return None
+
+	def getDHCPSnoopingOpt82(self):
+		return None
+
+	def setDHCPSnoopingOpt82(self, value):
+		return None
+
+	def getDHCPSnoopingMatchMAC(self):
+		return None
+
+	def setDHCPSnoopingMatchMAC(self, value):
+		return None
+
+	def getDHCPSnoopingVlans(self):
+		return None
+
+	def setDHCPSnoopingVlans(self, vlans):
+		return None
+
+	def setDHCPSnoopingOnVlan(self, vlan,value):
+		return None
+
+		
+	#
+	# Others
+	#
 	
 	def getPortCDPEnable(self):
 		return self.snmpget(self.mibs["cdp_enable"])
+	
+	def setPortCDPEnable(self, value):
+		return None
 	
 	def showCDPOpts(self):
 		return ""

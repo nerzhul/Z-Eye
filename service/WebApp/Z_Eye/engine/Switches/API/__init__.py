@@ -33,18 +33,20 @@ def getSNMPMib(request):
 	return HttpResponse(_('Err-Wrong-Request'))
 	
 def getPortMibValue(request):
-	if request.method == "GET" and "vendor" in request.GET and "device" in request.GET and "pid" in request.GET and "mib" in request.GET:
+	if request.method == "GET" and "vendor" in request.GET and "device" in request.GET and "mib" in request.GET:
 		if request.GET["vendor"] == "cisco":
 			SwitchObj = Cisco.CiscoSwitch()
 			mib = request.GET["mib"]
 			
-			if SwitchObj.setDevice(request.GET["device"]) and SwitchObj.setPortId(request.GET["pid"]) and mib in Cisco.Mibs:
-				if mib == "cdp_enable":
-					return HttpResponse(SwitchObj.getPortCDPEnable())
-				elif mib == "port_description":
-					return HttpResponse(SwitchObj.getPortDesc())
-				elif mib == "port_enable":
-					return HttpResponse(SwitchObj.getPortState())
+			if SwitchObj.setDevice(request.GET["device"]) and mib in Cisco.Mibs:
+				if "pid" in request.GET and SwitchObj.setPortId(request.GET["pid"]):
+					# We don't call methods here, it's faster to use the dictionnary
+					return HttpResponse(SwitchObj.snmpget(Cisco.Mibs[mib]))
+				else:
+					# Invalid the port ID
+					SwitchObj.setPortId(-1)
+					# @TODO handle non port ID requests
+					return HttpResponse(_('Err-Wrong-Request'))
 					
 	return HttpResponse(_('Err-Wrong-Request'))
 		
