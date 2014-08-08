@@ -17,12 +17,20 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
+import json
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 
+import Cisco
+
 def getSNMPMib(request):
-	if request.method == "GET":
-		
+	if request.method == "GET" and "mib" in request.GET and "vendor" in request.GET:
+		# Only Cisco is supported at this time
+		if request.GET["vendor"] == "cisco" and request.GET["mib"] in Cisco.Mibs:
+			return HttpResponse(json.dumps(Cisco.Mibs[request.GET["mib"]]), content_type="application/json")
+				
+
+		return HttpResponse(_('Err-Wrong-Request'))
 	else:
 		return HttpResponse(_('Err-Wrong-Request'))
