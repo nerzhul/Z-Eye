@@ -65,15 +65,22 @@ class SNMPCommunicator():
 		return 0
 
 	def snmpset(self,devcom,mib,value):
-		if self.ip == "":
-			self.logger.error("SNMPCommunicator: invalid IP '%s'" % (self.ip))
-			return 0
+		mibSplit = re.split("\.",mib)
+		
+		try:
+			fmtmib = ()
+			
+			for mibThing in mibSplit:
+				fmtmib += (int(mibThing), )
+		except:
+			self.logger.error("SNMPCommunicator: malformed MIB %s presented to snmpget" % mib)
+			return -1
 
 		cmdGen = cmdgen.CommandGenerator()
 		errorIndication, errorStatus, errorIndex, varBinds = cmdGen.setCmd(
 			cmdgen.CommunityData(devcom),
 			cmdgen.UdpTransportTarget((self.ip, 161)),
-			(mib, value)
+			(fmtmib, value)
 		)
 		if errorIndication:
 			self.logger.error("SNMPCommunicator: errorIndication on %s: %s" % (self.ip,errorIndication))
