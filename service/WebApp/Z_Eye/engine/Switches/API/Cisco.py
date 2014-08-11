@@ -241,11 +241,11 @@ class CiscoSwitch(GenericSwitch):
 		randNb = random.randint(1,100)
 		
 		# Pseudo port ID is a random number for the transfer
-		self.setPortId(randNb)
+		self.setPortId("%s" % randNb)
 		
-		self.snmpset(self.mibs["transfer_init"],1)
-		self.snmpset(self.mibs["transfer_source"],4)
-		self.snmpset(self.mibs["transfer_dest"],3)
-		self.snmpset(self.mibs["transfer_start"],1)
+		self.snmpset(self.mibs["transfer_init"],"1")
+		self.snmpset(self.mibs["transfer_source"],"4")
+		self.snmpset(self.mibs["transfer_dest"],"3")
+		self.snmpset(self.mibs["transfer_start"],"1")
 		
 		return randNb
