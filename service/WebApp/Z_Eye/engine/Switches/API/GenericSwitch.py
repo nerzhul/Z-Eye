@@ -350,13 +350,8 @@ class GenericSwitch:
 		if self.snmpCommunicator == None:
 			return -1
 		
-		# Format value there
-		if mib[1] == "i":
-			value = rfc1902.Integer(value)
-			
-		# Mib[0] is the SNMP path
 		# If there is a port ID, add it to MIB
 		if self.portId != "":
-			return self.snmpCommunicator.snmpset(self.snmp_rw, "%s.%s" % (mib[0], self.portId),  value)
-		else:
-			return self.snmpCommunicator.snmpset(self.snmp_rw, mib[0], value)
+			mib = ("%s.%s" % (mib[0], self.portId), mib[1])
+		
+		return self.snmpCommunicator.snmpset(self.snmp_rw, mib,  value)

@@ -758,7 +758,12 @@
 				return NULL;
 			}
 
-			return $this->setFieldForPortWithPID("ifAdminStatus","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=port_enable&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getPortState() {
@@ -787,7 +792,12 @@
 			if($value < 1 || $value > 4)
 				return NULL;
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.5.1.4.1.1.10","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=duplex_set&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getPortDuplex() {
@@ -800,10 +810,16 @@
 		}
 
 		public function setPortSpeed($value) {
-			if($value < 1)
+			if($value < 1) {
 				return NULL;
-
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.5.1.4.1.1.9","i",$value);
+			}
+			
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=speed&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getPortSpeed() {
@@ -822,7 +838,12 @@
 			if(!FS::$secMgr->isNumeric($value))
 				return -1;
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.2.2.1.2","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=access_vlan&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchAccessVLAN() {
@@ -836,9 +857,16 @@
 
 		public function setSwitchportMABEnable($value) {
 			// 1: enable / 2: disable
-			if($value != 1 && $value != 2)
+			if($value != 1 && $value != 2) {
 				return 1;
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.1","i",$value);
+			}
+
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=mab_enable&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchportMABState() {
@@ -852,9 +880,16 @@
 
 		public function setSwitchMABType($value) {
 			// 1: normal / 2: EAP
-			if($value != 1 && $value != 2)
+			if($value != 1 && $value != 2) {
 				return 1;
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.654.1.1.1.1.2","i",$value);
+			}
+			
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=mab_type&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchportMABType() {
@@ -917,9 +952,16 @@
 		// authentication port-control 1,2,3
 		public function setSwitchportControlMode($value) {
 			// 1: unauthorized / 2: auto / 3: authorized / 3: disable feature
-			if($value != 1 && $value != 2 && $value != 3)
+			if($value != 1 && $value != 2 && $value != 3) {
 				return 1;
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.5","i",$value);
+			}
+
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=control_mode&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchportControlMode() {
@@ -934,9 +976,16 @@
 		// authentication host-mode
 		public function setSwitchportAuthHostMode($value) {
 			// 1: single-host (default) / 2: multi-host / 3: multi-auth / 4: multi-domain
-			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4)
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4) {
 				return 1;
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.656.1.2.1.1.3","i",$value);
+			}
+			
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=auth_host_mode&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchportAuthHostMode() {
@@ -949,10 +998,16 @@
 		}
 
 		public function setSwitchTrunkNativeVlan($value) {
-			if(!FS::$secMgr->isNumeric($value) || $value > 1005)
+			if(!FS::$secMgr->isNumeric($value) || $value > 1005) {
 				return -1;
+			}
 
-            return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.5","i",$value);
+            return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=trunk_native_vlan&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchTrunkNativeVlan() {
@@ -1195,7 +1250,12 @@
 			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
 				return -1;
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.3","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=trunk_encapsulation&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchTrunkEncap() {
@@ -1211,7 +1271,12 @@
 			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 5)
 				return -1;
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.46.1.6.1.1.13","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=switchport_mode&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchportMode() {
@@ -1227,7 +1292,12 @@
 			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 4096)
 			   return -1;
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.68.1.5.1.1.1","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=voice_vlan&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getSwitchportVoiceVlan() {
@@ -1486,10 +1556,16 @@
 		}
 
 		public function setPortSecEnable($value) {
-			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2) {
 				return -1;
+			}
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.1","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=portsecurity_enable&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getPortSecViolAct() {
@@ -1502,10 +1578,16 @@
 		}
 
 		public function setPortSecViolAct($value) {
-			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3)
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 3) {
 				return -1;
-
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.8","i",$value);
+			}
+			
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=portsecurity_violation_action&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getPortSecMaxMAC() {
@@ -1521,7 +1603,12 @@
 			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 6144)
 				return -1;
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.315.1.2.1.1.3","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=portsecurity_maximum_macaddr&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		/*
@@ -1537,10 +1624,16 @@
 		}
 
 		public function setPortCDPEnable($value) {
-			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
+			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2) {
 				return -1;
+			}
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.23.1.1.1.1.2","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=cdp_enable&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		/*
@@ -1560,7 +1653,12 @@
 			if(!FS::$secMgr->isNumeric($value) || $value < 1 || $value > 2)
 				return -1;
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.1.1.1","i",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=dhcp_snooping_trust&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getPortDHCPSnoopingRate() {
@@ -1573,10 +1671,16 @@
 		}
 
 		public function setPortDHCPSnoopingRate($value) {
-			if(!FS::$secMgr->isNumeric($value) || $value < 0 || $value > 2048)
+			if(!FS::$secMgr->isNumeric($value) || $value < 0 || $value > 2048) {
 				return -1;
+			}
 
-			return $this->setFieldForPortWithPID("1.3.6.1.4.1.9.9.380.1.3.2.1.1","u",$value);
+			return file_get_contents(
+				sprintf(
+					"http://localhost:8080/switches/api/snmp_value/set?vendor=%s&device=%s&pid=%s&mib=dhcp_snooping_rate&value=%s",
+					$this->vendor, $this->device, $this->portid, $value
+				)
+			);
 		}
 
 		public function getDHCPSnoopingStatus() {

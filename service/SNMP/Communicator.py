@@ -65,7 +65,21 @@ class SNMPCommunicator():
 		return 0
 
 	def snmpset(self,devcom,mib,value):
-		mibSplit = re.split("\.",mib)
+		if len(mib) != 2:
+			self.logger.error("SNMPCommunicator: malformed MIB %s presented to snmpset" % mib)
+			return -1
+		
+		# Format value there
+		if mib[1] == "i":
+			value = rfc1902.Integer(value)
+		elif mib[1] == "u":
+			value = rfc1902.Unsigned32(value)
+		else:
+			self.logger.error("SNMPCommunicator: malformed MIB %s presented to snmpset" % mib)
+			return -1
+		
+		# Now we split the mib path
+		mibSplit = re.split("\.",mib[0])
 		
 		try:
 			fmtmib = ()
@@ -73,7 +87,7 @@ class SNMPCommunicator():
 			for mibThing in mibSplit:
 				fmtmib += (int(mibThing), )
 		except:
-			self.logger.error("SNMPCommunicator: malformed MIB %s presented to snmpget" % mib)
+			self.logger.error("SNMPCommunicator: malformed MIB %s presented to snmpset" % mib)
 			return -1
 
 		cmdGen = cmdgen.CommandGenerator()
