@@ -17,6 +17,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
+import random
 from GenericSwitch import GenericSwitch
 
 Mibs = {
@@ -231,3 +232,20 @@ class CiscoSwitch(GenericSwitch):
 		
 	def handleCDP(self, logvals):
 		return
+		
+	#
+	# Transfer
+	#
+	
+	def saveDeviceConfig(self):
+		randNb = random.randint(1,100)
+		
+		# Pseudo port ID is a random number for the transfer
+		self.setPortId(randNb)
+		
+		self.snmpset(self.mibs["transfer_init"],1)
+		self.snmpset(self.mibs["transfer_source"],4)
+		self.snmpset(self.mibs["transfer_dest"],3)
+		self.snmpset(self.mibs["transfer_start"],1)
+		
+		return randNb

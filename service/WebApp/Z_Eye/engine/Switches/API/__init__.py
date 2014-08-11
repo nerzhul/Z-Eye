@@ -65,3 +65,12 @@ def setPortMibValue(request):
 					return HttpResponse(SwitchObj.snmpset(Cisco.Mibs[mib],request.GET["value"]))
 					
 	return HttpResponse(_('Err-Wrong-Request'))
+
+def saveDeviceConfig(request):
+	if request.method == "GET" and "vendor" in request.GET and "device" in request.GET:
+		if request.GET["vendor"] == "cisco":
+			SwitchObj = Cisco.CiscoSwitch()
+			if SwitchObj.setDevice(request.GET["device"]):
+				return HttpResponse(SwitchObj.saveDeviceConfig())
+				
+	return HttpResponse(_('Err-Wrong-Request'))
