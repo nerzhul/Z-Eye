@@ -16,6 +16,8 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
+	
+	require_once(dirname(__FILE__)."/../switches/objects.php");
 
 	final class dhcpSubnet extends FSMObj {
 		function __construct() {
@@ -925,7 +927,7 @@
 			$subnet, $leasetime="", $servers=array(),
 			$distrib = 0, $clusterLink=false) {
 
-			$switch = "";
+			$switchName = "";
 			$port = "";
 			$rstate = "";
 
@@ -1001,22 +1003,25 @@
 
 			// If we have a MAC address, then show the switch
 			if (strlen($mac) > 0) {
-				$switch = FS::$dbMgr->GetOneData("node","switch","mac = '".$mac."' AND active = 't'",
-					array("order" => "time_last","ordersens" => 2));
+				if ($switch = FS::$dbMgr->GetOneData("node","switch","mac = '".$mac."' AND active = 't'",
+					array("order" => "time_last","ordersens" => 2))
+				) {
+					$switchName = netDeviceCacheResolver::getDeviceNameByIP($switch);
+				}
 				$port = FS::$dbMgr->GetOneData("node","port","mac = '".$mac."' AND active = 't'",
 					array("order" => "time_last","ordersens" => 2));
 			}
 			// Show switch column only of a switch is here
-			if ($switch) {
-				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
-					"&d=".$switch, $switch) : "");
+			if ($switchName) {
+				$output .= (strlen($switchName) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+					"&d=".$switchName, $switchName) : "");
 			}
 
 			$output .= "</td><td>";
 
-			if ($switch) {
-				$output .= (strlen($switch) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
-					"&d=".$switch."&p=".$port, $port) : "");
+			if ($switchName) {
+				$output .= (strlen($switchName) > 0 ? FS::$iMgr->aLink(FS::$iMgr->getModuleIdByPath("switches").
+					"&d=".$switchName."&p=".$port, $port) : "");
 			}
 
 			$output .= "</td><td>".$leasetime."</td><td>";

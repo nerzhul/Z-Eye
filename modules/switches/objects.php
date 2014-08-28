@@ -16,6 +16,57 @@
 	* along with this program; if not, write to the Free Software
 	* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 	*/
+	
+	/*
+	 * Device cache is useful to store device named for improve performance
+	 */
+	final class netDeviceCacheResolver {
+		private static $cache = array();
+		private static $reversecache = array();
+		private static $sqlTable = "device";
+		
+		public static function getDeviceIPByName($name) {
+			// If cached, return it
+			if (array_key_exists($name, self::$cache)) {
+				return self::$cache[$name];
+			}
+			
+			$ip = FS::$dbMgr->GetOneData(self::$sqlTable,"ip",
+				sprintf("name = '%s'", $name)
+			);
+
+			// Update caches
+			if ($ip) {
+				self::$cache[$name] = $ip;
+				if (!array_key_exists($ip, self::$cache)) {
+					self::$reversecache[$ip] = $name;
+				}
+			}
+		
+			return $ip;
+		}
+		
+		public static function getDeviceNameByIP($ip) {
+			// If cached, return it
+			if (array_key_exists($ip, self::$reversecache)) {
+				return self::$reversecache[$ip];
+			}
+			
+			$name = FS::$dbMgr->GetOneData(self::$sqlTable,"name",
+				sprintf("ip = '%s'", $ip)
+			);
+
+			// Update caches
+			if ($name) {
+				self::$reversecache[$ip] = $name;
+				if (!array_key_exists($name, self::$cache)) {
+					self::$cache[$ip] = $name;
+				}
+			}
+			
+			return $name;
+		}
+	}
 
 	final class netDevice extends FSMObj {
 		function __construct() {

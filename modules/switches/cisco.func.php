@@ -1428,12 +1428,6 @@
 		public function writeMemory() {
 			if($this->devip == "" || $this->snmprw == "")
 				return -1;
-			/*$rand = rand(1,100);
-			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.2.".$rand,"i","1");
-			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.3.".$rand,"i","4");
-			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.4.".$rand,"i","3");
-			snmpset($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.14.".$rand,"i","1");
-			snmpget($this->devip,$this->snmprw,"1.3.6.1.4.1.9.9.96.1.1.1.1.10.".$rand);*/
 			
 			return file_get_contents(
 				sprintf(
