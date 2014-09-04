@@ -18,7 +18,7 @@
 """
 
 from pyPgSQL import PgSQL
-import datetime, re, sys, time, thread, md5
+import datetime, re, sys, time, thread, hashlib
 from ipcalc import Network
 
 import ZEyeUtil, zConfig
@@ -298,7 +298,8 @@ class Manager(ZEyeUtil.Thread):
 
 			# check md5 trace to see if subnet file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (subnetpath,hashCmd))
-			tmpmd52 = md5.new("%s\n" % subnetBuf).hexdigest()
+			tmpmd5 = re.sub("\n", "", tmpmd5)
+			tmpmd52 = hashlib.md5("%s\n" % subnetBuf).hexdigest()
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (subnetBuf,subnetpath))
 				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
@@ -306,7 +307,8 @@ class Manager(ZEyeUtil.Thread):
 			
 			# check md5 trace to see if reserv file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (reservpath,hashCmd))
-			tmpmd52 = md5.new("%s\n" % reservBuf).hexdigest()
+			tmpmd5 = re.sub("\n", "", tmpmd5)
+			tmpmd52 = hashlib.md5("%s\n" % reservBuf).hexdigest()
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (reservBuf,reservpath))
 				ssh.sendCmd("echo 1 > /tmp/dhcprestart")
