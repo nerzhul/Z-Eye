@@ -20,7 +20,7 @@
 """
 
 from pyPgSQL import PgSQL
-import sys, thread, string, time, commands, re, md5
+import sys, thread, string, time, commands, re, hashlib
 
 import dns.query
 import dns.resolver
@@ -625,7 +625,8 @@ class Manager(ZEyeUtil.Thread):
 								
 			# check md5 trace to see if subnet file is different
 			tmpmd5 = ssh.sendCmd("cat %s|%s" % (zeyenamedpath,hashCmd))
-			tmpmd52 = md5.new("%s\n" % cfgbuffer).hexdigest()
+			tmpmd5 = re.sub("\n", "", tmpmd5)
+			tmpmd52 = hashlib.md5("%s\n" % cfgbuffer).hexdigest()
 			if tmpmd5 != tmpmd52:
 				ssh.sendCmd("echo '%s' > %s" % (cfgbuffer,zeyenamedpath))
 				ssh.sendCmd("echo 1 > /tmp/dnsrestart")
